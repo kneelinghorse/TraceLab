@@ -7,6 +7,38 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+The next release is a **major** bump: the removals below break callers of the
+1.2.0 action surface (decision #459, mission ACT-1).
+
+### Removed
+
+- `tracelab_home.attention`, `tracelab_home.inbox_summary` and
+  `tracelab_home.inbox_list`; the API no longer serves `GET /home/attention`,
+  `GET /inbox` or `GET /inbox/summary`.
+- `tracelab_mission.views` (`GET /mission-views` was removed with saved mission
+  views).
+- The `view` and `reason` parameters of `tracelab_mission.list`; the API no
+  longer accepts them.
+- `attention` in the `tracelab_home.snapshot` response (the server dropped it
+  together with `stalled_after_seconds` and the per-mission `reason`).
+
+### Added
+
+- `tracelab_home.activity`: `GET /activity` with optional `page` (1) and
+  `page_size` (20, max 100). One recency-ordered stream of missions, reports and
+  evidence; each item carries `type`, `id`, `title`, `subtitle`, `status`,
+  `occurred_at`, `href`, a caller-relative `new` flag and a canonical `url`.
+  Server `total` and `new_total` are preserved.
+- `tracelab_home.activity_summary`: `GET /activity/summary` with `new_total`
+  and `by_type` counts.
+- `activity` in the `tracelab_home.snapshot` response, linked like the other
+  sections.
+- `tracelab_mission.list` accepts optional `sort` (`created_desc` default,
+  `created_asc`, `updated_desc`, `updated_asc`), forwarded verbatim; omitting it
+  keeps the request URL unchanged.
+- Marking activity as viewed (`PUT /activity/viewed`) stays REST/UI-only, like
+  the inbox mark-seen it replaced.
+
 ## [1.2.0] — 2026-09-15
 
 ### Added

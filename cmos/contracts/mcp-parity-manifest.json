@@ -72,6 +72,55 @@
       "rest_only_by_design_added": 14,
       "destructive_disposition": "no approval recorded",
       "explanation": "Every remaining deferred-MCP-2 and needs-derek row is dispositioned: 11 rows closed by MCP-2 source actions (10 new plus the mission list reason argument), 7 per-user acknowledgement or preference writes and 7 destructive deletes recorded as rest-only-by-design. Tool count stays 9; actions go from 40 to 51 (the planning estimate of 50 counted the reason argument as an action)."
+    },
+    "act1": {
+      "decision": 459,
+      "measured_totals": {
+        "operations": 105,
+        "live": 98,
+        "dead": 7,
+        "tools": 9,
+        "actions": 49,
+        "covered": 20,
+        "closed-MCP-1": 18,
+        "closed-MCP-2": 7,
+        "rest-only-by-design": 53,
+        "dead-client-code": 7
+      },
+      "removed_operations": [
+        "frontend/src/lib/api/home.ts#homeApi.review:PUT:/home/missions/{mission.id}/review",
+        "frontend/src/lib/api/home.ts#homeApi.attention:GET:/home/attention",
+        "frontend/src/lib/api/missionViews.ts#missionViewsApi.create:POST:/mission-views",
+        "frontend/src/lib/api/missionViews.ts#missionViewsApi.delete:DELETE:/mission-views/{id}",
+        "frontend/src/lib/api/missionViews.ts#missionViewsApi.list:GET:/mission-views",
+        "frontend/src/lib/api/missionViews.ts#missionViewsApi.rename:PUT:/mission-views/{id}",
+        "frontend/src/lib/api/inbox.ts#inboxApi.list:GET:/inbox",
+        "frontend/src/lib/api/inbox.ts#inboxApi.markSeen:PUT:/inbox/seen",
+        "frontend/src/lib/api/inbox.ts#inboxApi.summary:GET:/inbox/summary"
+      ],
+      "added_operations": [
+        "frontend/src/lib/api/activity.ts#activityApi.list:GET:/activity",
+        "frontend/src/lib/api/activity.ts#activityApi.markViewed:PUT:/activity/viewed",
+        "frontend/src/lib/api/activity.ts#activityApi.summary:GET:/activity/summary"
+      ],
+      "removed_actions": [
+        "tracelab_home.attention",
+        "tracelab_home.inbox_summary",
+        "tracelab_home.inbox_list",
+        "tracelab_mission.views"
+      ],
+      "added_actions": [
+        "tracelab_home.activity",
+        "tracelab_home.activity_summary"
+      ],
+      "removed_parameters": [
+        "tracelab_mission.list view",
+        "tracelab_mission.list reason"
+      ],
+      "added_parameters": [
+        "tracelab_mission.list sort"
+      ],
+      "explanation": "ACT-1 replaced the inbox, needs-attention, mission reviews and saved mission views with one recency-ordered activity stream. Nine manifest rows left with their API routes (three inbox, four mission-view, home attention and home review); three activity rows were added: list and summary are covered by the two new tracelab_home reads, and the viewed watermark is a per-user preference write kept REST/UI-only. homeApi.get lost its missions-page consumers. Tool count stays 9; actions go from 51 to 49. The package's next release is a major bump."
     }
   },
   "operations": [
@@ -949,7 +998,7 @@
       "id": "frontend/src/lib/api/home.ts#homeApi.favorites:GET:/home/favorites",
       "api_file": "frontend/src/lib/api/home.ts",
       "operation": "homeApi.favorites",
-      "source_line": 41,
+      "source_line": 40,
       "method": "GET",
       "path": "/api/v1/home/favorites",
       "live": true,
@@ -968,25 +1017,23 @@
       "id": "frontend/src/lib/api/home.ts#homeApi.get:GET:/home",
       "api_file": "frontend/src/lib/api/home.ts",
       "operation": "homeApi.get",
-      "source_line": 44,
+      "source_line": 43,
       "method": "GET",
       "path": "/api/v1/home",
       "live": true,
       "ui_consumers": [
-        "frontend/src/pages/index.tsx",
-        "frontend/src/pages/missions/index.tsx",
-        "frontend/src/pages/missions/queue.tsx"
+        "frontend/src/pages/index.tsx"
       ],
       "mcp": "tracelab_home.snapshot",
       "classification": "closed-MCP-1",
       "baseline": "read-gap",
-      "rationale": "Caller-scoped snapshot preserves section totals and server hrefs; no MCP cache."
+      "rationale": "Caller-scoped snapshot preserves section totals and server hrefs; no MCP cache. ACT-1 (decision #459) replaced the attention section with the activity page."
     },
     {
       "id": "frontend/src/lib/api/home.ts#homeApi.pinProject:PUT:/home/favorites/projects/{id}",
       "api_file": "frontend/src/lib/api/home.ts",
       "operation": "homeApi.pinProject",
-      "source_line": 42,
+      "source_line": 41,
       "method": "PUT",
       "path": "/api/v1/home/favorites/projects/{id}",
       "live": true,
@@ -1000,28 +1047,10 @@
       "rationale": "Per-user acknowledgement or preference write. Decisions #395 and #409 make review and acknowledgement explicit human actions, and decision #426 keeps result review, inbox mark-seen, favorites, saved searches and saved views REST/UI-only; an agent must not perform them on the user's behalf."
     },
     {
-      "id": "frontend/src/lib/api/home.ts#homeApi.review:PUT:/home/missions/{mission.id}/review",
-      "api_file": "frontend/src/lib/api/home.ts",
-      "operation": "homeApi.review",
-      "source_line": 45,
-      "method": "PUT",
-      "path": "/api/v1/home/missions/{mission.id}/review",
-      "live": true,
-      "ui_consumers": [
-        "frontend/src/pages/inbox.tsx",
-        "frontend/src/pages/index.tsx",
-        "frontend/src/pages/missions/[id].tsx"
-      ],
-      "mcp": null,
-      "classification": "rest-only-by-design",
-      "baseline": "action-gap",
-      "rationale": "Per-user acknowledgement or preference write. Decisions #395 and #409 make review and acknowledgement explicit human actions, and decision #426 keeps result review, inbox mark-seen, favorites, saved searches and saved views REST/UI-only; an agent must not perform them on the user's behalf."
-    },
-    {
       "id": "frontend/src/lib/api/home.ts#homeApi.unpinProject:DELETE:/home/favorites/projects/{id}",
       "api_file": "frontend/src/lib/api/home.ts",
       "operation": "homeApi.unpinProject",
-      "source_line": 43,
+      "source_line": 42,
       "method": "DELETE",
       "path": "/api/v1/home/favorites/projects/{id}",
       "live": true,
@@ -1159,7 +1188,7 @@
       "mcp": "tracelab_mission.list",
       "classification": "closed-MCP-2",
       "baseline": "partial",
-      "rationale": "MCP-1 closed view forwarding; MCP-2 forwards the repeatable UX-12 reason filter after view and keeps the plain request URL byte-identical."
+      "rationale": "MCP-1 closed view forwarding and MCP-2 the UX-12 reason filter; ACT-1 (decision #459) removed both from the API and forwards the optional sort order last, keeping the plain request URL byte-identical."
     },
     {
       "id": "frontend/src/lib/api/missions.ts#missionsApi.previewContract:GET:/missions/{missionId}/contract-preview",
@@ -1814,143 +1843,56 @@
       "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
     },
     {
-      "id": "frontend/src/lib/api/home.ts#homeApi.attention:GET:/home/attention",
-      "api_file": "frontend/src/lib/api/home.ts",
-      "operation": "homeApi.attention",
+      "id": "frontend/src/lib/api/activity.ts#activityApi.list:GET:/activity",
+      "api_file": "frontend/src/lib/api/activity.ts",
+      "operation": "activityApi.list",
+      "source_line": 27,
       "method": "GET",
-      "path": "/api/v1/home/attention",
+      "path": "/api/v1/activity",
       "live": true,
       "ui_consumers": [
-        "frontend/src/components/missions/MissionDashboards.tsx",
-        "frontend/src/pages/missions/index.tsx",
-        "frontend/src/pages/missions/queue.tsx"
+        "frontend/src/pages/index.tsx"
       ],
-      "classification": "closed-MCP-2",
-      "mcp": "tracelab_home.attention",
-      "rationale": "MCP-2 closes the Sprint 52 read gap: GET /home/attention with the optional project_id scope; requires a human credential.",
-      "source_line": 46
+      "mcp": "tracelab_home.activity",
+      "classification": "covered",
+      "baseline": "act-1-read",
+      "rationale": "ACT-1 (decision #459): GET /activity with page and page_size; one recency-ordered stream of missions, reports and evidence with server total/new_total and hrefs preserved; requires a human credential. Replaces the closed inbox_list and attention reads."
     },
     {
-      "id": "frontend/src/lib/api/missionViews.ts#missionViewsApi.create:POST:/mission-views",
-      "api_file": "frontend/src/lib/api/missionViews.ts",
-      "operation": "missionViewsApi.create",
-      "method": "POST",
-      "path": "/api/v1/mission-views",
-      "live": true,
-      "ui_consumers": [
-        "frontend/src/components/missions/MissionDashboards.tsx",
-        "frontend/src/pages/missions/index.tsx",
-        "frontend/src/pages/missions/queue.tsx"
-      ],
-      "classification": "rest-only-by-design",
-      "mcp": null,
-      "rationale": "Personal saved-view preferences are REST/UI-only by decision 426.",
-      "source_line": 26
-    },
-    {
-      "id": "frontend/src/lib/api/missionViews.ts#missionViewsApi.delete:DELETE:/mission-views/{id}",
-      "api_file": "frontend/src/lib/api/missionViews.ts",
-      "operation": "missionViewsApi.delete",
-      "method": "DELETE",
-      "path": "/api/v1/mission-views/{id}",
-      "live": true,
-      "ui_consumers": [
-        "frontend/src/components/missions/MissionDashboards.tsx",
-        "frontend/src/pages/missions/index.tsx",
-        "frontend/src/pages/missions/queue.tsx"
-      ],
-      "classification": "rest-only-by-design",
-      "mcp": null,
-      "rationale": "Personal saved-view preferences are REST/UI-only by decision 426.",
-      "source_line": 28
-    },
-    {
-      "id": "frontend/src/lib/api/missionViews.ts#missionViewsApi.list:GET:/mission-views",
-      "api_file": "frontend/src/lib/api/missionViews.ts",
-      "operation": "missionViewsApi.list",
-      "method": "GET",
-      "path": "/api/v1/mission-views",
-      "live": true,
-      "ui_consumers": [
-        "frontend/src/components/AppShell.tsx",
-        "frontend/src/components/CommandPalette.tsx",
-        "frontend/src/components/missions/MissionDashboards.tsx",
-        "frontend/src/pages/_app.tsx",
-        "frontend/src/pages/missions/index.tsx",
-        "frontend/src/pages/missions/queue.tsx"
-      ],
-      "classification": "closed-MCP-2",
-      "mcp": "tracelab_mission.views",
-      "rationale": "MCP-2 closes the Sprint 52 read gap: GET /mission-views, read-only with live totals and UI-equivalent links; view writes stay REST/UI-only.",
-      "source_line": 25
-    },
-    {
-      "id": "frontend/src/lib/api/missionViews.ts#missionViewsApi.rename:PUT:/mission-views/{id}",
-      "api_file": "frontend/src/lib/api/missionViews.ts",
-      "operation": "missionViewsApi.rename",
+      "id": "frontend/src/lib/api/activity.ts#activityApi.markViewed:PUT:/activity/viewed",
+      "api_file": "frontend/src/lib/api/activity.ts",
+      "operation": "activityApi.markViewed",
+      "source_line": 29,
       "method": "PUT",
-      "path": "/api/v1/mission-views/{id}",
+      "path": "/api/v1/activity/viewed",
       "live": true,
       "ui_consumers": [
-        "frontend/src/components/missions/MissionDashboards.tsx",
-        "frontend/src/pages/missions/index.tsx",
-        "frontend/src/pages/missions/queue.tsx"
+        "frontend/src/pages/index.tsx",
+        "frontend/src/pages/missions/[id].tsx",
+        "frontend/src/pages/reports/[id].tsx"
       ],
-      "classification": "rest-only-by-design",
       "mcp": null,
-      "rationale": "Personal saved-view preferences are REST/UI-only by decision 426.",
-      "source_line": 27
-    },
-    {
-      "id": "frontend/src/lib/api/inbox.ts#inboxApi.list:GET:/inbox",
-      "api_file": "frontend/src/lib/api/inbox.ts",
-      "operation": "inboxApi.list",
-      "method": "GET",
-      "path": "/api/v1/inbox",
-      "live": true,
-      "ui_consumers": [
-        "frontend/src/pages/inbox.tsx"
-      ],
-      "classification": "closed-MCP-2",
-      "mcp": "tracelab_home.inbox_list",
-      "baseline": "sprint-52-read-gap",
-      "rationale": "MCP-2 closes the UX-13 read gap: GET /inbox with section, page, page_size and unread_only; requires a human credential.",
-      "source_line": 17
-    },
-    {
-      "id": "frontend/src/lib/api/inbox.ts#inboxApi.markSeen:PUT:/inbox/seen",
-      "api_file": "frontend/src/lib/api/inbox.ts",
-      "operation": "inboxApi.markSeen",
-      "method": "PUT",
-      "path": "/api/v1/inbox/seen",
-      "live": true,
-      "ui_consumers": [
-        "frontend/src/pages/inbox.tsx"
-      ],
       "classification": "rest-only-by-design",
-      "mcp": null,
-      "baseline": "sprint-52-preference-write",
-      "rationale": "The per-user inbox seen watermark is an explicit acknowledgement; per-user acknowledgement writes stay REST/UI-only by decision 426.",
-      "source_line": 19
+      "baseline": "act-1-preference-write",
+      "rationale": "The per-user activity viewed watermark is an explicit acknowledgement (it replaced the inbox seen watermark and mission review under decision #459); per-user acknowledgement writes stay REST/UI-only by decisions #426 and #454."
     },
     {
-      "id": "frontend/src/lib/api/inbox.ts#inboxApi.summary:GET:/inbox/summary",
-      "api_file": "frontend/src/lib/api/inbox.ts",
-      "operation": "inboxApi.summary",
+      "id": "frontend/src/lib/api/activity.ts#activityApi.summary:GET:/activity/summary",
+      "api_file": "frontend/src/lib/api/activity.ts",
+      "operation": "activityApi.summary",
+      "source_line": 28,
       "method": "GET",
-      "path": "/api/v1/inbox/summary",
+      "path": "/api/v1/activity/summary",
       "live": true,
       "ui_consumers": [
         "frontend/src/components/AppShell.tsx",
         "frontend/src/components/Navigation.tsx",
-        "frontend/src/pages/_app.tsx",
-        "frontend/src/pages/inbox.tsx"
+        "frontend/src/pages/_app.tsx"
       ],
-      "classification": "closed-MCP-2",
-      "mcp": "tracelab_home.inbox_summary",
-      "baseline": "sprint-52-read-gap",
-      "rationale": "MCP-2 closes the UX-13 read gap: GET /inbox/summary; requires a human credential. Mark-seen stays REST/UI-only.",
-      "source_line": 16
+      "mcp": "tracelab_home.activity_summary",
+      "classification": "covered",
+      "baseline": "act-1-read",
+      "rationale": "ACT-1 (decision #459): GET /activity/summary; new_total and by_type counts behind the caller's viewed watermark; requires a human credential. Replaces the closed inbox_summary read."
     }
   ]
 }

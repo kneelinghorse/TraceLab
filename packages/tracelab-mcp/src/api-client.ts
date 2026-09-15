@@ -544,9 +544,29 @@ export interface ReadEntity { id: string; [field: string]: unknown }
 export interface HrefEntity extends ReadEntity { href: string }
 export interface HomeSection<T> { total: number; items: T[] }
 export interface HomeMission extends ReadEntity { evidence_href?: string | null; report_id?: string | null }
+export type ActivityType = 'mission' | 'report' | 'evidence';
+export interface ActivityItem extends HrefEntity {
+  type: ActivityType;
+  title: string;
+  subtitle: string | null;
+  status: string | null;
+  occurred_at: string;
+  new: boolean;
+}
+export interface ActivityPage {
+  generated_at: string;
+  refresh_seconds: number;
+  page: number;
+  page_size: number;
+  total: number;
+  new_total: number;
+  items: ActivityItem[];
+}
+export interface ActivitySummary { generated_at: string; new_total: number; by_type: Record<string, number> }
+export type MissionSort = 'created_desc' | 'created_asc' | 'updated_desc' | 'updated_asc';
 export interface HomeSnapshot {
   missions: { total: number; by_status: Record<string, number> };
-  attention: HomeSection<HomeMission>;
+  activity: ActivityPage;
   active_runs: HomeSection<HomeMission>;
   recent_reports: HomeSection<HrefEntity>;
   recent_projects: HomeSection<HrefEntity>;
@@ -570,14 +590,6 @@ export interface CollectionMissionSeed {
 }
 export interface EvidenceDetail { entry: EvidenceEntry; links: HrefEntity[] }
 export interface MissionEvent { mission_id?: string; [field: string]: unknown }
-export interface HomeAttention {
-  generated_at: string;
-  stalled_after_seconds: number;
-  total: number;
-  by_reason: Record<string, number>;
-  dashboards: { key: string; total: number }[];
-}
-export type AttentionReason = 'validation_failed' | 'blocked' | 'stalled' | 'unreviewed';
 export interface GraphNeighborhoodQuery { root_type: NavigationEntityType; root_id: string; depth: 1 | 2; per_relation_limit: number; max_nodes: number }
 export interface GraphNode extends ReadEntity { key: string; type: NavigationEntityType; title: string; href: string }
 export interface GraphNeighborhood {
@@ -587,30 +599,12 @@ export interface GraphNeighborhood {
   groups: { from_key: string; relation: string; target_type: NavigationEntityType; total: number; shown: number }[];
   truncated: boolean;
 }
-export interface MissionViewFilters { view?: string; reason?: string[]; status?: string; project_id?: string }
-export interface MissionView extends ReadEntity { name: string; filters: MissionViewFilters; total: number }
-export interface InboxSummary {
-  generated_at: string;
-  refresh_seconds: number;
-  seen_through: string;
-  default_lookback_seconds: number;
-  unread: { failures: number; completions: number; evidence: number; total: number };
-}
-export type InboxSection = 'failures' | 'completions' | 'evidence';
-export interface InboxQuery extends PageQuery { section: InboxSection; unread_only?: boolean }
-export interface InboxPage { section: InboxSection; generated_at: string; seen_through: string; total: number; items: HrefEntity[] }
 export interface ReportPromotionResponse { document_id: string; document_name: string; status: string; message: string; chunk_count?: number | null }
 export interface CollectionUpdate { name?: string; description?: string; instructions?: string }
 export interface ReportUpdate { title?: string; status?: 'draft' | 'final' }
 
 function readQueryParams(options: object): URLSearchParams {
   return new URLSearchParams(Object.entries(options).filter(([, value]) => value !== undefined).map(([key, value]): [string, string] => [key, String(value)]));
-}
-
-/** Append a query only when the UI would; an empty option set keeps the bare path byte-identical. */
-function optionalQuery(options: object): string {
-  const query = readQueryParams(options).toString();
-  return query ? `?${query}` : '';
 }
 
 export class TraceLabClient {
@@ -720,26 +714,20 @@ export class TraceLabClient {
     return this.request<MissionEvent[]>('GET', `/api/v1/missions/events/recent?${readQueryParams(options)}`);
   }
 
-  // Sprint 52 surface reads (MCP-2). Home, inbox and evidence routes reject
+  // Sprint 52 surface reads (MCP-2). Home, activity and evidence routes reject
   // service principals: a human credential is required.
-  async getAttention(options: { project_id?: string }): Promise<HomeAttention> {
-    return this.request<HomeAttention>('GET', `/api/v1/home/attention${optionalQuery(options)}`);
-  }
-
   async getNeighborhood(options: GraphNeighborhoodQuery): Promise<GraphNeighborhood> {
     return this.request<GraphNeighborhood>('GET', `/api/v1/graph/neighborhood?${readQueryParams(options)}`);
   }
 
-  async listMissionViews(): Promise<{ items: MissionView[] }> {
-    return this.request<{ items: MissionView[] }>('GET', '/api/v1/mission-views');
+  // ACT-1 (decision #459): the recency-ordered activity stream that replaced the
+  // inbox, attention and saved mission views. PUT /activity/viewed stays REST/UI-only.
+  async getActivity(options: PageQuery): Promise<ActivityPage> {
+    return this.request<ActivityPage>('GET', `/api/v1/activity?${readQueryParams(options)}`);
   }
 
-  async getInboxSummary(): Promise<InboxSummary> {
-    return this.request<InboxSummary>('GET', '/api/v1/inbox/summary');
-  }
-
-  async listInbox(options: InboxQuery): Promise<InboxPage> {
-    return this.request<InboxPage>('GET', `/api/v1/inbox?${readQueryParams(options)}`);
+  async getActivitySummary(): Promise<ActivitySummary> {
+    return this.request<ActivitySummary>('GET', '/api/v1/activity/summary');
   }
 
   // Non-destructive actions on research objects (MCP-2). Each mirrors the
@@ -1022,8 +1010,7 @@ export class TraceLabClient {
     pageSize = 20,
     status?: string,
     projectId?: string,
-    view?: 'all' | 'attention' | 'queue',
-    reason?: AttentionReason[]
+    sort?: MissionSort
   ): Promise<MissionListResponse> {
     const params = new URLSearchParams({
       page: String(page),
@@ -1035,9 +1022,8 @@ export class TraceLabClient {
     if (projectId) {
       params.set('project_id', projectId);
     }
-    if (view !== undefined) params.set('view', view);
-    // UX-12: repeatable reason filter, appended after view exactly as the UI does.
-    for (const value of reason ?? []) params.append('reason', value);
+    // ACT-1: sort is appended last, exactly as the UI does; omitted keeps the URL unchanged.
+    if (sort !== undefined) params.set('sort', sort);
     return this.request<MissionListResponse>(
       'GET',
       `/api/v1/missions?${params}`

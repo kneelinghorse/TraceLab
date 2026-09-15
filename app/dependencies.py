@@ -14,13 +14,12 @@ from app.adapters.repositories.sqlalchemy_project_repo import SQLAlchemyProjectR
 from app.core.config import settings
 from app.ports.external import EmbeddingPort, LLMPort, VectorDBPort
 from app.ports.graph_neighborhood import GraphNeighborhoodRepository
-from app.ports.mission_views import MissionViewRepository
 from app.ports.navigation_search import NavigationSearchRepository
 from app.ports.repositories import DocumentRepository, MissionRepository, ProjectRepository
+from app.services.activity import ActivityService
 from app.services.admin_stats import AdminStatsService
 from app.services.collection_context import CollectionContextService
 from app.services.home import HomeService
-from app.services.inbox import InboxService
 
 logger = logging.getLogger(__name__)
 
@@ -47,13 +46,6 @@ def get_collection_context_service() -> CollectionContextService:
     return CollectionContextService(SQLAlchemyCollectionContextRepository())
 
 
-def get_mission_view_repository() -> MissionViewRepository:
-    """Wire personal filters to live mission visibility."""
-    from app.adapters.repositories.sqlalchemy_mission_views_repo import SQLAlchemyMissionViewRepository
-
-    return SQLAlchemyMissionViewRepository()
-
-
 def get_home_service() -> HomeService:
     """Wire Home's scoped aggregate repository to its service."""
     from app.adapters.repositories.sqlalchemy_home_repo import SQLAlchemyHomeRepository
@@ -61,11 +53,11 @@ def get_home_service() -> HomeService:
     return HomeService(SQLAlchemyHomeRepository())
 
 
-def get_inbox_service() -> InboxService:
-    """Wire the inbox's scoped sections and watermark repository to its service."""
-    from app.adapters.repositories.sqlalchemy_inbox_repo import SQLAlchemyInboxRepository
+def get_activity_service() -> ActivityService:
+    """Wire the recency stream and per-item viewed marks to their service."""
+    from app.adapters.repositories.sqlalchemy_activity_repo import SQLAlchemyActivityRepository
 
-    return InboxService(SQLAlchemyInboxRepository())
+    return ActivityService(SQLAlchemyActivityRepository())
 
 
 def get_navigation_search_repository() -> NavigationSearchRepository:

@@ -32,7 +32,7 @@ async function invoke(tool: string, args: Record<string, unknown>) {
 const section = (items: unknown[], total = 37) => ({ items, total });
 const home = {
   missions: { total: 83, by_status: { completed: 83 } },
-  attention: section([{ id, evidence_href: `/evidence?project_id=${id}`, title: authored }]),
+  activity: { generated_at: '2026-09-15T00:00:00', refresh_seconds: 30, page: 1, page_size: 20, total: 37, new_total: 2, items: [{ type: 'mission', id, title: authored, subtitle: null, status: 'completed', occurred_at: '2026-09-15T00:00:00', href: `/missions/${id}`, new: true }, { type: 'evidence', id, title: 'run', subtitle: 'mcp-agent', status: null, occurred_at: '2026-09-14T00:00:00', href: `/evidence?project_id=${id}`, new: false }] },
   active_runs: section([{ id }]),
   recent_reports: section([{ id, href: `/reports/${id}`, title: authored }]),
   recent_projects: section([{ id, href: `/projects/${id}` }]),
@@ -121,8 +121,9 @@ describe('MCP-1 read parity', () => {
     const second = await invoke('home', { action: 'snapshot' });
     expect(first.recent_reports.items[0]).toMatchObject(home.recent_reports.items[0]);
     expect(first.recent_reports.items[0].url).toBe(`${web}/reports/${id}`);
-    expect(first.attention.items[0].title).toBe(authored);
-    expect(first.attention.items[0].evidence_href).toBe(home.attention.items[0].evidence_href);
+    expect(first.activity.items[0]).toMatchObject({ ...home.activity.items[0], url: `${web}/missions/${id}` });
+    expect(first.activity.items[1]).toMatchObject({ ...home.activity.items[1], url: `${web}/evidence?project_id=${id}` });
+    expect(first.activity.new_total).toBe(2);
     expect(second.missions.total).toBe(84);
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });

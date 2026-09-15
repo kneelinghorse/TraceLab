@@ -271,9 +271,10 @@ export interface ApiMissionUpdate extends MissionAuthoringFields {
   execution_metadata?: Record<string, unknown>;
 }
 
+export type MissionSort = "created_desc" | "created_asc" | "updated_desc" | "updated_asc";
+
 export interface MissionListParams {
-  reason?: string[];
-  view?: "all" | "attention" | "queue";
+  sort?: MissionSort;
   page?: number;
   page_size?: number;
   status?: MissionStatus;

@@ -14,14 +14,16 @@
  * 3. tracelab_collection       — actions: list, get, export, create, add, synthesize, documents, mission_seed, update, add_document
  * 4. tracelab_report           — actions: create, list, get, export, update
  * 5. tracelab_document         — actions: upload, get_content, list, process
- * 6. tracelab_mission          — actions: create, list, get, update, views (CRUD + saved views)
+ * 6. tracelab_mission          — actions: create, list, get, update (CRUD; list sorts by created/updated)
  * 7. tracelab_mission_execution — actions: submit, status, preview, logs, events, cancel, promote_report (DS-bound lifecycle)
  * 8. tracelab_evidence         — actions: capture, note, list, search, promote, get
- * 9. tracelab_home             — actions: snapshot, favorites, attention, inbox_summary, inbox_list
+ * 9. tracelab_home             — actions: snapshot, favorites, activity, activity_summary
  *
- * MCP-2 (sprint-52): per-user acknowledgements (result review, inbox mark-seen,
- * favorites, saved searches and saved views) and every DELETE route stay
- * REST/UI-only by decision #426; see cmos/contracts/mcp-parity-manifest.json.
+ * MCP-2 (sprint-52): per-user acknowledgements (favorites, saved searches and
+ * the activity viewed watermark) and every DELETE route stay REST/UI-only by
+ * decision #426; see cmos/contracts/mcp-parity-manifest.json. ACT-1 (decision
+ * #459) replaced the inbox, attention, mission reviews and saved mission views
+ * with one recency-ordered activity stream.
  */
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
@@ -403,15 +405,14 @@ export const TOOLS: Tool[] = [
   {
     name: 'tracelab_mission',
     description:
-      'Research mission CRUD. Use tracelab_mission_execution for submit/status/preview/cancel/promote_report (DeepSearch-bound lifecycle). Actions: create, list, get, update, views (saved mission views owned by the caller, with live totals; requires a human credential). list accepts repeatable reason values (validation_failed, blocked, stalled, unreviewed) together with view=attention. project_id is required at create (T41.6) and editable on update (T41.5). action="get" returns slim payload by default; pass include_execution_metadata=true for full execution_metadata/result_protocol/result_markdown (T41.4). Required: action="create" needs mission_id, title, objective, success_criteria, project_id; action="get"/"update" needs mission_id. Related cluster: tracelab_mission_execution.',
+      'Research mission CRUD. Use tracelab_mission_execution for submit/status/preview/cancel/promote_report (DeepSearch-bound lifecycle). Actions: create, list, get, update. list accepts optional sort (created_desc default, created_asc, updated_desc, updated_asc) alongside status, project_id and pagination. project_id is required at create (T41.6) and editable on update (T41.5). action="get" returns slim payload by default; pass include_execution_metadata=true for full execution_metadata/result_protocol/result_markdown (T41.4). Required: action="create" needs mission_id, title, objective, success_criteria, project_id; action="get"/"update" needs mission_id. Related cluster: tracelab_mission_execution.',
     inputSchema: {
       type: 'object',
       properties: {
-        view: { type: 'string', enum: ['all', 'attention', 'queue'], description: 'Scoped list view.' },
-        reason: { type: 'array', items: { type: 'string', enum: ['validation_failed', 'blocked', 'stalled', 'unreviewed'] }, minItems: 1, description: 'list: repeatable attention reasons; requires view=attention.' },
+        sort: { type: 'string', enum: ['created_desc', 'created_asc', 'updated_desc', 'updated_asc'], description: 'list: sort order (default created_desc).' },
         action: {
           type: 'string',
-          enum: ['create', 'list', 'get', 'update', 'views'],
+          enum: ['create', 'list', 'get', 'update'],
           description: 'Mission CRUD action. create: new mission. list: browse with filters. get: full details (slim by default). update: modify before submission.',
         },
         mission_id: {
@@ -715,13 +716,11 @@ export const TOOLS: Tool[] = [
   },
   {
     name: 'tracelab_home',
-    description: 'Caller-scoped home, attention and inbox reads. Server totals are preserved; every request is fresh. A human credential is required (device-code login or a user API key); service principals are rejected. Actions: snapshot (attention, active runs, recent reports/projects and evidence activity), favorites (page, page_size, project_id), attention (reason counts and dashboard totals; optional project_id), inbox_summary (unread counts behind the caller\'s seen watermark), inbox_list (section failures|completions|evidence, page, page_size, unread_only). Marking the inbox as seen and reviewing results stay in the UI (decision #395).',
+    description: 'Caller-scoped home and recent-activity reads. Server totals are preserved; every request is fresh. A human credential is required (device-code login or a user API key); service principals are rejected. Actions: snapshot (recent activity, active runs, recent reports/projects and evidence activity), favorites (page, page_size, project_id), activity (one recency-ordered stream of missions, reports and evidence; page, page_size; each item carries type, id, title, status, occurred_at, href and a new flag relative to the caller\'s viewed watermark), activity_summary (new_total and by_type counts). Marking activity as viewed stays in the UI (decision #459).',
     inputSchema: {
       type: 'object',
       properties: {
-        action: { type: 'string', enum: ['snapshot', 'favorites', 'attention', 'inbox_summary', 'inbox_list'] },
-        section: { type: 'string', enum: ['failures', 'completions', 'evidence'], description: 'inbox_list: required section.' },
-        unread_only: { type: 'boolean', description: 'inbox_list: only items newer than the seen watermark.' },
+        action: { type: 'string', enum: ['snapshot', 'favorites', 'activity', 'activity_summary'] },
         page: { type: 'integer', minimum: 1 },
         page_size: { type: 'integer', minimum: 1, maximum: 100 },
         project_id: { type: 'string', format: 'uuid' },
@@ -925,19 +924,15 @@ const CreateMissionInput = z.object({
   ...MissionAuthoringFieldsSchema,
 });
 
-const AttentionReasonSchema = z.enum(['validation_failed', 'blocked', 'stalled', 'unreviewed']);
+const MissionSortSchema = z.enum(['created_desc', 'created_asc', 'updated_desc', 'updated_asc']);
 
 const ListMissionsInput = z.object({
-  view: z.enum(['all', 'attention', 'queue']).optional(),
-  // UX-12: repeatable attention reasons; the API rejects them without view=attention.
-  reason: z.array(AttentionReasonSchema).min(1).optional(),
+  // ACT-1: explicit sort order; omitted keeps the request URL byte-identical to before.
+  sort: MissionSortSchema.optional(),
   status: z.enum(['draft', 'queued', 'in_progress', 'completed', 'blocked', 'cancelled', 'validation_failed']).optional(),
   project_id: z.string().uuid().optional(),
   page: z.number().min(1).optional().default(1),
   page_size: z.number().min(1).max(100).optional().default(20),
-}).refine((input) => input.reason === undefined || input.view === 'attention', {
-  message: 'reason requires view="attention"',
-  path: ['reason'],
 });
 
 const GetMissionInput = z.object({
@@ -1121,15 +1116,8 @@ const NeighborhoodInput = z.object({
   per_relation_limit: z.number().int().min(1).max(50).default(12),
   max_nodes: z.number().int().min(1).max(150).default(60),
 });
-const AttentionInput = z.object({ project_id: z.string().uuid().optional() });
-const MissionViewsInput = z.object({});
-const InboxSummaryInput = z.object({});
-const InboxListInput = z.object({
-  section: z.enum(['failures', 'completions', 'evidence']),
-  page: z.number().int().min(1).default(1),
-  page_size: z.number().int().min(1).max(100).default(20),
-  unread_only: z.boolean().optional(),
-});
+const ActivityInput = z.object({ ...PageFields });
+const ActivitySummaryInput = z.object({});
 
 // Tool handlers
 async function handleSearchPedr(args: unknown) {
@@ -1930,8 +1918,7 @@ export async function handleListMissions(args: unknown) {
     input.page_size,
     input.status,
     input.project_id,
-    input.view,
-    input.reason
+    input.sort
   );
 
   // T41.4: list responses are always slim — N×full was the original payload
@@ -2215,7 +2202,7 @@ async function handleHomeSnapshot(args: unknown) {
   });
   return rawJsonResponse({
     ...result,
-    attention: { ...result.attention, items: result.attention.items.map(mission) },
+    activity: { ...result.activity, items: result.activity.items.map(withHrefUrl) },
     active_runs: { ...result.active_runs, items: result.active_runs.items.map(mission) },
     recent_reports: { ...result.recent_reports, items: result.recent_reports.items.map(withHrefUrl) },
     recent_projects: { ...result.recent_projects, items: result.recent_projects.items.map(withHrefUrl) },
@@ -2341,35 +2328,18 @@ async function handleNeighborhood(args: unknown) {
   return rawJsonResponse({ ...result, root: withLink(result.root), nodes: result.nodes.map(withLink) });
 }
 
-async function handleAttention(args: unknown) {
-  return rawJsonResponse(await client.getAttention(AttentionInput.parse(args)));
-}
-
-/** Mirror the UI's saved-view link so agents land on the same filtered list. */
-function missionViewHref(filters: import('./api-client.js').MissionViewFilters): string {
-  const params = new URLSearchParams();
-  if (filters.view) params.set('view', filters.view);
-  for (const reason of filters.reason ?? []) params.append('reason', reason);
-  if (filters.status) params.set('status', filters.status);
-  if (filters.project_id) params.set('project_id', filters.project_id);
-  const query = params.toString();
-  return `/missions${query ? `?${query}` : ''}`;
-}
-
-async function handleMissionViews(args: unknown) {
-  MissionViewsInput.parse(args);
-  const result = await client.listMissionViews();
-  return rawJsonResponse({ ...result, items: result.items.map(view => ({ ...view, href: missionViewHref(view.filters), url: new URL(missionViewHref(view.filters), canonicalFrontendOrigin()).href })) });
-}
-
-async function handleInboxSummary(args: unknown) {
-  InboxSummaryInput.parse(args);
-  return rawJsonResponse(await client.getInboxSummary());
-}
-
-async function handleInboxList(args: unknown) {
-  const result = await client.listInbox(InboxListInput.parse(args));
+// ACT-1 (decision #459): one recency-ordered activity stream replaces the
+// inbox, attention, mission reviews and saved mission views. Server hrefs and
+// the caller-relative `new` flag are preserved; marking items viewed stays in
+// the UI.
+async function handleActivity(args: unknown) {
+  const result = await client.getActivity(ActivityInput.parse(args));
   return rawJsonResponse({ ...result, items: result.items.map(withHrefUrl) });
+}
+
+async function handleActivitySummary(args: unknown) {
+  ActivitySummaryInput.parse(args);
+  return rawJsonResponse(await client.getActivitySummary());
 }
 
 async function handleCaptureEvidence(args: unknown) {
@@ -2551,12 +2521,10 @@ export async function handleTracelabDocument(args: unknown) {
   }
 }
 
-const MISSION_ACTIONS = ['create', 'list', 'get', 'update', 'views'] as const;
+const MISSION_ACTIONS = ['create', 'list', 'get', 'update'] as const;
 export async function handleTracelabMission(args: unknown) {
   const action = getAction(args);
   switch (action) {
-    case 'views':
-      return await handleMissionViews(args);
     case 'create':
       return await handleCreateMission(args);
     case 'list':
@@ -2618,15 +2586,14 @@ export async function handleTracelabEvidence(args: unknown) {
   }
 }
 
-const HOME_ACTIONS = ['snapshot', 'favorites', 'attention', 'inbox_summary', 'inbox_list'] as const;
+const HOME_ACTIONS = ['snapshot', 'favorites', 'activity', 'activity_summary'] as const;
 export async function handleTracelabHome(args: unknown) {
   const action = getAction(args);
   switch (action) {
     case 'snapshot': return await handleHomeSnapshot(args);
     case 'favorites': return await handleFavorites(args);
-    case 'attention': return await handleAttention(args);
-    case 'inbox_summary': return await handleInboxSummary(args);
-    case 'inbox_list': return await handleInboxList(args);
+    case 'activity': return await handleActivity(args);
+    case 'activity_summary': return await handleActivitySummary(args);
     default: return unknownAction('tracelab_home', action, HOME_ACTIONS);
   }
 }

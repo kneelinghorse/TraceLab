@@ -166,13 +166,11 @@ def test_harness_pedr1c_routes_match_wired_surface():
         if path.startswith(f"{settings.api_v1_prefix}/collections")
         or path.startswith(f"{settings.api_v1_prefix}/reports")
         or path.startswith(f"{settings.api_v1_prefix}/saved-searches")
-        or path.startswith(f"{settings.api_v1_prefix}/mission-views")
-        or path.startswith(f"{settings.api_v1_prefix}/inbox")
+        or path.startswith(f"{settings.api_v1_prefix}/activity")
         or path in {
             f"{settings.api_v1_prefix}/search/history",
             f"{settings.api_v1_prefix}/search/replay/{{id}}",
             f"{settings.api_v1_prefix}/navigation/search",
-            f"{settings.api_v1_prefix}/home/attention",
             f"{settings.api_v1_prefix}/graph/neighborhood",
             f"{settings.api_v1_prefix}/synthesize",
         }

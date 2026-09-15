@@ -29,9 +29,7 @@ for (const theme of ["light", "dark"] as const) for (const width of [390, 820, 1
       if (method !== "GET") writes.push({ method, path: endpoint, body });
       let response: unknown = {};
       if (endpoint.endsWith("/auth/me")) response = { user_id: "reader", email: "reader@example.test", role: "admin" };
-      else if (endpoint.endsWith("/home/attention")) response = { generated_at: "2026-09-13T00:00:00Z", total: 4, stalled_after_seconds: 3600, by_reason: { validation_failed: 1, blocked: 1, stalled: 1, unreviewed: 1 }, dashboards: [{ key: "at_risk", total: 3 }, { key: "unreviewed", total: 1 }] };
-      else if (endpoint.endsWith("/mission-views")) response = { items: [] };
-      else if (endpoint.endsWith("/home")) response = { missions: { total: 143 }, attention: { total: 4 }, active_runs: { total: 1 } };
+      else if (endpoint.endsWith("/home")) response = { missions: { total: 143 }, active_runs: { total: 1 } };
       else if (endpoint.endsWith("/projects")) response = { data: [{ id: project, name: "Research" }], pagination: { page: 1, pages: 1, total: 1 } };
       else if (endpoint.endsWith("/missions/events/recent")) { expect(url.searchParams.get("mission_id")).toBe("run-1"); response = []; }
       else if (endpoint.endsWith("/logs")) response = [];
@@ -98,6 +96,6 @@ test("queue bookmark permanently redirects and retains filters", async ({ reques
   expect(response.status()).toBe(308);
   const target = new URL(response.headers().location, response.url());
   expect(target.pathname).toBe("/missions");
-  expect(target.searchParams.get("view")).toBe("queue");
+  expect(target.searchParams.get("status")).toBe("queued");
   expect(target.searchParams.get("project_id")).toBe("scope");
 });

@@ -1,4 +1,4 @@
-"""Job views must agree with Home across pages, users and project scopes."""
+"""Mission listing is recency-sorted and scoped; status never floats a row."""
 
 from datetime import datetime, timedelta
 from uuid import uuid4
@@ -40,50 +40,33 @@ def mission(db, status="draft", **kwargs):
     return row
 
 
-def test_views_count_and_order_before_paging_and_match_home(client, db_session):
+def test_list_sorts_by_recency_only_and_counts_before_paging(client, db_session):
     _, headers = actor(db_session)
     now = datetime.utcnow()
-    done = mission(db_session, "completed")
-    stale = mission(db_session, "queued", queued_at=now - timedelta(hours=2))
-    blocked = mission(db_session, "blocked")
-    failed = mission(db_session, "validation_failed")
-    mission(db_session, "in_progress")
-    mission(db_session, "queued", queued_at=now)
-    for _ in range(137):
-        mission(db_session)
+    oldest = mission(db_session, "validation_failed", created_at=now - timedelta(days=9), updated_at=now)
+    middle = mission(db_session, "completed", created_at=now - timedelta(days=5), updated_at=now - timedelta(days=5))
+    newest = mission(db_session, "draft", created_at=now, updated_at=now - timedelta(days=1))
+    # Fillers are older on both clocks; a defaulted updated_at would be later than `now`.
+    for index in range(137):
+        stamp = now - timedelta(days=30 + index)
+        mission(db_session, created_at=stamp, updated_at=stamp)
     db_session.commit()
     home = client.get(HOME, headers=headers).json()
-    first = client.get(API, params={"view": "all", "page_size": 2}, headers=headers).json()
-    second = client.get(API, params={"view": "all", "page_size": 2, "page": 2}, headers=headers).json()
-    assert first["pagination"]["total"] == home["missions"]["total"] == 143
-    assert [r["id"] for r in first["data"] + second["data"]] == [str(r.id) for r in (failed, blocked, stale, done)]
-    attention = client.get(API, params={"view": "attention"}, headers=headers).json()
-    assert attention["pagination"]["total"] == home["attention"]["total"] == 4
-    assert [r["id"] for r in attention["data"]] == [r["id"] for r in home["attention"]["items"]]
-    queue = client.get(API, params={"view": "queue"}, headers=headers).json()
-    assert queue["pagination"]["total"] == 3
-    assert {r["status"] for r in queue["data"]} == {"queued", "in_progress"}
-    # Existing MCP callers without a view keep the established newest-first order.
-    ordinary = client.get(API, params={"page_size": 2}, headers=headers).json()
-    assert all(r["status"] == "draft" for r in ordinary["data"])
-    assert client.get(API, params={"view": "invented"}, headers=headers).status_code == 422
+    first = client.get(API, params={"page_size": 2}, headers=headers).json()
+    second = client.get(API, params={"page_size": 2, "page": 2}, headers=headers).json()
+    assert first["pagination"]["total"] == home["missions"]["total"] == 140
+    assert [r["id"] for r in first["data"] + second["data"]][:3] == [str(newest.id), str(middle.id), str(oldest.id)]
+    updated = client.get(API, params={"sort": "updated_desc", "page_size": 2}, headers=headers).json()
+    assert [r["id"] for r in updated["data"]] == [str(oldest.id), str(newest.id)]
+    ascending = client.get(API, params={"sort": "created_asc", "page_size": 1}, headers=headers).json()
+    assert ascending["data"][0]["id"] != str(newest.id)
+    failed = client.get(API, params={"status": "validation_failed"}, headers=headers).json()
+    assert [r["id"] for r in failed["data"]] == [str(oldest.id)]
+    assert client.get(API, params={"sort": "invented"}, headers=headers).status_code == 422
+    assert client.get(API, params={"view": "attention"}, headers=headers).status_code == 200
 
 
-def test_attention_uses_each_users_explicit_review_and_result_version(client, db_session):
-    _, first = actor(db_session)
-    _, second = actor(db_session)
-    row = mission(db_session, "completed")
-    db_session.commit()
-    payload = client.get(API, params={"view": "attention"}, headers=first).json()["data"][0]
-    assert client.put(f"{HOME}/missions/{row.id}/review", json={"updated_at": payload["updated_at"]}, headers=first).status_code == 204
-    assert client.get(API, params={"view": "attention"}, headers=first).json()["pagination"]["total"] == 0
-    assert client.get(API, params={"view": "attention"}, headers=second).json()["pagination"]["total"] == 1
-    row.updated_at += timedelta(seconds=1)
-    db_session.commit()
-    assert client.get(API, params={"view": "attention"}, headers=first).json()["pagination"]["total"] == 1
-
-
-def test_view_filters_do_not_leak_hidden_projects_or_statuses(client, db_session, monkeypatch):
+def test_filters_do_not_leak_hidden_projects_or_statuses(client, db_session, monkeypatch):
     monkeypatch.setattr(settings, "rbac_enabled", True)
     user, headers = actor(db_session, "member")
     other, _ = actor(db_session, "member")
@@ -95,10 +78,10 @@ def test_view_filters_do_not_leak_hidden_projects_or_statuses(client, db_session
         mission(db_session, "blocked", project_id=project.id, owner_id=owner.id)
         mission(db_session, "queued", project_id=project.id, owner_id=owner.id)
     db_session.commit()
-    body = client.get(API, params={"view": "all", "status": "blocked", "project_id": str(visible.id)}, headers=headers).json()
+    body = client.get(API, params={"status": "blocked", "project_id": str(visible.id)}, headers=headers).json()
     assert body["pagination"]["total"] == 1
     assert str(hidden.id) not in str(body)
-    assert client.get(API, params={"view": "queue", "project_id": str(hidden.id)}, headers=headers).json()["pagination"]["total"] == 0
+    assert client.get(API, params={"project_id": str(hidden.id)}, headers=headers).json()["pagination"]["total"] == 0
 
 
 def test_recent_activity_is_mission_scoped_before_limit_and_authorized(client, db_session, monkeypatch):

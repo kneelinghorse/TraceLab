@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.core.security import AuthenticatedUser
 from app.ports.home import HomeRepository
-from app.schemas.home import HomeAttention, HomeProgress, HomeRecent, HomeResponse, HomeSection
+from app.schemas.home import HomeProgress, HomeRecent, HomeResponse, HomeSection
 
 
 def observed_progress(metadata: object) -> HomeProgress:
@@ -39,9 +39,6 @@ class HomeService:
     def __init__(self, repository: HomeRepository):
         self.repository = repository
 
-    def attention(self, db: Session, user: AuthenticatedUser, *, project_id: UUID | None = None) -> HomeAttention:
-        return self.repository.attention(db, user, now=datetime.now(UTC).replace(tzinfo=None), project_id=project_id)
-
     def snapshot(self, db: Session, user: AuthenticatedUser) -> HomeResponse:
         return self.repository.snapshot(db, user, now=datetime.now(UTC).replace(tzinfo=None))
 
@@ -52,8 +49,3 @@ class HomeService:
 
     def set_favorite(self, db: Session, user: AuthenticatedUser, project_id: UUID, *, favorite: bool) -> None:
         self.repository.set_favorite(db, user, project_id, favorite=favorite)
-
-    def review_completion(self, db: Session, user: AuthenticatedUser, mission_id: UUID, updated_at: datetime) -> None:
-        if updated_at.tzinfo is not None:
-            updated_at = updated_at.astimezone(UTC).replace(tzinfo=None)
-        self.repository.review_completion(db, user, mission_id, updated_at)

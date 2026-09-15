@@ -1,10 +1,12 @@
 """Bounded Home sections with database totals independent of their item limits."""
 
 from datetime import datetime
-from typing import Generic, Literal, TypeVar
+from typing import Generic, TypeVar
 from uuid import UUID
 
 from pydantic import BaseModel, Field
+
+from app.schemas.activity import ActivityPage
 
 T = TypeVar("T")
 
@@ -29,7 +31,6 @@ class HomeMission(BaseModel):
     updated_at: datetime
     started_at: datetime | None
     completed_at: datetime | None
-    reason: Literal["validation_failed", "blocked", "stalled", "unreviewed"] | None = None
     progress: HomeProgress
     report_id: UUID | None
     evidence_count: int
@@ -61,28 +62,11 @@ class HomeMissionTotals(BaseModel):
 class HomeResponse(BaseModel):
     generated_at: datetime
     refresh_seconds: int = 30
-    stalled_after_seconds: int = 3600
     missions: HomeMissionTotals
-    attention: HomeSection[HomeMission]
+    activity: ActivityPage
     active_runs: HomeSection[HomeMission]
     recent_reports: HomeSection[HomeRecent]
     recent_projects: HomeSection[HomeRecent]
     favorites: HomeSection[HomeRecent]
     evidence_activity: HomeSection[HomeEvidenceActivity]
 
-
-class ReviewCompletionRequest(BaseModel):
-    updated_at: datetime
-
-
-class AttentionDashboard(BaseModel):
-    key: Literal["at_risk", "unreviewed"]
-    total: int
-
-
-class HomeAttention(BaseModel):
-    generated_at: datetime
-    stalled_after_seconds: int
-    total: int
-    by_reason: dict[str, int]
-    dashboards: list[AttentionDashboard]

@@ -5,7 +5,7 @@ const mocks = vi.hoisted(() => ({
   auth: { isAuthenticated: true, isReady: true, user: { user_id: "alice", display_name: "Alice", email: "alice@example.test" }, logout: vi.fn() },
   role: { isAdmin: false },
   router: { pathname: "/missions/[id]", push: vi.fn() },
-  inbox: { total: 0 },
+  activity: { mission: 0, evidence: 0, report: 0 },
 }));
 vi.mock("next/router", () => ({ useRouter: () => mocks.router }));
 vi.mock("@/contexts/AuthContext", () => ({ useAuth: () => mocks.auth }));
@@ -13,8 +13,7 @@ vi.mock("@/contexts/RoleContext", () => ({ useRole: () => mocks.role }));
 vi.mock("@/lib/api/navigation", () => ({ navigationApi: { search: async () => ({ groups: [] }) } }));
 vi.mock("@/lib/api/search", () => ({ searchApi: { history: async () => ({ entries: [] }) } }));
 vi.mock("@/lib/api/savedSearches", () => ({ savedSearchesApi: { list: async () => ({ items: [] }) } }));
-vi.mock("@/lib/api/missionViews", async original => ({ ...await original<object>(), missionViewsApi: { list: async () => ({ items: [] }) } }));
-vi.mock("@/lib/api/inbox", async original => ({ ...await original<object>(), inboxApi: { summary: async () => ({ generated_at: "2026-09-13T00:00:00", refresh_seconds: 30, seen_through: "2026-09-13T00:00:00", default_lookback_seconds: 604800, unread: { failures: mocks.inbox.total, completions: 0, evidence: 0, total: mocks.inbox.total } }) } }));
+vi.mock("@/lib/api/activity", async original => ({ ...await original<object>(), activityApi: { summary: async () => ({ generated_at: "2026-09-13T00:00:00", new_total: mocks.activity.mission + mocks.activity.evidence + mocks.activity.report, by_type: { ...mocks.activity } }), markViewed: async () => ({ viewed: 0, new_total: 0 }) } }));
 vi.mock("@/components/LoginPanel", () => ({ LoginPanel: () => <p>Sign in form</p> }));
 vi.mock("@/components/RegisterPanel", () => ({ RegisterPanel: () => <p>Registration form</p> }));
 
@@ -27,7 +26,7 @@ beforeEach(() => {
   localStorage.clear();
   mocks.auth.isAuthenticated = true;
   mocks.role.isAdmin = false;
-  mocks.inbox.total = 0;
+  mocks.activity.mission = 0; mocks.activity.evidence = 0; mocks.activity.report = 0;
   mocks.router.push.mockReset();
   vi.stubGlobal("matchMedia", vi.fn(() => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
   HTMLDialogElement.prototype.showModal = function () { this.setAttribute("open", ""); };
@@ -55,15 +54,17 @@ describe("the shared shell", () => {
     expect(within(nav).getByRole("link", { name: "Relationships" }).getAttribute("href")).toBe("/graph");
   });
 
-  it("carries the unread inbox badge in the toolbar, the sidebar and the drawer, hidden at zero", async () => {
-    mocks.inbox.total = 2;
+  it("shows new-item counts on the Missions, Evidence and Reports entries in the sidebar and the drawer, hidden at zero", async () => {
+    mocks.activity.mission = 2; mocks.activity.evidence = 1;
     shell();
-    expect(await within(screen.getByRole("banner")).findByRole("link", { name: "Inbox, 2 unread" })).toBeTruthy();
     const nav = screen.getByRole("navigation", { name: "Main navigation" });
-    expect(within(nav).getByRole("link", { name: "Inbox, 2 unread" }).getAttribute("href")).toBe("/inbox");
+    expect((await within(nav).findByRole("link", { name: "Missions, 2 new" })).getAttribute("href")).toBe("/missions");
+    expect(within(nav).getByRole("link", { name: "Evidence, 1 new" }).getAttribute("href")).toBe("/evidence");
+    expect(within(nav).getByRole("link", { name: "Reports", exact: true })).toBeTruthy();
+    expect(within(screen.getByRole("banner")).queryByRole("link", { name: /Inbox/ })).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Open navigation" }));
-    expect(within(screen.getByRole("dialog", { name: "Navigation" })).getByRole("link", { name: "Inbox, 2 unread" })).toBeTruthy();
-    expect(screen.getAllByTestId("inbox-unread").map((badge) => badge.textContent)).toEqual(["2", "2", "2"]);
+    expect(within(screen.getByRole("dialog", { name: "Navigation" })).getByRole("link", { name: "Missions, 2 new" })).toBeTruthy();
+    expect(screen.getAllByTestId("new-count").map((badge) => badge.textContent)).toEqual(["1", "2", "1", "2"]);
     expect(within(nav).queryByRole("link", { name: "Inbox", exact: true })).toBeNull();
   });
 

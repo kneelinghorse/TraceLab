@@ -1,4 +1,4 @@
-"""One ledger read scope shared by Home and the inbox, so the two cannot drift apart."""
+"""One ledger read scope shared by Home and the activity stream, so the two cannot drift apart."""
 
 from typing import Any
 from urllib.parse import urlencode

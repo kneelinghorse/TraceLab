@@ -38,6 +38,11 @@ function lastRequest() {
 async function rejects(tool: string, args: Record<string, unknown>) {
   await expect(dispatch(`tracelab_${tool}`)!(args)).rejects.toThrow();
 }
+async function unknownAction(tool: string, action: string) {
+  const response = await dispatch(`tracelab_${tool}`)!({ action });
+  expect(response).toMatchObject({ isError: true });
+  expect(response.content[0].text).toContain(`Unknown action "${action}"`);
+}
 
 describe('MCP-2 non-destructive actions', () => {
   it('cancel sends only status=cancelled through PATCH and rejects every other status', async () => {
@@ -118,49 +123,56 @@ describe('MCP-2 Sprint 52 surface reads', () => {
     await rejects('project', { action: 'neighborhood', root_type: 'chunk', root_id: id });
   });
 
-  it('attention keeps the bare route without a project and scopes it with one', async () => {
-    const attention = { generated_at: '2026-09-15T00:00:00', stalled_after_seconds: 3600, total: 5, by_reason: { validation_failed: 1, blocked: 1, stalled: 1, unreviewed: 2 }, dashboards: [{ key: 'at_risk', total: 3 }, { key: 'unreviewed', total: 2 }] };
-    respond(attention);
-    expect(await invoke('home', { action: 'attention' })).toEqual(attention);
-    expect(lastRequest().url).toBe(`${base}/api/v1/home/attention`);
-    respond(attention);
-    await invoke('home', { action: 'attention', project_id: id });
-    expect(lastRequest().url).toBe(`${base}/api/v1/home/attention?project_id=${id}`);
-  });
-
-  it('mission list forwards repeatable reasons after view and keeps the plain URL byte-identical', async () => {
+  // ACT-1 (decision #459): the recency-ordered activity stream replaced the
+  // inbox, attention, mission reviews and saved mission views.
+  it('mission list forwards sort after the UI filters and keeps the plain URL byte-identical', async () => {
     const page = { data: [], pagination: { page: 1, page_size: 20, total: 0, pages: 0 } };
     respond(page);
     await invoke('mission', { action: 'list' });
     expect(lastRequest().url).toBe(`${base}/api/v1/missions?page=1&page_size=20`);
+    for (const sort of ['created_desc', 'created_asc', 'updated_desc', 'updated_asc']) {
+      respond(page);
+      await invoke('mission', { action: 'list', status: 'completed', project_id: id, sort });
+      expect(lastRequest().url).toBe(`${base}/api/v1/missions?page=1&page_size=20&status=completed&project_id=${id}&sort=${sort}`);
+    }
+    await rejects('mission', { action: 'list', sort: 'title_asc' });
+    // The removed 1.2.0 view/reason inputs never reach the API any more.
     respond(page);
-    await invoke('mission', { action: 'list', view: 'attention', reason: ['blocked', 'stalled'], project_id: id });
-    expect(lastRequest().url).toBe(`${base}/api/v1/missions?page=1&page_size=20&project_id=${id}&view=attention&reason=blocked&reason=stalled`);
-    await rejects('mission', { action: 'list', reason: ['blocked'] });
-    await rejects('mission', { action: 'list', view: 'queue', reason: ['blocked'] });
-    await rejects('mission', { action: 'list', view: 'attention', reason: ['invented'] });
+    await invoke('mission', { action: 'list', view: 'attention', reason: ['blocked'] });
+    expect(lastRequest().url).toBe(`${base}/api/v1/missions?page=1&page_size=20`);
+    await unknownAction('mission', 'views');
+    expect(fetchMock).toHaveBeenCalledTimes(6);
+  });
+
+  it('activity pages the recency-ordered stream and links every item type', async () => {
+    const items = [
+      { type: 'mission', id, title: authored, subtitle: 'R-1', status: 'completed', occurred_at: '2026-09-15T00:00:00', href: `/missions/${id}`, new: true },
+      { type: 'report', id: other, title: 'Report', subtitle: null, status: 'final', occurred_at: '2026-09-14T23:00:00', href: `/reports/${other}`, new: false },
+      { type: 'evidence', id, title: 'run', subtitle: 'mcp-agent', status: null, occurred_at: '2026-09-14T22:00:00', href: `/evidence?project_id=${id}&mission_id=${other}&session_key=run`, new: true },
+    ];
+    respond({ generated_at: '2026-09-15T00:00:00.123456', refresh_seconds: 30, page: 1, page_size: 20, total: 59, new_total: 2, items });
+    const page = await invoke('home', { action: 'activity' });
+    expect(lastRequest()).toMatchObject({ url: `${base}/api/v1/activity?page=1&page_size=20`, method: 'GET' });
+    expect(page).toMatchObject({ total: 59, new_total: 2, refresh_seconds: 30 });
+    expect(page.items).toEqual([
+      { ...items[0], url: `${web}/missions/${id}` },
+      { ...items[1], url: `${web}/reports/${other}` },
+      { ...items[2], url: `${web}/evidence?project_id=${id}&mission_id=${other}&session_key=run` },
+    ]);
+    respond({ generated_at: '2026-09-15T00:00:00', refresh_seconds: 30, page: 3, page_size: 5, total: 59, new_total: 0, items: [] });
+    await invoke('home', { action: 'activity', page: 3, page_size: 5 });
+    expect(lastRequest().url).toBe(`${base}/api/v1/activity?page=3&page_size=5`);
+    await rejects('home', { action: 'activity', page: 0 });
+    await rejects('home', { action: 'activity', page_size: 101 });
+    for (const action of ['attention', 'inbox_summary', 'inbox_list']) await unknownAction('home', action);
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
-  it('views returns saved mission views with live totals and UI-equivalent links', async () => {
-    respond({ items: [{ id, name: authored, entity_type: 'missions', filters: { view: 'attention', reason: ['blocked', 'stalled'], project_id: other }, total: 83, created_at: '2026-09-14T00:00:00', updated_at: '2026-09-14T00:00:00' }, { id: other, name: 'Everything', entity_type: 'missions', filters: {}, total: 4 }] });
-    const value = await invoke('mission', { action: 'views' });
-    expect(lastRequest()).toMatchObject({ url: `${base}/api/v1/mission-views`, method: 'GET' });
-    expect(value.items[0]).toMatchObject({ name: authored, total: 83, href: `/missions?view=attention&reason=blocked&reason=stalled&project_id=${other}`, url: `${web}/missions?view=attention&reason=blocked&reason=stalled&project_id=${other}` });
-    expect(value.items[1]).toMatchObject({ href: '/missions', url: `${web}/missions` });
-  });
-
-  it('inbox_summary and inbox_list use the scoped inbox routes and link items', async () => {
-    const summary = { generated_at: '2026-09-15T00:00:00.123456', refresh_seconds: 30, seen_through: '2026-09-08T00:00:00', default_lookback_seconds: 604800, unread: { failures: 0, completions: 4, evidence: 6, total: 10 } };
+  it('activity_summary uses the bare summary route and keeps server counts', async () => {
+    const summary = { generated_at: '2026-09-15T00:00:00.123456', new_total: 10, by_type: { mission: 4, report: 0, evidence: 6 } };
     respond(summary);
-    expect(await invoke('home', { action: 'inbox_summary' })).toEqual(summary);
-    expect(lastRequest().url).toBe(`${base}/api/v1/inbox/summary`);
-    respond({ section: 'evidence', generated_at: summary.generated_at, seen_through: summary.seen_through, total: 59, items: [{ section: 'evidence', id: `${id}:${other}:run:mcp-agent`, title: 'run', label: 'mcp-agent', occurred_at: '2026-09-14T23:00:00', unread: true, href: `/evidence?project_id=${id}&mission_id=${other}&session_key=run`, entry_count: 12 }] });
-    const page = await invoke('home', { action: 'inbox_list', section: 'evidence', unread_only: true });
-    expect(lastRequest().url).toBe(`${base}/api/v1/inbox?section=evidence&page=1&page_size=20&unread_only=true`);
-    expect(page.total).toBe(59);
-    expect(page.items[0]).toMatchObject({ entry_count: 12, href: `/evidence?project_id=${id}&mission_id=${other}&session_key=run`, url: `${web}/evidence?project_id=${id}&mission_id=${other}&session_key=run` });
-    await rejects('home', { action: 'inbox_list' });
-    await rejects('home', { action: 'inbox_list', section: 'everything' });
+    expect(await invoke('home', { action: 'activity_summary' })).toEqual(summary);
+    expect(lastRequest()).toMatchObject({ url: `${base}/api/v1/activity/summary`, method: 'GET' });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });

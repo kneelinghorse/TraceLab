@@ -52,10 +52,10 @@ Version 1.2.0 exposes nine action-clustered tools / 51 actions:
 | `tracelab_collection` | `list`, `get`, `export`, `create`, `add`, `synthesize`, `documents`, `mission_seed`, `update`, `add_document` |
 | `tracelab_report` | `create`, `list`, `get`, `export`, `update` |
 | `tracelab_document` | `upload`, `get_content`, `list`, `process` |
-| `tracelab_mission` | `create`, `list`, `get`, `update`, `views` |
+| `tracelab_mission` | `create`, `list`, `get`, `update` |
 | `tracelab_mission_execution` | `submit`, `status`, `preview`, `logs`, `events`, `cancel`, `promote_report` |
 | `tracelab_evidence` | `capture`, `note`, `list`, `search`, `promote`, `get` |
-| `tracelab_home` | `snapshot`, `favorites`, `attention`, `inbox_summary`, `inbox_list` |
+| `tracelab_home` | `snapshot`, `favorites`, `activity`, `activity_summary` |
 
 
 Sprint 52 additions ship in **1.2.0**, the single publish that decision #425

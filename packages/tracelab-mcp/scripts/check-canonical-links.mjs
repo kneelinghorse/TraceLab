@@ -61,7 +61,9 @@ route('POST', '/evidence/promote', { project_id: ids.project, report_id: ids.rep
 const section = items => ({ total: 83, items });
 const recentProject = { id: ids.project, title: 'Project', href: `/projects/${ids.project}` };
 const recentReport = { id: ids.report, title: markdown, href: `/reports/${ids.report}` };
-const home = { missions: { total: 83, by_status: { completed: 83 } }, attention: section([{ ...mission, evidence_href: `/evidence?project_id=${ids.project}` }]), active_runs: section([mission]), recent_reports: section([recentReport]), recent_projects: section([recentProject]), favorites: section([recentProject]), evidence_activity: section([{ project_id: ids.project, href: `/evidence?project_id=${ids.project}` }]) };
+const activityItems = [{ type: 'mission', id: ids.mission, title: markdown, subtitle: mission.mission_id, status: 'completed', occurred_at: '2026-09-14T00:00:00', href: `/missions/${ids.mission}`, new: true }, { type: 'report', id: ids.report, title: markdown, subtitle: null, status: 'final', occurred_at: '2026-09-13T23:00:00', href: `/reports/${ids.report}`, new: false }, { type: 'evidence', id: ids.evidence, title: 'run', subtitle: 'mcp-agent', status: null, occurred_at: '2026-09-13T22:00:00', href: `/evidence?project_id=${ids.project}`, new: true }];
+const activity = { generated_at: '2026-09-14T00:00:00.123456', refresh_seconds: 30, page: 1, page_size: 20, total: 83, new_total: 2, items: activityItems };
+const home = { missions: { total: 83, by_status: { completed: 83 } }, activity, active_runs: section([mission]), recent_reports: section([recentReport]), recent_projects: section([recentProject]), favorites: section([recentProject]), evidence_activity: section([{ project_id: ids.project, href: `/evidence?project_id=${ids.project}` }]) };
 const seed = { collection_id: ids.collection, project_id: ids.project, background: markdown, references: [{ document_id: ids.document, title: markdown, href: `/documents/${ids.document}`, url: archivedUrl }], context: { references } };
 const jsonExport = '{\n "content": "Keep exact JSON whitespace"\n}\n';
 route('GET', '/home', home);
@@ -75,17 +77,13 @@ route('GET', `/collections/${ids.collection}/mission-seed`, seed);
 route('GET', `/missions/${ids.mission}/logs`, [{ id: ids.note, message: markdown }]);
 route('GET', '/missions/events/recent', [{ mission_id: ids.mission, event_type: 'mission.completed', details: { references } }]);
 // MCP-2 (sprint-52): Sprint 52 surface reads and non-destructive actions.
-const attention = { generated_at: '2026-09-14T00:00:00', stalled_after_seconds: 3600, total: 83, by_reason: { validation_failed: 1, blocked: 2, stalled: 3, unreviewed: 77 }, dashboards: [{ key: 'at_risk', total: 6 }, { key: 'unreviewed', total: 77 }] };
 const neighborhoodNode = kind => ({ key: `${kind}:${ids[kind]}`, type: kind, id: ids[kind], title: markdown, href: `/${kind === 'evidence' ? kind : kind + 's'}/${ids[kind]}`, attributes: {} });
 const neighborhood = { root: neighborhoodNode('project'), nodes: ['project', 'document', 'collection', 'mission', 'report', 'evidence'].map(neighborhoodNode), edges: [{ from: `project:${ids.project}`, to: `document:${ids.document}`, relation: 'documents', basis: 'persisted fixture relationship' }], groups: [{ from_key: `project:${ids.project}`, relation: 'documents', target_type: 'document', total: 83, shown: 1 }], truncated: true };
-const savedView = { id: ids.note, name: markdown, entity_type: 'missions', filters: { view: 'attention', reason: ['blocked', 'stalled'], project_id: ids.project }, total: 83, created_at: '2026-09-14T00:00:00', updated_at: '2026-09-14T00:00:00' };
-const inboxSummary = { generated_at: '2026-09-14T00:00:00.123456', refresh_seconds: 30, seen_through: '2026-09-13T00:00:00', default_lookback_seconds: 604800, unread: { failures: 1, completions: 2, evidence: 3, total: 6 } };
-const inboxItem = { section: 'completions', id: ids.mission, title: markdown, label: mission.mission_id, status: 'completed', occurred_at: '2026-09-13T22:00:00', updated_at: '2026-09-13T22:00:00', unread: true, href: `/missions/${ids.mission}`, reviewed: false };
+// ACT-1 (decision #459): the activity stream replaced attention, inbox and saved mission views.
+const activitySummary = { generated_at: activity.generated_at, new_total: 6, by_type: { mission: 1, report: 2, evidence: 3 } };
 route('GET', '/graph/neighborhood', neighborhood);
-route('GET', '/home/attention', attention);
-route('GET', '/mission-views', { items: [savedView] });
-route('GET', '/inbox/summary', inboxSummary);
-route('GET', '/inbox', { section: 'completions', generated_at: inboxSummary.generated_at, seen_through: inboxSummary.seen_through, total: 83, items: [inboxItem] });
+route('GET', '/activity', activity);
+route('GET', '/activity/summary', activitySummary);
 route('POST', `/missions/${ids.mission}/promote-report`, { document_id: ids.document, document_name: markdown, status: 'completed', message: 'Promoted', chunk_count: 3 });
 route('POST', `/documents/${ids.document}/process`, { document_id: ids.document, status: 'processing', message: markdown });
 route('PUT', `/collections/${ids.collection}`, collection);
@@ -137,7 +135,7 @@ try {
   await client.connect(transport);
   const tools = (await client.listTools()).tools;
   assert.equal(tools.length, 9);
-  assert.equal(tools.reduce((count, tool) => count + tool.inputSchema.properties.action.enum.length, 0), 51, 'MCP-2 action count');
+  assert.equal(tools.reduce((count, tool) => count + tool.inputSchema.properties.action.enum.length, 0), 49, 'ACT-1 action count (51 MCP-2 actions minus attention, inbox_summary, inbox_list and views, plus activity and activity_summary)');
   await check('search', { action: 'knowledge', query: 'provenance' }, ['POST /retrieval/search'], { 'results.0.document_url': url('document') });
   await check('project', { action: 'list' }, ['GET /projects'], { 'projects.0.url': url('project') });
   await check('project', { action: 'create', name: 'Project' }, ['POST /projects'], { 'project.url': url('project') });
@@ -168,7 +166,7 @@ try {
   await check('evidence', { action: 'note', project_id: ids.project, session_key: 'test', note_key: 'working', content: markdown }, ['PUT /evidence/notes/working'], { project_url: url('project') }, value => assert.equal(value.content, markdown));
   await check('evidence', { action: 'promote', project_id: ids.project, session_key: 'test', target: 'document' }, ['POST /evidence/promote'], { report_url: url('report'), document_url: url('document') });
 
-  await check('home', { action: 'snapshot' }, ['GET /home'], { 'attention.items.0.url': url('mission'), 'recent_reports.items.0.url': url('report'), 'recent_projects.items.0.url': url('project'), 'favorites.items.0.url': url('project'), 'evidence_activity.items.0.url': `${web}/evidence?project_id=${ids.project}` }, value => { assert.equal(value.missions.total, 83); assert.equal(value.recent_reports.items[0].title, markdown); assert.equal(value.recent_reports.items[0].href, recentReport.href); }, ['']);
+  await check('home', { action: 'snapshot' }, ['GET /home'], { 'activity.items.0.url': url('mission'), 'activity.items.1.url': url('report'), 'activity.items.2.url': `${web}/evidence?project_id=${ids.project}`, 'recent_reports.items.0.url': url('report'), 'recent_projects.items.0.url': url('project'), 'favorites.items.0.url': url('project'), 'evidence_activity.items.0.url': `${web}/evidence?project_id=${ids.project}` }, value => { assert.equal(value.missions.total, 83); assert.equal(value.activity.new_total, 2); assert.equal(value.activity.items[0].title, markdown); assert.equal(value.activity.items[0].new, true); assert.equal(value.recent_reports.items[0].title, markdown); assert.equal(value.recent_reports.items[0].href, recentReport.href); }, ['']);
   await check('home', { action: 'favorites', page: 2, page_size: 3, project_id: ids.project }, ['GET /home/favorites'], { 'items.0.url': url('project') }, value => assert.equal(value.total, 83), [`page=2&page_size=3&project_id=${ids.project}`]);
   await check('search', { action: 'navigate', q: 'A & B', entity_type: 'document', page: 2, page_size: 3 }, ['GET /navigation/search'], { 'groups.0.items.0.url': url('document') }, value => { assert.equal(value.groups[0].total, 83); assert.equal(value.groups[0].items[0].href, `/documents/${ids.document}`); }, ['q=A+%26+B&entity_type=document&page=2&page_size=3']);
   await check('evidence', { action: 'get', entry_id: ids.evidence }, [`GET /evidence/${ids.evidence}`], { 'entry.url': url('evidence'), 'links.0.url': url('report') }, value => assert.equal(value.entry.source_url, archivedUrl), ['']);
@@ -178,7 +176,7 @@ try {
   await check('collection', { action: 'mission_seed', collection_id: ids.collection }, [`GET /collections/${ids.collection}/mission-seed`], { url: url('collection'), project_url: url('project'), 'references.0.document_url': url('document') }, value => { assert.equal(value.background, markdown); assert.deepEqual(value.references, [{ ...seed.references[0], document_url: url('document') }]); assert.deepEqual(value.context, seed.context); }, ['']);
   await check('mission_execution', { action: 'logs', mission_id: ids.mission, limit: 3 }, [`GET /missions/${ids.mission}/logs`], { url: url('mission'), 'logs.0.url': url('mission') }, value => { assert.equal(value.empty, false); assert.equal(value.logs[0].message, markdown); }, ['limit=3']);
   await check('mission_execution', { action: 'events', mission_id: ids.mission, limit: 3 }, ['GET /missions/events/recent'], { 'events.0.url': url('mission') }, value => { assert.equal(value.empty, false); assert.deepEqual(value.events[0].details.references, references); }, [`mission_id=${ids.mission}&limit=3`]);
-  await check('mission', { action: 'list', project_id: ids.project, view: 'attention', page: 2, page_size: 3 }, ['GET /missions'], {}, undefined, [`page=2&page_size=3&project_id=${ids.project}&view=attention`]);
+  await check('mission', { action: 'list', project_id: ids.project, sort: 'updated_desc', page: 2, page_size: 3 }, ['GET /missions'], {}, undefined, [`page=2&page_size=3&project_id=${ids.project}&sort=updated_desc`]);
   await check('collection', { action: 'list', project_id: ids.project, page: 2, page_size: 3 }, ['GET /collections'], {}, undefined, [`project_id=${ids.project}&page=2&page_size=3`]);
   await check('collection', { action: 'get', collection_id: ids.collection }, [`GET /collections/${ids.collection}`], {}, value => assert.equal(value.instructions, markdown), ['']);
   await check('collection', { action: 'create', name: 'Collection', instructions: markdown }, ['POST /collections'], {}, value => { assert.equal(calls.at(-1).body.instructions, markdown); assert.equal(value.collection.instructions, markdown); }, ['']);
@@ -204,12 +202,9 @@ try {
   await check('collection', { action: 'add_document', collection_id: ids.collection, document_id: ids.document }, [`POST /collections/${ids.collection}/documents`], { url: url('document'), collection_url: url('collection') }, value => { assert.deepEqual(calls.at(-1).body, { document_id: ids.document }); assert.equal(value.name, markdown); }, ['']);
   await check('report', { action: 'update', report_id: ids.report, title: 'Report', status: 'final' }, [`PUT /reports/${ids.report}`], { 'report.url': url('report') }, value => { assert.deepEqual(calls.at(-1).body, { title: 'Report', status: 'final' }); assert.equal(value.report.content, markdown); }, ['']);
   await check('project', { action: 'neighborhood', root_type: 'project', root_id: ids.project, depth: 2 }, ['GET /graph/neighborhood'], { 'root.url': url('project'), 'nodes.1.url': url('document'), 'nodes.2.url': url('collection'), 'nodes.3.url': url('mission'), 'nodes.4.url': url('report'), 'nodes.5.url': url('evidence') }, value => { assert.equal(value.groups[0].total, 83); assert.equal(value.nodes[0].title, markdown); assert.equal(value.truncated, true); }, [`root_type=project&root_id=${ids.project}&depth=2&per_relation_limit=12&max_nodes=60`]);
-  await check('home', { action: 'attention' }, ['GET /home/attention'], {}, value => assert.equal(value.total, 83), ['']);
-  await check('home', { action: 'attention', project_id: ids.project }, ['GET /home/attention'], {}, undefined, [`project_id=${ids.project}`]);
-  await check('mission', { action: 'list', view: 'attention', reason: ['blocked', 'stalled'], page: 2, page_size: 3 }, ['GET /missions'], {}, undefined, ['page=2&page_size=3&view=attention&reason=blocked&reason=stalled']);
-  await check('mission', { action: 'views' }, ['GET /mission-views'], { 'items.0.url': `${web}/missions?view=attention&reason=blocked&reason=stalled&project_id=${ids.project}` }, value => { assert.equal(value.items[0].total, 83); assert.equal(value.items[0].name, markdown); }, ['']);
-  await check('home', { action: 'inbox_summary' }, ['GET /inbox/summary'], {}, value => assert.deepEqual(value.unread, inboxSummary.unread), ['']);
-  await check('home', { action: 'inbox_list', section: 'completions', page: 2, page_size: 3, unread_only: true }, ['GET /inbox'], { 'items.0.url': url('mission') }, value => { assert.equal(value.total, 83); assert.equal(value.items[0].title, markdown); assert.equal(value.items[0].href, `/missions/${ids.mission}`); }, ['section=completions&page=2&page_size=3&unread_only=true']);
+  // ACT-1 (decision #459): recent-activity reads.
+  await check('home', { action: 'activity', page: 2, page_size: 3 }, ['GET /activity'], { 'items.0.url': url('mission'), 'items.1.url': url('report'), 'items.2.url': `${web}/evidence?project_id=${ids.project}` }, value => { assert.equal(value.total, 83); assert.equal(value.new_total, 2); assert.equal(value.items[0].title, markdown); assert.equal(value.items[0].href, `/missions/${ids.mission}`); assert.equal(value.items[0].new, true); }, ['page=2&page_size=3']);
+  await check('home', { action: 'activity_summary' }, ['GET /activity/summary'], {}, value => { assert.equal(value.new_total, 6); assert.deepEqual(value.by_type, activitySummary.by_type); }, ['']);
   console.log(JSON.stringify({ passed: checks.length, generatedLinks: checks.reduce((sum, row) => sum + row.links, 0), httpRequests: calls.length, checks }, null, 2));
 } finally {
   await client.close();
