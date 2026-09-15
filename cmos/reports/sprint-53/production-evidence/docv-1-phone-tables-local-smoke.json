@@ -1,0 +1,314 @@
+[
+  {
+    "route": "/documents/d44bec3e-f665-439d-bc78-bc5385a4610d",
+    "themeRequested": "light",
+    "theme": "light",
+    "width": 1440,
+    "status": 200,
+    "finalUrl": "http://127.0.0.1:3100/documents/d44bec3e-f665-439d-bc78-bc5385a4610d",
+    "scrollWidth": 1440,
+    "mainCount": 1,
+    "shellPresent": true,
+    "background": "lab(98.2501 -0.0584126 -0.886416)",
+    "overflow": [],
+    "violations": [],
+    "internalLinks": [
+      "/",
+      "/admin/observability",
+      "/admin/spaces",
+      "/admin/users",
+      "/collections",
+      "/documents",
+      "/documents/d44bec3e-f665-439d-bc78-bc5385a4610d",
+      "/evidence",
+      "/graph",
+      "/missions",
+      "/missions/27cbe849-a801-49ef-8cb5-bfa891ade2bd",
+      "/projects",
+      "/projects/59f606db-9db8-4ba9-a200-c9b66c650f2a",
+      "/reports",
+      "/reports/1ff22d77-fb90-4220-8d74-34fd5526dab7",
+      "/saved-searches",
+      "/search",
+      "/settings"
+    ],
+    "legacyInternalLinks": [],
+    "errors": [],
+    "transportErrors": [],
+    "navigationCancellations": [],
+    "suppressedWrites": [],
+    "screenshot": "light-1440-_documents_d44bec3e-f665-439d-bc78-bc5385a4610d.png"
+  },
+  {
+    "route": "/documents/d44bec3e-f665-439d-bc78-bc5385a4610d",
+    "themeRequested": "light",
+    "theme": "light",
+    "width": 390,
+    "status": 200,
+    "finalUrl": "http://127.0.0.1:3100/documents/d44bec3e-f665-439d-bc78-bc5385a4610d",
+    "scrollWidth": 390,
+    "mainCount": 1,
+    "shellPresent": true,
+    "background": "lab(98.2501 -0.0584126 -0.886416)",
+    "overflow": [
+      {
+        "tag": "TABLE",
+        "class": "min-w-full border border-line rounded-lg",
+        "text": "EntityWhat it recordsRationale / alternatives"
+      },
+      {
+        "tag": "THEAD",
+        "class": "",
+        "text": "EntityWhat it recordsRationale / alternatives"
+      },
+      {
+        "tag": "TR",
+        "class": "",
+        "text": "EntityWhat it recordsRationale / alternatives"
+      },
+      {
+        "tag": "TH",
+        "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+        "text": "Rationale / alternatives"
+      },
+      {
+        "tag": "TH",
+        "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+        "text": "Applicability conditions"
+      },
+      {
+        "tag": "TH",
+        "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+        "text": "Evidence behind decision"
+      },
+      {
+        "tag": "TH",
+        "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+        "text": "Revision history"
+      },
+      {
+        "tag": "TBODY",
+        "class": "",
+        "text": "design rationale (field)Arguments/reasons beh"
+      },
+      {
+        "tag": "TR",
+        "class": "",
+        "text": "design rationale (field)Arguments/reasons beh"
+      },
+      {
+        "tag": "TD",
+        "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+        "text": "Yes, in QOC/IBIS-derived forms"
+      },
+      {
+        "tag": "TD",
+        "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+        "text": "Partial — criteria in QOC are the closest ana"
+      },
+      {
+        "tag": "TD",
+        "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+        "text": "— (Data unavailable in primary sources)"
+      },
+      {
+        "tag": "CODE",
+        "class": "bg-surface text-foreground px-1.5 py-0.5 rounded text-sm font-mono",
+        "text": "—"
+      },
+      {
+        "tag": "TD",
+        "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+        "text": "— (Data unavailable in primary sources)"
+      },
+      {
+        "tag": "CODE",
+        "class": "bg-surface text-foreground px-1.5 py-0.5 rounded text-sm font-mono",
+        "text": "—"
+      }
+    ],
+    "violations": [],
+    "internalLinks": [
+      "/",
+      "/admin/observability",
+      "/admin/spaces",
+      "/admin/users",
+      "/collections",
+      "/documents",
+      "/documents/d44bec3e-f665-439d-bc78-bc5385a4610d",
+      "/evidence",
+      "/graph",
+      "/missions",
+      "/missions/27cbe849-a801-49ef-8cb5-bfa891ade2bd",
+      "/projects",
+      "/projects/59f606db-9db8-4ba9-a200-c9b66c650f2a",
+      "/reports",
+      "/reports/1ff22d77-fb90-4220-8d74-34fd5526dab7",
+      "/saved-searches",
+      "/search",
+      "/settings"
+    ],
+    "legacyInternalLinks": [],
+    "errors": [],
+    "transportErrors": [],
+    "navigationCancellations": [],
+    "suppressedWrites": [],
+    "screenshot": "light-390-_documents_d44bec3e-f665-439d-bc78-bc5385a4610d.png"
+  },
+  {
+    "route": "/documents/d44bec3e-f665-439d-bc78-bc5385a4610d",
+    "themeRequested": "dark",
+    "theme": "dark",
+    "width": 1440,
+    "status": 200,
+    "finalUrl": "http://127.0.0.1:3100/documents/d44bec3e-f665-439d-bc78-bc5385a4610d",
+    "scrollWidth": 1440,
+    "mainCount": 1,
+    "shellPresent": true,
+    "background": "lab(5.23809 -0.0738502 -2.43738)",
+    "overflow": [],
+    "violations": [],
+    "internalLinks": [
+      "/",
+      "/admin/observability",
+      "/admin/spaces",
+      "/admin/users",
+      "/collections",
+      "/documents",
+      "/documents/d44bec3e-f665-439d-bc78-bc5385a4610d",
+      "/evidence",
+      "/graph",
+      "/missions",
+      "/missions/27cbe849-a801-49ef-8cb5-bfa891ade2bd",
+      "/projects",
+      "/projects/59f606db-9db8-4ba9-a200-c9b66c650f2a",
+      "/reports",
+      "/reports/1ff22d77-fb90-4220-8d74-34fd5526dab7",
+      "/saved-searches",
+      "/search",
+      "/settings"
+    ],
+    "legacyInternalLinks": [],
+    "errors": [],
+    "transportErrors": [],
+    "navigationCancellations": [],
+    "suppressedWrites": [],
+    "screenshot": "dark-1440-_documents_d44bec3e-f665-439d-bc78-bc5385a4610d.png"
+  },
+  {
+    "route": "/documents/d44bec3e-f665-439d-bc78-bc5385a4610d",
+    "themeRequested": "dark",
+    "theme": "dark",
+    "width": 390,
+    "status": 200,
+    "finalUrl": "http://127.0.0.1:3100/documents/d44bec3e-f665-439d-bc78-bc5385a4610d",
+    "scrollWidth": 390,
+    "mainCount": 1,
+    "shellPresent": true,
+    "background": "lab(5.23809 -0.0738502 -2.43738)",
+    "overflow": [
+      {
+        "tag": "TABLE",
+        "class": "min-w-full border border-line rounded-lg",
+        "text": "EntityWhat it recordsRationale / alternatives"
+      },
+      {
+        "tag": "THEAD",
+        "class": "",
+        "text": "EntityWhat it recordsRationale / alternatives"
+      },
+      {
+        "tag": "TR",
+        "class": "",
+        "text": "EntityWhat it recordsRationale / alternatives"
+      },
+      {
+        "tag": "TH",
+        "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+        "text": "Rationale / alternatives"
+      },
+      {
+        "tag": "TH",
+        "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+        "text": "Applicability conditions"
+      },
+      {
+        "tag": "TH",
+        "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+        "text": "Evidence behind decision"
+      },
+      {
+        "tag": "TH",
+        "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+        "text": "Revision history"
+      },
+      {
+        "tag": "TBODY",
+        "class": "",
+        "text": "design rationale (field)Arguments/reasons beh"
+      },
+      {
+        "tag": "TR",
+        "class": "",
+        "text": "design rationale (field)Arguments/reasons beh"
+      },
+      {
+        "tag": "TD",
+        "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+        "text": "Yes, in QOC/IBIS-derived forms"
+      },
+      {
+        "tag": "TD",
+        "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+        "text": "Partial — criteria in QOC are the closest ana"
+      },
+      {
+        "tag": "TD",
+        "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+        "text": "— (Data unavailable in primary sources)"
+      },
+      {
+        "tag": "CODE",
+        "class": "bg-surface text-foreground px-1.5 py-0.5 rounded text-sm font-mono",
+        "text": "—"
+      },
+      {
+        "tag": "TD",
+        "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+        "text": "— (Data unavailable in primary sources)"
+      },
+      {
+        "tag": "CODE",
+        "class": "bg-surface text-foreground px-1.5 py-0.5 rounded text-sm font-mono",
+        "text": "—"
+      }
+    ],
+    "violations": [],
+    "internalLinks": [
+      "/",
+      "/admin/observability",
+      "/admin/spaces",
+      "/admin/users",
+      "/collections",
+      "/documents",
+      "/documents/d44bec3e-f665-439d-bc78-bc5385a4610d",
+      "/evidence",
+      "/graph",
+      "/missions",
+      "/missions/27cbe849-a801-49ef-8cb5-bfa891ade2bd",
+      "/projects",
+      "/projects/59f606db-9db8-4ba9-a200-c9b66c650f2a",
+      "/reports",
+      "/reports/1ff22d77-fb90-4220-8d74-34fd5526dab7",
+      "/saved-searches",
+      "/search",
+      "/settings"
+    ],
+    "legacyInternalLinks": [],
+    "errors": [],
+    "transportErrors": [],
+    "navigationCancellations": [],
+    "suppressedWrites": [],
+    "screenshot": "dark-390-_documents_d44bec3e-f665-439d-bc78-bc5385a4610d.png"
+  }
+]

@@ -1,0 +1,88 @@
+{
+  "reviewer": "claude-code (session PS-2026-09-15-010)",
+  "deployment": {
+    "commit": "1bca77688d892cb9a04f93a4bb7db46d34d4b9ca",
+    "railway": {
+      "TraceLab": "37e3043f-3fca-405d-b446-715cac84e140",
+      "frontend": "8683c2a3-2245-48f6-9419-132cf467556b"
+    }
+  },
+  "timezoneId": "America/Chicago",
+  "method": "Image review of the ui-shell-smoke.mjs captures from main 1bca776 against read-only production data, read as full-resolution crops. It follows the e751df8 review kept alongside as e751df8-visual-review.json. The only UI change between the two runs is PR #324's table cell rule, so this review concentrates on the pages that render markdown and on the DOCV-1 links; every other route passed its checks in this baseline with no axe violations, no overflow and no client errors.",
+  "reviews": [
+    {
+      "image": "light-390-_documents_bbd76b21-162b-4a66-bc77-860a1d567dd2.png",
+      "crop": "table at y 9,762 to 12,162",
+      "missions": [
+        "DOCV-1"
+      ],
+      "observations": [
+        "The captured document is TL-ENG-R001_report.md, the report from the research mission run in this session.",
+        "Its 5-column Options Comparison Table renders whole words in every cell: 'GitHub Actions billing and runner pricing', 'Low: no migration', 'Low-medium: per-language YAML'.",
+        "Columns past the third are clipped at the region's right edge, which is the sideways scrolling the fix restores; the page itself does not overflow.",
+        "Before #324 a table of this shape broke words every one to three letters."
+      ],
+      "verdict": "pass"
+    },
+    {
+      "image": "dark-390-_documents_bbd76b21-162b-4a66-bc77-860a1d567dd2.png",
+      "crop": "table at y 9,762 to 12,162",
+      "missions": [
+        "DOCV-1",
+        "PAL-2"
+      ],
+      "observations": [
+        "The same layout in the dark theme; cell text, headers and borders stay legible on the dark surfaces."
+      ],
+      "verdict": "pass"
+    },
+    {
+      "image": "light-1440-_documents_bbd76b21-162b-4a66-bc77-860a1d567dd2.png",
+      "crop": "table at y 4,297 to 5,697",
+      "missions": [
+        "DOCV-1"
+      ],
+      "observations": [
+        "At 1440 px all five columns fit without scrolling, so the fix left the desktop layout alone.",
+        "The reader opens on the Text tab with Overview, Chunks and Evidence beside it."
+      ],
+      "verdict": "pass"
+    },
+    {
+      "image": "light-1440-_evidence_1da242cc-517e-4fcb-9850-3c620e2b484e.png",
+      "missions": [
+        "DOCV-1"
+      ],
+      "observations": [
+        "One 'Open report' link sits under 'Captured 9/13/2026, 6:59:19 PM · DeepSearch', which is America/Chicago time.",
+        "Provenance lists the session, the capturing mission ('Captured by this mission') and its report ('Result of the capturing mission')."
+      ],
+      "verdict": "pass"
+    }
+  ],
+  "unchanged_since_the_e751df8_review": [
+    "/",
+    "/missions",
+    "/settings",
+    "/projects/new",
+    "/collections/new"
+  ],
+  "limitations": [
+    "Mission results render behind the Results tab, which is local state with no URL parameter, so no capture shows a mission's result table. The shared renderer is covered by the 390 px browser test and by this document page.",
+    "Settings captures are kept out of the repository because they show the signed-in account's email; their SHA-256 hashes are recorded in withheld-screenshots.json."
+  ],
+  "baseline": {
+    "tooling": "main 1bca776 frontend/scripts/ui-shell-smoke.mjs",
+    "window": [
+      "2026-09-15T22:52:06Z",
+      "2026-09-15T22:58:16Z"
+    ],
+    "checks": 144,
+    "routes": 36,
+    "failures": 0,
+    "suppressedWrites": 12,
+    "publicSmoke": "4 passed",
+    "deploymentsUnchangedDuringRun": true
+  },
+  "pending": null
+}

@@ -1,0 +1,139 @@
+{
+  "reviewer": "claude-code (session PS-2026-09-15-010)",
+  "deployment": {
+    "commit": "e751df8880a4c5a7dd95480c061c96b5d46ad550",
+    "railway": {
+      "TraceLab": "d81d9749-7019-4712-9ef3-1beaf42a1299",
+      "frontend": "4eb8a0c9-07fc-41ad-b16e-f0e0347a4aa1"
+    }
+  },
+  "timezoneId": "America/Chicago",
+  "method": "Image-level review of the ui-shell-smoke.mjs screenshots (main e751df8 tooling, read-only production data). Full-page captures use a 1000 px viewport, so the fixed-height sidebar ends partway down tall pages; that is a capture artifact. The sidebar name 'UX validation' comes from the smoke's stored-auth stub. The 390 px document capture is 23,663 px tall and was reviewed through full-resolution crops.",
+  "reviews": [
+    {
+      "image": "light-1440-_.png",
+      "missions": [
+        "ACT-1",
+        "PAL-2",
+        "FAV-1",
+        "NAV-2"
+      ],
+      "observations": [
+        "Home shows one Recent activity list, newest first: Sep 15 10:57 AM, then Sep 14 3:17 PM, 3:15 PM, 1:18 AM and 12:33 AM, then Sep 13 6:59 PM. Status appears only as a chip (Draft, Completed).",
+        "The two viewed rows (no New badge, dot or Mark viewed button) render at full text contrast, which is the #322 fix. Unviewed rows carry a New badge, a dot and a Mark viewed button. The list reads 'Newest first. 978 new since you last looked.' and 'Showing 10 of 980'.",
+        "There is no inbox, Needs attention block, dashboard or saved view. The navigation shows counts for Evidence (59), Missions (99+) and Reports (99+).",
+        "'Updated Sep 15, 5:02 PM' for a capture at about 22:02Z, so times render in America/Chicago.",
+        "The sidebar footer holds only the account row. The brand tile is the brown T that the favicon reproduces."
+      ],
+      "verdict": "pass"
+    },
+    {
+      "image": "dark-390-_.png",
+      "missions": [
+        "ACT-1",
+        "PAL-2"
+      ],
+      "observations": [
+        "The phone shell has a menu button, the page title and Search; the Inbox button is gone.",
+        "Activity rows wrap inside the card with New badges and Mark viewed buttons, with no horizontal overflow.",
+        "'Updated Sep 15, 5:07 PM' matches a capture at about 22:07Z."
+      ],
+      "verdict": "pass"
+    },
+    {
+      "image": "light-1440-_missions.png",
+      "missions": [
+        "MISS-2",
+        "PAL-2"
+      ],
+      "observations": [
+        "Three-column card grid. Each card has a title with a status chip, a monospace mission id, a three-line objective, the project name and a relative update time.",
+        "Validation-failed cards show the failure code in red (for example zero_citations_on_nontrivial_report).",
+        "The Status, Project and Sort filters default to All statuses, All projects and Newest first. The page shows 435 matching missions, Page 1 of 22, and Previous and Next buttons."
+      ],
+      "verdict": "pass"
+    },
+    {
+      "image": "dark-1440-_settings.png",
+      "missions": [
+        "NAV-2",
+        "NOTIFY-1",
+        "PAL-2"
+      ],
+      "observations": [
+        "The Appearance section's Theme select shows Dark, and the sidebar has no theme control.",
+        "The Notifications section reads 'Email me when one of my missions completes, fails validation or is blocked.' and its Mission emails checkbox is checked.",
+        "The smoke masks API key prefixes and the invite code, but the Profile section shows the account email in plain text. The Settings captures are therefore kept out of the public repository; their SHA-256 hashes are recorded instead."
+      ],
+      "verdict": "pass"
+    },
+    {
+      "image": "light-1440-_evidence_1da242cc-517e-4fcb-9850-3c620e2b484e.png",
+      "missions": [
+        "DOCV-1"
+      ],
+      "observations": [
+        "One 'Open report' link sits under 'Captured 9/13/2026, 6:59:19 PM · DeepSearch', which is in America/Chicago time.",
+        "Provenance lists the session, the capturing mission ('Captured by this mission') and its report ('Result of the capturing mission')."
+      ],
+      "verdict": "pass"
+    },
+    {
+      "image": "dark-390-_projects_new.png",
+      "missions": [
+        "PROJ-2",
+        "PAL-2"
+      ],
+      "observations": [
+        "Create a project has a required Name field (focused, with a visible focus ring) and an optional Description, and no research type field.",
+        "Create project and Cancel sit on one row, and the form fits 390 px."
+      ],
+      "verdict": "pass"
+    },
+    {
+      "image": "light-1440-_documents_d44bec3e-f665-439d-bc78-bc5385a4610d.png",
+      "crops": [
+        "top",
+        "first table from y 3,920"
+      ],
+      "missions": [
+        "DOCV-1"
+      ],
+      "observations": [
+        "The page opens on the Text tab, with Overview, Chunks and Evidence as secondary tabs and links to Open project, Open report and Open mission.",
+        "Report headings, paragraphs and the 6-column comparison matrix are readable."
+      ],
+      "verdict": "pass"
+    },
+    {
+      "image": "light-390-_documents_d44bec3e-f665-439d-bc78-bc5385a4610d.png",
+      "crops": [
+        "top",
+        "first table from y 10,321"
+      ],
+      "missions": [
+        "DOCV-1"
+      ],
+      "observations": [
+        "The header, links, tabs and body text are readable at 390 px.",
+        "The 6-column comparison matrix is squeezed until words break every one to three letters ('d e si g n ra ti o n al e'), making the table unreadable. Table cells inherit .app-main overflow-wrap:anywhere, so the columns shrink and the existing scroll region never scrolls. The baseline passed this page because nothing overflows it and axe does not judge readability."
+      ],
+      "verdict": "fail: DOCV-1 tables on phones; fixed in a follow-up PR"
+    }
+  ],
+  "baseline": {
+    "tooling": "main e751df8 frontend/scripts/ui-shell-smoke.mjs",
+    "window": [
+      "2026-09-15T22:02:44Z",
+      "2026-09-15T22:09:05Z"
+    ],
+    "checks": 144,
+    "routes": 36,
+    "failures": 0,
+    "suppressedWrites": 12,
+    "publicSmoke": "4 passed",
+    "deploymentsUnchangedDuringRun": true,
+    "routeChangesSince667d11a": "/inbox and /missions?view=attention&reason=unreviewed retired by ACT-1; /missions?status=completed&sort=updated_desc added"
+  },
+  "pending": "DOCV-1 phone tables: merge the fix, deploy it and capture /documents/d44bec3e again at 390 px in both themes."
+}

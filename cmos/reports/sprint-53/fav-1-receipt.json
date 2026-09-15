@@ -1,0 +1,79 @@
+{
+  "mission": "FAV-1",
+  "pr": 314,
+  "merge_commit": "2858925ad039ecb7d14dbb35ec96df36b9d05ffb",
+  "main_push_runs": {
+    "success": [
+      35006893382,
+      35006893384,
+      35006893463,
+      35006893508,
+      35006893534,
+      35006893546
+    ],
+    "cancelled": [
+      35006893408
+    ]
+  },
+  "production": {
+    "icon_check": "cmos/reports/sprint-53/production-evidence/fav-1-icon-check.json",
+    "assets": "favicon.ico (48x48, 2792 B), icon.svg (216 B), apple-touch-icon.png (2676 B), icon-192.png and icon-512.png all return 200; the served head links favicon.ico, icon.svg and apple-touch-icon.png",
+    "brand_primary": "Mark fill #8a6150 equals Brand A light surface-interactive-primary oklch(0.53 0.06 43) in the re-pinned bundle (the old 114a268 value was #c93e00)",
+    "intermediate_667d11a": {
+      "commit": "667d11af489f3b8d1d718affc5b9c2d7b8b45586",
+      "railway": {
+        "TraceLab": "22800701-d46a-4dc5-ac42-0f16eebb2dd7",
+        "frontend": "1e034218-a28f-4681-bd82-325167fde334"
+      },
+      "baseline": "148 checks, 37 routes, 0 failures, 2026-09-15 20:15:29Z-20:34:02Z, America/Chicago; public smoke 4/4"
+    }
+  },
+  "limitations": [
+    "Headless Chromium and WebKit have no tab chrome, so the icon is rendered at 16 and 32 px on light and dark tab-strip colours instead of photographed in a real tab.",
+    "Backend Tests for 2858925 was cancelled before Actions was turned off; decision #464 drops the run-id requirement."
+  ],
+  "sprint": "sprint-53",
+  "status": "accepted",
+  "gate": "Decision #464: GitHub Actions stays off. Receipts cite the local CI-equivalent verification recorded in each PR, both Railway deployment ids, the post-deploy public smoke, the Light/Dark 1440/390 baseline from the deployed commit's own ui-shell-smoke.mjs, and an image review under America/Chicago. Decision #465: PRs with that local evidence are merged with --admin.",
+  "final_production": {
+    "commit": "1bca77688d892cb9a04f93a4bb7db46d34d4b9ca",
+    "railway": {
+      "TraceLab": "37e3043f-3fca-405d-b446-715cac84e140",
+      "frontend": "8683c2a3-2245-48f6-9419-132cf467556b"
+    },
+    "public_smoke": "cmos/reports/sprint-53/production-evidence/public-smoke.json",
+    "baseline": {
+      "window": [
+        "2026-09-15T22:52:06Z",
+        "2026-09-15T22:58:16Z"
+      ],
+      "checks": 144,
+      "routes": 36,
+      "failures": 0,
+      "suppressed_writes": 12,
+      "timezone": "America/Chicago",
+      "evidence": "cmos/reports/sprint-53/production-evidence"
+    },
+    "visual_review": "cmos/reports/sprint-53/production-evidence/visual-review.json",
+    "withheld_screenshots": "cmos/reports/sprint-53/production-evidence/withheld-screenshots.json",
+    "first_post_merge_baseline": {
+      "commit": "e751df8880a4c5a7dd95480c061c96b5d46ad550",
+      "railway": {
+        "TraceLab": "d81d9749-7019-4712-9ef3-1beaf42a1299",
+        "frontend": "4eb8a0c9-07fc-41ad-b16e-f0e0347a4aa1"
+      },
+      "checks": 144,
+      "routes": 36,
+      "failures": 0,
+      "summary": "cmos/reports/sprint-53/production-evidence/e751df8-summary.json",
+      "visual_review": "cmos/reports/sprint-53/production-evidence/e751df8-visual-review.json",
+      "public_smoke": "cmos/reports/sprint-53/production-evidence/e751df8-public-smoke.json",
+      "finding": "The image review found markdown tables unreadable at 390 px on /documents/[id]; PR #324 fixed it before this final baseline."
+    }
+  },
+  "decisions": [
+    459,
+    464,
+    465
+  ]
+}
