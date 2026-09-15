@@ -11,12 +11,14 @@ from app.models.mission import Mission
 from app.models.user import User
 from app.services import notifications
 
+_HASH = "placeholder-not-a-real-hash"
+
 
 def test_a_completed_mission_can_be_claimed_once_on_postgres(db_session, monkeypatch):
     monkeypatch.setattr(settings, "resend_api_key", "re_test_key")
     monkeypatch.setattr(settings, "resend_from_address", "TraceLab <notifications@tracelab.aquex.ai>")
     monkeypatch.setattr(settings, "notification_emails_enabled", True)
-    owner = User(email=f"{uuid4().hex}@owners.tracelab.aquex.ai", display_name="Owner", password_hash="placeholder-not-a-real-hash", role="member")
+    owner = User(email=f"{uuid4().hex}@owners.tracelab.aquex.ai", display_name="Owner", password_hash=_HASH, role="member")
     db_session.add(owner)
     db_session.flush()
     mission = Mission(
