@@ -9,13 +9,13 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from sqlalchemy.orm import Session, load_only, noload
 
+from app.adapters.repositories.sqlalchemy_activity_repo import SQLAlchemyActivityRepository
 from app.core.security import AuthenticatedUser
 from app.models.evidence_ledger import LedgerEntry
 from app.models.mission import MISSION_STATUSES, Mission
 from app.models.project import Project
 from app.models.report import Report
 from app.models.user_favorite import UserFavorite
-from app.adapters.repositories.sqlalchemy_activity_repo import SQLAlchemyActivityRepository
 from app.schemas.home import (
     HomeEvidenceActivity,
     HomeMission,

@@ -16,9 +16,9 @@ from app.ports.external import EmbeddingPort, LLMPort, VectorDBPort
 from app.ports.graph_neighborhood import GraphNeighborhoodRepository
 from app.ports.navigation_search import NavigationSearchRepository
 from app.ports.repositories import DocumentRepository, MissionRepository, ProjectRepository
+from app.services.activity import ActivityService
 from app.services.admin_stats import AdminStatsService
 from app.services.collection_context import CollectionContextService
-from app.services.activity import ActivityService
 from app.services.home import HomeService
 
 logger = logging.getLogger(__name__)
