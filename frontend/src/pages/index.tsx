@@ -36,7 +36,7 @@ function Section({ title, count, children, link }: { title: string; count: numbe
 const TYPE_LABELS = { mission: "Mission", report: "Report", evidence: "Evidence" } as const;
 
 function ActivityRow({ item, onOpen, onViewed, busy }: { item: ActivityItem; onOpen: (item: ActivityItem) => void; onViewed: (item: ActivityItem) => void; busy: boolean }) {
-  return <li className={`flex flex-wrap items-start gap-3 px-5 py-4 ${item.new ? "" : "opacity-80"}`} data-new={item.new || undefined}>
+  return <li className="flex flex-wrap items-start gap-3 px-5 py-4" data-new={item.new || undefined}>
     <span aria-hidden="true" className={`mt-2 h-2 w-2 shrink-0 rounded-full ${item.new ? "bg-accent" : "bg-transparent"}`} />
     <div className="min-w-0 flex-1">
       <div className="flex flex-wrap items-center gap-2 text-xs text-muted"><span>{TYPE_LABELS[item.type]}</span>{item.status && <StatusBadge status={item.status} />}{item.new && <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-medium text-on-accent">New</span>}</div>
