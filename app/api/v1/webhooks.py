@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import logging
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, Header, HTTPException, Request
 from fastapi import status as http_status
 from sqlalchemy.orm import Session
 
@@ -19,6 +19,7 @@ from app.schemas.webhook import (
     WebhookResponse,
 )
 from app.services.mission_service import MissionNotFoundError
+from app.services.notifications import NOTIFY_STATUSES, notify_terminal_status
 from app.services.webhook_handler import (
     WebhookHandler,
     WebhookProcessingError,
@@ -70,6 +71,7 @@ missing or stale local result artifacts from the authoritative persisted result.
 async def receive_deepsearch_webhook(
     request: Request,
     payload: DeepSearchWebhookPayload,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     x_deepsearch_signature: str | None = Header(None),
     x_deepsearch_timestamp: str | None = Header(None),
@@ -100,6 +102,9 @@ async def receive_deepsearch_webhook(
     # Process the webhook
     try:
         mission, status_message = handler.process_deepsearch_webhook(db, payload)
+        if mission.status in NOTIFY_STATUSES:
+            # Runs after the 200 is sent; sends at most once per terminal status.
+            background_tasks.add_task(notify_terminal_status, mission.id)
 
         return WebhookResponse(
             received=True,

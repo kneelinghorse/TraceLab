@@ -195,6 +195,7 @@ def get_me(
         email=db_user.email,
         display_name=db_user.display_name,
         role=db_user.role,
+        email_notifications_enabled=bool(db_user.email_notifications_enabled),
     )
 
 
@@ -211,6 +212,9 @@ def update_me(
 
     if payload.display_name is not None:
         db_user.display_name = payload.display_name
+
+    if payload.email_notifications_enabled is not None:
+        db_user.email_notifications_enabled = payload.email_notifications_enabled
 
     if payload.new_password is not None:
         if not payload.current_password:
@@ -229,6 +233,7 @@ def update_me(
         email=db_user.email,
         display_name=db_user.display_name,
         role=db_user.role,
+        email_notifications_enabled=bool(db_user.email_notifications_enabled),
     )
 
 

@@ -13,10 +13,12 @@ export type ProfileResponse = {
   email: string;
   display_name: string;
   role: Role;
+  email_notifications_enabled: boolean;
 };
 
 export type ProfileUpdatePayload = {
   display_name?: string;
+  email_notifications_enabled?: boolean;
   current_password?: string;
   new_password?: string;
 };

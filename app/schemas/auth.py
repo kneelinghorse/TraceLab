@@ -45,6 +45,7 @@ class ProfileUpdate(BaseModel):
     display_name: str | None = Field(None, max_length=100, description="New display name")
     current_password: str | None = Field(None, description="Required when changing password")
     new_password: str | None = Field(None, min_length=8, description="New password (minimum 8 characters)")
+    email_notifications_enabled: bool | None = Field(None, description="Receive mission completion and failure emails")
 
     @field_validator("display_name")
     @classmethod
@@ -69,6 +70,7 @@ class ProfileResponse(BaseModel):
     email: str
     display_name: str
     role: str
+    email_notifications_enabled: bool = True
 
 
 class AdminUserResponse(BaseModel):
