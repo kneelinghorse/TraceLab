@@ -1,0 +1,22 @@
+{
+  "mission": "PAL-2",
+  "date": "2026-09-15",
+  "forge_checkout_head": "04182b116703088773ab7e414c6d7d6721c6c24e",
+  "previous_pin": "114a268ea10b9141bc96925c69132179c7c4b334",
+  "previous_pin_certification": "Not established (cmos/reports/sprint-51/theme-1-validation.json); Forge rewrote Brand A in 403479399..747a48813 (2026-09-12/13); 601 of 916 vendored variables changed",
+  "packages": {
+    "oods-tokens-0.1.0.tgz": "b4c0c645f872e9084c8250dce252e3bb6160de7cce0c5015d043a228fee8f025",
+    "oods-tw-variants-0.1.0.tgz": "94c0a7d0def3666856fe7ba0ee8afac6863adbcfbcd0279d1f43ee7907a19819"
+  },
+  "installed_tokens_css_sha256": "a6bf5544d2b0de612644381a4ac462deb2fa14d40092fdc38b754116143292a4",
+  "clean_install_smoke": "Brand A light/dark/hc scopes present (2 each), base aliases light, tw plugin default export is a function",
+  "local_gates": {
+    "check:tokens": "passed",
+    "ThemeContext.test": "5/5",
+    "vitest": "241/241",
+    "lint": "clean",
+    "next build": "ok"
+  },
+  "local_shell_smoke": "/ light+dark 1440: status 200, overflow false, 0 axe violations, 0 console errors (screenshots alongside)",
+  "pending": "post-merge: main-push CI run ids, both Railway deployment ids, 35-route Light/Dark 1440/390 production baseline, non-UTC visual review"
+}
