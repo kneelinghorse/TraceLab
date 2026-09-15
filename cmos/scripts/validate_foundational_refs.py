@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Validate that roadmap and architecture templates are referenced from foundational-docs/."""
+"""Validate that roadmap and architecture templates are referenced from foundational-docs/.
+
+The rules and the boundary-aware matcher live in cmos/context/foundational_refs.py and
+are shared with ``./cmos/cli.py validate docs``. This script stays a manual guard, not a
+CI gate.
+"""
 
 from __future__ import annotations
 
@@ -28,70 +33,19 @@ def _find_cmos_root() -> Path:
 
 
 CMOS_ROOT = _find_cmos_root()
+if str(CMOS_ROOT) not in sys.path:
+    sys.path.insert(0, str(CMOS_ROOT))
 
-# Each entry: file path -> required substrings, forbidden substrings
-CHECKS = {
-    Path("agents.md"): {
-        "required": [
-            "foundational-docs/roadmap_template.md",
-            "foundational-docs/tech_arch_template.md",
-        ],
-        "forbidden": [
-            "docs/roadmap.md",
-            "docs/technical_architecture.md",
-        ],
-    },
-    Path("README.md"): {
-        "required": [
-            "foundational-docs/roadmap_template.md",
-            "foundational-docs/tech_arch_template.md",
-        ],
-        "forbidden": [
-            "docs/roadmap.md",
-            "docs/technical_architecture.md",
-        ],
-    },
-    Path("context/MASTER_CONTEXT.json"): {
-        "required": [
-            "foundational-docs/roadmap_template.md",
-            "foundational-docs/tech_arch_template.md",
-        ],
-        "forbidden": [
-            "docs/roadmap.md",
-            "docs/technical_architecture.md",
-        ],
-    },
-}
+from context.foundational_refs import FOUNDATIONAL_CHECKS, validate_file  # noqa: E402
 
-
-def validate_file(path: Path, required: list[str], forbidden: list[str]) -> list[str]:
-    errors: list[str] = []
-    try:
-        content = path.read_text(encoding="utf-8")
-    except FileNotFoundError:
-        errors.append(f"{path}: missing file")
-        return errors
-
-    for needle in required:
-        if needle not in content:
-            errors.append(f"{path}: missing required reference '{needle}'")
-    for needle in forbidden:
-        if needle in content:
-            errors.append(f"{path}: contains forbidden reference '{needle}'")
-    return errors
+# Kept under the historical name for callers and tests that load this script by path.
+CHECKS = FOUNDATIONAL_CHECKS
 
 
 def main() -> int:
     failures: list[str] = []
     for relative_path, config in CHECKS.items():
-        file_path = CMOS_ROOT / relative_path
-        failures.extend(
-            validate_file(
-                file_path,
-                config["required"],
-                config["forbidden"],
-            )
-        )
+        failures.extend(validate_file(CMOS_ROOT / relative_path, config["required"], config["forbidden"]))
 
     if failures:
         print("Foundational reference validation failed:", file=sys.stderr)

@@ -1,0 +1,4 @@
+{
+  "cmos/reports/sprint-N/": "placeholder: N stands for the sprint number of the receipt being cited",
+  "cmos/research/": "created on demand: `./cmos/cli.py research export` mkdirs cmos/research/ on first export (cmos/cli.py, research export handler); no export has been committed yet"
+}

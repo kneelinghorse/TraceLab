@@ -35,7 +35,7 @@ This guide consolidates operational procedures for both AI agents and human main
 3. **Execute**: Follow mission requirements. Capture intermediate decisions in mission notes or MASTER_CONTEXT (in database).
 4. **Validate**: Run required tests and link validators. Document outcomes in mission notes.
 5. **Complete**: Use `complete()` to mark Completed, record notes, and auto-promote the next mission.
-6. **Export research artifacts**: When the mission is research-focused, run `./cmos/cli.py research export <mission-id>` to capture the Markdown report under `cmos/research/` before committing.
+6. **Export research artifacts**: When the mission is research-focused, run `./cmos/cli.py research export <mission-id>` to capture the Markdown report under `cmos/research/` (created on first export) before committing.
 
 **Orchestration Patterns**:
 - Choose a single mode (`none`, `rsip`, `delegation`, `boomerang`) per mission
@@ -101,7 +101,7 @@ This guide consolidates operational procedures for both AI agents and human main
 - **Internal vs external**: Store maintainer-only procedures in this playbook. Material intended for downstream starters belongs under `cmos/docs/` or `cmos/foundational-docs/`.
 - **Cross-references**: Replace duplicated roadmap or architecture content with links to `cmos/foundational-docs/roadmap_template.md` and `cmos/foundational-docs/tech_arch_template.md`.
 - **Review cadence**: Re-evaluate each document when orchestration patterns, database schema, or telemetry targets change. Use the checklist in `cmos/README.md`.
-- **Knowledge capture**: Record new operational patterns or deviations within `cmos/MASTER_CONTEXT.json` and update this guide when behavior changes persist.
+- **Knowledge capture**: Record new operational patterns or deviations within `cmos/context/MASTER_CONTEXT.json` and update this guide when behavior changes persist.
 
 ### Escalation & Fallback
 
@@ -110,7 +110,7 @@ This guide consolidates operational procedures for both AI agents and human main
 - **Tier 3**: Fallback gracefully to linear execution and emit `status=fallback`, `fallbackTriggered=true` in telemetry
 - **Tier 4**: Require human review before closing missions that triggered fallback; document remediation steps in mission notes
 - **Blocked missions**: Set backlog status to `Blocked`, append a `needs` array in `SESSIONS.jsonl`, and document unblock criteria in mission notes
-- **Knowledge capture**: For recurring incidents, add a `decisions_made` entry to `MASTER_CONTEXT.json` and update relevant workflow sections
+- **Knowledge capture**: For recurring incidents, add a `decisions_made` entry to `cmos/context/MASTER_CONTEXT.json` and update relevant workflow sections
 
 ---
 
@@ -213,7 +213,7 @@ See `cmos/docs/mcp-reference.md` for complete parameter documentation.
 - **Scope boundaries**: Keep operations limited to the active mission; split backlogs if work scope grows
 
 ### Output Requirements
-- Document all decisions in mission notes or `MASTER_CONTEXT.json`
+- Document all decisions in mission notes or `cmos/context/MASTER_CONTEXT.json`
 - Include clear `next_hint` guidance in completion events
 - Record orchestration mode selection and rationale
 - Flag any fallbacks or escalations for human review
@@ -225,7 +225,7 @@ See `cmos/docs/mcp-reference.md` for complete parameter documentation.
 ### Session Management
 - Monitor `cmos/telemetry/events/database-health.jsonl` for anomalies
 - Review session events for patterns or recurring issues
-- Update `cmos/MASTER_CONTEXT.json` with operational insights
+- Update `cmos/context/MASTER_CONTEXT.json` with operational insights
 - Keep working memory synchronized across context stores
 
 ### Maintenance Operations
@@ -291,6 +291,6 @@ On **sprint close** with no immediately-following open, use the `-complete` vari
 
 ---
 
-**Last Updated**: 2026-05-30
+**Last Updated**: 2026-09-15
 **CMOS Version**: 2.1 (MCP-enabled)
-**Replaces**: `AI-coding-assistant-workflows.md`, `cmos_Playbook.md`, `packaging-guide.md`, `integration-testing-guide.md`
+**Replaces**: the retired AI-coding-assistant-workflows, cmos_Playbook and packaging-guide documents (removed from the repository); `cmos/docs/integration-testing-guide.md` is still maintained separately

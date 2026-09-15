@@ -9,8 +9,8 @@ Central index for TraceLab docs. Each guide references the canonical templates i
 | [`docs/best-practices.md`](best-practices.md) | Testing, benchmarking, and documentation guardrails for Sprint 04. |
 | [`docs/mission_protocol_validation.md`](mission_protocol_validation.md) | Deep dive into schema + gate enforcement. |
 | [`docs/mission_protocol_api.md`](mission_protocol_api.md) | FastAPI surface area for Mission Protocol CRUD + import/export. |
-| [`docs/frontend_architecture.md`](frontend_architecture.md) | Mission workspace UI implementation notes. |
+| [`docs/frontend_architecture.md`](frontend_architecture.md) | The frontend as built: Next 16 pages router, shell, themes, vendored tokens, API clients, primitives and test lanes. |
 | [`docs/quality_automation.md`](quality_automation.md) | Automation patterns for bias, traceability, and synthesis gates. |
 | [`docs/quality_gates.md`](quality_gates.md) | Research-side definition of each quality checkpoint referenced in the backlog. |
 
-For historical research docs see `cmos/reports/` and `cmos/docs/AI-coding-assistant-workflows.md`.
+For historical research docs see `cmos/reports/`; for CMOS operating procedures see `cmos/docs/README.md` and `cmos/docs/operations-guide.md`.

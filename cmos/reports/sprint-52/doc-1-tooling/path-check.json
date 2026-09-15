@@ -1,0 +1,1513 @@
+{
+  "repository_root": "/Users/systemsystems/portfolio/TraceLab",
+  "allowlist": {
+    "cmos/reports/sprint-N/": "placeholder: N stands for the sprint number of the receipt being cited",
+    "cmos/research/": "created on demand: `./cmos/cli.py research export` mkdirs cmos/research/ on first export (cmos/cli.py, research export handler); no export has been committed yet"
+  },
+  "documents": [
+    {
+      "document": "docs/frontend_architecture.md",
+      "counts": {
+        "resolved": 61,
+        "git": 1,
+        "allowlisted": 1,
+        "unresolved": 0
+      },
+      "tokens": {
+        "frontend/": {
+          "line": 4,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/foundational-docs/roadmap-sprints-50-53-ux-overhaul.md": {
+          "line": 5,
+          "status": "resolved",
+          "base": "."
+        },
+        "3a498c6:docs/frontend_architecture.md": {
+          "line": 7,
+          "status": "git",
+          "base": null
+        },
+        "frontend/postcss.config.mjs": {
+          "line": 13,
+          "status": "resolved",
+          "base": "."
+        },
+        "frontend/src/styles/globals.css": {
+          "line": 13,
+          "status": "resolved",
+          "base": "."
+        },
+        "frontend/package.json": {
+          "line": 14,
+          "status": "resolved",
+          "base": "."
+        },
+        "frontend/vendor/oods-tokens-0.1.0.tgz": {
+          "line": 16,
+          "status": "resolved",
+          "base": "."
+        },
+        "frontend/vendor/oods-tw-variants-0.1.0.tgz": {
+          "line": 16,
+          "status": "resolved",
+          "base": "."
+        },
+        "frontend/vendor/oods-provenance.json": {
+          "line": 17,
+          "status": "resolved",
+          "base": "."
+        },
+        "frontend/tailwind.config.ts": {
+          "line": 18,
+          "status": "resolved",
+          "base": "."
+        },
+        "frontend/scripts/check-token-colors.mjs": {
+          "line": 20,
+          "status": "resolved",
+          "base": "."
+        },
+        "frontend/src/pages": {
+          "line": 23,
+          "status": "resolved",
+          "base": "."
+        },
+        "index.tsx": {
+          "line": 27,
+          "status": "resolved",
+          "base": "frontend/src/pages"
+        },
+        "inbox.tsx": {
+          "line": 28,
+          "status": "resolved",
+          "base": "frontend/src/pages"
+        },
+        "projects/index.tsx": {
+          "line": 29,
+          "status": "resolved",
+          "base": "frontend/src/pages"
+        },
+        "projects/[id].tsx": {
+          "line": 29,
+          "status": "resolved",
+          "base": "frontend/src/pages"
+        },
+        "documents/*.tsx": {
+          "line": 30,
+          "status": "resolved",
+          "base": "frontend/src/pages"
+        },
+        "collections/*.tsx": {
+          "line": 31,
+          "status": "resolved",
+          "base": "frontend/src/pages"
+        },
+        "missions/*.tsx": {
+          "line": 32,
+          "status": "resolved",
+          "base": "frontend/src/pages"
+        },
+        "reports/*.tsx": {
+          "line": 33,
+          "status": "resolved",
+          "base": "frontend/src/pages"
+        },
+        "search/index.tsx": {
+          "line": 34,
+          "status": "resolved",
+          "base": "frontend/src/pages"
+        },
+        "graph.tsx": {
+          "line": 35,
+          "status": "resolved",
+          "base": "frontend/src/pages"
+        },
+        "evidence.tsx": {
+          "line": 36,
+          "status": "resolved",
+          "base": "frontend/src/pages"
+        },
+        "evidence/[id].tsx": {
+          "line": 36,
+          "status": "resolved",
+          "base": "frontend/src/pages"
+        },
+        "saved-searches.tsx": {
+          "line": 37,
+          "status": "resolved",
+          "base": "frontend/src/pages"
+        },
+        "settings.tsx": {
+          "line": 38,
+          "status": "resolved",
+          "base": "frontend/src/pages"
+        },
+        "device.tsx": {
+          "line": 38,
+          "status": "resolved",
+          "base": "frontend/src/pages"
+        },
+        "admin/*.tsx": {
+          "line": 39,
+          "status": "resolved",
+          "base": "frontend/src/pages"
+        },
+        "_app.tsx": {
+          "line": 41,
+          "status": "resolved",
+          "base": "frontend/src/pages"
+        },
+        "_document.tsx": {
+          "line": 41,
+          "status": "resolved",
+          "base": "frontend/src/pages"
+        },
+        "frontend/src/lib/route-migrations.json": {
+          "line": 42,
+          "status": "resolved",
+          "base": "."
+        },
+        "frontend/next.config.ts": {
+          "line": 43,
+          "status": "resolved",
+          "base": "."
+        },
+        "frontend/tests/e2e/route-migration.spec.ts": {
+          "line": 44,
+          "status": "resolved",
+          "base": "."
+        },
+        "frontend/src/components/AppShell.tsx": {
+          "line": 48,
+          "status": "resolved",
+          "base": "."
+        },
+        "Navigation.tsx": {
+          "line": 48,
+          "status": "resolved",
+          "base": "frontend/src/components"
+        },
+        "CommandPalette.tsx": {
+          "line": 51,
+          "status": "resolved",
+          "base": "frontend/src/components"
+        },
+        "frontend/src/contexts/AuthContext.tsx": {
+          "line": 52,
+          "status": "resolved",
+          "base": "."
+        },
+        "frontend/src/lib/auth/storage.ts": {
+          "line": 53,
+          "status": "resolved",
+          "base": "."
+        },
+        "components/AuthGate.tsx": {
+          "line": 54,
+          "status": "resolved",
+          "base": "frontend/src"
+        },
+        "lib/api/http.ts": {
+          "line": 55,
+          "status": "resolved",
+          "base": "frontend/src"
+        },
+        "frontend/src/contexts/RoleContext.tsx": {
+          "line": 56,
+          "status": "resolved",
+          "base": "."
+        },
+        "components/RequireAdmin.tsx": {
+          "line": 57,
+          "status": "resolved",
+          "base": "frontend/src"
+        },
+        "components/ThemeSelect.tsx": {
+          "line": 59,
+          "status": "resolved",
+          "base": "frontend/src"
+        },
+        "contexts/ThemeContext.tsx": {
+          "line": 59,
+          "status": "resolved",
+          "base": "frontend/src"
+        },
+        "lib/theme.ts": {
+          "line": 59,
+          "status": "resolved",
+          "base": "frontend/src"
+        },
+        "lib/api/navigation.ts": {
+          "line": 64,
+          "status": "resolved",
+          "base": "frontend/src"
+        },
+        "frontend/src/lib/api": {
+          "line": 67,
+          "status": "resolved",
+          "base": "."
+        },
+        "timestamps.ts": {
+          "line": 75,
+          "status": "resolved",
+          "base": "frontend/src/lib/api"
+        },
+        "lib/hooks/useInboxSummary.ts": {
+          "line": 79,
+          "status": "resolved",
+          "base": "frontend/src"
+        },
+        "scripts/mcp_parity_audit.mjs": {
+          "line": 81,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/contracts/mcp-parity-manifest.json": {
+          "line": 82,
+          "status": "resolved",
+          "base": "."
+        },
+        "frontend/src/components/ui": {
+          "line": 84,
+          "status": "resolved",
+          "base": "."
+        },
+        "lib/api/graph.ts": {
+          "line": 93,
+          "status": "resolved",
+          "base": "frontend/src"
+        },
+        "lib/api/missionViews.ts": {
+          "line": 95,
+          "status": "resolved",
+          "base": "frontend/src"
+        },
+        "frontend/src/__tests__": {
+          "line": 106,
+          "status": "resolved",
+          "base": "."
+        },
+        "*.test.tsx": {
+          "line": 106,
+          "status": "resolved",
+          "base": "."
+        },
+        ".github/workflows/frontend-production-build.yml": {
+          "line": 111,
+          "status": "resolved",
+          "base": "."
+        },
+        ".github/workflows/production-smoke.yml": {
+          "line": 113,
+          "status": "resolved",
+          "base": "."
+        },
+        "frontend/tests/e2e/production-smoke.spec.ts": {
+          "line": 113,
+          "status": "resolved",
+          "base": "."
+        },
+        "frontend/scripts/ui-shell-smoke.mjs": {
+          "line": 115,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/reports/sprint-N/": {
+          "line": 117,
+          "status": "allowlisted",
+          "base": null,
+          "reason": "placeholder: N stands for the sprint number of the receipt being cited"
+        },
+        "docs/frontend_deployment_decisions.md": {
+          "line": 123,
+          "status": "resolved",
+          "base": "."
+        },
+        "frontend/README.md": {
+          "line": 124,
+          "status": "resolved",
+          "base": "."
+        }
+      }
+    },
+    {
+      "document": "cmos/foundational-docs/technical_architecture.md",
+      "counts": {
+        "resolved": 52,
+        "git": 1,
+        "allowlisted": 1,
+        "unresolved": 0
+      },
+      "tokens": {
+        "cmos/foundational-docs/tech_arch_template.md": {
+          "line": 4,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/foundational-docs/roadmap-sprints-50-53-ux-overhaul.md": {
+          "line": 6,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/": {
+          "line": 12,
+          "status": "resolved",
+          "base": "."
+        },
+        "frontend/": {
+          "line": 13,
+          "status": "resolved",
+          "base": "."
+        },
+        "docs/frontend_architecture.md": {
+          "line": 13,
+          "status": "resolved",
+          "base": "."
+        },
+        "packages/tracelab-mcp": {
+          "line": 17,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/": {
+          "line": 18,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/api/v1/": {
+          "line": 25,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/services/": {
+          "line": 32,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/services/contract_compiler/": {
+          "line": 34,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/ports/": {
+          "line": 35,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/adapters/": {
+          "line": 35,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/dependencies.py": {
+          "line": 36,
+          "status": "resolved",
+          "base": "."
+        },
+        "docs/adr/": {
+          "line": 37,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/core/": {
+          "line": 38,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/models/": {
+          "line": 39,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/schemas/": {
+          "line": 39,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/mcp_server/": {
+          "line": 40,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/main.py": {
+          "line": 46,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/core/authorization.py": {
+          "line": 55,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/services/document_policy.py": {
+          "line": 59,
+          "status": "resolved",
+          "base": "."
+        },
+        "scripts/rbac_verify.py": {
+          "line": 63,
+          "status": "resolved",
+          "base": "."
+        },
+        "tests/test_rbac_verify_harness.py": {
+          "line": 64,
+          "status": "resolved",
+          "base": "."
+        },
+        "tests/integration/test_e2e_rbac_live.py": {
+          "line": 65,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/models/evidence_ledger.py": {
+          "line": 77,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/contracts/evidence-ledger-contract.md": {
+          "line": 79,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/contracts/mission-authoring-contract.md": {
+          "line": 84,
+          "status": "resolved",
+          "base": "."
+        },
+        "tests/integration/test_migration_coverage.py": {
+          "line": 86,
+          "status": "resolved",
+          "base": "."
+        },
+        "docs/document-processing.md": {
+          "line": 93,
+          "status": "resolved",
+          "base": "."
+        },
+        "docs/ingestion_pipeline_developer_guide.md": {
+          "line": 93,
+          "status": "resolved",
+          "base": "."
+        },
+        "docs/architecture/PEDR-search.md": {
+          "line": 95,
+          "status": "resolved",
+          "base": "."
+        },
+        "docs/pedr-search.md": {
+          "line": 95,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/services/evidence_scope.py": {
+          "line": 105,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/services/mission_attention.py": {
+          "line": 106,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/api/v1/webhooks.py": {
+          "line": 113,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/services/webhook_handler.py": {
+          "line": 113,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/contracts/deepsearch-compiler-vendor.md": {
+          "line": 116,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/core/mission_events.py": {
+          "line": 118,
+          "status": "resolved",
+          "base": "."
+        },
+        "docs/mcp-tools.md": {
+          "line": 130,
+          "status": "resolved",
+          "base": "."
+        },
+        "packages/tracelab-mcp/README.md": {
+          "line": 131,
+          "status": "resolved",
+          "base": "."
+        },
+        "packages/tracelab-mcp/src/canonical-link.ts": {
+          "line": 134,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/contracts/mcp-parity-manifest.json": {
+          "line": 136,
+          "status": "resolved",
+          "base": "."
+        },
+        "scripts/mcp_parity_audit.mjs": {
+          "line": 138,
+          "status": "resolved",
+          "base": "."
+        },
+        "packages/tracelab-mcp/scripts/check-canonical-links.mjs": {
+          "line": 141,
+          "status": "resolved",
+          "base": "."
+        },
+        ".github/ci/README.md": {
+          "line": 145,
+          "status": "resolved",
+          "base": "."
+        },
+        ".github/ci/backend-quarantine.txt": {
+          "line": 150,
+          "status": "resolved",
+          "base": "."
+        },
+        "tests/integration": {
+          "line": 150,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/reports/sprint-N/": {
+          "line": 154,
+          "status": "allowlisted",
+          "base": null,
+          "reason": "placeholder: N stands for the sprint number of the receipt being cited"
+        },
+        "scripts/check_no_credential_literals.py": {
+          "line": 159,
+          "status": "resolved",
+          "base": "."
+        },
+        "docs/authentication.md": {
+          "line": 161,
+          "status": "resolved",
+          "base": "."
+        },
+        "docs/auth_and_cors_guidance.md": {
+          "line": 161,
+          "status": "resolved",
+          "base": "."
+        },
+        "docs/data-protection-audit.md": {
+          "line": 162,
+          "status": "resolved",
+          "base": "."
+        },
+        "b9e3ee9:cmos/foundational-docs/technical_architecture.md": {
+          "line": 169,
+          "status": "git",
+          "base": null
+        },
+        "cmos/reports/white-papers/tracelab-technical-architecture.md": {
+          "line": 170,
+          "status": "resolved",
+          "base": "."
+        }
+      }
+    },
+    {
+      "document": "agents.md",
+      "counts": {
+        "resolved": 75,
+        "git": 0,
+        "allowlisted": 0,
+        "unresolved": 0
+      },
+      "tokens": {
+        "src/": {
+          "line": 90,
+          "status": "resolved",
+          "base": "frontend"
+        },
+        "cmos/": {
+          "line": 101,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/": {
+          "line": 102,
+          "status": "resolved",
+          "base": "."
+        },
+        "docs/": {
+          "line": 102,
+          "status": "resolved",
+          "base": "."
+        },
+        "db/": {
+          "line": 102,
+          "status": "resolved",
+          "base": "cmos"
+        },
+        "scripts/": {
+          "line": 102,
+          "status": "resolved",
+          "base": "."
+        },
+        "tests/": {
+          "line": 102,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/agents.md": {
+          "line": 102,
+          "status": "resolved",
+          "base": "."
+        },
+        "agents.md": {
+          "line": 103,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/db/cmos.sqlite": {
+          "line": 103,
+          "status": "resolved",
+          "base": "."
+        },
+        ".devcontainer/": {
+          "line": 126,
+          "status": "resolved",
+          "base": "."
+        },
+        ".devcontainer/docker-compose.devcontainer.yml": {
+          "line": 128,
+          "status": "resolved",
+          "base": "."
+        },
+        "frontend/": {
+          "line": 145,
+          "status": "resolved",
+          "base": "."
+        },
+        "package-lock.json": {
+          "line": 145,
+          "status": "resolved",
+          "base": "."
+        },
+        "package.json": {
+          "line": 145,
+          "status": "resolved",
+          "base": "."
+        },
+        "packages/tracelab-mcp/": {
+          "line": 148,
+          "status": "resolved",
+          "base": "."
+        },
+        "packages/*/dist/": {
+          "line": 149,
+          "status": "resolved",
+          "base": "."
+        },
+        "scripts/check_no_mcp_dist.sh": {
+          "line": 149,
+          "status": "resolved",
+          "base": "."
+        },
+        "packages/tracelab-mcp/src/": {
+          "line": 150,
+          "status": "resolved",
+          "base": "."
+        },
+        "packages/tracelab-mcp": {
+          "line": 150,
+          "status": "resolved",
+          "base": "."
+        },
+        "dist/index.js": {
+          "line": 150,
+          "status": "resolved",
+          "base": "packages/tracelab-mcp"
+        },
+        "dist/": {
+          "line": 152,
+          "status": "resolved",
+          "base": "cmos"
+        },
+        "docs/mcp-tools.md": {
+          "line": 153,
+          "status": "resolved",
+          "base": "."
+        },
+        "packages/tracelab-mcp/README.md": {
+          "line": 153,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/contracts/mcp-parity-manifest.json": {
+          "line": 153,
+          "status": "resolved",
+          "base": "."
+        },
+        "scripts/mcp_parity_audit.mjs": {
+          "line": 153,
+          "status": "resolved",
+          "base": "."
+        },
+        "./cmos/cli.py": {
+          "line": 183,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/scripts/seed_sqlite.py": {
+          "line": 189,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/context/integration_test_runner.js": {
+          "line": 192,
+          "status": "resolved",
+          "base": "."
+        },
+        "telemetry/events/testing-summary.json": {
+          "line": 192,
+          "status": "resolved",
+          "base": "."
+        },
+        "./cmos/scripts/package_starter.sh": {
+          "line": 195,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/services": {
+          "line": 199,
+          "status": "resolved",
+          "base": "."
+        },
+        "pyproject.toml": {
+          "line": 200,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/core/": {
+          "line": 201,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/ports/": {
+          "line": 201,
+          "status": "resolved",
+          "base": "."
+        },
+        "foundational-docs/": {
+          "line": 203,
+          "status": "resolved",
+          "base": "cmos"
+        },
+        "cmos/docs/": {
+          "line": 203,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/docs/operations-guide.md": {
+          "line": 204,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/docs/workflow-examples.md": {
+          "line": 204,
+          "status": "resolved",
+          "base": "."
+        },
+        "docs/authentication.md": {
+          "line": 207,
+          "status": "resolved",
+          "base": "."
+        },
+        "docs/data-protection-audit.md": {
+          "line": 207,
+          "status": "resolved",
+          "base": "."
+        },
+        "scripts/check_no_credential_literals.py": {
+          "line": 207,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/scripts/validate_foundational_refs.py": {
+          "line": 208,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/README.md": {
+          "line": 208,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/context/MASTER_CONTEXT.json": {
+          "line": 208,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/context/db_client.py": {
+          "line": 210,
+          "status": "resolved",
+          "base": "."
+        },
+        "tests/test_missions_api.py": {
+          "line": 221,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/mcp_server/tools/": {
+          "line": 225,
+          "status": "resolved",
+          "base": "."
+        },
+        "packages/tracelab-mcp/src/index.ts": {
+          "line": 226,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/contracts/mission-authoring-contract.md": {
+          "line": 235,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/contracts/deepsearch-compiler-vendor.md": {
+          "line": 248,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/services/contract_compiler/": {
+          "line": 250,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/adapters/": {
+          "line": 256,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/adapters/repositories/": {
+          "line": 256,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/adapters/external/": {
+          "line": 256,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/dependencies.py": {
+          "line": 257,
+          "status": "resolved",
+          "base": "."
+        },
+        "docs/adr/": {
+          "line": 258,
+          "status": "resolved",
+          "base": "."
+        },
+        "tests/unit/": {
+          "line": 272,
+          "status": "resolved",
+          "base": "."
+        },
+        "tests/integration/": {
+          "line": 273,
+          "status": "resolved",
+          "base": "."
+        },
+        "tests/e2e/": {
+          "line": 274,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/context/": {
+          "line": 279,
+          "status": "resolved",
+          "base": "."
+        },
+        "data/": {
+          "line": 280,
+          "status": "resolved",
+          "base": "."
+        },
+        "artifacts/": {
+          "line": 280,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/SESSIONS.jsonl": {
+          "line": 291,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/docs/session-management-guide.md": {
+          "line": 291,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/docs/sqlite-schema-reference.md": {
+          "line": 301,
+          "status": "resolved",
+          "base": "."
+        },
+        "README.md": {
+          "line": 304,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/docs/legacy-migration-guide.md": {
+          "line": 305,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/docs/mission_runtime_migration.md": {
+          "line": 305,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/docs/integration-testing-guide.md": {
+          "line": 307,
+          "status": "resolved",
+          "base": "."
+        },
+        "docs/frontend_architecture.md": {
+          "line": 308,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/foundational-docs/technical_architecture.md": {
+          "line": 308,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/foundational-docs/roadmap-sprints-50-53-ux-overhaul.md": {
+          "line": 309,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/foundational-docs/roadmap_template.md": {
+          "line": 310,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/foundational-docs/tech_arch_template.md": {
+          "line": 311,
+          "status": "resolved",
+          "base": "."
+        }
+      }
+    },
+    {
+      "document": "README.md",
+      "counts": {
+        "resolved": 44,
+        "git": 0,
+        "allowlisted": 0,
+        "unresolved": 0
+      },
+      "tokens": {
+        ".devcontainer/devcontainer.json": {
+          "line": 53,
+          "status": "resolved",
+          "base": "."
+        },
+        "docs/local-development.md": {
+          "line": 85,
+          "status": "resolved",
+          "base": "."
+        },
+        "frontend/": {
+          "line": 91,
+          "status": "resolved",
+          "base": "."
+        },
+        "docs/auth_and_cors_guidance.md": {
+          "line": 92,
+          "status": "resolved",
+          "base": "."
+        },
+        "examples/auth_examples.py": {
+          "line": 115,
+          "status": "resolved",
+          "base": "."
+        },
+        "postman/TraceLab-Auth.json": {
+          "line": 118,
+          "status": "resolved",
+          "base": "."
+        },
+        "tests/test_auth_flow.py": {
+          "line": 119,
+          "status": "resolved",
+          "base": "."
+        },
+        "tests/test_auth_api.py": {
+          "line": 119,
+          "status": "resolved",
+          "base": "."
+        },
+        "docs/authentication.md": {
+          "line": 121,
+          "status": "resolved",
+          "base": "."
+        },
+        "tests/e2e/production-smoke.spec.ts": {
+          "line": 135,
+          "status": "resolved",
+          "base": "frontend"
+        },
+        ".devcontainer/": {
+          "line": 143,
+          "status": "resolved",
+          "base": "."
+        },
+        ".github/": {
+          "line": 144,
+          "status": "resolved",
+          "base": "."
+        },
+        "alembic/": {
+          "line": 145,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/": {
+          "line": 146,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/api/": {
+          "line": 147,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/api/v1/": {
+          "line": 148,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/adapters/": {
+          "line": 149,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/core/": {
+          "line": 150,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/mcp_server/": {
+          "line": 151,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/models/": {
+          "line": 152,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/ports/": {
+          "line": 153,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/schemas/": {
+          "line": 154,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/services/": {
+          "line": 155,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/dependencies.py": {
+          "line": 156,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/main.py": {
+          "line": 157,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/": {
+          "line": 158,
+          "status": "resolved",
+          "base": "."
+        },
+        "docs/": {
+          "line": 159,
+          "status": "resolved",
+          "base": "."
+        },
+        "packages/": {
+          "line": 161,
+          "status": "resolved",
+          "base": "."
+        },
+        "packages/tracelab-mcp/": {
+          "line": 162,
+          "status": "resolved",
+          "base": "."
+        },
+        "scripts/": {
+          "line": 163,
+          "status": "resolved",
+          "base": "."
+        },
+        "tests/": {
+          "line": 164,
+          "status": "resolved",
+          "base": "."
+        },
+        "tests/unit/": {
+          "line": 165,
+          "status": "resolved",
+          "base": "."
+        },
+        "tests/integration/": {
+          "line": 166,
+          "status": "resolved",
+          "base": "."
+        },
+        "tests/e2e/": {
+          "line": 167,
+          "status": "resolved",
+          "base": "."
+        },
+        "docker-compose.yml": {
+          "line": 168,
+          "status": "resolved",
+          "base": "."
+        },
+        "Dockerfile": {
+          "line": 169,
+          "status": "resolved",
+          "base": "."
+        },
+        "pyproject.toml": {
+          "line": 170,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/foundational-docs/technical_architecture.md": {
+          "line": 187,
+          "status": "resolved",
+          "base": "."
+        },
+        "app/services/README_redaction.md": {
+          "line": 222,
+          "status": "resolved",
+          "base": "."
+        },
+        "scripts/generate_corpus.py": {
+          "line": 229,
+          "status": "resolved",
+          "base": "."
+        },
+        "scripts/evaluate_presidio.py": {
+          "line": 235,
+          "status": "resolved",
+          "base": "."
+        },
+        "scripts/package_corpus.py": {
+          "line": 241,
+          "status": "resolved",
+          "base": "."
+        },
+        "scripts/upload_corpus.py": {
+          "line": 242,
+          "status": "resolved",
+          "base": "."
+        },
+        "data/corpus/README.md": {
+          "line": 245,
+          "status": "resolved",
+          "base": "."
+        }
+      }
+    },
+    {
+      "document": "docs/README.md",
+      "counts": {
+        "resolved": 22,
+        "git": 0,
+        "allowlisted": 0,
+        "unresolved": 0
+      },
+      "tokens": {
+        "foundational-docs/": {
+          "line": 3,
+          "status": "resolved",
+          "base": "cmos"
+        },
+        "docs/getting-started.md": {
+          "line": 7,
+          "status": "resolved",
+          "base": "."
+        },
+        "foundational-docs/roadmap_template.md": {
+          "line": 7,
+          "status": "resolved",
+          "base": "cmos"
+        },
+        "getting-started.md": {
+          "line": 7,
+          "status": "resolved",
+          "base": "docs"
+        },
+        "docs/mission-protocol-tutorial.md": {
+          "line": 8,
+          "status": "resolved",
+          "base": "."
+        },
+        "foundational-docs/tech_arch_template.md": {
+          "line": 8,
+          "status": "resolved",
+          "base": "cmos"
+        },
+        "mission-protocol-tutorial.md": {
+          "line": 8,
+          "status": "resolved",
+          "base": "docs"
+        },
+        "docs/best-practices.md": {
+          "line": 9,
+          "status": "resolved",
+          "base": "."
+        },
+        "best-practices.md": {
+          "line": 9,
+          "status": "resolved",
+          "base": "docs"
+        },
+        "docs/mission_protocol_validation.md": {
+          "line": 10,
+          "status": "resolved",
+          "base": "."
+        },
+        "mission_protocol_validation.md": {
+          "line": 10,
+          "status": "resolved",
+          "base": "docs"
+        },
+        "docs/mission_protocol_api.md": {
+          "line": 11,
+          "status": "resolved",
+          "base": "."
+        },
+        "mission_protocol_api.md": {
+          "line": 11,
+          "status": "resolved",
+          "base": "docs"
+        },
+        "docs/frontend_architecture.md": {
+          "line": 12,
+          "status": "resolved",
+          "base": "."
+        },
+        "frontend_architecture.md": {
+          "line": 12,
+          "status": "resolved",
+          "base": "docs"
+        },
+        "docs/quality_automation.md": {
+          "line": 13,
+          "status": "resolved",
+          "base": "."
+        },
+        "quality_automation.md": {
+          "line": 13,
+          "status": "resolved",
+          "base": "docs"
+        },
+        "docs/quality_gates.md": {
+          "line": 14,
+          "status": "resolved",
+          "base": "."
+        },
+        "quality_gates.md": {
+          "line": 14,
+          "status": "resolved",
+          "base": "docs"
+        },
+        "cmos/reports/": {
+          "line": 16,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/docs/README.md": {
+          "line": 16,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/docs/operations-guide.md": {
+          "line": 16,
+          "status": "resolved",
+          "base": "."
+        }
+      }
+    },
+    {
+      "document": "cmos/docs/operations-guide.md",
+      "counts": {
+        "resolved": 28,
+        "git": 0,
+        "allowlisted": 1,
+        "unresolved": 0
+      },
+      "tokens": {
+        "cmos/agents.md": {
+          "line": 20,
+          "status": "resolved",
+          "base": "."
+        },
+        "./cmos/cli.py": {
+          "line": 21,
+          "status": "resolved",
+          "base": "."
+        },
+        "PROJECT_CONTEXT.json": {
+          "line": 28,
+          "status": "resolved",
+          "base": "cmos"
+        },
+        "cmos/research/": {
+          "line": 38,
+          "status": "allowlisted",
+          "base": null,
+          "reason": "created on demand: `./cmos/cli.py research export` mkdirs cmos/research/ on first export (cmos/cli.py, research export handler); no export has been committed yet"
+        },
+        "cmos/db/cmos.sqlite": {
+          "line": 47,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/missions/backlog.yaml": {
+          "line": 51,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/scripts/seed_sqlite.py": {
+          "line": 53,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/telemetry/events/database-health.jsonl": {
+          "line": 54,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/context/integration_test_runner.js": {
+          "line": 63,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/telemetry/events/": {
+          "line": 87,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/tests/security/": {
+          "line": 92,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/tests/performance/benchmarks.json": {
+          "line": 96,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/docs/": {
+          "line": 101,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/foundational-docs/": {
+          "line": 101,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/foundational-docs/roadmap_template.md": {
+          "line": 102,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/foundational-docs/tech_arch_template.md": {
+          "line": 102,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/README.md": {
+          "line": 103,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/context/MASTER_CONTEXT.json": {
+          "line": 104,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/docs/mcp-reference.md": {
+          "line": 151,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/scripts/migrate_sprint_yaml_to_db.py": {
+          "line": 158,
+          "status": "resolved",
+          "base": "."
+        },
+        "./cmos/scripts/package_starter.sh": {
+          "line": 180,
+          "status": "resolved",
+          "base": "."
+        },
+        "./cmos/scripts/reset_starter.sh": {
+          "line": 181,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/dist/": {
+          "line": 239,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/foundational-docs/roadmap-sprints-50-53-ux-overhaul.md": {
+          "line": 267,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/docs/build-session-prompt.md": {
+          "line": 287,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/docs/sqlite-schema-reference.md": {
+          "line": 288,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/docs/legacy-migration-guide.md": {
+          "line": 289,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/tests/": {
+          "line": 290,
+          "status": "resolved",
+          "base": "."
+        },
+        "cmos/docs/integration-testing-guide.md": {
+          "line": 296,
+          "status": "resolved",
+          "base": "."
+        }
+      }
+    }
+  ]
+}

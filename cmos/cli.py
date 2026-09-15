@@ -11,9 +11,9 @@ import argparse
 import json
 import sys
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 try:
     import yaml  # type: ignore
@@ -54,11 +54,18 @@ if str(DEFAULT_ROOT) not in sys.path:
     sys.path.insert(0, str(DEFAULT_ROOT))
 
 from context.db_client import SQLiteClient, SQLiteClientError  # noqa: E402
+from context.foundational_refs import FOUNDATIONAL_CHECKS, validate_file  # noqa: E402
 from context.mission_runtime import (  # noqa: E402
     MissionRuntime,
     MissionRuntimeError,
+)
+from context.mission_runtime import (  # noqa: E402
     block as block_mission,
+)
+from context.mission_runtime import (  # noqa: E402
     complete as complete_mission,
+)
+from context.mission_runtime import (  # noqa: E402
     start as start_mission,
 )
 from context.session_runtime import (  # noqa: E402
@@ -67,16 +74,24 @@ from context.session_runtime import (  # noqa: E402
     SessionError,
     SessionRuntimeError,
     ValidationError,
+)
+from context.session_runtime import (  # noqa: E402
     capture as capture_session,
+)
+from context.session_runtime import (  # noqa: E402
     complete as complete_session,
+)
+from context.session_runtime import (  # noqa: E402
     start as start_session,
 )
 from context.view_helpers import (  # noqa: E402
     ContextViewError,
-    export_context as export_context_view,
     get_context_at_point,
     get_domain_view,
     get_master_context_view,
+)
+from context.view_helpers import (  # noqa: E402
+    export_context as export_context_view,
 )
 
 
@@ -86,39 +101,6 @@ class Environment:
     db_path: Path
     schema_path: Path
 
-
-FOUNDATIONAL_CHECKS = {
-    Path("agents.md"): {
-        "required": [
-            "foundational-docs/roadmap_template.md",
-            "foundational-docs/tech_arch_template.md",
-        ],
-        "forbidden": [
-            "docs/roadmap.md",
-            "docs/technical_architecture.md",
-        ],
-    },
-    Path("README.md"): {
-        "required": [
-            "foundational-docs/roadmap_template.md",
-            "foundational-docs/tech_arch_template.md",
-        ],
-        "forbidden": [
-            "docs/roadmap.md",
-            "docs/technical_architecture.md",
-        ],
-    },
-    Path("context/MASTER_CONTEXT.json"): {
-        "required": [
-            "foundational-docs/roadmap_template.md",
-            "foundational-docs/tech_arch_template.md",
-        ],
-        "forbidden": [
-            "docs/roadmap.md",
-            "docs/technical_architecture.md",
-        ],
-    },
-}
 
 VALID_MISSION_STATUSES = (
     "Queued",
@@ -198,7 +180,7 @@ def _normalize_status(value: str) -> str:
     return normalized
 
 
-def _ensure_mission_exists(client: SQLiteClient, mission_id: str) -> Dict[str, Any]:
+def _ensure_mission_exists(client: SQLiteClient, mission_id: str) -> dict[str, Any]:
     row = client.fetchone(
         "SELECT id, metadata FROM missions WHERE id = :id", {"id": mission_id}
     )
@@ -215,13 +197,13 @@ def _ensure_sprint_exists(client: SQLiteClient, sprint_id: str) -> None:
 
 def _build_metadata_payload(
     *,
-    base: Optional[Dict[str, Any]] = None,
-    description: Optional[str] = None,
-    success_criteria: Optional[List[str]] = None,
-    deliverables: Optional[List[str]] = None,
-    metadata_json: Optional[str] = None,
-) -> Optional[Dict[str, Any]]:
-    payload: Dict[str, Any] = dict(base) if isinstance(base, dict) else {}
+    base: dict[str, Any] | None = None,
+    description: str | None = None,
+    success_criteria: list[str] | None = None,
+    deliverables: list[str] | None = None,
+    metadata_json: str | None = None,
+) -> dict[str, Any] | None:
+    payload: dict[str, Any] = dict(base) if isinstance(base, dict) else {}
     if metadata_json:
         try:
             incoming = json.loads(metadata_json)
@@ -256,12 +238,12 @@ def _build_runtime(env: Environment) -> MissionRuntime:
     return MissionRuntime(repo_root=env.root, db_path=env.db_path)
 
 
-def _print_json(label: str, payload: Dict[str, Any]) -> None:
+def _print_json(label: str, payload: dict[str, Any]) -> None:
     print(label)
     print(json.dumps(payload, indent=2, ensure_ascii=False))
 
 
-def _parse_metadata_blob(raw: Optional[str]) -> Dict[str, Any]:
+def _parse_metadata_blob(raw: str | None) -> dict[str, Any]:
     if not raw:
         return {}
     try:
@@ -271,14 +253,14 @@ def _parse_metadata_blob(raw: Optional[str]) -> Dict[str, Any]:
     return parsed if isinstance(parsed, dict) else {}
 
 
-def _extract_string_items(value: Any) -> List[str]:
+def _extract_string_items(value: Any) -> list[str]:
     if value is None:
         return []
     if isinstance(value, str):
         candidate = value.strip()
         return [candidate] if candidate else []
-    if isinstance(value, (list, tuple)):
-        results: List[str] = []
+    if isinstance(value, list | tuple):
+        results: list[str] = []
         for item in value:
             if isinstance(item, str):
                 candidate = item.strip()
@@ -287,7 +269,7 @@ def _extract_string_items(value: Any) -> List[str]:
         return results
 
 
-def _load_json_array(raw: Any) -> List[Any]:
+def _load_json_array(raw: Any) -> list[Any]:
     """Best-effort conversion of JSON-encoded list columns into Python lists."""
     if raw is None:
         return []
@@ -300,7 +282,7 @@ def _load_json_array(raw: Any) -> List[Any]:
     return parsed if isinstance(parsed, list) else []
 
 
-def _parse_iso_timestamp(value: Optional[str]) -> Optional[datetime]:
+def _parse_iso_timestamp(value: str | None) -> datetime | None:
     if not value:
         return None
     cleaned = value.strip()
@@ -314,12 +296,12 @@ def _parse_iso_timestamp(value: Optional[str]) -> Optional[datetime]:
         return None
 
 
-def _format_relative_timestamp(value: Optional[str]) -> str:
+def _format_relative_timestamp(value: str | None) -> str:
     dt = _parse_iso_timestamp(value)
     if not dt:
         return "unknown"
-    now = datetime.now(tz=timezone.utc)
-    delta = now - dt.astimezone(timezone.utc)
+    now = datetime.now(tz=UTC)
+    delta = now - dt.astimezone(UTC)
     seconds = int(delta.total_seconds())
     if seconds < 60:
         return "just now"
@@ -335,16 +317,16 @@ def _format_relative_timestamp(value: Optional[str]) -> str:
     return dt.strftime("%Y-%m-%d")
 
 
-def _format_full_timestamp(value: Optional[str]) -> str:
+def _format_full_timestamp(value: str | None) -> str:
     dt = _parse_iso_timestamp(value)
     if not dt:
         return "unknown"
-    return dt.astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    return dt.astimezone(UTC).strftime("%Y-%m-%d %H:%M UTC")
 
 
-def _format_duration(start: Optional[str], end: Optional[str]) -> str:
+def _format_duration(start: str | None, end: str | None) -> str:
     start_dt = _parse_iso_timestamp(start)
-    end_dt = _parse_iso_timestamp(end) or datetime.now(tz=timezone.utc)
+    end_dt = _parse_iso_timestamp(end) or datetime.now(tz=UTC)
     if not start_dt:
         return "unknown"
     total_seconds = int((end_dt - start_dt).total_seconds())
@@ -360,7 +342,7 @@ def _format_duration(start: Optional[str], end: Optional[str]) -> str:
     return f"{hours}h {mins}m" if mins else f"{hours}h"
 
 
-def _active_session_info(env: Environment) -> Optional[Dict[str, Any]]:
+def _active_session_info(env: Environment) -> dict[str, Any] | None:
     """Return the active session record from project_context if available."""
     client = _open_client(env)
     try:
@@ -374,7 +356,7 @@ def _active_session_info(env: Environment) -> Optional[Dict[str, Any]]:
     return None
 
 
-def _require_session_id(env: Environment, override: Optional[str]) -> str:
+def _require_session_id(env: Environment, override: str | None) -> str:
     """Resolve the session ID to operate on, enforcing active session when needed."""
     if override:
         return override
@@ -385,7 +367,7 @@ def _require_session_id(env: Environment, override: Optional[str]) -> str:
     return []
 
 
-def _format_sprint_label(mission: Dict[str, Any]) -> str:
+def _format_sprint_label(mission: dict[str, Any]) -> str:
     sprint_id = mission.get("sprint_id")
     sprint_title = mission.get("sprint_title")
     if sprint_id and sprint_title:
@@ -397,14 +379,14 @@ def _format_sprint_label(mission: Dict[str, Any]) -> str:
     return "Unassigned"
 
 
-def _render_bullet_block(items: List[str], placeholder: str) -> List[str]:
+def _render_bullet_block(items: list[str], placeholder: str) -> list[str]:
     if items:
         return [f"- {item}" for item in items]
     return [f"- {placeholder}"]
 
 
 def _render_research_report(
-    mission: Dict[str, Any], events: List[Dict[str, Any]]
+    mission: dict[str, Any], events: list[dict[str, Any]]
 ) -> str:
     metadata_blob = _parse_metadata_blob(mission.get("metadata"))
     brief = (
@@ -427,7 +409,7 @@ def _render_research_report(
     started_at = metadata_blob.get("started_at")
     completed_at = mission.get("completed_at") or metadata_blob.get("completed_at")
 
-    lines: List[str] = []
+    lines: list[str] = []
     mission_name = mission.get("name") or "(untitled mission)"
     lines.append(f"# Research Report: {mission.get('id')} – {mission_name}")
     lines.append("")
@@ -487,7 +469,7 @@ def _render_research_report(
         lines.append("_No session events recorded for this mission._")
     lines.append("")
 
-    snapshot_source: Dict[str, Any]
+    snapshot_source: dict[str, Any]
     if metadata_blob:
         snapshot_source = metadata_blob
     else:
@@ -620,10 +602,10 @@ def _mission_add(env: Environment, args: argparse.Namespace) -> None:
 
 def _mission_update(env: Environment, args: argparse.Namespace) -> None:
     client = _open_client(env)
-    changed_fields: List[str] = []
+    changed_fields: list[str] = []
     try:
         row = _ensure_mission_exists(client, args.mission_id)
-        updates: Dict[str, Any] = {}
+        updates: dict[str, Any] = {}
         if args.name:
             updates["name"] = args.name
         if args.status:
@@ -644,7 +626,7 @@ def _mission_update(env: Environment, args: argparse.Namespace) -> None:
             )
         )
         if metadata_requested:
-            base: Optional[Dict[str, Any]] = None
+            base: dict[str, Any] | None = None
             raw_metadata = row.get("metadata")
             if raw_metadata:
                 try:
@@ -669,7 +651,7 @@ def _mission_update(env: Environment, args: argparse.Namespace) -> None:
         assignments = ", ".join(f"{column} = :{column}" for column in changed_fields)
         updates["id"] = args.mission_id
         with client.transaction() as conn:
-            conn.execute(f"UPDATE missions SET {assignments} WHERE id = :id", updates)
+            conn.execute(f"UPDATE missions SET {assignments} WHERE id = :id", updates)  # noqa: S608 - column names come from the fixed update map; values are bound
     finally:
         client.close()
     _sync_backlog(env)
@@ -771,7 +753,7 @@ def _mission_show_cmd(env: Environment, args: argparse.Namespace) -> None:
             """
             SELECT m.id, m.name, m.status, m.completed_at, m.notes,
                    s.id as sprint_id, s.title as sprint_title,
-                   m.objective, m.context, m.success_criteria, 
+                   m.objective, m.context, m.success_criteria,
                    m.deliverables, m.reference_docs, m.domain_fields
             FROM missions m
             LEFT JOIN sprints s ON s.id = m.sprint_id
@@ -814,28 +796,28 @@ def _mission_show_cmd(env: Environment, args: argparse.Namespace) -> None:
 
             if row["success_criteria"]:
                 criteria = json.loads(row["success_criteria"])
-                print(f"\n## Success Criteria")
+                print("\n## Success Criteria")
                 for i, criterion in enumerate(criteria, 1):
                     print(f"  {i}. {criterion}")
 
             if row["deliverables"]:
                 deliverables = json.loads(row["deliverables"])
-                print(f"\n## Deliverables")
+                print("\n## Deliverables")
                 for i, item in enumerate(deliverables, 1):
                     print(f"  {i}. {item}")
 
             if row["reference_docs"]:
                 refs = json.loads(row["reference_docs"])
-                print(f"\n## References")
+                print("\n## References")
                 for ref in refs:
                     print(f"  - {ref}")
 
             if row["domain_fields"]:
                 domain = json.loads(row["domain_fields"])
-                print(f"\n## Domain Fields")
+                print("\n## Domain Fields")
                 print(f"Type: {domain.get('type', 'N/A')}")
                 if domain.get("researchFoundation"):
-                    print(f"\nResearch Foundation:")
+                    print("\nResearch Foundation:")
                     for finding in domain["researchFoundation"]:
                         print(
                             f"  - {finding.get('finding', 'N/A')} (from {finding.get('sourceMission', 'N/A')})"
@@ -975,7 +957,7 @@ def _session_onboard(env: Environment, _args: argparse.Namespace) -> None:
         "last_activity"
     )
 
-    lines: List[str] = []
+    lines: list[str] = []
     lines.append("=== Project Overview ===")
     lines.append(f"Project: {project_name}")
     if project_desc:
@@ -1079,7 +1061,7 @@ def _session_list(env: Environment, args: argparse.Namespace) -> None:
     client = _open_client(env)
     try:
         clauses = []
-        params: Dict[str, Any] = {"limit": args.limit}
+        params: dict[str, Any] = {"limit": args.limit}
         if args.type:
             clauses.append("type = :type")
             params["type"] = args.type.strip().lower()
@@ -1094,7 +1076,7 @@ def _session_list(env: Environment, args: argparse.Namespace) -> None:
               {where}
              ORDER BY COALESCE(completed_at, started_at) DESC
              LIMIT :limit
-            """,
+            """,  # noqa: S608 - clauses are fixed text; type/status/limit are bound parameters
             params,
         )
     finally:
@@ -1117,7 +1099,7 @@ def _session_list(env: Environment, args: argparse.Namespace) -> None:
             started, completed if status == "completed" else None
         )
         captures = _load_json_array(row.get("captures"))
-        counts: Dict[str, int] = {}
+        counts: dict[str, int] = {}
         for capture in captures:
             category = (capture.get("category") or "").lower()
             if category:
@@ -1192,7 +1174,7 @@ def _session_show(env: Environment, args: argparse.Namespace) -> None:
 def _session_search(env: Environment, args: argparse.Namespace) -> None:
     client = _open_client(env)
     try:
-        params: Dict[str, Any] = {
+        params: dict[str, Any] = {
             "pattern": f"%{args.query.lower()}%",
             "limit": args.limit,
         }
@@ -1259,7 +1241,7 @@ def _session_search(env: Environment, args: argparse.Namespace) -> None:
         print("No sessions matched the category filter.")
 
 
-def _load_backlog(client: SQLiteClient) -> Dict[str, Any]:
+def _load_backlog(client: SQLiteClient) -> dict[str, Any]:
     sprints = client.fetchall(
         "SELECT id, title, focus, status, start_date, end_date, total_missions, completed_missions "
         "FROM sprints ORDER BY COALESCE(start_date, '') ASC, id ASC"
@@ -1275,11 +1257,11 @@ def _load_backlog(client: SQLiteClient) -> Dict[str, Any]:
         "SELECT prompt, behavior FROM prompt_mappings ORDER BY id"
     )
 
-    missions_by_sprint: Dict[str, List[Dict[str, Any]]] = {}
+    missions_by_sprint: dict[str, list[dict[str, Any]]] = {}
     for mission in missions:
         sprint_id = mission.get("sprint_id")
         bucket = missions_by_sprint.setdefault(sprint_id, [])
-        entry: Dict[str, Any] = {
+        entry: dict[str, Any] = {
             "id": mission.get("id"),
             "name": mission.get("name"),
             "status": mission.get("status"),
@@ -1295,7 +1277,7 @@ def _load_backlog(client: SQLiteClient) -> Dict[str, Any]:
                 entry["metadata"] = mission["metadata"]
         bucket.append(entry)
 
-    sprint_documents: List[Dict[str, Any]] = []
+    sprint_documents: list[dict[str, Any]] = []
     for sprint in sprints:
         sprint_documents.append(
             {
@@ -1328,7 +1310,7 @@ def _load_backlog(client: SQLiteClient) -> Dict[str, Any]:
     }
 
 
-def _print_backlog(backlog: Dict[str, Any]) -> None:
+def _print_backlog(backlog: dict[str, Any]) -> None:
     sprints = backlog.get("sprints") or []
     if not sprints:
         print("No sprints defined in the database.")
@@ -1411,7 +1393,7 @@ def _export_contexts(env: Environment, args: argparse.Namespace) -> None:
 
 
 def _export_backlog(
-    env: Environment, output: Optional[Path] = None, *, quiet: bool = False
+    env: Environment, output: Path | None = None, *, quiet: bool = False
 ) -> Path:
     if yaml is None:
         raise SystemExit("PyYAML is required for backlog export. Install pyyaml first.")
@@ -1429,7 +1411,7 @@ def _export_backlog(
         "description": "Backlog export generated from the CMOS SQLite database.",
         "author": "CMOS",
         "schema": "./schemas/SprintPlan.v1.json",
-        "generatedAt": datetime.now(timezone.utc).isoformat(),
+        "generatedAt": datetime.now(UTC).isoformat(),
     }
     domain_fields = {
         "type": "Planning.SprintPlan.v1",
@@ -1455,7 +1437,7 @@ def _sync_backlog(env: Environment) -> Path:
 
 
 def _export_mission_yaml(
-    env: Environment, mission_id: str, output_dir: Optional[Path] = None
+    env: Environment, mission_id: str, output_dir: Path | None = None
 ) -> Path:
     """Export a single mission's full YAML specification from database."""
     if yaml is None:
@@ -1465,7 +1447,7 @@ def _export_mission_yaml(
     try:
         row = client.fetchone(
             """
-            SELECT id, sprint_id, name, objective, context, 
+            SELECT id, sprint_id, name, objective, context,
                    success_criteria, deliverables, reference_docs, domain_fields
             FROM missions WHERE id = :id
             """,
@@ -1510,7 +1492,7 @@ def _export_mission_yaml(
     return output_path
 
 
-def _export_all_missions(env: Environment, output_root: Optional[Path] = None) -> int:
+def _export_all_missions(env: Environment, output_root: Path | None = None) -> int:
     """Export all missions as YAML files organized by sprint."""
     if yaml is None:
         raise SystemExit("PyYAML is required for mission export. Install pyyaml first.")
@@ -1520,7 +1502,7 @@ def _export_all_missions(env: Environment, output_root: Optional[Path] = None) -
     try:
         rows = client.fetchall(
             """
-            SELECT id, sprint_id FROM missions 
+            SELECT id, sprint_id FROM missions
             WHERE objective IS NOT NULL
             ORDER BY sprint_id, id
             """
@@ -1540,8 +1522,8 @@ def _export_all_missions(env: Environment, output_root: Optional[Path] = None) -
 def _context_snapshot(
     env: Environment,
     context_id: str,
-    session_id: Optional[str] = None,
-    source: Optional[str] = None,
+    session_id: str | None = None,
+    source: str | None = None,
 ) -> None:
     """Take a snapshot of the specified context."""
     full_context_id = f"{context_id}_context"
@@ -1662,12 +1644,12 @@ def _context_render_view(env: Environment, args: argparse.Namespace) -> None:
     print(rendered)
 
 
-def _decisions_list(env: Environment, limit: int, domain: Optional[str] = None) -> None:
+def _decisions_list(env: Environment, limit: int, domain: str | None = None) -> None:
     """List strategic decisions."""
     client = _open_client(env)
     try:
         query = "SELECT id, decision_text, created_at, project_domain, sprint_id FROM strategic_decisions"
-        params: Dict[str, Any] = {"limit": limit}
+        params: dict[str, Any] = {"limit": limit}
 
         if domain:
             query += " WHERE project_domain = :domain"
@@ -1698,17 +1680,17 @@ def _decisions_list(env: Environment, limit: int, domain: Optional[str] = None) 
 
 
 def _decisions_search(
-    env: Environment, keyword: str, domain: Optional[str] = None
+    env: Environment, keyword: str, domain: str | None = None
 ) -> None:
     """Search decisions by keyword."""
     client = _open_client(env)
     try:
         query = """
-            SELECT id, decision_text, created_at, project_domain, sprint_id 
-            FROM strategic_decisions 
+            SELECT id, decision_text, created_at, project_domain, sprint_id
+            FROM strategic_decisions
             WHERE decision_text LIKE :keyword
         """
-        params: Dict[str, Any] = {"keyword": f"%{keyword}%"}
+        params: dict[str, Any] = {"keyword": f"%{keyword}%"}
 
         if domain:
             query += " AND project_domain = :domain"
@@ -1739,8 +1721,8 @@ def _decisions_by_sprint(env: Environment, sprint_id: str) -> None:
     try:
         decisions = client.fetchall(
             """
-            SELECT id, decision_text, created_at, project_domain 
-            FROM strategic_decisions 
+            SELECT id, decision_text, created_at, project_domain
+            FROM strategic_decisions
             WHERE sprint_id = :sprint_id
             ORDER BY created_at
             """,
@@ -1763,26 +1745,17 @@ def _decisions_by_sprint(env: Environment, sprint_id: str) -> None:
 
 
 def _validate_foundational_refs(env: Environment) -> None:
-    failures: List[str] = []
+    # One boundary-aware matcher shared with cmos/scripts/validate_foundational_refs.py.
+    failures: list[str] = []
     for relative_path, rules in FOUNDATIONAL_CHECKS.items():
-        file_path = env.root / relative_path
-        required = rules.get("required", [])
-        forbidden = rules.get("forbidden", [])
-        try:
-            content = file_path.read_text(encoding="utf-8")
-        except FileNotFoundError:
-            failures.append(f"{relative_path}: missing file")
-            continue
-        for needle in required:
-            if needle not in content:
-                failures.append(
-                    f"{relative_path}: missing required reference '{needle}'"
-                )
-        for needle in forbidden:
-            if needle in content:
-                failures.append(
-                    f"{relative_path}: contains forbidden reference '{needle}'"
-                )
+        failures.extend(
+            validate_file(
+                env.root / relative_path,
+                rules.get("required", []),
+                rules.get("forbidden", []),
+                label=str(relative_path),
+            )
+        )
 
     if failures:
         print("Foundational reference validation failed:")
@@ -2195,7 +2168,7 @@ def build_parser() -> argparse.ArgumentParser:
     session_complete.add_argument(
         "--agent", default="assistant", help="Agent identifier for session logging"
     )
-    session_onboard = session_sub.add_parser(
+    session_sub.add_parser(
         "onboard", help="Show a consolidated onboarding report"
     )
     session_list = session_sub.add_parser(
@@ -2352,7 +2325,7 @@ def _handle_validate(env: Environment, args: argparse.Namespace) -> None:
         raise SystemExit("Unknown validate subcommand")
 
 
-def main(argv: Optional[List[str]] = None) -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     env = _resolve_environment(args)
