@@ -46,8 +46,10 @@ def test_list_sorts_by_recency_only_and_counts_before_paging(client, db_session)
     oldest = mission(db_session, "validation_failed", created_at=now - timedelta(days=9), updated_at=now)
     middle = mission(db_session, "completed", created_at=now - timedelta(days=5), updated_at=now - timedelta(days=5))
     newest = mission(db_session, "draft", created_at=now, updated_at=now - timedelta(days=1))
+    # Fillers are older on both clocks; a defaulted updated_at would be later than `now`.
     for index in range(137):
-        mission(db_session, created_at=now - timedelta(days=30 + index))
+        stamp = now - timedelta(days=30 + index)
+        mission(db_session, created_at=stamp, updated_at=stamp)
     db_session.commit()
     home = client.get(HOME, headers=headers).json()
     first = client.get(API, params={"page_size": 2}, headers=headers).json()
