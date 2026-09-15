@@ -31,25 +31,29 @@ browser=await chromium.launch({headless:true});
 const results=[];
 for (const theme of (process.env.UI_THEME?[process.env.UI_THEME]:['light','dark'])) {
  for (const width of (process.env.UI_WIDTH?[Number(process.env.UI_WIDTH)]:[1440,390])) {
-  let transportErrors=[]; let navigationCancellations=[];
+  let transportErrors=[]; let navigationCancellations=[]; let suppressedWrites=[];
   const context=await browser.newContext({timezoneId,viewport:{width,height:1000},colorScheme:theme === 'dark' ? 'dark' : 'light'});
   await context.route(/https?:\/\/(api\.tracelab\.aquex\.ai|localhost:8000|127\.0\.0\.1:8103)\/.*/, async route => {
     const incoming = new URL(route.request().url());
     const method = route.request().method();
     // Facet metadata is an authenticated read even though its API uses POST.
     const readOnly = method === 'GET' || (method === 'POST' && incoming.pathname === '/api/v1/facets');
+    // Opening a mission or report marks it viewed (ACT-1). The smoke must not write, so it answers that call locally.
+    const localWrite = method === 'PUT' && incoming.pathname === '/api/v1/activity/viewed';
     try {
       if (directProduction) {
         if (incoming.origin !== api) throw Error('Production UI requested a non-production API');
         if (route.request().method() === 'OPTIONS') { await route.continue(); return; }
+        if (localWrite) { suppressedWrites.push({method, path:incoming.pathname}); await route.fulfill({status:200, json:{viewed:0,new_total:0}, headers:{'access-control-allow-origin':base,'access-control-allow-credentials':'true'}}); return; }
         if (!readOnly) throw Error('Smoke forbids API writes');
         const headers = {...route.request().headers(), 'x-api-key':creds.key};
         delete headers.authorization;
         await route.continue({headers}); return;
       }
       if (route.request().method() === 'OPTIONS') {
-        await route.fulfill({status:204, headers:{'access-control-allow-origin':base,'access-control-allow-headers':'authorization,content-type,x-api-key','access-control-allow-methods':'GET,POST,OPTIONS'}}); return;
+        await route.fulfill({status:204, headers:{'access-control-allow-origin':base,'access-control-allow-headers':'authorization,content-type,x-api-key','access-control-allow-methods':'GET,POST,PUT,OPTIONS'}}); return;
       }
+      if (localWrite) { suppressedWrites.push({method, path:incoming.pathname}); await route.fulfill({status:200, json:{viewed:0,new_total:0}, headers:{'access-control-allow-origin':base}}); return; }
       if (!readOnly) throw Error('Smoke forbids API writes');
       const response = await fetch(api + incoming.pathname + incoming.search, {method, headers:{'X-API-Key':creds.key,'Content-Type':'application/json'}, ...(method === 'POST' ? {body:route.request().postData()} : {})});
       if (!response.ok) transportErrors.push({path:incoming.pathname,status:response.status});
@@ -65,7 +69,7 @@ for (const theme of (process.env.UI_THEME?[process.env.UI_THEME]:['light','dark'
   page.on('response', response => { if(directProduction && new URL(response.url()).origin === api && response.status() >= 400) transportErrors.push({path:new URL(response.url()).pathname,status:response.status()}); });
   page.on('requestfailed', request => { if(new URL(request.url()).origin === api) { const failure = request.failure()?.errorText; const item={path:new URL(request.url()).pathname,error:failure || 'Browser API request failed'}; if(failure === 'net::ERR_ABORTED') navigationCancellations.push(item); else transportErrors.push(item); } });
   for(const route of selected) {
-   errors=[]; transportErrors=[]; navigationCancellations=[];
+   errors=[]; transportErrors=[]; navigationCancellations=[]; suppressedWrites=[];
    const slug=route.replace(/\//g,'_')||'home';
    const response=await page.goto(base+route,{waitUntil:'networkidle',timeout:60000});
    await page.waitForTimeout(400);
@@ -88,7 +92,7 @@ for (const theme of (process.env.UI_THEME?[process.env.UI_THEME]:['light','dark'
    const shot=`${theme}-${width}-${slug}.png`;
    const links=inspectInternalLinks(await page.locator('a[href]').evaluateAll(nodes=>nodes.map(node=>node.href)),page.url());
    await page.screenshot({path:path.join(out,shot),fullPage:true, mask:page.url().includes('/settings')?[page.locator('code')]:[]});
-   const result={route,themeRequested:theme,theme,width,status:response.status(),finalUrl:page.url(),...measured,...links,errors,transportErrors:[...transportErrors],navigationCancellations:[...navigationCancellations],screenshot:shot};
+   const result={route,themeRequested:theme,theme,width,status:response.status(),finalUrl:page.url(),...measured,...links,errors,transportErrors:[...transportErrors],navigationCancellations:[...navigationCancellations],suppressedWrites:[...suppressedWrites],screenshot:shot};
    results.push(result);
    await fs.writeFile(out+'/results.json',JSON.stringify(results,null,2));
    console.log(JSON.stringify({route,theme,width,status:response.status(),overflow:measured.scrollWidth>width+1,violations:measured.violations.map(v=>v.id+':'+v.nodes.length),errors:errors.length}));
@@ -99,7 +103,7 @@ for (const theme of (process.env.UI_THEME?[process.env.UI_THEME]:['light','dark'
 await browser.close();
 browser=undefined;
 const failures=results.filter(r => r.scrollWidth > r.width+1 || r.violations.length || r.errors.length || r.transportErrors.length || r.legacyInternalLinks.length || r.mainCount !== 1 || !r.shellPresent || r.theme !== r.themeRequested || r.status !== (r.route === '/404' ? 404 : 200));
-await fs.writeFile(out+'/summary.json', JSON.stringify({base, timezoneId, checkedAt:new Date().toISOString(), checks:results.length, routes:[...new Set(results.map(r=>r.route))].length, failures:failures.map(r=>({route:r.route,theme:r.theme,width:r.width})), internalLinkPaths:[...new Set(results.flatMap(r=>r.internalLinks))].sort(), legacyInternalLinks:results.flatMap(r=>r.legacyInternalLinks), readOnly:true, directProductionApi:directProduction, readOnlyApiProxy:!directProduction},null,2));
+await fs.writeFile(out+'/summary.json', JSON.stringify({base, timezoneId, checkedAt:new Date().toISOString(), checks:results.length, routes:[...new Set(results.map(r=>r.route))].length, failures:failures.map(r=>({route:r.route,theme:r.theme,width:r.width})), internalLinkPaths:[...new Set(results.flatMap(r=>r.internalLinks))].sort(), legacyInternalLinks:results.flatMap(r=>r.legacyInternalLinks), readOnly:true, suppressedWrites:results.reduce((count,r)=>count+r.suppressedWrites.length,0), directProductionApi:directProduction, readOnlyApiProxy:!directProduction},null,2));
 if(failures.length)process.exitCode=1;
 
 }

@@ -47,6 +47,29 @@ test("Home stays at the root and its search opens the shell palette", async ({ p
   await expect(page.getByRole("navigation", { name: "Main navigation" }).getByRole("link", { name: "Missions", exact: true })).toHaveAttribute("href", "/missions");
 });
 
+test("Home keeps viewed activity rows at AA contrast in the light theme", async ({ page }) => {
+  await page.emulateMedia({ colorScheme: "light" });
+  const row = (id: string, isNew: boolean) => ({
+    type: "evidence", id, title: `Evidence batch ${id}`, subtitle: "research-session-2026-09-15", status: null,
+    href: `/evidence?session_key=${id}`, occurred_at: "2026-09-15T15:57:27.375860", new: isNew,
+  });
+  // Viewed rows sit next to new ones; dimming them pushed their small muted text below the 4.5:1 floor.
+  await page.route("**/api/v1/home", async route => route.fulfill({ json: {
+    generated_at: "2026-09-15T16:00:00Z", refresh_seconds: 30, missions: { total: 2, by_status: { completed: 2 } },
+    activity: { generated_at: "2026-09-15T16:00:00Z", refresh_seconds: 30, page: 1, page_size: 10, total: 2, new_total: 1, items: [row("viewed", false), row("fresh", true)] },
+    active_runs: { total: 0, items: [] }, recent_reports: { total: 0, items: [] }, recent_projects: { total: 0, items: [] }, evidence_activity: { total: 0, items: [] },
+  } }));
+  await page.goto("/");
+  await expect(page.getByRole("link", { name: "Evidence batch viewed" })).toBeVisible();
+  await expect(page.locator("li[data-new]")).toHaveCount(1);
+  await page.addScriptTag({ path: path.resolve("node_modules/axe-core/axe.min.js") });
+  const violations = await page.evaluate(async () => {
+    const axe = (window as unknown as { axe: { run: (node: Document) => Promise<{ violations: { id: string; impact: string }[] }> } }).axe;
+    return (await axe.run(document)).violations.filter(v => ["critical", "serious"].includes(v.impact)).map(v => v.id);
+  });
+  expect(violations).toEqual([]);
+});
+
 test("theme persists through hydration and OS changes without a wrong-color frame", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", error => errors.push(error.message));
