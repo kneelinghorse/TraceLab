@@ -190,11 +190,12 @@ selected via the `action` parameter.
 | `tracelab_home` | `snapshot`, `favorites`, `attention`, `inbox_summary`, `inbox_list` | Caller-scoped home, attention and inbox reads (human credential required). |
 
 
-Sprint 52 additions below are **source-only and unreleased**. The package remains
-version 1.1.1; MCP-3 will publish once the sprint source and artifact checks pass.
-Installing 1.1.1 from npm does not yet provide these new actions.
+Sprint 52 additions below ship in **1.2.0**, the single publish that decision #425
+called for after every Sprint 52 MCP change landed. Installing 1.1.1 from npm
+does not provide these actions; use `npx -y @aquex/tracelab-mcp` (latest) or pin
+`@aquex/tracelab-mcp@1.2.0`.
 
-### Sprint 52 read parameters (unreleased)
+### Sprint 52 read parameters (1.2.0)
 
 Every action calls the authenticated REST API afresh. Server totals and authored
 fields are preserved. Entity responses add absolute browser links; existing
@@ -241,7 +242,7 @@ Existing actions also gain UI parameters:
   REST export route and returns its exact text. Omit `format` to retain the
   legacy response of exact `report.content` bytes.
 
-### Sprint 52 actions and reads (MCP-2, unreleased)
+### Sprint 52 actions and reads (MCP-2, 1.2.0)
 
 Six non-destructive actions on research objects and five caller-scoped reads
 mirror the exact REST routes the web UI calls. Per-user acknowledgements

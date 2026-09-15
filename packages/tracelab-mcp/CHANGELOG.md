@@ -7,6 +7,8 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.2.0] — 2026-09-15
+
 ### Added
 
 - Eleven read actions: home snapshot/favorites, navigation, optional PEDR search,
@@ -22,7 +24,7 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
 - Evidence filters match the deployed API: calendar dates, UUID source IDs,
   one report/document context at a time, and validated date order.
 - PEDR exposes graph controls and diagnostics without changing plain knowledge
-  retrieval. These changes remain unreleased at source version 1.1.1 until MCP-3.
+  retrieval. These changes ship in 1.2.0, the single Sprint 52 publish that decision #425 called for.
 
 - Canonical browser navigation metadata on every entity response through one
   link helper, with an explicit `TRACELAB_FRONTEND_URL` override for custom
@@ -44,6 +46,9 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Bumped the public package to 1.2.0: nine clusters now expose 51 actions (up
+  from 40 in 1.1.1), an additive public API change released once after every
+  Sprint 52 MCP change landed (decision #425).
 - Upload `next_steps` now name `tracelab_document(action="process")` and
   `tracelab_search(action="knowledge")` instead of a REST path and the retired
   `search_knowledge` tool.
@@ -208,6 +213,7 @@ swap the install line to `npm install -g @aquex/tracelab-mcp` (or `npx
 Calls against legacy flat tool names continue to return a friendly
 migration error pointing at the cluster equivalent.
 
+[1.2.0]: https://github.com/kneelinghorse/TraceLab/releases/tag/tracelab-mcp-v1.2.0
 [1.1.1]: https://github.com/kneelinghorse/TraceLab/releases/tag/tracelab-mcp-v1.1.1
 [1.1.0]: https://github.com/kneelinghorse/TraceLab/releases/tag/tracelab-mcp-v1.1.0
 [1.0.0]: https://github.com/kneelinghorse/TraceLab/releases/tag/tracelab-mcp-v1.0.0
