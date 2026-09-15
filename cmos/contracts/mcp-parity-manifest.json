@@ -397,7 +397,7 @@
       "live": true,
       "ui_consumers": [
         "frontend/src/components/AddToCollection.tsx",
-        "frontend/src/pages/collections/index.tsx",
+        "frontend/src/pages/collections/new.tsx",
         "frontend/src/pages/documents/[id].tsx"
       ],
       "mcp": "tracelab_collection.create",
@@ -1274,7 +1274,7 @@
       "path": "/api/v1/projects",
       "live": true,
       "ui_consumers": [
-        "frontend/src/pages/projects/index.tsx"
+        "frontend/src/pages/projects/new.tsx"
       ],
       "mcp": "tracelab_project.create",
       "classification": "covered",
