@@ -956,6 +956,9 @@ describe('T41.7 — cluster surface', () => {
     };
     const toolNames = Object.keys(CLUSTER_ACTIONS);
     expect(toolNames).toHaveLength(9);
+    // MCP-2 (sprint-52): the 40 MCP-1 actions plus 11 closures. The parity
+    // manifest, README and docs tables are checked against this registry.
+    expect(Object.values(CLUSTER_ACTIONS).reduce((count, actions) => count + actions.length, 0)).toBe(51);
     expect(toolNames.sort()).toEqual([
       'tracelab_collection',
       'tracelab_document',
