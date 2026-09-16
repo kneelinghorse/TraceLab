@@ -234,7 +234,10 @@ describe("UsersAdmin — error surfacing", () => {
     fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Delete user" }));
 
     expect(await screen.findByText("Cannot remove or demote the last remaining owner")).toBeTruthy();
-    expect(screen.queryByRole("dialog")).toBeNull();
+    // Dialog closes the native element from an effect, so the error text can be observed one
+    // commit before the close runs. Wait for the dismissal itself rather than assuming the two
+    // land together; the assertion still fails if the dialog never closes (VERIFY-1).
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
     expect(mocks.api.list).toHaveBeenCalledTimes(1); // not reloaded on failure
   });
 
