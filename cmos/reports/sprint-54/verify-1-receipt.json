@@ -1,0 +1,88 @@
+{
+  "mission": "VERIFY-1",
+  "sprint": "sprint-54",
+  "title": "Trustworthy pre-merge gate: unflake the blockers, catch the classes production caught",
+  "pr": 328,
+  "branch": "verify-1-trustworthy-pre-merge-gate",
+  "commit": "b488e6d",
+  "gate": "Decision #474: GitHub Actions is on again, so the eight required contexts report and the decision #465 --admin bypass is not used. This mission changes no runtime code: only frontend specs, the vitest config and one new backend integration test.",
+  "scope_note": "Chartered for 'the two CommandPalette specs'. The 20-run soak found FOUR specs failing in THREE distinct ways; all four were fixed, because any one of them makes a green pre-merge run meaningless (learning #207).",
+  "criteria": {
+    "commandpalette_20_consecutive_runs": {
+      "result": "met, and exceeded",
+      "evidence": "20 consecutive FULL vitest runs on the final tree: 20 green, 0 red, 0 CommandPalette spec failures. The criterion asked only that the two specs pass; the whole 239-test suite passed all 20 times.",
+      "before": "Same soak on the pre-fix tree produced red runs 1, 2 and 3 of 12 across three different files.",
+      "waits": "Timers are driven, not awaited: the 200 ms debounce is advanced with vi.advanceTimersByTimeAsync inside act, then assertions read a settled tree. No findBy remains in the file."
+    },
+    "table_390px_gate": {
+      "result": "met",
+      "evidence": "The assertion added by #324 (frontend/tests/e2e/app-shell.spec.ts) was verified as a real gate rather than assumed. On the pre-#324 MarkdownRenderer the 'Applicability conditions' column measures 48.40625 px against a >90 px assertion, and region.scrollWidth > clientWidth is false. Each half was shown to fail INDEPENDENTLY, so the gate does not rest on one magic number. Green on main.",
+      "new_test": false
+    },
+    "row_locking_on_real_postgres": {
+      "result": "met, with new coverage",
+      "audit": "All six with_for_update call sites were audited against the four lazy=\"joined\" relationships. Two are the outer-join defect class; four are not (no eager-joined relationship on the locked entity).",
+      "sites": {
+        "app/services/notifications.py:113": "defect class; covered by tests/integration/test_notifications_postgres.py (#323)",
+        "app/services/collection.py:338": "defect class; NEW coverage in tests/integration/test_collection_locking_postgres.py",
+        "app/services/evidence_ledger.py:794": "already covered by tests/integration/test_deepsearch_evidence_projection_pg.py",
+        "app/services/collection.py:235": "not the class (Collection has no eager-joined relationship)",
+        "app/services/collection.py:261": "not the class (inner join, no eager-joined relationship)",
+        "app/services/synthesis_cache.py:108,230": "not the class (SynthesisCache has no relationships at all)"
+      },
+      "red_then_green": [
+        "notifications: reverting with_for_update(of=Mission) to a bare lock fails with psycopg2.errors.FeatureNotSupported: FOR UPDATE cannot be applied to the nullable side of an outer join; restored, passes.",
+        "collection: reverting with_for_update(of=CollectionItem) to a bare lock fails with the same production error; restored, passes."
+      ]
+    },
+    "eight_required_contexts_green": {
+      "result": "met: all eight required contexts passed on PR #328, plus the non-required mcp-package",
+      "runs": {
+        "vitest": 35049626132,
+        "type-check": 35049626132,
+        "lint": 35049626132,
+        "ruff-diff": 35049625432,
+        "backend-integration": 35049625415,
+        "build-frontend-production": 35049625416,
+        "Secret Scan": 35049625393,
+        "backend-suite": 35049625394
+      },
+      "non_required_also_green": {
+        "mcp-package": 35049625401
+      }
+    }
+  },
+  "root_causes": [
+    "jsdom charges 50-120 ms per Testing Library role+name lookup (first in a worker ~0.7 s), so a 1 s findBy spent its whole budget on one or two attempts. Fixed by driving the debounce and asserting a settled tree.",
+    "Three specs (CommandPalette, mission-authoring, document-upload) legitimately exceeded the 5 s default testTimeout once vitest runs files in parallel. Fixed with testTimeout: 30_000 - budget, not a wait.",
+    "admin/users asserted the confirm dialog was gone one commit before Dialog's closing useEffect ran. Fixed by waiting for the dismissal being asserted."
+  ],
+  "mutation_verification": [
+    "Drop the late-close guard in CommandPalette -> the reopen spec fails.",
+    "Search the untrimmed query instead of the trimmed term -> the entity-link spec fails.",
+    "Make Dialog never close -> the admin/users spec fails.",
+    "Re-key EntityGroup by entity type only -> NO spec fails, but this is an equivalent mutant, not a coverage gap: the page reset is enforced by the loading state unmounting the group, confirmed by the spec's own not.toHaveBeenCalledWith(\"Second\",\"document\",2) assertion. The pre-existing spec behaves identically."
+  ],
+  "local_verification": {
+    "vitest_soak": "20/20 full-suite runs green, 239 tests each",
+    "integration_suite": "138 passed, 4 skipped in 280 s (local testcontainers Postgres)",
+    "backend_focused": "tests/test_notifications.py, tests/test_pedr_collection_scope.py, tests/test_collections.py: 35 passed",
+    "playwright": "390 px table spec green on main; red on the reverted renderer",
+    "ruff": "clean on the new test file",
+    "secret_scan": "clean on the new test file",
+    "foundational_refs": "validate_foundational_refs.py succeeded",
+    "type_check_and_lint": "both clean after clearing stale .next (see learning #212)"
+  },
+  "learnings_added": [
+    211,
+    212,
+    213
+  ],
+  "not_in_scope": "A phone-width sweep across every content-sized table belongs to A11Y-1, which owns the automated overflow checks across the 36 baseline routes. VERIFY-1 verified the one gate next-step #344 named.",
+  "limitations": [
+    "The 20-run soak ran on one machine (darwin, local). It demonstrates determinism under that machine's load, not across CI runner classes.",
+    "testTimeout: 30_000 means a genuinely hung spec now takes 30 s rather than 5 s to fail. Accepted: the full suite runs in ~80 s and a random red costs more than a slow red.",
+    "mission-authoring and document-upload were fixed by the timeout change alone; unlike CommandPalette their waits were already promise-driven, so no spec-level change was needed or made."
+  ],
+  "merge_commit": "a930eb0"
+}

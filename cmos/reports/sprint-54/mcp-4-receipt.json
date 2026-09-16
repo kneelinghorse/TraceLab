@@ -1,0 +1,53 @@
+{
+  "mission": "MCP-4",
+  "sprint": "sprint-54",
+  "title": "MCP parity at argument level, required check, package hygiene",
+  "pr": 333,
+  "merge_commit": "2b2c246354c56117aaec6e356accd3561a898698",
+  "criteria": {
+    "argument_level_parity": {
+      "result": "met",
+      "what_was_wrong": "The cluster audit proved an action NAME exists in CLUSTER_ACTIONS. Decision #458 called that a transport count, correctly: it says nothing about whether the arguments a client is told to send are the arguments the handler accepts.",
+      "the_gap_class": "Every tool is described twice. inputSchema.properties is what MCP clients see and call; the Zod schema the handler .parse()s is what runs. Zod strips unknown keys, so a property advertised but absent from the Zod schema is accepted, ignored and never reported. This is the input-side twin of the two-serializers bug in cmos/contracts/mission-authoring-contract.md.",
+      "check": "scripts/mcp_argument_parity.mjs resolves tool -> action -> handler -> Zod schema from source and reports advertised-but-never-accepted, accepted-but-not-advertised, type-mismatch, and handler-schema-unresolved.",
+      "result_now": "9 tools, 49 actions, 122 advertised arguments, ZERO gaps.",
+      "false_positives_i_had_to_fix_first": "The first version reported gaps that were its OWN bugs. Zod schemas compose (z.object({...}).refine(...), Base.extend({...}), .superRefine, .partial) and resolving only the outermost call makes a composed schema look like it accepts nothing, so every one of its arguments reads as missing. It claimed tracelab_evidence advertised q with no handler accepting it; q IS accepted, via EvidenceListInputBase.extend({q}). Caught by checking the finding against source rather than believing the tool. A checker that cries wolf is worse than no checker.",
+      "mutation_verified": "All three gap kinds fire on a real mutation of packages/tracelab-mcp/src/index.ts and the tree returns to zero when restored. 7 tests, including one asserting the real package reports zero, so this cannot rot into vacuous green - which was the original complaint about the audit."
+    },
+    "mcp_package_required": {
+      "result": "met",
+      "ratchet": "30 consecutive green main-push runs with no failure in the examined window, against the five-run ratchet of decisions #336/#421 that deferred promotion last time (it had only 2 qualifying pushes then).",
+      "readback": "branch protection now lists 9 contexts: backend-suite, vitest, type-check, ruff-diff, build-frontend-production, Secret Scan, backend-integration, lint, mcp-package. strict: true. Verified by an independent GET after the PATCH.",
+      "sequencing": "Promoted AFTER PR #333 went green and BEFORE merging it, so the merge itself was gated by the newly required check.",
+      "why_it_earned_it": "On ALIAS-1 (PR #332) mcp-package caught two stale parity-manifest operations that every required lane missed - type-check, lint, vitest and the e2e suites were all green. Because it was advisory, that staleness would have merged silently.",
+      "api_note": "gh api -f sends strings; required_status_checks.strict needs a real boolean, so the PATCH must use --input with a JSON body."
+    },
+    "package_hygiene": {
+      "result": "met",
+      "unused_dependency": "@tailwindcss/postcss was declared at ^4 while the project runs tailwindcss 3.4.14, and nothing imported it - postcss.config.mjs uses the v3 'tailwindcss' plugin. Not merely unused but version-mismatched, which would have confused a future v4 migration. Removing it takes 593 lines out of frontend/package-lock.json; the production build is unchanged and build-frontend-production passed on a clean npm ci.",
+      "npm_pkg_fix": "normalised the bin path from ./dist/index.js to dist/index.js in packages/tracelab-mcp/package.json."
+    },
+    "published_package_exercised_against_production": {
+      "result": "met",
+      "why_the_existing_checks_were_not_enough": "src/read-parity.test.ts mocks fetch, and scripts/check-package.sh only proves the installed tarball starts. Neither proves the shipped artifact can talk to production, which is exactly why DoD-1 exists: @aquex/tracelab-mcp v1.0.0 passed its tests and crashed on every fresh ESM install.",
+      "how": "packages/tracelab-mcp/scripts/check-published-read-parity.mjs npm-packs, installs into a throwaway prefix, spawns the installed dist/index.js as an MCP stdio server with production credentials, and drives JSON-RPC.",
+      "evidence": "tools/list returned all 9 clusters. 5/5 read-only calls succeeded against https://api.tracelab.aquex.ai: tracelab_project.list, tracelab_search.navigate, tracelab_mission.list, tracelab_report.list, tracelab_collection.list.",
+      "read_only": "Only list/get style actions are called; the script is read-only by construction."
+    }
+  },
+  "local_verification": {
+    "argument_parity": "0 gaps across 9 tools / 49 actions / 122 arguments",
+    "cluster_parity_audit": "0 errors",
+    "node_tests": "11 passed (mcp_parity_audit.test.mjs + mcp_argument_parity.test.mjs)",
+    "package_unit_contracts": "145 passed (6 files)",
+    "test_package": "tarball install check passed",
+    "frontend_build": "clean after removing the dependency"
+  },
+  "limitations": [
+    "check-published-read-parity.mjs needs production credentials, so it is a local mission verification rather than a CI gate. CI still runs the mocked contracts and the tarball-start check.",
+    "The argument checker reads the TypeScript source, not the published dist. A build that transformed schemas would not be caught by it; the tarball read-parity run covers that end separately.",
+    "Type comparison maps Zod base types to JSON Schema types and treats integer as narrowing number. Unions, z.any and z.unknown are not type-compared, only presence-compared.",
+    "The check covers arguments, not response shapes. The response-side parity gap that motivated the two-serializers note is still only covered by the existing serializer tests."
+  ],
+  "learnings_added": [222]
+}

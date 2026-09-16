@@ -1,0 +1,77 @@
+{
+  "mission": "ALIAS-1",
+  "sprint": "sprint-54",
+  "title": "Retire the seven deprecated aliases, legacy components and dead client code",
+  "pr": 332,
+  "branch": "alias-1-retire-deprecated-routes",
+  "retired": [
+    "/console",
+    "/console/missions",
+    "/console/missions/{id}",
+    "/console/corrections",
+    "/invites",
+    "/search/results",
+    "/missions/queue"
+  ],
+  "deliberately_kept": {
+    "/inbox": "Still a live 308. Added by ACT-1 in Sprint 53 and not among the seven the roadmap lists for retirement.",
+    "/": "Canonical Home, a real page rather than an alias."
+  },
+  "criteria": {
+    "no_navigation_link_points_at_an_alias": {
+      "result": "met",
+      "evidence": "Sweep over the reduced 30-route baseline: 120 checks, 0 failures, legacyInternalLinks 0, and no internal link path matching any retired alias."
+    },
+    "each_alias_404s_and_the_map_agrees_with_production": {
+      "result": "met",
+      "evidence": "All seven curled against a production build return 404, including with query strings (/missions/queue?project_id=scope -> 404). Kept routes still answer: / /missions /admin/observability /admin/corrections /search /settings /missions/{uuid} -> 200, /inbox -> 308. route-migration.spec.ts covers all 9 map rows, 18/18 checks passed.",
+      "the_trap": "Deleting src/pages/missions/queue.tsx did NOT retire the URL. The sibling [id].tsx matches /missions/queue with id=\"queue\" and renders a mission detail page for a mission that does not exist, so it answered 200 while the diff said it was gone. The other six have no dynamic sibling and 404 on their own. Fixed with a tombstone page exporting getStaticProps returning notFound, which is a real 404 without changing the dynamic route's rendering mode. Caught only by curling every alias after the build."
+    },
+    "legacy_and_dead_code_deleted_not_merely_unreferenced": {
+      "result": "met",
+      "deleted": [
+        "frontend/src/components/console/ExportButtons.tsx (no importers)",
+        "exportMissionAsJson (only used by that component)",
+        "exportMissionAsYaml (only used by that component)",
+        "getRelationshipContext (zero consumers)",
+        "getWorkerHealth (zero consumers)",
+        "frontend/src/pages/missions/queue.tsx as it existed (re-exported the missions index)"
+      ],
+      "proof": "ESLint no-unused-vars then flagged three imports left orphaned by those deletions (RelationshipContextResponse, WorkerHealthResponse, ApiMission); removing them leaves type-check and lint clean with --max-warnings=0.",
+      "deliberately_not_deleted": "The rest of components/console and lib/api/console is legacy-NAMED but live: StatCard and CorrectionStatusCard back /admin/observability and /admin/corrections, and downloadFile backs the mission Export as .md control. Renaming that module is recorded residue, not this mission's scope."
+    },
+    "evidence_unchanged": {
+      "result": "met",
+      "evidence": "app/ is untouched on this branch, the backend /missions/{id}/export route is untouched, and every removed function had zero importers so none could contribute a byte to any export. The only lib/api change is a 140-line deletion of dead code."
+    }
+  },
+  "design_decision": {
+    "what": "Retired rows STAY in frontend/src/lib/route-migrations.json as kind \"retired\", beside \"page\" and \"redirect\", rather than being deleted.",
+    "why": "route-migration-links.mjs derives its alias list from that map. Deleting the rows would have deleted the guard with them, and an application link to a retired alias is now a 404 - strictly worse than the redirect it used to be. The guard has to outlive the redirect.",
+    "enforcement": "route-migration.spec.ts asserts 404 for retired rows, and a unit test asserts no retired row emits a redirect from next.config, so a retirement that quietly left its redirect wired fails."
+  },
+  "local_verification": {
+    "aliases": "7/7 return 404, with and without query strings",
+    "route_migration_coverage": "9 map rows, 18 checks, 18 passed",
+    "vitest": "240 passed (34 files)",
+    "playwright": "25 passed across route-migration, console, search-command and mission-protocol",
+    "sweep": "120 checks / 30 routes / 0 failures / 0 legacy internal links",
+    "type_check": "clean",
+    "lint": "clean at --max-warnings=0"
+  },
+  "learnings_added": [
+    221
+  ],
+  "limitations": [
+    "The sweep and the 404 checks ran against a local production build. CI-6's post-deploy check covers the deployed commit separately.",
+    "components/console and lib/api/console keep their legacy names while holding live admin code. Renaming is residue this mission did not take on.",
+    "The retired aliases stay in the migration map indefinitely. Nothing currently prunes a retired row once no external bookmark could plausibly reference it; that is a future decision, not a defect."
+  ],
+  "merge_commit": "b8acda78ed6708b46bed9f178ed61915c10df5eb",
+  "mcp_parity_manifest": {
+    "what": "mcp-package failed on the first push: the parity manifest is a separate inventory of every UI operation, and deleting dead client code left two stale rows.",
+    "detail": "Both deleted operations were already classified dead-client-code with no live consumer, which is exactly the code this mission deletes, so the manifest had described them correctly and now stops describing them at all. Fixing it also surfaced 13 shifted source_line values and two ui_consumers lists still naming the retired missions/queue.tsx.",
+    "after": "audit exits 0 with no errors: 104 operations, 99 live, 5 dead.",
+    "note": "mcp-package is NOT yet a required context; promoting it is one of MCP-4's criteria. Had it not been running advisorily, this staleness would have merged silently."
+  }
+}
