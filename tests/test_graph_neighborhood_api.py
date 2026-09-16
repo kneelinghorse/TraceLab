@@ -2,7 +2,7 @@
 
 import json
 import os
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from uuid import uuid4
 
@@ -345,15 +345,13 @@ def test_parent_reports_and_duplicate_provenance_are_truthful(client, db_session
     assert group(mission.json(), "mission", graph["mission"], "result_documents")["total"] == 1
 
 
-def test_missing_roots_are_not_empty_graphs_and_stats_route_is_unchanged(client, db_session, graph):
+def test_missing_roots_are_not_empty_graphs_and_stats_route_requires_credentials(client, db_session, graph):
     headers = credentials(db_session, graph["owner"])
     for kind in ROUTES:
         response = client.get(API, params={"root_type": kind, "root_id": str(uuid4())}, headers=headers)
         assert response.status_code == 404, response.text
-    response = client.get("/api/v1/graph/stats")
-    assert response.status_code == 200, response.text
-    assert set(response.json()) == {"edge_counts", "total_edges", "document_count", "chunk_count"}
-    assert response.json()["document_count"] == response.json()["chunk_count"] == 1
+    # /graph/stats now requires credentials; see the SEC-3 tests below for its contract.
+    assert client.get("/api/v1/graph/stats").status_code == 401
 
 
 def test_graph_does_not_use_cache_manager_or_emit_ambiguous_local_times(client, db_session, graph, monkeypatch):
@@ -369,3 +367,53 @@ def test_graph_does_not_use_cache_manager_or_emit_ambiguous_local_times(client, 
     assert response.headers["cache-control"] == "private, no-store"
     for node in response.json()["nodes"]:
         assert datetime.fromisoformat(node["attributes"]["updated_at"]).utcoffset().total_seconds() == 0
+
+
+def test_graph_stats_refuses_anonymous_callers(client):
+    """It lived on the PUBLIC health router and served corpus counts to anyone (SEC-3).
+
+    Reverting it there would restore a credential-free disclosure of how much research
+    the instance holds, so the anonymous case is asserted on its own.
+    """
+    assert client.get("/api/v1/graph/stats").status_code == 401
+
+
+def test_graph_stats_counts_only_the_callers_own_projects(client, db_session, graph):
+    """A member sees their own corpus, not the whole instance's."""
+    settings.rbac_enabled = True
+    try:
+        outsider = actor(db_session)
+        foreign = Project(name="Someone else's research", owner_id=outsider.id)
+        db_session.add(foreign)
+        db_session.flush()
+        foreign_doc = Document(name="Private source", project_id=foreign.id, owner_id=outsider.id)
+        db_session.add(foreign_doc)
+        db_session.flush()
+        db_session.add(DocumentChunk(document_id=foreign_doc.id, chunk_index=0, content="Private text"))
+        db_session.commit()
+
+        owner_view = client.get("/api/v1/graph/stats", headers=credentials(db_session, graph["owner"]))
+        outsider_view = client.get("/api/v1/graph/stats", headers=credentials(db_session, outsider))
+
+        assert owner_view.status_code == 200, owner_view.text
+        assert set(owner_view.json()) == {"edge_counts", "total_edges", "document_count", "chunk_count"}
+        # Each caller counts their own document, never the other's.
+        assert owner_view.json()["document_count"] == 1
+        assert outsider_view.json()["document_count"] == 1
+        # Corpus-wide edge totals are withheld from a scoped caller rather than disclosed.
+        assert outsider_view.json()["edge_counts"] == {}
+        assert outsider_view.json()["total_edges"] == 0
+    finally:
+        settings.rbac_enabled = False
+
+
+def test_graph_stats_excludes_soft_deleted_documents(client, db_session, graph):
+    """A deleted document must stop being counted, like every other read path."""
+    headers = credentials(db_session, graph["owner"])
+    before = client.get("/api/v1/graph/stats", headers=headers).json()["document_count"]
+    graph["document"].deleted_at = datetime.now(UTC)
+    db_session.commit()
+
+    after = client.get("/api/v1/graph/stats", headers=headers).json()["document_count"]
+
+    assert after == before - 1

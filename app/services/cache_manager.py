@@ -217,6 +217,7 @@ class CacheManager:
         depth: int,
         entity_types: Sequence[str] | None,
         min_relevance: float | None,
+        allowed_project_ids: Sequence[Any] | None = None,
     ) -> tuple[Any, ...]:
         normalized_types: tuple[str, ...] = (
             tuple(sorted(entity_types)) if entity_types else tuple()
@@ -224,7 +225,19 @@ class CacheManager:
         normalized_relevance = (
             None if min_relevance is None else round(float(min_relevance), 3)
         )
-        return (str(mission_id), int(depth), normalized_types, normalized_relevance)
+        # None (unrestricted) must not collide with a caller scoped to no projects.
+        normalized_scope = (
+            None
+            if allowed_project_ids is None
+            else tuple(sorted(str(pid) for pid in allowed_project_ids))
+        )
+        return (
+            str(mission_id),
+            int(depth),
+            normalized_types,
+            normalized_relevance,
+            normalized_scope,
+        )
 
     # ------------------------------------------------------------------
     # Domain-specific invalidation adapters
