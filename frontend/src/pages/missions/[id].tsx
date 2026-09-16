@@ -10,7 +10,7 @@ import { markViewed } from "@/lib/hooks/useActivitySummary";
 import { apiErrorMessage } from "@/lib/api/errors";
 import { Dialog } from "@/components/ui/Dialog";
 import { EvidencePanel } from "@/components/evidence/EvidencePanel";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { formatDistanceToNow } from "date-fns";
@@ -35,7 +35,23 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function MissionDetailContent() {
   const router = useRouter();
   const missionId = typeof router.query.id === "string" ? router.query.id : undefined;
-  const [detailTab, setDetailTab] = useState("overview");
+  // The tab lives in the URL so a Results view can be linked, reloaded and captured by the
+  // route baseline, which previously could only ever photograph the Run tab (next-step #340).
+  // The URL is the entry point and local state is the interaction state: router.replace is
+  // async, so deriving the tab from the query alone would lag visibly on every click.
+  const urlTab = MISSION_TABS.includes(router.query.tab as MissionTab) ? (router.query.tab as MissionTab) : "overview";
+  const [detailTab, setTab] = useState<MissionTab>(urlTab);
+  useEffect(() => { setTab(urlTab); }, [urlTab]);
+  const setDetailTab = useCallback((tab: string) => {
+    setTab(tab as MissionTab);
+    // Keep the default view's URL clean; other params (filters, anchors) survive. Setting
+    // tab to undefined is not enough: Next keeps the key and emits a bare "?tab=".
+    const query: typeof router.query = Object.fromEntries(
+      Object.entries(router.query).filter(([key]) => key !== "tab"),
+    );
+    if (tab !== "overview") query.tab = tab;
+    void router.replace?.({ pathname: router.pathname, query }, undefined, { shallow: true });
+  }, [router]);
   const [actionError, setActionError] = useState<string | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -304,7 +320,7 @@ function MissionDetailContent() {
           </div>
 
           <div className="flex flex-wrap gap-3 border-b border-line p-4" role="tablist" aria-label="Mission detail">
-            {["overview", "results", "evidence"].map((tab, index, tabs) => <button key={tab} id={`mission-tab-${tab}`} role="tab" aria-selected={detailTab === tab} aria-controls={`mission-panel-${tab}`} tabIndex={detailTab === tab ? 0 : -1} onKeyDown={event => {
+            {MISSION_TABS.map((tab, index, tabs) => <button key={tab} id={`mission-tab-${tab}`} role="tab" aria-selected={detailTab === tab} aria-controls={`mission-panel-${tab}`} tabIndex={detailTab === tab ? 0 : -1} onKeyDown={event => {
               if (["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) {
                 event.preventDefault();
                 const next = event.key === "Home" ? tabs[0] : event.key === "End" ? tabs[tabs.length - 1] : tabs[(index + (event.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length];
@@ -449,6 +465,9 @@ function MissionDetailContent() {
     </div>
   );
 }
+
+const MISSION_TABS = ["overview", "results", "evidence"] as const;
+type MissionTab = (typeof MISSION_TABS)[number];
 
 export default function MissionDetailPage() {
   return (

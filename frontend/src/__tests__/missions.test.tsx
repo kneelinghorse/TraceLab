@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { beforeEach, expect, it, vi } from "vitest";
 import { SWRConfig } from "swr";
 import type { ApiMission, MissionStatus } from "@/types/mission";
-const mocks = vi.hoisted(() => ({ list: vi.fn(), get: vi.fn(), update: vi.fn(), markViewed: vi.fn(), projects: vi.fn(), httpGet: vi.fn(), push: vi.fn(), query: {} as Record<string, string | string[]> }));
+const mocks = vi.hoisted(() => ({ list: vi.fn(), get: vi.fn(), update: vi.fn(), markViewed: vi.fn(), projects: vi.fn(), httpGet: vi.fn(), push: vi.fn(), replace: vi.fn(), query: {} as Record<string, string | string[]> }));
 vi.mock("@/lib/api/missions", () => ({ missionsApi: mocks }));
 vi.mock("@/lib/api/activity", async original => ({ ...await original<object>(), activityApi: { markViewed: mocks.markViewed, summary: vi.fn().mockResolvedValue({ new_total: 0, by_type: {} }) } }));
 vi.mock("@/lib/api/projects", () => ({ projectsApi: { listAllProjects: mocks.projects } }));
@@ -12,7 +12,8 @@ vi.mock("@/lib/api/http", async importOriginal => ({ ...await importOriginal<obj
 vi.mock("@/components/AuthGate", () => ({ AuthGate: ({ children }: { children: ReactNode }) => children }));
 vi.mock("@/components/evidence/EvidencePanel", () => ({ EvidencePanel: () => <p>Linked evidence entries</p> }));
 vi.mock("@/contexts/AuthContext", () => ({ useAuth: () => ({ user: { user_id: "reader" } }) }));
-vi.mock("next/router", () => ({ useRouter: () => ({ query: mocks.query, push: mocks.push }) }));
+// The mission detail tab is URL-addressable, so the page calls router.replace (next-step #340).
+vi.mock("next/router", () => ({ useRouter: () => ({ query: mocks.query, pathname: "/missions/[id]", push: mocks.push, replace: mocks.replace }) }));
 import MissionsPage from "@/pages/missions";
 import MissionDetailPage from "@/pages/missions/[id]";
 function mission(status: MissionStatus = "draft"): ApiMission {
