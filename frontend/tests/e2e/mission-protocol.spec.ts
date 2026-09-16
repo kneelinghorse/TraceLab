@@ -91,6 +91,47 @@ for (const theme of ["light", "dark"] as const) for (const width of [390, 820, 1
     expect(writes.some(write => write.body?.status === "completed")).toBe(false);
   });
 }
+test("the mission Results tab is addressable by URL so it can be linked and captured", async ({ page }) => {
+  // The tab was local component state, so /missions/{id} always rendered the Run tab and the
+  // route baseline could never photograph rendered results at all (next-step #340).
+  const state = {
+    id: "run-2", mission_id: "UX6-RESULTS", title: "Completed research", objective: "Find primary evidence",
+    success_criteria: ["Cite primary sources"], project_id: project, project_name: "Research", status: "completed",
+    tags: [], deliverables: [], context: {}, metadata: {}, research_phases: {}, execution_metadata: {},
+    result_protocol: {}, result_document_ids: [], result_report_id: null,
+    result_markdown: "# Findings\n\nThe measured outcome is recorded here.",
+    created_at: "2026-09-13T00:00:00Z", updated_at: "2026-09-13T01:00:00Z",
+    queued_at: null, started_at: null, completed_at: "2026-09-13T01:00:00Z",
+  };
+  await page.addInitScript(() => {
+    localStorage.setItem("tracelab.auth.v2", JSON.stringify({ token: "fixture", user_id: "reader", email: "reader@example.test", display_name: "Researcher" }));
+  });
+  await page.route("**/api/v1/**", async route => {
+    const endpoint = new URL(route.request().url()).pathname;
+    let response: unknown = {};
+    if (endpoint.endsWith("/auth/me")) response = { user_id: "reader", email: "reader@example.test", role: "admin" };
+    else if (endpoint.endsWith("/missions/events/recent") || endpoint.endsWith("/logs")) response = [];
+    else if (endpoint.endsWith("/missions/run-2")) response = state;
+    else if (endpoint.endsWith("/evidence")) response = { entries: [], notes: [], entry_total: 0, note_total: 0, page: 1, page_size: 20 };
+    await route.fulfill({ json: response });
+  });
+
+  // Deep link straight to Results, with no clicking.
+  await page.goto("/missions/run-2?tab=results");
+  await expect(page.getByRole("tab", { name: "Results" })).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByRole("heading", { name: "Findings" })).toBeVisible();
+
+  // A reload keeps it, which is what makes it capturable and shareable.
+  await page.reload();
+  await expect(page.getByRole("tab", { name: "Results" })).toHaveAttribute("aria-selected", "true");
+
+  // Selecting a tab writes the URL, and returning to the default cleans it up again.
+  await page.getByRole("tab", { name: "Run" }).click();
+  await expect(page).toHaveURL(/\/missions\/run-2$/);
+  await page.getByRole("tab", { name: "Results" }).click();
+  await expect(page).toHaveURL(/\/missions\/run-2\?tab=results$/);
+});
+
 test("queue bookmark permanently redirects and retains filters", async ({ request }) => {
   const response = await request.get("/missions/queue?project_id=scope", { maxRedirects: 0 });
   expect(response.status()).toBe(308);

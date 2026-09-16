@@ -89,9 +89,11 @@ const components: Components = {
       </div>
     );
   },
+  // GFM only emits th inside thead, so Chromium already infers columnheader; scope states
+  // the association explicitly rather than leaving it to user-agent inference (next-step #339).
   th({ children }) {
     return (
-      <th className="px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal">
+      <th scope="col" className="px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal">
         {children}
       </th>
     );

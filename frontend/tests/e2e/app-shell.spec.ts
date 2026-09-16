@@ -94,6 +94,37 @@ test("document tables scroll sideways on a phone instead of breaking words apart
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
 });
 
+test("markdown table headers are exposed as column headers to assistive technology", async ({ page }) => {
+  // A screen reader announces a data cell by its column header. Without scope, a table
+  // whose first column is also a header is ambiguous and the association is guesswork,
+  // so the header is asserted against Chromium's real accessibility tree rather than
+  // against the DOM (next-step #339).
+  const table = [
+    "| Metric | Baseline | Result |",
+    "| --- | --- | --- |",
+    "| Latency | 120 ms | 90 ms |",
+  ].join("\n");
+  const record = { id: "doc-scope", project_id: "project-1", name: "metrics.md", mime_type: "text/markdown", source_origin: "synthesized", processed: true, chunked: true, embedded: true, links: [] };
+  await page.route("**/api/v1/documents/doc-scope**", async route => {
+    const pathname = new URL(route.request().url()).pathname;
+    if (pathname.endsWith("/content")) await route.fulfill({ json: { ...record, content: `# Metrics\n\n${table}\n` } });
+    else if (pathname.endsWith("/chunks")) await route.fulfill({ json: { data: [], pagination: { page: 1, page_size: 10, total: 0, pages: 1 } } });
+    else await route.fulfill({ json: record });
+  });
+  await page.goto("/documents/doc-scope");
+  await expect(page.getByRole("region", { name: "Scrollable table" })).toBeVisible();
+
+  const snapshot = await page.accessibility.snapshot({ interestingOnly: false });
+  const roles: string[] = [];
+  const walk = (node: { role?: string; name?: string; children?: unknown[] } | null) => {
+    if (!node) return;
+    if (node.role === "columnheader" && node.name) roles.push(node.name);
+    for (const child of (node.children ?? []) as typeof node[]) walk(child);
+  };
+  walk(snapshot as never);
+  expect(roles).toEqual(expect.arrayContaining(["Metric", "Baseline", "Result"]));
+});
+
 test("theme persists through hydration and OS changes without a wrong-color frame", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", error => errors.push(error.message));
