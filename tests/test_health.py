@@ -60,6 +60,23 @@ async def test_health_endpoint():
 
 
 @pytest.mark.asyncio
+async def test_health_reports_the_commit_it_is_running(monkeypatch):
+    """The post-deploy check reads this field to decide a deployment is actually live.
+
+    If it silently stopped being served, wait_for_deploy would conclude the deploy never
+    landed and block every merge's smoke, so the contract is asserted here (CI-6).
+    """
+    from app.core.config import settings
+
+    monkeypatch.setattr(settings, "railway_git_commit_sha", "c" * 40)
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        response = await client.get("/api/v1/health")
+        assert response.status_code == 200
+        assert response.json()["commit"] == "c" * 40
+
+
+@pytest.mark.asyncio
 async def test_db_health_endpoint(override_db_dependency):
     """Test database health endpoint with dependency override."""
     transport = ASGITransport(app=app)

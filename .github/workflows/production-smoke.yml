@@ -7,6 +7,9 @@ on:
   schedule:
     - cron: "55 */6 * * *"
   workflow_dispatch:
+  # Called by post-deploy-check.yml once both services are confirmed to serve the merged
+  # commit. Decision #353 keeps the cron and dispatch triggers; this only adds a caller.
+  workflow_call:
 
 permissions:
   contents: read

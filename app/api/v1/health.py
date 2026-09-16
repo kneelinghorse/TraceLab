@@ -22,9 +22,15 @@ async def health_check():
     only that this receiver has a secret configured; it cannot prove equality
     with the remote signer's secret. The reconciler block is counts-only (no
     identifiers) for the same reason.
+
+    ``commit`` is the sha this process was deployed from. It is public for the
+    same reason and discloses nothing: the repository is public. A post-deploy
+    check needs it because Railway reports SUCCESS before the new process is
+    actually serving, so only the served sha proves a deployment is live (CI-6).
     """
     return {
         "status": "healthy",
+        "commit": settings.railway_git_commit_sha,
         "rbac_enabled": settings.rbac_enabled,
         "deepsearch_receipt_receiver_configured": bool(
             settings.effective_deepsearch_service_secret

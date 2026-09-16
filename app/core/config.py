@@ -16,6 +16,10 @@ class Settings(BaseSettings):
     app_version: str = "1.0.0"
     environment: str = "development"
     debug: bool = False
+    # Set by Railway in both services. Served publicly by /health so a post-deploy
+    # check can tell that this process is running the merged commit; Railway's own
+    # SUCCESS status is reported before the new process serves traffic (CI-6).
+    railway_git_commit_sha: str | None = None
 
     # Database
     database_url: str = "postgresql://postgres:postgres@localhost:5432/tracelab"

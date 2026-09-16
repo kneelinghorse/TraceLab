@@ -1,0 +1,54 @@
+# ABOUTME: After a push to main, waits until production actually serves that commit, then smokes it.
+# ABOUTME: Covers receipt-only and docs-only merges, which rebuild production with no smoke today.
+
+name: Post-Deploy Check
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: "Commit both services must serve (defaults to this ref's head)"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+# Production only ever runs the newest commit, so an in-flight check for an older one is
+# already answering the wrong question.
+concurrency:
+  group: post-deploy-check
+  cancel-in-progress: true
+
+jobs:
+  wait-for-deploy:
+    name: wait-for-deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Wait until both services serve the merged commit
+        run: |
+          python scripts/wait_for_deploy.py \
+            --sha "${{ inputs.sha || github.sha }}" \
+            --budget-seconds 1200 \
+            --output deploy-wait.json
+      - name: Archive the wait summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: post-deploy-wait
+          path: deploy-wait.json
+          if-no-files-found: error
+
+  # Only runs once the sha is confirmed live, so a green smoke can no longer be reported
+  # against the previous deployment.
+  production-smoke:
+    name: production-smoke
+    needs: wait-for-deploy
+    uses: ./.github/workflows/production-smoke.yml
