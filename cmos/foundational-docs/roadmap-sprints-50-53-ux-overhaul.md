@@ -1,4 +1,4 @@
-# TraceLab — Vision and Roadmap: Recovery and the UX Overhaul (Sprints 50–53)
+# TraceLab — Vision and Roadmap: Recovery and the UX Overhaul (Sprints 50–54)
 
 **Status:** living document. Authored 2026-09-12 at Sprint 50 open. Owner: Derek.
 **Authority split:** this document is authoritative for *intent* (why, what, in what order). The CMOS sprint and mission records are authoritative for *status*. When they disagree, fix the one that drifted and note it here.
@@ -211,6 +211,29 @@ After the missions land: live testing of missions in motion (queue, progress, ac
 
 **Moved to Sprint 54 (formerly the Sprint 53 hardening slate):** AA sweep in Light and Dark, performance budgets (baseline-relative per decision #458), Stage1 drift scan, automated phone-width overflow checks, retirement of deprecated aliases and legacy components, the Sprint 52 planning deferrals (gate `GET /api/v1/graph/stats`, scope `/missions/{id}/related`, `/pedr/related` soft-delete exclusion, dead frontend client code, promote `mcp-package` to required, owner read-path fixture), package hygiene, argument-level parity check (#307), and THEME-2. Next-step #312 (reviewed-completion resurfacing) is obsolete once ACT-1 removes reviews.
 
+**What shipped (closed 2026-09-16):** eight of nine missions accepted — PAL-2, FAV-1, NAV-2, PROJ-2, ACT-1, MISS-2, DOCV-1 and NOTIFY-1 — all live in production, receipts merged on main in carrier `2e1f7e3` (PR #325), final baseline on `1bca776` clean at 144 checks over 36 routes with a 4/4 public smoke. CI-6 was never started and moved to Sprint 54. Every item from Derek's walkthrough shipped.
+
+**What it cost:** the sprint opened with an unauthorized build start (learning #200) and was recovered by a dedicated post-merge verification session (learning #208). Four defects reached production and **none** was caught by a pre-merge check (learning #207): AA contrast on viewed activity rows, markdown tables unreadable at 390 px, a PostgreSQL `FOR UPDATE` error on the nullable side of an outer join that meant no mission email had ever sent while SQLite tests stayed green, and 45 of 51 projects owned by an account at an undeliverable domain. Stacked PRs merged seconds apart never reached main (learning #203), and one merge slipped past branch protection (learning #204). That evidence set Sprint 54's theme.
+
+**Decisions at close:** GitHub Actions is re-enabled and decision #464 superseded by #474 — its "$10 per run" premise was hand-waved, and learning #209 shows TraceLab bills $0 because the repository is public while OODS-Forge was 99.9% of September's real bill. The screenshot scrub was dropped (the account email is not sensitive), and all 47 legacy-owner projects moved onto `derek@deniedart.com`, which now owns 56, so mission email reaches Derek directly (proven: mission TL-ENG-R001, Resend message id, 2026-09-15T22:51:43Z). The per-user opt-out remains proven by tests only.
+
+### Sprint 54 — Verification and Security Residue (opened 2026-09-16)
+
+**Goal:** make the gate trustworthy, then close the access-control residue. Sprint 53 proved that a green pre-merge run says nothing about layout readability, production data shape or real PostgreSQL locking, and Actions is back on under decision #474 — so hardening the gate now pays back on every later mission.
+
+Missions (CMOS is authoritative for status), in build order:
+
+- **VERIFY-1** — Stabilise the CommandPalette specs that now *block* merges (next-step #335) and add gates for the two defect classes that escaped: a 390 px layout assertion for content-sized tables, and row-locking tests against real PostgreSQL instead of SQLite (next-step #344).
+- **CI-6** — Carried from Sprint 53, re-scoped by #474 to decision #463's design: wait until `GET /api/v1/health` and a build-time frontend commit marker both serve the pushed sha, then run the production smoke and baseline. Covers receipt-only merges, which still rebuild production unsmoked.
+- **SEC-3** — The Sprint 52 access-control deferrals: gate `GET /api/v1/graph/stats`, scope `/missions/{id}/related`, exclude soft-deleted rows from `/pedr/related`, add the owner read-path fixture, and record a production `rbac_verify` run — the first since Sprint 49.
+- **A11Y-1** — AA sweep across the 36 baseline routes in Light and Dark with automated phone-width overflow checks, folding in `th scope="col"` (next-step #339) and a URL-addressable mission Results tab (next-step #340) so rendered results are capturable at all.
+- **ALIAS-1** — Retire the seven deprecated aliases listed below, plus legacy components and dead frontend client code. Authored source URLs, references and exported document bytes stay untouched as evidence.
+- **MCP-4** — Argument-level parity check (#307), `mcp-package` promoted to a required context, and the package hygiene raised at the 1.2.0 publish.
+
+Live testing of missions in motion with Derek (next-step #330) happens early, before A11Y-1 touches the UI.
+
+**Deferred to Sprint 55:** baseline-relative performance budgets (decision #458), the Stage1 drift scan, and THEME-2 — gated on confirming that Forge has certified its themes, which Derek believes it now has. The vendored bundle is still pinned at `04182b1` from PAL-2.
+
 ### Beyond Sprint 53 (not scheduled)
 
 - Collaboration chrome (mentions, shared views) only if collaborators in Spaces become real users.
@@ -298,7 +321,7 @@ A UI mission is not done until all of the following are true. Each rule exists b
 
 All redirects retain query parameters, including repeated values. The destination's explicit `view=queue` wins over an incoming `view`. Home is a replacement page, not an alias or a self-redirect. The executable map is `frontend/src/lib/route-migrations.json`; unit tests bind it to this maintained table, and the production smoke walks every row.
 
-### Deprecated aliases to retire in Sprint 53
+### Deprecated aliases to retire in Sprint 54 (ALIAS-1)
 
 - `/console`
 - `/console/missions`
@@ -338,3 +361,5 @@ _Truth in data, evidence as the connective tissue, one system._
 - **2026-09-14 UTC, Sprint 52 open** — Sprint 52 created in CMOS with eleven missions (CI-5, SEC-1, SEC-2, MCP-1, GRAPH-1, UX-11, UX-12, UX-13, MCP-2, MCP-3, DOC-1) and identity synced to `sprint-52-active`. Derek decided that a project owner keeps document read access (decision #424) and that the MCP package publishes once after all MCP changes (decision #425). Deferrals found while grounding the slate were added to the Sprint 53 section.
 - **2026-09-15 UTC, Sprint 52 close** — Eleven missions accepted with post-merge main-push CI, both Railway deployment ids and production receipts each. `@aquex/tracelab-mcp` 1.2.0 is published (Derek ran the OTP-gated publish; agent-prepared tag checkout and fresh-install smoke). Derek closed the two open questions: no MCP deletes (decision #454) and yes to an email provider (decision #455, Sprint 53). Sixteen next-steps carried to the Sprint 53 shell; identity synced to `sprint-52-complete`; `cmos/context/MASTER_CONTEXT.json` regenerated per decision #420.
 - **2026-09-15 UTC, Sprint 53 open** — Sprint 53 re-planned from Derek's walkthrough of the deployed app (favicon, theme switcher placement, status-pinned attention and inbox with no dismissal, three project-create patterns and dead research types, no document reader, single-column missions page with dashboards and saved views, palette). Nine missions created (PAL-2, FAV-1, NAV-2, ACT-1, PROJ-2, DOCV-1, MISS-2, NOTIFY-1, CI-6); hardening slate moved to Sprint 54; identity synced to `sprint-53-active`; `cmos/context/MASTER_CONTEXT.json` regenerated per decision #420.
+- **2026-09-16 UTC, Sprint 53 close** — Eight of nine missions accepted, all live in production with receipts merged in carrier `2e1f7e3` and a clean 144-check final baseline on `1bca776`. CI-6 moved to Sprint 54, re-scoped once GitHub Actions returned. Four production defects that no pre-merge check caught (learning #207) set the next sprint's theme. Decision #474 re-enabled Actions and superseded #464; learning #209 shows TraceLab's CI bills $0 and OODS-Forge was 99.9% of September's real bill. The screenshot scrub was dropped, and all 47 legacy-owner projects moved to `derek@deniedart.com` (now 56), with production mission email proven. Identity synced to `sprint-53-complete`.
+- **2026-09-16 UTC, Sprint 54 open** — Sprint 54 created as Verification and Security Residue, running to 2026-09-30 with six missions (VERIFY-1, CI-6, SEC-3, A11Y-1, ALIAS-1, MCP-4) in build order. Eight next-steps carried. Derek set the theme, the size and the close of Sprint 53 at planning; performance budgets, the Stage1 drift scan and THEME-2 defer to Sprint 55, THEME-2 gated on confirming Forge's theme certification. Identity synced to `sprint-54-active`; `cmos/context/MASTER_CONTEXT.json` regenerated per decision #420.
