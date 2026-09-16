@@ -115,16 +115,31 @@ class TestGate6BootstrapParity:
         monkeypatch.setenv("AUTH_USERNAME", "derek@deniedart.com")
         assert bootstrap_owner_email() == "derek@deniedart.com"
 
-    def test_bare_username_gets_tracelab_local_suffix(self, monkeypatch):
-        from app.services.ownership import bootstrap_owner_email
+    def test_bare_username_is_refused_instead_of_fabricated(self, monkeypatch):
+        # Sprint 55 RBAC-1: this used to return "tracelab-admin@tracelab.local".
+        # That derivation minted the production owner row at a non-routable
+        # domain, so a bare username is now a hard error, not a default.
+        from app.services.ownership import (
+            BootstrapIdentityError,
+            bootstrap_owner_email,
+        )
 
         monkeypatch.setenv("AUTH_USERNAME", "tracelab-admin")
-        assert bootstrap_owner_email() == "tracelab-admin@tracelab.local"
+        with pytest.raises(BootstrapIdentityError) as exc:
+            bootstrap_owner_email()
+        # The operator must be told what to do, not just that something failed.
+        assert "tracelab-admin" in str(exc.value)
+        assert "email address" in str(exc.value)
 
-    def test_default_when_unset_matches_migration_default(self, monkeypatch):
-        # Migration 031 and runtime both default to 'tracelab-admin' when AUTH_USERNAME
-        # is absent — keep them in lockstep so the flip can't bootstrap a stray owner.
-        from app.services.ownership import bootstrap_owner_email
+    def test_default_when_unset_is_refused(self, monkeypatch):
+        # The absent-AUTH_USERNAME default ('tracelab-admin') is itself a bare
+        # username, so an unconfigured deploy now fails loudly rather than
+        # silently bootstrapping a stray owner at @tracelab.local.
+        from app.services.ownership import (
+            BootstrapIdentityError,
+            bootstrap_owner_email,
+        )
 
         monkeypatch.delenv("AUTH_USERNAME", raising=False)
-        assert bootstrap_owner_email() == "tracelab-admin@tracelab.local"
+        with pytest.raises(BootstrapIdentityError):
+            bootstrap_owner_email()

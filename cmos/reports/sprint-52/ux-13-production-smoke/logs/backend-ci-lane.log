@@ -1,0 +1,238 @@
+........................................................................ [  2%]
+........................................................................ [  5%]
+........................................................................ [  8%]
+..................................s..................................... [ 10%]
+........................................................................ [ 13%]
+........................................................................ [ 16%]
+........................................................................ [ 18%]
+........................................................................ [ 21%]
+........................................................................ [ 24%]
+........................................................................ [ 26%]
+........................................................................ [ 29%]
+........................................................................ [ 32%]
+........................................................................ [ 34%]
+........................................................................ [ 37%]
+........................................................................ [ 40%]
+........................................................................ [ 43%]
+........................................................................ [ 45%]
+........................................................................ [ 48%]
+........................................................................ [ 51%]
+........................................................................ [ 53%]
+........................................................................ [ 56%]
+........................................................................ [ 59%]
+........................................................................ [ 61%]
+...........................ss........................................... [ 64%]
+........................................................................ [ 67%]
+........................................................................ [ 69%]
+........................................................................ [ 72%]
+........................................................................ [ 75%]
+........................................................................ [ 77%]
+........................................................................ [ 80%]
+........................................................................ [ 83%]
+........................................................................ [ 86%]
+........................................................................ [ 88%]
+........................................................................ [ 91%]
+........................................................................ [ 94%]
+........................................................................ [ 96%]
+........................................................................ [ 99%]
+..............                                                           [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/_pytest/config/__init__.py:852
+  /Users/systemsystems/portfolio/TraceLab/.venv/lib/python3.11/site-packages/_pytest/config/__init__.py:852: PytestAssertRewriteWarning: Module already imported so cannot be rewritten; cmos_pytest_telemetry_plugin
+    self.import_plugin(import_spec)
+
+app/core/config.py:11
+  /Users/systemsystems/portfolio/TraceLab/app/core/config.py:11: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class Settings(BaseSettings):
+
+app/core/database.py:29
+tests/unit/test_recovery_database_engine.py::test_sqlite_pool_override_is_limited_to_test_sqlite[test-sqlite+pysqlite:///:memory:-True]
+tests/unit/test_recovery_database_engine.py::test_sqlite_pool_override_is_limited_to_test_sqlite[production-sqlite:///:memory:-False]
+tests/unit/test_recovery_database_engine.py::test_sqlite_pool_override_is_limited_to_test_sqlite[test-postgresql://unused.invalid/tracelab-False]
+  /Users/systemsystems/portfolio/TraceLab/app/core/database.py:29: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+.venv/lib/python3.11/site-packages/passlib/utils/__init__.py:854
+  /Users/systemsystems/portfolio/TraceLab/.venv/lib/python3.11/site-packages/passlib/utils/__init__.py:854: DeprecationWarning: 'crypt' is deprecated and slated for removal in Python 3.13
+    from crypt import crypt as _crypt
+
+app/schemas/pagination.py:8
+  /Users/systemsystems/portfolio/TraceLab/app/schemas/pagination.py:8: PydanticDeprecatedSince20: `pydantic.generics:GenericModel` has been moved to `pydantic.BaseModel`. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    from pydantic.generics import GenericModel
+
+app/schemas/api_key.py:23
+  /Users/systemsystems/portfolio/TraceLab/app/schemas/api_key.py:23: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class APIKeyResponse(BaseModel):
+
+app/schemas/api_key.py:39
+  /Users/systemsystems/portfolio/TraceLab/app/schemas/api_key.py:39: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class APIKeyInfo(BaseModel):
+
+app/schemas/saved_searches.py:41
+  /Users/systemsystems/portfolio/TraceLab/app/schemas/saved_searches.py:41: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class SavedSearchResponse(SavedSearchBase):
+
+app/schemas/search_history.py:15
+  /Users/systemsystems/portfolio/TraceLab/app/schemas/search_history.py:15: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class SearchHistoryEntry(BaseModel):
+
+app/schemas/webhook.py:22
+  /Users/systemsystems/portfolio/TraceLab/app/schemas/webhook.py:22: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class ExecutionMetadata(BaseModel):
+
+app/main.py:161
+  /Users/systemsystems/portfolio/TraceLab/app/main.py:161: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+.venv/lib/python3.11/site-packages/fastapi/applications.py:4599
+.venv/lib/python3.11/site-packages/fastapi/applications.py:4599
+  /Users/systemsystems/portfolio/TraceLab/.venv/lib/python3.11/site-packages/fastapi/applications.py:4599: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)
+
+app/main.py:210
+  /Users/systemsystems/portfolio/TraceLab/app/main.py:210: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("shutdown")
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionStatuses::test_all_statuses_defined without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionInstantiation::test_create_mission_minimal without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionInstantiation::test_create_mission_full without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionMethods::test_to_dict without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionMethods::test_to_dict_with_none_values without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionMethods::test_to_mission_protocol without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionMethods::test_from_mission_protocol_minimal without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionMethods::test_from_mission_protocol_full without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionResultFields::test_execution_lifecycle_fields without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionResultFields::test_result_protocol_storage without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionResultFields::test_error_handling_fields without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionTableDefinition::test_table_name without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionTableDefinition::test_required_columns_exist without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionTableDefinition::test_indexes_defined without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionTableDefinition::test_lease_timestamps_are_timezone_aware without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionTableDefinition::test_opaque_lease_fields_are_not_public_dict_fields without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionTableDefinition::test_constraints_defined without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionAuthoringFields::test_instantiation_with_all_authoring_fields without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionAuthoringFields::test_to_dict_includes_authoring_fields without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionAuthoringFields::test_to_mission_protocol_includes_authoring_fields without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionAuthoringFields::test_from_mission_protocol_round_trip without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionAuthoringFields::test_constraints_fallback_to_context without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionAuthoringFields::test_constraints_column_wins_over_context without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionAuthoringFields::test_authoring_fields_optional without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_evidence_auto_linking.py::test_auto_linking_respects_threshold_and_counts_skips
+  /Users/systemsystems/portfolio/TraceLab/.venv/lib/python3.11/site-packages/pydantic/main.py:464: UserWarning: Pydantic serializer warnings:
+    PydanticSerializationUnexpectedValue(Expected `Evidence` - serialized value may not be as expected [field_name='evidence', input_value={'evidence_id': 'EV-alrea...ry', 'chunk_id': '1234'}, input_type=dict])
+    return self.__pydantic_serializer__.to_python(
+
+tests/test_evidence_ledger_api.py::TestWorkingNotes::test_dot_segment_note_keys_are_rejected[dot]
+tests/test_evidence_ledger_api.py::TestWorkingNotes::test_dot_segment_note_keys_are_rejected[dot-dot]
+  /Users/systemsystems/portfolio/TraceLab/.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py:986: DeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    result = context.run(func, *args)
+
+tests/test_evidence_ledger_api.py::TestEvidenceBrowser::test_filters_count_all_matching_rows_and_keep_exact_tags
+  /Users/systemsystems/portfolio/TraceLab/app/api/v1/evidence.py:106: DeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    return _normalize_required_filter(value, label)
+
+tests/test_mission_linter.py::TestSubmitEndpointLintIntegration::test_hard_fail_returns_422_with_errors
+tests/test_mission_linter.py::TestSubmitEndpointLintIntegration::test_hard_fail_preserves_draft_status
+  /Users/systemsystems/portfolio/TraceLab/app/api/v1/missions.py:872: DeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    return _submit_existing_mission(db=db, mission=mission)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+
+--------------------------------------------------- benchmark 'rag_concurrency': 1 tests ---------------------------------------------------
+Name (time in ms)                                        Min     Max    Mean  StdDev  Median     IQR  Outliers       OPS  Rounds  Iterations
+--------------------------------------------------------------------------------------------------------------------------------------------
+test_concurrent_queries_reaches_target_throughput     6.7605  7.8719  7.0017  0.1944  6.9480  0.1854      26;8  142.8229     134           1
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+Legend:
+  Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
+  OPS: Operations Per Second, computed as 1 / Mean
+2675 passed, 3 skipped, 12 deselected, 47 warnings in 469.95s (0:07:49)
+exit=0

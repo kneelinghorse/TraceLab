@@ -76,17 +76,40 @@ class LastOwnerError(Exception):
     """
 
 
+class BootstrapIdentityError(Exception):
+    """Raised when AUTH_USERNAME is not an email address (Sprint 55 RBAC-1).
+
+    The old derivation turned a bare ``AUTH_USERNAME`` into
+    ``<username>@tracelab.local``. That is not a harmless placeholder: in
+    production it minted a real ``users`` row holding the irreducible ``owner``
+    role at a domain reserved by RFC 6761, which nothing can route mail to and
+    no human can be reached at. Refuse to invent an identity instead.
+    """
+
+
 def bootstrap_owner_email() -> str:
     """Email of the configured bootstrap user (Derek / AUTH_USERNAME).
 
     Reads AUTH_USERNAME from the environment directly (NOT pydantic settings),
     exactly as migrations 023/031 do, so the resolved email matches the SEEDED
     user even when AUTH_USERNAME is configured only via .env (which pydantic reads
-    but ``os.environ`` does not). Derivation: the raw username if it already looks
-    like an email, otherwise ``<username>@tracelab.local``. Email is the unique key.
+    but ``os.environ`` does not). Email is the unique key.
+
+    AUTH_USERNAME must already BE an email address. Sprint 55 RBAC-1 removed the
+    ``<username>@tracelab.local`` fallback: a bare username raises
+    ``BootstrapIdentityError`` rather than fabricating an account at a
+    non-routable domain. The email case is unchanged, byte for byte.
     """
     username = os.environ.get("AUTH_USERNAME", "tracelab-admin")
-    return username if "@" in username else f"{username}@tracelab.local"
+    if "@" not in username:
+        raise BootstrapIdentityError(
+            f"AUTH_USERNAME must be an email address; got {username!r}. "
+            f"TraceLab no longer derives {username}@tracelab.local — that domain "
+            "is non-routable (RFC 6761), so the account it creates can never "
+            "receive mail or be recovered. Set AUTH_USERNAME to the bootstrap "
+            "owner's real email address."
+        )
+    return username
 
 
 def ensure_owner_bootstrap(db: Session) -> bool:

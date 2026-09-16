@@ -67,6 +67,37 @@ class TestEnsureOwnerBootstrap:
         db_session.refresh(seed)
         assert seed.role == ROLE_ADMIN  # bootstrap user NOT promoted; owner already exists
 
+    def test_does_not_resurrect_a_demoted_account_after_the_rbac1_role_change(
+        self, db_session
+    ):
+        """Sprint 55 RBAC-1: the startup safety net must not undo the remediation.
+
+        Mirrors production after the role change: the real owner holds 'owner'
+        and the demoted fabricated account holds 'admin'. ensure_owner_bootstrap
+        runs on EVERY app start (app/main.py), so if its owner-count guard were
+        ever weakened, the next deploy would silently re-promote the fabricated
+        row and hand the irreducible role straight back to it.
+        """
+        db_session.query(User).delete()  # drop the seed admin; build prod's shape
+        db_session.commit()
+        real_owner = _make_user(db_session, "derek@deniedart.com", ROLE_OWNER)
+        demoted = _make_user(db_session, "kneelinghorse@tracelab.local", ROLE_ADMIN)
+
+        assert ensure_owner_bootstrap(db_session) is False  # no-op, an owner exists
+
+        db_session.refresh(real_owner)
+        db_session.refresh(demoted)
+        assert real_owner.role == ROLE_OWNER  # untouched
+        assert demoted.role == ROLE_ADMIN  # NOT re-promoted
+        assert _owner_count(db_session) == 1  # still exactly one owner
+        # And the demoted row is still present — this was a demotion, not a delete.
+        assert (
+            db_session.query(User)
+            .filter(User.email == "kneelinghorse@tracelab.local")
+            .count()
+            == 1
+        )
+
     def test_falls_back_to_oldest_user_when_bootstrap_email_absent(self, db_session):
         # No user matches the bootstrap email -> promote the oldest-created user.
         # Explicit, distinct created_at so the assertion can't depend on tie-break.

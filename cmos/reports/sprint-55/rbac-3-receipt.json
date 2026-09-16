@@ -1,0 +1,97 @@
+{
+  "mission": "RBAC-3",
+  "name": "Continuous, non-vacuous production RBAC verification",
+  "sprint": "sprint-55",
+  "session": "PS-2026-09-16-009",
+  "run_at": "2026-09-16T16:06Z-17:30Z",
+  "result": "SUBSTANTIALLY COMPLETE, with one external dependency that only Derek can satisfy: the verification identity's credentials. Everything that does not depend on that credential is done, tested and committed. Read limitation L1 before reading anything else.",
+
+  "success_criteria": {
+    "1_scheduled_run_that_fails_loudly": {
+      "status": "MET in mechanism; the first GREEN run is blocked on L1",
+      "delivered": ".github/workflows/rbac-verify-production.yml — cron every 6 hours at :25 (offset from Production Smoke at :55 so the two never contend for the 5-logins-per-60s rate limit) plus workflow_dispatch, modelled on decision #353.",
+      "a_run_that_cannot_start_reports_FAILURE": "PROVEN against the real production URL, not argued. The credential check is a STEP, not an `if:` guard on the job, specifically because a guarded job reports 'skipped' — which renders green and is indistinguishable from a pass at a glance. That is the exact silence this mission exists to remove. Exit code 2 (setup abort) is given its own ::error annotation so it is as loud as a real enforcement gap. Evidence: cmos/reports/sprint-55/rbac-3-cannot-start-production.log, three cases, all exit 2 with a named actionable reason.",
+      "honest_caveat": "Once merged, this workflow will FAIL every six hours until the secrets in L1 are set. That is by design and is the point of the mission — it converts an invisible five-sprint gap into a visible, nagging failure — but it should not be a surprise."
+    },
+    "2_no_bootstrap_row_and_no_ownership_accident": {
+      "status": "MET",
+      "identity": "scripts/rbac_verify.py::resolve_verification_identity now prefers a dedicated RBAC_VERIFY_USERNAME/RBAC_VERIFY_PASSWORD over the app's own AUTH_USERNAME/AUTH_PASSWORD, and REFUSES two values outright instead of coercing them: a bare username (the old code appended @tracelab.local right here, which is precisely how every run since Sprint 49 authenticated as the fabricated bootstrap row), and any address at that domain even spelled out in full. Each refusal names the variable and says what to set.",
+      "fixture": "scripts/rbac_verify.py::provision_fixture_project replaces the dependency on discover_owned_project finding an incidentally-owned project. The harness now find-or-creates ONE durable project it owns (_FIXTURE_PROJECT_NAME) and reads it back to confirm ownership before trusting any positive control.",
+      "why_durable_and_not_per_run": "DELETE /projects/{id} only SOFT-deletes — app/api/v1/projects.py:220 says in as many words that a purge operation is 'not yet implemented'. A per-run fixture would therefore strand a dead row on every schedule tick: ~1,460 soft-deleted rows a year at six-hourly. This was caught and corrected mid-implementation; the first version created and 'hard-deleted' a fixture per run, which would silently have accumulated exactly that.",
+      "safety_note_that_is_not_obvious": "Owning the fixture is SAFER than the status quo, not riskier. live_safe only ever suppressed project DELETE (_LOCAL_ONLY_AUTHZ_ROUTES), so pointing the matrix at a real project meant firing member/viewer PUT, PATCH and restore deny-probes at live tenant data and seeding children inside it. A fail-open — the exact condition the harness hunts — would have landed on real rows. It now lands on a fixture that holds nothing."
+    },
+    "3_the_three_vacuous_rows": {
+      "status": "2 of 3 CLOSED, 1 EXPLICITLY GATED (the criterion permits either)",
+      "row_1_pedr_preflight_zero_match_baseline": {
+        "status": "CLOSED",
+        "before": "_note_owner_preflight_baseline appended a NOTE saying the checks were 'smoke only' and let the run PASS.",
+        "after": "A zero-match owner baseline, a non-200 baseline, and a missing owner principal are each now a VACUOUS-BASELINE gap, so the run exits non-zero. The reasoning is in the docstring: if the owner's own preflight returns nothing, member and viewer returning nothing proves nothing — everyone gets an empty list, enforcement or not. A check that cannot fail is not evidence."
+      },
+      "row_2_skipped_SEC2_document_deny_probes": {
+        "status": "CLOSED",
+        "before": "document_deny_matrix returned a note — 'no live document; no production document was created' — and the run still reported PASS with the probes unrun. That is how the Sprint 54 receipt came to say PASS with not_run: [].",
+        "after": "Because the project is now the harness's own fixture, the matrix SEEDS a document into it (_seed_fixture_document, via POST /documents/upload) and runs the probes for real. If the seed produces no readable row it is a DOCUMENT-FIXTURE-MISSING gap and the run fails, rather than passing with a note."
+      },
+      "row_3_project_owner_read_positives_are_local_only": {
+        "status": "EXPLICITLY GATED, not closed — and deliberately so",
+        "what": "The over-blocking guard for a NON-privileged user who owns the parent project still runs only against a local TestClient.",
+        "why_not_closed": "Closing it needs a new production-mutating path: create a project OWNED BY the member principal, upload a document into it, assert the 200, then delete that project before purging the user. I could not run ANY live production matrix this session (L1), so shipping that path would have meant shipping untested production-mutating code. That trade was not worth it.",
+        "how_it_is_gated": "The run now emits a dedicated 'GATED —' note, stated separately rather than buried in the summary paragraph, because an unrun positive control is the single thing most likely to be mistaken for a passing one. It says plainly that until it runs, a PASS does not prove enforcement avoids over-blocking legitimate project owners."
+      }
+    },
+    "4_a_deliberate_enforcement_regression_is_caught": {
+      "status": "MET, mutation-verified end to end",
+      "how": "tests/test_rbac_verify_mutation_proof.py introduces an ACTUAL code regression into app/core/authorization.py — authorize() failing open on reads — rather than the weaker flag-off mutation the Sprint 47 tests already cover, and asserts the harness records a DENY-LEAK-2xx and reports non-zero.",
+      "control": "test_control_enforced_matrix_is_clean drives the identical path with enforcement intact and asserts zero leaks, so the mutant test cannot pass for the wrong reason (e.g. a matrix that flags everything).",
+      "meta_mutation": "The proof was itself verified: removing the injected regression makes test_mutant_fail_open_regression_is_caught FAIL with 'THE HARNESS DID NOT CATCH A FAIL-OPEN READ REGRESSION', and restoring it makes both tests pass. The detection is demonstrated, not assumed.",
+      "scope_note": "This runs against a local TestClient app, not against production — you cannot inject a regression into production to prove a point. The scheduled workflow executes the same harness code, so the detection capability is what is proven; the production run's job is to exercise it against real data."
+    },
+    "5_receipt_with_its_raw_log_committed": {
+      "status": "MET for the mechanism and for a far bigger problem than the mission described",
+      "the_gitignore_fix": "cmos/.gitignore line 5 (*.log) now has a '!reports/**/*.log' negation. Verified the right way: `git add` without -f now accepts the file.",
+      "what_the_mission_expected": "one at-risk log, cmos/reports/sprint-54/sec-3-rbac-verify-production.log.",
+      "what_was_actually_at_risk": "ALL 21 evidence logs under cmos/reports were untracked — 7 in sprint-50, 13 in sprint-52, 1 in sprint-54. Every one of them was a `git clean` away from being lost, and every receipt that cited one was citing a file that existed on exactly one machine. All 21 are now committed, after a credential scan (scripts/check_no_credential_literals.py) came back clean across the set.",
+      "the_run_log": "cmos/reports/sprint-55/rbac-3-cannot-start-production.log is committed. It is the cannot-start evidence, NOT a full matrix run — see L1."
+    }
+  },
+
+  "limitations": {
+    "L1_no_live_matrix_run_was_possible_this_session": {
+      "severity": "This is the one thing standing between RBAC-3 and done.",
+      "what": "No full production rbac_verify run was executed, so there is still no recorded green production matrix. The last one remains Sprint 54's, which was itself partly vacuous.",
+      "why": "The matrix needs credentials for a principal that can create projects, provision throwaway users and mint API keys. The ONLY production credential available to an agent is the Railway AUTH_PASSWORD, and a bcrypt check against all 8 production password hashes shows it authenticates exactly one account: kneelinghorse@tracelab.local — the retired bootstrap row that THIS MISSION's own guard now correctly refuses. Derek's password is not recoverable by an agent. Overriding the guard to manufacture a green run would have been precisely the dishonesty this mission exists to end, so it was not done.",
+      "why_I_did_not_just_create_the_identity": "The harness provisions a second-owner principal, and POST /admin/users with role=owner is owner-gated — so the verification identity must itself be an OWNER. Minting a second privileged production account, with a password generated inside an agent session, immediately after RBAC-1 removed a fabricated privileged account, is an access-control decision that belongs to Derek and not to an agent.",
+      "what_Derek_needs_to_do": [
+        "1. Create a verification account in production with a real routable address (e.g. rbac-verify@tracelab.aquex.ai) and role=owner, via the admin UI at /admin/users while signed in as derek@deniedart.com.",
+        "2. Add two GitHub repository secrets: RBAC_VERIFY_USERNAME (that address) and RBAC_VERIFY_PASSWORD.",
+        "3. Trigger the workflow manually once (Actions -> 'RBAC Verify (production)' -> Run workflow) and commit the archived log to cmos/reports/sprint-55/ as the first green run.",
+        "Until step 2 is done the scheduled workflow FAILS every six hours, by design."
+      ]
+    },
+    "L2_one_pre_existing_harness_test_failure": {
+      "what": "tests/test_rbac_verify_harness.py::test_harness_passes_against_enforced_app fails with 'Client.__init__() got an unexpected keyword argument proxies'.",
+      "attribution": "NOT caused by this mission. It is an httpx/starlette version incompatibility in the local venv and it fails identically on unmodified HEAD, confirmed by running it in a detached worktree. Everything else in that file passes: 70 passed, 1 failed."
+    }
+  },
+
+  "carried_next_step_closed": {
+    "id": 279,
+    "text": "Sprint 53: extend scripts/rbac_verify.py with authenticated cross-tenant rows ... Then record a production rbac_verify run, since none has been recorded since Sprint 49.",
+    "status": "PARTIALLY closed. The coverage-extension half was already delivered by SEC-3 in Sprint 54 and is strengthened here (vacuity gates, seeded document fixture). The 'record a production run' half is still open and is blocked by L1. It has now been carried four times; it should not be carried a fifth without the L1 credential being created."
+  },
+
+  "code_changes": {
+    "scripts/rbac_verify.py": "resolve_verification_identity() (new, with the bare-username and @tracelab.local refusals); provision_fixture_project() + _find_project_by_name() (new, replacing the live path's dependence on discover_owned_project — which is RETAINED for the local TestClient tests that legitimately use it); _seed_fixture_document() (new); _note_owner_preflight_baseline() now records VACUOUS-BASELINE gaps instead of 'smoke only' notes; document_deny_matrix seeds rather than skips; _call() gained an opt-in files= path for the multipart upload, kept off the default path so both transports and every existing call site are unaffected; run() summary notes rewritten to match what actually happens, plus the explicit row-3 gate.",
+    ".github/workflows/rbac-verify-production.yml": "NEW. cron + workflow_dispatch, concurrency group with cancel-in-progress false (a cancelled run can strand throwaway users), credential check as a failing STEP rather than a skip-guard, distinct ::error annotations for exit 2 vs other non-zero, 90-day log artifact.",
+    "cmos/.gitignore": "'!reports/**/*.log' negation so evidence logs are tracked.",
+    "tests/test_rbac_verify_harness.py": "Two tests rewritten to pin the NEW stronger contract instead of the old silent-skip behaviour (the document matrix now gaps rather than notes; the pedr baseline now gaps rather than noting 'smoke only'), plus TestVerificationIdentity (6 cases) and TestFixtureProjectLifecycle (3 cases).",
+    "tests/test_rbac_verify_mutation_proof.py": "NEW. The control/mutant pair described under criterion 4."
+  },
+
+  "tests": {
+    "tests/test_rbac_verify_harness.py + tests/test_rbac_verify_mutation_proof.py": "70 passed, 1 failed (L2, pre-existing on HEAD)",
+    "ruff check on every changed file": "All checks passed",
+    "secret scan on every changed file and all 21 rescued logs": "clean",
+    "workflow YAML": "parses; triggers schedule + workflow_dispatch"
+  }
+}

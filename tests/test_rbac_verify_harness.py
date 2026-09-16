@@ -41,6 +41,8 @@ from app.models.user import User
 from app.models.workspace import Workspace
 from app.services.cache_manager import get_cache_manager
 from scripts.rbac_verify import (
+    _FABRICATED_DOMAIN,
+    _FIXTURE_PROJECT_NAME,
     _PEDR_SCOPE_QUERY,
     _RAG_EMPTY_ANSWER,
     _SYNTHESIS_EMPTY_CONTENT,
@@ -52,6 +54,7 @@ from scripts.rbac_verify import (
     pedr1b_scope_routes,
     pedr1c_anon_routes,
     pedr_scope_routes,
+    resolve_verification_identity,
 )
 
 OWNER_EMAIL = "tracelab-admin@tracelab.local"  # conftest seed: {AUTH_USERNAME}@tracelab.local
@@ -456,7 +459,14 @@ def test_document_deny_matrix_detects_read_and_write_leaks_without_mutating_requ
             assert path.endswith("/restore") and kwargs.get("json") is None
 
 
-def test_document_deny_matrix_records_empty_owner_project_without_seeding():
+def test_document_deny_matrix_gaps_when_no_document_can_be_seeded():
+    """A document matrix that could not run must FAIL, not pass with a note.
+
+    Sprint 55 RBAC-3. This previously asserted the opposite: zero gaps and a
+    "no live document" note, which let a run report PASS while the SEC-2
+    cross-tenant deny probes had not executed at all. That is exactly how the
+    Sprint 54 receipt came to say PASS with the probes skipped.
+    """
     calls = []
 
     class EmptyTransport:
@@ -466,9 +476,43 @@ def test_document_deny_matrix_records_empty_owner_project_without_seeding():
 
     verifier = RbacVerifier(EmptyTransport(), log=lambda _message: None)
     verifier.document_deny_matrix(str(uuid4()), {"owner": "owner"})
-    assert len(calls) == 1 and calls[0][0] == "GET"
+
+    # It listed, then TRIED to seed a fixture document rather than giving up.
+    assert [method for method, _ in calls] == ["GET", "POST"]
+    assert calls[1][1].endswith("/documents/upload?project_id=" + calls[1][1].split("project_id=")[1])
+    # And because the seed produced no row, the run fails loudly instead of
+    # quietly reporting that it skipped the probes.
+    assert any(gap.kind == "DOCUMENT-FIXTURE-MISSING" for gap in verifier.gaps)
+    assert verifier.report() == 1
+
+
+def test_document_deny_matrix_runs_the_probes_against_a_seeded_fixture():
+    """When the seed succeeds, the SEC-2 deny probes actually execute."""
+    document_id = str(uuid4())
+
+    class SeedingTransport:
+        def __init__(self):
+            self.calls = []
+
+        def request(self, method, path, **kwargs):
+            self.calls.append((method, path))
+            if method == "POST" and "/documents/upload" in path:
+                return _StubResponse(201, {"id": document_id})
+            if method == "GET" and "/documents?" in path:
+                return _StubResponse(200, {"data": []})
+            # every outsider probe correctly denies
+            return _StubResponse(403, {"detail": "denied"})
+
+    transport = SeedingTransport()
+    verifier = RbacVerifier(transport, log=lambda _message: None)
+    verifier.document_deny_matrix(
+        str(uuid4()), {"owner": "owner", "member": "member", "viewer": "viewer"}
+    )
+
+    assert any("/documents/upload" in path for _m, path in transport.calls)
+    # The per-document deny probes ran against the seeded row.
+    assert any(document_id in path for _m, path in transport.calls)
     assert verifier.gaps == []
-    assert any("no live document" in note for note in verifier.notes)
 
 
 @pytest.mark.parametrize("overblock", [False, True])
@@ -938,7 +982,11 @@ def test_pedr_scope_matrix_fails_when_no_known_positive_search_project_exists():
 
     assert any(gap.kind == "NO-SEARCHABLE-PROJECT" for gap in verifier.gaps)
     assert transport.explicit_search_calls == 0
-    assert any("smoke only" in note for note in verifier.notes)
+    # Sprint 55 RBAC-3: a zero-match owner baseline used to be recorded as a
+    # "smoke only" NOTE, which still allowed a PASS. It is now a gap in its own
+    # right — if the owner sees nothing, member/viewer seeing nothing proves
+    # nothing, and the run must say so rather than bury it in a note.
+    assert any(gap.kind == "VACUOUS-BASELINE" for gap in verifier.gaps)
     assert verifier.report() == 1
 
 
@@ -1872,3 +1920,137 @@ def test_pedr1c_matrix_is_compatible_with_real_testclient_routes(
         .count()
         == 0
     )
+
+
+# --- Sprint 55 RBAC-3: the verification identity ---------------------------------
+#
+# The harness authenticated as the fabricated @tracelab.local bootstrap row for five
+# sprints because main() silently appended that domain to a bare AUTH_USERNAME. These
+# pin the refusals so the coercion cannot come back.
+
+
+class TestVerificationIdentity:
+    def test_prefers_the_dedicated_identity_over_the_app_bootstrap_credentials(self):
+        email, password, source = resolve_verification_identity(
+            {
+                "RBAC_VERIFY_USERNAME": "rbac-verify@tracelab.aquex.ai",
+                "RBAC_VERIFY_PASSWORD": "dedicated-pw",
+                "AUTH_USERNAME": "derek@deniedart.com",
+                "AUTH_PASSWORD": "bootstrap-pw",
+            }
+        )
+        assert email == "rbac-verify@tracelab.aquex.ai"
+        assert password == "dedicated-pw"  # noqa: S105 - fake transport credential
+        assert source == "RBAC_VERIFY_USERNAME"
+
+    def test_falls_back_to_auth_username_when_no_dedicated_identity_is_set(self):
+        email, password, source = resolve_verification_identity(
+            {"AUTH_USERNAME": "derek@deniedart.com", "AUTH_PASSWORD": "pw"}
+        )
+        assert email == "derek@deniedart.com"
+        assert source == "AUTH_USERNAME"
+
+    def test_a_bare_username_is_refused_instead_of_being_given_a_domain(self):
+        """The whole bug in one assertion.
+
+        'kneelinghorse' used to become 'kneelinghorse@tracelab.local', which is a
+        real production account holding the irreducible owner role. Every run since
+        Sprint 49 authenticated as it without anyone intending to.
+        """
+        email, reason, _ = resolve_verification_identity(
+            {"AUTH_USERNAME": "kneelinghorse", "AUTH_PASSWORD": "pw"}
+        )
+        assert email is None
+        assert "bare username" in reason
+        assert _FABRICATED_DOMAIN in reason  # names what it refused to invent
+        assert "AUTH_USERNAME" in reason  # names the variable to fix
+
+    def test_the_fabricated_domain_is_refused_even_spelled_out_in_full(self):
+        email, reason, _ = resolve_verification_identity(
+            {
+                "RBAC_VERIFY_USERNAME": "kneelinghorse" + _FABRICATED_DOMAIN,
+                "RBAC_VERIFY_PASSWORD": "pw",
+            }
+        )
+        assert email is None
+        assert "retired bootstrap identity" in reason
+
+    @pytest.mark.parametrize(
+        "env",
+        [
+            {},
+            {"AUTH_USERNAME": "derek@deniedart.com"},  # password missing
+            {"AUTH_PASSWORD": "pw"},  # username missing
+        ],
+    )
+    def test_missing_credentials_are_refused_with_an_actionable_reason(self, env):
+        email, reason, _ = resolve_verification_identity(env)
+        assert email is None
+        assert "RBAC_VERIFY_USERNAME" in reason and "RBAC_VERIFY_PASSWORD" in reason
+
+
+class TestFixtureProjectLifecycle:
+    """The harness owns its fixture instead of depending on an ownership accident."""
+
+    def _transport(self, existing_pages):
+        owner_id = str(uuid4())
+
+        class T:
+            created = []
+
+            def request(self, method, path, **kwargs):
+                if path.endswith("/auth/me"):
+                    return _StubResponse(200, {"user_id": owner_id})
+                if method == "GET" and "/projects?" in path:
+                    return _StubResponse(200, existing_pages)
+                if method == "POST" and path.endswith("/projects"):
+                    body = kwargs.get("json") or {}
+                    self.created.append(body.get("name"))
+                    return _StubResponse(201, {"id": "new-project-id"})
+                if method == "GET" and "/projects/" in path:
+                    pid = path.rsplit("/", 1)[-1]
+                    return _StubResponse(200, {"id": pid, "owner_id": owner_id})
+                return _StubResponse(404, {})
+
+        return T()
+
+    def test_creates_the_fixture_when_it_does_not_exist_yet(self):
+        transport = self._transport({"data": [], "pagination": {"pages": 1}})
+        verifier = RbacVerifier(transport, log=lambda _m: None)
+        assert verifier.provision_fixture_project("owner-jwt") == "new-project-id"
+        assert transport.created == [_FIXTURE_PROJECT_NAME]
+
+    def test_reuses_the_existing_fixture_rather_than_creating_another(self):
+        """Durability matters: DELETE /projects only soft-deletes, so a fixture
+        created per run would strand a dead row on every scheduled tick."""
+        existing_id = str(uuid4())
+        transport = self._transport(
+            {
+                "data": [{"id": existing_id, "name": _FIXTURE_PROJECT_NAME}],
+                "pagination": {"pages": 1},
+            }
+        )
+        verifier = RbacVerifier(transport, log=lambda _m: None)
+        assert verifier.provision_fixture_project("owner-jwt") == existing_id
+        assert transport.created == []  # nothing new was created
+
+    def test_refuses_a_fixture_that_does_not_read_back_as_owned(self):
+        """A create that 2xx'd without persisting an owned row would make every
+        downstream deny-probe vacuous, so the run aborts instead."""
+        owner_id = str(uuid4())
+
+        class T:
+            def request(self, method, path, **kwargs):
+                if path.endswith("/auth/me"):
+                    return _StubResponse(200, {"user_id": owner_id})
+                if method == "GET" and "/projects?" in path:
+                    return _StubResponse(200, {"data": [], "pagination": {"pages": 1}})
+                if method == "POST" and path.endswith("/projects"):
+                    return _StubResponse(201, {"id": "p1"})
+                # reads back owned by somebody else
+                return _StubResponse(200, {"id": "p1", "owner_id": str(uuid4())})
+
+        verifier = RbacVerifier(T(), log=lambda _m: None)
+        with pytest.raises(HarnessError) as exc:
+            verifier.provision_fixture_project("owner-jwt")
+        assert "did not read back as owned" in str(exc.value)

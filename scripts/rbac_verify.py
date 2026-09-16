@@ -73,6 +73,11 @@ _SYNTHESIS_EMPTY_CONTENT = (
 # users exist only for the duration of a run and are purged at the end.
 _THROWAWAY_PASSWORD = "rbac-verify-throwaway-pw"  # noqa: S105 — ephemeral test-user password, not a secret
 
+#: The single durable project the harness owns and reuses. Stable by NAME so a run
+#: can find the one it made last time. Never per-run: DELETE /projects only
+#: soft-deletes, so a per-run fixture would strand a dead row on every schedule tick.
+_FIXTURE_PROJECT_NAME = "TraceLab RBAC verification fixture (do not delete)"
+
 
 # --- the wired per-id routes (anon-401 sweep) ------------------------------------
 # Mirrors tests/test_rbac_route_enforcement_api.py::PER_ID_ROUTES. The e2e_prod
@@ -384,13 +389,26 @@ class RbacVerifier:
 
     # -- transport ----------------------------------------------------------------
     def _call(
-        self, method: str, path: str, *, token: str | None = None, api_key: str | None = None, json: Any | None = None
+        self,
+        method: str,
+        path: str,
+        *,
+        token: str | None = None,
+        api_key: str | None = None,
+        json: Any | None = None,
+        files: Any | None = None,
     ) -> Any:
         headers: dict[str, str] = {}
         if token:
             headers["Authorization"] = f"Bearer {token}"
         if api_key:
             headers["X-API-Key"] = api_key
+        # ``files`` is only ever used to seed the harness's own document fixture
+        # (Sprint 55 RBAC-3). Kept out of the default path so every existing call
+        # site and both transports (httpx.Client / fastapi TestClient) are
+        # unaffected — they share this exact keyword signature.
+        if files is not None:
+            return self._http.request(method.upper(), path, headers=headers, files=files)
         return self._http.request(method.upper(), path, headers=headers, json=json)
 
     @staticmethod
@@ -555,12 +573,112 @@ class RbacVerifier:
             return None
         return str(resource_id)
 
+    def provision_fixture_project(self, owner_token: str) -> str:
+        """Find-or-create the ONE durable project this harness owns.
+
+        Sprint 55 RBAC-3. The harness used to hunt for a pre-existing project that
+        happened to be owned by the login account (``discover_owned_project``).
+        That coupled verification to an ownership accident: the 2026-09-16 account
+        move re-owned every project away from the bootstrap row, the lookup started
+        aborting, and because the matrix had not run since Sprint 49 nothing
+        reported it. Owning the fixture removes that whole class.
+
+        It is also SAFER than reuse, which is not obvious. Pointing the matrix at a
+        real project meant firing member/viewer PUT, PATCH and restore deny-probes
+        at live tenant data and seeding children inside it — ``live_safe`` only
+        ever suppressed project DELETE. A fail-open on any of those probes landed
+        on real rows. Now it lands on a fixture that holds nothing.
+
+        DURABLE, not per-run, and deliberately so: DELETE /projects/{id} only
+        SOFT-deletes (app/api/v1/projects.py:220 — "a separate purge operation
+        (not yet implemented)"), so creating one per run would strand a dead row
+        every time. On the six-hourly schedule this mission adds, that is ~1,460
+        soft-deleted rows a year. One stable row, reused, leaks nothing.
+        """
+        me = self._json_object(self._call("get", f"{self._prefix}/auth/me", token=owner_token))
+        owner_id = me.get("user_id") if me is not None else None
+        if not owner_id:
+            raise HarnessError(
+                f"fixture project: GET {self._prefix}/auth/me returned no user_id; "
+                "cannot establish which principal the positive controls belong to."
+            )
+
+        existing = self._find_project_by_name(owner_token, _FIXTURE_PROJECT_NAME)
+        if existing is None:
+            resp = self._call(
+                "post",
+                f"{self._prefix}/projects",
+                token=owner_token,
+                json={
+                    "name": _FIXTURE_PROJECT_NAME,
+                    "description": (
+                        "Durable RBAC verification fixture, owned and reused by "
+                        "scripts/rbac_verify.py. Deny-probes run against this row so "
+                        "they never touch real tenant data. Do not delete: it is "
+                        "recreated automatically, but deleting it strands a "
+                        "soft-deleted row (there is no purge operation)."
+                    ),
+                },
+            )
+            payload = self._json_object(resp)
+            project_id = payload.get("id") if payload is not None else None
+            if resp.status_code not in (200, 201) or not project_id:
+                raise HarnessError(
+                    f"fixture project create failed: POST {self._prefix}/projects -> "
+                    f"{resp.status_code}. The verification identity must be able to "
+                    "create a project; without one the authz matrix cannot run "
+                    "against a row whose lifecycle this harness controls."
+                )
+            existing = str(project_id)
+
+        # Read it back. A create that 2xx'd without persisting an owned, readable
+        # row would make every downstream deny-probe vacuous — the exact failure
+        # mode this mission exists to close.
+        detail = self._call("get", f"{self._prefix}/projects/{existing}", token=owner_token)
+        detail_payload = self._json_object(detail)
+        if (
+            detail.status_code != 200
+            or detail_payload is None
+            or str(detail_payload.get("owner_id")) != str(owner_id)
+        ):
+            raise HarnessError(
+                f"fixture project {existing} did not read back as owned by the "
+                f"verification identity (GET -> {detail.status_code}, owner_id="
+                f"{(detail_payload or {}).get('owner_id')!r}, expected {owner_id!r}). "
+                "Refusing to run a matrix whose positive controls are unproven."
+            )
+        return str(existing)
+
+    def _find_project_by_name(self, owner_token: str, name: str) -> str | None:
+        """Exact-name lookup across the caller's project pages; None if absent."""
+        page = 1
+        while True:
+            listing = self._call(
+                "get", f"{self._prefix}/projects?page={page}&page_size=100", token=owner_token
+            )
+            payload = self._json_object(listing)
+            rows = payload.get("data") if payload is not None else None
+            if listing.status_code != 200 or not isinstance(rows, list):
+                raise HarnessError(
+                    f"fixture project lookup failed: GET {self._prefix}/projects "
+                    f"-> {listing.status_code}"
+                )
+            for row in rows:
+                if isinstance(row, dict) and row.get("name") == name:
+                    return str(row.get("id"))
+            pagination = payload.get("pagination") if payload is not None else None
+            pages = pagination.get("pages") if isinstance(pagination, dict) else None
+            if not isinstance(pages, int) or page >= pages:
+                return None
+            page += 1
+
     def discover_owned_project(self, owner_token: str) -> str:
         """Return a validated, non-deleted project owned by the bootstrap owner.
 
-        The live verifier reuses this row and never creates/soft-deletes a project.
-        If no exact owner match exists, mutation-free verification cannot proceed
-        deterministically and the run aborts after its guaranteed cleanup.
+        RETAINED for tests/integration/test_e2e_rbac_live.py and focused harness
+        tests that run against a local TestClient with a pre-seeded project. The
+        live production path uses provision_fixture_project instead — see the note
+        there on why depending on an ownership accident was the Sprint 49 blind spot.
         """
         me_path = f"{self._prefix}/auth/me"
         me = self._call("get", me_path, token=owner_token)
@@ -2339,10 +2457,25 @@ class RbacVerifier:
                 )
 
     def _note_owner_preflight_baseline(self, owner_token: str | None) -> None:
-        """State transparently whether the preflight deny smoke is non-vacuous."""
+        """Gate the preflight deny-smoke on a non-vacuous owner baseline.
+
+        Sprint 55 RBAC-3. This used to append a NOTE and let the run PASS. That is
+        the vacuity Sprint 54 recorded and nobody acted on: if the owner's own
+        preflight returns zero matches, then member and viewer returning zero
+        proves NOTHING — everyone gets an empty list, enforcement or not. A check
+        that cannot fail is not evidence, and a PASS that includes one is a lie by
+        omission. These are now GAPS, so the run exits non-zero and says why.
+        """
         if not owner_token:
-            self.notes.append(
-                "pedr-preflight: no owner principal; scoped-empty checks are smoke only"
+            self.gaps.append(
+                Gap(
+                    "VACUOUS-BASELINE",
+                    "owner",
+                    "post",
+                    f"{self._prefix}/pedr/preflight",
+                    "owner principal available to establish a positive baseline",
+                    "no owner principal — member/viewer scoped-empty checks prove nothing",
+                )
             )
             return
         response = self._call(
@@ -2352,20 +2485,39 @@ class RbacVerifier:
             json={"query": _PEDR_SCOPE_QUERY},
         )
         if response.status_code != 200:
-            self.notes.append(
-                "pedr-preflight: owner baseline returned "
-                f"{response.status_code}; scoped-empty checks are smoke only"
+            self.gaps.append(
+                Gap(
+                    "VACUOUS-BASELINE",
+                    "owner",
+                    "post",
+                    f"{self._prefix}/pedr/preflight",
+                    "200 with a positive match_count",
+                    f"{response.status_code} — member/viewer scoped-empty checks prove nothing",
+                )
             )
             return
         try:
             payload = response.json()
         except Exception:  # pragma: no cover - real HTTP adapters vary
             payload = {}
-        if not isinstance(payload, dict) or not payload.get("match_count"):
-            self.notes.append(
-                "pedr-preflight: owner baseline had zero matches; member/viewer "
-                "scoped-empty checks are smoke only, not a non-vacuous isolation proof"
+        match_count = payload.get("match_count") if isinstance(payload, dict) else None
+        if not match_count:
+            self.gaps.append(
+                Gap(
+                    "VACUOUS-BASELINE",
+                    "owner",
+                    "post",
+                    f"{self._prefix}/pedr/preflight",
+                    "match_count > 0 so that a member/viewer empty result is meaningful",
+                    f"match_count={match_count!r} — everyone sees empty, so the "
+                    "member/viewer scoped-empty checks are not an isolation proof",
+                )
             )
+            return
+        self.notes.append(
+            f"pedr-preflight: owner baseline match_count={match_count}; "
+            "member/viewer scoped-empty checks are a non-vacuous isolation proof"
+        )
 
     def graph_scope_matrix(self, project_id: str, principals: dict[str, str]) -> None:
         """Require exact tenant denials and a real owner root, without writes."""
@@ -2581,8 +2733,25 @@ class RbacVerifier:
             raise HarnessError(f"document fixture discovery failed: GET {list_path} -> {listing.status_code}")
         documents = [row for row in rows if isinstance(row, dict) and row.get("id") and str(row.get("project_id")) == project_id and not row.get("deleted_at")]
         if not documents:
-            self.notes.append("SEC-2 document deny probes skipped: discovered owner project has no live document; no production document was created.")
-            return
+            # Sprint 55 RBAC-3: this used to return a NOTE and let the run PASS,
+            # which is how the SEC-2 deny probes went unrun for a whole sprint
+            # while the receipt still said PASS. The project is now the harness's
+            # own fixture, so seed a document into it and run them for real.
+            seeded_id = self._seed_fixture_document(project_id, principals["owner"])
+            if seeded_id is None:
+                self.gaps.append(
+                    Gap(
+                        "DOCUMENT-FIXTURE-MISSING",
+                        "owner",
+                        "post",
+                        f"{self._prefix}/documents/upload",
+                        "a live document in the fixture project so the SEC-2 deny probes can run",
+                        "could not seed one — the deny probes did NOT run, so this "
+                        "run proves nothing about document isolation",
+                    )
+                )
+                return
+            documents = [{"id": seeded_id}]
         document_id = str(documents[0]["id"])
         path = f"{self._prefix}/documents/{document_id}"
         for role in ("member", "viewer"):
@@ -2602,6 +2771,40 @@ class RbacVerifier:
                 response = self._call(method, path + suffix, token=token, json=body)
                 self.document_checks.append({"role": "member", "method": method, "path": path + suffix, "status": response.status_code, "expected": 403})
                 self._record_exact_deny(response, role="member", method=method, path=path + suffix, expected=403, kind="DOCUMENT-WRITE-STATUS")
+
+    def _seed_fixture_document(self, project_id: str, owner_token: str) -> str | None:
+        """Upload a tiny document into the harness's own fixture project.
+
+        Only ever called against the fixture (``_FIXTURE_PROJECT_NAME``), never a
+        real tenant project. Returns the new document id, or None if the upload
+        did not produce a readable row — in which case the caller records a GAP
+        rather than quietly skipping the probes.
+        """
+        path = f"{self._prefix}/documents/upload?project_id={project_id}"
+        body = (
+            b"RBAC verification fixture document. Created by scripts/rbac_verify.py "
+            b"so the SEC-2 cross-tenant deny probes have a real row to fail against.\n"
+        )
+        try:
+            resp = self._call(
+                "post",
+                path,
+                token=owner_token,
+                files={"file": ("rbac-verify-fixture.txt", body, "text/plain")},
+            )
+        except Exception as exc:  # pragma: no cover - exercised by live transport
+            self.notes.append(f"fixture document upload raised {type(exc).__name__}: {exc}")
+            return None
+        payload = self._json_object(resp)
+        document_id = payload.get("id") if payload is not None else None
+        if resp.status_code not in (200, 201) or not document_id:
+            self.notes.append(
+                f"fixture document upload -> {resp.status_code}; SEC-2 deny probes "
+                "cannot run against a document that was not created"
+            )
+            return None
+        self._log(f"seeded fixture document={document_id} in the fixture project")
+        return str(document_id)
 
     def project_owner_document_read_matrix(self, project_id: str, document_id: str, token: str) -> None:
         """Local-only positive fixture: reject over-blocking without privileged roles."""
@@ -3160,7 +3363,8 @@ class RbacVerifier:
                 project_spec = next(
                     spec for spec in specs if spec.name == "project"
                 )
-                project_id = self.discover_owned_project(owner_token)
+                project_id = self.provision_fixture_project(owner_token)
+                self._log(f"fixture project={project_id} (durable, owned by this harness)")
                 self._log("onboarding registration tenant-scope matrix...")
                 self.registration_matrix(project_id, principals)
                 self._log("existing-document tenant-scope matrix...")
@@ -3206,16 +3410,34 @@ class RbacVerifier:
                     self.service_log_write_matrix(ctx["mission"], principals)
 
                 self.notes.append(
-                    "authz matrix reuses a validated owner project and seeds only "
-                    "hard-deletable collection/mission fixtures; project DELETE is "
-                    "local-only (live anonymous 401 coverage retained); "
+                    "authz matrix runs against the harness's OWN durable fixture "
+                    "project, not a real tenant project, so member/viewer PUT/PATCH/"
+                    "restore deny-probes and seeded children never touch live data "
+                    "(Sprint 55 RBAC-3); project DELETE stays local-only because "
+                    "there is no purge operation and a soft-delete would strand the "
+                    "fixture (live anonymous 401 coverage retained); "
                     f"{len(_ANON_ONLY_ROUTES)} per-id routes remain in the explicit "
                     "anon registry; reports/collection children also receive PEDR-1C "
                     "cross-tenant probes; onboarding registration has member/viewer "
-                    "deny probes; existing documents receive read/list/PATCH/restore "
-                    "deny probes. Project-owner document read positives are local-only "
-                    "because the bootstrap owner is privileged and live fixture creation "
-                    "would mutate production projects/documents."
+                    "deny probes; documents receive read/list/PATCH/restore deny "
+                    "probes against a document the harness seeded into its own "
+                    "fixture, so the SEC-2 probes run live rather than being skipped."
+                )
+                # Sprint 55 RBAC-3, third vacuous row: EXPLICITLY GATED, not closed.
+                # Stated as its own note rather than buried in the paragraph above,
+                # because an unrun positive control is the thing most likely to be
+                # mistaken for a passing one.
+                self.notes.append(
+                    "GATED — project-owner document read positives (the "
+                    "over-blocking guard for a NON-privileged user who owns the "
+                    "parent project) still do not run live; they are covered only by "
+                    "tests/test_rbac_verify_harness.py against a local TestClient. "
+                    "Closing this needs the harness to create a project OWNED BY its "
+                    "member principal, upload a document into it, assert the 200, "
+                    "then delete that project before purging the user. That is a new "
+                    "production-mutating path and was deliberately not shipped "
+                    "untested. Until it runs, a PASS does not prove that enforcement "
+                    "avoids over-blocking legitimate project owners in production."
                 )
             finally:
                 # Children before parents (mission references project); best-effort.
@@ -3270,6 +3492,71 @@ class RbacVerifier:
         return 0
 
 
+#: The domain the retired bootstrap derivation used to invent. Reserved by RFC 6761
+#: and unreachable, so an account there can never be recovered or mailed. Sprint 55
+#: RBAC-1 demoted the production row that lived here; the harness must never
+#: authenticate as it again.
+_FABRICATED_DOMAIN = "@tracelab.local"
+
+
+def resolve_verification_identity(
+    env: dict[str, str] | Any,
+) -> tuple[str | None, str, str]:
+    """Resolve the login the matrix runs as.
+
+    Returns ``(email, password, source)`` on success, or ``(None, reason, "")``
+    when the run must not start. Every failure is named and actionable: RBAC-3
+    exists because a run that could not start reported nothing at all.
+
+    Prefers a DEDICATED verification identity (RBAC_VERIFY_USERNAME /
+    RBAC_VERIFY_PASSWORD) over the app's own bootstrap credentials, so the matrix
+    stops riding on whatever AUTH_USERNAME happens to hold on the operator's
+    machine. Two values are refused outright rather than silently coerced:
+
+    * a bare username — the old code appended ``@tracelab.local`` here, which is
+      how every run since Sprint 49 ended up authenticating as the fabricated
+      bootstrap row without anyone noticing;
+    * any address at that fabricated domain, even spelled out in full.
+    """
+    dedicated = env.get("RBAC_VERIFY_USERNAME"), env.get("RBAC_VERIFY_PASSWORD")
+    fallback = env.get("AUTH_USERNAME"), env.get("AUTH_PASSWORD")
+    email, password = dedicated if dedicated[0] else fallback
+    source = "RBAC_VERIFY_USERNAME" if dedicated[0] else "AUTH_USERNAME"
+
+    if not email or not password:
+        return (
+            None,
+            "no verification credentials. Set RBAC_VERIFY_USERNAME and "
+            "RBAC_VERIFY_PASSWORD to a dedicated verification identity (preferred), "
+            "or AUTH_USERNAME and AUTH_PASSWORD. Both the username and the password "
+            "must be set; "
+            f"{source} was {'set' if email else 'empty'} and its password was "
+            f"{'set' if password else 'empty'}.",
+            "",
+        )
+    if "@" not in email:
+        return (
+            None,
+            f"{source}={email!r} is a bare username, not an email address. This "
+            f"harness no longer derives {email}{_FABRICATED_DOMAIN} — that "
+            "derivation is why every run since Sprint 49 authenticated as the "
+            "fabricated bootstrap account instead of a real one. Set "
+            f"{source} to the full email address of the verification identity.",
+            "",
+        )
+    if email.lower().endswith(_FABRICATED_DOMAIN):
+        return (
+            None,
+            f"{source}={email!r} is the retired bootstrap identity at the "
+            f"non-routable domain {_FABRICATED_DOMAIN}. Sprint 55 RBAC-1 demoted "
+            "that account precisely so verification would stop depending on it. "
+            "Set RBAC_VERIFY_USERNAME and RBAC_VERIFY_PASSWORD to a dedicated "
+            "verification identity with a real, routable address.",
+            "",
+        )
+    return email, password, source
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Live RBAC verification harness (T47.2).")
     parser.add_argument("--base-url", required=True, help="Deployed API base URL, e.g. https://api.tracelab.aquex.ai")
@@ -3277,14 +3564,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--timeout", type=float, default=30.0)
     args = parser.parse_args(argv)
 
-    owner_email = os.environ.get("AUTH_USERNAME")
-    owner_password = os.environ.get("AUTH_PASSWORD")
-    if not owner_email or not owner_password:
-        print("AUTH_USERNAME and AUTH_PASSWORD must be set (the bootstrap owner login).", file=sys.stderr)
+    owner_email, owner_password, source = resolve_verification_identity(os.environ)
+    if owner_email is None:
+        # Sprint 55 RBAC-3: every one of these is a FAILURE, never a skip. A run
+        # that cannot start is exactly the silence that cost five sprints.
+        print(f"CANNOT START: {owner_password}", file=sys.stderr)
         return 2
-    # AUTH_USERNAME may be a bare username (bootstrap derives <username>@tracelab.local).
-    if "@" not in owner_email:
-        owner_email = f"{owner_email}@tracelab.local"
+    print(f"verification identity: {owner_email} (from {source})")
 
     try:
         import httpx

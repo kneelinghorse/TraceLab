@@ -1,0 +1,371 @@
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+
+ RUN  v3.2.4 /Users/systemsystems/portfolio/TraceLab/frontend
+
+stderr | src/components/AppShell.test.tsx > the shared shell > opens focused search from the Home entry point
+An update to Navigation inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to Navigation inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to AppShell inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to CommandPalette inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to CommandPalette inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to CommandPalette inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/components/AppShell.test.tsx > the shared shell > provides one main and banner, and marks only the deepest navigation route current
+An update to Navigation inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to Navigation inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to AppShell inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/components/AppShell.test.tsx > the shared shell > keeps admin destinations out of both navigation and command search for non-admins
+An update to Navigation inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to Navigation inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to AppShell inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to CommandPalette inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to CommandPalette inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to CommandPalette inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/__tests__/admin/spaces.test.tsx (14 tests) 884ms
+stderr | src/components/AppShell.test.tsx > the shared shell > opens focused keyboard search and submits an encoded research query ({"ctrlKey":true})
+An update to Navigation inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to Navigation inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to AppShell inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/components/AppShell.test.tsx > the shared shell > opens focused keyboard search and submits an encoded research query ({"metaKey":true})
+An update to Navigation inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to Navigation inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to AppShell inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/__tests__/admin/users.test.tsx (15 tests) 1015ms
+   ✓ UsersAdmin — list + lifecycle > creates a user at a role and reloads the list  311ms
+stderr | src/components/AppShell.test.tsx > the shared shell > jumps to a section and restores drawer state on close
+An update to Navigation inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to Navigation inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to AppShell inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/components/AppShell.test.tsx > the shared shell > keeps login in the same themed landmark shell without exposing workspace controls
+An update to AppShell inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/components/AppShell.test.tsx (8 tests) 1158ms
+   ✓ the shared shell > jumps to a section and restores drawer state on close  320ms
+ ✓ src/__tests__/mission-authoring.test.tsx (9 tests) 1634ms
+   ✓ saves and previews inline, preserves authored fields, and submits the same pristine draft  575ms
+   ✓ does not reset a run after an ambiguous submission response  317ms
+stderr | src/features/search/SearchExperience.test.tsx > API-authoritative search state > does not carry result data into another account
+An update to SearchExperience inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to SearchExperience inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to SearchExperience inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to SearchExperience inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to SearchExperience inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/features/search/SearchExperience.test.tsx (15 tests) 1577ms
+ ✓ src/components/CommandPalette.test.tsx (7 tests) 3062ms
+   ✓ scoped palette data and actions > queries names only while open and exposes every server-returned entity link  661ms
+   ✓ scoped palette data and actions > pages a full scoped group and resets its page for a new name  666ms
+   ✓ scoped palette data and actions > keeps a quickly reopened palette active when the previous native close event arrives late  303ms
+   ✓ scoped palette data and actions > keeps old lookup results out of a new query and a new account  720ms
+   ✓ scoped palette data and actions > routes saved and recent searches to their canonical execution flow and exposes useful actions  378ms
+ ✓ src/__tests__/missions.test.tsx (11 tests) 1553ms
+   ✓ renders completed with actions appropriate to one execution  393ms
+ ✓ src/__tests__/inbox.test.tsx (10 tests) 492ms
+ ✓ src/__tests__/project-bundles.test.tsx (9 tests) 390ms
+ ✓ src/__tests__/collection-context.test.tsx (5 tests) 553ms
+ ✓ src/__tests__/home.test.tsx (5 tests) 627ms
+ ✓ src/__tests__/graph.test.tsx (16 tests) 707ms
+ ✓ src/__tests__/hygiene.test.tsx (10 tests) 789ms
+ ✓ src/__tests__/evidence.test.tsx (7 tests) 762ms
+ ✓ src/__tests__/mission-dashboards.test.tsx (4 tests) 599ms
+   ✓ uses independent server totals and reconstructs every repeated reason without saving pagination  392ms
+ ✓ scripts/check-token-colors.test.ts (8 tests) 584ms
+ ✓ src/__tests__/mission-run.test.tsx (9 tests) 224ms
+ ✓ src/__tests__/document-upload.test.tsx (4 tests) 202ms
+ ✓ src/__tests__/collection-picker.test.tsx (3 tests) 278ms
+ ✓ src/contexts/ThemeContext.test.tsx (5 tests) 140ms
+ ✓ src/components/RequireAdmin.test.tsx (12 tests) 158ms
+ ✓ src/__tests__/admin/observability.test.tsx (6 tests) 428ms
+ ✓ src/components/MarkdownRenderer.test.tsx (2 tests) 145ms
+ ✓ src/lib/theme.test.ts (7 tests) 10ms
+ ✓ src/contexts/AuthContext.test.tsx (1 test) 31ms
+ ✓ src/__tests__/document-upload-api.test.ts (3 tests) 6ms
+ ✓ src/lib/api/admin.test.ts (12 tests) 9ms
+ ✓ src/contexts/RoleContext.test.tsx (8 tests) 146ms
+ ✓ src/lib/route-migrations.test.ts (2 tests) 8ms
+ ✓ src/lib/route-migration-links.test.ts (2 tests) 4ms
+ ✓ src/lib/api/errors.test.ts (4 tests) 2ms
+ ✓ src/__tests__/document-state.test.ts (6 tests) 2ms
+ ✓ src/lib/api/timestamps.test.ts (1 test) 2ms
+ ✓ src/__tests__/mission-timeline.test.tsx (1 test) 62ms
+
+ Test Files  34 passed (34)
+      Tests  241 passed (241)
+   Start at  19:42:05
+   Duration  10.35s (transform 2.19s, setup 9.77s, collect 15.40s, tests 18.24s, environment 16.38s, prepare 2.26s)
+

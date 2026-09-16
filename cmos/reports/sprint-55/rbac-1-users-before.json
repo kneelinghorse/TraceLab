@@ -1,0 +1,86 @@
+{
+  "users": [
+    {
+      "id": "92a27b41-cff4-4e41-a35d-b2f8423d6572",
+      "email": "kneelinghorse@tracelab.local",
+      "role": "owner",
+      "is_active": true,
+      "created_at": "2026-03-09 20:44:29.560597",
+      "display_name": "kneelinghorse",
+      "owned": 0
+    },
+    {
+      "id": "5caab5b5-c72f-4116-ab93-5307e9ad7bd7",
+      "email": "derekn@shout.net",
+      "role": "admin",
+      "is_active": true,
+      "created_at": "2026-03-09 21:06:10.562831",
+      "display_name": "James Jamerson",
+      "owned": 0
+    },
+    {
+      "id": "007c8cb6-7d70-48fc-bcb4-3a0e46bc0519",
+      "email": "derek@deniedart.com",
+      "role": "admin",
+      "is_active": true,
+      "created_at": "2026-03-10 23:44:30.075983",
+      "display_name": "kneelinghorse",
+      "owned": 52
+    },
+    {
+      "id": "b69b6185-224b-405d-b56b-7fadc613abb3",
+      "email": "birch@chimptek.com",
+      "role": "admin",
+      "is_active": true,
+      "created_at": "2026-03-11 17:12:22.090477",
+      "display_name": "Birch",
+      "owned": 0
+    },
+    {
+      "id": "cb8b2d57-2d11-4542-a0a6-df0acdaef2ff",
+      "email": "test@example.com",
+      "role": "member",
+      "is_active": true,
+      "created_at": "2026-06-01 01:07:14.856904",
+      "display_name": "Test",
+      "owned": 0
+    },
+    {
+      "id": "47ecf953-bfb0-477d-ad0e-3516506286c2",
+      "email": "disabled@x.com",
+      "role": "member",
+      "is_active": false,
+      "created_at": "2026-06-01 17:57:47.185533",
+      "display_name": "d",
+      "owned": 0
+    },
+    {
+      "id": "98c270b4-a0ca-4e84-bc03-523de96060b7",
+      "email": "info@system.systems",
+      "role": "service",
+      "is_active": true,
+      "created_at": "2026-08-14 17:36:17.505724",
+      "display_name": "DeepSearch",
+      "owned": 0
+    },
+    {
+      "id": "f4e8a0e0-0626-4bab-9f72-37f6080a79d4",
+      "email": "sziegenfuss@partstown.com",
+      "role": "member",
+      "is_active": true,
+      "created_at": "2026-09-01 20:44:00.747877",
+      "display_name": "Syndy",
+      "owned": 0
+    }
+  ],
+  "owner_count": 1,
+  "active_owner_count": 1,
+  "projects_total": 52,
+  "alembic_head": "050_user_email_notifications",
+  "env": {
+    "AUTH_USERNAME": "derek@deniedart.com",
+    "RBAC_ENABLED": "true",
+    "ENVIRONMENT": "production",
+    "AUTH_PASSWORD_set": true
+  }
+}

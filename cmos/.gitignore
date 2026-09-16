@@ -3,6 +3,12 @@ cmos/
 dist/
 SESSIONS.jsonl
 *.log
+# ...but evidence logs under reports/ are the receipt, not transient output.
+# Sprint 55 RBAC-3: the blanket *.log rule silently kept 21 production-evidence
+# logs across sprints 50, 52 and 54 untracked, including the only record of the
+# Sprint 54 SEC-3 production rbac_verify run. A receipt whose log is ignored is
+# not a receipt.
+!reports/**/*.log
 telemetry/events/*.tmp
 .DS_Store
 __pycache__/
