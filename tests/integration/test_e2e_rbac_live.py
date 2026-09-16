@@ -172,6 +172,7 @@ def test_harness_pedr1c_routes_match_wired_surface():
             f"{settings.api_v1_prefix}/search/replay/{{id}}",
             f"{settings.api_v1_prefix}/navigation/search",
             f"{settings.api_v1_prefix}/graph/neighborhood",
+            f"{settings.api_v1_prefix}/graph/stats",
             f"{settings.api_v1_prefix}/synthesize",
         }
     }
