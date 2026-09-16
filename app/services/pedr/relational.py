@@ -552,7 +552,9 @@ class RelationalService:
 
         # Get the document
         doc = session.execute(
-            select(Document).where(Document.id == doc_uuid)
+            select(Document).where(
+                Document.id == doc_uuid, Document.deleted_at.is_(None)
+            )
         ).scalar_one_or_none()
 
         if not doc:
@@ -561,7 +563,9 @@ class RelationalService:
         # Document BELONGS_TO project (outbound)
         if doc.project_id:
             project = session.execute(
-                select(Project).where(Project.id == doc.project_id)
+                select(Project).where(
+                    Project.id == doc.project_id, Project.deleted_at.is_(None)
+                )
             ).scalar_one_or_none()
 
             if project:
@@ -677,7 +681,9 @@ class RelationalService:
         # Chunk BELONGS_TO document (outbound - using CONTAINS inverse)
         if chunk.document_id:
             doc = session.execute(
-                select(Document).where(Document.id == chunk.document_id)
+                select(Document).where(
+                    Document.id == chunk.document_id, Document.deleted_at.is_(None)
+                )
             ).scalar_one_or_none()
 
             if doc:
@@ -834,7 +840,9 @@ class RelationalService:
         # Mission BELONGS_TO project (outbound)
         if mission.project_id:
             project = session.execute(
-                select(Project).where(Project.id == mission.project_id)
+                select(Project).where(
+                    Project.id == mission.project_id, Project.deleted_at.is_(None)
+                )
             ).scalar_one_or_none()
 
             if project:
@@ -861,7 +869,9 @@ class RelationalService:
                     UUID(doc_id_str) if isinstance(doc_id_str, str) else doc_id_str
                 )
                 doc = session.execute(
-                    select(Document).where(Document.id == doc_uuid)
+                    select(Document).where(
+                        Document.id == doc_uuid, Document.deleted_at.is_(None)
+                    )
                 ).scalar_one_or_none()
 
                 if doc:
@@ -974,7 +984,9 @@ class RelationalService:
         # Insight BELONGS_TO project (outbound)
         if insight.project_id:
             project = session.execute(
-                select(Project).where(Project.id == insight.project_id)
+                select(Project).where(
+                    Project.id == insight.project_id, Project.deleted_at.is_(None)
+                )
             ).scalar_one_or_none()
 
             if project:
@@ -1092,7 +1104,9 @@ class RelationalService:
         # Report BELONGS_TO project (outbound)
         if report.project_id:
             project = session.execute(
-                select(Project).where(Project.id == report.project_id)
+                select(Project).where(
+                    Project.id == report.project_id, Project.deleted_at.is_(None)
+                )
             ).scalar_one_or_none()
 
             if project:

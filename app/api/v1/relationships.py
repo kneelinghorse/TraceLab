@@ -7,7 +7,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
-from app.core.authorization import authorize_or_403
+from app.core.authorization import accessible_project_ids, authorize_or_403
 from app.core.database import get_db
 from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.models.mission import Mission
@@ -56,6 +56,8 @@ def get_relationship_context(
             depth=depth,
             entity_types=entity_types,
             min_relevance=min_relevance,
+            # Reading the mission does not grant reading whatever its evidence cites.
+            allowed_project_ids=accessible_project_ids(user, db),
         )
     except MissionRelationshipNotFound as exc:
         raise HTTPException(

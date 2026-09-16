@@ -183,6 +183,11 @@ def pedr1c_anon_routes(
     """Alternate artifact routes that must reject anonymous callers."""
     return [
         *graph_scope_routes(prefix, resource_id),
+        # /graph/stats served corpus document and chunk counts from the PUBLIC health
+        # router until SEC-3. It is anon-only here rather than in the graph deny matrix
+        # because it legitimately returns 200 to every authenticated caller, scoped to
+        # that caller's own projects, instead of 403.
+        ("get", f"{prefix}/graph/stats", None),
         ("get", f"{prefix}/activity", None),
         ("get", f"{prefix}/activity/summary", None),
         ("put", f"{prefix}/activity/viewed", {}),

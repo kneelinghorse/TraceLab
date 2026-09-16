@@ -76,6 +76,7 @@ class RelationshipService:
         depth: int = 1,
         entity_types: Sequence[str] | None = None,
         min_relevance: float | None = None,
+        allowed_project_ids: list[UUID] | None = None,
     ) -> RelationshipContextResponse:
         normalized_depth = self._normalize_depth(depth)
         normalized_types = self._normalize_entity_types(entity_types)
@@ -86,15 +87,20 @@ class RelationshipService:
             entity_types=normalized_types, min_relevance=normalized_relevance
         )
 
+        # The caller's project scope is part of the key. Without it the first caller's
+        # results are replayed to every later caller, silently undoing the filtering below.
         cache_key = self.cache_manager.relationship_context_key(
             mission_id=str(mission.id),
             depth=normalized_depth,
             entity_types=tuple(filters.entity_types),
             min_relevance=filters.min_relevance,
+            allowed_project_ids=allowed_project_ids,
         )
 
         def _loader() -> dict:
-            context = self._build_context(db, mission, normalized_depth, filters)
+            context = self._build_context(
+                db, mission, normalized_depth, filters, allowed_project_ids
+            )
             return context.model_dump(exclude={"cached"})
 
         payload, cache_hit = self.cache_manager.cached_value(
@@ -111,11 +117,12 @@ class RelationshipService:
         mission: Mission,
         depth: int,
         filters: RelationshipFilters,
+        allowed_project_ids: list[UUID] | None = None,
     ) -> RelationshipContextResponse:
         context = mission.context if isinstance(mission.context, dict) else {}
         evidence_payload = self._normalize_evidence(context.get("evidence", []))
         chunk_ids = [link.chunk_id for link in evidence_payload if link.chunk_id]
-        chunk_map, missing_chunk_ids = self._load_chunks(db, chunk_ids)
+        chunk_map, missing_chunk_ids = self._load_chunks(db, chunk_ids, allowed_project_ids)
 
         include_chunk_preview = depth >= 2
 
@@ -550,23 +557,34 @@ class RelationshipService:
         self,
         db: Session,
         chunk_ids: Sequence[UUID | None],
+        allowed_project_ids: list[UUID] | None = None,
     ) -> tuple[dict[UUID, _ChunkRecord], set[str]]:
+        """Load cited chunks, refusing any the caller could not read directly.
+
+        The ids come from mission.context["evidence"], which is author-controlled, so
+        this join is the only thing standing between a written mission and any chunk in
+        the instance. A chunk outside the caller's projects, or one whose document is
+        soft-deleted, is reported as missing rather than returned (SEC-3).
+        """
         normalized_ids = {cid for cid in chunk_ids if cid}
         if not normalized_ids:
             return {}, set()
-        chunks = (
-            db.query(DocumentChunk)
-            .filter(DocumentChunk.id.in_(list(normalized_ids)))
-            .all()
+        query = (
+            db.query(DocumentChunk, Document)
+            .join(Document, Document.id == DocumentChunk.document_id)
+            .filter(
+                DocumentChunk.id.in_(list(normalized_ids)),
+                Document.deleted_at.is_(None),
+            )
         )
+        if allowed_project_ids is not None:
+            query = query.filter(Document.project_id.in_(allowed_project_ids))
+        rows = query.all()
+
+        chunks = [chunk for chunk, _ in rows]
+        documents: dict[UUID, Document] = {doc.id: doc for _, doc in rows}
         chunk_map: dict[UUID, DocumentChunk] = {chunk.id: chunk for chunk in chunks}
         missing = {str(cid) for cid in normalized_ids if cid not in chunk_map}
-
-        document_ids = {chunk.document_id for chunk in chunks}
-        documents: dict[UUID, Document] = {}
-        if document_ids:
-            rows = db.query(Document).filter(Document.id.in_(list(document_ids))).all()
-            documents = {row.id: row for row in rows}
 
         records: dict[UUID, _ChunkRecord] = {}
         for chunk in chunks:
