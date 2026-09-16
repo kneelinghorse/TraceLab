@@ -1,0 +1,133 @@
+{
+  "mission": "RBAC-1",
+  "name": "Put the owner role on the real owner",
+  "sprint": "sprint-55",
+  "session": "PS-2026-09-16-009",
+  "run_at": "2026-09-16T14:44Z-15:40Z",
+  "result": "COMPLETE, with two residuals recorded below that are out of this mission's scope.",
+
+  "what_changed_in_production": {
+    "summary": "Two role values. Nothing was created, deleted, or re-owned. users row count 8 before and 8 after; live project count 52 before and 52 after.",
+    "derek@deniedart.com": {
+      "id": "007c8cb6-7d70-48fc-bcb4-3a0e46bc0519",
+      "role": "admin -> owner",
+      "owns_live_projects": 52
+    },
+    "kneelinghorse@tracelab.local": {
+      "id": "92a27b41-cff4-4e41-a35d-b2f8423d6572",
+      "role": "owner -> admin",
+      "owns_live_projects": 0,
+      "note": "Demoted, NOT deleted. The row and every FK reference to it are untouched."
+    },
+    "statements_used": [
+      "-- executed via app.core.database.SessionLocal on the Railway TraceLab service, in this order",
+      "UPDATE users SET role='owner' WHERE id='007c8cb6-7d70-48fc-bcb4-3a0e46bc0519';  -- promote FIRST",
+      "UPDATE users SET role='admin' WHERE id='92a27b41-cff4-4e41-a35d-b2f8423d6572';  -- then demote"
+    ],
+    "rollback": [
+      "-- restores the exact prior state; run in this order so the last-owner invariant never breaks",
+      "UPDATE users SET role='owner' WHERE id='92a27b41-cff4-4e41-a35d-b2f8423d6572';",
+      "UPDATE users SET role='admin' WHERE id='007c8cb6-7d70-48fc-bcb4-3a0e46bc0519';",
+      "Takes effect on the next request: role is resolved live from the users row per request (app/core/security.py:216-228, decision #226). No restart, no key rotation."
+    ],
+    "evidence_files": [
+      "cmos/reports/sprint-55/rbac-1-users-before.json",
+      "cmos/reports/sprint-55/rbac-1-users-after.json",
+      "cmos/reports/sprint-55/rbac-1-role-change-transcript.json"
+    ]
+  },
+
+  "success_criteria": {
+    "1_derek_holds_owner_read_back_from_the_table": {
+      "status": "MET",
+      "how": "Re-read the production users table in a fresh connection after the change, not trusted from an API response. derek@deniedart.com role='owner'. See rbac-1-users-after.json."
+    },
+    "2_fabricated_account_no_longer_owner_and_the_refusal_was_observed": {
+      "status": "MET",
+      "how": "The LastOwnerError refusal was observed against production BEFORE the promotion, read-only: is_last_owner(fabricated) -> True, assert_not_last_owner(fabricated) -> LastOwnerError('Cannot remove or demote the last remaining owner'). After promoting Derek the same call permitted the demotion, and after the demotion the guard transferred to Derek (assert_not_last_owner(derek) -> LastOwnerError). The full four-step transcript is in rbac-1-role-change-transcript.json. Nothing here was assumed."
+    },
+    "3_bootstrap_owner_email_can_no_longer_mint_a_non_routable_identity": {
+      "status": "MET for the runtime path; see residual R2 for migration 023",
+      "how": "app/services/ownership.py::bootstrap_owner_email() now raises BootstrapIdentityError on a non-email AUTH_USERNAME instead of deriving <username>@tracelab.local. The email case is unchanged byte for byte, and production AUTH_USERNAME is already derek@deniedart.com, so production behaviour is identical.",
+      "mutation_verified": "YES. With the guard removed and the old derivation restored, tests/test_pre_flip_gates.py::TestGate6BootstrapParity goes 2 failed / 1 passed; with the guard in place, 3 passed. The guard is known to fire, not merely present."
+    },
+    "4_ensure_owner_bootstrap_does_not_recreate_the_demoted_account": {
+      "status": "MET",
+      "how": "ensure_owner_bootstrap() never creates users at all - it only promotes an existing row - and its owner-count guard (app/services/ownership.py:100) short-circuits while any owner exists, which is now Derek. tests/test_ownership.py::TestEnsureOwnerBootstrap::test_does_not_resurrect_a_demoted_account_after_the_rbac1_role_change builds a database in production's post-change shape (Derek owner, fabricated admin) and asserts the call is a no-op that re-promotes nothing.",
+      "mutation_verified": "YES. Disabling the owner-count guard makes that test fail; restoring it makes it pass."
+    },
+    "5_rbac_status_and_dereks_reach": {
+      "status": "PARTIALLY MET - see limitation L1",
+      "rbac_status_live": {
+        "endpoint": "GET https://api.tracelab.aquex.ai/api/v1/admin/rbac-status",
+        "body": {"rbac_enabled": true, "owner_count": 1, "your_role": "admin", "policy_version": "1.1"},
+        "reading": "rbac_enabled true and owner_count 1, both as required. your_role reports 'admin' for the fabricated account, which is the live API confirming the demotion took effect immediately without a restart."
+      },
+      "dereks_reach": "VERIFIED, by exercising the real authorization code path against the real production rows rather than by assumption: authorize(derek_principal, 'read', project, db) allows 52/52 live projects, and accessible_project_ids returns None (unrestricted tier). Evidence in cmos/reports/sprint-55/rbac-1-authorization-reach.json.",
+      "dereks_login": "NOT VERIFIED. See limitation L1."
+    }
+  },
+
+  "limitations": {
+    "L1_dereks_login_is_unverified": {
+      "what": "The criterion asks that Derek 'can log in and reach all 52 projects'. The reach half is verified through the real authorize() path. The LOGIN half is not, and could not be from this session.",
+      "why": "Login authenticates against users.password_hash (app/api/v1/auth.py:64-77), not against any environment variable. A bcrypt check of the Railway AUTH_PASSWORD against all 8 production password hashes matches exactly one account - kneelinghorse@tracelab.local - and does NOT match derek@deniedart.com. Derek's real password is known only to Derek. Attempting a login as derek@deniedart.com with the credentials available to this session returns 401, which is correct behaviour, not a defect introduced here.",
+      "impact": "The role change is independently confirmed at the database layer and at the live API layer. What remains unconfirmed is only that Derek's own password works - which was equally true before this mission and was not changed by it.",
+      "how_to_close": "Derek logs in to https://tracelab.aquex.ai once and confirms the UI shows owner-tier access. One minute of his time closes it."
+    }
+  },
+
+  "residuals": {
+    "R1_the_fabricated_account_still_holds_admin_and_a_live_api_key": {
+      "severity": "medium, and deliberately NOT fixed here",
+      "finding": "Demoting to 'admin' rather than to 'member' or 'viewer' was chosen on purpose. app/core/authorization.py:41 puts owner and admin in the same _PRIVILEGED_ROLES tier, so the fabricated account retains unconditional access to all 52 projects. Going lower WOULD have been a real least-privilege win but was rejected for two reasons: (a) it is the RBAC-2 policy decision - separating administrative capability from data access - which Derek explicitly dropped as agent-invented scope, and this mission's notes forbid drifting into it; (b) it would have broken production. The account owns a LIVE API key named 'mcp-server' (prefix tl_jQ6vFscS, expires_at NULL, last used 2026-09-16 04:30:48Z). API-key principals carry the DB user's live role (app/core/security.py:223-228, :259-261), and the account has ZERO space_members rows and owns zero live projects, so a demotion below the privileged tier would have made every project read 403 and every project-scoped search return silently empty while entity lists kept working - a partial, inconsistent failure that is hard to notice.",
+      "recommendation_for_derek": "Re-issue that mcp-server key under a real account (or the 'service' role account info@system.systems that already exists for machine identities), then the fabricated account can be dropped to viewer with near-zero blast radius. That ordering is what makes any future RBAC-2 safe."
+    },
+    "R2_migration_023_can_still_mint_a_local_identity_on_a_fresh_database": {
+      "severity": "low",
+      "finding": "alembic/versions/023_add_users_table.py:71-73 carries its own copy of the same derivation and is the only code that CREATES the account row. It was deliberately left unguarded: it already ran in production so changing it cannot help there, and making it raise would fail 'alembic upgrade head' for any operator or CI runner whose AUTH_USERNAME is a bare username - trading a latent problem for an immediate deploy breakage. Migrations 031/037/038 only RESOLVE by email, so with 023 unable to be reached by a fresh correctly-configured deploy they degrade to their existing no-match fallbacks.",
+      "recommendation": "Fold into whichever mission next touches the migration chain: give 023 the same guard at the same time as updating every AUTH_USERNAME in CI and developer .env files to a full email address."
+    },
+    "R3_the_stale_local_env_is_the_root_cause_and_is_untracked": {
+      "severity": "medium, handed to RBAC-3",
+      "finding": "The repository's local .env sets AUTH_USERNAME to the BARE username 'kneelinghorse'. That is why every rbac_verify run authenticated as kneelinghorse@tracelab.local rather than as Derek, and why the Sprint 54 SEC-3 receipt recorded caller_role 'owner'. scripts/rbac_verify.py does NOT call bootstrap_owner_email(); it carries its own copy of the derivation at :3285-3287, so the guard landed here does not fix the harness. RBAC-3 owns re-pointing it.",
+      "note": ".env is gitignored, so each operator machine and CI runner holds its own copy. There is no single file to fix."
+    }
+  },
+
+  "corrections_to_prior_records": {
+    "decision_493_owns_0_projects": "Accurate for NON-DELETED projects, and misleading without that qualifier. The fabricated account is the owner-of-record for the bulk of the corpus: 1562 documents, 446 reports, 405 missions, 52 collections, 1113 ledger_entries, 1 soft-deleted project and 2 api_keys. The 2026-09-16 account move re-owned PROJECTS to Derek and left every other entity type behind. This matters because it means a future RBAC-2 would cut Derek off from most of his own corpus unless those rows are re-owned first.",
+    "sprint_54_sec_3_receipt_writes_to_production": "The SEC-3 receipt states 'writes_to_production: none beyond the throwaway principals, which were purged'. That is not correct. A production project named 'RBAC verify fixture (SEC-3)' (a5245f04-08a0-4660-bf98-61c85aa767db) was created, used as the harness fixture, and soft-deleted at 2026-09-16 14:01:47. The row is still present in the projects table today. The harness itself refuses to do this (scripts/rbac_verify.py:609-612), so it was done out of band to work around the discovery blocker. Recording it here so the next reader is not misled; RBAC-3 should decide whether to hard-delete that row."
+  },
+
+  "code_changes": {
+    "app/services/ownership.py": "Added BootstrapIdentityError; bootstrap_owner_email() raises it on a non-email AUTH_USERNAME instead of fabricating <username>@tracelab.local.",
+    "tests/conftest.py": "AUTH_USERNAME default is now the full address 'tracelab-admin@tracelab.local' (explicitly configured, not derived), so every seeded email is byte-identical to before. get_seed_user_email() and the seed-user fixture now delegate to bootstrap_owner_email() instead of each carrying its own copy of the derivation - the duplication that let this class of bug hide.",
+    "tests/test_pre_flip_gates.py": "Gate 6's two assertions that pinned the fabricating behaviour now assert BootstrapIdentityError is raised, and check the message names the offending value and tells the operator what to do.",
+    "tests/test_ownership.py": "Added test_does_not_resurrect_a_demoted_account_after_the_rbac1_role_change."
+  },
+
+  "tests": {
+    "tests/test_ownership.py + tests/test_pre_flip_gates.py": "18 passed",
+    "pytest -m unit": "279 passed, 2 skipped",
+    "mutation_verification": "Both new guards confirmed to fail their tests when broken and pass when restored. Details under success_criteria 3 and 4.",
+    "ruff check on all four changed files": "All checks passed",
+    "scripts/check_no_credential_literals.py on all four changed files": "clean",
+
+    "regression_attribution": {
+      "method": "The full non-integration tree was run TWICE: once on this branch and once in a detached worktree at unmodified HEAD (a984a78), using the same interpreter, so every failure could be attributed rather than hand-waved.",
+      "this_branch": "19 failed, 2707 passed, 3 skipped, 7 errors",
+      "baseline_HEAD": "38 failed, 2677 passed, 3 skipped, 19 errors",
+      "naive_diff": "The failure-set diff appeared to show 10 branch-only failures in tests/test_project_owner_document_read.py, tests/test_rbac_verify_harness.py and tests/test_rbac_route_enforcement_api.py.",
+      "verdict": "NOT regressions. Re-running those three files in ISOLATION gives byte-identical results on both trees: test_project_owner_document_read.py 35 passed on both, test_rbac_verify_harness.py 1 failed / 57 passed on both, test_rbac_route_enforcement_api.py 77 passed on both. The whole-suite difference is test-order pollution, and it runs in this branch's favour (26 non-passing here vs 57 on baseline).",
+      "conclusion": "This change introduces ZERO new test failures. Every failure observed on this branch also occurs on unmodified HEAD.",
+      "pre_existing_failures_not_touched_by_this_mission": [
+        "tests/sprint_03/* and tests/sprint_04/* quality and latency gates (9 tests) - identical on both trees",
+        "tests/performance/test_qdrant_performance.py::test_parameter_sweep_finds_configuration_with_latency_headroom - nondeterministic; across 4 isolated runs each it failed 2/4 on BASELINE and 0/4 on this branch",
+        "tests/test_rbac_verify_harness.py::test_harness_passes_against_enforced_app - fails in isolation on both trees",
+        "tests/test_admin_dashboard.py::test_metrics_aggregator_generates_sections - fails in isolation on both trees",
+        "tests/test_document_ingestion.py::test_upload_and_process_endpoints_record_statuses - fails in isolation on both trees"
+      ]
+    }
+  }
+}

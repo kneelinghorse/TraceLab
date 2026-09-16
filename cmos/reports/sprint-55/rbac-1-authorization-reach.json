@@ -1,0 +1,32 @@
+{
+  "rbac_enabled_setting": true,
+  "live_projects": 52,
+  "derek@deniedart.com": {
+    "role": "owner",
+    "authorize_read_allows": "52/52",
+    "accessible_project_ids": "None (unrestricted/privileged tier)",
+    "owns_live_projects": 52
+  },
+  "kneelinghorse@tracelab.local": {
+    "role": "admin",
+    "authorize_read_allows": "52/52",
+    "accessible_project_ids": "None (unrestricted/privileged tier)",
+    "owns_live_projects": 0
+  },
+  "live_api": {
+    "login_status": 200,
+    "auth_me": {
+      "status": 200,
+      "role": "admin"
+    },
+    "rbac_status": {
+      "status": 200,
+      "body": {
+        "rbac_enabled": true,
+        "owner_count": 1,
+        "your_role": "admin",
+        "policy_version": "1.1"
+      }
+    }
+  }
+}

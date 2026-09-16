@@ -1,0 +1,74 @@
+[
+  {
+    "step": "0-before",
+    "rows": [
+      {
+        "email": "derek@deniedart.com",
+        "role": "admin",
+        "is_active": true
+      },
+      {
+        "email": "kneelinghorse@tracelab.local",
+        "role": "owner",
+        "is_active": true
+      }
+    ],
+    "all_owners": [
+      "kneelinghorse@tracelab.local"
+    ]
+  },
+  {
+    "step": "1-after-promote",
+    "rows": [
+      {
+        "email": "derek@deniedart.com",
+        "role": "owner",
+        "is_active": true
+      },
+      {
+        "email": "kneelinghorse@tracelab.local",
+        "role": "owner",
+        "is_active": true
+      }
+    ],
+    "all_owners": [
+      "derek@deniedart.com",
+      "kneelinghorse@tracelab.local"
+    ]
+  },
+  {
+    "step": "2-guard-recheck",
+    "is_last_owner_fabricated": false,
+    "is_last_owner_derek": false
+  },
+  {
+    "step": "2b-assert",
+    "result": "permits demoting the fabricated account (expected)"
+  },
+  {
+    "step": "3-after-demote",
+    "rows": [
+      {
+        "email": "derek@deniedart.com",
+        "role": "owner",
+        "is_active": true
+      },
+      {
+        "email": "kneelinghorse@tracelab.local",
+        "role": "admin",
+        "is_active": true
+      }
+    ],
+    "all_owners": [
+      "derek@deniedart.com"
+    ]
+  },
+  {
+    "step": "4-derek-now-protected",
+    "is_last_owner_derek": true
+  },
+  {
+    "step": "4b",
+    "result": "LastOwnerError: Cannot remove or demote the last remaining owner"
+  }
+]

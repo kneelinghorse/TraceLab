@@ -27,7 +27,11 @@ if "postgresql" in _current_db.lower() or "rlwy.net" in _current_db.lower():
 
 os.environ["DATABASE_URL"] = _TEST_DB_URL  # Force, don't setdefault
 os.environ["ENVIRONMENT"] = "test"
-os.environ.setdefault("AUTH_USERNAME", "tracelab-admin")
+# Must be a full email address: Sprint 55 RBAC-1 removed the
+# "<username>@tracelab.local" derivation, so a bare username now raises
+# BootstrapIdentityError. Spelling the address out here keeps the seeded test
+# user's email byte-identical to what the old derivation produced.
+os.environ.setdefault("AUTH_USERNAME", "tracelab-admin@tracelab.local")
 os.environ.setdefault("AUTH_PASSWORD", "changeme")
 # Mocked synthesis tests must never depend on a developer or CI secret.
 os.environ["OPENAI_API_KEY"] = "test"
@@ -161,7 +165,7 @@ def reset_database_and_reports(request):
         creds = get_configured_credentials()
         _seed_session.add(
             User(
-                email=f"{creds.username}@tracelab.local",
+                email=get_seed_user_email(),
                 display_name=creds.username,
                 password_hash=creds.password_hash,
                 role="admin",
@@ -204,9 +208,16 @@ def project(db_session):
 
 
 def get_seed_user_email() -> str:
-    """Return the seed user's email address for test login."""
-    username = os.environ.get("AUTH_USERNAME", "tracelab-admin")
-    return username if "@" in username else f"{username}@tracelab.local"
+    """Return the seed user's email address for test login.
+
+    Delegates to the runtime helper so the tests and the app cannot drift: this
+    used to carry its own copy of the "<username>@tracelab.local" derivation,
+    which is exactly the duplication that let the fabricated production owner go
+    unnoticed (Sprint 55 RBAC-1).
+    """
+    from app.services.ownership import bootstrap_owner_email
+
+    return bootstrap_owner_email()
 
 
 @pytest.fixture(scope="session")
