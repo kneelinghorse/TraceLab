@@ -168,10 +168,11 @@ test("recent and saved search times use UTC even outside the UTC timezone", asyn
   await expect.soft(page.getByText("Last run 1 minute ago", { exact: true })).toBeVisible();
 });
 
-test("legacy search URL permanently redirects with its query intact", async ({ request }) => {
+test("the retired /search/results alias is gone rather than silently redirecting", async ({ request }) => {
+  // Retired in Sprint 54 (ALIAS-1). route-migration.spec.ts asserts this from the migration
+  // map too; this keeps the search suite honest about its own former alias.
   const response = await request.get("/search/results?q=scope%20%26%20provenance", { maxRedirects: 0 });
-  expect(response.status()).toBe(308);
-  expect(response.headers().location).toBe("/search?q=scope%20%26%20provenance");
+  expect(response.status()).toBe(404);
 });
 
 test("loading, no matches, service failure and missing saved search stay distinct", async ({ page }) => {

@@ -1,19 +1,11 @@
 import { expect, test } from "@playwright/test";
 
-// Legacy URLs must redirect at the server boundary, retaining the selected ID
-// and query rather than keeping a second implementation of the mission pages.
-for (const [source, destination] of [
-  ["/console", "/admin/observability"],
-  ["/console/corrections", "/admin/corrections"],
-  ["/console/missions?status=completed", "/missions?status=completed"],
-  ["/console/missions/11111111-1111-1111-1111-111111111111", "/missions/11111111-1111-1111-1111-111111111111"],
-]) test(`${source} redirects permanently to the canonical page`, async ({ request }) => {
-  const response = await request.get(source, { maxRedirects: 0 });
-  expect(response.status()).toBe(308);
-  expect(response.headers().location).toBe(destination);
-});
-
-test("legacy console redirects remain behind admin authorization", async ({ page }) => {
+// The /console aliases were retired in Sprint 54 (ALIAS-1); route-migration.spec.ts owns
+// the 404 assertions, driven by the migration map so it cannot drift from it.
+//
+// What is unique here is the authorization boundary the aliases used to lead to: their
+// successors must still refuse a non-admin, and must not fetch admin data before doing so.
+test("the admin successors of the retired console routes stay behind admin authorization", async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem("tracelab.auth.v2", JSON.stringify({ token: "admin-test", user_id: "member", email: "member@example.test", display_name: "Member" })));
   const requests: string[] = [];
   await page.route("**/api/v1/**", async route => {
@@ -21,10 +13,11 @@ test("legacy console redirects remain behind admin authorization", async ({ page
     if (!pathname.endsWith("/auth/me")) requests.push(pathname);
     await route.fulfill({ json: { user_id: "member", email: "member@example.test", display_name: "Member", role: "member" } });
   });
-  for (const route of ["/console", "/console/corrections"]) {
+  for (const route of ["/admin/observability", "/admin/corrections"]) {
     await page.goto(route);
     await expect(page.getByRole("heading", { name: "Admin access required" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Observability", exact: true })).toHaveCount(0);
   }
+  // Refusing after fetching would still have leaked the data it was refusing to show.
   expect(requests.filter(p => p.includes("/admin/") || p.includes("/corrections"))).toEqual([]);
 });

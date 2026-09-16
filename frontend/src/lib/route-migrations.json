@@ -1,11 +1,56 @@
 [
-  { "source": "/", "destination": "/", "kind": "page", "sprint": "50 (UX-2)" },
-  { "source": "/console", "destination": "/admin/observability", "kind": "redirect", "sprint": "50 (UX-4)" },
-  { "source": "/console/missions", "destination": "/missions", "kind": "redirect", "sprint": "50 (UX-4)" },
-  { "source": "/console/missions/:id", "destination": "/missions/:id", "kind": "redirect", "sprint": "50 (UX-4)" },
-  { "source": "/console/corrections", "destination": "/admin/corrections", "kind": "redirect", "sprint": "50 (UX-4)" },
-  { "source": "/invites", "destination": "/settings#invites", "kind": "redirect", "sprint": "50 (UX-5)" },
-  { "source": "/search/results", "destination": "/search", "kind": "redirect", "sprint": "51 (UX-9)" },
-  { "source": "/missions/queue", "destination": "/missions?status=queued", "kind": "redirect", "sprint": "51 (UX-6); retargeted 53 (ACT-1)" },
-  { "source": "/inbox", "destination": "/", "kind": "redirect", "sprint": "53 (ACT-1)" }
+  {
+    "source": "/",
+    "destination": "/",
+    "kind": "page",
+    "sprint": "50 (UX-2)"
+  },
+  {
+    "source": "/console",
+    "destination": "/admin/observability",
+    "kind": "retired",
+    "sprint": "50 (UX-4); retired 54 (ALIAS-1)"
+  },
+  {
+    "source": "/console/missions",
+    "destination": "/missions",
+    "kind": "retired",
+    "sprint": "50 (UX-4); retired 54 (ALIAS-1)"
+  },
+  {
+    "source": "/console/missions/:id",
+    "destination": "/missions/:id",
+    "kind": "retired",
+    "sprint": "50 (UX-4); retired 54 (ALIAS-1)"
+  },
+  {
+    "source": "/console/corrections",
+    "destination": "/admin/corrections",
+    "kind": "retired",
+    "sprint": "50 (UX-4); retired 54 (ALIAS-1)"
+  },
+  {
+    "source": "/invites",
+    "destination": "/settings#invites",
+    "kind": "retired",
+    "sprint": "50 (UX-5); retired 54 (ALIAS-1)"
+  },
+  {
+    "source": "/search/results",
+    "destination": "/search",
+    "kind": "retired",
+    "sprint": "51 (UX-9); retired 54 (ALIAS-1)"
+  },
+  {
+    "source": "/missions/queue",
+    "destination": "/missions?status=queued",
+    "kind": "retired",
+    "sprint": "51 (UX-6); retargeted 53 (ACT-1); retired 54 (ALIAS-1)"
+  },
+  {
+    "source": "/inbox",
+    "destination": "/",
+    "kind": "redirect",
+    "sprint": "53 (ACT-1)"
+  }
 ]

@@ -53,18 +53,20 @@ try {
       results.push({ name, theme, width, ...measured, transportErrors: [...transportErrors], pageErrors: [...pageErrors], screenshot });
       await fs.writeFile(path.join(out, 'results.json'), JSON.stringify(results, null, 2));
     }
-    for (const legacy of ['/console', '/console/corrections']) {
-      stage = `${theme}-${width}-${legacy}`;
-      await page.goto(base+legacy, { waitUntil: 'networkidle' });
-      if (legacy === '/console') {
-        ensure(new URL(page.url()).pathname === '/admin/observability', 'Observability redirect failed');
+    // The /console aliases were retired in Sprint 54 (ALIAS-1); these pages are reached
+    // directly now, and route-migration.spec.ts asserts the old URLs return 404.
+    for (const route of ['/admin/observability', '/admin/corrections']) {
+      stage = `${theme}-${width}-${route}`;
+      await page.goto(base+route, { waitUntil: 'networkidle' });
+      if (route === '/admin/observability') {
+        ensure(new URL(page.url()).pathname === '/admin/observability', 'Observability did not load');
         await page.getByRole('region', { name: 'Mission statuses' }).waitFor();
         await page.getByText(stats.missions.total.toLocaleString(), { exact: true }).first().waitFor();
         await page.getByRole('button', { name: 'Refresh', exact: true }).click();
         await page.getByRole('button', { name: 'Refresh', exact: true }).waitFor();
         await measure('observability');
       } else {
-        ensure(new URL(page.url()).pathname === '/admin/corrections', 'Corrections redirect failed');
+        ensure(new URL(page.url()).pathname === '/admin/corrections', 'Corrections did not load');
         await page.getByRole('button', { name: 'Telemetry', exact: true }).waitFor();
         await measure('correction-queue');
         await page.getByRole('button', { name: 'Telemetry', exact: true }).click();

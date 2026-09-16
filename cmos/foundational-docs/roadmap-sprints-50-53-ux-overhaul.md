@@ -310,28 +310,24 @@ A UI mission is not done until all of the following are true. Each rule exists b
 | Old route | Successor | Sprint | Behavior |
 |---|---|---|---|
 | `/` | `/` | 50 (UX-2) | Home returns 200, replacing the former redirect to missions |
-| `/console` | `/admin/observability` | 50 (UX-4) | Permanent 308 |
-| `/console/missions` | `/missions` | 50 (UX-4) | Permanent 308 |
-| `/console/missions/{id}` | `/missions/{id}` | 50 (UX-4) | Permanent 308 |
-| `/console/corrections` | `/admin/corrections` | 50 (UX-4) | Permanent 308 |
-| `/invites` | `/settings#invites` | 50 (UX-5) | Permanent 308; query precedes fragment |
-| `/search/results` | `/search` | 51 (UX-9) | Permanent 308 |
-| `/missions/queue` | `/missions?status=queued` | 51 (UX-6); retargeted 53 (ACT-1) | Permanent 308; the queue view was retired with the attention model |
+| `/console` | `/admin/observability` | 50 (UX-4); retired 54 (ALIAS-1) | Retired; returns 404 |
+| `/console/missions` | `/missions` | 50 (UX-4); retired 54 (ALIAS-1) | Retired; returns 404 |
+| `/console/missions/{id}` | `/missions/{id}` | 50 (UX-4); retired 54 (ALIAS-1) | Retired; returns 404 |
+| `/console/corrections` | `/admin/corrections` | 50 (UX-4); retired 54 (ALIAS-1) | Retired; returns 404 |
+| `/invites` | `/settings#invites` | 50 (UX-5); retired 54 (ALIAS-1) | Retired; returns 404 |
+| `/search/results` | `/search` | 51 (UX-9); retired 54 (ALIAS-1) | Retired; returns 404 |
+| `/missions/queue` | `/missions?status=queued` | 51 (UX-6); retargeted 53 (ACT-1); retired 54 (ALIAS-1) | Retired; returns 404 |
 | `/inbox` | `/` | 53 (ACT-1) | Permanent 308; the inbox was replaced by the recent activity stream on Home |
 
-All redirects retain query parameters, including repeated values. The destination's explicit `view=queue` wins over an incoming `view`. Home is a replacement page, not an alias or a self-redirect. The executable map is `frontend/src/lib/route-migrations.json`; unit tests bind it to this maintained table, and the production smoke walks every row.
+Live redirects retain query parameters, including repeated values. Home is a replacement page, not an alias or a self-redirect. The executable map is `frontend/src/lib/route-migrations.json`; unit tests bind it to this maintained table, and the production smoke walks every row.
 
-### Deprecated aliases to retire in Sprint 54 (ALIAS-1)
+Rows keep one of three kinds. `page` is a real route. `redirect` is a live permanent 308. `retired` is an alias that has been removed and now returns 404; retired rows stay in the map on purpose, because a generated application link to a retired alias is now a broken link rather than a redirect, and the link guard in `frontend/scripts/route-migration-links.mjs` still has to catch it.
 
-- `/console`
-- `/console/missions`
-- `/console/missions/{id}`
-- `/console/corrections`
-- `/invites`
-- `/search/results`
-- `/missions/queue`
+### Deprecated aliases retired in Sprint 54 (ALIAS-1)
 
-Keep these redirects active through Sprint 52. Canonical Home `/` is retained. Source URLs, authored references and exported document contents are preserved as evidence; this migration applies to generated application navigation links.
+Retired and now returning 404: `/console`, `/console/missions`, `/console/missions/{id}`, `/console/corrections`, `/invites`, `/search/results`, `/missions/queue`.
+
+`/inbox` stays a live redirect: it was added in Sprint 53 (ACT-1) and was not part of this retirement. Canonical Home `/` is retained. Source URLs, authored references and exported document contents are preserved as evidence; this retirement applies to generated application navigation links.
 
 ---
 
