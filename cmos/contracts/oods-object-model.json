@@ -778,14 +778,6 @@
             "annotation": "str | None",
             "mapping": "Document.file_type"
           },
-          "content": {
-            "annotation": "str | None",
-            "mapping": "Document.content"
-          },
-          "raw_content": {
-            "annotation": "bytes | None",
-            "mapping": "Document.raw_content"
-          },
           "uploaded_at": {
             "annotation": "datetime.datetime | None",
             "mapping": "Document.uploaded_at"
@@ -845,6 +837,22 @@
           "processing_events": {
             "annotation": "list[app.schemas.document_status.DocumentProcessingStatusRead] | None",
             "mapping": "Document.processing_events"
+          },
+          "source_report_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Document.source_report_id \u2192 the rendered report this document came from"
+          },
+          "source_mission_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Document.source_mission_id \u2192 the mission that captured it"
+          },
+          "source_origin": {
+            "annotation": "str | None",
+            "mapping": "Document.source_origin"
+          },
+          "links": {
+            "annotation": "list[app.schemas.document.DocumentLink]",
+            "mapping": "Document provenance links \u2192 DocumentLink[]"
           },
           "chunk_count": {
             "annotation": "int | None",
@@ -911,6 +919,112 @@
           "validation_status": {
             "annotation": "str | None",
             "mapping": "Document.validation_status"
+          }
+        },
+        "DocumentReadBase": {
+          "project_id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Document.project_id"
+          },
+          "name": {
+            "annotation": "<class 'str'>",
+            "mapping": "Document.name \u2192 Labelled.label (display alias)"
+          },
+          "file_path": {
+            "annotation": "str | None",
+            "mapping": "Document.file_path"
+          },
+          "file_type": {
+            "annotation": "str | None",
+            "mapping": "Document.file_type"
+          },
+          "uploaded_at": {
+            "annotation": "datetime.datetime | None",
+            "mapping": "Document.uploaded_at"
+          },
+          "file_size": {
+            "annotation": "int | None",
+            "mapping": "Document.file_size"
+          },
+          "mime_type": {
+            "annotation": "str | None",
+            "mapping": "Document.mime_type"
+          },
+          "source_type": {
+            "annotation": "str | None",
+            "mapping": "Document.source_type"
+          },
+          "participant_count": {
+            "annotation": "int | None",
+            "mapping": "Document.participant_count"
+          },
+          "collection_date": {
+            "annotation": "datetime.date | None",
+            "mapping": "Document.collection_date"
+          },
+          "processed": {
+            "annotation": "bool | None",
+            "mapping": "Document.processed"
+          },
+          "chunked": {
+            "annotation": "bool | None",
+            "mapping": "Document.chunked"
+          },
+          "embedded": {
+            "annotation": "bool | None",
+            "mapping": "Document.embedded"
+          },
+          "transcription_accuracy": {
+            "annotation": "decimal.Decimal | None",
+            "mapping": "Document.transcription_accuracy"
+          },
+          "validation_status": {
+            "annotation": "str | None",
+            "mapping": "Document.validation_status"
+          }
+        },
+        "DocumentLink": {
+          "kind": {
+            "annotation": "typing.Literal['report', 'mission']",
+            "mapping": "Link target discriminator: report or mission \u2192 Linkable.kind"
+          },
+          "id": {
+            "annotation": "<class 'str'>",
+            "mapping": "Report.id or Mission.id of the link target"
+          },
+          "title": {
+            "annotation": "<class 'str'>",
+            "mapping": "Report.title or Mission.title \u2192 Labelled.label (display alias)"
+          },
+          "href": {
+            "annotation": "<class 'str'>",
+            "mapping": "Canonical route to the target \u2192 Linkable.href"
+          }
+        },
+        "DocumentContentRead": {
+          "id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Document.id"
+          },
+          "name": {
+            "annotation": "<class 'str'>",
+            "mapping": "Document.name \u2192 Labelled.label (display alias)"
+          },
+          "mime_type": {
+            "annotation": "str | None",
+            "mapping": "Document.mime_type"
+          },
+          "source_origin": {
+            "annotation": "str | None",
+            "mapping": "Document.source_origin"
+          },
+          "content": {
+            "annotation": "str | None",
+            "mapping": "Document.content (full text; served only by the content endpoint)"
+          },
+          "links": {
+            "annotation": "list[app.schemas.document.DocumentLink]",
+            "mapping": "Document provenance links \u2192 DocumentLink[]"
           }
         }
       },
