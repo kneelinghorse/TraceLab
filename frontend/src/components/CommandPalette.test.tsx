@@ -1,6 +1,6 @@
-import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { SWRConfig } from "swr";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   auth: { isAuthenticated: true, isReady: true, user: { user_id: "alice", display_name: "Alice", email: "alice@example.test" }, logout: vi.fn() },
@@ -26,6 +26,10 @@ function response(query = "Needle") {
 }
 
 beforeEach(() => {
+  // The palette debounces queries for 200 ms. Drive that timer rather than waiting on it: a
+  // default 1 s findBy poll spends its whole budget on one or two name lookups and then fails.
+  // Only the timer functions are faked, so SWR's Date/performance use stays real.
+  vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
   vi.clearAllMocks();
   mocks.auth.user.user_id = "alice";
   mocks.role.isAdmin = false;
@@ -36,11 +40,15 @@ beforeEach(() => {
   HTMLDialogElement.prototype.showModal = function () { this.setAttribute("open", ""); };
   HTMLDialogElement.prototype.close = function () { this.removeAttribute("open"); this.dispatchEvent(new Event("close")); };
 });
+afterEach(() => { vi.useRealTimers(); });
 
 function shell() {
   return <SWRConfig value={{ provider: () => new Map(), dedupingInterval: 0, shouldRetryOnError: false }}><ThemeProvider><AppShell><h1>Existing route</h1></AppShell></ThemeProvider></SWRConfig>;
 }
 function open() { act(openCommandPalette); return screen.getByRole("textbox", { name: "Search research or find a section" }); }
+/** Runs out the 200 ms query debounce and flushes the lookup promises it releases, so every
+ *  assertion below reads a settled tree. Deterministic regardless of machine load. */
+async function settle() { await act(async () => { await vi.advanceTimersByTimeAsync(250); }); }
 
 describe("scoped palette data and actions", () => {
   it("queries names only while open and exposes every server-returned entity link", async () => {
@@ -49,7 +57,8 @@ describe("scoped palette data and actions", () => {
     const input = open();
     expect(mocks.names).not.toHaveBeenCalled();
     fireEvent.change(input, { target: { value: " Needle " } });
-    for (const kind of kinds) expect(await screen.findByRole("button", { name: `Needle ${kind}`, exact: true })).toBeTruthy();
+    await settle();
+    for (const kind of kinds) expect(screen.getByRole("button", { name: `Needle ${kind}`, exact: true })).toBeTruthy();
     expect(mocks.names).toHaveBeenCalledWith("Needle");
     fireEvent.click(screen.getByRole("button", { name: "Needle evidence", exact: true }));
     expect(mocks.router.push).toHaveBeenCalledWith("/evidence/evidence");
@@ -60,13 +69,16 @@ describe("scoped palette data and actions", () => {
     render(shell());
     const input = open();
     fireEvent.change(input, { target: { value: "First" } });
-    const group = await screen.findByRole("region", { name: "Documents (113)" });
+    await settle();
+    const group = screen.getByRole("region", { name: "Documents (113)" });
     fireEvent.click(within(group).getByRole("button", { name: "Next" }));
-    expect(await screen.findByRole("button", { name: "First page 2" })).toBeTruthy();
+    await settle();
+    expect(screen.getByRole("button", { name: "First page 2" })).toBeTruthy();
     expect(mocks.names).toHaveBeenCalledWith("First", "document", 2);
     fireEvent.change(input, { target: { value: "Second" } });
     expect(screen.queryByText("First page 2")).toBeNull();
-    expect(await screen.findByRole("button", { name: "Second page 1" })).toBeTruthy();
+    await settle();
+    expect(screen.getByRole("button", { name: "Second page 1" })).toBeTruthy();
     expect(mocks.names).not.toHaveBeenCalledWith("Second", "document", 2);
   });
 
@@ -74,11 +86,13 @@ describe("scoped palette data and actions", () => {
     mocks.names.mockRejectedValueOnce(new Error("Unavailable")).mockResolvedValue({ query: "Needle", groups: [] });
     render(shell());
     fireEvent.change(open(), { target: { value: "Needle" } });
-    const error = await screen.findByRole("alert");
+    await settle();
+    const error = screen.getByRole("alert");
     expect(within(error).getByText("Could not find objects")).toBeTruthy();
     expect(screen.queryByText("No matching objects")).toBeNull();
     fireEvent.click(within(error).getByRole("button", { name: "Retry" }));
-    expect(await screen.findByText("No matching objects")).toBeTruthy();
+    await settle();
+    expect(screen.getByText("No matching objects")).toBeTruthy();
   });
 
   it("keeps a quickly reopened palette active when the previous native close event arrives late", async () => {
@@ -90,7 +104,8 @@ describe("scoped palette data and actions", () => {
     const input = open();
     fireEvent(dialog, new Event("close"));
     fireEvent.change(input, { target: { value: "Needle" } });
-    expect(await screen.findByRole("button", { name: "Needle project", exact: true })).toBeTruthy();
+    await settle();
+    expect(screen.getByRole("button", { name: "Needle project", exact: true })).toBeTruthy();
   });
 
   it("keeps old lookup results out of a new query and a new account", async () => {
@@ -99,10 +114,13 @@ describe("scoped palette data and actions", () => {
     const view = render(shell());
     const input = open();
     fireEvent.change(input, { target: { value: "Old" } });
-    await waitFor(() => expect(mocks.names).toHaveBeenCalledWith("Old"));
+    await settle();
+    expect(mocks.names).toHaveBeenCalledWith("Old");
     fireEvent.change(input, { target: { value: "New" } });
-    expect(await screen.findByRole("button", { name: "New project" })).toBeTruthy();
-    await act(async () => release(response("Old")));
+    await settle();
+    expect(screen.getByRole("button", { name: "New project" })).toBeTruthy();
+    await act(async () => { release(response("Old")); });
+    await settle();
     expect(screen.queryByRole("button", { name: "Old project" })).toBeNull();
     mocks.auth.user.user_id = "bob";
     view.rerender(shell());
@@ -115,11 +133,13 @@ describe("scoped palette data and actions", () => {
     mocks.saved.mockResolvedValue({ items: [{ id: "saved-id", name: "Saved research" }] });
     render(shell());
     open();
-    expect(await screen.findByRole("button", { name: "Saved research", exact: true })).toBeTruthy();
+    await settle();
+    expect(screen.getByRole("button", { name: "Saved research", exact: true })).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Saved research", exact: true }));
     expect(mocks.router.push).toHaveBeenCalledWith("/search?saved=saved-id");
     open();
-    fireEvent.click(await screen.findByRole("button", { name: "Recent research", exact: true }));
+    await settle();
+    fireEvent.click(screen.getByRole("button", { name: "Recent research", exact: true }));
     expect(mocks.router.push).toHaveBeenCalledWith("/search?history=history-id");
     open();
     expect(screen.getByRole("button", { name: "New mission", exact: true })).toBeTruthy();
