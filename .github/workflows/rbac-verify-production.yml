@@ -1,17 +1,25 @@
-# ABOUTME: Runs the production RBAC role x route matrix on a schedule and fails loudly.
+# ABOUTME: Runs the production RBAC role x route matrix on MANUAL DISPATCH ONLY and fails loudly.
 # ABOUTME: A run that cannot even start is a FAILURE here, never a skip — that silence cost five sprints.
+# ABOUTME: The six-hourly schedule was removed 2026-09-16; see the DISARMED note below.
 
 name: RBAC Verify (production)
 
 # Sprint 55 RBAC-3. Production RBAC verification was silently unrunnable for roughly
 # five sprints. Nothing reported it, because RUNNING the matrix is the only thing that
-# detects the matrix having stopped. Decision #353's cron-plus-dispatch shape is reused
-# deliberately so this lands where Derek already looks for production failures.
+# detects the matrix having stopped. That problem is real and still unsolved, but the
+# cron-plus-dispatch shape borrowed from decision #353 was the wrong fix for it here —
+# see DISARMED below.
+# DISARMED 2026-09-16. The six-hourly `schedule:` trigger was REMOVED, deliberately
+# and by Derek's direct instruction. scripts/rbac_verify.py::run() unconditionally
+# provisions four real user accounts in the target environment via POST /admin/users
+# (a hardcoded throwaway password, plus minted API keys) and purges them at the end.
+# On a cron that meant creating and deleting real production accounts every six hours,
+# forever, with a reconcile sweep that exists precisely because teardown is expected to
+# leak rows when a run is cancelled or crashes. A role x route enforcement check must
+# never mutate a production auth table. Manual dispatch is retained so the matrix stays
+# runnable on purpose; it must not run on its own until the harness is reworked to use
+# permanent, pre-existing, zero-privilege principals instead of provisioning any.
 on:
-  schedule:
-    # Every six hours, offset from Production Smoke (":55") so the two never contend
-    # for the login rate limit (5 logins / 60s, app/core/rate_limit.py).
-    - cron: "25 */6 * * *"
   workflow_dispatch:
 
 permissions:
