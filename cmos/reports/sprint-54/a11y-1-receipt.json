@@ -1,0 +1,50 @@
+{
+  "mission": "A11Y-1",
+  "sprint": "sprint-54",
+  "title": "AA sweep in both themes with automated phone-width overflow checks",
+  "pr": 331,
+  "branch": "a11y-1-aa-sweep",
+  "criteria": {
+    "zero_critical_or_serious_axe_findings": {
+      "result": "met",
+      "evidence": "scripts/ui-shell-smoke.mjs against a local production build of the final commit: 148 checks, 37 routes, 0 failures. Covers Light and Dark at 1440 and 390 px, and fails on axe critical/serious, element overflow, page horizontal scroll, console errors, transport errors, wrong theme, wrong status, missing shell, duplicate main, or any legacy internal link.",
+      "note": "The sweep was already clean before this mission. Criterion 1 needed running and recording, not fixing."
+    },
+    "contrast_measured_not_assumed": {
+      "result": "met",
+      "evidence": "frontend/tests/e2e/token-contrast.spec.ts resolves the theme tokens from a real page in each theme and gates all 14 text-on-surface pairs at 4.5:1: text-primary/secondary/muted/accent against surface-canvas/raised/subtle, text-inverse on surface-inverse, and text-on-interactive on the primary interactive default/hover/pressed surfaces.",
+      "unit_bug_found_and_fixed": "The OODS tokens resolve to CIE Lab, not rgb. Parsing three numbers out of the colour string and treating them as 0-255 channels reported ~1.2:1 for EVERY pair, including text-primary on surface-canvas which is actually excellent. Dangerous in both directions: it looks like total failure, and with the comparison inverted it would hide real failures. Each colour is now round-tripped through a 1x1 canvas so the browser returns sRGB whatever space the token used.",
+      "recorded_not_gated": "text-disabled on surface-disabled measures 2.18:1 in light and 2.97:1 in dark. WCAG 1.4.3 exempts inactive controls, so the value is printed by its own test rather than gated, so a change to it is visible.",
+      "mutation_verified": "Adding a real sub-AA pair to the gated list fails both themes and names the exact ratios."
+    },
+    "markdown_headers_expose_columnheader": {
+      "result": "met, and reported honestly",
+      "finding": "Chromium ALREADY exposed markdown table headers as columnheader before this mission, because GFM only ever emits th inside thead. scope=\"col\" was added as the mission asked, but it states the association explicitly rather than fixing a defect.",
+      "deliverable": "The assertion in frontend/tests/e2e/app-shell.spec.ts reads Chromium's own accessibility tree via page.accessibility.snapshot rather than Playwright's role computation, and fails if headers ever render as data cells (mutation-verified)."
+    },
+    "results_tab_url_addressable_and_captured": {
+      "result": "met",
+      "gap": "The tab was local component state, so /missions/{id} always rendered the Run tab and the route baseline could never photograph rendered results at all.",
+      "implementation": "?tab=results deep-links, survives reload, and cleans the URL when returning to the default view. Setting the query key to undefined is not enough - Next keeps the key and emits a bare '?tab='.",
+      "design_correction": "Deriving the tab purely from router.query passed the e2e test but broke seven unit tests. The tests were right: router.replace is async, so every tab click would lag before the panel switched. The URL is the entry point and local state is the interaction state, kept in sync. All 11 unit tests pass with no assertion softened.",
+      "captured": "The Results route is in the baseline set: 4 captures (Light/Dark x 1440/390), all HTTP 200 with zero violations and no overflow. Verified against real production data with the tab selected and the report markdown rendered."
+    }
+  },
+  "local_verification": {
+    "sweep": "148 checks / 37 routes / 0 failures, readOnly true, 16 page-load writes answered locally, 0 legacy internal links",
+    "vitest": "239 passed (34 files)",
+    "type_check": "clean",
+    "lint": "clean",
+    "playwright_touched_specs": "26 passed (app-shell, mission-protocol, token-contrast)"
+  },
+  "learnings_added": [
+    220
+  ],
+  "limitations": [
+    "The sweep ran against a local production build, not against the deployed site. The post-deploy check from CI-6 covers the deployed commit separately.",
+    "The contrast gate checks TOKEN PAIRS, not every rendered element. A component that hardcodes a colour outside the token system would not be caught here - that is what scripts/check-token-colors.mjs gates.",
+    "High-contrast tokens are NOT checked: THEME-2 is deferred to Sprint 55 and decision #408 already records that the hc tokens fail 4.5:1.",
+    "Derek's live mission-in-motion walkthrough (next-step #355/#330) was supposed to precede A11Y-1 touching the UI. It needs Derek live, so it did not happen first; this mission is additive hardening rather than a redesign, but the walkthrough is still pending."
+  ],
+  "merge_commit": "d7bdd748500e6ccd35be286db6c4345aab48bc38"
+}

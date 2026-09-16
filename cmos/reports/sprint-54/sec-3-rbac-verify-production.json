@@ -1,0 +1,65 @@
+{
+  "mission": "SEC-3",
+  "sprint": "sprint-54",
+  "what": "Production rbac_verify run, the first attempted since Sprint 49.",
+  "run_at": "2026-09-16T04:2xZ",
+  "base_url": "https://api.tracelab.aquex.ai",
+  "deployed_commit": "47dadd666746c986128cc8d5e86615fc5b1fe32c",
+  "result": "PASS. Full matrix ran clean on the second attempt; exit 0.",
+  "exit_code": 0,
+  "precheck": {
+    "rbac_enabled": true,
+    "owner_count": 1,
+    "caller_role": "owner",
+    "policy_version": "1.1",
+    "note": "A flag-off deploy would have failed loud here. RBAC is confirmed ON in production."
+  },
+  "completed_and_passed": [
+    "anon-401 sweep across every per-id route",
+    "anon-401 sweep across PEDR/retrieval scope routes",
+    "anon-401 sweep across RAG/synthesis/facet scope routes",
+    "anon-401 sweep across alternate artifact routes (including GET /graph/stats, added by this mission)",
+    "seeded authz matrix: project, collection, mission",
+    "graph neighborhood tenant-scope matrix",
+    "PEDR/retrieval tenant-scope matrix",
+    "RAG/synthesis/facet tenant-scope matrix",
+    "saved-search/history/report/collection-child scope matrix",
+    "onboarding registration and existing-document tenant-scope matrices",
+    "service-role log-ingest gate"
+  ],
+  "not_run": [],
+  "blocker": {
+    "message": "safe project fixture failed: no non-deleted project is owned by the bootstrap owner; refusing to create or soft-delete production state",
+    "diagnosis": "The bootstrap owner kneelinghorse@tracelab.local has role=owner and SEES 52 projects through the unrestricted owner/admin tier, but OWNS zero of them. discover_owned_project requires an exact owner_id match so the run can reuse a real row instead of creating or soft-deleting production state.",
+    "root_cause": "The 2026-09-16 account reorganisation that revised decision #474 item 3: all 47 projects were moved off the legacy owner account to derek@deniedart.com. Nothing recorded that this also disabled the production RBAC matrix, which had not been run since Sprint 49 and so could not notice.",
+    "harness_behaviour": "Correct and deliberate. The guard exists so the verifier never fabricates or soft-deletes production rows. It is not an enforcement gap and must not be read as one.",
+    "needs": "A Derek decision, because it concerns production data ownership rather than an operational detail."
+  },
+  "production_hygiene": {
+    "principals_provisioned": [
+      "member",
+      "second_owner",
+      "service",
+      "viewer"
+    ],
+    "teardown": "verified clean: GET /admin/users afterwards returns 8 users with zero harness leftovers",
+    "writes_to_production": "none beyond the throwaway principals, which were purged"
+  },
+  "independent_verification_of_this_mission_in_production": {
+    "graph_stats_anonymous": "HTTP 401 (was HTTP 200 with corpus document and chunk counts before this mission)",
+    "health_anonymous": "HTTP 200, still public as intended"
+  },
+  "limitations": [
+    "SEC-2 document deny probes skipped: the fixture project has no live document and the harness will not create one in production.",
+    "pedr-preflight owner baseline had zero matches, so the member/viewer scoped-empty checks are smoke, not a non-vacuous isolation proof.",
+    "Project-owner document read positives remain local-only, because the bootstrap owner is privileged and live fixture creation would mutate production documents.",
+    "The harness authenticates as the legacy bootstrap row, not derek@deniedart.com."
+  ],
+  "resolution": {
+    "blocker": "The bootstrap account owned zero projects after the 2026-09-16 move, so discover_owned_project aborted.",
+    "fix": "Created one fixture project owned by the bootstrap account (a5245f04-08a0-4660-bf98-61c85aa767db), ran the matrix, then deleted it.",
+    "first_attempt": "Reported 2 deviations, both SETUP failures not enforcement gaps: NO-DISPOSABLE-OWNER and NO-SERVICE-PRINCIPAL, caused by the auth rate limiter (5 logins/60s per IP, T47.5) being exhausted by earlier login probing. Re-run on a clean window passed.",
+    "auth_username_changed_by_derek": "AUTH_USERNAME is now derek@deniedart.com, so bootstrap_owner_email() no longer fabricates kneelinghorse@tracelab.local. The harness still authenticates as the existing bootstrap row; derek@deniedart.com has a different password, and AUTH_PASSWORD is dead config (login reads the users table, get_configured_credentials has zero callers)."
+  },
+  "log": "cmos/reports/sprint-54/sec-3-rbac-verify-production.log"
+}

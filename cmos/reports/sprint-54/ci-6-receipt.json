@@ -1,0 +1,66 @@
+{
+  "mission": "CI-6",
+  "sprint": "sprint-54",
+  "title": "Post-deploy check: prove both services serve the merged commit, then smoke",
+  "pr": 329,
+  "merge_commit": "abe2f660671d9fdc58087ad5a32598065754b552",
+  "gate": "Decision #474: Actions is on, the eight required contexts reported green on PR #329, no --admin bypass used.",
+  "scope_correction": {
+    "what": "The mission's stored objective and criteria were written under decision #464 ('GitHub Actions stays off, each run cost about $10, build a verification path that costs nothing per run'). They were replaced at mission start with decision #463's design.",
+    "why": "Decision #474 voided #464 as written: the ~$10/run premise was hand-waved, TraceLab bills $0 (public repo, standard runners, GITHUB_TOKEN only), all ten workflows are re-enabled, and #474 states that CI-6's 'no GitHub Actions' scope is obsolete and CI-6 reverts toward #463. Next-step #338 dropped.",
+    "authority": "Executing an existing Derek decision, not a new scope choice."
+  },
+  "problem": {
+    "statement": "Every merge to main rebuilds production and nothing smokes it; the scheduled smoke runs every six hours against whatever is deployed, so receipt-only and docs-only merges reach production unverified (next-step #286, decision #458 item 3).",
+    "why_railway_status_is_insufficient": "Railway reports SUCCESS before the new process serves traffic. Observed directly at mission start: Railway reported SUCCESS for a930eb0 while both services were still serving bf58ed0."
+  },
+  "criteria": {
+    "backend_reports_deployed_sha": {
+      "result": "met",
+      "evidence": "GET https://api.tracelab.aquex.ai/api/v1/health returns commit abe2f660671d9fdc58087ad5a32598065754b552. Read from RAILWAY_GIT_COMMIT_SHA via settings. Public for the same reason the existing config booleans are (DEC#329): it discloses nothing, the repository is public."
+    },
+    "frontend_build_time_marker": {
+      "result": "met",
+      "evidence": "GET https://tracelab.aquex.ai/api/version returns the same sha. The value is inlined by next.config.ts at BUILD time.",
+      "proof_it_is_build_time_not_runtime": "Built locally with RAILWAY_GIT_COMMIT_SHA=abc123buildtime, then started with RAILWAY_GIT_COMMIT_SHA=zzz_runtime_value and NEXT_PUBLIC_COMMIT_SHA=zzz_runtime_value in the environment. The endpoint returned abc123buildtime. A restart with a newer env cannot forge it.",
+      "resolves_463_unknown": "Decision #463 required verifying whether Railway exposes RAILWAY_GIT_COMMIT_SHA during the Nixpacks BUILD. It DOES: the deployed marker served the real sha rather than the 'unknown' fallback. The RAILWAY_TOKEN / GraphQL polling fallback is therefore not needed."
+    },
+    "post_deploy_workflow": {
+      "result": "met",
+      "evidence": "post-deploy-check.yml, triggered by the push of abe2f66 to main, ran as 35051602044 and succeeded: wait-for-deploy success, production-smoke success. production-smoke.yml gained workflow_call only; decision #353's cron and dispatch triggers are unchanged and the smoke steps are not duplicated.",
+      "budget_seconds": 1200,
+      "measured": { "frontend_seconds_to_serve": 106.3, "backend_seconds_to_serve": 121.3, "elapsed_seconds": 121.3 },
+      "artifact": "post-deploy-wait (deploy-wait.json), uploaded with if-no-files-found: error"
+    },
+    "fails_loudly": {
+      "result": "met",
+      "unit_evidence": "tests/test_wait_for_deploy.py: 5 tests, 4 of which assert a NON-ZERO exit — backend stale, frontend stale, frontend 403, and a health payload with no commit field. A silent pass would put an unsmoked deployment behind a green check.",
+      "observed_evidence": "Run against production before the deploy landed, the script exited 1 and printed 'Production is NOT running the merged commit'. It also correctly refused a mistyped sha rather than loose-matching."
+    },
+    "verified_end_to_end": {
+      "result": "met",
+      "run_id": 35051602044,
+      "sha": "abe2f660671d9fdc58087ad5a32598065754b552",
+      "observed": { "backend": "abe2f660671d9fdc58087ad5a32598065754b552", "frontend": "abe2f660671d9fdc58087ad5a32598065754b552" }
+    }
+  },
+  "failure_modes_found_while_building": [
+    "Cloudflare fronts tracelab.aquex.ai and answers 403 to the default Python-urllib user-agent, while api.tracelab.aquex.ai (CF DNS-only) is unaffected. Unfixed, the check would have reported 'the deploy never landed' forever, and only for the frontend. The poller now sends a named User-Agent.",
+    "A health payload with no commit field proves nothing and is treated as not-yet-deployed rather than as a pass.",
+    "The backend returned a transient 502 Bad Gateway DURING the real cutover, 15 s before it served the new sha. Treating a read failure as fatal would have failed a good deploy; the poller treats every non-answer as NOT-YET and keeps polling within the budget."
+  ],
+  "local_verification": {
+    "ruff": "clean on all changed files (the repo-wide ruff check has 41 pre-existing findings; CI gates on ruff-diff)",
+    "secret_scan": "clean",
+    "pytest": "tests/test_wait_for_deploy.py 5 passed; tests/test_health.py 4 passed",
+    "frontend": "type-check and lint clean; next build succeeds",
+    "ci": "all eight required contexts green on PR #329, plus non-required mcp-package"
+  },
+  "learnings_added": [214, 215],
+  "limitations": [
+    "The check verifies that both services SERVE the merged commit and that the smoke passes. It does not verify the deployment is healthy under load, nor does it roll back on failure.",
+    "concurrency cancel-in-progress means a rapid second merge cancels the in-flight check for the older commit. That is deliberate — production only ever runs the newest commit — but it does mean an intermediate commit can go unsmoked.",
+    "post-deploy-check is NOT a required status context and cannot be: it runs on push to main, after the merge. A red run reports an already-live problem rather than preventing it.",
+    "The 1200 s budget was met with a wide margin on this deploy (121 s), but it is untested against a slow or queued Railway build."
+  ]
+}
