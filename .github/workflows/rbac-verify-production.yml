@@ -44,12 +44,12 @@ jobs:
       # at a glance, and precisely the silence this mission exists to remove.
       - name: Verify credentials are configured
         env:
-          RBAC_VERIFY_USERNAME: ${{ secrets.RBAC_VERIFY_USERNAME }}
-          RBAC_VERIFY_PASSWORD: ${{ secrets.RBAC_VERIFY_PASSWORD }}
+          AUTH_USERNAME: ${{ secrets.AUTH_USERNAME }}
+          AUTH_PASSWORD: ${{ secrets.AUTH_PASSWORD }}
         run: |
           missing=""
-          [ -n "$RBAC_VERIFY_USERNAME" ] || missing="$missing RBAC_VERIFY_USERNAME"
-          [ -n "$RBAC_VERIFY_PASSWORD" ] || missing="$missing RBAC_VERIFY_PASSWORD"
+          [ -n "$AUTH_USERNAME" ] || missing="$missing AUTH_USERNAME"
+          [ -n "$AUTH_PASSWORD" ] || missing="$missing AUTH_PASSWORD"
           if [ -n "$missing" ]; then
             echo "::error title=RBAC verification cannot start::Missing repository secret(s):$missing"
             echo "The production RBAC matrix did NOT run. This is a FAILURE, not a skip:"
@@ -58,13 +58,13 @@ jobs:
             echo "(a real, routable address — not the retired @tracelab.local bootstrap row)."
             exit 1
           fi
-          echo "Credentials present; the matrix will run as $RBAC_VERIFY_USERNAME."
+          echo "Credentials present; the matrix will run as $AUTH_USERNAME."
 
       - name: Run the production RBAC matrix
         id: matrix
         env:
-          RBAC_VERIFY_USERNAME: ${{ secrets.RBAC_VERIFY_USERNAME }}
-          RBAC_VERIFY_PASSWORD: ${{ secrets.RBAC_VERIFY_PASSWORD }}
+          AUTH_USERNAME: ${{ secrets.AUTH_USERNAME }}
+          AUTH_PASSWORD: ${{ secrets.AUTH_PASSWORD }}
         run: |
           set -o pipefail
           python scripts/rbac_verify.py \

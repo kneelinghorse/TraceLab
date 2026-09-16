@@ -5,7 +5,6 @@
   "session": "PS-2026-09-16-009",
   "run_at": "2026-09-16T16:06Z-17:30Z",
   "result": "SUBSTANTIALLY COMPLETE, with one external dependency that only Derek can satisfy: the verification identity's credentials. Everything that does not depend on that credential is done, tested and committed. Read limitation L1 before reading anything else.",
-
   "success_criteria": {
     "1_scheduled_run_that_fails_loudly": {
       "status": "MET in mechanism; the first GREEN run is blocked on L1",
@@ -15,7 +14,7 @@
     },
     "2_no_bootstrap_row_and_no_ownership_accident": {
       "status": "MET",
-      "identity": "scripts/rbac_verify.py::resolve_verification_identity now prefers a dedicated RBAC_VERIFY_USERNAME/RBAC_VERIFY_PASSWORD over the app's own AUTH_USERNAME/AUTH_PASSWORD, and REFUSES two values outright instead of coercing them: a bare username (the old code appended @tracelab.local right here, which is precisely how every run since Sprint 49 authenticated as the fabricated bootstrap row), and any address at that domain even spelled out in full. Each refusal names the variable and says what to set.",
+      "identity": "scripts/rbac_verify.py::resolve_verification_identity reads AUTH_USERNAME/AUTH_PASSWORD and REFUSES two values outright instead of coercing them: a bare username (the old code appended @tracelab.local right here, which is precisely how every run since Sprint 49 authenticated as the fabricated bootstrap row), and any address at that domain even spelled out in full. Each refusal names the variable and says what to set. CORRECTION: the first version of this mission invented a separate RBAC_VERIFY_USERNAME/RBAC_VERIFY_PASSWORD pair. That was unnecessary — the functional requirement is only that the credential point at a real routable identity rather than the retired bootstrap row, which the existing AUTH_USERNAME/AUTH_PASSWORD names satisfy. The extra variables were removed; they added a concept and bought nothing.",
       "fixture": "scripts/rbac_verify.py::provision_fixture_project replaces the dependency on discover_owned_project finding an incidentally-owned project. The harness now find-or-creates ONE durable project it owns (_FIXTURE_PROJECT_NAME) and reads it back to confirm ownership before trusting any positive control.",
       "why_durable_and_not_per_run": "DELETE /projects/{id} only SOFT-deletes — app/api/v1/projects.py:220 says in as many words that a purge operation is 'not yet implemented'. A per-run fixture would therefore strand a dead row on every schedule tick: ~1,460 soft-deleted rows a year at six-hourly. This was caught and corrected mid-implementation; the first version created and 'hard-deleted' a fixture per run, which would silently have accumulated exactly that.",
       "safety_note_that_is_not_obvious": "Owning the fixture is SAFER than the status quo, not riskier. live_safe only ever suppressed project DELETE (_LOCAL_ONLY_AUTHZ_ROUTES), so pointing the matrix at a real project meant firing member/viewer PUT, PATCH and restore deny-probes at live tenant data and seeding children inside it. A fail-open — the exact condition the harness hunts — would have landed on real rows. It now lands on a fixture that holds nothing."
@@ -54,7 +53,6 @@
       "the_run_log": "cmos/reports/sprint-55/rbac-3-cannot-start-production.log is committed. It is the cannot-start evidence, NOT a full matrix run — see L1."
     }
   },
-
   "limitations": {
     "L1_no_live_matrix_run_was_possible_this_session": {
       "severity": "This is the one thing standing between RBAC-3 and done.",
@@ -63,7 +61,7 @@
       "why_I_did_not_just_create_the_identity": "The harness provisions a second-owner principal, and POST /admin/users with role=owner is owner-gated — so the verification identity must itself be an OWNER. Minting a second privileged production account, with a password generated inside an agent session, immediately after RBAC-1 removed a fabricated privileged account, is an access-control decision that belongs to Derek and not to an agent.",
       "what_Derek_needs_to_do": [
         "1. Create a verification account in production with a real routable address (e.g. rbac-verify@tracelab.aquex.ai) and role=owner, via the admin UI at /admin/users while signed in as derek@deniedart.com.",
-        "2. Add two GitHub repository secrets: RBAC_VERIFY_USERNAME (that address) and RBAC_VERIFY_PASSWORD.",
+        "2. Add two GitHub repository secrets: AUTH_USERNAME (that address) and AUTH_PASSWORD.",
         "3. Trigger the workflow manually once (Actions -> 'RBAC Verify (production)' -> Run workflow) and commit the archived log to cmos/reports/sprint-55/ as the first green run.",
         "Until step 2 is done the scheduled workflow FAILS every six hours, by design."
       ]
@@ -73,21 +71,18 @@
       "attribution": "NOT caused by this mission. It is an httpx/starlette version incompatibility in the local venv and it fails identically on unmodified HEAD, confirmed by running it in a detached worktree. Everything else in that file passes: 70 passed, 1 failed."
     }
   },
-
   "carried_next_step_closed": {
     "id": 279,
     "text": "Sprint 53: extend scripts/rbac_verify.py with authenticated cross-tenant rows ... Then record a production rbac_verify run, since none has been recorded since Sprint 49.",
     "status": "PARTIALLY closed. The coverage-extension half was already delivered by SEC-3 in Sprint 54 and is strengthened here (vacuity gates, seeded document fixture). The 'record a production run' half is still open and is blocked by L1. It has now been carried four times; it should not be carried a fifth without the L1 credential being created."
   },
-
   "code_changes": {
-    "scripts/rbac_verify.py": "resolve_verification_identity() (new, with the bare-username and @tracelab.local refusals); provision_fixture_project() + _find_project_by_name() (new, replacing the live path's dependence on discover_owned_project — which is RETAINED for the local TestClient tests that legitimately use it); _seed_fixture_document() (new); _note_owner_preflight_baseline() now records VACUOUS-BASELINE gaps instead of 'smoke only' notes; document_deny_matrix seeds rather than skips; _call() gained an opt-in files= path for the multipart upload, kept off the default path so both transports and every existing call site are unaffected; run() summary notes rewritten to match what actually happens, plus the explicit row-3 gate.",
-    ".github/workflows/rbac-verify-production.yml": "NEW. cron + workflow_dispatch, concurrency group with cancel-in-progress false (a cancelled run can strand throwaway users), credential check as a failing STEP rather than a skip-guard, distinct ::error annotations for exit 2 vs other non-zero, 90-day log artifact.",
+    "scripts/rbac_verify.py": "resolve_verification_identity() (new, reading AUTH_USERNAME/AUTH_PASSWORD, with the bare-username and @tracelab.local refusals); provision_fixture_project() + _find_project_by_name() (new, replacing the live path's dependence on discover_owned_project — which is RETAINED for the local TestClient tests that legitimately use it); _seed_fixture_document() (new); _note_owner_preflight_baseline() now records VACUOUS-BASELINE gaps instead of 'smoke only' notes; document_deny_matrix seeds rather than skips; _call() gained an opt-in files= path for the multipart upload, kept off the default path so both transports and every existing call site are unaffected; run() summary notes rewritten to match what actually happens, plus the explicit row-3 gate.",
+    ".github/workflows/rbac-verify-production.yml": "NEW. cron + workflow_dispatch, concurrency group with cancel-in-progress false (a cancelled run can strand throwaway users), credential check on AUTH_USERNAME/AUTH_PASSWORD as a failing STEP rather than a skip-guard, distinct ::error annotations for exit 2 vs other non-zero, 90-day log artifact.",
     "cmos/.gitignore": "'!reports/**/*.log' negation so evidence logs are tracked.",
-    "tests/test_rbac_verify_harness.py": "Two tests rewritten to pin the NEW stronger contract instead of the old silent-skip behaviour (the document matrix now gaps rather than notes; the pedr baseline now gaps rather than noting 'smoke only'), plus TestVerificationIdentity (6 cases) and TestFixtureProjectLifecycle (3 cases).",
+    "tests/test_rbac_verify_harness.py": "Two tests rewritten to pin the NEW stronger contract instead of the old silent-skip behaviour (the document matrix now gaps rather than notes; the pedr baseline now gaps rather than noting 'smoke only'), plus TestVerificationIdentity (6 cases, on AUTH_USERNAME/AUTH_PASSWORD) and TestFixtureProjectLifecycle (3 cases).",
     "tests/test_rbac_verify_mutation_proof.py": "NEW. The control/mutant pair described under criterion 4."
   },
-
   "tests": {
     "tests/test_rbac_verify_harness.py + tests/test_rbac_verify_mutation_proof.py": "70 passed, 1 failed (L2, pre-existing on HEAD)",
     "ruff check on every changed file": "All checks passed",

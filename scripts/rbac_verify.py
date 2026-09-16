@@ -3502,59 +3502,48 @@ _FABRICATED_DOMAIN = "@tracelab.local"
 def resolve_verification_identity(
     env: dict[str, str] | Any,
 ) -> tuple[str | None, str, str]:
-    """Resolve the login the matrix runs as.
+    """Resolve the login the matrix runs as, from AUTH_USERNAME / AUTH_PASSWORD.
 
-    Returns ``(email, password, source)`` on success, or ``(None, reason, "")``
-    when the run must not start. Every failure is named and actionable: RBAC-3
-    exists because a run that could not start reported nothing at all.
+    Returns ``(email, password, "AUTH_USERNAME")`` on success, or
+    ``(None, reason, "")`` when the run must not start. Every failure is named and
+    actionable: RBAC-3 exists because a run that could not start reported nothing.
 
-    Prefers a DEDICATED verification identity (RBAC_VERIFY_USERNAME /
-    RBAC_VERIFY_PASSWORD) over the app's own bootstrap credentials, so the matrix
-    stops riding on whatever AUTH_USERNAME happens to hold on the operator's
-    machine. Two values are refused outright rather than silently coerced:
+    Two values are refused rather than silently coerced:
 
-    * a bare username — the old code appended ``@tracelab.local`` here, which is
-      how every run since Sprint 49 ended up authenticating as the fabricated
-      bootstrap row without anyone noticing;
+    * a bare username — the old code appended ``@tracelab.local`` here, which is how
+      every run since Sprint 49 authenticated as the fabricated bootstrap row;
     * any address at that fabricated domain, even spelled out in full.
     """
-    dedicated = env.get("RBAC_VERIFY_USERNAME"), env.get("RBAC_VERIFY_PASSWORD")
-    fallback = env.get("AUTH_USERNAME"), env.get("AUTH_PASSWORD")
-    email, password = dedicated if dedicated[0] else fallback
-    source = "RBAC_VERIFY_USERNAME" if dedicated[0] else "AUTH_USERNAME"
-
+    email, password = env.get("AUTH_USERNAME"), env.get("AUTH_PASSWORD")
     if not email or not password:
         return (
             None,
-            "no verification credentials. Set RBAC_VERIFY_USERNAME and "
-            "RBAC_VERIFY_PASSWORD to a dedicated verification identity (preferred), "
-            "or AUTH_USERNAME and AUTH_PASSWORD. Both the username and the password "
-            "must be set; "
-            f"{source} was {'set' if email else 'empty'} and its password was "
+            "no verification credentials. Set AUTH_USERNAME and AUTH_PASSWORD to the "
+            "verification identity's full email address and password; "
+            f"AUTH_USERNAME was {'set' if email else 'empty'} and AUTH_PASSWORD was "
             f"{'set' if password else 'empty'}.",
             "",
         )
     if "@" not in email:
         return (
             None,
-            f"{source}={email!r} is a bare username, not an email address. This "
-            f"harness no longer derives {email}{_FABRICATED_DOMAIN} — that "
-            "derivation is why every run since Sprint 49 authenticated as the "
-            "fabricated bootstrap account instead of a real one. Set "
-            f"{source} to the full email address of the verification identity.",
+            f"AUTH_USERNAME={email!r} is a bare username, not an email address. This "
+            f"harness no longer derives {email}{_FABRICATED_DOMAIN} — that derivation "
+            "is why every run since Sprint 49 authenticated as the fabricated "
+            "bootstrap account instead of a real one. Set AUTH_USERNAME to the full "
+            "email address of the verification identity.",
             "",
         )
     if email.lower().endswith(_FABRICATED_DOMAIN):
         return (
             None,
-            f"{source}={email!r} is the retired bootstrap identity at the "
-            f"non-routable domain {_FABRICATED_DOMAIN}. Sprint 55 RBAC-1 demoted "
-            "that account precisely so verification would stop depending on it. "
-            "Set RBAC_VERIFY_USERNAME and RBAC_VERIFY_PASSWORD to a dedicated "
-            "verification identity with a real, routable address.",
+            f"AUTH_USERNAME={email!r} is the retired bootstrap identity at the "
+            f"non-routable domain {_FABRICATED_DOMAIN}. Sprint 55 RBAC-1 demoted that "
+            "account precisely so verification would stop depending on it. Set "
+            "AUTH_USERNAME to a real, routable address.",
             "",
         )
-    return email, password, source
+    return email, password, "AUTH_USERNAME"
 
 
 def main(argv: list[str] | None = None) -> int:

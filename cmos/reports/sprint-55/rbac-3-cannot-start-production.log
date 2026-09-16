@@ -1,10 +1,10 @@
 RBAC-3 'cannot start' evidence — scripts/rbac_verify.py against production
 base-url: https://api.tracelab.aquex.ai    date: 2026-09-16
-Each case below MUST exit non-zero with a named, actionable reason. A run that
-cannot start reporting nothing is the exact silence that cost five sprints.
+Each case MUST exit non-zero with a named, actionable reason. A run that cannot
+start reporting nothing is the exact silence that cost five sprints.
 
 ### Case 1: no credentials configured (scheduled run with missing secrets)
-CANNOT START: no verification credentials. Set RBAC_VERIFY_USERNAME and RBAC_VERIFY_PASSWORD to a dedicated verification identity (preferred), or AUTH_USERNAME and AUTH_PASSWORD. Both the username and the password must be set; AUTH_USERNAME was empty and its password was empty.
+CANNOT START: no verification credentials. Set AUTH_USERNAME and AUTH_PASSWORD to the verification identity's full email address and password; AUTH_USERNAME was empty and AUTH_PASSWORD was empty.
 exit=2
 
 ### Case 2: the stale bare username from the repo's local .env (the Sprint 49-54 silent case)
@@ -12,5 +12,5 @@ CANNOT START: AUTH_USERNAME='kneelinghorse' is a bare username, not an email add
 exit=2
 
 ### Case 3: the retired bootstrap identity spelled out in full
-CANNOT START: AUTH_USERNAME='kneelinghorse@tracelab.local' is the retired bootstrap identity at the non-routable domain @tracelab.local. Sprint 55 RBAC-1 demoted that account precisely so verification would stop depending on it. Set RBAC_VERIFY_USERNAME and RBAC_VERIFY_PASSWORD to a dedicated verification identity with a real, routable address.
+CANNOT START: AUTH_USERNAME='kneelinghorse@tracelab.local' is the retired bootstrap identity at the non-routable domain @tracelab.local. Sprint 55 RBAC-1 demoted that account precisely so verification would stop depending on it. Set AUTH_USERNAME to a real, routable address.
 exit=2

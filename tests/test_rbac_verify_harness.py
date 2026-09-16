@@ -1930,20 +1930,7 @@ def test_pedr1c_matrix_is_compatible_with_real_testclient_routes(
 
 
 class TestVerificationIdentity:
-    def test_prefers_the_dedicated_identity_over_the_app_bootstrap_credentials(self):
-        email, password, source = resolve_verification_identity(
-            {
-                "RBAC_VERIFY_USERNAME": "rbac-verify@tracelab.aquex.ai",
-                "RBAC_VERIFY_PASSWORD": "dedicated-pw",
-                "AUTH_USERNAME": "derek@deniedart.com",
-                "AUTH_PASSWORD": "bootstrap-pw",
-            }
-        )
-        assert email == "rbac-verify@tracelab.aquex.ai"
-        assert password == "dedicated-pw"  # noqa: S105 - fake transport credential
-        assert source == "RBAC_VERIFY_USERNAME"
-
-    def test_falls_back_to_auth_username_when_no_dedicated_identity_is_set(self):
+    def test_accepts_a_full_email_address(self):
         email, password, source = resolve_verification_identity(
             {"AUTH_USERNAME": "derek@deniedart.com", "AUTH_PASSWORD": "pw"}
         )
@@ -1967,10 +1954,7 @@ class TestVerificationIdentity:
 
     def test_the_fabricated_domain_is_refused_even_spelled_out_in_full(self):
         email, reason, _ = resolve_verification_identity(
-            {
-                "RBAC_VERIFY_USERNAME": "kneelinghorse" + _FABRICATED_DOMAIN,
-                "RBAC_VERIFY_PASSWORD": "pw",
-            }
+            {"AUTH_USERNAME": "kneelinghorse" + _FABRICATED_DOMAIN, "AUTH_PASSWORD": "pw"}
         )
         assert email is None
         assert "retired bootstrap identity" in reason
@@ -1986,7 +1970,7 @@ class TestVerificationIdentity:
     def test_missing_credentials_are_refused_with_an_actionable_reason(self, env):
         email, reason, _ = resolve_verification_identity(env)
         assert email is None
-        assert "RBAC_VERIFY_USERNAME" in reason and "RBAC_VERIFY_PASSWORD" in reason
+        assert "AUTH_USERNAME" in reason and "AUTH_PASSWORD" in reason
 
 
 class TestFixtureProjectLifecycle:
