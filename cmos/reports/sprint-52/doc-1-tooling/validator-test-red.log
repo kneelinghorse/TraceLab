@@ -1,0 +1,4 @@
+FAILED tests/unit/test_validate_foundational_refs.py::test_legitimate_foundational_paths_are_not_flagged[cmos/foundational-docs/technical_architecture.md]
+FAILED tests/unit/test_validate_foundational_refs.py::test_legitimate_foundational_paths_are_not_flagged[cmos/foundational-docs/roadmap.md]
+ERROR tests/unit/test_validate_foundational_refs.py::test_script_and_cli_share_one_matcher
+2 failed, 6 passed, 4 warnings, 1 error in 0.15s

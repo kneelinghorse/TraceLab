@@ -1,0 +1,9 @@
+
+Running 4 tests using 4 workers
+
+  ✓  3 [chromium] › tests/e2e/production-smoke.spec.ts:33:7 › Production smoke › API health endpoint confirms production authorization and reconciler freshness (332ms)
+  ✓  1 [chromium] › tests/e2e/production-smoke.spec.ts:23:9 › Production smoke › /admin/users is deployed as its own Next page (885ms)
+  ✓  2 [chromium] › tests/e2e/production-smoke.spec.ts:23:9 › Production smoke › /admin/spaces is deployed as its own Next page (892ms)
+  ✓  4 [chromium] › tests/e2e/production-smoke.spec.ts:17:7 › Production smoke › missions route responds at the public domain (985ms)
+
+  4 passed (2.7s)

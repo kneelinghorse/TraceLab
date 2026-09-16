@@ -1,0 +1,31 @@
+
+> frontend@0.1.0 test:unit
+> vitest --run
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+
+ RUN  v3.2.4 /Users/systemsystems/portfolio/TraceLab/frontend
+
+ ✓ src/__tests__/home.test.tsx (5 tests) 408ms
+ ✓ src/__tests__/admin/spaces.test.tsx (14 tests) 553ms
+ ✓ src/components/AppShell.test.tsx (7 tests) 590ms
+ ✓ src/__tests__/admin/observability.test.tsx (6 tests) 573ms
+ ✓ src/__tests__/admin/users.test.tsx (15 tests) 825ms
+ ✓ src/__tests__/evidence.test.tsx (7 tests) 820ms
+   ✓ the evidence browser > preserves Home's mission and session scope through pagination, then clears it when switching projects  352ms
+ ✓ src/contexts/ThemeContext.test.tsx (3 tests) 83ms
+ ✓ src/components/RequireAdmin.test.tsx (12 tests) 129ms
+ ✓ src/components/MarkdownRenderer.test.tsx (2 tests) 129ms
+ ✓ src/contexts/RoleContext.test.tsx (8 tests) 107ms
+ ✓ src/contexts/AuthContext.test.tsx (1 test) 35ms
+ ✓ src/lib/theme.test.ts (5 tests) 6ms
+ ✓ src/__tests__/hygiene.test.tsx (10 tests) 543ms
+ ✓ src/lib/api/admin.test.ts (12 tests) 3ms
+ ✓ src/lib/api/errors.test.ts (4 tests) 2ms
+ ✓ src/features/search/SearchExperience.test.tsx (4 tests) 73ms
+
+ Test Files  16 passed (16)
+      Tests  115 passed (115)
+   Start at  09:38:29
+   Duration  3.91s (transform 988ms, setup 1.95s, collect 4.56s, tests 4.88s, environment 7.15s, prepare 1.42s)
+
