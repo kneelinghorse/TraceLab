@@ -15,7 +15,9 @@ export function inspectInternalLinks(hrefs, baseUrl) {
       if (url.origin === base.origin) paths.add(url.pathname);
     } catch { /* An invalid URL cannot point to a legacy application route. */ }
   }
-  const aliases = migrations.filter(row => row.kind === 'redirect');
+  // Retired aliases still count: an application link to one is now a 404 rather than a
+  // redirect, which is worse, so the guard has to outlive the redirect (ALIAS-1).
+  const aliases = migrations.filter(row => row.kind === 'redirect' || row.kind === 'retired');
   const internalLinks = [...paths].sort();
   const legacyInternalLinks = internalLinks.flatMap(pathname => aliases
     .filter(row => new RegExp(`^${row.source.replace(/:[^/]+/g, '[^/]+')}/?$`).test(pathname))

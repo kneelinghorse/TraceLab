@@ -15,6 +15,14 @@ test("every maintained migration preserves its destination and query parameters"
         if (!destinationKeys.has(key)) expected.searchParams.append(key, value);
       }
       const response = await request.get(source, { maxRedirects: 0 });
+      // A retired alias must be GONE, not quietly still redirecting. Asserting 404 here is
+      // what stops a retirement from being cosmetic (ALIAS-1).
+      if (row.kind === "retired") {
+        const passed = response.status() === 404;
+        checks.push({ source: row.source, requested: source, status: response.status(), actual: null, expected: 404, passed });
+        expect.soft(passed, `${source}: retired alias should be 404, got ${response.status()}`).toBe(true);
+        continue;
+      }
       const actual = new URL(row.kind === "redirect" ? response.headers().location ?? "" : response.url(), baseURL);
       const actualQuery = [...actual.searchParams].sort(([a], [b]) => a.localeCompare(b));
       const expectedQuery = [...expected.searchParams].sort(([a], [b]) => a.localeCompare(b));

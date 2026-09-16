@@ -132,11 +132,8 @@ test("the mission Results tab is addressable by URL so it can be linked and capt
   await expect(page).toHaveURL(/\/missions\/run-2\?tab=results$/);
 });
 
-test("queue bookmark permanently redirects and retains filters", async ({ request }) => {
+test("the retired /missions/queue alias is gone rather than silently redirecting", async ({ request }) => {
+  // Retired in Sprint 54 (ALIAS-1), along with its shadow page that re-exported the index.
   const response = await request.get("/missions/queue?project_id=scope", { maxRedirects: 0 });
-  expect(response.status()).toBe(308);
-  const target = new URL(response.headers().location, response.url());
-  expect(target.pathname).toBe("/missions");
-  expect(target.searchParams.get("status")).toBe("queued");
-  expect(target.searchParams.get("project_id")).toBe("scope");
+  expect(response.status()).toBe(404);
 });
