@@ -28,6 +28,13 @@ _TABLES = ("missions", "reports")
 
 
 def _bootstrap_owner_email() -> str:
+    # Lookup only, never creation: this resolves a bootstrap row that a
+    # pre-Sprint-55 migration 023 may have created at the retired
+    # "<username>@tracelab.local" domain, and falls back to the
+    # earliest-created user when it misses. 023 is where the derivation is now
+    # refused (Sprint 56 HYG-2, next-step #368); making THIS raise would break
+    # `alembic upgrade head` on a legacy database without preventing anything,
+    # because nothing here INSERTs into users.
     username = os.environ.get("AUTH_USERNAME", "tracelab-admin")
     return username if "@" in username else f"{username}@tracelab.local"
 

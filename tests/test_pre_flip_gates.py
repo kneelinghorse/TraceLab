@@ -143,3 +143,84 @@ class TestGate6BootstrapParity:
         monkeypatch.delenv("AUTH_USERNAME", raising=False)
         with pytest.raises(BootstrapIdentityError):
             bootstrap_owner_email()
+
+
+# --- Gate 6b: the migration-side half of the same refusal (Sprint 56 HYG-2) -----
+
+
+def _load_migration(filename: str):
+    """Import an Alembic revision by path (module names start with a digit)."""
+    import importlib.util
+    from pathlib import Path
+
+    path = Path(__file__).resolve().parent.parent / "alembic" / "versions" / filename
+    spec = importlib.util.spec_from_file_location(f"_mig_{filename[:3]}", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+class TestGate6bMigrationBootstrapIdentity:
+    """Runtime refusing a bare AUTH_USERNAME is only half the fix.
+
+    app/services/ownership.py raises at request time, but migration 023 is what
+    CREATES the row. Until it refuses too, a fresh provision with a bare
+    AUTH_USERNAME silently mints a new ``<username>@tracelab.local`` owner — the
+    exact account Sprint 55 RBAC-1 spent a mission demoting. Next-step #368.
+    """
+
+    def test_email_username_is_seeded_verbatim(self):
+        mig = _load_migration("023_add_users_table.py")
+        assert mig.seed_admin_email("derek@deniedart.com") == "derek@deniedart.com"
+
+    def test_bare_username_is_refused_not_fabricated(self):
+        mig = _load_migration("023_add_users_table.py")
+        with pytest.raises(mig.BootstrapIdentityError) as exc:
+            mig.seed_admin_email("tracelab-admin")
+        message = str(exc.value)
+        # An operator who hits this at provision time must learn what to change.
+        assert "tracelab-admin" in message
+        assert "email address" in message
+        assert "AUTH_USERNAME" in message
+
+    def test_023_is_the_only_migration_that_creates_a_user(self):
+        """The three backfills may KEEP the derivation; they must not mint with it.
+
+        031/037/038 derive the same legacy address on purpose, to resolve a row a
+        pre-Sprint-55 023 created. That is safe only while they cannot create one,
+        so lock it: if a future migration starts INSERTing into users, it has to
+        come here and decide deliberately whether the refusal applies to it too.
+        """
+        import re
+        from pathlib import Path
+
+        versions = Path(__file__).resolve().parent.parent / "alembic" / "versions"
+        inserts_users = re.compile(r"INSERT\s+INTO\s+users", re.IGNORECASE)
+
+        creators = sorted(
+            path.name
+            for path in versions.glob("*.py")
+            if inserts_users.search(path.read_text())
+        )
+        assert creators == ["023_add_users_table.py"], (
+            "a migration other than 023 now creates a users row: " f"{creators}"
+        )
+
+    def test_backfills_that_keep_the_derivation_only_read(self):
+        """Each derivation site outside 023 must be lookup-only."""
+        from pathlib import Path
+
+        versions = Path(__file__).resolve().parent.parent / "alembic" / "versions"
+        derivers = {
+            "031_backfill_ownership.py",
+            "037_backfill_doc_coll_owner.py",
+            "038_backfill_mission_report.py",
+        }
+        for name in sorted(derivers):
+            source = (versions / name).read_text()
+            assert "@tracelab.local" in source, (
+                f"{name} no longer derives the legacy address; if that was "
+                "deliberate, update this test and confirm legacy databases still "
+                "resolve their bootstrap owner"
+            )
+            assert "INSERT INTO users" not in source.upper().replace("  ", " ")

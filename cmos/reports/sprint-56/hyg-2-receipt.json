@@ -1,0 +1,56 @@
+{
+  "mission": "HYG-2",
+  "name": "Sprint 55 boundary residue: the three agent-ownable next-steps",
+  "sprint": "sprint-56",
+  "session": "PS-2026-09-17-001",
+  "result": "COMPLETE. All three next-steps resolved. Two findings changed what the work was: #368's stated blocker was disproved by running it, and #369's stated cause was a misdiagnosis that concealed two wrongly-skipped tests.",
+
+  "next_step_368_alembic_email_derivation_guard": {
+    "status": "DONE",
+    "what_shipped": "alembic/versions/023_add_users_table.py gains seed_admin_email(), which raises BootstrapIdentityError on a bare AUTH_USERNAME instead of seeding <username>@tracelab.local. 023 is the ONLY migration that INSERTs into users, so it is the only place the derivation can mint an identity.",
+    "why_031_037_038_keep_the_derivation": "They only SELECT an existing row and fall back to the earliest-created user; they never INSERT. They must still resolve a legacy bootstrap account that a pre-Sprint-55 run of 023 created. Each now carries a comment saying so, so the next reader does not 'finish the job' by making them raise and break legacy upgrades.",
+    "PREMISE_DISPROVED": {
+      "claim_in_next_step_368": "'Not done in Sprint 55 because making an already-applied migration raise would fail alembic upgrade head for any operator with a bare AUTH_USERNAME.'",
+      "finding": "That is not true, and it is why this was deferred for nothing. Alembic does not re-run an applied revision, and 023 additionally returns early when the users table exists. An already-provisioned database upgrades cleanly with a bare AUTH_USERNAME.",
+      "how_verified": "Run, not reasoned about — cmos/reports/sprint-56/hyg-2-migration-guard-proof.py against real PostgreSQL 15 via testcontainers, each claim in its own subprocess because alembic/env.py:32 overrides sqlalchemy.url with settings.database_url."
+    },
+    "proof_results": {
+      "A_fresh_db_plus_bare_username": "PASS — rc=1, refused at 023 with the actionable message, and to_regclass('public.users') is None afterwards: nothing was minted, the transactional DDL rolled back.",
+      "B_fresh_db_plus_email_username": "PASS — rc=0, reached head 050_user_email_notifications, seeded owner email derek@deniedart.com verbatim.",
+      "C_db_already_past_023_plus_bare_username": "PASS — provisioned at 023 with an email, then upgraded the REST of history with AUTH_USERNAME=kneelinghorse (bare). rc=0, reached head, users=1. This is the exact scenario #368 feared."
+    },
+    "env_files": ".env.example carried AUTH_USERNAME=tracelab-admin, a bare username that the Sprint 55 runtime guard already rejected — the template shipped a value that cannot boot. Now an email, with a comment naming both refusal sites. CI sets AUTH_USERNAME nowhere except the rbac-verify workflow, which reads it from a repository secret, so there was no CI value to change.",
+    "tests": "tests/test_pre_flip_gates.py::TestGate6bMigrationBootstrapIdentity — 4 tests locking the guard and the invariant that 023 stays the only creator.",
+    "mutation_proof": "Both guard tests were shown to go RED before being trusted. Mutant 1: neutralise the raise and restore the old fabricating return -> test_bare_username_is_refused_not_fabricated FAILED. Mutant 2: add an INSERT INTO users to migration 031 -> test_023_is_the_only_migration_that_creates_a_user FAILED. Both mutants reverted; control green at 12 passed."
+  },
+
+  "next_step_374_workflow_echo_masked_to_nothing": {
+    "status": "DONE",
+    "before": "echo \"Credentials present; the matrix will run as $AUTH_USERNAME.\" — GitHub masks the secret's value, so this rendered as 'will run as ***' and confirmed nothing while looking like confirmation (learning #229).",
+    "after": "Prints two DERIVED facts that are not the secret and so are not masked: the local-part length and the domain. A value with no '@' says so plainly and defers to the harness, which is the authority on refusing a bare username (exit 2) — the check is not duplicated as a second gate.",
+    "verification": "LOCAL REPRODUCTION, not a dispatched run — a dispatch is impossible because the credential step exits 1 on the missing secrets before ever reaching this line. The shell logic was executed against two sample values and each output asserted NOT to contain the secret verbatim, which is the condition under which GitHub masking applies. Rendered output from a real run remains unseen until Derek sets the secrets."
+  },
+
+  "next_step_369_local_httpx_starlette_skew": {
+    "status": "DONE — the reported skew does not exist, and the stated cause was wrong",
+    "reported": "tests/test_rbac_verify_harness.py::test_harness_passes_against_enforced_app fails locally with Client.__init__() got an unexpected keyword argument 'proxies', described as an httpx/starlette version skew in the venv.",
+    "finding_1": "The test PASSES locally, in 79s, in the project venv. Both venvs in the tree (.venv and venv) hold httpx 0.28.1 and starlette 0.52.1; installed starlette passes no 'proxies' kwarg anywhere, so the named combination is not present and the declared deps cannot produce it: pyproject floors httpx>=0.28.0 and fastapi>=0.115.0 (starlette>=0.40). No pin was added, because nothing needs pinning.",
+    "finding_2": "The 'proxies' error IS real in this repo, but it came from the openai SDK, not starlette — tests/integration/test_rag_pipeline.py skipped TWO tests with reason 'openai/httpx version incompatibility... needs openai SDK upgrade'. Installed openai is 2.24.0 and passes no such kwarg, so that reason is stale.",
+    "finding_3_the_material_one": "Un-skipped, test_rag_pipeline_returns_cached_payload PASSES. It had been suppressed for a reason that was never true of it. The skip is removed and the check is live again. Its sibling test_rag_pipeline_generates_cited_answer still fails, but NOT on dependencies: _StubRetrievalService.calls is empty at line 177, so the pipeline never reaches the stub. Its skip reason now says that, and says in as many words not to 'fix' it by upgrading the SDK.",
+    "residue": "The cause of test_rag_pipeline_generates_cited_answer failing is undiagnosed and deliberately out of scope here; recorded as a next-step."
+  },
+
+  "verification": {
+    "targeted": "tests/test_pre_flip_gates.py + test_ownership.py + test_notifications.py + test_api_key_auth.py — 58 passed.",
+    "migrations": "tests/integration/test_migration_031_backfill.py + 037 + 038 by explicit file path — 8 passed against real PostgreSQL.",
+    "harness_end_to_end": "tests/test_rbac_verify_harness.py::test_harness_passes_against_enforced_app — 1 passed, 79s, locally.",
+    "rag": "tests/integration/test_rag_pipeline.py — 1 passed, 1 skipped (was 0 passed, 2 skipped).",
+    "lint": "ruff check clean on every changed Python file. Note: 023 carried a PRE-EXISTING I001 that CI's changed-files ruff-diff would have newly surfaced because this mission touches the file; fixed as import ordering only, no reformatting (decision #311).",
+    "secret_scan": "scripts/check_no_credential_literals.py exit 0."
+  },
+
+  "not_done_and_why": {
+    "re_arming_the_schedule": "Out of scope here and belongs to RBAC-5. The workflow stays dispatch-only; the DISARMED note is untouched by this mission.",
+    "dispatched_workflow_run": "Impossible without the repository secrets, which are Derek's to set."
+  }
+}

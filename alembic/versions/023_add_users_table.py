@@ -14,15 +14,52 @@ import os
 import uuid
 from datetime import datetime
 
-from alembic import op
 import sqlalchemy as sa
 from sqlalchemy import inspect, text
 
+from alembic import op
 
 revision = "023_add_users_table"
 down_revision = "022_graph_edges"
 branch_labels = None
 depends_on = None
+
+
+class BootstrapIdentityError(RuntimeError):
+    """Raised when AUTH_USERNAME is not an email address at provision time."""
+
+
+def seed_admin_email(auth_username: str) -> str:
+    """The email the seeded admin row gets, or refuse to invent one.
+
+    Sprint 56 HYG-2 (next-step #368). This migration is the ONLY one that CREATES
+    the users row, so it is the only place the retired "<username>@tracelab.local"
+    derivation could mint a new identity. That domain is non-routable (RFC 6761):
+    the account it creates can never receive mail or be recovered, and in
+    production the account this line minted held the irreducible ``owner`` role
+    for five sprints before Sprint 55 RBAC-1 moved it. Refuse instead of
+    inventing, matching app/services/ownership.py::bootstrap_owner_email() — this
+    just fails earlier, at provision time, for the same reason.
+
+    Migrations 031/037/038 keep the derivation deliberately. They only SELECT an
+    existing row and never INSERT, so they must still resolve a legacy account a
+    pre-Sprint-55 run of THIS migration created. Making them raise would break
+    ``alembic upgrade head`` on a legacy database for no safety gain.
+
+    Already-provisioned databases are unaffected either way: ``upgrade()`` returns
+    early when the users table exists, and Alembic does not re-run an applied
+    revision.
+    """
+    if "@" not in auth_username:
+        raise BootstrapIdentityError(
+            f"AUTH_USERNAME must be an email address; got {auth_username!r}. "
+            f"TraceLab no longer seeds {auth_username}@tracelab.local — that "
+            "domain is non-routable (RFC 6761), so the bootstrap owner it creates "
+            "could never receive mail or be recovered. Set AUTH_USERNAME to the "
+            "bootstrap owner's real email address and re-run "
+            "`alembic upgrade head`."
+        )
+    return auth_username
 
 
 def upgrade() -> None:
@@ -68,10 +105,7 @@ def upgrade() -> None:
             auth_password.encode("utf-8"), bcrypt.gensalt()
         ).decode("utf-8")
 
-    # Use username as email if it doesn't look like an email
-    admin_email = (
-        auth_username if "@" in auth_username else f"{auth_username}@tracelab.local"
-    )
+    admin_email = seed_admin_email(auth_username)
 
     bind.execute(
         text(

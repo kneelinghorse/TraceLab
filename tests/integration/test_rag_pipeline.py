@@ -164,7 +164,15 @@ def _build_service(monkeypatch, *, cache=None, responses=None):
 
 
 @pytest.mark.skip(
-    reason="openai/httpx version incompatibility — httpx removed 'proxies' kwarg; needs openai SDK upgrade"
+    # Sprint 56 HYG-2 corrected this reason. The openai/httpx "proxies"
+    # incompatibility is GONE: openai 2.24.0 does not pass that kwarg and neither
+    # does anything in this repo, so an SDK upgrade fixes nothing here. Un-skipped,
+    # this test fails at line 177 with _StubRetrievalService.calls empty — the
+    # pipeline never reaches the stub, which is a real and undiagnosed behaviour
+    # change, not a dependency problem. Its sibling below was skipped for the same
+    # false reason and passes today, so it is no longer skipped.
+    reason="RAG pipeline never calls the stub retrieval service; cause undiagnosed. "
+    "NOT an openai/httpx issue — see the comment above before changing deps."
 )
 def test_rag_pipeline_generates_cited_answer(monkeypatch):
     service, embedding, retrieval, cache_service, cost_monitor, assessor, client = (
@@ -188,9 +196,6 @@ def test_rag_pipeline_generates_cited_answer(monkeypatch):
     assert client.calls and client.calls[0]["messages"]
 
 
-@pytest.mark.skip(
-    reason="openai/httpx version incompatibility — httpx removed 'proxies' kwarg; needs openai SDK upgrade"
-)
 def test_rag_pipeline_returns_cached_payload(monkeypatch):
     cached = {
         "answer": "Cached answer",
