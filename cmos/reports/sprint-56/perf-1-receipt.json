@@ -1,0 +1,49 @@
+{
+  "mission": "PERF-1",
+  "name": "Baseline-relative performance budgets for the Sprint 52 aggregates",
+  "sprint": "sprint-56",
+  "session": "PS-2026-09-17-001",
+  "result": "COMPLETE for four aggregates, as real gates in a required check. Two Sprint 52 surfaces are deliberately left uncovered and named; one scope limitation is stated in the test file itself rather than only here.",
+
+  "what_shipped": "tests/integration/test_aggregate_perf_budgets.py. Every budget is a p95 DELTA over a baseline measured by the same client in the same run, per decision #458. It lives in the backend-integration lane, which is a required check (decision #421), so exceeding a budget blocks a merge — it is a gate, not advice.",
+
+  "the_baseline": {
+    "endpoint": "GET /api/v1/auth/me",
+    "why": "Authenticated, one DB session, one primary-key lookup, one small response. It travels the same middleware, auth, session and serialization path as every aggregate and then does O(1) work, so subtracting it removes almost everything that is about the machine rather than the query. That is what makes the budgets portable between a laptop and a CI runner."
+  },
+
+  "measurements": {
+    "method": "40 samples per round after 5 discarded warmups; three rounds; the LOWEST round p95 is kept.",
+    "why_best_of_rounds": "Measured, not assumed. Across four exploratory single-round runs the Home delta came out +23.1, +32.7, +34.0 and +157.1 ms — the last while the machine was busy. Sizing a budget around that outlier would have made it so loose it could never fail, which is the exact vacuity this project keeps finding. Contention only ever ADDS time, never subtracts it, so the minimum across rounds is a robust estimator of real cost. After the change the same figure ranged 22.8-28.4 ms across three runs.",
+    "observed_deltas_ms_best_of_rounds_developer_machine": {
+      "baseline_p95_ms": [3.4, 3.1, 3.3, 2.9],
+      "home": [28.4, 22.8, 25.3, 33.3],
+      "activity_summary": [8.5, 5.5, 5.7, 7.2],
+      "graph_stats": [0.5, 15.3, 2.3, 3.5],
+      "graph_neighborhood": [12.3, 28.4, 14.2, 22.8]
+    },
+    "budgets_ms": {"home": 150.0, "activity_summary": 75.0, "graph_stats": 75.0, "graph_neighborhood": 150.0},
+    "budget_sizing_and_its_honest_tension": "Roughly five times the worst observed delta. That multiplier is deliberate: a CI runner is slower and noisier than this laptop, and a gate that flakes is worse than no gate because it teaches people to re-run it. These are FIRST budgets chosen to be reliable rather than tight, and they should be tightened once a few CI runs show the real variance there. They are not vacuous even so: the regressions worth catching are order-of-magnitude, not percentage — an N+1 over the 200-mission corpus, or a dropped index, moves these deltas by hundreds of milliseconds, not tens."
+  },
+
+  "non_vacuity": {
+    "corpus": "200 missions inside a project, seeded per run. A budget measured against an empty table is the vacuity this project keeps finding: every aggregate is fast over zero rows, so the assertion could never fail.",
+    "guard": "The test asserts GET /home reports exactly SEEDED_MISSIONS before any timing is trusted, so a corpus that does not reach the aggregate fails the run instead of producing a fast, meaningless pass."
+  },
+
+  "mutation_proofs": {
+    "budget_gate_can_fail": "Set the Home budget to 0.0 -> FAILED with 'home exceeded its baseline-relative budget: p95 delta 35.7 ms over a 4.2 ms baseline, budget 0 ms'. Reverted; control green.",
+    "vacuity_guard_can_fail": "Seeded 50 fewer missions than the constant claims -> FAILED with 'Home reported 150 missions but 200 were seeded; the budget would be measured against the wrong corpus size'. Reverted; control green.",
+    "two_mutants_that_failed_to_prove_anything_and_why": "Recorded because each taught something. (a) Assigning the corpus to a random UUID owner raised a psycopg2 ForeignKeyViolation rather than testing the guard — badly designed, though it incidentally confirms real FK enforcement on PostgreSQL where SQLite would be silent. (b) Assigning the corpus to a DIFFERENT REAL user still PASSED, which is what exposed the scope limitation below: the caller is privileged, so ownership does not filter these queries at all."
+  },
+
+  "scope_limitation_stated_in_the_test_file_itself": "The authenticated principal in this fixture set resolves to role 'admin' (subject 'kneelinghorse'), and admin is in _PRIVILEGED_ROLES, so authorize() short-circuits and every aggregate runs its UNSCOPED query. That is representative of the operator who actually uses TraceLab — Derek is owner, also privileged — but the member-scoped variant, which carries an extra accessible-projects filter and could behave differently at volume, is NOT under budget. Covering it needs a non-privileged principal that authentication will accept, and authentication resolves the JWT through its own SessionLocal() rather than the get_db override (app/core/security.py::_resolve_user_from_jwt), so it is a fixture change rather than a one-line edit.",
+
+  "surfaces_deliberately_left_uncovered": {
+    "saved_exception_dashboards_UX12": "No budget. Not reached this session.",
+    "priority_inbox_UX13": "No budget. Not reached this session.",
+    "production_measurement": "Not attempted. Measuring the deployed service needs the same credential that blocks the RBAC matrix; gh secret list is empty. These budgets therefore catch REGRESSIONS against real PostgreSQL in CI, and say nothing about absolute production latency."
+  },
+
+  "a_correction_worth_recording": "During this mission I twice described tests/test_semantic_edge_e2e_validation.py::test_graph_latency_remains_acceptable as 'exactly what decision #458 forbids'. That is wrong. It asserts on result.metadata.timings.graph_ms, a SERVER-side timing, which #458 explicitly permits alongside baseline-relative client measurement. What is actually wrong with it is narrower: an absolute threshold (avg < 5.0 ms, max < 20.0 ms) on a load-sensitive measurement, which is why it failed at the end of a 15-minute 2743-test run and passed in isolation in 3.19 s. It is left untouched here rather than converted under PERF-1's banner, and recorded as its own next-step with that evidence."
+}
