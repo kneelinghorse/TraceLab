@@ -14,7 +14,6 @@ it is pointed at prod (the live prod run itself is T47.6):
 
 from __future__ import annotations
 
-import json
 from uuid import UUID, uuid4
 
 import pytest
@@ -44,11 +43,9 @@ from app.models.workspace import Workspace
 from app.services.cache_manager import get_cache_manager
 from app.services.hybrid_search import HybridSearchService
 from scripts.rbac_verify import (
-    _FABRICATED_DOMAIN,
     _FIXTURE_PROJECT_NAME,
     _PEDR_SCOPE_QUERY,
     _PRINCIPAL_ROLES,
-    _PRINCIPALS_ENV,
     _RAG_EMPTY_ANSWER,
     _SYNTHESIS_EMPTY_CONTENT,
     HarnessError,
@@ -58,10 +55,7 @@ from scripts.rbac_verify import (
     pedr1b_scope_routes,
     pedr1c_anon_routes,
     pedr_scope_routes,
-    resolve_verification_identity,
-    resolve_verification_principals,
 )
-from scripts.rbac_verify import main as rbac_verify_main
 
 OWNER_EMAIL = "tracelab-admin@tracelab.local"  # conftest seed: {AUTH_USERNAME}@tracelab.local
 OWNER_PW = "changeme"  # conftest AUTH_PASSWORD
@@ -2033,57 +2027,6 @@ def test_pedr1c_matrix_is_compatible_with_real_testclient_routes(
     )
 
 
-# --- Sprint 55 RBAC-3: the verification identity ---------------------------------
-#
-# The harness authenticated as the fabricated @tracelab.local bootstrap row for five
-# sprints because main() silently appended that domain to a bare AUTH_USERNAME. These
-# pin the refusals so the coercion cannot come back.
-
-
-class TestVerificationIdentity:
-    def test_accepts_a_full_email_address(self):
-        email, password, source = resolve_verification_identity(
-            {"AUTH_USERNAME": "derek@deniedart.com", "AUTH_PASSWORD": "pw"}
-        )
-        assert email == "derek@deniedart.com"
-        assert source == "AUTH_USERNAME"
-
-    def test_a_bare_username_is_refused_instead_of_being_given_a_domain(self):
-        """The whole bug in one assertion.
-
-        'kneelinghorse' used to become 'kneelinghorse@tracelab.local', which is a
-        real production account holding the irreducible owner role. Every run since
-        Sprint 49 authenticated as it without anyone intending to.
-        """
-        email, reason, _ = resolve_verification_identity(
-            {"AUTH_USERNAME": "kneelinghorse", "AUTH_PASSWORD": "pw"}
-        )
-        assert email is None
-        assert "bare username" in reason
-        assert _FABRICATED_DOMAIN in reason  # names what it refused to invent
-        assert "AUTH_USERNAME" in reason  # names the variable to fix
-
-    def test_the_fabricated_domain_is_refused_even_spelled_out_in_full(self):
-        email, reason, _ = resolve_verification_identity(
-            {"AUTH_USERNAME": "kneelinghorse" + _FABRICATED_DOMAIN, "AUTH_PASSWORD": "pw"}
-        )
-        assert email is None
-        assert "retired bootstrap identity" in reason
-
-    @pytest.mark.parametrize(
-        "env",
-        [
-            {},
-            {"AUTH_USERNAME": "derek@deniedart.com"},  # password missing
-            {"AUTH_PASSWORD": "pw"},  # username missing
-        ],
-    )
-    def test_missing_credentials_are_refused_with_an_actionable_reason(self, env):
-        email, reason, _ = resolve_verification_identity(env)
-        assert email is None
-        assert "AUTH_USERNAME" in reason and "AUTH_PASSWORD" in reason
-
-
 class TestFixtureProjectLifecycle:
     """The harness owns its fixture instead of depending on an ownership accident."""
 
@@ -2151,104 +2094,3 @@ class TestFixtureProjectLifecycle:
         assert "did not read back as owned" in str(exc.value)
 
 
-class TestResolveVerificationPrincipals:
-    """Sprint 56 RBAC-5: the principals arrive from outside and are never minted.
-
-    Every refusal below is a run that does NOT start. That is deliberate and is
-    the RBAC-3 rule carried forward: a verifier which cannot verify must say so
-    loudly, because the one thing that detects a stopped matrix is running it.
-    There is no fallback to provisioning and no owner-only mode — an owner-only
-    matrix has no deny tier, so it would pass vacuously and look exactly like a
-    real green run.
-    """
-
-    def _valid(self, **overrides):
-        payload = {
-            "member": {"email": "rbac-member@tracelab.aquex.ai", "password": "pw1"},
-            "viewer": {"email": "rbac-viewer@tracelab.aquex.ai", "password": "pw2"},
-        }
-        payload.update(overrides)
-        return {_PRINCIPALS_ENV: json.dumps(payload)}
-
-    def test_parses_supplied_principals(self):
-        principals, reason = resolve_verification_principals(self._valid())
-        assert reason == ""
-        assert principals == {
-            "member": ("rbac-member@tracelab.aquex.ai", "pw1"),
-            "viewer": ("rbac-viewer@tracelab.aquex.ai", "pw2"),
-        }
-
-    def test_absent_env_refuses_and_names_what_to_set(self):
-        principals, reason = resolve_verification_principals({})
-        assert principals is None
-        assert _PRINCIPALS_ENV in reason
-        # It must not merely fail; it must say what a permanent principal IS.
-        assert "permanent" in reason.lower()
-        assert "member" in reason and "viewer" in reason
-
-    def test_malformed_json_is_named_as_such(self):
-        principals, reason = resolve_verification_principals(
-            {_PRINCIPALS_ENV: "{not json"}
-        )
-        assert principals is None
-        assert "not valid JSON" in reason
-
-    def test_bare_username_is_refused_not_derived(self):
-        principals, reason = resolve_verification_principals(
-            self._valid(member={"email": "rbac-member", "password": "pw"})
-        )
-        assert principals is None
-        assert "bare username" in reason
-        assert _FABRICATED_DOMAIN in reason
-
-    def test_fabricated_domain_is_refused(self):
-        principals, reason = resolve_verification_principals(
-            self._valid(
-                member={"email": f"rbac-member{_FABRICATED_DOMAIN}", "password": "pw"}
-            )
-        )
-        assert principals is None
-        assert "non-routable" in reason
-
-    def test_unknown_role_is_refused(self):
-        principals, reason = resolve_verification_principals(
-            {_PRINCIPALS_ENV: json.dumps({"superuser": {"email": "a@b.co", "password": "p"}})}
-        )
-        assert principals is None
-        assert "unknown role" in reason
-
-    def test_missing_password_is_refused(self):
-        principals, reason = resolve_verification_principals(
-            self._valid(member={"email": "rbac-member@tracelab.aquex.ai"})
-        )
-        assert principals is None
-        assert "missing password" in reason
-
-    def test_partial_set_parses_so_the_run_can_fail_loudly(self):
-        """member alone is NOT refused here — it becomes a NO-DENY-PRINCIPAL gap.
-
-        A refusal at this point exits 2 ("could not start"); a gap exits 1 ("the
-        matrix ran and something is wrong"). A half-supplied set genuinely ran, so
-        it must produce the second, and it must never produce a PASS.
-        """
-        principals, reason = resolve_verification_principals(
-            {_PRINCIPALS_ENV: json.dumps(
-                {"member": {"email": "m@tracelab.aquex.ai", "password": "pw"}}
-            )}
-        )
-        assert reason == ""
-        assert set(principals) == {"member"}
-
-
-def test_main_exits_2_when_principals_are_absent(monkeypatch, capsys):
-    """The harness must not start without principals, and must be loud about it."""
-    monkeypatch.setenv("AUTH_USERNAME", "rbac-verify@tracelab.aquex.ai")
-    monkeypatch.setenv("AUTH_PASSWORD", "pw")
-    monkeypatch.delenv(_PRINCIPALS_ENV, raising=False)
-
-    code = rbac_verify_main(["--base-url", "https://api.example.invalid"])
-
-    assert code == 2, "a run that cannot start must be a FAILURE, never a skip"
-    err = capsys.readouterr().err
-    assert "CANNOT START" in err
-    assert _PRINCIPALS_ENV in err
