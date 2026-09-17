@@ -66,7 +66,24 @@ jobs:
             echo "(a real, routable address — not the retired @tracelab.local bootstrap row)."
             exit 1
           fi
-          echo "Credentials present; the matrix will run as $AUTH_USERNAME."
+          # GitHub masks a secret's value wherever it appears in the log, so
+          # "will run as $AUTH_USERNAME" renders as "will run as ***" and tells the
+          # operator nothing — the line looked like confirmation while confirming
+          # nothing (next-step #374, learning #229). Print two DERIVED facts
+          # instead. Neither is the secret value, so neither is masked, and
+          # together they identify which identity is configured.
+          case "$AUTH_USERNAME" in
+            *@*)
+              domain="${AUTH_USERNAME##*@}"
+              local_part="${AUTH_USERNAME%@*}"
+              echo "Credentials present. The matrix will run as a ${#local_part}-character local part at ${domain}."
+              ;;
+            *)
+              echo "Credentials present, but AUTH_USERNAME contains no '@'."
+              echo "The harness refuses a bare username and will abort with exit 2"
+              echo "in the next step; it is the authority on that refusal, not this check."
+              ;;
+          esac
 
       - name: Run the production RBAC matrix
         id: matrix
