@@ -1,24 +1,33 @@
 # ABOUTME: Runs the production RBAC role x route matrix on MANUAL DISPATCH ONLY and fails loudly.
 # ABOUTME: A run that cannot even start is a FAILURE here, never a skip — that silence cost five sprints.
-# ABOUTME: The six-hourly schedule was removed 2026-09-16; see the DISARMED note below.
+# ABOUTME: Still dispatch-only: the schedule returns once the principals exist (see below).
 
 name: RBAC Verify (production)
 
 # Sprint 55 RBAC-3. Production RBAC verification was silently unrunnable for roughly
 # five sprints. Nothing reported it, because RUNNING the matrix is the only thing that
-# detects the matrix having stopped. That problem is real and still unsolved, but the
-# cron-plus-dispatch shape borrowed from decision #353 was the wrong fix for it here —
-# see DISARMED below.
-# DISARMED 2026-09-16. The six-hourly `schedule:` trigger was REMOVED, deliberately
-# and by Derek's direct instruction. scripts/rbac_verify.py::run() unconditionally
-# provisions four real user accounts in the target environment via POST /admin/users
-# (a hardcoded throwaway password, plus minted API keys) and purges them at the end.
-# On a cron that meant creating and deleting real production accounts every six hours,
-# forever, with a reconcile sweep that exists precisely because teardown is expected to
-# leak rows when a run is cancelled or crashes. A role x route enforcement check must
-# never mutate a production auth table. Manual dispatch is retained so the matrix stays
-# runnable on purpose; it must not run on its own until the harness is reworked to use
-# permanent, pre-existing, zero-privilege principals instead of provisioning any.
+# detects the matrix having stopped. That problem is real and STILL UNSOLVED while this
+# workflow only runs when a human remembers to press the button.
+#
+# DISARMED 2026-09-16, by Derek's direct instruction: scripts/rbac_verify.py::run()
+# provisioned four real accounts via POST /admin/users, minted API keys for them and
+# purged them at the end, so a six-hourly cron meant creating and deleting real
+# production accounts every six hours, forever.
+#
+# Sprint 56 RBAC-5 fixed the CAUSE. The harness no longer creates a user at all: it
+# authenticates as permanent, pre-existing, zero-privilege principals supplied in
+# RBAC_VERIFY_PRINCIPALS, and tests/test_rbac_verify_harness.py asserts at the
+# transport that a run issues no POST/PATCH/PUT/DELETE against /admin/users. The
+# reconcile-users sweep is gone with the hazard it existed for.
+#
+# The schedule is STILL REMOVED, and that is deliberate rather than leftover. The one
+# remaining precondition is operator work that cannot be automated without recreating
+# the problem: someone must create the principals once, on purpose, in production, and
+# set them as a repository secret. Re-add the `schedule:` trigger below once they
+# exist — the suggested slot is "25 */6 * * *", offset from Production Smoke at ":55"
+# so the two never contend for the login rate limit (5 logins / 60s,
+# app/core/rate_limit.py). Note the budget is exactly spent: a run performs five
+# logins (the owner plus four principals) with zero headroom.
 on:
   workflow_dispatch:
 
@@ -26,9 +35,9 @@ permissions:
   contents: read
 
 concurrency:
-  # Two concurrent matrices would provision throwaway principals against the same
-  # fixture project and race each other's teardown. Never cancel a run in flight:
-  # a cancelled run can leave throwaway users behind.
+  # Two concurrent matrices would seed and tear down children inside the same fixture
+  # projects and race each other. Never cancel a run in flight: a cancelled run can
+  # leave seeded artifacts behind for the next run's reconcile sweep to clean up.
   group: rbac-verify-production
   cancel-in-progress: false
 
@@ -54,16 +63,26 @@ jobs:
         env:
           AUTH_USERNAME: ${{ secrets.AUTH_USERNAME }}
           AUTH_PASSWORD: ${{ secrets.AUTH_PASSWORD }}
+          RBAC_VERIFY_PRINCIPALS: ${{ secrets.RBAC_VERIFY_PRINCIPALS }}
         run: |
           missing=""
           [ -n "$AUTH_USERNAME" ] || missing="$missing AUTH_USERNAME"
           [ -n "$AUTH_PASSWORD" ] || missing="$missing AUTH_PASSWORD"
+          [ -n "$RBAC_VERIFY_PRINCIPALS" ] || missing="$missing RBAC_VERIFY_PRINCIPALS"
           if [ -n "$missing" ]; then
             echo "::error title=RBAC verification cannot start::Missing repository secret(s):$missing"
             echo "The production RBAC matrix did NOT run. This is a FAILURE, not a skip:"
             echo "an unrunnable verifier is the exact condition that went unnoticed for"
-            echo "five sprints. Set the secrets to a dedicated verification identity"
-            echo "(a real, routable address — not the retired @tracelab.local bootstrap row)."
+            echo "five sprints. Set AUTH_USERNAME/AUTH_PASSWORD to a dedicated"
+            echo "verification identity (a real, routable address — not the retired"
+            echo "@tracelab.local bootstrap row), and RBAC_VERIFY_PRINCIPALS to a JSON"
+            echo "object of PERMANENT, pre-existing, zero-privilege accounts:"
+            echo '  {"member":{"email":"...","password":"..."},'
+            echo '   "viewer":{"email":"...","password":"..."}}'
+            echo "member and viewer are the two deny tiers and are required; add"
+            echo "second_owner and service to unlock the remaining checks. Sprint 56"
+            echo "RBAC-5: the harness no longer creates these itself, because a"
+            echo "role x route check must never write to the auth table it verifies."
             exit 1
           fi
           # GitHub masks a secret's value wherever it appears in the log, so
@@ -90,6 +109,7 @@ jobs:
         env:
           AUTH_USERNAME: ${{ secrets.AUTH_USERNAME }}
           AUTH_PASSWORD: ${{ secrets.AUTH_PASSWORD }}
+          RBAC_VERIFY_PRINCIPALS: ${{ secrets.RBAC_VERIFY_PRINCIPALS }}
         run: |
           set -o pipefail
           python scripts/rbac_verify.py \

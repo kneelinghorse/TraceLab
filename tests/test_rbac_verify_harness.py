@@ -14,6 +14,7 @@ it is pointed at prod (the live prod run itself is T47.6):
 
 from __future__ import annotations
 
+import json
 from uuid import UUID, uuid4
 
 import pytest
@@ -25,6 +26,7 @@ from app.core.security import (
     ROLE_OWNER,
     ROLE_VIEWER,
     create_access_token,
+    hash_password,
 )
 from app.main import app
 from app.models.api_key import APIKey
@@ -40,13 +42,15 @@ from app.models.space_member import SpaceMember
 from app.models.user import User
 from app.models.workspace import Workspace
 from app.services.cache_manager import get_cache_manager
+from app.services.hybrid_search import HybridSearchService
 from scripts.rbac_verify import (
     _FABRICATED_DOMAIN,
     _FIXTURE_PROJECT_NAME,
     _PEDR_SCOPE_QUERY,
+    _PRINCIPAL_ROLES,
+    _PRINCIPALS_ENV,
     _RAG_EMPTY_ANSWER,
     _SYNTHESIS_EMPTY_CONTENT,
-    _THROWAWAY_PASSWORD,
     HarnessError,
     RbacVerifier,
     _seed_specs,
@@ -55,7 +59,9 @@ from scripts.rbac_verify import (
     pedr1c_anon_routes,
     pedr_scope_routes,
     resolve_verification_identity,
+    resolve_verification_principals,
 )
+from scripts.rbac_verify import main as rbac_verify_main
 
 OWNER_EMAIL = "tracelab-admin@tracelab.local"  # conftest seed: {AUTH_USERNAME}@tracelab.local
 OWNER_PW = "changeme"  # conftest AUTH_PASSWORD
@@ -63,6 +69,77 @@ _SECOND_OWNER_TOKEN = "second-owner-jwt"  # noqa: S105 - fake transport credenti
 _SECOND_OWNER_ID = str(uuid4())
 _MEMBER_ID = str(uuid4())
 _VIEWER_ID = str(uuid4())
+
+
+# Sprint 56 RBAC-5: the harness no longer provisions principals, so the TEST does.
+# This is not the thing that was wrong — the defect was a *production* enforcement
+# check mutating the auth table on a schedule. A test owning its own throwaway
+# database is free to create whatever it needs.
+_TEST_PRINCIPAL_PW = "rbac-verify-test-principal-pw"  # noqa: S105 - local test fixture
+
+
+_TEST_PRINCIPAL_HASH = hash_password(_TEST_PRINCIPAL_PW)
+
+
+def _stub_vector_backends(monkeypatch):
+    """Keep PEDR's search off backends this venv does not have.
+
+    Needed from Sprint 56 RBAC-5 onward, and only because of it. RetrievalService
+    returns [] WITHOUT searching when the caller has no accessible projects, so
+    every earlier version of this test sailed straight past the search stack: the
+    member principal owned nothing. The over-blocking fixture gives the member a
+    project it owns — the whole point of next-step #367 — which makes preflight
+    genuinely run and hit three things this machine does not have, in order: an
+    OpenAI key (401 on the placeholder), a Qdrant collection (400), and
+    PostgreSQL full-text syntax, which SQLite cannot even parse
+    ("unrecognized token: @" from hybrid_search._keyword_search).
+
+    All three are ENVIRONMENT limits, not enforcement findings: production has a
+    real key, a real collection and real PostgreSQL. Stubbing the one seam they
+    share returns exactly what the caller saw before — an empty scoped result —
+    while letting the authorization path execute instead of short-circuiting,
+    which is the part this test is actually about. PEDR scope semantics are
+    covered by tests/test_pedr_scope_core.py, and against production the real
+    search runs unstubbed.
+    """
+    monkeypatch.setattr(
+        HybridSearchService,
+        "search",
+        lambda _self, *_args, **_kwargs: [],
+    )
+
+
+def _create_principal(db, role, tag):
+    """Create one PERMANENT principal directly in the test database.
+
+    Deliberately NOT through POST /admin/users. Logging in costs budget against
+    app/core/rate_limit.py's five-logins-per-60s window, and a full run already
+    spends exactly five (owner plus four principals) with zero headroom — an
+    earlier version of this helper minted an owner API key first and pushed the
+    run's last login to a 429. Fixture setup must not consume the budget of the
+    thing it is setting up.
+    """
+    email = f"{tag}-{role}@tracelab-verify.invalid"
+    user = User(
+        email=email,
+        display_name=f"{role} principal",
+        password_hash=_TEST_PRINCIPAL_HASH,
+        role=role,
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return str(user.id), email
+
+
+def _supplied_principals(db, tag="fixture"):
+    """Create the four principals and return them in RBAC_VERIFY_PRINCIPALS shape."""
+    supplied = {}
+    for pname in _PRINCIPAL_ROLES:
+        role = ROLE_OWNER if pname == "second_owner" else pname
+        _uid, email = _create_principal(db, role, f"{tag}-{pname}")
+        supplied[pname] = (email, _TEST_PRINCIPAL_PW)
+    return supplied
 
 
 @pytest.fixture
@@ -123,6 +200,13 @@ def test_harness_passes_against_enforced_app(
         lambda _self, principals, _principal_ids=None: pedr1c_calls.append(principals),
     )
     verifier = RbacVerifier(client)
+
+    # The principals EXIST BEFORE the run and outlive it — that is the whole point
+    # of RBAC-5. Seeded straight into the database so fixture setup spends none of
+    # the five-logins-per-60s budget the run itself needs.
+    supplied = _supplied_principals(db_session)
+    _stub_vector_backends(monkeypatch)
+
     login_calls = []
     real_login = verifier.login
 
@@ -131,7 +215,7 @@ def test_harness_passes_against_enforced_app(
         return real_login(email, password)
 
     monkeypatch.setattr(verifier, "login", _tracked_login)
-    code = verifier.run(OWNER_EMAIL, OWNER_PW)
+    code = verifier.run(OWNER_EMAIL, OWNER_PW, supplied)
     leaks = [g for g in verifier.gaps if g.kind == "DENY-LEAK-2xx"]
     assert not leaks, f"unexpected BOLA leaks: {[str(g) for g in leaks]}"
     assert code == 0, f"gaps: {[str(g) for g in verifier.gaps]}\nnotes: {verifier.notes}"
@@ -148,16 +232,24 @@ def test_harness_passes_against_enforced_app(
         "second_owner",
         "service",
     }
+    # Sprint 56 RBAC-5: the principals must still be there afterwards. The old
+    # harness purged them on the way out, which is what made a six-hourly schedule
+    # a six-hourly mutation of the production auth table.
+    db_session.expire_all()
+    for _role, (email, _pw) in supplied.items():
+        assert (
+            db_session.query(User).filter(User.email == email).count() == 1
+        ), f"the run deleted the supplied principal {email}"
 
 
 def test_precheck_aborts_when_rbac_off(client, owner_principal, monkeypatch):
     monkeypatch.setattr(settings, "rbac_enabled", False)
     verifier = RbacVerifier(client)
     with pytest.raises(HarnessError, match="RBAC IS OFF"):
-        verifier.run(OWNER_EMAIL, OWNER_PW)
+        verifier.run(OWNER_EMAIL, OWNER_PW, {})
 
 
-def test_matrix_flags_leak_when_unenforced(client, owner_principal, monkeypatch):
+def test_matrix_flags_leak_when_unenforced(client, db_session, owner_principal, monkeypatch):
     """With RBAC OFF a member reaches the resource (200) — the harness MUST flag it.
 
     Drives the steps directly (bypassing the precheck, which would abort first) to
@@ -166,10 +258,8 @@ def test_matrix_flags_leak_when_unenforced(client, owner_principal, monkeypatch)
     verifier = RbacVerifier(client)
     owner_token = verifier.login(OWNER_EMAIL, OWNER_PW)
     owner_key, _ = verifier.mint_api_key(owner_token)
-    created = verifier.create_throwaway_user(owner_key, "member", "leaktest")
-    assert created is not None, "member provisioning failed"
-    _uid, member_email = created
-    member_jwt = verifier.login(member_email, _THROWAWAY_PASSWORD)
+    _uid, member_email = _create_principal(db_session, ROLE_MEMBER, "leaktest")
+    member_jwt = verifier.login(member_email, _TEST_PRINCIPAL_PW)
     spec = next(s for s in _seed_specs(settings.api_v1_prefix) if s.name == "project")
     rid = verifier.seed(owner_key, spec, {})
     assert rid is not None, "project seeding failed"
@@ -180,7 +270,7 @@ def test_matrix_flags_leak_when_unenforced(client, owner_principal, monkeypatch)
     assert leaks, "harness FAILED to flag a 2xx BOLA leak when RBAC was off"
 
 
-def test_service_log_matrix_flags_leak_when_gate_off(client, owner_principal, monkeypatch):
+def test_service_log_matrix_flags_leak_when_gate_off(client, db_session, owner_principal, monkeypatch):
     """With RBAC OFF the service gate is a no-op, so a non-service human reaches the
     log-write (201). The new service_log_write_matrix MUST flag that as a DENY-LEAK —
     proving the check can go RED (a harness check that can't fail is worthless, the
@@ -189,10 +279,8 @@ def test_service_log_matrix_flags_leak_when_gate_off(client, owner_principal, mo
     verifier = RbacVerifier(client)
     owner_token = verifier.login(OWNER_EMAIL, OWNER_PW)
     owner_key, _ = verifier.mint_api_key(owner_token)
-    created = verifier.create_throwaway_user(owner_key, "member", "svc-leaktest")
-    assert created is not None, "member provisioning failed"
-    _uid, member_email = created
-    member_jwt = verifier.login(member_email, _THROWAWAY_PASSWORD)
+    _uid, member_email = _create_principal(db_session, ROLE_MEMBER, "svc-leaktest")
+    member_jwt = verifier.login(member_email, _TEST_PRINCIPAL_PW)
     proj_spec = next(s for s in _seed_specs(settings.api_v1_prefix) if s.name == "project")
     mission_spec = next(s for s in _seed_specs(settings.api_v1_prefix) if s.name == "mission")
     proj_id = verifier.seed(owner_key, proj_spec, {})
@@ -206,7 +294,7 @@ def test_service_log_matrix_flags_leak_when_gate_off(client, owner_principal, mo
     assert leaks, "harness FAILED to flag the log-write leak when the service gate was off"
 
 
-def test_service_log_matrix_flags_missing_service_principal(client, owner_principal, monkeypatch):
+def test_service_log_matrix_flags_missing_service_principal(client, db_session, owner_principal, monkeypatch):
     """The service-ALLOW probe is the over-block guard the rbac_enabled flip relies on
     (proves the legitimate runner is not denied). If the service principal can't be
     provisioned the harness must go RED (NO-SERVICE-PRINCIPAL), not silently green —
@@ -216,10 +304,8 @@ def test_service_log_matrix_flags_missing_service_principal(client, owner_princi
     verifier = RbacVerifier(client)
     owner_token = verifier.login(OWNER_EMAIL, OWNER_PW)
     owner_key, _ = verifier.mint_api_key(owner_token)
-    created = verifier.create_throwaway_user(owner_key, "member", "no-svc")
-    assert created is not None, "member provisioning failed"
-    _uid, member_email = created
-    member_jwt = verifier.login(member_email, _THROWAWAY_PASSWORD)
+    _uid, member_email = _create_principal(db_session, ROLE_MEMBER, "no-svc")
+    member_jwt = verifier.login(member_email, _TEST_PRINCIPAL_PW)
 
     # A human IS present (deny half runs) but NO service principal is supplied.
     verifier.service_log_write_matrix(str(uuid4()), {"member": member_jwt})
@@ -287,10 +373,8 @@ def test_seeded_mission_cannot_queue_if_authorization_fails_open(
     verifier = RbacVerifier(client, log=lambda _message: None)
     owner_token = verifier.login(OWNER_EMAIL, OWNER_PW)
     owner_key, _key_id = verifier.mint_api_key(owner_token)
-    created = verifier.create_throwaway_user(owner_key, "member", "safe-submit")
-    assert created is not None
-    _member_id, member_email = created
-    member_token = verifier.login(member_email, _THROWAWAY_PASSWORD)
+    _member_id, member_email = _create_principal(db_session, ROLE_MEMBER, "safe-submit")
+    member_token = verifier.login(member_email, _TEST_PRINCIPAL_PW)
 
     project_spec = next(
         spec for spec in _seed_specs(settings.api_v1_prefix) if spec.name == "project"
@@ -709,7 +793,7 @@ def test_run_reconciles_api_key_when_committed_response_is_lost(
     verifier = RbacVerifier(transport, log=lambda _message: None)
 
     with pytest.raises(HarnessError, match="api-key mint raised TimeoutError"):
-        verifier.run(OWNER_EMAIL, OWNER_PW)
+        verifier.run(OWNER_EMAIL, OWNER_PW, {})
 
     assert transport.committed_id is not None
     db_session.expire_all()
@@ -722,48 +806,77 @@ def test_run_reconciles_api_key_when_committed_response_is_lost(
     assert verifier.teardown_failures == []
 
 
-def test_run_reconciles_user_when_committed_response_is_lost(
+def test_run_never_creates_or_deletes_a_user(
     client,
     db_session,
     owner_principal,
     monkeypatch,
 ):
-    """A response-lost throwaway user is found by its unique email prefix."""
+    """The load-bearing RBAC-5 guarantee: a run does not touch the auth table.
+
+    REPLACES test_run_reconciles_user_when_committed_response_is_lost, which
+    covered a hazard that only existed because the harness minted its own
+    accounts: a create could commit while its response was lost, stranding a user
+    holding a password committed in this repo. There is nothing left to reconcile,
+    so the test that proved reconciliation worked is replaced by one that proves
+    the creation cannot happen — otherwise deleting it would be a silent loss of
+    coverage rather than a hazard genuinely removed.
+
+    Asserted at the transport, not by reading the source: a future edit that
+    reintroduces provisioning anywhere in the call graph fails here.
+    """
     monkeypatch.setattr(settings, "rbac_enabled", True)
-    transport = _ForwardingFaultTransport(
-        client,
-        fault_path=f"{settings.api_v1_prefix}/admin/users",
-    )
-    verifier = RbacVerifier(transport, log=lambda _message: None)
+    events: list[tuple[str, str]] = []
+
+    class _RecordingTransport:
+        def request(self, method, url, **kwargs):
+            events.append((method.upper(), str(url)))
+            return client.request(method, url, **kwargs)
+
+    supplied = _supplied_principals(db_session, tag="no-mutation")
+    users_before = db_session.query(User).count()
+
+    verifier = RbacVerifier(_RecordingTransport(), log=lambda _message: None)
+    # The matrices themselves are proven elsewhere; silencing them keeps this test
+    # on its one question (does the run write to the auth table?) and off the
+    # RAG path, which reaches a real OpenAI client.
     _silence_run_matrices(verifier, monkeypatch)
+    verifier.run(OWNER_EMAIL, OWNER_PW, supplied)
 
-    with pytest.raises(HarnessError, match="member provisioning raised TimeoutError"):
-        verifier.run(OWNER_EMAIL, OWNER_PW)
+    admin_user_writes = [
+        (method, url)
+        for method, url in events
+        if f"{settings.api_v1_prefix}/admin/users" in url
+        and method in {"POST", "PATCH", "PUT", "DELETE"}
+    ]
+    assert not admin_user_writes, (
+        "the harness wrote to the auth table: "
+        f"{admin_user_writes}. A role-by-route enforcement check must never "
+        "create, modify or delete a principal in the environment it verifies."
+    )
 
-    assert transport.committed_id is not None
     db_session.expire_all()
-    assert (
-        db_session.query(User)
-        .filter(User.email.like(f"{verifier._run_tag}-%"))
-        .count()
-        == 0
+    assert db_session.query(User).count() == users_before, (
+        "the run changed the number of users; supplied principals are permanent "
+        "and the harness must add and remove none"
     )
-    assert (
-        db_session.query(APIKey)
-        .filter(APIKey.name.like(f"{verifier._run_tag}%"))
-        .count()
-        == 0
-    )
-    assert verifier.teardown_failures == []
 
 
-def test_run_reconciles_missing_id_artifact_before_user_purge(
+def test_run_reconciles_missing_id_artifact(
     client,
     db_session,
     owner_principal,
     monkeypatch,
 ):
-    """A missing collection id is reconciled before user FKs can become NULL."""
+    """A collection whose create response lost its id is still reconciled.
+
+    Was test_run_reconciles_missing_id_artifact_before_user_purge. The ordering
+    half of that name is gone with the purge: reconciliation had to beat user
+    deletion only because collection/report owner FKs are SET NULL, and the
+    harness was about to delete the accounts it had just created. Supplied
+    principals are permanent (RBAC-5), so nothing can be orphaned. The reconcile
+    itself still matters and is still asserted.
+    """
     monkeypatch.setattr(settings, "rbac_enabled", True)
     owner_space = Workspace(name=f"run-order-{uuid4().hex[:8]}")
     db_session.add(owner_space)
@@ -792,22 +905,20 @@ def test_run_reconciles_missing_id_artifact_before_user_purge(
 
     monkeypatch.setattr(verifier, "login", _budget_free_local_login)
 
-    code = verifier.run(OWNER_EMAIL, OWNER_PW)
+    code = verifier.run(OWNER_EMAIL, OWNER_PW, {})
 
     assert code == 1
     assert transport.committed_id is not None
-    collection_delete_index = transport.events.index(
-        (
-            "DELETE",
-            f"{settings.api_v1_prefix}/collections/{transport.committed_id}",
-        )
-    )
-    first_user_delete_index = next(
-        index
-        for index, (method, path) in enumerate(transport.events)
+    assert (
+        "DELETE",
+        f"{settings.api_v1_prefix}/collections/{transport.committed_id}",
+    ) in transport.events
+    # There must be no user deletion left to order against.
+    assert not [
+        (method, path)
+        for method, path in transport.events
         if method == "DELETE" and f"{settings.api_v1_prefix}/admin/users/" in path
-    )
-    assert collection_delete_index < first_user_delete_index
+    ]
 
     db_session.expire_all()
     assert (
@@ -1745,7 +1856,7 @@ def test_pedr1c_scope_matrix_fails_without_disposable_owner_fixture():
 
     verifier.pedr1c_scope_matrix({"owner": "owner-jwt"})
 
-    assert any(gap.kind == "NO-DISPOSABLE-OWNER" for gap in verifier.gaps)
+    assert any(gap.kind == "NO-SECOND-OWNER-PRINCIPAL" for gap in verifier.gaps)
 
 
 def test_pedr1c_anon_sweep_can_detect_a_public_route():
@@ -2038,3 +2149,106 @@ class TestFixtureProjectLifecycle:
         with pytest.raises(HarnessError) as exc:
             verifier.provision_fixture_project("owner-jwt")
         assert "did not read back as owned" in str(exc.value)
+
+
+class TestResolveVerificationPrincipals:
+    """Sprint 56 RBAC-5: the principals arrive from outside and are never minted.
+
+    Every refusal below is a run that does NOT start. That is deliberate and is
+    the RBAC-3 rule carried forward: a verifier which cannot verify must say so
+    loudly, because the one thing that detects a stopped matrix is running it.
+    There is no fallback to provisioning and no owner-only mode — an owner-only
+    matrix has no deny tier, so it would pass vacuously and look exactly like a
+    real green run.
+    """
+
+    def _valid(self, **overrides):
+        payload = {
+            "member": {"email": "rbac-member@tracelab.aquex.ai", "password": "pw1"},
+            "viewer": {"email": "rbac-viewer@tracelab.aquex.ai", "password": "pw2"},
+        }
+        payload.update(overrides)
+        return {_PRINCIPALS_ENV: json.dumps(payload)}
+
+    def test_parses_supplied_principals(self):
+        principals, reason = resolve_verification_principals(self._valid())
+        assert reason == ""
+        assert principals == {
+            "member": ("rbac-member@tracelab.aquex.ai", "pw1"),
+            "viewer": ("rbac-viewer@tracelab.aquex.ai", "pw2"),
+        }
+
+    def test_absent_env_refuses_and_names_what_to_set(self):
+        principals, reason = resolve_verification_principals({})
+        assert principals is None
+        assert _PRINCIPALS_ENV in reason
+        # It must not merely fail; it must say what a permanent principal IS.
+        assert "permanent" in reason.lower()
+        assert "member" in reason and "viewer" in reason
+
+    def test_malformed_json_is_named_as_such(self):
+        principals, reason = resolve_verification_principals(
+            {_PRINCIPALS_ENV: "{not json"}
+        )
+        assert principals is None
+        assert "not valid JSON" in reason
+
+    def test_bare_username_is_refused_not_derived(self):
+        principals, reason = resolve_verification_principals(
+            self._valid(member={"email": "rbac-member", "password": "pw"})
+        )
+        assert principals is None
+        assert "bare username" in reason
+        assert _FABRICATED_DOMAIN in reason
+
+    def test_fabricated_domain_is_refused(self):
+        principals, reason = resolve_verification_principals(
+            self._valid(
+                member={"email": f"rbac-member{_FABRICATED_DOMAIN}", "password": "pw"}
+            )
+        )
+        assert principals is None
+        assert "non-routable" in reason
+
+    def test_unknown_role_is_refused(self):
+        principals, reason = resolve_verification_principals(
+            {_PRINCIPALS_ENV: json.dumps({"superuser": {"email": "a@b.co", "password": "p"}})}
+        )
+        assert principals is None
+        assert "unknown role" in reason
+
+    def test_missing_password_is_refused(self):
+        principals, reason = resolve_verification_principals(
+            self._valid(member={"email": "rbac-member@tracelab.aquex.ai"})
+        )
+        assert principals is None
+        assert "missing password" in reason
+
+    def test_partial_set_parses_so_the_run_can_fail_loudly(self):
+        """member alone is NOT refused here — it becomes a NO-DENY-PRINCIPAL gap.
+
+        A refusal at this point exits 2 ("could not start"); a gap exits 1 ("the
+        matrix ran and something is wrong"). A half-supplied set genuinely ran, so
+        it must produce the second, and it must never produce a PASS.
+        """
+        principals, reason = resolve_verification_principals(
+            {_PRINCIPALS_ENV: json.dumps(
+                {"member": {"email": "m@tracelab.aquex.ai", "password": "pw"}}
+            )}
+        )
+        assert reason == ""
+        assert set(principals) == {"member"}
+
+
+def test_main_exits_2_when_principals_are_absent(monkeypatch, capsys):
+    """The harness must not start without principals, and must be loud about it."""
+    monkeypatch.setenv("AUTH_USERNAME", "rbac-verify@tracelab.aquex.ai")
+    monkeypatch.setenv("AUTH_PASSWORD", "pw")
+    monkeypatch.delenv(_PRINCIPALS_ENV, raising=False)
+
+    code = rbac_verify_main(["--base-url", "https://api.example.invalid"])
+
+    assert code == 2, "a run that cannot start must be a FAILURE, never a skip"
+    err = capsys.readouterr().err
+    assert "CANNOT START" in err
+    assert _PRINCIPALS_ENV in err
