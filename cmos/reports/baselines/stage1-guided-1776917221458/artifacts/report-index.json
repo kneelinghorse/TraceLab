@@ -1,0 +1,174 @@
+{
+  "kind": "report_index",
+  "version": "1.1.0",
+  "schema_version": "1.0.0",
+  "run_id": "guided-1776917529524",
+  "generated_at": "2026-04-23T04:12:09.949Z",
+  "artifacts": [
+    {
+      "type": "app_profile",
+      "path": "app_profile.json",
+      "description": "App profile summary of routes and related artifacts.",
+      "metadata": {
+        "bytes": 2135,
+        "modified_at": "2026-04-23T04:12:09.780Z"
+      }
+    },
+    {
+      "type": "baseline_metrics",
+      "path": "baseline_metrics.json",
+      "description": "Baseline UX metrics derived from computed styles.",
+      "metadata": {
+        "bytes": 11027,
+        "modified_at": "2026-04-23T04:12:09.750Z"
+      }
+    },
+    {
+      "type": "breakpoints",
+      "path": "breakpoints.json",
+      "description": "Responsive breakpoint detection with scale pattern analysis.",
+      "metadata": {
+        "bytes": 306,
+        "modified_at": "2026-04-23T04:12:09.726Z"
+      }
+    },
+    {
+      "type": "capability_rollup",
+      "path": "capability_rollup.json",
+      "description": "Capability Rollup artifact.",
+      "metadata": {
+        "bytes": 45976,
+        "modified_at": "2026-04-23T04:12:09.947Z"
+      }
+    },
+    {
+      "type": "component_clusters",
+      "path": "component_clusters.json",
+      "description": "UI component clusters with variant and nesting detection.",
+      "metadata": {
+        "bytes": 157323,
+        "modified_at": "2026-04-23T04:12:09.774Z"
+      }
+    },
+    {
+      "type": "composition_patterns",
+      "path": "composition_patterns.json",
+      "description": "Composition Patterns artifact.",
+      "metadata": {
+        "bytes": 6013,
+        "modified_at": "2026-04-23T04:12:09.778Z"
+      }
+    },
+    {
+      "type": "coverage_status",
+      "path": "coverage_status.json",
+      "description": "Guided capture coverage summary and next-route suggestions.",
+      "metadata": {
+        "bytes": 1127,
+        "modified_at": "2026-04-23T04:12:02.047Z"
+      }
+    },
+    {
+      "type": "entity_catalog",
+      "path": "entity_catalog.json",
+      "description": "Catalog of normalized API entities.",
+      "metadata": {
+        "bytes": 1278,
+        "modified_at": "2026-04-23T04:12:09.778Z"
+      }
+    },
+    {
+      "type": "ia_outline",
+      "path": "ia_outline.json",
+      "description": "Information architecture outline with route taxonomy.",
+      "metadata": {
+        "bytes": 6545,
+        "modified_at": "2026-04-23T04:12:09.715Z"
+      }
+    },
+    {
+      "type": "identity_candidates",
+      "path": "identity_candidates.json",
+      "description": "Identity Candidates artifact.",
+      "metadata": {
+        "bytes": 137970,
+        "modified_at": "2026-04-23T04:12:09.823Z"
+      }
+    },
+    {
+      "type": "identity_graph",
+      "path": "identity_graph.json",
+      "description": "Identity Graph artifact.",
+      "metadata": {
+        "bytes": 302327,
+        "modified_at": "2026-04-23T04:12:09.908Z"
+      }
+    },
+    {
+      "type": "object_rollup",
+      "path": "object_rollup.json",
+      "description": "Object Rollup artifact.",
+      "metadata": {
+        "bytes": 204719,
+        "modified_at": "2026-04-23T04:12:09.942Z"
+      }
+    },
+    {
+      "type": "orca_candidates",
+      "path": "orca_candidates.json",
+      "description": "Orca Candidates artifact.",
+      "metadata": {
+        "bytes": 1054526,
+        "modified_at": "2026-04-23T04:12:09.810Z"
+      }
+    },
+    {
+      "type": "report_index",
+      "path": "report-index.json",
+      "description": "Index of artifacts produced in this run."
+    },
+    {
+      "type": "style_fingerprint",
+      "path": "style_fingerprint.json",
+      "description": "Design token fingerprint extracted from UI styles.",
+      "metadata": {
+        "bytes": 9810,
+        "modified_at": "2026-04-23T04:12:09.750Z"
+      }
+    },
+    {
+      "type": "surface_snapshot",
+      "path": "surface_snapshot.json",
+      "description": "Surface snapshot capturing DOM and visual context.",
+      "metadata": {
+        "bytes": 4042,
+        "modified_at": "2026-04-23T04:12:09.754Z"
+      }
+    },
+    {
+      "type": "theming",
+      "path": "theming.json",
+      "description": "Theming and dark mode detection with CSS custom property analysis.",
+      "metadata": {
+        "bytes": 468,
+        "modified_at": "2026-04-23T04:12:09.726Z"
+      }
+    },
+    {
+      "type": "token_guess",
+      "path": "token-guess.json",
+      "description": "Design token guesses mapped to standard vocabulary.",
+      "metadata": {
+        "bytes": 2395,
+        "modified_at": "2026-04-23T04:12:09.775Z"
+      }
+    }
+  ],
+  "targets": [
+    {
+      "id": "tracelab-prod-authed",
+      "name": "tracelab-prod-authed",
+      "artifacts": []
+    }
+  ]
+}

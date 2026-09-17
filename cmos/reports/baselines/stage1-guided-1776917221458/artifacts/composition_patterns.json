@@ -1,0 +1,198 @@
+{
+  "kind": "composition_patterns",
+  "version": "1.0.0",
+  "schema_version": "1.0.0",
+  "run_id": "guided-1776917529524",
+  "generated_at": "2026-04-23T04:12:09.777Z",
+  "patterns": [
+    {
+      "patternId": "composition-0",
+      "name": "Font Bold Composition",
+      "rootClusterId": "cluster-0",
+      "structure": [
+        {
+          "clusterId": "cluster-3",
+          "patternName": "List Container",
+          "semanticRole": "list"
+        },
+        {
+          "clusterId": "cluster-1",
+          "patternName": "Inter 6e63d4e8 Module Qthnq G Variable",
+          "semanticRole": "unknown",
+          "children": [
+            {
+              "clusterId": "cluster-19",
+              "patternName": "Font Semibold",
+              "semanticRole": "unknown",
+              "children": [
+                {
+                  "clusterId": "cluster-11",
+                  "patternName": "Font Semibold",
+                  "semanticRole": "unknown",
+                  "children": [
+                    {
+                      "clusterId": "cluster-20",
+                      "patternName": "Rounded Full",
+                      "semanticRole": "unknown"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "frequency": 17,
+      "confidence": 1,
+      "routes": [
+        "/collections",
+        "/collections/6b9ba524-9bdc-4a14-9d9f-6a4ff210a069",
+        "/console",
+        "/documents",
+        "/documents/516fd80c-a295-4d4f-b49e-971ad4a41525",
+        "/documents/8cc368e5-f5a4-4c81-8909-2c9348f361db",
+        "/documents/d3800df0-bb53-421f-aa93-df4fa5739445",
+        "/missions",
+        "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+        "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+        "/projects",
+        "/projects/95dc6df6-5a69-42d5-9e33-b8e1e2726152",
+        "/projects/fbd3bd03-5ddc-49ee-8013-529163a99290",
+        "/reports",
+        "/reports/36697b37-a4cf-4074-9c01-c98e0690a3f0",
+        "/search",
+        "/settings"
+      ]
+    },
+    {
+      "patternId": "composition-3",
+      "name": "Font Semibold Composition",
+      "rootClusterId": "cluster-11",
+      "structure": [
+        {
+          "clusterId": "cluster-20",
+          "patternName": "Rounded Full",
+          "semanticRole": "unknown",
+          "children": [
+            {
+              "clusterId": "cluster-48",
+              "patternName": "Dark:Text Gray 400",
+              "semanticRole": "unknown"
+            }
+          ]
+        }
+      ],
+      "frequency": 11,
+      "confidence": 0.79,
+      "routes": [
+        "/documents",
+        "/documents/516fd80c-a295-4d4f-b49e-971ad4a41525",
+        "/documents/d3800df0-bb53-421f-aa93-df4fa5739445",
+        "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+        "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+        "/projects",
+        "/projects/95dc6df6-5a69-42d5-9e33-b8e1e2726152",
+        "/reports",
+        "/reports/36697b37-a4cf-4074-9c01-c98e0690a3f0",
+        "/search",
+        "/settings"
+      ]
+    },
+    {
+      "patternId": "composition-1",
+      "name": "Inter 6e63d4e8 Module Qthnq G Variable Composition",
+      "rootClusterId": "cluster-1",
+      "structure": [
+        {
+          "clusterId": "cluster-19",
+          "patternName": "Font Semibold",
+          "semanticRole": "unknown",
+          "children": [
+            {
+              "clusterId": "cluster-11",
+              "patternName": "Font Semibold",
+              "semanticRole": "unknown",
+              "children": [
+                {
+                  "clusterId": "cluster-20",
+                  "patternName": "Rounded Full",
+                  "semanticRole": "unknown",
+                  "children": [
+                    {
+                      "clusterId": "cluster-48",
+                      "patternName": "Dark:Text Gray 400",
+                      "semanticRole": "unknown"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "frequency": 10,
+      "confidence": 0.75,
+      "routes": [
+        "/collections/6b9ba524-9bdc-4a14-9d9f-6a4ff210a069",
+        "/documents/516fd80c-a295-4d4f-b49e-971ad4a41525",
+        "/documents/d3800df0-bb53-421f-aa93-df4fa5739445",
+        "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+        "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+        "/projects",
+        "/projects/95dc6df6-5a69-42d5-9e33-b8e1e2726152",
+        "/reports/36697b37-a4cf-4074-9c01-c98e0690a3f0",
+        "/search",
+        "/settings"
+      ]
+    },
+    {
+      "patternId": "composition-2",
+      "name": "Font Semibold Composition",
+      "rootClusterId": "cluster-19",
+      "structure": [
+        {
+          "clusterId": "cluster-11",
+          "patternName": "Font Semibold",
+          "semanticRole": "unknown",
+          "children": [
+            {
+              "clusterId": "cluster-20",
+              "patternName": "Rounded Full",
+              "semanticRole": "unknown",
+              "children": [
+                {
+                  "clusterId": "cluster-48",
+                  "patternName": "Dark:Text Gray 400",
+                  "semanticRole": "unknown"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "frequency": 10,
+      "confidence": 0.75,
+      "routes": [
+        "/collections/6b9ba524-9bdc-4a14-9d9f-6a4ff210a069",
+        "/documents/516fd80c-a295-4d4f-b49e-971ad4a41525",
+        "/documents/d3800df0-bb53-421f-aa93-df4fa5739445",
+        "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+        "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+        "/projects",
+        "/projects/95dc6df6-5a69-42d5-9e33-b8e1e2726152",
+        "/reports/36697b37-a4cf-4074-9c01-c98e0690a3f0",
+        "/search",
+        "/settings"
+      ]
+    }
+  ],
+  "summary": {
+    "totalPatterns": 4,
+    "avgDepth": 3.25,
+    "maxDepth": 4,
+    "pagesAnalyzed": 17,
+    "byRootRole": {
+      "unknown": 4
+    }
+  }
+}

@@ -1,0 +1,1243 @@
+{
+  "kind": "capability_rollup",
+  "schema_version": "1.2.0",
+  "generated_at": "2026-04-23T04:12:09.928Z",
+  "run_id": "guided-1776917529524",
+  "target": {
+    "id": "guided-1776917529524",
+    "url": "https://namozine.com/"
+  },
+  "capabilities": [
+    {
+      "canonical_id": "capability:border-white15",
+      "display_label": "Border White/15",
+      "presentations": [
+        {
+          "surface": "dom",
+          "label": "Border White/15",
+          "confidence": {
+            "total": 0.4,
+            "method": "threshold_gate_v1",
+            "signals": [
+              {
+                "type": "composition_pattern",
+                "raw_score": 1,
+                "weight": 0.4,
+                "weighted_contribution": 0.4,
+                "evidence_ref": {
+                  "artifact_ref": "orca_candidates.json",
+                  "json_pointer": "/objects/36/role",
+                  "run_id": "guided-1776917529524",
+                  "observation_type": "action_source_role"
+                },
+                "hint": "Source object 'cluster-cluster-52' exposes actionable role"
+              }
+            ]
+          },
+          "preconditions": [],
+          "role_hints": [],
+          "state_hints": [],
+          "member_instances": [
+            {
+              "artifact_ref": "orca_candidates.json",
+              "json_pointer": "/action_candidates/9",
+              "run_id": "guided-1776917529524",
+              "source_surface": "dom",
+              "observation_type": "orca_action"
+            }
+          ]
+        }
+      ],
+      "minimum_preconditions": [],
+      "lifecycle_hints": [],
+      "conflicts": [],
+      "resolution_strategy": "identity_node",
+      "derived_from_runs": [
+        "guided-1776917529524"
+      ]
+    },
+    {
+      "canonical_id": "capability:darktext-blue-400",
+      "display_label": "Dark:Text Blue 400",
+      "presentations": [
+        {
+          "surface": "dom",
+          "label": "Dark:Text Blue 400",
+          "confidence": {
+            "total": 0.65,
+            "method": "weighted_blend_v1",
+            "signals": [
+              {
+                "type": "composition_pattern",
+                "raw_score": 1,
+                "weight": 0.4,
+                "weighted_contribution": 0.4,
+                "evidence_ref": {
+                  "artifact_ref": "orca_candidates.json",
+                  "json_pointer": "/objects/10/inferred_role",
+                  "run_id": "guided-1776917529524",
+                  "observation_type": "action_source_role"
+                },
+                "hint": "Source object 'cluster-cluster-17' exposes actionable role"
+              },
+              {
+                "type": "composition_pattern",
+                "raw_score": 1,
+                "weight": 0.15,
+                "weighted_contribution": 0.15,
+                "evidence_ref": {
+                  "artifact_ref": "orca_candidates.json",
+                  "json_pointer": "/objects/10/inferred_role",
+                  "run_id": "guided-1776917529524",
+                  "observation_type": "action_role_confirmation"
+                },
+                "hint": "Source object inferred_role 'link' confirmed actionability"
+              },
+              {
+                "type": "entity_link",
+                "raw_score": 1,
+                "weight": 0.1,
+                "weighted_contribution": 0.1,
+                "evidence_ref": {
+                  "artifact_ref": "orca_candidates.json",
+                  "json_pointer": "/action_candidates/2/target_entity_id",
+                  "run_id": "guided-1776917529524",
+                  "observation_type": "action_target_entity"
+                },
+                "hint": "Action linked to 'entity-document'"
+              }
+            ]
+          },
+          "preconditions": [
+            {
+              "type": "data",
+              "description": "Requires existing document — action verb 'navigate' operates on a specific entity",
+              "confidence": 0.55,
+              "evidence_chain": [
+                {
+                  "pass": "orca.infer",
+                  "artifact": "orca_candidates.json",
+                  "selector": "api_association:cluster-cluster-17"
+                }
+              ],
+              "decomposition": {
+                "total": 0.55,
+                "method": "threshold_gate_v1",
+                "signals": [
+                  {
+                    "type": "entity_link",
+                    "raw_score": 0.55,
+                    "weight": 1,
+                    "weighted_contribution": 0.55,
+                    "evidence_ref": {
+                      "artifact_ref": "orca_candidates.json",
+                      "json_pointer": "/action_candidates/2/preconditions/0/evidence_chain/0",
+                      "run_id": "guided-1776917529524",
+                      "observation_type": "action_precondition"
+                    },
+                    "hint": "Requires existing document — action verb 'navigate' operates on a specific entity"
+                  }
+                ]
+              }
+            }
+          ],
+          "role_hints": [],
+          "state_hints": [],
+          "member_instances": [
+            {
+              "artifact_ref": "orca_candidates.json",
+              "json_pointer": "/action_candidates/2",
+              "run_id": "guided-1776917529524",
+              "source_surface": "dom",
+              "observation_type": "orca_action"
+            }
+          ]
+        }
+      ],
+      "minimum_preconditions": [
+        {
+          "type": "data",
+          "description": "Requires existing document — action verb 'navigate' operates on a specific entity",
+          "confidence": 0.55,
+          "evidence_chain": [
+            {
+              "pass": "orca.infer",
+              "artifact": "orca_candidates.json",
+              "selector": "api_association:cluster-cluster-17"
+            }
+          ],
+          "decomposition": {
+            "total": 0.55,
+            "method": "threshold_gate_v1",
+            "signals": [
+              {
+                "type": "entity_link",
+                "raw_score": 0.55,
+                "weight": 1,
+                "weighted_contribution": 0.55,
+                "evidence_ref": {
+                  "artifact_ref": "orca_candidates.json",
+                  "json_pointer": "/action_candidates/2/preconditions/0/evidence_chain/0",
+                  "run_id": "guided-1776917529524",
+                  "observation_type": "action_precondition"
+                },
+                "hint": "Requires existing document — action verb 'navigate' operates on a specific entity"
+              }
+            ]
+          }
+        }
+      ],
+      "lifecycle_hints": [],
+      "conflicts": [],
+      "resolution_strategy": "action_signature",
+      "derived_from_runs": [
+        "guided-1776917529524"
+      ]
+    },
+    {
+      "canonical_id": "capability:darktext-gray-300",
+      "display_label": "Dark:Text Gray 300",
+      "presentations": [
+        {
+          "surface": "dom",
+          "label": "Dark:Border Gray 600",
+          "confidence": {
+            "total": 0.5,
+            "method": "weighted_blend_v1",
+            "signals": [
+              {
+                "type": "composition_pattern",
+                "raw_score": 1,
+                "weight": 0.4,
+                "weighted_contribution": 0.4,
+                "evidence_ref": {
+                  "artifact_ref": "orca_candidates.json",
+                  "json_pointer": "/objects/34/role",
+                  "run_id": "guided-1776917529524",
+                  "observation_type": "action_source_role"
+                },
+                "hint": "Source object 'cluster-cluster-41' exposes actionable role"
+              },
+              {
+                "type": "entity_link",
+                "raw_score": 1,
+                "weight": 0.1,
+                "weighted_contribution": 0.1,
+                "evidence_ref": {
+                  "artifact_ref": "orca_candidates.json",
+                  "json_pointer": "/action_candidates/8/target_entity_id",
+                  "run_id": "guided-1776917529524",
+                  "observation_type": "action_target_entity"
+                },
+                "hint": "Action linked to 'entity-project'"
+              }
+            ]
+          },
+          "preconditions": [
+            {
+              "type": "data",
+              "description": "Requires existing project — action verb 'submit' operates on a specific entity",
+              "confidence": 0.55,
+              "evidence_chain": [
+                {
+                  "pass": "orca.infer",
+                  "artifact": "orca_candidates.json",
+                  "selector": "api_association:cluster-cluster-41"
+                }
+              ],
+              "decomposition": {
+                "total": 0.55,
+                "method": "threshold_gate_v1",
+                "signals": [
+                  {
+                    "type": "entity_link",
+                    "raw_score": 0.55,
+                    "weight": 1,
+                    "weighted_contribution": 0.55,
+                    "evidence_ref": {
+                      "artifact_ref": "orca_candidates.json",
+                      "json_pointer": "/action_candidates/8/preconditions/0/evidence_chain/0",
+                      "run_id": "guided-1776917529524",
+                      "observation_type": "action_precondition"
+                    },
+                    "hint": "Requires existing project — action verb 'submit' operates on a specific entity"
+                  }
+                ]
+              }
+            }
+          ],
+          "role_hints": [],
+          "state_hints": [],
+          "member_instances": [
+            {
+              "artifact_ref": "orca_candidates.json",
+              "json_pointer": "/action_candidates/8",
+              "run_id": "guided-1776917529524",
+              "source_surface": "dom",
+              "observation_type": "orca_action"
+            }
+          ]
+        },
+        {
+          "surface": "dom",
+          "label": "Dark:Text Gray 300",
+          "confidence": {
+            "total": 0.65,
+            "method": "weighted_blend_v1",
+            "signals": [
+              {
+                "type": "composition_pattern",
+                "raw_score": 1,
+                "weight": 0.4,
+                "weighted_contribution": 0.4,
+                "evidence_ref": {
+                  "artifact_ref": "orca_candidates.json",
+                  "json_pointer": "/objects/15/inferred_role",
+                  "run_id": "guided-1776917529524",
+                  "observation_type": "action_source_role"
+                },
+                "hint": "Source object 'cluster-cluster-26' exposes actionable role"
+              },
+              {
+                "type": "composition_pattern",
+                "raw_score": 1,
+                "weight": 0.15,
+                "weighted_contribution": 0.15,
+                "evidence_ref": {
+                  "artifact_ref": "orca_candidates.json",
+                  "json_pointer": "/objects/15/inferred_role",
+                  "run_id": "guided-1776917529524",
+                  "observation_type": "action_role_confirmation"
+                },
+                "hint": "Source object inferred_role 'form-control' confirmed actionability"
+              },
+              {
+                "type": "entity_link",
+                "raw_score": 1,
+                "weight": 0.1,
+                "weighted_contribution": 0.1,
+                "evidence_ref": {
+                  "artifact_ref": "orca_candidates.json",
+                  "json_pointer": "/action_candidates/4/target_entity_id",
+                  "run_id": "guided-1776917529524",
+                  "observation_type": "action_target_entity"
+                },
+                "hint": "Action linked to 'entity-project'"
+              }
+            ]
+          },
+          "preconditions": [
+            {
+              "type": "data",
+              "description": "Requires a selected project — action sits inside list cluster 'Dark:Text Gray 300'",
+              "confidence": 0.7,
+              "evidence_chain": [
+                {
+                  "pass": "dom.components",
+                  "artifact": "component_clusters.json",
+                  "selector": "Dark:Text Gray 300"
+                }
+              ],
+              "decomposition": {
+                "total": 0.7,
+                "method": "threshold_gate_v1",
+                "signals": [
+                  {
+                    "type": "composition_pattern",
+                    "raw_score": 0.7,
+                    "weight": 1,
+                    "weighted_contribution": 0.7,
+                    "evidence_ref": {
+                      "artifact_ref": "orca_candidates.json",
+                      "json_pointer": "/action_candidates/4/preconditions/0/evidence_chain/0",
+                      "run_id": "guided-1776917529524",
+                      "observation_type": "action_precondition"
+                    },
+                    "hint": "Requires a selected project — action sits inside list cluster 'Dark:Text Gray 300'"
+                  }
+                ]
+              }
+            }
+          ],
+          "role_hints": [],
+          "state_hints": [],
+          "member_instances": [
+            {
+              "artifact_ref": "orca_candidates.json",
+              "json_pointer": "/action_candidates/4",
+              "run_id": "guided-1776917529524",
+              "source_surface": "dom",
+              "observation_type": "orca_action"
+            }
+          ]
+        }
+      ],
+      "minimum_preconditions": [],
+      "lifecycle_hints": [],
+      "conflicts": [],
+      "resolution_strategy": "action_signature",
+      "derived_from_runs": [
+        "guided-1776917529524"
+      ]
+    },
+    {
+      "canonical_id": "capability:font-bold",
+      "display_label": "Font Bold",
+      "presentations": [
+        {
+          "surface": "dom",
+          "label": "Font Bold",
+          "confidence": {
+            "total": 0.65,
+            "method": "weighted_blend_v1",
+            "signals": [
+              {
+                "type": "composition_pattern",
+                "raw_score": 1,
+                "weight": 0.4,
+                "weighted_contribution": 0.4,
+                "evidence_ref": {
+                  "artifact_ref": "orca_candidates.json",
+                  "json_pointer": "/objects/4/inferred_role",
+                  "run_id": "guided-1776917529524",
+                  "observation_type": "action_source_role"
+                },
+                "hint": "Source object 'cluster-cluster-0' exposes actionable role"
+              },
+              {
+                "type": "composition_pattern",
+                "raw_score": 1,
+                "weight": 0.15,
+                "weighted_contribution": 0.15,
+                "evidence_ref": {
+                  "artifact_ref": "orca_candidates.json",
+                  "json_pointer": "/objects/4/inferred_role",
+                  "run_id": "guided-1776917529524",
+                  "observation_type": "action_role_confirmation"
+                },
+                "hint": "Source object inferred_role 'link' confirmed actionability"
+              },
+              {
+                "type": "entity_link",
+                "raw_score": 1,
+                "weight": 0.1,
+                "weighted_contribution": 0.1,
+                "evidence_ref": {
+                  "artifact_ref": "orca_candidates.json",
+                  "json_pointer": "/action_candidates/0/target_entity_id",
+                  "run_id": "guided-1776917529524",
+                  "observation_type": "action_target_entity"
+                },
+                "hint": "Action linked to 'entity-collection'"
+              }
+            ]
+          },
+          "preconditions": [
+            {
+              "type": "data",
+              "description": "Requires existing collection — action verb 'navigate' operates on a specific entity",
+              "confidence": 0.55,
+              "evidence_chain": [
+                {
+                  "pass": "orca.infer",
+                  "artifact": "orca_candidates.json",
+                  "selector": "api_association:cluster-cluster-0"
+                }
+              ],
+              "decomposition": {
+                "total": 0.55,
+                "method": "threshold_gate_v1",
+                "signals": [
+                  {
+                    "type": "entity_link",
+                    "raw_score": 0.55,
+                    "weight": 1,
+                    "weighted_contribution": 0.55,
+                    "evidence_ref": {
+                      "artifact_ref": "orca_candidates.json",
+                      "json_pointer": "/action_candidates/0/preconditions/0/evidence_chain/0",
+                      "run_id": "guided-1776917529524",
+                      "observation_type": "action_precondition"
+                    },
+                    "hint": "Requires existing collection — action verb 'navigate' operates on a specific entity"
+                  }
+                ]
+              }
+            }
+          ],
+          "role_hints": [],
+          "state_hints": [],
+          "member_instances": [
+            {
+              "artifact_ref": "orca_candidates.json",
+              "json_pointer": "/action_candidates/0",
+              "run_id": "guided-1776917529524",
+              "source_surface": "dom",
+              "observation_type": "orca_action"
+            }
+          ]
+        }
+      ],
+      "minimum_preconditions": [
+        {
+          "type": "data",
+          "description": "Requires existing collection — action verb 'navigate' operates on a specific entity",
+          "confidence": 0.55,
+          "evidence_chain": [
+            {
+              "pass": "orca.infer",
+              "artifact": "orca_candidates.json",
+              "selector": "api_association:cluster-cluster-0"
+            }
+          ],
+          "decomposition": {
+            "total": 0.55,
+            "method": "threshold_gate_v1",
+            "signals": [
+              {
+                "type": "entity_link",
+                "raw_score": 0.55,
+                "weight": 1,
+                "weighted_contribution": 0.55,
+                "evidence_ref": {
+                  "artifact_ref": "orca_candidates.json",
+                  "json_pointer": "/action_candidates/0/preconditions/0/evidence_chain/0",
+                  "run_id": "guided-1776917529524",
+                  "observation_type": "action_precondition"
+                },
+                "hint": "Requires existing collection — action verb 'navigate' operates on a specific entity"
+              }
+            ]
+          }
+        }
+      ],
+      "lifecycle_hints": [],
+      "conflicts": [],
+      "resolution_strategy": "action_signature",
+      "derived_from_runs": [
+        "guided-1776917529524"
+      ]
+    },
+    {
+      "canonical_id": "capability:font-medium",
+      "display_label": "Font Medium",
+      "presentations": [
+        {
+          "surface": "dom",
+          "label": "Border White/5",
+          "confidence": {
+            "total": 0.5,
+            "method": "weighted_blend_v1",
+            "signals": [
+              {
+                "type": "composition_pattern",
+                "raw_score": 1,
+                "weight": 0.4,
+                "weighted_contribution": 0.4,
+                "evidence_ref": {
+                  "artifact_ref": "orca_candidates.json",
+                  "json_pointer": "/objects/26/role",
+                  "run_id": "guided-1776917529524",
+                  "observation_type": "action_source_role"
+                },
+                "hint": "Source object 'cluster-cluster-10' exposes actionable role"
+              },
+              {
+                "type": "entity_link",
+                "raw_score": 1,
+                "weight": 0.1,
+                "weighted_contribution": 0.1,
+                "evidence_ref": {
+                  "artifact_ref": "orca_candidates.json",
+                  "json_pointer": "/action_candidates/7/target_entity_id",
+                  "run_id": "guided-1776917529524",
+                  "observation_type": "action_target_entity"
+                },
+                "hint": "Action linked to 'entity-mission'"
+              }
+            ]
+          },
+          "preconditions": [
+            {
+              "type": "auth",
+              "description": "Authenticated session required — route under /settings implies authenticated session",
+              "confidence": 0.75,
+              "evidence_chain": [
+                {
+                  "pass": "ia.outline",
+                  "artifact": "ia_outline.json",
+                  "selector": "/settings"
+                }
+              ],
+              "decomposition": {
+                "total": 0.75,
+                "method": "threshold_gate_v1",
+                "signals": [
+                  {
+                    "type": "route_match",
+                    "raw_score": 0.75,
+                    "weight": 1,
+                    "weighted_contribution": 0.75,
+                    "evidence_ref": {
+                      "artifact_ref": "orca_candidates.json",
+                      "json_pointer": "/action_candidates/7/preconditions/0/evidence_chain/0",
+                      "run_id": "guided-1776917529524",
+                      "observation_type": "action_precondition"
+                    },
+                    "hint": "Authenticated session required — route under /settings implies authenticated session"
+                  }
+                ]
+              }
+            },
+            {
+              "type": "data",
+              "description": "Requires existing mission — action verb 'submit' operates on a specific entity",
+              "confidence": 0.55,
+              "evidence_chain": [
+                {
+                  "pass": "orca.infer",
+                  "artifact": "orca_candidates.json",
+                  "selector": "api_association:cluster-cluster-10"
+                }
+              ],
+              "decomposition": {
+                "total": 0.55,
+                "method": "threshold_gate_v1",
+                "signals": [
+                  {
+                    "type": "entity_link",
+                    "raw_score": 0.55,
+                    "weight": 1,
+                    "weighted_contribution": 0.55,
+                    "evidence_ref": {
+                      "artifact_ref": "orca_candidates.json",
+                      "json_pointer": "/action_candidates/7/preconditions/1/evidence_chain/0",
+                      "run_id": "guided-1776917529524",
+                      "observation_type": "action_precondition"
+                    },
+                    "hint": "Requires existing mission — action verb 'submit' operates on a specific entity"
+                  }
+                ]
+              }
+            }
+          ],
+          "role_hints": [],
+          "state_hints": [],
+          "member_instances": [
+            {
+              "artifact_ref": "orca_candidates.json",
+              "json_pointer": "/action_candidates/7",
+              "run_id": "guided-1776917529524",
+              "source_surface": "dom",
+              "observation_type": "orca_action"
+            }
+          ]
+        },
+        {
+          "surface": "dom",
+          "label": "Font Medium",
+          "confidence": {
+            "total": 0.65,
+            "method": "weighted_blend_v1",
+            "signals": [
+              {
+                "type": "composition_pattern",
+                "raw_score": 1,
+                "weight": 0.4,
+                "weighted_contribution": 0.4,
+                "evidence_ref": {
+                  "artifact_ref": "orca_candidates.json",
+                  "json_pointer": "/objects/13/inferred_role",
+                  "run_id": "guided-1776917529524",
+                  "observation_type": "action_source_role"
+                },
+                "hint": "Source object 'cluster-cluster-25' exposes actionable role"
+              },
+              {
+                "type": "composition_pattern",
+                "raw_score": 1,
+                "weight": 0.15,
+                "weighted_contribution": 0.15,
+                "evidence_ref": {
+                  "artifact_ref": "orca_candidates.json",
+                  "json_pointer": "/objects/13/inferred_role",
+                  "run_id": "guided-1776917529524",
+                  "observation_type": "action_role_confirmation"
+                },
+                "hint": "Source object inferred_role 'form-control' confirmed actionability"
+              },
+              {
+                "type": "entity_link",
+                "raw_score": 1,
+                "weight": 0.1,
+                "weighted_contribution": 0.1,
+                "evidence_ref": {
+                  "artifact_ref": "orca_candidates.json",
+                  "json_pointer": "/action_candidates/3/target_entity_id",
+                  "run_id": "guided-1776917529524",
+                  "observation_type": "action_target_entity"
+                },
+                "hint": "Action linked to 'entity-mission'"
+              }
+            ]
+          },
+          "preconditions": [
+            {
+              "type": "auth",
+              "description": "Authenticated session required — route under /settings implies authenticated session",
+              "confidence": 0.75,
+              "evidence_chain": [
+                {
+                  "pass": "ia.outline",
+                  "artifact": "ia_outline.json",
+                  "selector": "/settings"
+                }
+              ],
+              "decomposition": {
+                "total": 0.75,
+                "method": "threshold_gate_v1",
+                "signals": [
+                  {
+                    "type": "route_match",
+                    "raw_score": 0.75,
+                    "weight": 1,
+                    "weighted_contribution": 0.75,
+                    "evidence_ref": {
+                      "artifact_ref": "orca_candidates.json",
+                      "json_pointer": "/action_candidates/3/preconditions/0/evidence_chain/0",
+                      "run_id": "guided-1776917529524",
+                      "observation_type": "action_precondition"
+                    },
+                    "hint": "Authenticated session required — route under /settings implies authenticated session"
+                  }
+                ]
+              }
+            },
+            {
+              "type": "data",
+              "description": "Requires existing mission — action verb 'submit' operates on a specific entity",
+              "confidence": 0.55,
+              "evidence_chain": [
+                {
+                  "pass": "orca.infer",
+                  "artifact": "orca_candidates.json",
+                  "selector": "api_association:cluster-cluster-25"
+                }
+              ],
+              "decomposition": {
+                "total": 0.55,
+                "method": "threshold_gate_v1",
+                "signals": [
+                  {
+                    "type": "entity_link",
+                    "raw_score": 0.55,
+                    "weight": 1,
+                    "weighted_contribution": 0.55,
+                    "evidence_ref": {
+                      "artifact_ref": "orca_candidates.json",
+                      "json_pointer": "/action_candidates/3/preconditions/1/evidence_chain/0",
+                      "run_id": "guided-1776917529524",
+                      "observation_type": "action_precondition"
+                    },
+                    "hint": "Requires existing mission — action verb 'submit' operates on a specific entity"
+                  }
+                ]
+              }
+            }
+          ],
+          "role_hints": [],
+          "state_hints": [],
+          "member_instances": [
+            {
+              "artifact_ref": "orca_candidates.json",
+              "json_pointer": "/action_candidates/3",
+              "run_id": "guided-1776917529524",
+              "source_surface": "dom",
+              "observation_type": "orca_action"
+            }
+          ]
+        },
+        {
+          "surface": "dom",
+          "label": "Hover:Text Sky 300",
+          "confidence": {
+            "total": 0.5,
+            "method": "weighted_blend_v1",
+            "signals": [
+              {
+                "type": "composition_pattern",
+                "raw_score": 1,
+                "weight": 0.4,
+                "weighted_contribution": 0.4,
+                "evidence_ref": {
+                  "artifact_ref": "orca_candidates.json",
+                  "json_pointer": "/objects/19/role",
+                  "run_id": "guided-1776917529524",
+                  "observation_type": "action_source_role"
+                },
+                "hint": "Source object 'cluster-cluster-8' exposes actionable role"
+              },
+              {
+                "type": "entity_link",
+                "raw_score": 1,
+                "weight": 0.1,
+                "weighted_contribution": 0.1,
+                "evidence_ref": {
+                  "artifact_ref": "orca_candidates.json",
+                  "json_pointer": "/action_candidates/5/target_entity_id",
+                  "run_id": "guided-1776917529524",
+                  "observation_type": "action_target_entity"
+                },
+                "hint": "Action linked to 'entity-mission'"
+              }
+            ]
+          },
+          "preconditions": [
+            {
+              "type": "data",
+              "description": "Requires existing mission — action verb 'submit' operates on a specific entity",
+              "confidence": 0.55,
+              "evidence_chain": [
+                {
+                  "pass": "orca.infer",
+                  "artifact": "orca_candidates.json",
+                  "selector": "api_association:cluster-cluster-8"
+                }
+              ],
+              "decomposition": {
+                "total": 0.55,
+                "method": "threshold_gate_v1",
+                "signals": [
+                  {
+                    "type": "entity_link",
+                    "raw_score": 0.55,
+                    "weight": 1,
+                    "weighted_contribution": 0.55,
+                    "evidence_ref": {
+                      "artifact_ref": "orca_candidates.json",
+                      "json_pointer": "/action_candidates/5/preconditions/0/evidence_chain/0",
+                      "run_id": "guided-1776917529524",
+                      "observation_type": "action_precondition"
+                    },
+                    "hint": "Requires existing mission — action verb 'submit' operates on a specific entity"
+                  }
+                ]
+              }
+            }
+          ],
+          "role_hints": [],
+          "state_hints": [],
+          "member_instances": [
+            {
+              "artifact_ref": "orca_candidates.json",
+              "json_pointer": "/action_candidates/5",
+              "run_id": "guided-1776917529524",
+              "source_surface": "dom",
+              "observation_type": "orca_action"
+            }
+          ]
+        }
+      ],
+      "minimum_preconditions": [
+        {
+          "type": "data",
+          "description": "Requires existing mission — action verb 'submit' operates on a specific entity",
+          "confidence": 0.55,
+          "evidence_chain": [
+            {
+              "pass": "orca.infer",
+              "artifact": "orca_candidates.json",
+              "selector": "api_association:cluster-cluster-10"
+            }
+          ],
+          "decomposition": {
+            "total": 0.55,
+            "method": "threshold_gate_v1",
+            "signals": [
+              {
+                "type": "entity_link",
+                "raw_score": 0.55,
+                "weight": 1,
+                "weighted_contribution": 0.55,
+                "evidence_ref": {
+                  "artifact_ref": "orca_candidates.json",
+                  "json_pointer": "/action_candidates/7/preconditions/1/evidence_chain/0",
+                  "run_id": "guided-1776917529524",
+                  "observation_type": "action_precondition"
+                },
+                "hint": "Requires existing mission — action verb 'submit' operates on a specific entity"
+              }
+            ]
+          }
+        }
+      ],
+      "lifecycle_hints": [],
+      "conflicts": [],
+      "resolution_strategy": "action_signature",
+      "derived_from_runs": [
+        "guided-1776917529524"
+      ]
+    },
+    {
+      "canonical_id": "capability:form",
+      "display_label": "Form",
+      "presentations": [
+        {
+          "surface": "dom",
+          "label": "Form",
+          "confidence": {
+            "total": 0.55,
+            "method": "weighted_blend_v1",
+            "signals": [
+              {
+                "type": "composition_pattern",
+                "raw_score": 1,
+                "weight": 0.4,
+                "weighted_contribution": 0.4,
+                "evidence_ref": {
+                  "artifact_ref": "orca_candidates.json",
+                  "json_pointer": "/objects/37/inferred_role",
+                  "run_id": "guided-1776917529524",
+                  "observation_type": "action_source_role"
+                },
+                "hint": "Source object 'cluster-cluster-54' exposes actionable role"
+              },
+              {
+                "type": "composition_pattern",
+                "raw_score": 1,
+                "weight": 0.15,
+                "weighted_contribution": 0.15,
+                "evidence_ref": {
+                  "artifact_ref": "orca_candidates.json",
+                  "json_pointer": "/objects/37/inferred_role",
+                  "run_id": "guided-1776917529524",
+                  "observation_type": "action_role_confirmation"
+                },
+                "hint": "Source object inferred_role 'form-control' confirmed actionability"
+              }
+            ]
+          },
+          "preconditions": [
+            {
+              "type": "auth",
+              "description": "Authenticated session required — route under /settings implies authenticated session",
+              "confidence": 0.75,
+              "evidence_chain": [
+                {
+                  "pass": "ia.outline",
+                  "artifact": "ia_outline.json",
+                  "selector": "/settings"
+                }
+              ],
+              "decomposition": {
+                "total": 0.75,
+                "method": "threshold_gate_v1",
+                "signals": [
+                  {
+                    "type": "route_match",
+                    "raw_score": 0.75,
+                    "weight": 1,
+                    "weighted_contribution": 0.75,
+                    "evidence_ref": {
+                      "artifact_ref": "orca_candidates.json",
+                      "json_pointer": "/action_candidates/10/preconditions/0/evidence_chain/0",
+                      "run_id": "guided-1776917529524",
+                      "observation_type": "action_precondition"
+                    },
+                    "hint": "Authenticated session required — route under /settings implies authenticated session"
+                  }
+                ]
+              }
+            }
+          ],
+          "role_hints": [],
+          "state_hints": [],
+          "member_instances": [
+            {
+              "artifact_ref": "orca_candidates.json",
+              "json_pointer": "/action_candidates/10",
+              "run_id": "guided-1776917529524",
+              "source_surface": "dom",
+              "observation_type": "orca_action"
+            }
+          ]
+        }
+      ],
+      "minimum_preconditions": [
+        {
+          "type": "auth",
+          "description": "Authenticated session required — route under /settings implies authenticated session",
+          "confidence": 0.75,
+          "evidence_chain": [
+            {
+              "pass": "ia.outline",
+              "artifact": "ia_outline.json",
+              "selector": "/settings"
+            }
+          ],
+          "decomposition": {
+            "total": 0.75,
+            "method": "threshold_gate_v1",
+            "signals": [
+              {
+                "type": "route_match",
+                "raw_score": 0.75,
+                "weight": 1,
+                "weighted_contribution": 0.75,
+                "evidence_ref": {
+                  "artifact_ref": "orca_candidates.json",
+                  "json_pointer": "/action_candidates/10/preconditions/0/evidence_chain/0",
+                  "run_id": "guided-1776917529524",
+                  "observation_type": "action_precondition"
+                },
+                "hint": "Authenticated session required — route under /settings implies authenticated session"
+              }
+            ]
+          }
+        }
+      ],
+      "lifecycle_hints": [],
+      "conflicts": [],
+      "resolution_strategy": "identity_node",
+      "derived_from_runs": [
+        "guided-1776917529524"
+      ]
+    },
+    {
+      "canonical_id": "capability:rounded-xl",
+      "display_label": "Rounded Xl",
+      "presentations": [
+        {
+          "surface": "dom",
+          "label": "Dark:Border Gray 700",
+          "confidence": {
+            "total": 0.5,
+            "method": "weighted_blend_v1",
+            "signals": [
+              {
+                "type": "composition_pattern",
+                "raw_score": 1,
+                "weight": 0.4,
+                "weighted_contribution": 0.4,
+                "evidence_ref": {
+                  "artifact_ref": "orca_candidates.json",
+                  "json_pointer": "/objects/25/role",
+                  "run_id": "guided-1776917529524",
+                  "observation_type": "action_source_role"
+                },
+                "hint": "Source object 'cluster-cluster-39' exposes actionable role"
+              },
+              {
+                "type": "entity_link",
+                "raw_score": 1,
+                "weight": 0.1,
+                "weighted_contribution": 0.1,
+                "evidence_ref": {
+                  "artifact_ref": "orca_candidates.json",
+                  "json_pointer": "/action_candidates/6/target_entity_id",
+                  "run_id": "guided-1776917529524",
+                  "observation_type": "action_target_entity"
+                },
+                "hint": "Action linked to 'entity-document'"
+              }
+            ]
+          },
+          "preconditions": [
+            {
+              "type": "data",
+              "description": "Requires existing document — action verb 'submit' operates on a specific entity",
+              "confidence": 0.55,
+              "evidence_chain": [
+                {
+                  "pass": "orca.infer",
+                  "artifact": "orca_candidates.json",
+                  "selector": "api_association:cluster-cluster-39"
+                }
+              ],
+              "decomposition": {
+                "total": 0.55,
+                "method": "threshold_gate_v1",
+                "signals": [
+                  {
+                    "type": "entity_link",
+                    "raw_score": 0.55,
+                    "weight": 1,
+                    "weighted_contribution": 0.55,
+                    "evidence_ref": {
+                      "artifact_ref": "orca_candidates.json",
+                      "json_pointer": "/action_candidates/6/preconditions/0/evidence_chain/0",
+                      "run_id": "guided-1776917529524",
+                      "observation_type": "action_precondition"
+                    },
+                    "hint": "Requires existing document — action verb 'submit' operates on a specific entity"
+                  }
+                ]
+              }
+            }
+          ],
+          "role_hints": [],
+          "state_hints": [],
+          "member_instances": [
+            {
+              "artifact_ref": "orca_candidates.json",
+              "json_pointer": "/action_candidates/6",
+              "run_id": "guided-1776917529524",
+              "source_surface": "dom",
+              "observation_type": "orca_action"
+            }
+          ]
+        },
+        {
+          "surface": "dom",
+          "label": "Rounded Xl",
+          "confidence": {
+            "total": 0.5,
+            "method": "weighted_blend_v1",
+            "signals": [
+              {
+                "type": "composition_pattern",
+                "raw_score": 1,
+                "weight": 0.4,
+                "weighted_contribution": 0.4,
+                "evidence_ref": {
+                  "artifact_ref": "orca_candidates.json",
+                  "json_pointer": "/objects/9/role",
+                  "run_id": "guided-1776917529524",
+                  "observation_type": "action_source_role"
+                },
+                "hint": "Source object 'cluster-cluster-9' exposes actionable role"
+              },
+              {
+                "type": "entity_link",
+                "raw_score": 1,
+                "weight": 0.1,
+                "weighted_contribution": 0.1,
+                "evidence_ref": {
+                  "artifact_ref": "orca_candidates.json",
+                  "json_pointer": "/action_candidates/1/target_entity_id",
+                  "run_id": "guided-1776917529524",
+                  "observation_type": "action_target_entity"
+                },
+                "hint": "Action linked to 'entity-document'"
+              }
+            ]
+          },
+          "preconditions": [
+            {
+              "type": "auth",
+              "description": "Authenticated session required — route under /settings implies authenticated session",
+              "confidence": 0.75,
+              "evidence_chain": [
+                {
+                  "pass": "ia.outline",
+                  "artifact": "ia_outline.json",
+                  "selector": "/settings"
+                }
+              ],
+              "decomposition": {
+                "total": 0.75,
+                "method": "threshold_gate_v1",
+                "signals": [
+                  {
+                    "type": "route_match",
+                    "raw_score": 0.75,
+                    "weight": 1,
+                    "weighted_contribution": 0.75,
+                    "evidence_ref": {
+                      "artifact_ref": "orca_candidates.json",
+                      "json_pointer": "/action_candidates/1/preconditions/0/evidence_chain/0",
+                      "run_id": "guided-1776917529524",
+                      "observation_type": "action_precondition"
+                    },
+                    "hint": "Authenticated session required — route under /settings implies authenticated session"
+                  }
+                ]
+              }
+            },
+            {
+              "type": "data",
+              "description": "Requires existing document — action verb 'submit' operates on a specific entity",
+              "confidence": 0.55,
+              "evidence_chain": [
+                {
+                  "pass": "orca.infer",
+                  "artifact": "orca_candidates.json",
+                  "selector": "api_association:cluster-cluster-9"
+                }
+              ],
+              "decomposition": {
+                "total": 0.55,
+                "method": "threshold_gate_v1",
+                "signals": [
+                  {
+                    "type": "entity_link",
+                    "raw_score": 0.55,
+                    "weight": 1,
+                    "weighted_contribution": 0.55,
+                    "evidence_ref": {
+                      "artifact_ref": "orca_candidates.json",
+                      "json_pointer": "/action_candidates/1/preconditions/1/evidence_chain/0",
+                      "run_id": "guided-1776917529524",
+                      "observation_type": "action_precondition"
+                    },
+                    "hint": "Requires existing document — action verb 'submit' operates on a specific entity"
+                  }
+                ]
+              }
+            }
+          ],
+          "role_hints": [],
+          "state_hints": [],
+          "member_instances": [
+            {
+              "artifact_ref": "orca_candidates.json",
+              "json_pointer": "/action_candidates/1",
+              "run_id": "guided-1776917529524",
+              "source_surface": "dom",
+              "observation_type": "orca_action"
+            }
+          ]
+        }
+      ],
+      "minimum_preconditions": [
+        {
+          "type": "data",
+          "description": "Requires existing document — action verb 'submit' operates on a specific entity",
+          "confidence": 0.55,
+          "evidence_chain": [
+            {
+              "pass": "orca.infer",
+              "artifact": "orca_candidates.json",
+              "selector": "api_association:cluster-cluster-39"
+            }
+          ],
+          "decomposition": {
+            "total": 0.55,
+            "method": "threshold_gate_v1",
+            "signals": [
+              {
+                "type": "entity_link",
+                "raw_score": 0.55,
+                "weight": 1,
+                "weighted_contribution": 0.55,
+                "evidence_ref": {
+                  "artifact_ref": "orca_candidates.json",
+                  "json_pointer": "/action_candidates/6/preconditions/0/evidence_chain/0",
+                  "run_id": "guided-1776917529524",
+                  "observation_type": "action_precondition"
+                },
+                "hint": "Requires existing document — action verb 'submit' operates on a specific entity"
+              }
+            ]
+          }
+        }
+      ],
+      "lifecycle_hints": [],
+      "conflicts": [],
+      "resolution_strategy": "action_signature",
+      "derived_from_runs": [
+        "guided-1776917529524"
+      ]
+    }
+  ]
+}

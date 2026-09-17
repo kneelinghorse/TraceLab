@@ -1,0 +1,244 @@
+{
+  "run_id": "guided-1776917529524",
+  "mode": "app",
+  "targets": [
+    {
+      "name": "tracelab-prod-authed",
+      "url": "https://namozine.com/"
+    }
+  ],
+  "project_id": "stage1-namozine.com-2026-04-23",
+  "auth": {
+    "type": "none",
+    "redaction": {
+      "applied": false,
+      "rules": []
+    }
+  },
+  "passes": [
+    {
+      "id": "web.crawl",
+      "version": "1.0.0",
+      "cache_key": "web.crawl-stub-guided-1776917529524",
+      "status": "ok",
+      "ms": 0
+    },
+    {
+      "id": "web.computed_styles",
+      "version": "1.0.0",
+      "cache_key": "web.computed_styles-stub-guided-1776917529524",
+      "status": "ok",
+      "ms": 9
+    },
+    {
+      "id": "web.stylesheet_rules",
+      "version": "1.0.0",
+      "cache_key": "web.stylesheet_rules-guided-guided-1776917529524",
+      "status": "ok",
+      "ms": 9
+    },
+    {
+      "id": "dom.components",
+      "version": "1.0.0",
+      "cache_key": "dom.components-v1-https://namozine.com/",
+      "status": "ok",
+      "ms": 188
+    },
+    {
+      "id": "ia.outline",
+      "version": "1.0.0",
+      "cache_key": "ia.outline-v1-https://namozine.com/",
+      "status": "ok",
+      "ms": 181
+    },
+    {
+      "id": "style.fingerprint",
+      "version": "1.0.0",
+      "cache_key": "style.fingerprint-v1-https://namozine.com/",
+      "status": "ok",
+      "ms": 30
+    },
+    {
+      "id": "token.guess",
+      "version": "2.1.0",
+      "cache_key": "token.guess-v2.1-https://namozine.com/",
+      "status": "ok",
+      "ms": 50
+    },
+    {
+      "id": "semantic.component_clustering",
+      "version": "1.0.0",
+      "cache_key": "semantic.component_clustering-v1-https://namozine.com/",
+      "status": "ok",
+      "ms": 50
+    },
+    {
+      "id": "style.breakpoints",
+      "version": "1.0.0",
+      "cache_key": "style.breakpoints-v1-https://namozine.com/",
+      "status": "ok",
+      "ms": 2
+    },
+    {
+      "id": "style.theming",
+      "version": "1.0.0",
+      "cache_key": "style.theming-v1-https://namozine.com/",
+      "status": "ok",
+      "ms": 2
+    },
+    {
+      "id": "semantic.composition_patterns",
+      "version": "1.0.0",
+      "cache_key": "semantic.composition_patterns-v1-https://namozine.com/",
+      "status": "ok",
+      "ms": 4
+    },
+    {
+      "id": "app.profile",
+      "version": "1.0.0",
+      "cache_key": "app.profile-v1-https://namozine.com/",
+      "status": "ok",
+      "ms": 5
+    },
+    {
+      "id": "orca.extract",
+      "version": "2.0.0",
+      "cache_key": "orca.extract-v2-guided-1776917529524",
+      "status": "ok",
+      "ms": 5
+    },
+    {
+      "id": "orca.infer",
+      "version": "1.0.0",
+      "cache_key": "orca-infer-guided-1776917529524-https://namozine.com/",
+      "status": "ok",
+      "ms": 29
+    },
+    {
+      "id": "identity.surface_entities",
+      "version": "1.0.0",
+      "cache_key": "identity-surface-entities-v1-fb663a8236d4",
+      "status": "ok",
+      "ms": 13
+    },
+    {
+      "id": "identity.cross_surface_resolution",
+      "version": "1.2.0",
+      "cache_key": "identity-cross-surface-resolution-v3-64baae4a527e",
+      "status": "ok",
+      "ms": 85
+    },
+    {
+      "id": "semantic.capability_rollup",
+      "version": "1.2.0",
+      "cache_key": "semantic-capability-rollup-v2-bd4e46bd2428",
+      "status": "ok",
+      "ms": 40
+    },
+    {
+      "id": "semantic.object_rollup",
+      "version": "1.1.0",
+      "cache_key": "semantic-object-rollup-v2-cb05affccc3e",
+      "status": "ok",
+      "ms": 38
+    }
+  ],
+  "inputs": {
+    "routes": {
+      "page_types": [
+        {
+          "type": "content",
+          "routes": [
+            "/collections",
+            "/collections/6b9ba524-9bdc-4a14-9d9f-6a4ff210a069",
+            "/console",
+            "/documents",
+            "/documents/516fd80c-a295-4d4f-b49e-971ad4a41525",
+            "/documents/8cc368e5-f5a4-4c81-8909-2c9348f361db",
+            "/documents/d3800df0-bb53-421f-aa93-df4fa5739445",
+            "/missions",
+            "/projects/95dc6df6-5a69-42d5-9e33-b8e1e2726152",
+            "/projects/fbd3bd03-5ddc-49ee-8013-529163a99290",
+            "/reports/36697b37-a4cf-4074-9c01-c98e0690a3f0"
+          ],
+          "confidence": 0.95
+        },
+        {
+          "type": "form",
+          "routes": [
+            "/projects",
+            "/search",
+            "/settings"
+          ],
+          "confidence": 0.85
+        },
+        {
+          "type": "listing",
+          "routes": [
+            "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+            "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+            "/reports"
+          ],
+          "confidence": 0.85
+        }
+      ]
+    },
+    "ia_outline": {
+      "evidence": {
+        "ia_manifest_path": "evidence/ia/ia_manifest.json"
+      },
+      "artifact": {
+        "ia_outline_ref": "ia_outline.json"
+      }
+    },
+    "component_clusters": {
+      "artifact": {
+        "component_clusters_ref": "component_clusters.json"
+      }
+    },
+    "composition_patterns": {
+      "artifact": {
+        "composition_patterns_ref": "composition_patterns.json"
+      }
+    },
+    "app_profile": {
+      "artifact": {
+        "app_profile_ref": "app_profile.json"
+      }
+    },
+    "orca_extract": {
+      "artifact": {
+        "orca_candidates_ref": "orca_candidates.json"
+      }
+    },
+    "identity_surface_entities": {
+      "artifact": {
+        "identity_candidates_ref": "identity_candidates.json"
+      }
+    },
+    "identity_cross_surface_resolution": {
+      "artifact": {
+        "identity_graph_ref": "identity_graph.json"
+      }
+    },
+    "semantic_capability_rollup": {
+      "artifact": {
+        "capability_rollup_ref": "capability_rollup.json"
+      }
+    },
+    "semantic_object_rollup": {
+      "artifact": {
+        "object_rollup_ref": "object_rollup.json"
+      }
+    }
+  },
+  "outputs": {
+    "evidence_dir": "/Users/systemsystems/portfolio/TraceLab/out/stage1/tracelab-prod-guided/guided-1776917221458",
+    "artifacts_dir": "/Users/systemsystems/portfolio/TraceLab/out/stage1/tracelab-prod-guided/guided-1776917221458/artifacts"
+  },
+  "environment": {
+    "timestamp": "2026-04-23T04:12:09.525Z",
+    "stage": "production"
+  },
+  "hashes": {}
+}

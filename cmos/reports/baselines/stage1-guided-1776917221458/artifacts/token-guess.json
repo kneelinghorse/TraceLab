@@ -1,0 +1,104 @@
+{
+  "kind": "token_guess",
+  "version": "2.1.0",
+  "schema_version": "2.1.0",
+  "generated_at": "2026-04-23T04:12:09.774Z",
+  "tokens": {
+    "colors.text.primary": {
+      "value": "#4b5563",
+      "confidence": 0.46,
+      "confidenceLevel": "medium",
+      "occurrences": 234,
+      "source": "computed_style"
+    },
+    "colors.text.secondary": {
+      "value": "#111827",
+      "confidence": 0.45,
+      "confidenceLevel": "medium",
+      "occurrences": 200,
+      "source": "computed_style"
+    },
+    "colors.background": {
+      "value": "#dcfce7",
+      "confidence": 0.18,
+      "confidenceLevel": "low",
+      "occurrences": 45,
+      "source": "computed_style"
+    },
+    "colors.surface": {
+      "value": "#f3f4f6",
+      "confidence": 0.44,
+      "confidenceLevel": "medium",
+      "occurrences": 39,
+      "source": "computed_style"
+    },
+    "colors.primary": {
+      "value": "#ffffff",
+      "confidence": 0.43,
+      "confidenceLevel": "medium",
+      "occurrences": 36,
+      "source": "computed_style"
+    },
+    "typography.fontFamily.sans": {
+      "value": "Inter",
+      "confidence": 0.85,
+      "confidenceLevel": "high",
+      "occurrences": 1050,
+      "source": "computed_style"
+    },
+    "typography.fontSize.md": {
+      "value": "14px",
+      "confidence": 0.67,
+      "confidenceLevel": "medium",
+      "occurrences": 460,
+      "source": "computed_style"
+    },
+    "spacing.md": {
+      "value": "8px",
+      "confidence": 0.71,
+      "confidenceLevel": "high",
+      "occurrences": 668,
+      "source": "computed_style"
+    },
+    "radius.md": {
+      "value": "6px",
+      "confidence": 0.57,
+      "confidenceLevel": "medium",
+      "occurrences": 552,
+      "source": "computed_style"
+    }
+  },
+  "categories": {
+    "brand": [
+      "colors.primary"
+    ],
+    "surface": [
+      "colors.background",
+      "colors.surface"
+    ],
+    "text": [
+      "colors.text.primary",
+      "colors.text.secondary"
+    ],
+    "spacing": [
+      "spacing.md"
+    ],
+    "typography": [
+      "typography.fontFamily.sans",
+      "typography.fontSize.md"
+    ],
+    "border": [
+      "radius.md"
+    ]
+  },
+  "derivations": {
+    "colors.text.secondary": {
+      "derived_from": "colors.text.primary",
+      "transform": "darkened variant"
+    },
+    "colors.primary": {
+      "derived_from": "colors.background",
+      "transform": "lightened variant"
+    }
+  }
+}

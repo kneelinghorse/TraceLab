@@ -1,0 +1,19 @@
+{
+  "kind": "theming",
+  "version": "1.0.0",
+  "schema_version": "1.0.0",
+  "generated_at": "2026-04-23T04:12:09.725Z",
+  "url": "https://namozine.com/",
+  "theme_blocks": [],
+  "prefers_color_scheme": [],
+  "custom_property_inventory": [],
+  "theme_diffs": [],
+  "summary": {
+    "total_custom_properties": 0,
+    "theme_block_count": 0,
+    "has_dark_mode": false,
+    "has_light_mode": false,
+    "has_prefers_color_scheme": false,
+    "toggle_mechanisms": []
+  }
+}

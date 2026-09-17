@@ -1,0 +1,588 @@
+{
+  "kind": "style_fingerprint",
+  "version": "1.0.0",
+  "generated_at": "2026-04-23T04:12:09.746Z",
+  "sample_counts": {
+    "pages": 17,
+    "elements": 1052
+  },
+  "type_scale": {
+    "font_families": [
+      {
+        "value": "Inter",
+        "count": 1050
+      },
+      {
+        "value": "ui-monospace",
+        "count": 2
+      }
+    ],
+    "font_sizes": [
+      {
+        "px": 12,
+        "min": 12,
+        "max": 12,
+        "count": 184,
+        "token": true
+      },
+      {
+        "px": 14,
+        "min": 14,
+        "max": 14,
+        "count": 460,
+        "token": true
+      },
+      {
+        "px": 16,
+        "min": 16,
+        "max": 16,
+        "count": 292,
+        "token": true
+      },
+      {
+        "px": 18,
+        "min": 18,
+        "max": 18,
+        "count": 56,
+        "token": true
+      },
+      {
+        "px": 20,
+        "min": 20,
+        "max": 20,
+        "count": 35,
+        "token": true
+      },
+      {
+        "px": 24,
+        "min": 24,
+        "max": 24,
+        "count": 16,
+        "token": true
+      },
+      {
+        "px": 30,
+        "min": 30,
+        "max": 30,
+        "count": 9,
+        "token": true
+      }
+    ],
+    "line_heights": [
+      {
+        "px": 16,
+        "min": 16,
+        "max": 16,
+        "count": 184,
+        "token": true
+      },
+      {
+        "px": 20,
+        "min": 20,
+        "max": 20,
+        "count": 458,
+        "token": true
+      },
+      {
+        "px": 24,
+        "min": 24,
+        "max": 24,
+        "count": 197,
+        "token": true
+      },
+      {
+        "px": 26,
+        "min": 26,
+        "max": 26,
+        "count": 83,
+        "token": true
+      },
+      {
+        "px": 28,
+        "min": 28,
+        "max": 28,
+        "count": 100,
+        "token": true
+      },
+      {
+        "px": 32,
+        "min": 32,
+        "max": 32,
+        "count": 16,
+        "token": true
+      },
+      {
+        "px": 36,
+        "min": 36,
+        "max": 36,
+        "count": 9,
+        "token": true
+      }
+    ]
+  },
+  "spacing_scale": {
+    "padding": [
+      {
+        "px": 0,
+        "min": 0,
+        "max": 0,
+        "count": 2599,
+        "token": true
+      },
+      {
+        "px": 2,
+        "min": 2,
+        "max": 2,
+        "count": 94,
+        "token": true
+      },
+      {
+        "px": 4,
+        "min": 4,
+        "max": 4,
+        "count": 122,
+        "token": true
+      },
+      {
+        "px": 6,
+        "min": 6,
+        "max": 6,
+        "count": 33,
+        "token": true
+      },
+      {
+        "px": 8,
+        "min": 8,
+        "max": 8,
+        "count": 668,
+        "token": true
+      },
+      {
+        "px": 10,
+        "min": 10,
+        "max": 10,
+        "count": 2,
+        "token": false
+      },
+      {
+        "px": 12,
+        "min": 12,
+        "max": 12,
+        "count": 420,
+        "token": true
+      },
+      {
+        "px": 16,
+        "min": 16,
+        "max": 16,
+        "count": 200,
+        "token": true
+      },
+      {
+        "px": 24,
+        "min": 24,
+        "max": 24,
+        "count": 62,
+        "token": true
+      },
+      {
+        "px": 32,
+        "min": 32,
+        "max": 32,
+        "count": 6,
+        "token": true
+      },
+      {
+        "px": 40,
+        "min": 40,
+        "max": 40,
+        "count": 2,
+        "token": false
+      }
+    ],
+    "margin": [
+      {
+        "px": 0,
+        "min": -1,
+        "max": 0,
+        "count": 3940,
+        "token": true
+      },
+      {
+        "px": 4,
+        "min": 4,
+        "max": 4,
+        "count": 37,
+        "token": true
+      },
+      {
+        "px": 6,
+        "min": 6,
+        "max": 6,
+        "count": 9,
+        "token": true
+      },
+      {
+        "px": 8,
+        "min": 8,
+        "max": 8,
+        "count": 79,
+        "token": true
+      },
+      {
+        "px": 12,
+        "min": 12,
+        "max": 12,
+        "count": 41,
+        "token": true
+      },
+      {
+        "px": 16,
+        "min": 16,
+        "max": 16,
+        "count": 53,
+        "token": true
+      },
+      {
+        "px": 20,
+        "min": 20,
+        "max": 20,
+        "count": 33,
+        "token": true
+      },
+      {
+        "px": 24,
+        "min": 24,
+        "max": 24,
+        "count": 10,
+        "token": true
+      },
+      {
+        "px": 32,
+        "min": 32,
+        "max": 32,
+        "count": 4,
+        "token": true
+      },
+      {
+        "px": 95,
+        "min": 95,
+        "max": 95,
+        "count": 2,
+        "token": false
+      }
+    ]
+  },
+  "colors": {
+    "text": [
+      {
+        "value": "#4b5563",
+        "count": 234,
+        "token": true
+      },
+      {
+        "value": "#111827",
+        "count": 200,
+        "token": true
+      },
+      {
+        "value": "#f1f2f4",
+        "count": 106,
+        "token": true
+      },
+      {
+        "value": "#2563eb",
+        "count": 74,
+        "token": true
+      },
+      {
+        "value": "#6b7280",
+        "count": 71,
+        "token": true
+      },
+      {
+        "value": "#ffffff",
+        "count": 67,
+        "token": true
+      },
+      {
+        "value": "#374151",
+        "count": 56,
+        "token": true
+      },
+      {
+        "value": "#94a3b8",
+        "count": 48,
+        "token": true
+      },
+      {
+        "value": "#e2e8f0",
+        "count": 37,
+        "token": true
+      },
+      {
+        "value": "#166534",
+        "count": 35,
+        "token": true
+      },
+      {
+        "value": "#dc2626",
+        "count": 28,
+        "token": true
+      },
+      {
+        "value": "#a16207",
+        "count": 21,
+        "token": true
+      },
+      {
+        "value": "#ffffffe6",
+        "count": 16,
+        "token": true
+      },
+      {
+        "value": "#9ca3af",
+        "count": 13,
+        "token": true
+      },
+      {
+        "value": "#15803d",
+        "count": 10,
+        "token": true
+      },
+      {
+        "value": "#16a34a",
+        "count": 7,
+        "token": true
+      },
+      {
+        "value": "#ca8a04",
+        "count": 7,
+        "token": true
+      },
+      {
+        "value": "#047857",
+        "count": 5,
+        "token": true
+      },
+      {
+        "value": "#64748b",
+        "count": 5,
+        "token": true
+      },
+      {
+        "value": "#4f46e5",
+        "count": 3,
+        "token": true
+      },
+      {
+        "value": "#38bdf8",
+        "count": 2,
+        "token": false
+      },
+      {
+        "value": "#d1d5db",
+        "count": 2,
+        "token": false
+      },
+      {
+        "value": "#0f172a",
+        "count": 1,
+        "token": false
+      },
+      {
+        "value": "#1d4ed8",
+        "count": 1,
+        "token": false
+      },
+      {
+        "value": "#7e22ce",
+        "count": 1,
+        "token": false
+      },
+      {
+        "value": "#bae6fd",
+        "count": 1,
+        "token": false
+      },
+      {
+        "value": "#cbd5e1",
+        "count": 1,
+        "token": false
+      }
+    ],
+    "background": [
+      {
+        "value": "#00000000",
+        "count": 824,
+        "token": true
+      },
+      {
+        "value": "#dcfce7",
+        "count": 45,
+        "token": true
+      },
+      {
+        "value": "#f3f4f6",
+        "count": 39,
+        "token": true
+      },
+      {
+        "value": "#ffffff",
+        "count": 36,
+        "token": true
+      },
+      {
+        "value": "#fef9c3",
+        "count": 21,
+        "token": true
+      },
+      {
+        "value": "#0d101c",
+        "count": 18,
+        "token": true
+      },
+      {
+        "value": "#020617b3",
+        "count": 16,
+        "token": true
+      },
+      {
+        "value": "#00000033",
+        "count": 10,
+        "token": true
+      },
+      {
+        "value": "#2563eb",
+        "count": 10,
+        "token": true
+      },
+      {
+        "value": "#9ca3af",
+        "count": 6,
+        "token": true
+      },
+      {
+        "value": "#60a5fa",
+        "count": 4,
+        "token": true
+      },
+      {
+        "value": "#ffffff0d",
+        "count": 4,
+        "token": true
+      },
+      {
+        "value": "#d1fae5",
+        "count": 3,
+        "token": true
+      },
+      {
+        "value": "#f9fafb",
+        "count": 3,
+        "token": true
+      },
+      {
+        "value": "#0f172a66",
+        "count": 2,
+        "token": false
+      },
+      {
+        "value": "#16a34a",
+        "count": 2,
+        "token": false
+      },
+      {
+        "value": "#34d399",
+        "count": 2,
+        "token": false
+      },
+      {
+        "value": "#059669",
+        "count": 1,
+        "token": false
+      },
+      {
+        "value": "#0ea5e933",
+        "count": 1,
+        "token": false
+      },
+      {
+        "value": "#38bdf8",
+        "count": 1,
+        "token": false
+      },
+      {
+        "value": "#9333ea",
+        "count": 1,
+        "token": false
+      },
+      {
+        "value": "#dbeafe",
+        "count": 1,
+        "token": false
+      },
+      {
+        "value": "#f3e8ff",
+        "count": 1,
+        "token": false
+      },
+      {
+        "value": "#f3f4f600",
+        "count": 1,
+        "token": false
+      }
+    ]
+  },
+  "radii": [
+    {
+      "px": 0,
+      "min": 0,
+      "max": 0,
+      "count": 2712,
+      "token": true
+    },
+    {
+      "px": 4,
+      "min": 4,
+      "max": 4,
+      "count": 400,
+      "token": true
+    },
+    {
+      "px": 6,
+      "min": 6,
+      "max": 6,
+      "count": 552,
+      "token": true
+    },
+    {
+      "px": 8,
+      "min": 8,
+      "max": 8,
+      "count": 268,
+      "token": true
+    },
+    {
+      "px": 12,
+      "min": 12,
+      "max": 12,
+      "count": 44,
+      "token": true
+    },
+    {
+      "px": 20,
+      "min": 20,
+      "max": 20,
+      "count": 4,
+      "token": true
+    },
+    {
+      "px": 9999,
+      "min": 9999,
+      "max": 9999,
+      "count": 228,
+      "token": true
+    }
+  ]
+}
