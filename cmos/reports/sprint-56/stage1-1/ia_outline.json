@@ -1,0 +1,76 @@
+{
+  "kind": "ia_outline",
+  "version": "1.0.0",
+  "schema_version": "1.10.0",
+  "generated_at": "2026-09-17T02:45:06.406Z",
+  "url": "https://tracelab.aquex.ai/",
+  "routes": {
+    "discovered": [
+      "/"
+    ]
+  },
+  "taxonomy": {
+    "by_prefix": [
+      {
+        "prefix": "/",
+        "routes": [
+          "/"
+        ]
+      }
+    ]
+  },
+  "navigation": {
+    "items": [
+      {
+        "label": "Skip to content",
+        "href": "https://tracelab.aquex.ai/#main-content",
+        "route": "/",
+        "count": 1
+      },
+      {
+        "label": "TTraceLab",
+        "href": "https://tracelab.aquex.ai/",
+        "route": "/",
+        "count": 1
+      }
+    ],
+    "tree": []
+  },
+  "categories": [],
+  "facets": [],
+  "breadcrumbs": [],
+  "class_signals": {
+    "class_names": [
+      "Sign in"
+    ],
+    "published_codes": []
+  },
+  "coverage": {
+    "pages_scanned": 1,
+    "facets_recovered": 0,
+    "nav_tree_roots": 0,
+    "notes": [
+      "facets: extraction ran over 1 captured page(s) and recovered 0 — no filter/facet rail was present in the captured DOM (ABSENT, not un-extracted); a hydrated/guided re-capture may surface client-rendered facets.",
+      "nav_hierarchy: 0 tree roots derived from 2 nav item(s) — no parent/child nav structure was detected this run (ABSENT, not un-extracted)."
+    ]
+  },
+  "page_types": [
+    {
+      "type": "home",
+      "routes": [
+        "/"
+      ],
+      "confidence": 0.65
+    }
+  ],
+  "assignments": [
+    {
+      "route": "/",
+      "type": "home",
+      "confidence": 0.65
+    }
+  ],
+  "evidence": {
+    "ia_manifest_path": "evidence/ia/ia_manifest.json"
+  }
+}

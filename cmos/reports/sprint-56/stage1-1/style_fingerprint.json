@@ -1,0 +1,261 @@
+{
+  "kind": "style_fingerprint",
+  "version": "1.0.0",
+  "generated_at": "2026-09-17T02:45:14.379Z",
+  "sample_counts": {
+    "pages": 1,
+    "elements": 23
+  },
+  "type_scale": {
+    "font_families": [
+      {
+        "value": "Inter",
+        "count": 23
+      }
+    ],
+    "font_sizes": [
+      {
+        "px": 12,
+        "min": 12,
+        "max": 12,
+        "count": 1,
+        "token": false
+      },
+      {
+        "px": 14,
+        "min": 14,
+        "max": 14,
+        "count": 12,
+        "token": true
+      },
+      {
+        "px": 16,
+        "min": 16,
+        "max": 16,
+        "count": 9,
+        "token": true
+      },
+      {
+        "px": 30,
+        "min": 30,
+        "max": 30,
+        "count": 1,
+        "token": false
+      }
+    ],
+    "line_heights": [
+      {
+        "px": 16,
+        "min": 16,
+        "max": 16,
+        "count": 1,
+        "token": false
+      },
+      {
+        "px": 20,
+        "min": 20,
+        "max": 20,
+        "count": 11,
+        "token": true
+      },
+      {
+        "px": 24,
+        "min": 24,
+        "max": 24,
+        "count": 9,
+        "token": true
+      },
+      {
+        "px": 36,
+        "min": 36,
+        "max": 36,
+        "count": 1,
+        "token": false
+      }
+    ]
+  },
+  "spacing_scale": {
+    "padding": [
+      {
+        "px": 0,
+        "min": 0,
+        "max": 0,
+        "count": 66,
+        "token": true
+      },
+      {
+        "px": 6,
+        "min": 6,
+        "max": 6,
+        "count": 2,
+        "token": false
+      },
+      {
+        "px": 8,
+        "min": 8,
+        "max": 8,
+        "count": 2,
+        "token": false
+      },
+      {
+        "px": 12,
+        "min": 11.2,
+        "max": 12,
+        "count": 8,
+        "token": true
+      },
+      {
+        "px": 16,
+        "min": 16,
+        "max": 16,
+        "count": 8,
+        "token": true
+      },
+      {
+        "px": 20,
+        "min": 20,
+        "max": 20,
+        "count": 2,
+        "token": false
+      },
+      {
+        "px": 24,
+        "min": 24,
+        "max": 24,
+        "count": 2,
+        "token": false
+      },
+      {
+        "px": 32,
+        "min": 32,
+        "max": 32,
+        "count": 2,
+        "token": false
+      }
+    ],
+    "margin": [
+      {
+        "px": 0,
+        "min": -1,
+        "max": 0,
+        "count": 84,
+        "token": true
+      },
+      {
+        "px": 8,
+        "min": 8,
+        "max": 8,
+        "count": 3,
+        "token": true
+      },
+      {
+        "px": 12,
+        "min": 12,
+        "max": 12,
+        "count": 1,
+        "token": false
+      },
+      {
+        "px": 24,
+        "min": 24,
+        "max": 24,
+        "count": 4,
+        "token": true
+      }
+    ]
+  },
+  "colors": {
+    "text": [
+      {
+        "value": "color(srgb 0.241304 0.260413 0.299897)",
+        "count": 7,
+        "token": true
+      },
+      {
+        "value": "color(srgb 0.101941 0.113385 0.137092)",
+        "count": 4,
+        "token": true
+      },
+      {
+        "value": "color(srgb 0.334499 0.356392 0.401509)",
+        "count": 4,
+        "token": true
+      },
+      {
+        "value": "lab(10.6158 -0.114791 -4.64307)",
+        "count": 4,
+        "token": true
+      },
+      {
+        "value": "color(srgb 0.977176 0.980509 0.986886)",
+        "count": 2,
+        "token": false
+      },
+      {
+        "value": "color(srgb 0.422791 0.235202 0.599689)",
+        "count": 1,
+        "token": false
+      },
+      {
+        "value": "lab(95.3464 -0.0792146 -1.21593)",
+        "count": 1,
+        "token": false
+      }
+    ],
+    "background": [
+      {
+        "value": "#00000000",
+        "count": 16,
+        "token": true
+      },
+      {
+        "value": "color(srgb 0.540491 0.378639 0.31284)",
+        "count": 2,
+        "token": false
+      },
+      {
+        "value": "color(srgb 0.977176 0.980509 0.986886)",
+        "count": 2,
+        "token": false
+      },
+      {
+        "value": "color(srgb 0.999867 1.00006 1)",
+        "count": 1,
+        "token": false
+      },
+      {
+        "value": "lab(10.6158 -0.114791 -4.64307)",
+        "count": 1,
+        "token": false
+      },
+      {
+        "value": "lab(98.2501 -0.0584126 -0.886416)",
+        "count": 1,
+        "token": false
+      }
+    ]
+  },
+  "radii": [
+    {
+      "px": 0,
+      "min": 0,
+      "max": 0,
+      "count": 68,
+      "token": true
+    },
+    {
+      "px": 8,
+      "min": 8,
+      "max": 8,
+      "count": 12,
+      "token": true
+    },
+    {
+      "px": 12,
+      "min": 12,
+      "max": 12,
+      "count": 12,
+      "token": true
+    }
+  ]
+}

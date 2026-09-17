@@ -1,0 +1,43 @@
+{
+  "mission": "STAGE1-1",
+  "name": "Stage1 drift scan of the shipped UI",
+  "sprint": "sprint-56",
+  "session": "PS-2026-09-17-001",
+  "result": "PARTIAL — BLOCKED on the half that matters. The public surface was scanned and compared against its April 2026 counterpart, and that comparison produced one real finding. The AUTHENTICATED drift scan, which is the point of the mission because Sprints 50-54 rebuilt the authenticated surfaces, could not run. Reported as a failure with the reason, per the mission's own first criterion, rather than as a quiet absence.",
+
+  "what_ran": {
+    "run_id": "c6cd5896-a0b1-485f-9c84-bdc7cc2739fd",
+    "date": "2026-09-17T02:45:01Z",
+    "target": "https://tracelab.aquex.ai/",
+    "settings": "maxPages 50, crawlDepth 2, include a11y, infer true",
+    "passes": "21 passes, 0 failed, 0 degraded",
+    "compare_run": "out/stage1/tracelab-prod/5200dec3-00d2-4c9f-b5eb-abd4e0777715 — the April 2026 UNAUTHENTICATED pass (8 routes), named in cmos/reports/sprint-40/tracelab-design-scan.md",
+    "operational_note": "The Stage1 MCP server runs with cwd '/' and fails with ENOENT mkdir '/out' unless an explicit writable outDir is passed. That is the first thing to set, not a sign the server is unhealthy."
+  },
+
+  "finding_1_public_surface_no_longer_leaks_the_authenticated_IA": {
+    "severity": "informational — this is an improvement, recorded so it is not mistaken for a regression",
+    "april_2026": "The unauthenticated crawl discovered 8 routes: /, /collections, /console, /documents, /missions, /projects, /reports, /search. The pre-overhaul shell rendered its nav to visitors who were not signed in, so the whole authenticated IA was readable from the login wall.",
+    "now": "The unauthenticated crawl discovers exactly one route: /. The seven app routes are gone from the public surface.",
+    "not_a_crawl_artifact": "This run used maxPages 50 and crawlDepth 2 — equal to or deeper than the April pass that found 8 — so the difference is the site, not the settings. An earlier exploratory run at maxPages 3 / depth 1 was discarded for exactly this reason before any comparison was drawn.",
+    "consistent_with": "The Sprint 50-51 shell rebuild, and with ALIAS-1 (Sprint 54) retiring /console, which is one of the seven."
+  },
+
+  "finding_2_the_15_disappeared_component_clusters_are_one_finding_not_fifteen": {
+    "severity": "none — reported to prevent double-counting",
+    "what_the_tool_says": "drift_report.json lists 15 object_coverage_gap entries, every one 'disappeared' (Font Bold, Uppercase, List Container, Rounded Xl, Label, Inline, Hover:Text Sky 300, ...).",
+    "what_is_actually_true": "They are all downstream of finding 1. The April run sampled components across 8 pages; this run sampled one login page. Nothing was removed from the product — the crawler simply cannot see those pages any more. Reading these as 15 regressions would be wrong.",
+    "the_one_remaining_entry": "token_intent_mismatch on trait-fp-bg-00000000 (background-color:#00000000), confidence 1.0 -> 0.8. A transparent-background trait measured over one page instead of eight; noise, not signal."
+  },
+
+  "a11y_on_the_public_surface": "0 violations at every severity on /, axe-core via Stage1.",
+
+  "why_the_authenticated_scan_could_not_run": {
+    "the_baseline_exists": "out/stage1/tracelab-prod-guided/guided-1776917221458/ is present on this machine with a complete artifact set (style_fingerprint, ia_outline, component_clusters, identity_graph and 11 more). It is the April 2026 guided run, 17 authenticated routes, named in decision #378 as the style-fingerprint baseline. Note out/ is gitignored, so it exists on this machine only.",
+    "what_is_missing_is_a_credential": "An authenticated crawl needs either a Playwright storageState (none exists in the tree) or the X-API-Key injection technique. That means holding a production API key for a design scan. Sprint 55 demoted the account owning the only known key (prefix tl_jQ6vFscS) and next-step #364 already asks for it to be re-issued.",
+    "why_it_was_not_worked_around": "Minting or reading a production credential to run a UI scan is the same class of action RBAC-5 spent this sprint removing from the verification harness — a convenience credential taken because it was reachable. It is Derek's call, not an implementation detail, and the mission is a findings mission: a wrong answer here is worse than no answer.",
+    "consequence": "Nothing is known about whether the surfaces Sprints 50-54 actually rebuilt — Home, Missions, Projects, Collections, Reports, Search, Graph, the dashboards, the inbox — drifted from the April fingerprint. That was the question the mission was created to answer, and it remains open."
+  },
+
+  "no_ui_change_shipped": "Correct per the mission's third criterion. This produced findings and evidence only."
+}

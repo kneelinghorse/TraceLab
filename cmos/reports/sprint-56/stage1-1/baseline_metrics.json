@@ -1,0 +1,71 @@
+{
+  "kind": "baseline_metrics",
+  "version": "1.0.0",
+  "schema_version": "1.0.0",
+  "generated_at": "2026-09-17T02:45:14.380Z",
+  "url": "https://tracelab.aquex.ai/",
+  "sample_counts": {
+    "pages": 1,
+    "elements": 23
+  },
+  "pages": [
+    {
+      "route": "/",
+      "element_count": 23,
+      "text_element_count": 17,
+      "font_size_px": {
+        "min": 12,
+        "p50": 14,
+        "p90": 16,
+        "max": 30
+      },
+      "type_hierarchy": {
+        "p50_px": 14,
+        "p90_px": 16,
+        "ratio_p90_to_p50": 1.1429
+      },
+      "cta_contrast": {
+        "sampled_count": 0,
+        "avg_ratio": null
+      },
+      "colors": {
+        "unique_text": 0,
+        "unique_background": 1
+      },
+      "scores": {
+        "density": 0.5603,
+        "prominence": 0.0953
+      }
+    }
+  ],
+  "aggregate": {
+    "element_count": 23,
+    "text_element_count": 17,
+    "font_size_px": {
+      "min": 12,
+      "p50": 14,
+      "p90": 16,
+      "max": 30
+    },
+    "type_hierarchy": {
+      "p50_px": 14,
+      "p90_px": 16,
+      "ratio_p90_to_p50": 1.1429
+    },
+    "cta_contrast": {
+      "sampled_count": 0,
+      "avg_ratio": null
+    },
+    "colors": {
+      "unique_text": 0,
+      "unique_background": 1
+    },
+    "scores": {
+      "density": 0.5603,
+      "prominence": 0.0953
+    }
+  },
+  "evidence": {
+    "computed_styles_manifest_path": "evidence/computed_styles/styles.json"
+  }
+}

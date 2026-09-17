@@ -1,0 +1,190 @@
+{
+  "kind": "ia_outline",
+  "version": "1.0.0",
+  "schema_version": "1.0.0",
+  "generated_at": "2026-04-23T04:04:14.680Z",
+  "url": "https://namozine.com/",
+  "routes": {
+    "discovered": [
+      "/",
+      "/collections",
+      "/console",
+      "/documents",
+      "/missions",
+      "/projects",
+      "/reports",
+      "/search"
+    ]
+  },
+  "taxonomy": {
+    "by_prefix": [
+      {
+        "prefix": "/",
+        "routes": [
+          "/"
+        ]
+      },
+      {
+        "prefix": "/collections",
+        "routes": [
+          "/collections"
+        ]
+      },
+      {
+        "prefix": "/console",
+        "routes": [
+          "/console"
+        ]
+      },
+      {
+        "prefix": "/documents",
+        "routes": [
+          "/documents"
+        ]
+      },
+      {
+        "prefix": "/missions",
+        "routes": [
+          "/missions"
+        ]
+      },
+      {
+        "prefix": "/projects",
+        "routes": [
+          "/projects"
+        ]
+      },
+      {
+        "prefix": "/reports",
+        "routes": [
+          "/reports"
+        ]
+      },
+      {
+        "prefix": "/search",
+        "routes": [
+          "/search"
+        ]
+      }
+    ]
+  },
+  "navigation": {
+    "items": [
+      {
+        "label": "Collections",
+        "href": "https://namozine.com/collections",
+        "route": "/collections",
+        "count": 8
+      },
+      {
+        "label": "Console",
+        "href": "https://namozine.com/console",
+        "route": "/console",
+        "count": 8
+      },
+      {
+        "label": "Documents",
+        "href": "https://namozine.com/documents",
+        "route": "/documents",
+        "count": 8
+      },
+      {
+        "label": "Missions",
+        "href": "https://namozine.com/missions",
+        "route": "/missions",
+        "count": 8
+      },
+      {
+        "label": "Projects",
+        "href": "https://namozine.com/projects",
+        "route": "/projects",
+        "count": 8
+      },
+      {
+        "label": "Reports",
+        "href": "https://namozine.com/reports",
+        "route": "/reports",
+        "count": 8
+      },
+      {
+        "label": "Search",
+        "href": "https://namozine.com/search",
+        "route": "/search",
+        "count": 8
+      },
+      {
+        "label": "TraceLab",
+        "href": "https://namozine.com/",
+        "route": "/",
+        "count": 8
+      }
+    ]
+  },
+  "page_types": [
+    {
+      "type": "content",
+      "routes": [
+        "/collections",
+        "/console",
+        "/documents",
+        "/missions",
+        "/projects",
+        "/reports",
+        "/search"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "type": "home",
+      "routes": [
+        "/"
+      ],
+      "confidence": 0.65
+    }
+  ],
+  "assignments": [
+    {
+      "route": "/collections",
+      "type": "content",
+      "confidence": 0.95
+    },
+    {
+      "route": "/console",
+      "type": "content",
+      "confidence": 0.95
+    },
+    {
+      "route": "/documents",
+      "type": "content",
+      "confidence": 0.95
+    },
+    {
+      "route": "/missions",
+      "type": "content",
+      "confidence": 0.95
+    },
+    {
+      "route": "/projects",
+      "type": "content",
+      "confidence": 0.95
+    },
+    {
+      "route": "/reports",
+      "type": "content",
+      "confidence": 0.95
+    },
+    {
+      "route": "/search",
+      "type": "content",
+      "confidence": 0.95
+    },
+    {
+      "route": "/",
+      "type": "home",
+      "confidence": 0.65
+    }
+  ],
+  "evidence": {
+    "ia_manifest_path": "evidence/ia/ia_manifest.json"
+  }
+}

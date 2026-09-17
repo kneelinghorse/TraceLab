@@ -1,0 +1,121 @@
+{
+  "kind": "drift_report",
+  "schema_version": "1.0.0",
+  "generated_at": "2026-09-17T02:45:14.635Z",
+  "current_run": {
+    "id": "c6cd5896-a0b1-485f-9c84-bdc7cc2739fd",
+    "url": "https://tracelab.aquex.ai/"
+  },
+  "semantic_drift": [],
+  "projection_inconsistency": [],
+  "capability_contradiction": [],
+  "token_intent_mismatch": [
+    {
+      "trait_id": "trait-fp-bg-00000000",
+      "trait_type": "color",
+      "css_fingerprint": "background-color:#00000000",
+      "prior_confidence": 1,
+      "current_confidence": 0.8,
+      "direction": "degraded",
+      "delta": 0.19999999999999996
+    }
+  ],
+  "object_coverage_gap": [
+    {
+      "name": "Font Bold",
+      "object_id": "cluster-cluster-0",
+      "direction": "disappeared",
+      "reason": "Object 'Font Bold' present in prior run but absent in current run"
+    },
+    {
+      "name": "Inter 6e63d4e8 Module Qthnq G Variable",
+      "object_id": "cluster-cluster-1",
+      "direction": "disappeared",
+      "reason": "Object 'Inter 6e63d4e8 Module Qthnq G Variable' present in prior run but absent in current run"
+    },
+    {
+      "name": "Uppercase",
+      "object_id": "cluster-cluster-2",
+      "direction": "disappeared",
+      "reason": "Object 'Uppercase' present in prior run but absent in current run"
+    },
+    {
+      "name": "List Container",
+      "object_id": "cluster-cluster-3",
+      "direction": "disappeared",
+      "reason": "Object 'List Container' present in prior run but absent in current run"
+    },
+    {
+      "name": "Container",
+      "object_id": "cluster-cluster-4",
+      "direction": "disappeared",
+      "reason": "Object 'Container' present in prior run but absent in current run"
+    },
+    {
+      "name": "Rounded Xl",
+      "object_id": "cluster-cluster-5",
+      "direction": "disappeared",
+      "reason": "Object 'Rounded Xl' present in prior run but absent in current run"
+    },
+    {
+      "name": "Label",
+      "object_id": "cluster-cluster-6",
+      "direction": "disappeared",
+      "reason": "Object 'Label' present in prior run but absent in current run"
+    },
+    {
+      "name": "Inline",
+      "object_id": "cluster-cluster-7",
+      "direction": "disappeared",
+      "reason": "Object 'Inline' present in prior run but absent in current run"
+    },
+    {
+      "name": "Hover:Text Sky 300",
+      "object_id": "cluster-cluster-8",
+      "direction": "disappeared",
+      "reason": "Object 'Hover:Text Sky 300' present in prior run but absent in current run"
+    },
+    {
+      "name": "Border White/5",
+      "object_id": "cluster-cluster-10",
+      "direction": "disappeared",
+      "reason": "Object 'Border White/5' present in prior run but absent in current run"
+    },
+    {
+      "name": "Font Semibold",
+      "object_id": "cluster-cluster-11",
+      "direction": "disappeared",
+      "reason": "Object 'Font Semibold' present in prior run but absent in current run"
+    },
+    {
+      "name": "Main",
+      "object_id": "cluster-cluster-12",
+      "direction": "disappeared",
+      "reason": "Object 'Main' present in prior run but absent in current run"
+    },
+    {
+      "name": "Border B",
+      "object_id": "cluster-cluster-13",
+      "direction": "disappeared",
+      "reason": "Object 'Border B' present in prior run but absent in current run"
+    },
+    {
+      "name": "Primary Navigation",
+      "object_id": "nav-primary",
+      "direction": "disappeared",
+      "reason": "Object 'Primary Navigation' present in prior run but absent in current run"
+    },
+    {
+      "name": "Content Page",
+      "object_id": "page-content",
+      "direction": "disappeared",
+      "reason": "Object 'Content Page' present in prior run but absent in current run"
+    }
+  ],
+  "signals": [],
+  "prior_run": {
+    "id": "5200dec3-00d2-4c9f-b5eb-abd4e0777715",
+    "url": "https://namozine.com/",
+    "dir": "/Users/systemsystems/portfolio/TraceLab/out/stage1/tracelab-prod/5200dec3-00d2-4c9f-b5eb-abd4e0777715"
+  }
+}
