@@ -1,76 +1,29 @@
 #!/usr/bin/env python3
-"""Live RBAC verification harness (Sprint 47 T47.2).
+"""RBAC role x route verification harness.
 
-Runs the role × route matrix against a DEPLOYED TraceLab API and exits NON-ZERO on
-any enforcement gap — the answer to "how do we know RBAC actually works in prod."
+Drives the full role-by-route matrix against an app and reports every
+enforcement gap. It is exercised by tests/test_rbac_verify_harness.py and
+tests/test_rbac_verify_mutation_proof.py against a FastAPI TestClient with
+enforcement on, which is where its value is: the mutation proof injects a real
+fail-open regression into authorize() and requires this matrix to catch it.
 
-It AUTHENTICATES as principals that already exist and never creates one. Sprint 56
-RBAC-5: it used to provision four real accounts through POST /admin/users, mint API
-keys for them and purge them at the end. On the six-hourly schedule Sprint 55 added,
-that made a role-by-route enforcement check create and delete rows in the PRODUCTION
-auth table every six hours — with a reconcile sweep that existed precisely because
-teardown leaks when a run is cancelled, stranding accounts that held a password
-committed in this repo. A verifier must not mutate what it verifies. It still seeds
-and deletes its own non-auth resources inside a fixture project it owns.
+It has NO production runner and NO scheduled job. Both were removed 2026-09-17
+at Derek's direction, who never asked for a cron that checks RBAC every six
+hours. The earlier version provisioned four real accounts in the target
+environment via POST /admin/users on every run; commit 2703c6e disarmed the
+schedule for that reason, and this change removes the remaining live-run path
+along with the environment variable that fed it.
 
-    AUTH_USERNAME=... AUTH_PASSWORD=... \
-    RBAC_VERIFY_PRINCIPALS='{"member":{"email":"...","password":"..."},
-                             "viewer":{"email":"...","password":"..."}}' \
-        python scripts/rbac_verify.py --base-url https://api.tracelab.aquex.ai
-
-The principals are PERMANENT, pre-existing and zero-privilege; creating them is a
-deliberate one-time operator action, which is the whole point — it happens once, on
-purpose, rather than every six hours by cron. member and viewer are the two deny
-tiers and are required; second_owner and service unlock extra checks. A missing
-deny tier is a loud NO-DENY-PRINCIPAL gap, never a quiet pass.
-
-It PRECHECKS GET /admin/rbac-status first: if RBAC is OFF (or the endpoint is
-missing) the matrix would falsely pass (everything 200), so a flag-off deploy fails
-LOUD instead of silently green.
-
-Checks:
-  * anon -> 401 sweep across EVERY wired per-id route (PER_ID_ROUTES — kept in
-    lockstep with tests/test_rbac_route_enforcement_api.py by the e2e_prod wrapper).
-  * seeded authz matrix for project / collection / mission:
-      - member -> 403 and viewer -> 403 on every per-id route of the seeded resource
-        (the BOLA/IDOR deny requirement — a 200 here is a CRITICAL enforcement gap);
-      - owner -> 2xx and second-owner -> 2xx on the canonical GET (an over-blocking
-        guard: enforcement must not 403 the legitimate owner).
-  * PEDR search-scope matrix:
-      - anon -> 401 on PEDR search, related, preflight, and retrieval search;
-      - member / viewer -> empty search responses for an inaccessible explicit
-        project and a deny on that project's related-entity URN;
-      - owner -> 2xx on the related-entity URN (over-blocking guard).
-  * RAG/synthesis/facet scope matrix:
-      - anon -> 401 on all three PEDR-1B routes;
-      - member / viewer -> no sources from an owner-positive RAG project, no
-        citations from an owner-owned chunk, and facet projects limited to the
-        caller's own project list.
-  * alternate RAG/synthesis and collection-child matrix:
-      - saved-search/history artifacts are owner-scoped and replay fail-closes;
-      - foreign chunks cannot be added or removed through a caller-owned collection;
-      - legacy mixed collections expose zero children/content/counts;
-      - direct and collection-backed report creation persists zero foreign sources.
-  * onboarding document registration: anonymous -> 401; outsider member/viewer
-    -> exactly 403 against the discovered owner project with an absent ingest path.
-    An existing owner-project document also receives member/viewer read/list deny
-    checks and non-mutating member PATCH/restore denies. Human project-owner read
-    grants are local-only: proving them live would require a production mutation.
-    Remaining ingestion-job routes retain anonymous checks. Reports and collection
-    children receive the non-vacuous PEDR-1C cross-tenant matrix above.
-
-The core (`RbacVerifier`) is transport-agnostic: it talks to any object exposing
-``.request(method, url, headers=, json=)`` returning ``.status_code`` / ``.json()``
-— an ``httpx.Client`` against prod, or a FastAPI ``TestClient`` for local
-verification (see tests/integration/test_e2e_rbac_live.py).
+The core (``RbacVerifier``) is transport-agnostic: it talks to any object
+exposing ``.request(method, url, headers=, json=)`` returning ``.status_code``
+/ ``.json()``. Principals are SUPPLIED by the caller as {role: (email,
+password)} — this module never creates, modifies or deletes a user, and
+tests/test_rbac_verify_harness.py::test_run_never_creates_or_deletes_a_user
+asserts that at the transport.
 """
 
 from __future__ import annotations
 
-import argparse
-import json
-import os
-import sys
 import uuid
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -83,19 +36,10 @@ _SYNTHESIS_EMPTY_CONTENT = (
     "No content available for synthesis. The collection or chunks are empty."
 )
 
-#: The env name carrying the NON-OWNER principals. Sprint 56 RBAC-5.
-#:
-#: Why a new name, when PR #336 deleted the last pair it found: #336 removed a
-#: DUPLICATE of AUTH_USERNAME/AUTH_PASSWORD, which "added a concept and bought
-#: nothing". This carries information that exists nowhere else — the identities of
-#: pre-existing member/viewer/second-owner/service accounts — and deleting it does
-#: change behaviour: without it the harness has no non-owner principal, and the
-#: role-by-route matrix cannot run at all. It is the thing that lets the harness
-#: stop provisioning.
-_PRINCIPALS_ENV = "RBAC_VERIFY_PRINCIPALS"
-
-#: Roles the matrix can use. member and viewer are the two deny tiers and are
-#: mandatory; second_owner and service unlock extra checks and are optional.
+#: Roles the matrix exercises. member and viewer are the two deny tiers and are
+#: required for a run to mean anything; second_owner and service unlock extra
+#: checks. The caller passes these in as {role: (email, password)} — nothing here
+#: reads the environment and nothing here creates a user.
 _PRINCIPAL_ROLES = ("member", "viewer", "second_owner", "service")
 
 #: The single durable project the harness owns and reuses. Stable by NAME so a run
@@ -2354,7 +2298,7 @@ class RbacVerifier:
                     "post",
                     f"{self._prefix}/auth/login",
                     "an authenticated second_owner principal for the fixture",
-                    f"{owner_role or 'none'} — add 'second_owner' to {_PRINCIPALS_ENV}",
+                    (owner_role or "none") + " — no second_owner principal was supplied to run()",
                 )
             )
             return
@@ -2841,7 +2785,7 @@ class RbacVerifier:
                     "get",
                     f"{self._prefix}/projects",
                     "an authenticated member principal to prove the owner read path",
-                    f"missing — supply 'member' in {_PRINCIPALS_ENV}",
+                    "missing — no member principal was supplied to run()",
                 )
             )
             return
@@ -3130,7 +3074,7 @@ class RbacVerifier:
             self.gaps.append(
                 Gap("NO-DENY-PRINCIPAL", "service-gate", "post", path,
                     "a human principal to prove denial",
-                    f"none authenticated — supply one in {_PRINCIPALS_ENV}")
+                    "none authenticated — no human principal was supplied to run()")
             )
 
         # the service principal -> 2xx (over-blocking guard: the runner must still work)
@@ -3153,7 +3097,7 @@ class RbacVerifier:
                 Gap(
                     "NO-SERVICE-PRINCIPAL", "service-gate", "post", path,
                     "a service principal to prove the runner is not over-blocked",
-                    f"none authenticated — add a 'service' entry to {_PRINCIPALS_ENV}",
+                    "none authenticated — no service principal was supplied to run()",
                 )
             )
 
@@ -3500,7 +3444,7 @@ class RbacVerifier:
                                 (
                                     "supplied but could not authenticate"
                                     if supplied
-                                    else f"absent from {_PRINCIPALS_ENV}"
+                                    else "not supplied to run()"
                                 )
                                 + " — role matrix did not run",
                             )
@@ -3647,188 +3591,3 @@ class RbacVerifier:
             "leaked cruft."
         )
         return 0
-
-
-#: The domain the retired bootstrap derivation used to invent. Reserved by RFC 6761
-#: and unreachable, so an account there can never be recovered or mailed. Sprint 55
-#: RBAC-1 demoted the production row that lived here; the harness must never
-#: authenticate as it again.
-_FABRICATED_DOMAIN = "@tracelab.local"
-
-
-def resolve_verification_identity(
-    env: dict[str, str] | Any,
-) -> tuple[str | None, str, str]:
-    """Resolve the login the matrix runs as, from AUTH_USERNAME / AUTH_PASSWORD.
-
-    Returns ``(email, password, "AUTH_USERNAME")`` on success, or
-    ``(None, reason, "")`` when the run must not start. Every failure is named and
-    actionable: RBAC-3 exists because a run that could not start reported nothing.
-
-    Two values are refused rather than silently coerced:
-
-    * a bare username — the old code appended ``@tracelab.local`` here, which is how
-      every run since Sprint 49 authenticated as the fabricated bootstrap row;
-    * any address at that fabricated domain, even spelled out in full.
-    """
-    email, password = env.get("AUTH_USERNAME"), env.get("AUTH_PASSWORD")
-    if not email or not password:
-        return (
-            None,
-            "no verification credentials. Set AUTH_USERNAME and AUTH_PASSWORD to the "
-            "verification identity's full email address and password; "
-            f"AUTH_USERNAME was {'set' if email else 'empty'} and AUTH_PASSWORD was "
-            f"{'set' if password else 'empty'}.",
-            "",
-        )
-    if "@" not in email:
-        return (
-            None,
-            f"AUTH_USERNAME={email!r} is a bare username, not an email address. This "
-            f"harness no longer derives {email}{_FABRICATED_DOMAIN} — that derivation "
-            "is why every run since Sprint 49 authenticated as the fabricated "
-            "bootstrap account instead of a real one. Set AUTH_USERNAME to the full "
-            "email address of the verification identity.",
-            "",
-        )
-    if email.lower().endswith(_FABRICATED_DOMAIN):
-        return (
-            None,
-            f"AUTH_USERNAME={email!r} is the retired bootstrap identity at the "
-            f"non-routable domain {_FABRICATED_DOMAIN}. Sprint 55 RBAC-1 demoted that "
-            "account precisely so verification would stop depending on it. Set "
-            "AUTH_USERNAME to a real, routable address.",
-            "",
-        )
-    return email, password, "AUTH_USERNAME"
-
-
-def resolve_verification_principals(
-    env: dict[str, str] | Any,
-) -> tuple[dict[str, tuple[str, str]] | None, str]:
-    """Resolve the NON-OWNER principals the matrix runs as, from one env name.
-
-    Returns ``(principals, "")`` on success or ``(None, reason)`` when the run must
-    not start. Sprint 56 RBAC-5: these principals are permanent and pre-existing.
-    The harness authenticates as them and never creates one, because a run that
-    provisions accounts in the environment it is verifying is mutating the auth
-    table it exists to check — on a schedule, forever.
-
-    Format (one repository secret, JSON):
-
-        {"member":       {"email": "...", "password": "..."},
-         "viewer":       {"email": "...", "password": "..."},
-         "second_owner": {"email": "...", "password": "..."},
-         "service":      {"email": "...", "password": "..."}}
-
-    ``member`` and ``viewer`` are the two deny tiers. Their ABSENCE is not refused
-    here: it is reported at run time as a NO-DENY-PRINCIPAL gap, so a partial set
-    produces a loud failing run rather than a quiet start that cannot be
-    distinguished from a passing one. Only an unusable payload stops the run.
-
-    The same two refusals as ``resolve_verification_identity`` apply per principal:
-    a bare username, and any address at the retired fabricated domain.
-    """
-    raw = env.get(_PRINCIPALS_ENV)
-    if not raw:
-        return None, (
-            f"no verification principals. Set {_PRINCIPALS_ENV} to a JSON object "
-            "mapping role -> {\"email\", \"password\"} for PERMANENT, pre-existing, "
-            f"zero-privilege accounts. Recognised roles: {', '.join(_PRINCIPAL_ROLES)}; "
-            "member and viewer are the two deny tiers and are required for the role "
-            "matrix to mean anything. This harness no longer creates them: doing so "
-            "made a role-by-route check mutate the production auth table on every run."
-        )
-    try:
-        parsed = json.loads(raw)
-    except ValueError as exc:
-        return None, (
-            f"{_PRINCIPALS_ENV} is not valid JSON ({exc}). Expected an object "
-            'like {"member": {"email": "...", "password": "..."}, "viewer": {...}}.'
-        )
-    if not isinstance(parsed, dict) or not parsed:
-        return None, (
-            f"{_PRINCIPALS_ENV} must be a non-empty JSON object mapping role -> "
-            '{"email", "password"}; got '
-            f"{type(parsed).__name__}."
-        )
-
-    resolved: dict[str, tuple[str, str]] = {}
-    for role, creds in parsed.items():
-        if role not in _PRINCIPAL_ROLES:
-            return None, (
-                f"{_PRINCIPALS_ENV} names an unknown role {role!r}. Recognised "
-                f"roles: {', '.join(_PRINCIPAL_ROLES)}."
-            )
-        if not isinstance(creds, dict):
-            return None, (
-                f"{_PRINCIPALS_ENV}[{role!r}] must be an object with 'email' and "
-                f"'password'; got {type(creds).__name__}."
-            )
-        email, password = creds.get("email"), creds.get("password")
-        if not email or not password:
-            return None, (
-                f"{_PRINCIPALS_ENV}[{role!r}] is missing "
-                f"{'email' if not email else 'password'}."
-            )
-        if "@" not in email:
-            return None, (
-                f"{_PRINCIPALS_ENV}[{role!r}] email {email!r} is a bare username, "
-                "not an email address. This harness never derives "
-                f"{email}{_FABRICATED_DOMAIN} — that derivation is why every run "
-                "since Sprint 49 authenticated as the fabricated bootstrap account."
-            )
-        if email.lower().endswith(_FABRICATED_DOMAIN):
-            return None, (
-                f"{_PRINCIPALS_ENV}[{role!r}] email {email!r} is at the retired "
-                f"non-routable domain {_FABRICATED_DOMAIN}. Use a real address."
-            )
-        resolved[role] = (str(email), str(password))
-    return resolved, ""
-
-
-def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Live RBAC verification harness (T47.2).")
-    parser.add_argument("--base-url", required=True, help="Deployed API base URL, e.g. https://api.tracelab.aquex.ai")
-    parser.add_argument("--prefix", default=DEFAULT_PREFIX, help="API prefix (default /api/v1)")
-    parser.add_argument("--timeout", type=float, default=30.0)
-    args = parser.parse_args(argv)
-
-    owner_email, owner_password, source = resolve_verification_identity(os.environ)
-    if owner_email is None:
-        # Sprint 55 RBAC-3: every one of these is a FAILURE, never a skip. A run
-        # that cannot start is exactly the silence that cost five sprints.
-        print(f"CANNOT START: {owner_password}", file=sys.stderr)
-        return 2
-    print(f"verification identity: {owner_email} (from {source})")
-
-    principals, principals_reason = resolve_verification_principals(os.environ)
-    if principals is None:
-        # Same rule as the identity refusal above: a run that cannot start is a
-        # FAILURE, never a skip. There is deliberately NO fallback to provisioning
-        # and no owner-only mode — an owner-only matrix has no deny tier, so it
-        # would pass vacuously and look exactly like a real green run.
-        print(f"CANNOT START: {principals_reason}", file=sys.stderr)
-        return 2
-    print(
-        "supplied principals: "
-        + ", ".join(f"{role}={email}" for role, (email, _pw) in sorted(principals.items()))
-    )
-
-    try:
-        import httpx
-    except ImportError:
-        print("httpx is required to run against a live URL (pip install httpx).", file=sys.stderr)
-        return 2
-
-    with httpx.Client(base_url=args.base_url, timeout=args.timeout) as http:
-        verifier = RbacVerifier(http, prefix=args.prefix)
-        try:
-            return verifier.run(owner_email, owner_password, principals)
-        except HarnessError as exc:
-            print(f"\nHARNESS ABORTED (setup/precheck failure): {exc}", file=sys.stderr)
-            return 2
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())
