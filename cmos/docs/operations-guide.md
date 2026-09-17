@@ -270,6 +270,24 @@ On **sprint close** with no immediately-following open, use the `-complete` vari
 
 **Durable fix (cross-project):** the permanent automation belongs in `cmos-mcp-pro`'s sprint-open and `cmos_sprint complete` handlers, which should write these identity pointers whenever a sprint's status changes. Until that lands, this runbook is the mechanism — keep it in the build-session closeout checklist.
 
+### Receipt Re-Verification at Sprint Close (Runbook)
+
+A receipt is verified when it merges and then never read again, so a later commit in the **same sprint** can falsify it silently — the deleting commit has no way to know which receipts cite it. Run this before `cmos_sprint(action="complete")`, per decision #509.
+
+**What happened once already:** `cmos/reports/sprint-56/rbac-5-receipt.json` merged at 02:05Z in PR #339 and was falsified at 04:12Z by PR #343, which deleted the cron, the CLI entrypoint, the `RBAC_VERIFY_PRINCIPALS` environment variable and three cited tests. Nothing flagged it. The receipt sat on `main` asking Derek to create four permanent production accounts for a feature that no longer existed.
+
+**Procedure** (`<N>` = the closing sprint):
+
+1. Collect every citation in `cmos/reports/sprint-<N>/*.json` that names something in the tree: symbols, function and class names, test names, environment variables, file paths, workflow filenames.
+2. Grep HEAD for each one. A citation that returns zero hits, or hits only in prose and comments, is **falsified**.
+3. Do the same for the sprint's active decisions: `cmos_decisions(action="list", sprintId="sprint-<N>")`.
+4. For each falsified citation, either **correct it in place** or **annotate it with the commit that removed it** — never leave it standing. Preserve the original text under an `original_claim` key so the record of what was built is not erased; add a `corrected_at_sprint_close` block naming the date, the session and the removing PR.
+5. Re-measure any test counts the receipt asserts, rather than copying them forward.
+6. A decision whose *mechanism* is falsified but whose *principle* holds is superseded by a corrected restatement, not archived — `cmos_decisions(action="update", decisionId=<old>, supersededBy=<new>)`.
+7. Check `not_done_and_why` and equivalent sections last: these carry **requests for operator action**, and a stale one asks a human to do work the tree no longer needs.
+
+The cost is one grep per citation. A sprint is not closed while a receipt on `main` describes code that is not there.
+
 ### Incident Response
 - For blocked missions: Document unblock criteria and required actions in database
 - For fallback scenarios: Review telemetry, document root cause, update patterns if needed
