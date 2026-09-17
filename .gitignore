@@ -61,7 +61,17 @@ data/uploads/
 artifacts/
 artifacts/**/*
 
-# Stage1 design-scan output (research evidence; large JSON artifacts)
+# ...but NOT a deliberately preserved design baseline. The blanket rule above is
+# for local packaging output; it also silently swallowed the Stage1 fingerprint
+# baseline when it was copied here for safekeeping, so a receipt would have cited
+# files that were never committed. Same defect class as the `*.log` rule that hid
+# 21 evidence logs across three sprints (Sprint 55).
+!cmos/reports/baselines/**/artifacts/
+!cmos/reports/baselines/**/artifacts/**
+
+# Stage1 design-scan output (research evidence; large JSON artifacts).
+# NOTE: this is why the only copy of the April 2026 fingerprint baseline lived on
+# one machine. The preserved copy is tracked under cmos/reports/baselines/.
 out/
 
 # Telemetry build artifacts

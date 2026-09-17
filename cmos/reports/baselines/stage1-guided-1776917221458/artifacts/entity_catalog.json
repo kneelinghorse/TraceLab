@@ -1,0 +1,54 @@
+{
+  "kind": "entity_catalog",
+  "entities": [
+    {
+      "name": "Collection",
+      "identifiers": [],
+      "fields": [],
+      "source_endpoints": [
+        "/collections",
+        "/collections/6b9ba524-9bdc-4a14-9d9f-6a4ff210a069"
+      ]
+    },
+    {
+      "name": "Document",
+      "identifiers": [],
+      "fields": [],
+      "source_endpoints": [
+        "/documents",
+        "/documents/516fd80c-a295-4d4f-b49e-971ad4a41525",
+        "/documents/8cc368e5-f5a4-4c81-8909-2c9348f361db",
+        "/documents/d3800df0-bb53-421f-aa93-df4fa5739445"
+      ]
+    },
+    {
+      "name": "Mission",
+      "identifiers": [],
+      "fields": [],
+      "source_endpoints": [
+        "/missions",
+        "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+        "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f"
+      ]
+    },
+    {
+      "name": "Project",
+      "identifiers": [],
+      "fields": [],
+      "source_endpoints": [
+        "/projects",
+        "/projects/95dc6df6-5a69-42d5-9e33-b8e1e2726152",
+        "/projects/fbd3bd03-5ddc-49ee-8013-529163a99290"
+      ]
+    },
+    {
+      "name": "Report",
+      "identifiers": [],
+      "fields": [],
+      "source_endpoints": [
+        "/reports",
+        "/reports/36697b37-a4cf-4074-9c01-c98e0690a3f0"
+      ]
+    }
+  ]
+}

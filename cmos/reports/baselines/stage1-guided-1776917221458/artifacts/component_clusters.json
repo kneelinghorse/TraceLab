@@ -1,0 +1,5475 @@
+{
+  "kind": "component_clusters",
+  "version": "1.3.0",
+  "schema_version": "1.3.0",
+  "run_id": "guided-1776917529524",
+  "generated_at": "2026-04-23T04:12:09.755Z",
+  "clusters": [
+    {
+      "clusterId": "cluster-14",
+      "patternName": "Border B",
+      "structureHash": "e5e39e80c002c9598312327c9b636d673b50abd9d1e83fdbb08b8e34fe74e942",
+      "semanticRole": "unknown",
+      "primaryClassPattern": "utility",
+      "tagName": "td",
+      "selectors": {
+        "css": "td.px-4"
+      },
+      "variants": [
+        "700",
+        "300",
+        "400"
+      ],
+      "variantStyles": {
+        "300": {
+          "font_size": "16px",
+          "line_height": "24px",
+          "color": "rgb(75, 85, 99)",
+          "display": "block",
+          "width": "782px"
+        },
+        "400": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(107, 114, 128)",
+          "display": "inline",
+          "width": "auto"
+        }
+      },
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "700",
+            "300",
+            "400"
+          ]
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 131.67,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "td.px-4",
+          "instanceCount": 545
+        },
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "td.px-4",
+          "instanceCount": 416
+        },
+        {
+          "route": "/reports",
+          "selector": "td.px-6",
+          "instanceCount": 120
+        }
+      ],
+      "totalInstances": 1081,
+      "confidence": 0.71,
+      "evidenceRefs": [
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json",
+        "dom/components/reports.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-4",
+      "patternName": "Container",
+      "structureHash": "a4a5ed807618eef3e9000778e2b53a3d4c3445ea48b8f64ca627823d45076cfb",
+      "semanticRole": "unknown",
+      "primaryClassPattern": "utility",
+      "tagName": "div",
+      "selectors": {
+        "css": "div.max-w-7xl"
+      },
+      "variants": [
+        "7xl",
+        "auto"
+      ],
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "7xl",
+            "auto"
+          ]
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 53.47,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/missions",
+          "selector": "div.max-w-7xl",
+          "instanceCount": 2
+        },
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "div.max-w-7xl",
+          "instanceCount": 28
+        },
+        {
+          "route": "/documents/8cc368e5-f5a4-4c81-8909-2c9348f361db",
+          "selector": "div.max-w-7xl",
+          "instanceCount": 3
+        },
+        {
+          "route": "/documents",
+          "selector": "div.max-w-7xl",
+          "instanceCount": 58
+        },
+        {
+          "route": "/documents/d3800df0-bb53-421f-aa93-df4fa5739445",
+          "selector": "div.max-w-7xl",
+          "instanceCount": 35
+        },
+        {
+          "route": "/projects",
+          "selector": "div.max-w-7xl",
+          "instanceCount": 17
+        },
+        {
+          "route": "/projects/fbd3bd03-5ddc-49ee-8013-529163a99290",
+          "selector": "div.max-w-7xl",
+          "instanceCount": 3
+        },
+        {
+          "route": "/projects/95dc6df6-5a69-42d5-9e33-b8e1e2726152",
+          "selector": "div.max-w-7xl",
+          "instanceCount": 56
+        },
+        {
+          "route": "/documents/516fd80c-a295-4d4f-b49e-971ad4a41525",
+          "selector": "div.max-w-7xl",
+          "instanceCount": 15
+        },
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "div.max-w-7xl",
+          "instanceCount": 27
+        },
+        {
+          "route": "/collections",
+          "selector": "div.max-w-7xl",
+          "instanceCount": 8
+        },
+        {
+          "route": "/collections/6b9ba524-9bdc-4a14-9d9f-6a4ff210a069",
+          "selector": "div.max-w-7xl",
+          "instanceCount": 10
+        },
+        {
+          "route": "/reports",
+          "selector": "div.max-w-7xl",
+          "instanceCount": 8
+        },
+        {
+          "route": "/reports/36697b37-a4cf-4074-9c01-c98e0690a3f0",
+          "selector": "div.max-w-7xl",
+          "instanceCount": 11
+        },
+        {
+          "route": "/search",
+          "selector": "div.max-w-7xl",
+          "instanceCount": 17
+        },
+        {
+          "route": "/console",
+          "selector": "div.max-w-7xl",
+          "instanceCount": 6
+        },
+        {
+          "route": "/settings",
+          "selector": "div.max-w-7xl",
+          "instanceCount": 6
+        }
+      ],
+      "totalInstances": 310,
+      "confidence": 0.87,
+      "evidenceRefs": [
+        "dom/components/collections.json",
+        "dom/components/collections_6b9ba524-9bdc-4a14-9d9f-6a4ff210a069.json",
+        "dom/components/console.json",
+        "dom/components/documents.json",
+        "dom/components/documents_516fd80c-a295-4d4f-b49e-971ad4a41525.json",
+        "dom/components/documents_8cc368e5-f5a4-4c81-8909-2c9348f361db.json",
+        "dom/components/documents_d3800df0-bb53-421f-aa93-df4fa5739445.json",
+        "dom/components/missions.json",
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json",
+        "dom/components/projects.json",
+        "dom/components/projects_95dc6df6-5a69-42d5-9e33-b8e1e2726152.json",
+        "dom/components/projects_fbd3bd03-5ddc-49ee-8013-529163a99290.json",
+        "dom/components/reports.json",
+        "dom/components/reports_36697b37-a4cf-4074-9c01-c98e0690a3f0.json",
+        "dom/components/search.json",
+        "dom/components/settings.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-15",
+      "patternName": "Hover:Bg Gray 50",
+      "structureHash": "b1fcb7a80314e30060ced1a98c002c391b3810d137d3802bd8fd626dbd500260",
+      "semanticRole": "unknown",
+      "primaryClassPattern": "unknown",
+      "tagName": "tr",
+      "selectors": {
+        "css": "tr"
+      },
+      "variants": [
+        "700",
+        "pointer"
+      ],
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "700",
+            "pointer"
+          ]
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 107.67,
+      "commonAttributes": [],
+      "instances": [
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "tr",
+          "instanceCount": 97
+        },
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "tr",
+          "instanceCount": 75
+        },
+        {
+          "route": "/reports",
+          "selector": "tr",
+          "instanceCount": 21
+        }
+      ],
+      "totalInstances": 193,
+      "confidence": 0.64,
+      "evidenceRefs": [
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json",
+        "dom/components/reports.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-20",
+      "patternName": "Rounded Full",
+      "structureHash": "d8423b5581c8e3acf0d0e102672f213bcaac38dada90a370c71c6b5567bfc094",
+      "semanticRole": "unknown",
+      "primaryClassPattern": "utility",
+      "tagName": "span",
+      "selectors": {
+        "css": "span.w-2"
+      },
+      "variants": [
+        "full",
+        "mono",
+        "400",
+        "600",
+        "900"
+      ],
+      "variantStyles": {
+        "300": {
+          "font_family": "Inter, \"Inter Fallback\", Inter, system-ui, sans-serif",
+          "font_size": "16px",
+          "line_height": "24px",
+          "color": "rgb(75, 85, 99)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "padding_top": "0px",
+          "padding_right": "0px",
+          "padding_bottom": "0px",
+          "padding_left": "0px",
+          "margin_bottom": "0px",
+          "margin_left": "0px",
+          "border_radius_top_left": "0px",
+          "border_radius_top_right": "0px",
+          "border_radius_bottom_right": "0px",
+          "border_radius_bottom_left": "0px",
+          "display": "block",
+          "width": "782px",
+          "border": "0px solid rgb(229, 231, 235)"
+        },
+        "400": {
+          "font_family": "Inter, \"Inter Fallback\", Inter, system-ui, sans-serif",
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(107, 114, 128)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "padding_top": "0px",
+          "padding_right": "0px",
+          "padding_bottom": "0px",
+          "padding_left": "0px",
+          "margin_bottom": "0px",
+          "margin_left": "0px",
+          "border_radius_top_left": "0px",
+          "border_radius_top_right": "0px",
+          "border_radius_bottom_right": "0px",
+          "border_radius_bottom_left": "0px",
+          "display": "inline",
+          "width": "auto",
+          "border": "0px solid rgb(229, 231, 235)"
+        },
+        "500": {
+          "font_family": "Inter, \"Inter Fallback\", Inter, system-ui, sans-serif",
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(107, 114, 128)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "padding_top": "0px",
+          "padding_right": "0px",
+          "padding_bottom": "0px",
+          "padding_left": "0px",
+          "margin_bottom": "0px",
+          "margin_left": "0px",
+          "border_radius_top_left": "0px",
+          "border_radius_top_right": "0px",
+          "border_radius_bottom_right": "0px",
+          "border_radius_bottom_left": "0px",
+          "display": "block",
+          "width": "595.625px",
+          "border": "0px solid rgb(229, 231, 235)"
+        },
+        "600": {
+          "font_family": "Inter, \"Inter Fallback\", Inter, system-ui, sans-serif",
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(209, 213, 219)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "padding_top": "0px",
+          "padding_right": "0px",
+          "padding_bottom": "0px",
+          "padding_left": "0px",
+          "margin_bottom": "0px",
+          "margin_left": "0px",
+          "border_radius_top_left": "0px",
+          "border_radius_top_right": "0px",
+          "border_radius_bottom_right": "0px",
+          "border_radius_bottom_left": "0px",
+          "display": "block",
+          "width": "7.875px",
+          "border": "0px solid rgb(229, 231, 235)"
+        },
+        "900": {
+          "font_family": "Inter, \"Inter Fallback\", Inter, system-ui, sans-serif",
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(17, 24, 39)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "padding_top": "0px",
+          "padding_right": "0px",
+          "padding_bottom": "0px",
+          "padding_left": "0px",
+          "margin_bottom": "0px",
+          "margin_left": "8px",
+          "border_radius_top_left": "0px",
+          "border_radius_top_right": "0px",
+          "border_radius_bottom_right": "0px",
+          "border_radius_bottom_left": "0px",
+          "display": "inline",
+          "width": "auto",
+          "border": "0px solid rgb(229, 231, 235)"
+        },
+        "full": {
+          "font_family": "Inter, \"Inter Fallback\", Inter, system-ui, sans-serif",
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(255, 255, 255)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "padding_top": "4px",
+          "padding_right": "16px",
+          "padding_bottom": "4px",
+          "padding_left": "16px",
+          "margin_bottom": "0px",
+          "margin_left": "0px",
+          "border_radius_top_left": "9999px",
+          "border_radius_top_right": "9999px",
+          "border_radius_bottom_right": "9999px",
+          "border_radius_bottom_left": "9999px",
+          "display": "block",
+          "width": "166.953px",
+          "border": "1px solid rgba(255, 255, 255, 0.2)"
+        },
+        "mono": {
+          "font_family": "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace",
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(107, 114, 128)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "padding_top": "0px",
+          "padding_right": "0px",
+          "padding_bottom": "0px",
+          "padding_left": "0px",
+          "margin_bottom": "0px",
+          "margin_left": "0px",
+          "border_radius_top_left": "0px",
+          "border_radius_top_right": "0px",
+          "border_radius_bottom_right": "0px",
+          "border_radius_bottom_left": "0px",
+          "display": "block",
+          "width": "219.148px",
+          "border": "0px solid rgb(229, 231, 235)"
+        },
+        "white": {
+          "font_family": "Inter, \"Inter Fallback\", Inter, system-ui, sans-serif",
+          "font_size": "16px",
+          "line_height": "24px",
+          "color": "rgb(17, 24, 39)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "padding_top": "0px",
+          "padding_right": "0px",
+          "padding_bottom": "0px",
+          "padding_left": "0px",
+          "margin_bottom": "0px",
+          "margin_left": "0px",
+          "border_radius_top_left": "0px",
+          "border_radius_top_right": "0px",
+          "border_radius_bottom_right": "0px",
+          "border_radius_bottom_left": "0px",
+          "display": "inline",
+          "width": "auto",
+          "border": "0px solid rgb(229, 231, 235)"
+        },
+        "0.5": {
+          "font_family": "Inter, \"Inter Fallback\", Inter, system-ui, sans-serif",
+          "font_size": "12px",
+          "line_height": "16px",
+          "color": "rgb(21, 128, 61)",
+          "background_color": "rgb(220, 252, 231)",
+          "padding_top": "2px",
+          "padding_right": "8px",
+          "padding_bottom": "2px",
+          "padding_left": "8px",
+          "margin_bottom": "0px",
+          "margin_left": "0px",
+          "border_radius_top_left": "4px",
+          "border_radius_top_right": "4px",
+          "border_radius_bottom_right": "4px",
+          "border_radius_bottom_left": "4px",
+          "display": "block",
+          "width": "49.9375px",
+          "border": "0px solid rgb(229, 231, 235)"
+        },
+        "medium": {
+          "font_family": "Inter, \"Inter Fallback\", Inter, system-ui, sans-serif",
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(17, 24, 39)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "padding_top": "0px",
+          "padding_right": "0px",
+          "padding_bottom": "0px",
+          "padding_left": "0px",
+          "margin_bottom": "8px",
+          "margin_left": "0px",
+          "border_radius_top_left": "0px",
+          "border_radius_top_right": "0px",
+          "border_radius_bottom_right": "0px",
+          "border_radius_bottom_left": "0px",
+          "display": "block",
+          "width": "750px",
+          "border": "0px solid rgb(229, 231, 235)"
+        }
+      },
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "full",
+            "mono",
+            "400",
+            "600",
+            "900"
+          ]
+        }
+      },
+      "avgDepth": 0.36,
+      "avgChildCount": 46.91,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "span.w-2",
+          "instanceCount": 14
+        },
+        {
+          "route": "/documents",
+          "selector": "span.px-2",
+          "instanceCount": 30
+        },
+        {
+          "route": "/documents/d3800df0-bb53-421f-aa93-df4fa5739445",
+          "selector": "span.text-gray-500",
+          "instanceCount": 25
+        },
+        {
+          "route": "/projects",
+          "selector": "span.ml-2",
+          "instanceCount": 18
+        },
+        {
+          "route": "/projects/95dc6df6-5a69-42d5-9e33-b8e1e2726152",
+          "selector": "span.mx-2",
+          "instanceCount": 33
+        },
+        {
+          "route": "/documents/516fd80c-a295-4d4f-b49e-971ad4a41525",
+          "selector": "span.text-gray-500",
+          "instanceCount": 15
+        },
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "span.w-2",
+          "instanceCount": 14
+        },
+        {
+          "route": "/reports",
+          "selector": "span.text-sm",
+          "instanceCount": 22
+        },
+        {
+          "route": "/reports/36697b37-a4cf-4074-9c01-c98e0690a3f0",
+          "selector": "span.px-2",
+          "instanceCount": 2
+        },
+        {
+          "route": "/search",
+          "selector": "span.text-xs",
+          "instanceCount": 9
+        },
+        {
+          "route": "/settings",
+          "selector": "span.text-xs",
+          "instanceCount": 3
+        }
+      ],
+      "totalInstances": 185,
+      "confidence": 0.87,
+      "evidenceRefs": [
+        "dom/components/documents.json",
+        "dom/components/documents_516fd80c-a295-4d4f-b49e-971ad4a41525.json",
+        "dom/components/documents_d3800df0-bb53-421f-aa93-df4fa5739445.json",
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json",
+        "dom/components/projects.json",
+        "dom/components/projects_95dc6df6-5a69-42d5-9e33-b8e1e2726152.json",
+        "dom/components/reports.json",
+        "dom/components/reports_36697b37-a4cf-4074-9c01-c98e0690a3f0.json",
+        "dom/components/search.json",
+        "dom/components/settings.json"
+      ],
+      "parentCluster": "cluster-11"
+    },
+    {
+      "clusterId": "cluster-0",
+      "patternName": "Font Bold",
+      "structureHash": "0b4978a2ec2f0321f1b24f4ddf10a0307cc86f17632bb312d9e5181c4b79512f",
+      "semanticRole": "unknown",
+      "primaryClassPattern": "utility",
+      "tagName": "a",
+      "selectors": {
+        "css": "a.text-xl"
+      },
+      "variants": [
+        "900",
+        "bold",
+        "white",
+        "medium"
+      ],
+      "variantStyles": {
+        "900": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "margin_bottom": "0px",
+          "margin_left": "8px",
+          "display": "inline",
+          "width": "auto"
+        },
+        "bold": {
+          "font_size": "20px",
+          "line_height": "28px",
+          "margin_bottom": "0px",
+          "margin_left": "0px",
+          "display": "block",
+          "width": "90.9141px"
+        },
+        "white": {
+          "font_size": "16px",
+          "line_height": "24px",
+          "margin_bottom": "0px",
+          "margin_left": "0px",
+          "display": "inline",
+          "width": "auto"
+        },
+        "medium": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "margin_bottom": "8px",
+          "margin_left": "0px",
+          "display": "block",
+          "width": "750px"
+        }
+      },
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "900",
+            "bold",
+            "white",
+            "medium"
+          ]
+        },
+        "href": {
+          "type": "string",
+          "required": true
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 79.06,
+      "commonAttributes": [
+        "class",
+        "href"
+      ],
+      "instances": [
+        {
+          "route": "/missions",
+          "selector": "a.text-xl",
+          "instanceCount": 8
+        },
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "a.text-xl",
+          "instanceCount": 10
+        },
+        {
+          "route": "/documents/8cc368e5-f5a4-4c81-8909-2c9348f361db",
+          "selector": "a.text-xl",
+          "instanceCount": 9
+        },
+        {
+          "route": "/documents",
+          "selector": "a.text-xl",
+          "instanceCount": 20
+        },
+        {
+          "route": "/documents/d3800df0-bb53-421f-aa93-df4fa5739445",
+          "selector": "a.text-xl",
+          "instanceCount": 10
+        },
+        {
+          "route": "/projects",
+          "selector": "a.text-xl",
+          "instanceCount": 19
+        },
+        {
+          "route": "/projects/fbd3bd03-5ddc-49ee-8013-529163a99290",
+          "selector": "a.text-xl",
+          "instanceCount": 9
+        },
+        {
+          "route": "/projects/95dc6df6-5a69-42d5-9e33-b8e1e2726152",
+          "selector": "a.text-xl",
+          "instanceCount": 9
+        },
+        {
+          "route": "/documents/516fd80c-a295-4d4f-b49e-971ad4a41525",
+          "selector": "a.text-xl",
+          "instanceCount": 10
+        },
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "a.text-xl",
+          "instanceCount": 9
+        },
+        {
+          "route": "/collections",
+          "selector": "a.text-xl",
+          "instanceCount": 9
+        },
+        {
+          "route": "/collections/6b9ba524-9bdc-4a14-9d9f-6a4ff210a069",
+          "selector": "a.text-xl",
+          "instanceCount": 10
+        },
+        {
+          "route": "/reports",
+          "selector": "a.text-xl",
+          "instanceCount": 9
+        },
+        {
+          "route": "/reports/36697b37-a4cf-4074-9c01-c98e0690a3f0",
+          "selector": "a.text-xl",
+          "instanceCount": 10
+        },
+        {
+          "route": "/search",
+          "selector": "a.text-xl",
+          "instanceCount": 9
+        },
+        {
+          "route": "/console",
+          "selector": "a.text-xl",
+          "instanceCount": 9
+        },
+        {
+          "route": "/settings",
+          "selector": "a.text-xl",
+          "instanceCount": 9
+        }
+      ],
+      "totalInstances": 178,
+      "confidence": 0.93,
+      "evidenceRefs": [
+        "dom/components/collections.json",
+        "dom/components/collections_6b9ba524-9bdc-4a14-9d9f-6a4ff210a069.json",
+        "dom/components/console.json",
+        "dom/components/documents.json",
+        "dom/components/documents_516fd80c-a295-4d4f-b49e-971ad4a41525.json",
+        "dom/components/documents_8cc368e5-f5a4-4c81-8909-2c9348f361db.json",
+        "dom/components/documents_d3800df0-bb53-421f-aa93-df4fa5739445.json",
+        "dom/components/missions.json",
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json",
+        "dom/components/projects.json",
+        "dom/components/projects_95dc6df6-5a69-42d5-9e33-b8e1e2726152.json",
+        "dom/components/projects_fbd3bd03-5ddc-49ee-8013-529163a99290.json",
+        "dom/components/reports.json",
+        "dom/components/reports_36697b37-a4cf-4074-9c01-c98e0690a3f0.json",
+        "dom/components/search.json",
+        "dom/components/settings.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-3",
+      "patternName": "List Container",
+      "structureHash": "be65d1eeb3d74f0496899ddfccba06b1f232e1e966b9a27cf930223928df60d1",
+      "semanticRole": "list",
+      "primaryClassPattern": "utility",
+      "tagName": "div",
+      "selectors": {
+        "css": "div.flex"
+      },
+      "variants": [
+        "center",
+        "between"
+      ],
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "center",
+            "between"
+          ]
+        }
+      },
+      "avgDepth": 0.06,
+      "avgChildCount": 55.82,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/missions",
+          "selector": "div.flex",
+          "instanceCount": 2
+        },
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "div.flex",
+          "instanceCount": 17
+        },
+        {
+          "route": "/documents/8cc368e5-f5a4-4c81-8909-2c9348f361db",
+          "selector": "div.flex",
+          "instanceCount": 4
+        },
+        {
+          "route": "/documents",
+          "selector": "div.flex",
+          "instanceCount": 16
+        },
+        {
+          "route": "/documents/d3800df0-bb53-421f-aa93-df4fa5739445",
+          "selector": "div.flex",
+          "instanceCount": 15
+        },
+        {
+          "route": "/projects",
+          "selector": "div.flex",
+          "instanceCount": 25
+        },
+        {
+          "route": "/projects/fbd3bd03-5ddc-49ee-8013-529163a99290",
+          "selector": "div.flex",
+          "instanceCount": 4
+        },
+        {
+          "route": "/projects/95dc6df6-5a69-42d5-9e33-b8e1e2726152",
+          "selector": "div.flex",
+          "instanceCount": 16
+        },
+        {
+          "route": "/documents/516fd80c-a295-4d4f-b49e-971ad4a41525",
+          "selector": "div.flex",
+          "instanceCount": 7
+        },
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "div.flex",
+          "instanceCount": 17
+        },
+        {
+          "route": "/collections",
+          "selector": "div.flex",
+          "instanceCount": 3
+        },
+        {
+          "route": "/collections/6b9ba524-9bdc-4a14-9d9f-6a4ff210a069",
+          "selector": "div.flex",
+          "instanceCount": 4
+        },
+        {
+          "route": "/reports",
+          "selector": "div.flex",
+          "instanceCount": 5
+        },
+        {
+          "route": "/reports/36697b37-a4cf-4074-9c01-c98e0690a3f0",
+          "selector": "div.flex",
+          "instanceCount": 7
+        },
+        {
+          "route": "/search",
+          "selector": "div.flex",
+          "instanceCount": 19
+        },
+        {
+          "route": "/console",
+          "selector": "div.flex",
+          "instanceCount": 4
+        },
+        {
+          "route": "/settings",
+          "selector": "div.flex",
+          "instanceCount": 7
+        }
+      ],
+      "totalInstances": 172,
+      "confidence": 0.87,
+      "evidenceRefs": [
+        "dom/components/collections.json",
+        "dom/components/collections_6b9ba524-9bdc-4a14-9d9f-6a4ff210a069.json",
+        "dom/components/console.json",
+        "dom/components/documents.json",
+        "dom/components/documents_516fd80c-a295-4d4f-b49e-971ad4a41525.json",
+        "dom/components/documents_8cc368e5-f5a4-4c81-8909-2c9348f361db.json",
+        "dom/components/documents_d3800df0-bb53-421f-aa93-df4fa5739445.json",
+        "dom/components/missions.json",
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json",
+        "dom/components/projects.json",
+        "dom/components/projects_95dc6df6-5a69-42d5-9e33-b8e1e2726152.json",
+        "dom/components/projects_fbd3bd03-5ddc-49ee-8013-529163a99290.json",
+        "dom/components/reports.json",
+        "dom/components/reports_36697b37-a4cf-4074-9c01-c98e0690a3f0.json",
+        "dom/components/search.json",
+        "dom/components/settings.json"
+      ],
+      "parentCluster": "cluster-0"
+    },
+    {
+      "clusterId": "cluster-2",
+      "patternName": "Uppercase",
+      "structureHash": "d9d3ce0b60b6b4b472fb22809da82a11671323bae1650b02a938271c649ec7a0",
+      "semanticRole": "unknown",
+      "primaryClassPattern": "utility",
+      "tagName": "p",
+      "selectors": {
+        "css": "p.text-xs"
+      },
+      "variants": [
+        "400",
+        "[0.4em]",
+        "600",
+        "300",
+        "500"
+      ],
+      "variantStyles": {
+        "300": {
+          "font_size": "16px",
+          "line_height": "24px",
+          "color": "rgb(75, 85, 99)",
+          "width": "782px"
+        },
+        "400": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(148, 163, 184)",
+          "width": "241.188px"
+        },
+        "500": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(107, 114, 128)",
+          "width": "595.625px"
+        },
+        "600": {
+          "font_size": "16px",
+          "line_height": "24px",
+          "color": "rgb(75, 85, 99)",
+          "width": "782px"
+        }
+      },
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "400",
+            "[0.4em]",
+            "600",
+            "300",
+            "500"
+          ]
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 47.06,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/missions",
+          "selector": "p.text-xs",
+          "instanceCount": 3
+        },
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "p.text-xs",
+          "instanceCount": 25
+        },
+        {
+          "route": "/documents/8cc368e5-f5a4-4c81-8909-2c9348f361db",
+          "selector": "p.text-xs",
+          "instanceCount": 2
+        },
+        {
+          "route": "/documents",
+          "selector": "p.text-xs",
+          "instanceCount": 3
+        },
+        {
+          "route": "/documents/d3800df0-bb53-421f-aa93-df4fa5739445",
+          "selector": "p.text-xs",
+          "instanceCount": 16
+        },
+        {
+          "route": "/projects",
+          "selector": "p.text-xs",
+          "instanceCount": 10
+        },
+        {
+          "route": "/projects/fbd3bd03-5ddc-49ee-8013-529163a99290",
+          "selector": "p.text-xs",
+          "instanceCount": 2
+        },
+        {
+          "route": "/projects/95dc6df6-5a69-42d5-9e33-b8e1e2726152",
+          "selector": "p.text-xs",
+          "instanceCount": 12
+        },
+        {
+          "route": "/documents/516fd80c-a295-4d4f-b49e-971ad4a41525",
+          "selector": "p.text-xs",
+          "instanceCount": 2
+        },
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "p.text-xs",
+          "instanceCount": 25
+        },
+        {
+          "route": "/collections",
+          "selector": "p.text-xs",
+          "instanceCount": 3
+        },
+        {
+          "route": "/collections/6b9ba524-9bdc-4a14-9d9f-6a4ff210a069",
+          "selector": "p.text-xs",
+          "instanceCount": 4
+        },
+        {
+          "route": "/reports",
+          "selector": "p.text-xs",
+          "instanceCount": 2
+        },
+        {
+          "route": "/reports/36697b37-a4cf-4074-9c01-c98e0690a3f0",
+          "selector": "p.text-xs",
+          "instanceCount": 2
+        },
+        {
+          "route": "/search",
+          "selector": "p.text-xs",
+          "instanceCount": 31
+        },
+        {
+          "route": "/console",
+          "selector": "p.text-xs",
+          "instanceCount": 2
+        },
+        {
+          "route": "/settings",
+          "selector": "p.text-xs",
+          "instanceCount": 4
+        }
+      ],
+      "totalInstances": 148,
+      "confidence": 0.87,
+      "evidenceRefs": [
+        "dom/components/collections.json",
+        "dom/components/collections_6b9ba524-9bdc-4a14-9d9f-6a4ff210a069.json",
+        "dom/components/console.json",
+        "dom/components/documents.json",
+        "dom/components/documents_516fd80c-a295-4d4f-b49e-971ad4a41525.json",
+        "dom/components/documents_8cc368e5-f5a4-4c81-8909-2c9348f361db.json",
+        "dom/components/documents_d3800df0-bb53-421f-aa93-df4fa5739445.json",
+        "dom/components/missions.json",
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json",
+        "dom/components/projects.json",
+        "dom/components/projects_95dc6df6-5a69-42d5-9e33-b8e1e2726152.json",
+        "dom/components/projects_fbd3bd03-5ddc-49ee-8013-529163a99290.json",
+        "dom/components/reports.json",
+        "dom/components/reports_36697b37-a4cf-4074-9c01-c98e0690a3f0.json",
+        "dom/components/search.json",
+        "dom/components/settings.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-7",
+      "patternName": "Font Semibold",
+      "structureHash": "323f9f9f32a83d5e298ea42bf8939cc4d4ef02f8c0149215c62d141811985eb9",
+      "semanticRole": "unknown",
+      "primaryClassPattern": "unknown",
+      "tagName": "span",
+      "selectors": {
+        "css": "span"
+      },
+      "variants": [
+        "semibold",
+        "1.5",
+        "white",
+        "full"
+      ],
+      "variantStyles": {
+        "400": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(37, 99, 235)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "padding_top": "0px",
+          "padding_right": "0px",
+          "padding_bottom": "0px",
+          "padding_left": "0px",
+          "margin_top": "0px",
+          "margin_bottom": "0px",
+          "margin_left": "0px",
+          "border_radius_top_left": "0px",
+          "border_radius_top_right": "0px",
+          "border_radius_bottom_right": "0px",
+          "border_radius_bottom_left": "0px",
+          "display": "block",
+          "width": "123.258px",
+          "border": "0px solid rgb(229, 231, 235)",
+          "flex": "0 1 auto"
+        },
+        "600": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(37, 99, 235)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "padding_top": "0px",
+          "padding_right": "0px",
+          "padding_bottom": "0px",
+          "padding_left": "0px",
+          "margin_top": "0px",
+          "margin_bottom": "0px",
+          "margin_left": "0px",
+          "border_radius_top_left": "0px",
+          "border_radius_top_right": "0px",
+          "border_radius_bottom_right": "0px",
+          "border_radius_bottom_left": "0px",
+          "display": "block",
+          "width": "123.258px",
+          "border": "0px solid rgb(229, 231, 235)",
+          "flex": "0 1 auto"
+        },
+        "900": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(17, 24, 39)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "padding_top": "0px",
+          "padding_right": "0px",
+          "padding_bottom": "0px",
+          "padding_left": "0px",
+          "margin_top": "0px",
+          "margin_bottom": "0px",
+          "margin_left": "8px",
+          "border_radius_top_left": "0px",
+          "border_radius_top_right": "0px",
+          "border_radius_bottom_right": "0px",
+          "border_radius_bottom_left": "0px",
+          "display": "inline",
+          "width": "auto",
+          "border": "0px solid rgb(229, 231, 235)",
+          "flex": "0 1 auto"
+        },
+        "semibold": {
+          "font_size": "18px",
+          "line_height": "28px",
+          "color": "rgb(17, 24, 39)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "padding_top": "0px",
+          "padding_right": "0px",
+          "padding_bottom": "0px",
+          "padding_left": "0px",
+          "margin_top": "0px",
+          "margin_bottom": "16px",
+          "margin_left": "0px",
+          "border_radius_top_left": "0px",
+          "border_radius_top_right": "0px",
+          "border_radius_bottom_right": "0px",
+          "border_radius_bottom_left": "0px",
+          "display": "block",
+          "width": "782px",
+          "border": "0px solid rgb(229, 231, 235)",
+          "flex": "0 1 auto"
+        },
+        "1.5": {
+          "font_size": "16px",
+          "line_height": "24px",
+          "color": "rgb(241, 242, 244)",
+          "background_color": "rgb(156, 163, 175)",
+          "padding_top": "0px",
+          "padding_right": "0px",
+          "padding_bottom": "0px",
+          "padding_left": "0px",
+          "margin_top": "6px",
+          "margin_bottom": "0px",
+          "margin_left": "0px",
+          "border_radius_top_left": "9999px",
+          "border_radius_top_right": "9999px",
+          "border_radius_bottom_right": "9999px",
+          "border_radius_bottom_left": "9999px",
+          "display": "block",
+          "width": "6px",
+          "border": "0px solid rgb(229, 231, 235)",
+          "flex": "0 0 auto"
+        },
+        "white": {
+          "font_size": "30px",
+          "line_height": "36px",
+          "color": "rgb(255, 255, 255)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "padding_top": "0px",
+          "padding_right": "0px",
+          "padding_bottom": "0px",
+          "padding_left": "0px",
+          "margin_top": "8px",
+          "margin_bottom": "0px",
+          "margin_left": "0px",
+          "border_radius_top_left": "0px",
+          "border_radius_top_right": "0px",
+          "border_radius_bottom_right": "0px",
+          "border_radius_bottom_left": "0px",
+          "display": "block",
+          "width": "382px",
+          "border": "0px solid rgb(229, 231, 235)",
+          "flex": "0 1 auto"
+        },
+        "full": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(255, 255, 255)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "padding_top": "4px",
+          "padding_right": "16px",
+          "padding_bottom": "4px",
+          "padding_left": "16px",
+          "margin_top": "0px",
+          "margin_bottom": "0px",
+          "margin_left": "0px",
+          "border_radius_top_left": "9999px",
+          "border_radius_top_right": "9999px",
+          "border_radius_bottom_right": "9999px",
+          "border_radius_bottom_left": "9999px",
+          "display": "block",
+          "width": "166.953px",
+          "border": "1px solid rgba(255, 255, 255, 0.2)",
+          "flex": "0 1 auto"
+        },
+        "medium": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(17, 24, 39)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "padding_top": "0px",
+          "padding_right": "0px",
+          "padding_bottom": "0px",
+          "padding_left": "0px",
+          "margin_top": "0px",
+          "margin_bottom": "8px",
+          "margin_left": "0px",
+          "border_radius_top_left": "0px",
+          "border_radius_top_right": "0px",
+          "border_radius_bottom_right": "0px",
+          "border_radius_bottom_left": "0px",
+          "display": "block",
+          "width": "750px",
+          "border": "0px solid rgb(229, 231, 235)",
+          "flex": "0 1 auto"
+        },
+        "[200px]": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(226, 232, 240)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "padding_top": "0px",
+          "padding_right": "0px",
+          "padding_bottom": "0px",
+          "padding_left": "0px",
+          "margin_top": "0px",
+          "margin_bottom": "0px",
+          "margin_left": "0px",
+          "border_radius_top_left": "0px",
+          "border_radius_top_right": "0px",
+          "border_radius_bottom_right": "0px",
+          "border_radius_bottom_left": "0px",
+          "display": "block",
+          "width": "200px",
+          "border": "0px solid rgb(229, 231, 235)",
+          "flex": "0 1 auto"
+        }
+      },
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "semibold",
+            "1.5",
+            "white",
+            "full"
+          ]
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 45.65,
+      "commonAttributes": [],
+      "instances": [
+        {
+          "route": "/missions",
+          "selector": "span",
+          "instanceCount": 2
+        },
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "span.font-semibold",
+          "instanceCount": 8
+        },
+        {
+          "route": "/documents/8cc368e5-f5a4-4c81-8909-2c9348f361db",
+          "selector": "span.font-semibold",
+          "instanceCount": 1
+        },
+        {
+          "route": "/documents",
+          "selector": "span.font-semibold",
+          "instanceCount": 31
+        },
+        {
+          "route": "/documents/d3800df0-bb53-421f-aa93-df4fa5739445",
+          "selector": "span.font-semibold",
+          "instanceCount": 10
+        },
+        {
+          "route": "/projects",
+          "selector": "span.font-semibold",
+          "instanceCount": 12
+        },
+        {
+          "route": "/projects/fbd3bd03-5ddc-49ee-8013-529163a99290",
+          "selector": "span.font-semibold",
+          "instanceCount": 1
+        },
+        {
+          "route": "/projects/95dc6df6-5a69-42d5-9e33-b8e1e2726152",
+          "selector": "span.font-semibold",
+          "instanceCount": 34
+        },
+        {
+          "route": "/documents/516fd80c-a295-4d4f-b49e-971ad4a41525",
+          "selector": "span.font-semibold",
+          "instanceCount": 2
+        },
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "span.font-semibold",
+          "instanceCount": 7
+        },
+        {
+          "route": "/collections",
+          "selector": "span.font-semibold",
+          "instanceCount": 1
+        },
+        {
+          "route": "/collections/6b9ba524-9bdc-4a14-9d9f-6a4ff210a069",
+          "selector": "span.font-semibold",
+          "instanceCount": 3
+        },
+        {
+          "route": "/reports",
+          "selector": "span.font-semibold",
+          "instanceCount": 1
+        },
+        {
+          "route": "/reports/36697b37-a4cf-4074-9c01-c98e0690a3f0",
+          "selector": "span.font-semibold",
+          "instanceCount": 10
+        },
+        {
+          "route": "/search",
+          "selector": "span.font-semibold",
+          "instanceCount": 6
+        },
+        {
+          "route": "/console",
+          "selector": "span.font-semibold",
+          "instanceCount": 1
+        },
+        {
+          "route": "/settings",
+          "selector": "span.font-semibold",
+          "instanceCount": 1
+        }
+      ],
+      "totalInstances": 131,
+      "confidence": 0.8,
+      "evidenceRefs": [
+        "dom/components/collections.json",
+        "dom/components/collections_6b9ba524-9bdc-4a14-9d9f-6a4ff210a069.json",
+        "dom/components/console.json",
+        "dom/components/documents.json",
+        "dom/components/documents_516fd80c-a295-4d4f-b49e-971ad4a41525.json",
+        "dom/components/documents_8cc368e5-f5a4-4c81-8909-2c9348f361db.json",
+        "dom/components/documents_d3800df0-bb53-421f-aa93-df4fa5739445.json",
+        "dom/components/missions.json",
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json",
+        "dom/components/projects.json",
+        "dom/components/projects_95dc6df6-5a69-42d5-9e33-b8e1e2726152.json",
+        "dom/components/projects_fbd3bd03-5ddc-49ee-8013-529163a99290.json",
+        "dom/components/reports.json",
+        "dom/components/reports_36697b37-a4cf-4074-9c01-c98e0690a3f0.json",
+        "dom/components/search.json",
+        "dom/components/settings.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-1",
+      "patternName": "Inter 6e63d4e8 Module Qthnq G Variable",
+      "structureHash": "0403762818ba2b10aeaf1f50429ad83d2de6a303a97274caa0c2332b81296905",
+      "semanticRole": "unknown",
+      "primaryClassPattern": "unknown",
+      "tagName": "div",
+      "selectors": {
+        "css": "#__next",
+        "testId": "__next"
+      },
+      "variants": [
+        "variable",
+        "sans",
+        "background))]",
+        "screen",
+        "none"
+      ],
+      "variantStyles": {
+        "variable": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(148, 163, 184)",
+          "margin_top": "24px",
+          "width": "382px"
+        },
+        "sans": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(148, 163, 184)",
+          "margin_top": "24px",
+          "width": "382px"
+        },
+        "background))]": {
+          "font_size": "12px",
+          "line_height": "16px",
+          "color": "rgb(148, 163, 184)",
+          "margin_top": "0px",
+          "width": "181.07px"
+        },
+        "screen": {
+          "font_size": "30px",
+          "line_height": "36px",
+          "color": "rgb(255, 255, 255)",
+          "margin_top": "8px",
+          "width": "382px"
+        }
+      },
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "variable",
+            "sans",
+            "background))]",
+            "screen",
+            "none"
+          ]
+        }
+      },
+      "avgDepth": 0.06,
+      "avgChildCount": 80,
+      "commonAttributes": [],
+      "instances": [
+        {
+          "route": "/missions",
+          "selector": "#__next",
+          "instanceCount": 3
+        },
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "#__next",
+          "instanceCount": 20
+        },
+        {
+          "route": "/documents/8cc368e5-f5a4-4c81-8909-2c9348f361db",
+          "selector": "#__next",
+          "instanceCount": 3
+        },
+        {
+          "route": "/documents",
+          "selector": "#__next",
+          "instanceCount": 3
+        },
+        {
+          "route": "/documents/d3800df0-bb53-421f-aa93-df4fa5739445",
+          "selector": "#__next",
+          "instanceCount": 9
+        },
+        {
+          "route": "/projects",
+          "selector": "#__next",
+          "instanceCount": 11
+        },
+        {
+          "route": "/projects/fbd3bd03-5ddc-49ee-8013-529163a99290",
+          "selector": "#__next",
+          "instanceCount": 3
+        },
+        {
+          "route": "/projects/95dc6df6-5a69-42d5-9e33-b8e1e2726152",
+          "selector": "#__next",
+          "instanceCount": 7
+        },
+        {
+          "route": "/documents/516fd80c-a295-4d4f-b49e-971ad4a41525",
+          "selector": "#__next",
+          "instanceCount": 8
+        },
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "#__next",
+          "instanceCount": 16
+        },
+        {
+          "route": "/collections",
+          "selector": "#__next",
+          "instanceCount": 3
+        },
+        {
+          "route": "/collections/6b9ba524-9bdc-4a14-9d9f-6a4ff210a069",
+          "selector": "#__next",
+          "instanceCount": 4
+        },
+        {
+          "route": "/reports",
+          "selector": "#__next",
+          "instanceCount": 3
+        },
+        {
+          "route": "/reports/36697b37-a4cf-4074-9c01-c98e0690a3f0",
+          "selector": "#__next",
+          "instanceCount": 5
+        },
+        {
+          "route": "/search",
+          "selector": "#__next",
+          "instanceCount": 18
+        },
+        {
+          "route": "/console",
+          "selector": "#__next",
+          "instanceCount": 3
+        },
+        {
+          "route": "/settings",
+          "selector": "#__next",
+          "instanceCount": 9
+        }
+      ],
+      "totalInstances": 128,
+      "confidence": 0.8,
+      "evidenceRefs": [
+        "dom/components/collections.json",
+        "dom/components/collections_6b9ba524-9bdc-4a14-9d9f-6a4ff210a069.json",
+        "dom/components/console.json",
+        "dom/components/documents.json",
+        "dom/components/documents_516fd80c-a295-4d4f-b49e-971ad4a41525.json",
+        "dom/components/documents_8cc368e5-f5a4-4c81-8909-2c9348f361db.json",
+        "dom/components/documents_d3800df0-bb53-421f-aa93-df4fa5739445.json",
+        "dom/components/missions.json",
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json",
+        "dom/components/projects.json",
+        "dom/components/projects_95dc6df6-5a69-42d5-9e33-b8e1e2726152.json",
+        "dom/components/projects_fbd3bd03-5ddc-49ee-8013-529163a99290.json",
+        "dom/components/reports.json",
+        "dom/components/reports_36697b37-a4cf-4074-9c01-c98e0690a3f0.json",
+        "dom/components/search.json",
+        "dom/components/settings.json"
+      ],
+      "parentCluster": "cluster-0"
+    },
+    {
+      "clusterId": "cluster-9",
+      "patternName": "Rounded Xl",
+      "structureHash": "cb8bcff9b7575cdf4aa1dad6e4f1124690f4514b3717883dfa2788dfcb0b3bb7",
+      "semanticRole": "button",
+      "primaryClassPattern": "utility",
+      "tagName": "button",
+      "selectors": {
+        "css": "button.w-full"
+      },
+      "variants": [
+        "full",
+        "semibold",
+        "400",
+        "900",
+        "white"
+      ],
+      "variantStyles": {
+        "400": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(107, 114, 128)",
+          "margin_top": "0px",
+          "margin_bottom": "0px",
+          "display": "inline",
+          "width": "auto"
+        },
+        "full": {
+          "font_size": "30px",
+          "line_height": "36px",
+          "color": "rgb(255, 255, 255)",
+          "margin_top": "8px",
+          "margin_bottom": "0px",
+          "display": "block",
+          "width": "382px"
+        },
+        "semibold": {
+          "font_size": "18px",
+          "line_height": "28px",
+          "color": "rgb(17, 24, 39)",
+          "margin_top": "0px",
+          "margin_bottom": "16px",
+          "display": "block",
+          "width": "782px"
+        }
+      },
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "full",
+            "semibold",
+            "400",
+            "900",
+            "white"
+          ]
+        },
+        "type": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "button",
+            "submit",
+            "reset"
+          ]
+        },
+        "disabled": {
+          "type": "boolean",
+          "required": false
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 43.65,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/missions",
+          "selector": "button.w-full",
+          "instanceCount": 1
+        },
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "button.px-3",
+          "instanceCount": 6
+        },
+        {
+          "route": "/documents/8cc368e5-f5a4-4c81-8909-2c9348f361db",
+          "selector": "button.px-3",
+          "instanceCount": 2
+        },
+        {
+          "route": "/documents",
+          "selector": "button.px-3",
+          "instanceCount": 15
+        },
+        {
+          "route": "/documents/d3800df0-bb53-421f-aa93-df4fa5739445",
+          "selector": "button.px-3",
+          "instanceCount": 4
+        },
+        {
+          "route": "/projects",
+          "selector": "button.px-3",
+          "instanceCount": 5
+        },
+        {
+          "route": "/projects/fbd3bd03-5ddc-49ee-8013-529163a99290",
+          "selector": "button.px-3",
+          "instanceCount": 2
+        },
+        {
+          "route": "/projects/95dc6df6-5a69-42d5-9e33-b8e1e2726152",
+          "selector": "button.px-3",
+          "instanceCount": 17
+        },
+        {
+          "route": "/documents/516fd80c-a295-4d4f-b49e-971ad4a41525",
+          "selector": "button.px-3",
+          "instanceCount": 5
+        },
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "button.px-3",
+          "instanceCount": 7
+        },
+        {
+          "route": "/collections",
+          "selector": "button.px-3",
+          "instanceCount": 3
+        },
+        {
+          "route": "/collections/6b9ba524-9bdc-4a14-9d9f-6a4ff210a069",
+          "selector": "button.px-3",
+          "instanceCount": 6
+        },
+        {
+          "route": "/reports",
+          "selector": "button.px-3",
+          "instanceCount": 7
+        },
+        {
+          "route": "/reports/36697b37-a4cf-4074-9c01-c98e0690a3f0",
+          "selector": "button.px-3",
+          "instanceCount": 6
+        },
+        {
+          "route": "/search",
+          "selector": "button.px-3",
+          "instanceCount": 14
+        },
+        {
+          "route": "/console",
+          "selector": "button.px-3",
+          "instanceCount": 2
+        },
+        {
+          "route": "/settings",
+          "selector": "button.px-3",
+          "instanceCount": 7
+        }
+      ],
+      "totalInstances": 109,
+      "confidence": 0.87,
+      "evidenceRefs": [
+        "dom/components/collections.json",
+        "dom/components/collections_6b9ba524-9bdc-4a14-9d9f-6a4ff210a069.json",
+        "dom/components/console.json",
+        "dom/components/documents.json",
+        "dom/components/documents_516fd80c-a295-4d4f-b49e-971ad4a41525.json",
+        "dom/components/documents_8cc368e5-f5a4-4c81-8909-2c9348f361db.json",
+        "dom/components/documents_d3800df0-bb53-421f-aa93-df4fa5739445.json",
+        "dom/components/missions.json",
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json",
+        "dom/components/projects.json",
+        "dom/components/projects_95dc6df6-5a69-42d5-9e33-b8e1e2726152.json",
+        "dom/components/projects_fbd3bd03-5ddc-49ee-8013-529163a99290.json",
+        "dom/components/reports.json",
+        "dom/components/reports_36697b37-a4cf-4074-9c01-c98e0690a3f0.json",
+        "dom/components/search.json",
+        "dom/components/settings.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-17",
+      "patternName": "Dark:Text Blue 400",
+      "structureHash": "00d6c6cad5caab7c429aa9afa820c90f8b7f7be3b25c73daaf3c95a749fdc450",
+      "semanticRole": "unknown",
+      "primaryClassPattern": "unknown",
+      "tagName": "a",
+      "selectors": {
+        "css": "a.text-blue-600"
+      },
+      "variants": [
+        "400",
+        "600"
+      ],
+      "variantStyles": {
+        "400": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(37, 99, 235)",
+          "margin_bottom": "0px",
+          "margin_left": "0px",
+          "display": "block",
+          "width": "123.258px"
+        },
+        "600": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(37, 99, 235)",
+          "margin_bottom": "0px",
+          "margin_left": "0px",
+          "display": "block",
+          "width": "123.258px"
+        },
+        "900": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(17, 24, 39)",
+          "margin_bottom": "0px",
+          "margin_left": "8px",
+          "display": "inline",
+          "width": "auto"
+        },
+        "semibold": {
+          "font_size": "18px",
+          "line_height": "28px",
+          "color": "rgb(17, 24, 39)",
+          "margin_bottom": "16px",
+          "margin_left": "0px",
+          "display": "block",
+          "width": "782px"
+        },
+        "white": {
+          "font_size": "16px",
+          "line_height": "24px",
+          "color": "rgb(17, 24, 39)",
+          "margin_bottom": "0px",
+          "margin_left": "0px",
+          "display": "inline",
+          "width": "auto"
+        },
+        "medium": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(17, 24, 39)",
+          "margin_bottom": "8px",
+          "margin_left": "0px",
+          "display": "block",
+          "width": "750px"
+        }
+      },
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "400",
+            "600"
+          ]
+        },
+        "href": {
+          "type": "string",
+          "required": true
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 56.8,
+      "commonAttributes": [
+        "class",
+        "href"
+      ],
+      "instances": [
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "a.text-blue-600",
+          "instanceCount": 31
+        },
+        {
+          "route": "/documents",
+          "selector": "a.text-lg",
+          "instanceCount": 20
+        },
+        {
+          "route": "/projects/95dc6df6-5a69-42d5-9e33-b8e1e2726152",
+          "selector": "a.text-blue-600",
+          "instanceCount": 11
+        },
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "a.text-blue-600",
+          "instanceCount": 21
+        },
+        {
+          "route": "/reports",
+          "selector": "a.text-gray-900",
+          "instanceCount": 20
+        }
+      ],
+      "totalInstances": 103,
+      "confidence": 0.93,
+      "evidenceRefs": [
+        "dom/components/documents.json",
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json",
+        "dom/components/projects_95dc6df6-5a69-42d5-9e33-b8e1e2726152.json",
+        "dom/components/reports.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-16",
+      "patternName": "Dark:Bg Gray 700",
+      "structureHash": "ccac39b435011952b421438ea49230b60be98f2fc0413bfd512b3d4ae9d40c75",
+      "semanticRole": "unknown",
+      "primaryClassPattern": "utility",
+      "tagName": "th",
+      "selectors": {
+        "css": "th.px-4"
+      },
+      "variants": [
+        "100",
+        "700",
+        "600",
+        "semibold",
+        "left"
+      ],
+      "variantStyles": {
+        "400": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(107, 114, 128)",
+          "margin_bottom": "0px",
+          "display": "inline",
+          "width": "auto"
+        },
+        "semibold": {
+          "font_size": "18px",
+          "line_height": "28px",
+          "color": "rgb(17, 24, 39)",
+          "margin_bottom": "16px",
+          "display": "block",
+          "width": "782px"
+        },
+        "medium": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(17, 24, 39)",
+          "margin_bottom": "8px",
+          "display": "block",
+          "width": "750px"
+        }
+      },
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "100",
+            "700",
+            "600",
+            "semibold",
+            "left"
+          ]
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 158.33,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "th.px-4",
+          "instanceCount": 32
+        },
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "th.px-4",
+          "instanceCount": 28
+        },
+        {
+          "route": "/reports",
+          "selector": "th.px-6",
+          "instanceCount": 6
+        }
+      ],
+      "totalInstances": 66,
+      "confidence": 0.71,
+      "evidenceRefs": [
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json",
+        "dom/components/reports.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-38",
+      "patternName": "Option",
+      "structureHash": "225128bbef395324c034b19b6131cd146291ab33d37ef3dd7c0cbeb0e565323f",
+      "semanticRole": "unknown",
+      "primaryClassPattern": "unknown",
+      "tagName": "option",
+      "selectors": {
+        "css": "option"
+      },
+      "avgDepth": 0,
+      "avgChildCount": 151,
+      "commonAttributes": [
+        "value"
+      ],
+      "instances": [
+        {
+          "route": "/documents",
+          "selector": "option",
+          "instanceCount": 48
+        },
+        {
+          "route": "/projects",
+          "selector": "option",
+          "instanceCount": 5
+        }
+      ],
+      "totalInstances": 53,
+      "confidence": 0.63,
+      "evidenceRefs": [
+        "dom/components/documents.json",
+        "dom/components/projects.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-25",
+      "patternName": "Font Medium",
+      "structureHash": "7a23ee0c69400984bf7fc0c95ecc8461ab552461e58bc4f722f82acf2e157dda",
+      "semanticRole": "unknown",
+      "primaryClassPattern": "unknown",
+      "tagName": "p",
+      "selectors": {
+        "css": "p.text-white/90"
+      },
+      "variants": [
+        "white/90",
+        "medium",
+        "white",
+        "900"
+      ],
+      "variantStyles": {
+        "900": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(17, 24, 39)",
+          "margin_bottom": "0px",
+          "margin_left": "8px",
+          "display": "inline",
+          "width": "auto"
+        },
+        "white/90": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgba(255, 255, 255, 0.9)",
+          "margin_bottom": "0px",
+          "margin_left": "0px",
+          "display": "block",
+          "width": "181.07px"
+        },
+        "medium": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(17, 24, 39)",
+          "margin_bottom": "8px",
+          "margin_left": "0px",
+          "display": "block",
+          "width": "750px"
+        },
+        "white": {
+          "font_size": "16px",
+          "line_height": "24px",
+          "color": "rgb(17, 24, 39)",
+          "margin_bottom": "0px",
+          "margin_left": "0px",
+          "display": "inline",
+          "width": "auto"
+        },
+        "semibold": {
+          "font_size": "18px",
+          "line_height": "28px",
+          "color": "rgb(17, 24, 39)",
+          "margin_bottom": "16px",
+          "margin_left": "0px",
+          "display": "block",
+          "width": "782px"
+        }
+      },
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "white/90",
+            "medium",
+            "white",
+            "900"
+          ]
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 43.44,
+      "commonAttributes": [],
+      "instances": [
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "p.text-white/90",
+          "instanceCount": 6
+        },
+        {
+          "route": "/documents/8cc368e5-f5a4-4c81-8909-2c9348f361db",
+          "selector": "p.text-white/90",
+          "instanceCount": 2
+        },
+        {
+          "route": "/documents",
+          "selector": "p.text-white/90",
+          "instanceCount": 2
+        },
+        {
+          "route": "/documents/d3800df0-bb53-421f-aa93-df4fa5739445",
+          "selector": "p.text-white/90",
+          "instanceCount": 2
+        },
+        {
+          "route": "/projects",
+          "selector": "p.text-white/90",
+          "instanceCount": 12
+        },
+        {
+          "route": "/projects/fbd3bd03-5ddc-49ee-8013-529163a99290",
+          "selector": "p.text-white/90",
+          "instanceCount": 2
+        },
+        {
+          "route": "/projects/95dc6df6-5a69-42d5-9e33-b8e1e2726152",
+          "selector": "p.text-white/90",
+          "instanceCount": 2
+        },
+        {
+          "route": "/documents/516fd80c-a295-4d4f-b49e-971ad4a41525",
+          "selector": "p.text-white/90",
+          "instanceCount": 2
+        },
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "p.text-white/90",
+          "instanceCount": 6
+        },
+        {
+          "route": "/collections",
+          "selector": "p.text-white/90",
+          "instanceCount": 2
+        },
+        {
+          "route": "/collections/6b9ba524-9bdc-4a14-9d9f-6a4ff210a069",
+          "selector": "p.text-white/90",
+          "instanceCount": 2
+        },
+        {
+          "route": "/reports",
+          "selector": "p.text-white/90",
+          "instanceCount": 2
+        },
+        {
+          "route": "/reports/36697b37-a4cf-4074-9c01-c98e0690a3f0",
+          "selector": "p.text-white/90",
+          "instanceCount": 2
+        },
+        {
+          "route": "/search",
+          "selector": "p.text-white/90",
+          "instanceCount": 2
+        },
+        {
+          "route": "/console",
+          "selector": "p.text-white/90",
+          "instanceCount": 2
+        },
+        {
+          "route": "/settings",
+          "selector": "p.text-white/90",
+          "instanceCount": 2
+        }
+      ],
+      "totalInstances": 50,
+      "confidence": 0.8,
+      "evidenceRefs": [
+        "dom/components/collections.json",
+        "dom/components/collections_6b9ba524-9bdc-4a14-9d9f-6a4ff210a069.json",
+        "dom/components/console.json",
+        "dom/components/documents.json",
+        "dom/components/documents_516fd80c-a295-4d4f-b49e-971ad4a41525.json",
+        "dom/components/documents_8cc368e5-f5a4-4c81-8909-2c9348f361db.json",
+        "dom/components/documents_d3800df0-bb53-421f-aa93-df4fa5739445.json",
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json",
+        "dom/components/projects.json",
+        "dom/components/projects_95dc6df6-5a69-42d5-9e33-b8e1e2726152.json",
+        "dom/components/projects_fbd3bd03-5ddc-49ee-8013-529163a99290.json",
+        "dom/components/reports.json",
+        "dom/components/reports_36697b37-a4cf-4074-9c01-c98e0690a3f0.json",
+        "dom/components/search.json",
+        "dom/components/settings.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-49",
+      "patternName": "Option",
+      "structureHash": "d1c4ed04a7fd5c407c5edf0d8fe31f7e0ee0f2aa694c5b45441f9bbe953e0f5b",
+      "semanticRole": "unknown",
+      "primaryClassPattern": "utility",
+      "tagName": "option",
+      "selectors": {
+        "css": "option.bg-slate-900"
+      },
+      "variants": [
+        "900",
+        "white"
+      ],
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "900",
+            "white"
+          ]
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 148,
+      "commonAttributes": [
+        "class",
+        "value"
+      ],
+      "instances": [
+        {
+          "route": "/search",
+          "selector": "option.bg-slate-900",
+          "instanceCount": 49
+        }
+      ],
+      "totalInstances": 49,
+      "confidence": 0.61,
+      "evidenceRefs": [
+        "dom/components/search.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-18",
+      "patternName": "Font Semibold",
+      "structureHash": "7e59beddb06b263b0e9a650f4ba88581816e38daa1e8b1d29052c08d010a8a5c",
+      "semanticRole": "unknown",
+      "primaryClassPattern": "unknown",
+      "tagName": "strong",
+      "selectors": {
+        "css": "strong.font-semibold"
+      },
+      "variants": [
+        "semibold",
+        "white",
+        "900"
+      ],
+      "variantStyles": {
+        "900": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "margin_bottom": "0px",
+          "margin_left": "8px",
+          "display": "inline",
+          "width": "auto"
+        },
+        "semibold": {
+          "font_size": "18px",
+          "line_height": "28px",
+          "margin_bottom": "16px",
+          "margin_left": "0px",
+          "display": "block",
+          "width": "782px"
+        },
+        "white": {
+          "font_size": "16px",
+          "line_height": "24px",
+          "margin_bottom": "0px",
+          "margin_left": "0px",
+          "display": "inline",
+          "width": "auto"
+        }
+      },
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "semibold",
+            "white",
+            "900"
+          ]
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 9.5,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "strong.font-semibold",
+          "instanceCount": 19
+        },
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "strong.font-semibold",
+          "instanceCount": 28
+        }
+      ],
+      "totalInstances": 47,
+      "confidence": 0.63,
+      "evidenceRefs": [
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-19",
+      "patternName": "Font Semibold",
+      "structureHash": "b870c407608f37900221e8d10dfedd11c2ac65f5a213063224be190039702fe6",
+      "semanticRole": "unknown",
+      "primaryClassPattern": "utility",
+      "tagName": "h2",
+      "selectors": {
+        "css": "h2.text-lg"
+      },
+      "variants": [
+        "900",
+        "semibold",
+        "white",
+        "2xl"
+      ],
+      "variantStyles": {
+        "900": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "margin_bottom": "0px",
+          "margin_left": "8px",
+          "display": "inline",
+          "width": "auto"
+        },
+        "semibold": {
+          "font_size": "18px",
+          "line_height": "28px",
+          "margin_bottom": "16px",
+          "margin_left": "0px",
+          "display": "block",
+          "width": "782px"
+        },
+        "white": {
+          "font_size": "16px",
+          "line_height": "24px",
+          "margin_bottom": "0px",
+          "margin_left": "0px",
+          "display": "inline",
+          "width": "auto"
+        },
+        "2xl": {
+          "font_size": "24px",
+          "line_height": "32px",
+          "margin_bottom": "0px",
+          "margin_left": "0px",
+          "display": "block",
+          "width": "782px"
+        }
+      },
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "900",
+            "semibold",
+            "white",
+            "2xl"
+          ]
+        }
+      },
+      "avgDepth": 0.2,
+      "avgChildCount": 43.1,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "h2.text-lg",
+          "instanceCount": 18
+        },
+        {
+          "route": "/documents/d3800df0-bb53-421f-aa93-df4fa5739445",
+          "selector": "h2.text-lg",
+          "instanceCount": 2
+        },
+        {
+          "route": "/projects",
+          "selector": "h2.text-lg",
+          "instanceCount": 2
+        },
+        {
+          "route": "/projects/95dc6df6-5a69-42d5-9e33-b8e1e2726152",
+          "selector": "h2.text-lg",
+          "instanceCount": 1
+        },
+        {
+          "route": "/documents/516fd80c-a295-4d4f-b49e-971ad4a41525",
+          "selector": "h2.text-lg",
+          "instanceCount": 1
+        },
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "h2.text-lg",
+          "instanceCount": 15
+        },
+        {
+          "route": "/collections/6b9ba524-9bdc-4a14-9d9f-6a4ff210a069",
+          "selector": "h2.text-lg",
+          "instanceCount": 1
+        },
+        {
+          "route": "/reports/36697b37-a4cf-4074-9c01-c98e0690a3f0",
+          "selector": "h2.text-lg",
+          "instanceCount": 2
+        },
+        {
+          "route": "/search",
+          "selector": "h2.text-2xl",
+          "instanceCount": 1
+        },
+        {
+          "route": "/settings",
+          "selector": "h2.text-lg",
+          "instanceCount": 3
+        }
+      ],
+      "totalInstances": 46,
+      "confidence": 0.87,
+      "evidenceRefs": [
+        "dom/components/collections_6b9ba524-9bdc-4a14-9d9f-6a4ff210a069.json",
+        "dom/components/documents_516fd80c-a295-4d4f-b49e-971ad4a41525.json",
+        "dom/components/documents_d3800df0-bb53-421f-aa93-df4fa5739445.json",
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json",
+        "dom/components/projects.json",
+        "dom/components/projects_95dc6df6-5a69-42d5-9e33-b8e1e2726152.json",
+        "dom/components/reports_36697b37-a4cf-4074-9c01-c98e0690a3f0.json",
+        "dom/components/search.json",
+        "dom/components/settings.json"
+      ],
+      "parentCluster": "cluster-1"
+    },
+    {
+      "clusterId": "cluster-45",
+      "patternName": "Dark:Bg Gray 700",
+      "structureHash": "2146b86ab571247dbd2caf44933104399931b951b61cb1710fd75d6c4ab7d1a0",
+      "semanticRole": "unknown",
+      "primaryClassPattern": "unknown",
+      "tagName": "code",
+      "selectors": {
+        "css": "code.bg-gray-100"
+      },
+      "variants": [
+        "700",
+        "200",
+        "1.5",
+        "100",
+        "800"
+      ],
+      "variantStyles": {
+        "900": {
+          "font_family": "Inter, \"Inter Fallback\", Inter, system-ui, sans-serif",
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(17, 24, 39)",
+          "margin_left": "8px",
+          "display": "inline",
+          "width": "auto"
+        },
+        "mono": {
+          "font_family": "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace",
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(107, 114, 128)",
+          "margin_left": "0px",
+          "display": "block",
+          "width": "219.148px"
+        },
+        "white": {
+          "font_family": "Inter, \"Inter Fallback\", Inter, system-ui, sans-serif",
+          "font_size": "16px",
+          "line_height": "24px",
+          "color": "rgb(17, 24, 39)",
+          "margin_left": "0px",
+          "display": "inline",
+          "width": "auto"
+        }
+      },
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "700",
+            "200",
+            "1.5",
+            "100",
+            "800"
+          ]
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 6.5,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "code.bg-gray-100",
+          "instanceCount": 37
+        },
+        {
+          "route": "/settings",
+          "selector": "code.font-mono",
+          "instanceCount": 1
+        }
+      ],
+      "totalInstances": 38,
+      "confidence": 0.63,
+      "evidenceRefs": [
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/settings.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-21",
+      "patternName": "Font Semibold",
+      "structureHash": "aae35fb5934ac979037e4d85afb0f98531a204184f61ae4ab5c379deffc75813",
+      "semanticRole": "unknown",
+      "primaryClassPattern": "utility",
+      "tagName": "h3",
+      "selectors": {
+        "css": "h3.text-lg"
+      },
+      "variants": [
+        "900",
+        "semibold",
+        "white",
+        "medium"
+      ],
+      "variantStyles": {
+        "900": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "margin_bottom": "0px",
+          "margin_left": "8px",
+          "display": "inline",
+          "width": "auto"
+        },
+        "semibold": {
+          "font_size": "18px",
+          "line_height": "28px",
+          "margin_bottom": "16px",
+          "margin_left": "0px",
+          "display": "block",
+          "width": "782px"
+        },
+        "white": {
+          "font_size": "16px",
+          "line_height": "24px",
+          "margin_bottom": "0px",
+          "margin_left": "0px",
+          "display": "inline",
+          "width": "auto"
+        },
+        "medium": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "margin_bottom": "8px",
+          "margin_left": "0px",
+          "display": "block",
+          "width": "750px"
+        }
+      },
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "900",
+            "semibold",
+            "white",
+            "medium"
+          ]
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 22,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "h3.text-lg",
+          "instanceCount": 7
+        },
+        {
+          "route": "/documents/d3800df0-bb53-421f-aa93-df4fa5739445",
+          "selector": "h3.text-sm",
+          "instanceCount": 2
+        },
+        {
+          "route": "/projects/95dc6df6-5a69-42d5-9e33-b8e1e2726152",
+          "selector": "h3.text-lg",
+          "instanceCount": 1
+        },
+        {
+          "route": "/documents/516fd80c-a295-4d4f-b49e-971ad4a41525",
+          "selector": "h3.text-sm",
+          "instanceCount": 1
+        },
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "h3.text-lg",
+          "instanceCount": 6
+        },
+        {
+          "route": "/search",
+          "selector": "h3.text-lg",
+          "instanceCount": 2
+        }
+      ],
+      "totalInstances": 19,
+      "confidence": 0.87,
+      "evidenceRefs": [
+        "dom/components/documents_516fd80c-a295-4d4f-b49e-971ad4a41525.json",
+        "dom/components/documents_d3800df0-bb53-421f-aa93-df4fa5739445.json",
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json",
+        "dom/components/projects_95dc6df6-5a69-42d5-9e33-b8e1e2726152.json",
+        "dom/components/search.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-13",
+      "patternName": "Border B",
+      "structureHash": "0f835aa28b886da15e647c2375dee96e468f813344a8ee8015475349053bd980",
+      "semanticRole": "navigation",
+      "primaryClassPattern": "utility",
+      "tagName": "nav",
+      "selectors": {
+        "css": "nav.bg-white"
+      },
+      "variants": [
+        "white",
+        "200",
+        "800",
+        "700"
+      ],
+      "variantStyles": {
+        "200": {
+          "font_size": "18px",
+          "line_height": "28px",
+          "color": "rgb(17, 24, 39)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "width": "109.406px"
+        },
+        "800": {
+          "font_size": "16px",
+          "line_height": "24px",
+          "color": "rgb(241, 242, 244)",
+          "background_color": "rgb(255, 255, 255)",
+          "width": "1470px"
+        },
+        "white": {
+          "font_size": "16px",
+          "line_height": "24px",
+          "color": "rgb(241, 242, 244)",
+          "background_color": "rgb(255, 255, 255)",
+          "width": "1470px"
+        }
+      },
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "white",
+            "200",
+            "800",
+            "700"
+          ]
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 95.65,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/missions",
+          "selector": "nav.bg-white",
+          "instanceCount": 1
+        },
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "nav.bg-white",
+          "instanceCount": 1
+        },
+        {
+          "route": "/documents/8cc368e5-f5a4-4c81-8909-2c9348f361db",
+          "selector": "nav.bg-white",
+          "instanceCount": 1
+        },
+        {
+          "route": "/documents",
+          "selector": "nav.bg-white",
+          "instanceCount": 1
+        },
+        {
+          "route": "/documents/d3800df0-bb53-421f-aa93-df4fa5739445",
+          "selector": "nav.bg-white",
+          "instanceCount": 1
+        },
+        {
+          "route": "/projects",
+          "selector": "nav.bg-white",
+          "instanceCount": 1
+        },
+        {
+          "route": "/projects/fbd3bd03-5ddc-49ee-8013-529163a99290",
+          "selector": "nav.bg-white",
+          "instanceCount": 1
+        },
+        {
+          "route": "/projects/95dc6df6-5a69-42d5-9e33-b8e1e2726152",
+          "selector": "nav.bg-white",
+          "instanceCount": 2
+        },
+        {
+          "route": "/documents/516fd80c-a295-4d4f-b49e-971ad4a41525",
+          "selector": "nav.bg-white",
+          "instanceCount": 1
+        },
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "nav.bg-white",
+          "instanceCount": 1
+        },
+        {
+          "route": "/collections",
+          "selector": "nav.bg-white",
+          "instanceCount": 1
+        },
+        {
+          "route": "/collections/6b9ba524-9bdc-4a14-9d9f-6a4ff210a069",
+          "selector": "nav.bg-white",
+          "instanceCount": 1
+        },
+        {
+          "route": "/reports",
+          "selector": "nav.bg-white",
+          "instanceCount": 1
+        },
+        {
+          "route": "/reports/36697b37-a4cf-4074-9c01-c98e0690a3f0",
+          "selector": "nav.bg-white",
+          "instanceCount": 1
+        },
+        {
+          "route": "/search",
+          "selector": "nav.bg-white",
+          "instanceCount": 1
+        },
+        {
+          "route": "/console",
+          "selector": "nav.bg-white",
+          "instanceCount": 1
+        },
+        {
+          "route": "/settings",
+          "selector": "nav.bg-white",
+          "instanceCount": 1
+        }
+      ],
+      "totalInstances": 18,
+      "confidence": 0.87,
+      "evidenceRefs": [
+        "dom/components/collections.json",
+        "dom/components/collections_6b9ba524-9bdc-4a14-9d9f-6a4ff210a069.json",
+        "dom/components/console.json",
+        "dom/components/documents.json",
+        "dom/components/documents_516fd80c-a295-4d4f-b49e-971ad4a41525.json",
+        "dom/components/documents_8cc368e5-f5a4-4c81-8909-2c9348f361db.json",
+        "dom/components/documents_d3800df0-bb53-421f-aa93-df4fa5739445.json",
+        "dom/components/missions.json",
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json",
+        "dom/components/projects.json",
+        "dom/components/projects_95dc6df6-5a69-42d5-9e33-b8e1e2726152.json",
+        "dom/components/projects_fbd3bd03-5ddc-49ee-8013-529163a99290.json",
+        "dom/components/reports.json",
+        "dom/components/reports_36697b37-a4cf-4074-9c01-c98e0690a3f0.json",
+        "dom/components/search.json",
+        "dom/components/settings.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-31",
+      "patternName": "Header",
+      "structureHash": "cd6f0fedf1851f698cd24d1c463ba12a408f07b9c9f5160e644e557b71e50699",
+      "semanticRole": "header",
+      "primaryClassPattern": "unknown",
+      "tagName": "header",
+      "selectors": {
+        "css": "header.sticky"
+      },
+      "variants": [
+        "center"
+      ],
+      "avgDepth": 0,
+      "avgChildCount": 82.75,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "header.sticky",
+          "instanceCount": 2
+        },
+        {
+          "route": "/documents/8cc368e5-f5a4-4c81-8909-2c9348f361db",
+          "selector": "header.sticky",
+          "instanceCount": 1
+        },
+        {
+          "route": "/documents",
+          "selector": "header.sticky",
+          "instanceCount": 1
+        },
+        {
+          "route": "/documents/d3800df0-bb53-421f-aa93-df4fa5739445",
+          "selector": "header.sticky",
+          "instanceCount": 1
+        },
+        {
+          "route": "/projects",
+          "selector": "header.sticky",
+          "instanceCount": 1
+        },
+        {
+          "route": "/projects/fbd3bd03-5ddc-49ee-8013-529163a99290",
+          "selector": "header.sticky",
+          "instanceCount": 1
+        },
+        {
+          "route": "/projects/95dc6df6-5a69-42d5-9e33-b8e1e2726152",
+          "selector": "header.sticky",
+          "instanceCount": 1
+        },
+        {
+          "route": "/documents/516fd80c-a295-4d4f-b49e-971ad4a41525",
+          "selector": "header.sticky",
+          "instanceCount": 1
+        },
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "header.sticky",
+          "instanceCount": 2
+        },
+        {
+          "route": "/collections",
+          "selector": "header.sticky",
+          "instanceCount": 1
+        },
+        {
+          "route": "/collections/6b9ba524-9bdc-4a14-9d9f-6a4ff210a069",
+          "selector": "header.sticky",
+          "instanceCount": 1
+        },
+        {
+          "route": "/reports",
+          "selector": "header.sticky",
+          "instanceCount": 1
+        },
+        {
+          "route": "/reports/36697b37-a4cf-4074-9c01-c98e0690a3f0",
+          "selector": "header.sticky",
+          "instanceCount": 1
+        },
+        {
+          "route": "/search",
+          "selector": "header.sticky",
+          "instanceCount": 1
+        },
+        {
+          "route": "/console",
+          "selector": "header.sticky",
+          "instanceCount": 1
+        },
+        {
+          "route": "/settings",
+          "selector": "header.sticky",
+          "instanceCount": 1
+        }
+      ],
+      "totalInstances": 18,
+      "confidence": 0.87,
+      "evidenceRefs": [
+        "dom/components/collections.json",
+        "dom/components/collections_6b9ba524-9bdc-4a14-9d9f-6a4ff210a069.json",
+        "dom/components/console.json",
+        "dom/components/documents.json",
+        "dom/components/documents_516fd80c-a295-4d4f-b49e-971ad4a41525.json",
+        "dom/components/documents_8cc368e5-f5a4-4c81-8909-2c9348f361db.json",
+        "dom/components/documents_d3800df0-bb53-421f-aa93-df4fa5739445.json",
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json",
+        "dom/components/projects.json",
+        "dom/components/projects_95dc6df6-5a69-42d5-9e33-b8e1e2726152.json",
+        "dom/components/projects_fbd3bd03-5ddc-49ee-8013-529163a99290.json",
+        "dom/components/reports.json",
+        "dom/components/reports_36697b37-a4cf-4074-9c01-c98e0690a3f0.json",
+        "dom/components/search.json",
+        "dom/components/settings.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-11",
+      "patternName": "Font Semibold",
+      "structureHash": "1a5d145eab9405fed352a1da62cf9745763b3e4b13a71ec38f3c6339fb38382f",
+      "semanticRole": "unknown",
+      "primaryClassPattern": "utility",
+      "tagName": "h1",
+      "selectors": {
+        "css": "h1.text-3xl"
+      },
+      "variants": [
+        "3xl",
+        "white",
+        "semibold",
+        "2xl",
+        "900"
+      ],
+      "variantStyles": {
+        "900": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(17, 24, 39)",
+          "margin_top": "0px",
+          "margin_bottom": "0px",
+          "margin_left": "8px",
+          "display": "inline",
+          "width": "auto"
+        },
+        "3xl": {
+          "font_size": "30px",
+          "line_height": "36px",
+          "color": "rgb(255, 255, 255)",
+          "margin_top": "8px",
+          "margin_bottom": "0px",
+          "margin_left": "0px",
+          "display": "block",
+          "width": "382px"
+        },
+        "white": {
+          "font_size": "30px",
+          "line_height": "36px",
+          "color": "rgb(255, 255, 255)",
+          "margin_top": "8px",
+          "margin_bottom": "0px",
+          "margin_left": "0px",
+          "display": "block",
+          "width": "382px"
+        },
+        "semibold": {
+          "font_size": "18px",
+          "line_height": "28px",
+          "color": "rgb(17, 24, 39)",
+          "margin_top": "0px",
+          "margin_bottom": "16px",
+          "margin_left": "0px",
+          "display": "block",
+          "width": "782px"
+        },
+        "2xl": {
+          "font_size": "24px",
+          "line_height": "32px",
+          "color": "rgb(17, 24, 39)",
+          "margin_top": "0px",
+          "margin_bottom": "0px",
+          "margin_left": "0px",
+          "display": "block",
+          "width": "782px"
+        },
+        "bold": {
+          "font_size": "20px",
+          "line_height": "28px",
+          "color": "rgb(17, 24, 39)",
+          "margin_top": "0px",
+          "margin_bottom": "0px",
+          "margin_left": "0px",
+          "display": "block",
+          "width": "90.9141px"
+        }
+      },
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "3xl",
+            "white",
+            "semibold",
+            "2xl",
+            "900"
+          ]
+        }
+      },
+      "avgDepth": 0.27,
+      "avgChildCount": 74.4,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/missions",
+          "selector": "h1.text-3xl",
+          "instanceCount": 1
+        },
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "h1.text-2xl",
+          "instanceCount": 2
+        },
+        {
+          "route": "/documents",
+          "selector": "h1.text-3xl",
+          "instanceCount": 1
+        },
+        {
+          "route": "/documents/d3800df0-bb53-421f-aa93-df4fa5739445",
+          "selector": "h1.text-2xl",
+          "instanceCount": 1
+        },
+        {
+          "route": "/projects",
+          "selector": "h1.text-3xl",
+          "instanceCount": 1
+        },
+        {
+          "route": "/projects/95dc6df6-5a69-42d5-9e33-b8e1e2726152",
+          "selector": "h1.text-2xl",
+          "instanceCount": 1
+        },
+        {
+          "route": "/documents/516fd80c-a295-4d4f-b49e-971ad4a41525",
+          "selector": "h1.text-2xl",
+          "instanceCount": 1
+        },
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "h1.text-2xl",
+          "instanceCount": 2
+        },
+        {
+          "route": "/collections",
+          "selector": "h1.text-3xl",
+          "instanceCount": 1
+        },
+        {
+          "route": "/collections/6b9ba524-9bdc-4a14-9d9f-6a4ff210a069",
+          "selector": "h1.text-2xl",
+          "instanceCount": 1
+        },
+        {
+          "route": "/reports",
+          "selector": "h1.text-3xl",
+          "instanceCount": 1
+        },
+        {
+          "route": "/reports/36697b37-a4cf-4074-9c01-c98e0690a3f0",
+          "selector": "h1.text-2xl",
+          "instanceCount": 1
+        },
+        {
+          "route": "/search",
+          "selector": "h1.text-2xl",
+          "instanceCount": 1
+        },
+        {
+          "route": "/console",
+          "selector": "h1.text-3xl",
+          "instanceCount": 1
+        },
+        {
+          "route": "/settings",
+          "selector": "h1.text-2xl",
+          "instanceCount": 1
+        }
+      ],
+      "totalInstances": 17,
+      "confidence": 0.87,
+      "evidenceRefs": [
+        "dom/components/collections.json",
+        "dom/components/collections_6b9ba524-9bdc-4a14-9d9f-6a4ff210a069.json",
+        "dom/components/console.json",
+        "dom/components/documents.json",
+        "dom/components/documents_516fd80c-a295-4d4f-b49e-971ad4a41525.json",
+        "dom/components/documents_d3800df0-bb53-421f-aa93-df4fa5739445.json",
+        "dom/components/missions.json",
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json",
+        "dom/components/projects.json",
+        "dom/components/projects_95dc6df6-5a69-42d5-9e33-b8e1e2726152.json",
+        "dom/components/reports.json",
+        "dom/components/reports_36697b37-a4cf-4074-9c01-c98e0690a3f0.json",
+        "dom/components/search.json",
+        "dom/components/settings.json"
+      ],
+      "parentCluster": "cluster-19"
+    },
+    {
+      "clusterId": "cluster-26",
+      "patternName": "Dark:Text Gray 300",
+      "structureHash": "7279f151dc8e97c15aaa50f7fe42d8527a55060b18544caf449a2b5c098e15ea",
+      "semanticRole": "unknown",
+      "primaryClassPattern": "utility",
+      "tagName": "li",
+      "selectors": {
+        "css": "li.text-gray-700"
+      },
+      "variants": [
+        "700",
+        "300"
+      ],
+      "variantStyles": {
+        "300": {
+          "line_height": "24px",
+          "color": "rgb(75, 85, 99)",
+          "margin_top": "0px",
+          "margin_bottom": "0px",
+          "width": "782px"
+        },
+        "700": {
+          "line_height": "26px",
+          "color": "rgb(55, 65, 81)",
+          "margin_top": "20px",
+          "margin_bottom": "12px",
+          "width": "750px"
+        }
+      },
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "700",
+            "300"
+          ]
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 20,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "li.text-gray-700",
+          "instanceCount": 5
+        },
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "li.text-gray-700",
+          "instanceCount": 7
+        },
+        {
+          "route": "/search",
+          "selector": "li.rounded-xl",
+          "instanceCount": 5
+        }
+      ],
+      "totalInstances": 17,
+      "confidence": 0.71,
+      "evidenceRefs": [
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json",
+        "dom/components/search.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-23",
+      "patternName": "Dark:Bg Gray 800",
+      "structureHash": "7f83fa3200d7ac0bdf33b13e94d6dfd34c978e3514b4f90867310c0d5861fe09",
+      "semanticRole": "unknown",
+      "primaryClassPattern": "unknown",
+      "tagName": "tbody",
+      "selectors": {
+        "css": "tbody"
+      },
+      "variants": [
+        "800",
+        "200",
+        "white"
+      ],
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "800",
+            "200",
+            "white"
+          ]
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 121,
+      "commonAttributes": [],
+      "instances": [
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "tbody",
+          "instanceCount": 7
+        },
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "tbody",
+          "instanceCount": 6
+        },
+        {
+          "route": "/reports",
+          "selector": "tbody.bg-white",
+          "instanceCount": 1
+        }
+      ],
+      "totalInstances": 14,
+      "confidence": 0.64,
+      "evidenceRefs": [
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json",
+        "dom/components/reports.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-5",
+      "patternName": "Rounded Xl",
+      "structureHash": "45205971ac7bba9bdf7799c5f88feaa734982939335f8ff31e7e633dbfeb1b26",
+      "semanticRole": "input",
+      "primaryClassPattern": "utility",
+      "tagName": "input",
+      "selectors": {
+        "css": "input.w-full",
+        "testId": "graph-toggle"
+      },
+      "variants": [
+        "full",
+        "900/40",
+        "white/10",
+        "none",
+        "700"
+      ],
+      "variantStyles": {
+        "800": {
+          "font_size": "16px",
+          "line_height": "24px",
+          "color": "rgb(241, 242, 244)",
+          "background_color": "rgb(255, 255, 255)",
+          "margin_top": "0px",
+          "margin_bottom": "0px",
+          "display": "block",
+          "width": "1470px"
+        },
+        "900": {
+          "font_size": "24px",
+          "line_height": "32px",
+          "color": "rgb(17, 24, 39)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "margin_top": "24px",
+          "margin_bottom": "12px",
+          "display": "block",
+          "width": "750px"
+        },
+        "full": {
+          "font_size": "30px",
+          "line_height": "36px",
+          "color": "rgb(255, 255, 255)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "margin_top": "8px",
+          "margin_bottom": "0px",
+          "display": "block",
+          "width": "382px"
+        },
+        "white": {
+          "font_size": "16px",
+          "line_height": "24px",
+          "color": "rgb(17, 24, 39)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "margin_top": "0px",
+          "margin_bottom": "0px",
+          "display": "inline",
+          "width": "auto"
+        }
+      },
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "full",
+            "900/40",
+            "white/10",
+            "none",
+            "700"
+          ]
+        },
+        "type": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "text",
+            "password",
+            "email",
+            "number",
+            "checkbox",
+            "radio",
+            "search",
+            "tel",
+            "url"
+          ]
+        },
+        "disabled": {
+          "type": "boolean",
+          "required": false
+        },
+        "required": {
+          "type": "boolean",
+          "required": false
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 71.83,
+      "commonAttributes": [
+        "class",
+        "type"
+      ],
+      "instances": [
+        {
+          "route": "/missions",
+          "selector": "input.w-full",
+          "instanceCount": 2
+        },
+        {
+          "route": "/documents",
+          "selector": "input.px-4",
+          "instanceCount": 1
+        },
+        {
+          "route": "/projects",
+          "selector": "input.w-full",
+          "instanceCount": 2
+        },
+        {
+          "route": "/projects/95dc6df6-5a69-42d5-9e33-b8e1e2726152",
+          "selector": "#file-input-detail",
+          "instanceCount": 2
+        },
+        {
+          "route": "/search",
+          "selector": "#graph-toggle",
+          "instanceCount": 1
+        },
+        {
+          "route": "/settings",
+          "selector": "input.w-full",
+          "instanceCount": 5
+        }
+      ],
+      "totalInstances": 13,
+      "confidence": 0.93,
+      "evidenceRefs": [
+        "dom/components/documents.json",
+        "dom/components/missions.json",
+        "dom/components/projects.json",
+        "dom/components/projects_95dc6df6-5a69-42d5-9e33-b8e1e2726152.json",
+        "dom/components/search.json",
+        "dom/components/settings.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-6",
+      "patternName": "Font Medium",
+      "structureHash": "936b38538eb17b6611b5723fe5e879f5a7d70cde7c2587397e08ca6e4629a157",
+      "semanticRole": "unknown",
+      "primaryClassPattern": "utility",
+      "tagName": "label",
+      "selectors": {
+        "css": "label.block"
+      },
+      "variants": [
+        "200",
+        "700",
+        "medium",
+        "400"
+      ],
+      "variantStyles": {
+        "300": {
+          "font_size": "16px",
+          "line_height": "24px",
+          "color": "rgb(75, 85, 99)",
+          "margin_top": "0px",
+          "margin_bottom": "0px",
+          "width": "782px"
+        },
+        "400": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(148, 163, 184)",
+          "margin_top": "0px",
+          "margin_bottom": "0px",
+          "width": "241.188px"
+        },
+        "700": {
+          "font_size": "16px",
+          "line_height": "26px",
+          "color": "rgb(55, 65, 81)",
+          "margin_top": "20px",
+          "margin_bottom": "12px",
+          "width": "750px"
+        },
+        "medium": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(17, 24, 39)",
+          "margin_top": "0px",
+          "margin_bottom": "8px",
+          "width": "750px"
+        }
+      },
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "200",
+            "700",
+            "medium",
+            "400"
+          ]
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 72,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/missions",
+          "selector": "label.block",
+          "instanceCount": 2
+        },
+        {
+          "route": "/projects",
+          "selector": "label.block",
+          "instanceCount": 3
+        },
+        {
+          "route": "/search",
+          "selector": "label.text-sm",
+          "instanceCount": 3
+        },
+        {
+          "route": "/settings",
+          "selector": "label.block",
+          "instanceCount": 5
+        }
+      ],
+      "totalInstances": 13,
+      "confidence": 0.79,
+      "evidenceRefs": [
+        "dom/components/missions.json",
+        "dom/components/projects.json",
+        "dom/components/search.json",
+        "dom/components/settings.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-22",
+      "patternName": "Border Gray 200",
+      "structureHash": "7c6e207e11caba5e4ba3084ac1cba6064050ed6a3bf9bf21ae03e639cc6cec53",
+      "semanticRole": "unknown",
+      "primaryClassPattern": "utility",
+      "tagName": "table",
+      "selectors": {
+        "css": "table.min-w-full"
+      },
+      "variants": [
+        "full",
+        "200",
+        "600"
+      ],
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "full",
+            "200",
+            "600"
+          ]
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 96.5,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "table.min-w-full",
+          "instanceCount": 7
+        },
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "table.min-w-full",
+          "instanceCount": 6
+        }
+      ],
+      "totalInstances": 13,
+      "confidence": 0.63,
+      "evidenceRefs": [
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-24",
+      "patternName": "Thead",
+      "structureHash": "6b6673c23a795b616b3a87f07f977cc4e77653bc1b8af215c102726ed0aba6eb",
+      "semanticRole": "unknown",
+      "primaryClassPattern": "unknown",
+      "tagName": "thead",
+      "selectors": {
+        "css": "thead"
+      },
+      "avgDepth": 0,
+      "avgChildCount": 95.5,
+      "commonAttributes": [],
+      "instances": [
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "thead",
+          "instanceCount": 7
+        },
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "thead",
+          "instanceCount": 6
+        }
+      ],
+      "totalInstances": 13,
+      "confidence": 0.56,
+      "evidenceRefs": [
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-8",
+      "patternName": "Hover:Text Sky 300",
+      "structureHash": "f6f7828801ebeb7574ebde3d2108b3fb805965e21ad44460bd22b24be53c616f",
+      "semanticRole": "button",
+      "primaryClassPattern": "unknown",
+      "tagName": "button",
+      "selectors": {
+        "css": "button.text-sky-400"
+      },
+      "variants": [
+        "300",
+        "medium",
+        "400",
+        "1.5"
+      ],
+      "variantStyles": {
+        "300": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(56, 189, 248)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "padding_top": "0px",
+          "padding_right": "0px",
+          "padding_bottom": "0px",
+          "padding_left": "0px",
+          "margin_bottom": "0px",
+          "border_radius_top_left": "0px",
+          "border_radius_top_right": "0px",
+          "border_radius_bottom_right": "0px",
+          "border_radius_bottom_left": "0px",
+          "display": "inline-block",
+          "width": "73.4062px",
+          "border": "0px solid rgb(229, 231, 235)",
+          "box_shadow": "none"
+        },
+        "400": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(56, 189, 248)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "padding_top": "0px",
+          "padding_right": "0px",
+          "padding_bottom": "0px",
+          "padding_left": "0px",
+          "margin_bottom": "0px",
+          "border_radius_top_left": "0px",
+          "border_radius_top_right": "0px",
+          "border_radius_bottom_right": "0px",
+          "border_radius_bottom_left": "0px",
+          "display": "inline-block",
+          "width": "73.4062px",
+          "border": "0px solid rgb(229, 231, 235)",
+          "box_shadow": "none"
+        },
+        "medium": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(17, 24, 39)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "padding_top": "0px",
+          "padding_right": "0px",
+          "padding_bottom": "0px",
+          "padding_left": "0px",
+          "margin_bottom": "8px",
+          "border_radius_top_left": "0px",
+          "border_radius_top_right": "0px",
+          "border_radius_bottom_right": "0px",
+          "border_radius_bottom_left": "0px",
+          "display": "block",
+          "width": "750px",
+          "border": "0px solid rgb(229, 231, 235)",
+          "box_shadow": "none"
+        },
+        "1.5": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(75, 85, 99)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "padding_top": "6px",
+          "padding_right": "12px",
+          "padding_bottom": "6px",
+          "padding_left": "12px",
+          "margin_bottom": "0px",
+          "border_radius_top_left": "8px",
+          "border_radius_top_right": "8px",
+          "border_radius_bottom_right": "8px",
+          "border_radius_bottom_left": "8px",
+          "display": "block",
+          "width": "77.0234px",
+          "border": "1px solid rgb(209, 213, 219)",
+          "box_shadow": "none"
+        },
+        "full": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(255, 255, 255)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "padding_top": "4px",
+          "padding_right": "16px",
+          "padding_bottom": "4px",
+          "padding_left": "16px",
+          "margin_bottom": "0px",
+          "border_radius_top_left": "9999px",
+          "border_radius_top_right": "9999px",
+          "border_radius_bottom_right": "9999px",
+          "border_radius_bottom_left": "9999px",
+          "display": "block",
+          "width": "166.953px",
+          "border": "1px solid rgba(255, 255, 255, 0.2)",
+          "box_shadow": "none"
+        },
+        "[52px]": {
+          "font_size": "16px",
+          "line_height": "24px",
+          "color": "rgb(255, 255, 255)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "padding_top": "0px",
+          "padding_right": "32px",
+          "padding_bottom": "0px",
+          "padding_left": "32px",
+          "margin_bottom": "0px",
+          "border_radius_top_left": "12px",
+          "border_radius_top_right": "12px",
+          "border_radius_bottom_right": "12px",
+          "border_radius_bottom_left": "12px",
+          "display": "flex",
+          "width": "118.336px",
+          "border": "0px solid rgb(229, 231, 235)",
+          "box_shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(14, 165, 233, 0.25) 0px 10px 15px -3px, rgba(14, 165, 233, 0.25) 0px 4px 6px -4px"
+        },
+        "center": {
+          "font_size": "20px",
+          "line_height": "28px",
+          "color": "rgb(17, 24, 39)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "padding_top": "0px",
+          "padding_right": "0px",
+          "padding_bottom": "0px",
+          "padding_left": "0px",
+          "margin_bottom": "0px",
+          "border_radius_top_left": "0px",
+          "border_radius_top_right": "0px",
+          "border_radius_bottom_right": "0px",
+          "border_radius_bottom_left": "0px",
+          "display": "block",
+          "width": "90.9141px",
+          "border": "0px solid rgb(229, 231, 235)",
+          "box_shadow": "none"
+        },
+        "flex": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(4, 120, 87)",
+          "background_color": "rgb(209, 250, 229)",
+          "padding_top": "6px",
+          "padding_right": "12px",
+          "padding_bottom": "6px",
+          "padding_left": "12px",
+          "margin_bottom": "0px",
+          "border_radius_top_left": "9999px",
+          "border_radius_top_right": "9999px",
+          "border_radius_bottom_right": "9999px",
+          "border_radius_bottom_left": "9999px",
+          "display": "flex",
+          "width": "111.07px",
+          "border": "0px solid rgb(229, 231, 235)",
+          "box_shadow": "none"
+        }
+      },
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "300",
+            "medium",
+            "400",
+            "1.5"
+          ]
+        },
+        "type": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "button",
+            "submit",
+            "reset"
+          ]
+        },
+        "disabled": {
+          "type": "boolean",
+          "required": false
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 27.4,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/missions",
+          "selector": "button.text-sky-400",
+          "instanceCount": 1
+        },
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "button.px-3",
+          "instanceCount": 1
+        },
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "button.px-3",
+          "instanceCount": 1
+        },
+        {
+          "route": "/reports/36697b37-a4cf-4074-9c01-c98e0690a3f0",
+          "selector": "button.px-3",
+          "instanceCount": 1
+        },
+        {
+          "route": "/search",
+          "selector": "button.inline-flex",
+          "instanceCount": 6
+        }
+      ],
+      "totalInstances": 10,
+      "confidence": 0.87,
+      "evidenceRefs": [
+        "dom/components/missions.json",
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json",
+        "dom/components/reports_36697b37-a4cf-4074-9c01-c98e0690a3f0.json",
+        "dom/components/search.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-27",
+      "patternName": "Dark:Bg Gray 700/50",
+      "structureHash": "acf198b567f452eb5a44eb3b6c20ed57872b198f977702bb2155cd0d3f51903c",
+      "semanticRole": "list",
+      "primaryClassPattern": "utility",
+      "tagName": "li",
+      "selectors": {
+        "css": "li.flex"
+      },
+      "variants": [
+        "start",
+        "between",
+        "2.5"
+      ],
+      "variantStyles": {
+        "start": {
+          "font_size": "24px",
+          "line_height": "32px",
+          "width": "782px"
+        },
+        "center": {
+          "font_size": "20px",
+          "line_height": "28px",
+          "width": "90.9141px"
+        }
+      },
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "start",
+            "between",
+            "2.5"
+          ]
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 13,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "li.flex",
+          "instanceCount": 4
+        },
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "li.flex",
+          "instanceCount": 5
+        },
+        {
+          "route": "/settings",
+          "selector": "li.flex",
+          "instanceCount": 1
+        }
+      ],
+      "totalInstances": 10,
+      "confidence": 0.71,
+      "evidenceRefs": [
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json",
+        "dom/components/settings.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-28",
+      "patternName": "List",
+      "structureHash": "15a0723224177e6918606be1c1d3923e82e30f0e15d1aba8896222c270bffc86",
+      "semanticRole": "list",
+      "primaryClassPattern": "unknown",
+      "tagName": "ul",
+      "selectors": {
+        "css": "ul.space-y-2"
+      },
+      "avgDepth": 0,
+      "avgChildCount": 9,
+      "commonAttributes": [],
+      "instances": [
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "ul.space-y-2",
+          "instanceCount": 4
+        },
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "ul.space-y-2",
+          "instanceCount": 4
+        },
+        {
+          "route": "/settings",
+          "selector": "ul.space-y-2",
+          "instanceCount": 1
+        }
+      ],
+      "totalInstances": 9,
+      "confidence": 0.6,
+      "evidenceRefs": [
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json",
+        "dom/components/settings.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-34",
+      "patternName": "Flex Col",
+      "structureHash": "970eb25b72ba18e2ce3590734ca010d853c31b9a6b1a45c0b9df99647c3248c0",
+      "semanticRole": "list",
+      "primaryClassPattern": "unknown",
+      "tagName": "div",
+      "selectors": {
+        "css": "div.flex"
+      },
+      "variants": [
+        "between",
+        "start",
+        "row",
+        "col"
+      ],
+      "variantStyles": {
+        "start": {
+          "font_size": "24px",
+          "line_height": "32px",
+          "color": "rgb(17, 24, 39)",
+          "padding_top": "0px",
+          "padding_right": "0px",
+          "padding_bottom": "0px",
+          "padding_left": "0px",
+          "border_radius_top_left": "0px",
+          "border_radius_top_right": "0px",
+          "border_radius_bottom_right": "0px",
+          "border_radius_bottom_left": "0px",
+          "width": "782px",
+          "border": "0px solid rgb(229, 231, 235)"
+        },
+        "col": {
+          "font_size": "16px",
+          "line_height": "24px",
+          "color": "rgb(241, 242, 244)",
+          "padding_top": "8px",
+          "padding_right": "16px",
+          "padding_bottom": "8px",
+          "padding_left": "16px",
+          "border_radius_top_left": "8px",
+          "border_radius_top_right": "8px",
+          "border_radius_bottom_right": "8px",
+          "border_radius_bottom_left": "8px",
+          "width": "99.3594px",
+          "border": "1px solid rgb(209, 213, 219)"
+        },
+        "center": {
+          "font_size": "20px",
+          "line_height": "28px",
+          "color": "rgb(17, 24, 39)",
+          "padding_top": "0px",
+          "padding_right": "0px",
+          "padding_bottom": "0px",
+          "padding_left": "0px",
+          "border_radius_top_left": "0px",
+          "border_radius_top_right": "0px",
+          "border_radius_bottom_right": "0px",
+          "border_radius_bottom_left": "0px",
+          "width": "90.9141px",
+          "border": "0px solid rgb(229, 231, 235)"
+        }
+      },
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "between",
+            "start",
+            "row",
+            "col"
+          ]
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 63,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "div.flex",
+          "instanceCount": 1
+        },
+        {
+          "route": "/projects",
+          "selector": "div.flex",
+          "instanceCount": 1
+        },
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "div.flex",
+          "instanceCount": 1
+        },
+        {
+          "route": "/search",
+          "selector": "div.flex",
+          "instanceCount": 5
+        }
+      ],
+      "totalInstances": 8,
+      "confidence": 0.71,
+      "evidenceRefs": [
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json",
+        "dom/components/projects.json",
+        "dom/components/search.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-50",
+      "patternName": "Rounded 2xl",
+      "structureHash": "d31d9bf739fcf82fdb59d6b47ac4d3d55b1c0c9c12f8d39b8b1de00773642025",
+      "semanticRole": "card",
+      "primaryClassPattern": "utility",
+      "tagName": "div",
+      "selectors": {
+        "css": "div.glass-card"
+      },
+      "variants": [
+        "2xl",
+        "card",
+        "center",
+        "between"
+      ],
+      "variantStyles": {
+        "2xl": {
+          "font_size": "18px",
+          "line_height": "28px",
+          "color": "rgb(255, 255, 255)",
+          "width": "145.039px"
+        },
+        "card": {
+          "font_size": "24px",
+          "line_height": "32px",
+          "color": "rgb(255, 255, 255)",
+          "width": "846px"
+        },
+        "center": {
+          "font_size": "20px",
+          "line_height": "28px",
+          "color": "rgb(17, 24, 39)",
+          "width": "90.9141px"
+        }
+      },
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "2xl",
+            "card",
+            "center",
+            "between"
+          ]
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 79,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/search",
+          "selector": "div.glass-card",
+          "instanceCount": 7
+        }
+      ],
+      "totalInstances": 7,
+      "confidence": 0.43,
+      "evidenceRefs": [
+        "dom/components/search.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-35",
+      "patternName": "Rounded Lg",
+      "structureHash": "69b0336a807c642b37bab842fbc0ef641ab5a87010a1c7101b2df33f448a1d64",
+      "semanticRole": "section",
+      "primaryClassPattern": "utility",
+      "tagName": "section",
+      "selectors": {
+        "css": "section.rounded-lg"
+      },
+      "variants": [
+        "200",
+        "700",
+        "800",
+        "full",
+        "card"
+      ],
+      "variantStyles": {
+        "200": {
+          "font_size": "18px",
+          "line_height": "28px",
+          "color": "rgb(17, 24, 39)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "width": "109.406px"
+        },
+        "800": {
+          "font_size": "16px",
+          "line_height": "24px",
+          "color": "rgb(241, 242, 244)",
+          "background_color": "rgb(255, 255, 255)",
+          "width": "1470px"
+        },
+        "full": {
+          "font_size": "24px",
+          "line_height": "32px",
+          "color": "rgb(255, 255, 255)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "width": "846px"
+        },
+        "card": {
+          "font_size": "24px",
+          "line_height": "32px",
+          "color": "rgb(255, 255, 255)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "width": "846px"
+        },
+        "white": {
+          "font_size": "16px",
+          "line_height": "24px",
+          "color": "rgb(241, 242, 244)",
+          "background_color": "rgb(255, 255, 255)",
+          "width": "1470px"
+        }
+      },
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "200",
+            "700",
+            "800",
+            "full",
+            "card"
+          ]
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 54,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "section.rounded-lg",
+          "instanceCount": 1
+        },
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "section.rounded-lg",
+          "instanceCount": 1
+        },
+        {
+          "route": "/search",
+          "selector": "section.glass-card",
+          "instanceCount": 1
+        },
+        {
+          "route": "/settings",
+          "selector": "section.bg-white",
+          "instanceCount": 3
+        }
+      ],
+      "totalInstances": 6,
+      "confidence": 0.63,
+      "evidenceRefs": [
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json",
+        "dom/components/search.json",
+        "dom/components/settings.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-39",
+      "patternName": "Dark:Border Gray 700",
+      "structureHash": "c03362556cb5c4e3c3508e16e4d87fb981f6cecec6e164d1ba7c2036a0d35be6",
+      "semanticRole": "input",
+      "primaryClassPattern": "utility",
+      "tagName": "select",
+      "selectors": {
+        "css": "select.px-4",
+        "testId": "project-filter"
+      },
+      "variants": [
+        "700",
+        "800",
+        "white",
+        "full",
+        "600"
+      ],
+      "variantStyles": {
+        "800": {
+          "font_size": "16px",
+          "line_height": "24px",
+          "color": "rgb(241, 242, 244)",
+          "background_color": "rgb(255, 255, 255)",
+          "margin_top": "0px",
+          "margin_bottom": "0px",
+          "display": "block",
+          "width": "1470px"
+        },
+        "900": {
+          "font_size": "24px",
+          "line_height": "32px",
+          "color": "rgb(17, 24, 39)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "margin_top": "24px",
+          "margin_bottom": "12px",
+          "display": "block",
+          "width": "750px"
+        },
+        "white": {
+          "font_size": "16px",
+          "line_height": "24px",
+          "color": "rgb(17, 24, 39)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "margin_top": "0px",
+          "margin_bottom": "0px",
+          "display": "inline",
+          "width": "auto"
+        },
+        "full": {
+          "font_size": "30px",
+          "line_height": "36px",
+          "color": "rgb(255, 255, 255)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "margin_top": "8px",
+          "margin_bottom": "0px",
+          "display": "block",
+          "width": "382px"
+        }
+      },
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "700",
+            "800",
+            "white",
+            "full",
+            "600"
+          ]
+        },
+        "disabled": {
+          "type": "boolean",
+          "required": false
+        },
+        "required": {
+          "type": "boolean",
+          "required": false
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 152.33,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/documents",
+          "selector": "select.px-4",
+          "instanceCount": 2
+        },
+        {
+          "route": "/projects",
+          "selector": "select.w-full",
+          "instanceCount": 1
+        },
+        {
+          "route": "/search",
+          "selector": "#project-filter",
+          "instanceCount": 2
+        }
+      ],
+      "totalInstances": 5,
+      "confidence": 0.51,
+      "evidenceRefs": [
+        "dom/components/documents.json",
+        "dom/components/projects.json",
+        "dom/components/search.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-10",
+      "patternName": "Border White/5",
+      "structureHash": "c8632ac1dd3087f56bae7ebd150f341cf76069e5945390d8777d2790c6c7ac83",
+      "semanticRole": "form",
+      "primaryClassPattern": "utility",
+      "tagName": "form",
+      "selectors": {
+        "css": "form.w-full"
+      },
+      "variants": [
+        "full",
+        "white/5",
+        "card",
+        "white",
+        "200"
+      ],
+      "variantStyles": {
+        "200": {
+          "font_size": "18px",
+          "line_height": "28px",
+          "color": "rgb(17, 24, 39)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "margin_top": "0px",
+          "width": "109.406px"
+        },
+        "800": {
+          "font_size": "16px",
+          "line_height": "24px",
+          "color": "rgb(241, 242, 244)",
+          "background_color": "rgb(255, 255, 255)",
+          "margin_top": "0px",
+          "width": "1470px"
+        },
+        "full": {
+          "font_size": "30px",
+          "line_height": "36px",
+          "color": "rgb(255, 255, 255)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "margin_top": "8px",
+          "width": "382px"
+        },
+        "card": {
+          "font_size": "24px",
+          "line_height": "32px",
+          "color": "rgb(255, 255, 255)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "margin_top": "0px",
+          "width": "846px"
+        },
+        "white": {
+          "font_size": "16px",
+          "line_height": "24px",
+          "color": "rgb(241, 242, 244)",
+          "background_color": "rgb(255, 255, 255)",
+          "margin_top": "0px",
+          "width": "1470px"
+        }
+      },
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "full",
+            "white/5",
+            "card",
+            "white",
+            "200"
+          ]
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 83.5,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/missions",
+          "selector": "form.w-full",
+          "instanceCount": 1
+        },
+        {
+          "route": "/projects",
+          "selector": "form.bg-white",
+          "instanceCount": 1
+        },
+        {
+          "route": "/search",
+          "selector": "form.w-full",
+          "instanceCount": 1
+        },
+        {
+          "route": "/settings",
+          "selector": "form.flex",
+          "instanceCount": 1
+        }
+      ],
+      "totalInstances": 4,
+      "confidence": 0.55,
+      "evidenceRefs": [
+        "dom/components/missions.json",
+        "dom/components/projects.json",
+        "dom/components/search.json",
+        "dom/components/settings.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-36",
+      "patternName": "Inline Flex",
+      "structureHash": "647deb51588f1659357ed31f6f150b4054d2d0360ed874a293013b4cd8192865",
+      "semanticRole": "list",
+      "primaryClassPattern": "utility",
+      "tagName": "span",
+      "selectors": {
+        "css": "span.inline-flex"
+      },
+      "variants": [
+        "flex",
+        "full",
+        "1.5",
+        "medium"
+      ],
+      "variantStyles": {
+        "flex": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(4, 120, 87)",
+          "background_color": "rgb(209, 250, 229)",
+          "padding_top": "6px",
+          "padding_right": "12px",
+          "padding_bottom": "6px",
+          "padding_left": "12px",
+          "margin_bottom": "0px",
+          "border_radius_top_left": "9999px",
+          "border_radius_top_right": "9999px",
+          "border_radius_bottom_right": "9999px",
+          "border_radius_bottom_left": "9999px",
+          "display": "flex",
+          "width": "111.07px",
+          "border": "0px solid rgb(229, 231, 235)"
+        },
+        "full": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(255, 255, 255)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "padding_top": "4px",
+          "padding_right": "16px",
+          "padding_bottom": "4px",
+          "padding_left": "16px",
+          "margin_bottom": "0px",
+          "border_radius_top_left": "9999px",
+          "border_radius_top_right": "9999px",
+          "border_radius_bottom_right": "9999px",
+          "border_radius_bottom_left": "9999px",
+          "display": "block",
+          "width": "166.953px",
+          "border": "1px solid rgba(255, 255, 255, 0.2)"
+        },
+        "1.5": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(75, 85, 99)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "padding_top": "6px",
+          "padding_right": "12px",
+          "padding_bottom": "6px",
+          "padding_left": "12px",
+          "margin_bottom": "0px",
+          "border_radius_top_left": "8px",
+          "border_radius_top_right": "8px",
+          "border_radius_bottom_right": "8px",
+          "border_radius_bottom_left": "8px",
+          "display": "block",
+          "width": "77.0234px",
+          "border": "1px solid rgb(209, 213, 219)"
+        },
+        "medium": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(17, 24, 39)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "padding_top": "0px",
+          "padding_right": "0px",
+          "padding_bottom": "0px",
+          "padding_left": "0px",
+          "margin_bottom": "8px",
+          "border_radius_top_left": "0px",
+          "border_radius_top_right": "0px",
+          "border_radius_bottom_right": "0px",
+          "border_radius_bottom_left": "0px",
+          "display": "block",
+          "width": "750px",
+          "border": "0px solid rgb(229, 231, 235)"
+        },
+        "center": {
+          "font_size": "20px",
+          "line_height": "28px",
+          "color": "rgb(17, 24, 39)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "padding_top": "0px",
+          "padding_right": "0px",
+          "padding_bottom": "0px",
+          "padding_left": "0px",
+          "margin_bottom": "0px",
+          "border_radius_top_left": "0px",
+          "border_radius_top_right": "0px",
+          "border_radius_bottom_right": "0px",
+          "border_radius_bottom_left": "0px",
+          "display": "block",
+          "width": "90.9141px",
+          "border": "0px solid rgb(229, 231, 235)"
+        }
+      },
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "flex",
+            "full",
+            "1.5",
+            "medium"
+          ]
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 73.25,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "span.inline-flex",
+          "instanceCount": 1
+        },
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "span.inline-flex",
+          "instanceCount": 1
+        },
+        {
+          "route": "/collections/6b9ba524-9bdc-4a14-9d9f-6a4ff210a069",
+          "selector": "span.inline-flex",
+          "instanceCount": 1
+        },
+        {
+          "route": "/search",
+          "selector": "span.flex",
+          "instanceCount": 1
+        }
+      ],
+      "totalInstances": 4,
+      "confidence": 0.55,
+      "evidenceRefs": [
+        "dom/components/collections_6b9ba524-9bdc-4a14-9d9f-6a4ff210a069.json",
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json",
+        "dom/components/search.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-12",
+      "patternName": "Dark:Bg Gray 900",
+      "structureHash": "8c99c66fa0fd7ffde4e424d6187e857c6c4e42bc786857fc4c3c79ab8290b440",
+      "semanticRole": "main",
+      "primaryClassPattern": "utility",
+      "tagName": "main",
+      "selectors": {
+        "css": "main.min-h-screen"
+      },
+      "variants": [
+        "screen",
+        "center",
+        "background))]",
+        "auto"
+      ],
+      "variantStyles": {
+        "900": {
+          "font_size": "24px",
+          "line_height": "32px",
+          "color": "rgb(17, 24, 39)",
+          "margin_top": "24px",
+          "margin_bottom": "12px",
+          "width": "750px"
+        },
+        "screen": {
+          "font_size": "30px",
+          "line_height": "36px",
+          "color": "rgb(255, 255, 255)",
+          "margin_top": "8px",
+          "margin_bottom": "0px",
+          "width": "382px"
+        },
+        "center": {
+          "font_size": "20px",
+          "line_height": "28px",
+          "color": "rgb(17, 24, 39)",
+          "margin_top": "0px",
+          "margin_bottom": "0px",
+          "width": "90.9141px"
+        },
+        "background))]": {
+          "font_size": "12px",
+          "line_height": "16px",
+          "color": "rgb(148, 163, 184)",
+          "margin_top": "0px",
+          "margin_bottom": "0px",
+          "width": "181.07px"
+        },
+        "auto": {
+          "font_size": "20px",
+          "line_height": "28px",
+          "color": "rgb(17, 24, 39)",
+          "margin_top": "0px",
+          "margin_bottom": "0px",
+          "width": "90.9141px"
+        },
+        "7xl": {
+          "font_size": "20px",
+          "line_height": "28px",
+          "color": "rgb(17, 24, 39)",
+          "margin_top": "0px",
+          "margin_bottom": "0px",
+          "width": "90.9141px"
+        }
+      },
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "screen",
+            "center",
+            "background))]",
+            "auto"
+          ]
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 72.67,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/missions",
+          "selector": "main.min-h-screen",
+          "instanceCount": 1
+        },
+        {
+          "route": "/search",
+          "selector": "main.relative",
+          "instanceCount": 1
+        },
+        {
+          "route": "/console",
+          "selector": "main.min-h-screen",
+          "instanceCount": 1
+        }
+      ],
+      "totalInstances": 3,
+      "confidence": 0.43,
+      "evidenceRefs": [
+        "dom/components/console.json",
+        "dom/components/missions.json",
+        "dom/components/search.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-29",
+      "patternName": "Emphasis",
+      "structureHash": "8283f2a85419c09cc95f70dff2c1df6e880263981c3113bc26e023599b6be531",
+      "semanticRole": "unknown",
+      "primaryClassPattern": "unknown",
+      "tagName": "em",
+      "selectors": {
+        "css": "em"
+      },
+      "avgDepth": 0,
+      "avgChildCount": 9,
+      "commonAttributes": [],
+      "instances": [
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "em",
+          "instanceCount": 3
+        }
+      ],
+      "totalInstances": 3,
+      "confidence": 0.2,
+      "evidenceRefs": [
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-30",
+      "patternName": "Font Semibold",
+      "structureHash": "5c68fd1d160fea502600aa06e2ab3fd8025b12e15925c485c86ec917cf901812",
+      "semanticRole": "unknown",
+      "primaryClassPattern": "unknown",
+      "tagName": "h3",
+      "selectors": {
+        "css": "h3.text-sm"
+      },
+      "variants": [
+        "semibold",
+        "300",
+        "700"
+      ],
+      "variantStyles": {
+        "300": {
+          "font_size": "16px",
+          "line_height": "24px",
+          "color": "rgb(75, 85, 99)",
+          "margin_top": "0px",
+          "margin_bottom": "0px",
+          "width": "782px"
+        },
+        "700": {
+          "font_size": "16px",
+          "line_height": "26px",
+          "color": "rgb(55, 65, 81)",
+          "margin_top": "20px",
+          "margin_bottom": "12px",
+          "width": "750px"
+        },
+        "semibold": {
+          "font_size": "18px",
+          "line_height": "28px",
+          "color": "rgb(17, 24, 39)",
+          "margin_top": "0px",
+          "margin_bottom": "16px",
+          "width": "782px"
+        }
+      },
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "semibold",
+            "300",
+            "700"
+          ]
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 38,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "h3.text-sm",
+          "instanceCount": 2
+        },
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "h3.text-sm",
+          "instanceCount": 1
+        }
+      ],
+      "totalInstances": 3,
+      "confidence": 0.35,
+      "evidenceRefs": [
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-37",
+      "patternName": "Dark:Text Gray 400",
+      "structureHash": "e5e8960c54ddaf21ffbf030f18e8de2ac2502f279836c84856dfce742107e3a6",
+      "semanticRole": "unknown",
+      "primaryClassPattern": "utility",
+      "tagName": "svg",
+      "selectors": {
+        "css": "svg.w-5"
+      },
+      "variants": [
+        "600",
+        "400"
+      ],
+      "variantStyles": {
+        "400": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(107, 114, 128)",
+          "display": "inline",
+          "width": "auto"
+        },
+        "600": {
+          "font_size": "16px",
+          "line_height": "24px",
+          "color": "rgb(75, 85, 99)",
+          "display": "block",
+          "width": "782px"
+        }
+      },
+      "props": {
+        "variant": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "600",
+            "400"
+          ]
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 134.33,
+      "commonAttributes": [
+        "class",
+        "fill",
+        "stroke",
+        "viewbox"
+      ],
+      "instances": [
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "svg.w-5",
+          "instanceCount": 1
+        },
+        {
+          "route": "/documents",
+          "selector": "svg.w-5",
+          "instanceCount": 1
+        },
+        {
+          "route": "/search",
+          "selector": "svg.h-5",
+          "instanceCount": 1
+        }
+      ],
+      "totalInstances": 3,
+      "confidence": 0.56,
+      "evidenceRefs": [
+        "dom/components/documents.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json",
+        "dom/components/search.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-44",
+      "patternName": "Section",
+      "structureHash": "4fedf550232fd3534d1ca5c36e2fdb6f2f301aeb78e1c7ee3adf11f104b188b3",
+      "semanticRole": "section",
+      "primaryClassPattern": "unknown",
+      "tagName": "section",
+      "selectors": {
+        "css": "section.lg:col-span-2"
+      },
+      "avgDepth": 0,
+      "avgChildCount": 124.5,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/projects/95dc6df6-5a69-42d5-9e33-b8e1e2726152",
+          "selector": "section.lg:col-span-2",
+          "instanceCount": 1
+        },
+        {
+          "route": "/search",
+          "selector": "section.space-y-4",
+          "instanceCount": 2
+        }
+      ],
+      "totalInstances": 3,
+      "confidence": 0.35,
+      "evidenceRefs": [
+        "dom/components/projects_95dc6df6-5a69-42d5-9e33-b8e1e2726152.json",
+        "dom/components/search.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-51",
+      "patternName": "Shape",
+      "structureHash": "83387643e48e50cef9bedc29723512293b8d059eaea57e4f3a38e3b95e10c324",
+      "semanticRole": "unknown",
+      "primaryClassPattern": "unknown",
+      "tagName": "path",
+      "selectors": {
+        "css": "path"
+      },
+      "avgDepth": 0,
+      "avgChildCount": 188,
+      "commonAttributes": [
+        "d"
+      ],
+      "instances": [
+        {
+          "route": "/search",
+          "selector": "path",
+          "instanceCount": 3
+        }
+      ],
+      "totalInstances": 3,
+      "confidence": 0.27,
+      "evidenceRefs": [
+        "dom/components/search.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-33",
+      "patternName": "Inline Flex",
+      "structureHash": "3e88ce74ecf4bd6d0473552b2913e09e9ac07a681abcad0453be9980f0817249",
+      "semanticRole": "list",
+      "primaryClassPattern": "utility",
+      "tagName": "a",
+      "selectors": {
+        "css": "a.inline-flex"
+      },
+      "variants": [
+        "flex",
+        "600",
+        "400",
+        "700",
+        "center"
+      ],
+      "variantStyles": {
+        "400": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(37, 99, 235)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "padding_top": "0px",
+          "padding_right": "0px",
+          "padding_bottom": "0px",
+          "padding_left": "0px",
+          "border_radius_top_left": "0px",
+          "border_radius_top_right": "0px",
+          "border_radius_bottom_right": "0px",
+          "border_radius_bottom_left": "0px",
+          "display": "block",
+          "width": "123.258px"
+        },
+        "600": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(37, 99, 235)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "padding_top": "0px",
+          "padding_right": "0px",
+          "padding_bottom": "0px",
+          "padding_left": "0px",
+          "border_radius_top_left": "0px",
+          "border_radius_top_right": "0px",
+          "border_radius_bottom_right": "0px",
+          "border_radius_bottom_left": "0px",
+          "display": "block",
+          "width": "123.258px"
+        },
+        "flex": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(4, 120, 87)",
+          "background_color": "rgb(209, 250, 229)",
+          "padding_top": "6px",
+          "padding_right": "12px",
+          "padding_bottom": "6px",
+          "padding_left": "12px",
+          "border_radius_top_left": "9999px",
+          "border_radius_top_right": "9999px",
+          "border_radius_bottom_right": "9999px",
+          "border_radius_bottom_left": "9999px",
+          "display": "flex",
+          "width": "111.07px"
+        },
+        "center": {
+          "font_size": "20px",
+          "line_height": "28px",
+          "color": "rgb(17, 24, 39)",
+          "background_color": "rgba(0, 0, 0, 0)",
+          "padding_top": "0px",
+          "padding_right": "0px",
+          "padding_bottom": "0px",
+          "padding_left": "0px",
+          "border_radius_top_left": "0px",
+          "border_radius_top_right": "0px",
+          "border_radius_bottom_right": "0px",
+          "border_radius_bottom_left": "0px",
+          "display": "block",
+          "width": "90.9141px"
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 54.5,
+      "commonAttributes": [
+        "class",
+        "href"
+      ],
+      "instances": [
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "a.inline-flex",
+          "instanceCount": 1
+        },
+        {
+          "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+          "selector": "a.inline-flex",
+          "instanceCount": 1
+        }
+      ],
+      "totalInstances": 2,
+      "confidence": 0.37,
+      "evidenceRefs": [
+        "dom/components/missions_301b236b-164f-4bcb-8db9-8fc0228d832e.json",
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-42",
+      "patternName": "Aside Sidebar",
+      "structureHash": "cd3f6a459b42acc199e47abe233df1b255ad9921725f5d769c2e6ddae5977e83",
+      "semanticRole": "aside",
+      "primaryClassPattern": "unknown",
+      "tagName": "aside",
+      "selectors": {
+        "css": "aside.space-y-4"
+      },
+      "avgDepth": 0,
+      "avgChildCount": 17,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/projects/95dc6df6-5a69-42d5-9e33-b8e1e2726152",
+          "selector": "aside.space-y-4",
+          "instanceCount": 1
+        },
+        {
+          "route": "/search",
+          "selector": "aside.space-y-4",
+          "instanceCount": 1
+        }
+      ],
+      "totalInstances": 2,
+      "confidence": 0.31,
+      "evidenceRefs": [
+        "dom/components/projects_95dc6df6-5a69-42d5-9e33-b8e1e2726152.json",
+        "dom/components/search.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-32",
+      "patternName": "Dark:Bg Gray 900",
+      "structureHash": "39e2e1095faa6c679fdb6813cc7cd5a853ed9a9171e21fea64044e1cecfba069",
+      "semanticRole": "list",
+      "primaryClassPattern": "unknown",
+      "tagName": "a",
+      "selectors": {
+        "css": "a.flex"
+      },
+      "variants": [
+        "900",
+        "100",
+        "center"
+      ],
+      "variantStyles": {
+        "900": {
+          "font_size": "24px",
+          "line_height": "32px",
+          "margin_top": "24px",
+          "margin_bottom": "12px",
+          "width": "750px"
+        },
+        "center": {
+          "font_size": "20px",
+          "line_height": "28px",
+          "margin_top": "0px",
+          "margin_bottom": "0px",
+          "width": "90.9141px"
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 45,
+      "commonAttributes": [
+        "class",
+        "href"
+      ],
+      "instances": [
+        {
+          "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+          "selector": "a.flex",
+          "instanceCount": 1
+        }
+      ],
+      "totalInstances": 1,
+      "confidence": 0.25,
+      "evidenceRefs": [
+        "dom/components/missions_6c3273a3-12ed-43fe-81cd-537b6230a60f.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-40",
+      "patternName": "Header",
+      "structureHash": "a31609bf1a5b0bfc8579a438ccabcaa0a921234c80946ff6b176eaafe95bee7d",
+      "semanticRole": "header",
+      "primaryClassPattern": "utility",
+      "tagName": "header",
+      "selectors": {
+        "css": "header.mb-8"
+      },
+      "avgDepth": 0,
+      "avgChildCount": 122,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/projects",
+          "selector": "header.mb-8",
+          "instanceCount": 1
+        }
+      ],
+      "totalInstances": 1,
+      "confidence": 0.19,
+      "evidenceRefs": [
+        "dom/components/projects.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-41",
+      "patternName": "Dark:Border Gray 600",
+      "structureHash": "c0067ec0dfe23f34f79416ac997bec3a9579da28b492cde56b04766f4c6b9910",
+      "semanticRole": "input",
+      "primaryClassPattern": "utility",
+      "tagName": "textarea",
+      "selectors": {
+        "css": "textarea.w-full"
+      },
+      "variants": [
+        "full",
+        "600",
+        "900",
+        "white"
+      ],
+      "variantStyles": {
+        "900": {
+          "font_size": "24px",
+          "line_height": "32px",
+          "color": "rgb(17, 24, 39)",
+          "margin_top": "24px",
+          "margin_bottom": "12px",
+          "display": "block",
+          "width": "750px"
+        },
+        "full": {
+          "font_size": "30px",
+          "line_height": "36px",
+          "color": "rgb(255, 255, 255)",
+          "margin_top": "8px",
+          "margin_bottom": "0px",
+          "display": "block",
+          "width": "382px"
+        },
+        "white": {
+          "font_size": "16px",
+          "line_height": "24px",
+          "color": "rgb(17, 24, 39)",
+          "margin_top": "0px",
+          "margin_bottom": "0px",
+          "display": "inline",
+          "width": "auto"
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 98,
+      "commonAttributes": [
+        "class",
+        "placeholder",
+        "rows",
+        "style"
+      ],
+      "instances": [
+        {
+          "route": "/projects",
+          "selector": "textarea.w-full",
+          "instanceCount": 1
+        }
+      ],
+      "totalInstances": 1,
+      "confidence": 0.32,
+      "evidenceRefs": [
+        "dom/components/projects.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-43",
+      "patternName": "Dark:Text Gray 300",
+      "structureHash": "0ac7617ea9c3e6439aad855371612e6339f89cc9849216c7b307f779951d5a35",
+      "semanticRole": "list",
+      "primaryClassPattern": "utility",
+      "tagName": "label",
+      "selectors": {
+        "css": "label.flex"
+      },
+      "variants": [
+        "300",
+        "center"
+      ],
+      "variantStyles": {
+        "300": {
+          "font_size": "16px",
+          "line_height": "24px",
+          "color": "rgb(75, 85, 99)",
+          "width": "782px"
+        },
+        "center": {
+          "font_size": "20px",
+          "line_height": "28px",
+          "color": "rgb(17, 24, 39)",
+          "width": "90.9141px"
+        }
+      },
+      "avgDepth": 0,
+      "avgChildCount": 4,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/projects/95dc6df6-5a69-42d5-9e33-b8e1e2726152",
+          "selector": "label.flex",
+          "instanceCount": 1
+        }
+      ],
+      "totalInstances": 1,
+      "confidence": 0.19,
+      "evidenceRefs": [
+        "dom/components/projects_95dc6df6-5a69-42d5-9e33-b8e1e2726152.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-46",
+      "patternName": "Dark:Divide Gray 700",
+      "structureHash": "f805bef931547d85e9b3e8fa285b73d7a6ebf81e9a07330976000bac858b0036",
+      "semanticRole": "unknown",
+      "primaryClassPattern": "unknown",
+      "tagName": "table",
+      "selectors": {
+        "css": "table.min-w-full"
+      },
+      "variants": [
+        "200",
+        "700",
+        "full"
+      ],
+      "avgDepth": 0,
+      "avgChildCount": 195,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/reports",
+          "selector": "table.min-w-full",
+          "instanceCount": 1
+        }
+      ],
+      "totalInstances": 1,
+      "confidence": 0.19,
+      "evidenceRefs": [
+        "dom/components/reports.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-47",
+      "patternName": "Dark:Bg Gray 700",
+      "structureHash": "3a91c7891d42bdced6703168c6d8a42b848796be3ec59b92369dd9ce6597e675",
+      "semanticRole": "unknown",
+      "primaryClassPattern": "utility",
+      "tagName": "thead",
+      "selectors": {
+        "css": "thead.bg-gray-50"
+      },
+      "variants": [
+        "700"
+      ],
+      "avgDepth": 0,
+      "avgChildCount": 194,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/reports",
+          "selector": "thead.bg-gray-50",
+          "instanceCount": 1
+        }
+      ],
+      "totalInstances": 1,
+      "confidence": 0.19,
+      "evidenceRefs": [
+        "dom/components/reports.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-48",
+      "patternName": "Dark:Text Gray 400",
+      "structureHash": "0917add2a0c6efb2d812349e8c76ed68354d0bca55de96fa72cb6c8a2dc18c99",
+      "semanticRole": "unknown",
+      "primaryClassPattern": "utility",
+      "tagName": "code",
+      "selectors": {
+        "css": "code.text-sm"
+      },
+      "variants": [
+        "600",
+        "400"
+      ],
+      "variantStyles": {
+        "400": {
+          "font_size": "14px",
+          "line_height": "20px",
+          "color": "rgb(107, 114, 128)",
+          "display": "inline",
+          "width": "auto"
+        },
+        "600": {
+          "font_size": "16px",
+          "line_height": "24px",
+          "color": "rgb(75, 85, 99)",
+          "display": "block",
+          "width": "782px"
+        }
+      },
+      "avgDepth": 4,
+      "avgChildCount": 3,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/reports/36697b37-a4cf-4074-9c01-c98e0690a3f0",
+          "selector": "code.text-sm",
+          "instanceCount": 1
+        }
+      ],
+      "totalInstances": 1,
+      "confidence": 0.19,
+      "evidenceRefs": [
+        "dom/components/reports_36697b37-a4cf-4074-9c01-c98e0690a3f0.json"
+      ],
+      "parentCluster": "cluster-20"
+    },
+    {
+      "clusterId": "cluster-52",
+      "patternName": "Border White/15",
+      "structureHash": "2f058c1053ab33377088a0b2466a7589f36386fcc3ac814faef71a5a3b080b4a",
+      "semanticRole": "input",
+      "primaryClassPattern": "unknown",
+      "tagName": "textarea",
+      "selectors": {
+        "css": "#query-input",
+        "testId": "query-input"
+      },
+      "variants": [
+        "none",
+        "white/15",
+        "white/5",
+        "full"
+      ],
+      "avgDepth": 0,
+      "avgChildCount": 179,
+      "commonAttributes": [
+        "class",
+        "id",
+        "placeholder",
+        "rows",
+        "style"
+      ],
+      "instances": [
+        {
+          "route": "/search",
+          "selector": "#query-input",
+          "instanceCount": 1
+        }
+      ],
+      "totalInstances": 1,
+      "confidence": 0.32,
+      "evidenceRefs": [
+        "dom/components/search.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-53",
+      "patternName": "List",
+      "structureHash": "df82e5872873ae6c083a16e0796b79db40cb1567d086cb9878dd4649d7a8956a",
+      "semanticRole": "list",
+      "primaryClassPattern": "utility",
+      "tagName": "ul",
+      "selectors": {
+        "css": "ul.mt-4"
+      },
+      "avgDepth": 0,
+      "avgChildCount": 75,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/search",
+          "selector": "ul.mt-4",
+          "instanceCount": 1
+        }
+      ],
+      "totalInstances": 1,
+      "confidence": 0.19,
+      "evidenceRefs": [
+        "dom/components/search.json"
+      ]
+    },
+    {
+      "clusterId": "cluster-54",
+      "patternName": "Form",
+      "structureHash": "824f4e7796cded2ccec221782597bf750d01f81e3857875ad10d3b9bb21f71c8",
+      "semanticRole": "form",
+      "primaryClassPattern": "unknown",
+      "tagName": "form",
+      "selectors": {
+        "css": "form.space-y-4"
+      },
+      "avgDepth": 0,
+      "avgChildCount": 42,
+      "commonAttributes": [
+        "class"
+      ],
+      "instances": [
+        {
+          "route": "/settings",
+          "selector": "form.space-y-4",
+          "instanceCount": 1
+        }
+      ],
+      "totalInstances": 1,
+      "confidence": 0.19,
+      "evidenceRefs": [
+        "dom/components/settings.json"
+      ]
+    }
+  ],
+  "summary": {
+    "totalClusters": 55,
+    "totalInstances": 3337,
+    "pagesAnalyzed": 17,
+    "byRole": {
+      "unknown": 30,
+      "list": 9,
+      "button": 2,
+      "navigation": 1,
+      "header": 2,
+      "input": 4,
+      "card": 1,
+      "section": 2,
+      "form": 2,
+      "main": 1,
+      "aside": 1
+    },
+    "byPattern": {
+      "utility": 32,
+      "unknown": 23
+    },
+    "avgClusterSize": 60.67272727272727,
+    "crossPageClusters": 41
+  }
+}

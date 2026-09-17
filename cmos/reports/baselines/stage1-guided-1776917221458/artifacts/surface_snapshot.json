@@ -1,0 +1,99 @@
+{
+  "kind": "surface_snapshot",
+  "schema_version": "1.0.0",
+  "target": {
+    "url": "https://namozine.com/",
+    "seed_routes": [
+      "/"
+    ]
+  },
+  "pages": [
+    {
+      "route": "/missions",
+      "dom_path": "dom/page-_missions-8a7f9ab4.html",
+      "screenshot_path": "screenshots/page-_missions-8a7f9ab4.png"
+    },
+    {
+      "route": "/missions/6c3273a3-12ed-43fe-81cd-537b6230a60f",
+      "dom_path": "dom/page-_missions_6c3273a3-12ed-43fe-81cd-537b6230a60f-5e842b8f.html",
+      "screenshot_path": "screenshots/page-_missions_6c3273a3-12ed-43fe-81cd-537b6230a60f-5e842b8f.png"
+    },
+    {
+      "route": "/documents/8cc368e5-f5a4-4c81-8909-2c9348f361db",
+      "dom_path": "dom/page-_documents_8cc368e5-f5a4-4c81-8909-2c9348f361db-2134ef19.html",
+      "screenshot_path": "screenshots/page-_documents_8cc368e5-f5a4-4c81-8909-2c9348f361db-2134ef19.png"
+    },
+    {
+      "route": "/documents",
+      "dom_path": "dom/page-_documents-cba320c2.html",
+      "screenshot_path": "screenshots/page-_documents-cba320c2.png"
+    },
+    {
+      "route": "/documents/d3800df0-bb53-421f-aa93-df4fa5739445",
+      "dom_path": "dom/page-_documents_d3800df0-bb53-421f-aa93-df4fa5739445-b6c466d6.html",
+      "screenshot_path": "screenshots/page-_documents_d3800df0-bb53-421f-aa93-df4fa5739445-b6c466d6.png"
+    },
+    {
+      "route": "/projects",
+      "dom_path": "dom/page-_projects-f73c5083.html",
+      "screenshot_path": "screenshots/page-_projects-f73c5083.png"
+    },
+    {
+      "route": "/projects/fbd3bd03-5ddc-49ee-8013-529163a99290",
+      "dom_path": "dom/page-_projects_fbd3bd03-5ddc-49ee-8013-529163a99290-61d46f8e.html",
+      "screenshot_path": "screenshots/page-_projects_fbd3bd03-5ddc-49ee-8013-529163a99290-61d46f8e.png"
+    },
+    {
+      "route": "/projects/95dc6df6-5a69-42d5-9e33-b8e1e2726152",
+      "dom_path": "dom/page-_projects_95dc6df6-5a69-42d5-9e33-b8e1e2726152-367742c3.html",
+      "screenshot_path": "screenshots/page-_projects_95dc6df6-5a69-42d5-9e33-b8e1e2726152-367742c3.png"
+    },
+    {
+      "route": "/documents/516fd80c-a295-4d4f-b49e-971ad4a41525",
+      "dom_path": "dom/page-_documents_516fd80c-a295-4d4f-b49e-971ad4a41525-eebc7f40.html",
+      "screenshot_path": "screenshots/page-_documents_516fd80c-a295-4d4f-b49e-971ad4a41525-eebc7f40.png"
+    },
+    {
+      "route": "/missions/301b236b-164f-4bcb-8db9-8fc0228d832e",
+      "dom_path": "dom/page-_missions_301b236b-164f-4bcb-8db9-8fc0228d832e-5b98fa6d.html",
+      "screenshot_path": "screenshots/page-_missions_301b236b-164f-4bcb-8db9-8fc0228d832e-5b98fa6d.png"
+    },
+    {
+      "route": "/collections",
+      "dom_path": "dom/page-_collections-48b51c01.html",
+      "screenshot_path": "screenshots/page-_collections-48b51c01.png"
+    },
+    {
+      "route": "/collections/6b9ba524-9bdc-4a14-9d9f-6a4ff210a069",
+      "dom_path": "dom/page-_collections_6b9ba524-9bdc-4a14-9d9f-6a4ff210a069-614c69da.html",
+      "screenshot_path": "screenshots/page-_collections_6b9ba524-9bdc-4a14-9d9f-6a4ff210a069-614c69da.png"
+    },
+    {
+      "route": "/reports",
+      "dom_path": "dom/page-_reports-f1166ee1.html",
+      "screenshot_path": "screenshots/page-_reports-f1166ee1.png"
+    },
+    {
+      "route": "/reports/36697b37-a4cf-4074-9c01-c98e0690a3f0",
+      "dom_path": "dom/page-_reports_36697b37-a4cf-4074-9c01-c98e0690a3f0-df2b793b.html",
+      "screenshot_path": "screenshots/page-_reports_36697b37-a4cf-4074-9c01-c98e0690a3f0-df2b793b.png"
+    },
+    {
+      "route": "/search",
+      "dom_path": "dom/page-_search-3042db19.html",
+      "screenshot_path": "screenshots/page-_search-3042db19.png"
+    },
+    {
+      "route": "/console",
+      "dom_path": "dom/page-_console-a8795ae2.html",
+      "screenshot_path": "screenshots/page-_console-a8795ae2.png"
+    },
+    {
+      "route": "/settings",
+      "dom_path": "dom/page-_settings-7141e64a.html",
+      "screenshot_path": "screenshots/page-_settings-7141e64a.png"
+    }
+  ],
+  "style_fingerprint_ref": "style_fingerprint.json",
+  "baseline_metrics_ref": "baseline_metrics.json"
+}

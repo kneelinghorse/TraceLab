@@ -1,0 +1,14 @@
+{
+  "kind": "breakpoints",
+  "version": "1.0.0",
+  "schema_version": "1.0.0",
+  "generated_at": "2026-04-23T04:12:09.725Z",
+  "url": "https://namozine.com/",
+  "breakpoints": [],
+  "scale": null,
+  "summary": {
+    "breakpoint_count": 0,
+    "total_media_rules": 0,
+    "has_responsive_design": false
+  }
+}

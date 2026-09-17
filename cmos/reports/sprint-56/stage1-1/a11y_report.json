@@ -1,0 +1,38 @@
+{
+  "kind": "a11y_report",
+  "version": "2.0.0",
+  "schema_version": "2.2.0",
+  "generated_at": "2026-09-17T02:45:14.067Z",
+  "url": "https://tracelab.aquex.ai/",
+  "pages": [
+    {
+      "route": "/",
+      "url": "https://tracelab.aquex.ai/",
+      "evidence_ref": "evidence/a11y/root.json",
+      "violation_count": 0,
+      "by_severity": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0,
+        "unknown": 0
+      }
+    }
+  ],
+  "violations_detail": [],
+  "rollup": {
+    "violation_count": 0,
+    "by_severity": {
+      "critical": 0,
+      "serious": 0,
+      "moderate": 0,
+      "minor": 0,
+      "unknown": 0
+    },
+    "accessibility_score": 100,
+    "accessibility_score_basis": "per_page_mean_severity"
+  },
+  "evidence": {
+    "a11y_manifest_path": "evidence/a11y/a11y_manifest.json"
+  }
+}
