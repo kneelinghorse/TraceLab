@@ -11,17 +11,21 @@ AUTH_USERNAME set — which is also exactly what an operator does.
 import os
 import subprocess
 import sys
+from pathlib import Path
 
 from sqlalchemy import create_engine, text
 from testcontainers.postgres import PostgresContainer
 
-REPO = "/Users/systemsystems/portfolio/TraceLab"
+# cmos/reports/sprint-56/<this file> -> repo root
+REPO = str(Path(__file__).resolve().parents[3])
 
 
 def alembic(url, auth_username, target):
     env = dict(os.environ, DATABASE_URL=url, AUTH_USERNAME=auth_username)
-    return subprocess.run(
-        [f"{REPO}/.venv/bin/alembic", "upgrade", target],
+    # noqa S603: fixed literal argv run through the current interpreter; `target`
+    # is a revision id chosen by this script, never external input.
+    return subprocess.run(  # noqa: S603
+        [sys.executable, "-m", "alembic", "upgrade", target],
         cwd=REPO, env=env, capture_output=True, text=True,
     )
 
