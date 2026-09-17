@@ -127,7 +127,7 @@ def _create_principal(db, role, tag):
 
 
 def _supplied_principals(db, tag="fixture"):
-    """Create the four principals and return them in RBAC_VERIFY_PRINCIPALS shape."""
+    """Create the four principals in the shape run() takes: role -> (email, password)."""
     supplied = {}
     for pname in _PRINCIPAL_ROLES:
         role = ROLE_OWNER if pname == "second_owner" else pname
