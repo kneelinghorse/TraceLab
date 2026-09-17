@@ -15,11 +15,16 @@ from fastapi.testclient import TestClient
 
 from app.core import authorization
 from app.core.config import settings
-from app.core.security import ROLE_OWNER
+from app.core.security import ROLE_MEMBER, ROLE_OWNER
 from app.main import app
 from app.models.user import User
-from scripts.rbac_verify import _THROWAWAY_PASSWORD, RbacVerifier, _seed_specs
-from tests.test_rbac_verify_harness import OWNER_EMAIL, OWNER_PW
+from scripts.rbac_verify import RbacVerifier, _seed_specs
+from tests.test_rbac_verify_harness import (
+    _TEST_PRINCIPAL_PW,
+    OWNER_EMAIL,
+    OWNER_PW,
+    _create_principal,
+)
 
 
 @pytest.fixture
@@ -43,16 +48,20 @@ def owner_principal(db_session):
     return user
 
 
-def _drive_project_matrix(client, monkeypatch) -> RbacVerifier:
-    """Run the seeded project authz matrix as a member against an owner's project."""
+def _drive_project_matrix(client, db_session, monkeypatch) -> RbacVerifier:
+    """Run the seeded project authz matrix as a member against an owner's project.
+
+    Sprint 56 RBAC-5: the member principal is seeded into the test database rather
+    than minted by the harness, which no longer creates users at all. The mutation
+    proof itself is unchanged — it still injects a real fail-open into authorize()
+    and requires the matrix to catch it.
+    """
     monkeypatch.setattr(settings, "rbac_enabled", True)
     verifier = RbacVerifier(client, log=lambda _m: None)
     owner_token = verifier.login(OWNER_EMAIL, OWNER_PW)
     owner_key, _ = verifier.mint_api_key(owner_token)
-    created = verifier.create_throwaway_user(owner_key, "member", "mutation-proof")
-    assert created is not None, "member provisioning failed"
-    _uid, member_email = created
-    member_jwt = verifier.login(member_email, _THROWAWAY_PASSWORD)
+    _uid, member_email = _create_principal(db_session, ROLE_MEMBER, "mutation-proof")
+    member_jwt = verifier.login(member_email, _TEST_PRINCIPAL_PW)
     spec = next(s for s in _seed_specs(settings.api_v1_prefix) if s.name == "project")
     rid = verifier.seed(owner_key, spec, {})
     assert rid is not None, "project seeding failed"
@@ -61,19 +70,19 @@ def _drive_project_matrix(client, monkeypatch) -> RbacVerifier:
 
 
 @pytest.mark.usefixtures("owner_principal")
-def test_control_enforced_matrix_is_clean(client, monkeypatch):
+def test_control_enforced_matrix_is_clean(client, db_session, monkeypatch):
     """CONTROL: with enforcement intact the same path produces no leak.
 
     Without this, the mutation test below could pass for the wrong reason (e.g. the
     matrix flagging everything regardless).
     """
-    verifier = _drive_project_matrix(client, monkeypatch)
+    verifier = _drive_project_matrix(client, db_session, monkeypatch)
     leaks = [g for g in verifier.gaps if g.kind == "DENY-LEAK-2xx"]
     assert leaks == [], f"unexpected leak with enforcement intact: {leaks}"
 
 
 @pytest.mark.usefixtures("owner_principal")
-def test_mutant_fail_open_regression_is_caught(client, monkeypatch):
+def test_mutant_fail_open_regression_is_caught(client, db_session, monkeypatch):
     """MUTANT: authorize() fails open for reads — the harness MUST catch it.
 
     This is the regression class that matters: not "someone turned RBAC off", which
@@ -90,7 +99,7 @@ def test_mutant_fail_open_regression_is_caught(client, monkeypatch):
     monkeypatch.setattr(authorization, "authorize", fail_open)
     # authorize_or_403 resolves the name at call time from this module, so the
     # patch reaches every route that gates on it.
-    verifier = _drive_project_matrix(client, monkeypatch)
+    verifier = _drive_project_matrix(client, db_session, monkeypatch)
 
     leaks = [g for g in verifier.gaps if g.kind == "DENY-LEAK-2xx"]
     assert leaks, (

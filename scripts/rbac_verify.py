@@ -4,12 +4,25 @@
 Runs the role × route matrix against a DEPLOYED TraceLab API and exits NON-ZERO on
 any enforcement gap — the answer to "how do we know RBAC actually works in prod."
 
-It provisions its OWN throwaway users (via the T47.1 admin API) and tears them down,
-seeds its OWN resources and deletes them — no manual setup, no leaked cruft. It
-needs only the bootstrap owner's login from the environment; nothing hand-crafted.
+It AUTHENTICATES as principals that already exist and never creates one. Sprint 56
+RBAC-5: it used to provision four real accounts through POST /admin/users, mint API
+keys for them and purge them at the end. On the six-hourly schedule Sprint 55 added,
+that made a role-by-route enforcement check create and delete rows in the PRODUCTION
+auth table every six hours — with a reconcile sweep that existed precisely because
+teardown leaks when a run is cancelled, stranding accounts that held a password
+committed in this repo. A verifier must not mutate what it verifies. It still seeds
+and deletes its own non-auth resources inside a fixture project it owns.
 
     AUTH_USERNAME=... AUTH_PASSWORD=... \
+    RBAC_VERIFY_PRINCIPALS='{"member":{"email":"...","password":"..."},
+                             "viewer":{"email":"...","password":"..."}}' \
         python scripts/rbac_verify.py --base-url https://api.tracelab.aquex.ai
+
+The principals are PERMANENT, pre-existing and zero-privilege; creating them is a
+deliberate one-time operator action, which is the whole point — it happens once, on
+purpose, rather than every six hours by cron. member and viewer are the two deny
+tiers and are required; second_owner and service unlock extra checks. A missing
+deny tier is a loud NO-DENY-PRINCIPAL gap, never a quiet pass.
 
 It PRECHECKS GET /admin/rbac-status first: if RBAC is OFF (or the endpoint is
 missing) the matrix would falsely pass (everything 200), so a flag-off deploy fails
@@ -55,6 +68,7 @@ verification (see tests/integration/test_e2e_rbac_live.py).
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import sys
 import uuid
@@ -69,14 +83,33 @@ _SYNTHESIS_EMPTY_CONTENT = (
     "No content available for synthesis. The collection or chunks are empty."
 )
 
-# Throwaway-user password (>= 8 chars, per AdminUserCreate). Not a real secret — the
-# users exist only for the duration of a run and are purged at the end.
-_THROWAWAY_PASSWORD = "rbac-verify-throwaway-pw"  # noqa: S105 — ephemeral test-user password, not a secret
+#: The env name carrying the NON-OWNER principals. Sprint 56 RBAC-5.
+#:
+#: Why a new name, when PR #336 deleted the last pair it found: #336 removed a
+#: DUPLICATE of AUTH_USERNAME/AUTH_PASSWORD, which "added a concept and bought
+#: nothing". This carries information that exists nowhere else — the identities of
+#: pre-existing member/viewer/second-owner/service accounts — and deleting it does
+#: change behaviour: without it the harness has no non-owner principal, and the
+#: role-by-route matrix cannot run at all. It is the thing that lets the harness
+#: stop provisioning.
+_PRINCIPALS_ENV = "RBAC_VERIFY_PRINCIPALS"
+
+#: Roles the matrix can use. member and viewer are the two deny tiers and are
+#: mandatory; second_owner and service unlock extra checks and are optional.
+_PRINCIPAL_ROLES = ("member", "viewer", "second_owner", "service")
 
 #: The single durable project the harness owns and reuses. Stable by NAME so a run
 #: can find the one it made last time. Never per-run: DELETE /projects only
 #: soft-deletes, so a per-run fixture would strand a dead row on every schedule tick.
 _FIXTURE_PROJECT_NAME = "TraceLab RBAC verification fixture (do not delete)"
+
+#: The durable project owned by the MEMBER principal (Sprint 56 RBAC-5, next-step
+#: #367). Enforcement must deny a non-owner AND still allow a non-privileged user
+#: who owns the parent project; without this second half a green run proves only
+#: that the system says no, never that it says yes to the right person. Durable for
+#: the same reason as the owner fixture: there is no purge, so a per-run project
+#: would strand a soft-deleted row on every tick.
+_MEMBER_FIXTURE_PROJECT_NAME = "TraceLab RBAC over-blocking fixture (do not delete)"
 
 
 # --- the wired per-id routes (anon-401 sweep) ------------------------------------
@@ -381,6 +414,7 @@ class RbacVerifier:
         self.teardown_failures: list[str] = []  # leaked cruft -> non-zero exit
         self.registration_checks: list[dict[str, Any]] = []
         self.document_checks: list[dict[str, Any]] = []
+        self.owner_positive_checks: list[dict[str, Any]] = []
         self.graph_checks: list[dict[str, Any]] = []
         self._pedr1b_fixture: tuple[str, str] | None = None
         self._pedr1b_fixture_owner_role: str | None = None
@@ -429,7 +463,7 @@ class RbacVerifier:
     def login(self, email: str, password: str) -> str:
         resp = self._call("post", f"{self._prefix}/auth/login", json={"email": email, "password": password})
         if resp.status_code != 200:
-            raise HarnessError(f"owner login failed: POST /auth/login -> {resp.status_code} {resp.text}")
+            raise HarnessError(f"login failed: POST /auth/login -> {resp.status_code} {resp.text}")
         return resp.json()["access_token"]
 
     def mint_api_key(self, token: str) -> tuple[str, str]:
@@ -475,37 +509,43 @@ class RbacVerifier:
         )
         return body
 
-    def create_throwaway_user(self, owner_key: str, role: str, run_id: str) -> tuple[str, str] | None:
-        """Create a throwaway user at ``role``; return (user_id, email) or None if the
-        owner principal may not mint that role (e.g. second-owner when not owner).
+    def login_principal(self, role: str, email: str, password: str) -> tuple[str, str] | None:
+        """Log in a SUPPLIED principal; return (token, user_id) or None.
 
-        Returns the id (NOT a logged-in session) so the CALLER registers it for
-        teardown BEFORE attempting login — a login failure must never leak the user.
+        Sprint 56 RBAC-5. This replaces create_throwaway_user(), which POSTed to
+        /admin/users to mint four real accounts, minted API keys for them and
+        purged them at the end. On the six-hourly schedule RBAC-3 added, that was a
+        role-by-route *enforcement check* creating and deleting rows in the
+        production auth table every six hours — and reconcile_throwaway_users()
+        existed precisely because teardown is expected to leak when a run is
+        cancelled or crashes, stranding accounts holding a password committed in
+        this repo. A verifier must not mutate what it verifies.
+
+        The principals are now permanent, pre-existing and zero-privilege: the
+        harness authenticates as them and never creates, modifies or deletes one.
+
+        Goes through login() rather than posting directly, so every login in a run
+        shares one code path and stays inside the five-logins-per-60s budget
+        (app/core/rate_limit.py). Identity comes from the principal's OWN
+        /auth/me, never an admin listing: a login is all the harness is given.
         """
-        email = f"{run_id}-{role}@tracelab-verify.invalid"
         try:
-            resp = self._call(
-                "post",
-                f"{self._prefix}/admin/users",
-                api_key=owner_key,
-                json={
-                    "email": email,
-                    "password": _THROWAWAY_PASSWORD,
-                    "display_name": self._tagged(f"{role} principal"),
-                    "role": role,
-                },
-            )
-        except Exception as exc:
-            raise HarnessError(
-                f"{role} provisioning raised {type(exc).__name__}: {exc}"
-            ) from exc
-        if resp.status_code != 201:
+            token = self.login(email, password)
+        except HarnessError as exc:
             self.notes.append(
-                f"could not provision {role}: POST /admin/users -> {resp.status_code} "
-                f"{resp.text} — skipping that principal's checks"
+                f"could not authenticate the supplied {role} principal {email}: "
+                f"{exc} — that principal's checks did not run"
             )
             return None
-        return resp.json()["id"], email
+        me = self._json_object(self._call("get", f"{self._prefix}/auth/me", token=token))
+        user_id = me.get("user_id") if me is not None else None
+        if not user_id:
+            self.notes.append(
+                f"{role} principal {email} authenticated but GET /auth/me returned "
+                "no user_id; ownership assertions for that principal did not run"
+            )
+            return None
+        return token, str(user_id)
 
     def seed(self, owner_key: str, spec: SeedSpec, ctx: dict[str, Any]) -> str | None:
         try:
@@ -2309,12 +2349,12 @@ class RbacVerifier:
         if owner_role != "second_owner" or not owner_token:
             self.gaps.append(
                 Gap(
-                    "NO-DISPOSABLE-OWNER",
+                    "NO-SECOND-OWNER-PRINCIPAL",
                     "setup",
                     "post",
-                    f"{self._prefix}/admin/users",
-                    "throwaway second-owner fixture principal",
-                    owner_role or "none",
+                    f"{self._prefix}/auth/login",
+                    "an authenticated second_owner principal for the fixture",
+                    f"{owner_role or 'none'} — add 'second_owner' to {_PRINCIPALS_ENV}",
                 )
             )
             return
@@ -2325,11 +2365,11 @@ class RbacVerifier:
         if not expected_owner_id:
             self.gaps.append(
                 Gap(
-                    "NO-DISPOSABLE-OWNER",
+                    "NO-SECOND-OWNER-PRINCIPAL",
                     "setup",
-                    "post",
-                    f"{self._prefix}/admin/users",
-                    "throwaway second-owner fixture principal UUID",
+                    "get",
+                    f"{self._prefix}/auth/me",
+                    "the second_owner principal's user id, read from its own /auth/me",
                     "missing",
                 )
             )
@@ -2772,6 +2812,168 @@ class RbacVerifier:
                 self.document_checks.append({"role": "member", "method": method, "path": path + suffix, "status": response.status_code, "expected": 403})
                 self._record_exact_deny(response, role="member", method=method, path=path + suffix, expected=403, kind="DOCUMENT-WRITE-STATUS")
 
+    def project_owner_read_positive_matrix(self, principals: dict[str, str]) -> None:
+        """Prove enforcement does NOT over-block a non-privileged project owner.
+
+        Sprint 56 RBAC-5, closing next-step #367 — the third of SEC-3's vacuous
+        rows, which Sprint 55 explicitly GATED rather than closed. Every other
+        positive control in this harness runs as owner or second_owner, both of
+        which are in ``_PRIVILEGED_ROLES`` and therefore short-circuit authorize()
+        before any ownership check. So the run could prove the system says NO to
+        outsiders while never once proving it says YES to a member who legitimately
+        owns the parent project. A deny-only matrix passes just as happily on a
+        system that denies everyone.
+
+        Sprint 55 could not ship this because its plan was to create a project as
+        the member and delete it afterwards, which is a new production-mutating
+        path it had no live run to test against. It also would not have worked:
+        DELETE /projects only soft-deletes, so the per-run project would strand a
+        dead row on every tick. The fixture is durable instead — find-or-create by
+        name, owned by the member, never deleted.
+        """
+        member_token = principals.get("member")
+        member_id = self._principal_ids.get("member")
+        if not member_token or not member_id:
+            self.gaps.append(
+                Gap(
+                    "NO-OVERBLOCK-PRINCIPAL",
+                    "member",
+                    "get",
+                    f"{self._prefix}/projects",
+                    "an authenticated member principal to prove the owner read path",
+                    f"missing — supply 'member' in {_PRINCIPALS_ENV}",
+                )
+            )
+            return
+
+        project_id = self._find_project_by_name(
+            member_token, _MEMBER_FIXTURE_PROJECT_NAME
+        )
+        if project_id is None:
+            resp = self._call(
+                "post",
+                f"{self._prefix}/projects",
+                token=member_token,
+                json={
+                    "name": _MEMBER_FIXTURE_PROJECT_NAME,
+                    "description": (
+                        "Durable RBAC over-blocking fixture, owned by the member "
+                        "principal and reused by scripts/rbac_verify.py. Proves a "
+                        "non-privileged owner is not denied their own project. Do "
+                        "not delete: deleting it strands a soft-deleted row."
+                    ),
+                },
+            )
+            payload = self._json_object(resp)
+            created = payload.get("id") if payload is not None else None
+            if resp.status_code not in (200, 201) or not created:
+                self.gaps.append(
+                    Gap(
+                        "OVERBLOCK-FIXTURE-MISSING",
+                        "member",
+                        "post",
+                        f"{self._prefix}/projects",
+                        "the member principal can create the project it will own",
+                        f"{resp.status_code} — the owner read positive did NOT run",
+                    )
+                )
+                return
+            project_id = str(created)
+
+        # The member must be able to read the project it owns.
+        detail = self._call("get", f"{self._prefix}/projects/{project_id}", token=member_token)
+        detail_payload = self._json_object(detail)
+        owner_matches = (
+            detail.status_code == 200
+            and detail_payload is not None
+            and str(detail_payload.get("owner_id")) == str(member_id)
+        )
+        self.owner_positive_checks.append(
+            {
+                "role": "member",
+                "method": "get",
+                "path": f"{self._prefix}/projects/{project_id}",
+                "status": detail.status_code,
+                "expected": "200 owned by the member principal",
+            }
+        )
+        self._record(
+            owner_matches,
+            Gap(
+                "OWNER-OVERBLOCK",
+                "member",
+                "get",
+                f"{self._prefix}/projects/{project_id}",
+                "200 with owner_id == the member principal",
+                f"{detail.status_code}, owner_id="
+                f"{(detail_payload or {}).get('owner_id')!r}",
+            ),
+        )
+        if not owner_matches:
+            return
+
+        # ...and a document inside it that the member does NOT own.
+        #
+        # This distinction is the entire row, and it is easy to get wrong: seeding
+        # the document as the MEMBER makes document.owner_id == the member, so
+        # authorize() returns True at the plain owner clause
+        # (app/core/authorization.py:143) and the project-owner path below it never
+        # executes. A mutation test proved that mistake silently: disabling the
+        # project-owner clause outright left the check green. Seeding as the OWNER
+        # gives a document the member does not own inside a project the member
+        # does, which is the only shape that reaches the clause under test.
+        owner_token = principals.get("owner")
+        if not owner_token:
+            self.gaps.append(
+                Gap(
+                    "OVERBLOCK-DOCUMENT-MISSING",
+                    "owner",
+                    "post",
+                    f"{self._prefix}/documents/upload",
+                    "the owner principal, to seed a document the member does not own",
+                    "missing — the owner read positive did NOT run",
+                )
+            )
+            return
+        document_id = self._seed_fixture_document(project_id, owner_token)
+        if document_id is None:
+            self.gaps.append(
+                Gap(
+                    "OVERBLOCK-DOCUMENT-MISSING",
+                    "member",
+                    "post",
+                    f"{self._prefix}/documents/upload",
+                    "a document in the member-owned project so the read positive can run",
+                    "could not seed one — the owner read positive did NOT run",
+                )
+            )
+            return
+        doc_path = f"{self._prefix}/documents/{document_id}"
+        read = self._call("get", doc_path, token=member_token)
+        self.owner_positive_checks.append(
+            {
+                "role": "member",
+                "method": "get",
+                "path": doc_path,
+                "status": read.status_code,
+                "expected": (
+                    "200 — a non-privileged owner of the PARENT PROJECT must not "
+                    "be over-blocked on a document they do not themselves own"
+                ),
+            }
+        )
+        self._record(
+            read.status_code == 200,
+            Gap(
+                "OWNER-OVERBLOCK",
+                "member",
+                "get",
+                doc_path,
+                "200 for the owner of the parent project (document owned by another)",
+                str(read.status_code),
+            ),
+        )
+
     def _seed_fixture_document(self, project_id: str, owner_token: str) -> str | None:
         """Upload a tiny document into the harness's own fixture project.
 
@@ -2927,7 +3129,8 @@ class RbacVerifier:
             # No human principal -> the deny half proves nothing. Loud, not silent.
             self.gaps.append(
                 Gap("NO-DENY-PRINCIPAL", "service-gate", "post", path,
-                    "a human principal to prove denial", "none provisioned")
+                    "a human principal to prove denial",
+                    f"none authenticated — supply one in {_PRINCIPALS_ENV}")
             )
 
         # the service principal -> 2xx (over-blocking guard: the runner must still work)
@@ -2950,7 +3153,7 @@ class RbacVerifier:
                 Gap(
                     "NO-SERVICE-PRINCIPAL", "service-gate", "post", path,
                     "a service principal to prove the runner is not over-blocked",
-                    "none provisioned (could not mint role='service')",
+                    f"none authenticated — add a 'service' entry to {_PRINCIPALS_ENV}",
                 )
             )
 
@@ -2968,20 +3171,6 @@ class RbacVerifier:
         if not (200 <= resp.status_code < 300):
             self.teardown_failures.append(
                 f"{spec.name} {resource_id}: {spec.delete_method.upper()} {path} -> {resp.status_code} {resp.text}"
-            )
-
-    def purge_user(self, owner_key: str, user_id: str) -> None:
-        path = f"{self._prefix}/admin/users/{user_id}"
-        try:
-            resp = self._call("delete", path, api_key=owner_key)
-        except Exception as exc:  # pragma: no cover - exercised by live transport
-            self.teardown_failures.append(
-                f"user {user_id}: DELETE {path} raised {type(exc).__name__}: {exc}"
-            )
-            return
-        if not (200 <= resp.status_code < 300):
-            self.teardown_failures.append(
-                f"user {user_id}: DELETE /admin/users/{user_id} -> {resp.status_code} {resp.text}"
             )
 
     def delete_api_key(self, token: str, key_id: str) -> None:
@@ -3217,63 +3406,6 @@ class RbacVerifier:
                 f"{sorted(str(row.get('id')) for row in remaining)}"
             )
 
-    def reconcile_throwaway_users(self, owner_token: str) -> None:
-        """Hard-delete response-lost run users and verify none remain."""
-        path = f"{self._prefix}/admin/users"
-        email_prefix = f"{self._run_tag}-"
-
-        def _list() -> list[dict[str, Any]] | None:
-            try:
-                response = self._call("get", path, token=owner_token)
-            except Exception as exc:  # pragma: no cover - live transport
-                self.teardown_failures.append(
-                    f"user reconciliation: GET {path} raised "
-                    f"{type(exc).__name__}: {exc}"
-                )
-                return None
-            try:
-                rows = response.json()
-            except Exception:  # pragma: no cover - live adapters vary
-                rows = None
-            if response.status_code != 200 or not isinstance(rows, list):
-                self.teardown_failures.append(
-                    f"user reconciliation: GET {path} -> "
-                    f"{response.status_code} invalid list response"
-                )
-                return None
-            return [
-                row
-                for row in rows
-                if isinstance(row, dict)
-                and str(row.get("email", "")).startswith(email_prefix)
-            ]
-
-        matches = _list()
-        if matches is None:
-            return
-        for row in matches:
-            user_id = row.get("id")
-            target = f"{path}/{user_id}"
-            try:
-                response = self._call("delete", target, token=owner_token)
-            except Exception as exc:  # pragma: no cover - live transport
-                self.teardown_failures.append(
-                    f"user reconciliation: DELETE {target} raised "
-                    f"{type(exc).__name__}: {exc}"
-                )
-                continue
-            if not 200 <= response.status_code < 300:
-                self.teardown_failures.append(
-                    f"user reconciliation: DELETE {target} -> "
-                    f"{response.status_code} {getattr(response, 'text', '')}"
-                )
-        remaining = _list()
-        if remaining:
-            self.teardown_failures.append(
-                "user reconciliation left run emails: "
-                f"{sorted(str(row.get('email')) for row in remaining)}"
-            )
-
     def list_isolation_check(self, owner_project_id: str, principals: dict[str, str]) -> None:
         """Spot-check list-endpoint row-filtering (T47.3): the owner's seeded project
         must NOT appear in a non-owner's GET /projects list. A present id is a
@@ -3303,8 +3435,17 @@ class RbacVerifier:
                     )
 
     # -- orchestration ------------------------------------------------------------
-    def run(self, owner_email: str, owner_password: str) -> int:
-        """Run the full harness. Returns a process exit code (0 = all enforced)."""
+    def run(
+        self,
+        owner_email: str,
+        owner_password: str,
+        supplied_principals: dict[str, tuple[str, str]],
+    ) -> int:
+        """Run the full harness. Returns a process exit code (0 = all enforced).
+
+        ``supplied_principals`` maps role -> (email, password) for principals that
+        ALREADY EXIST. Sprint 56 RBAC-5: the harness no longer creates any.
+        """
         self._principal_ids = {}
         self._run_tag = f"rbac-verify-{uuid.uuid4().hex}"
         owner_token = self.login(owner_email, owner_password)
@@ -3323,39 +3464,45 @@ class RbacVerifier:
             self._log("anon-401 sweep across alternate artifact routes...")
             self.pedr1c_anon_sweep()
 
-            provisioned: list[str] = []
             seeded: list[tuple[SeedSpec, str]] = []
             principals: dict[str, str] = {"owner": owner_token}
             try:
-                for role in ("member", "viewer", "owner", "service"):
-                    pname = "second_owner" if role == "owner" else role
-                    created = self.create_throwaway_user(
-                        owner_key,
-                        role,
-                        self._run_tag,
-                    )
-                    if not created:
+                # Sprint 56 RBAC-5: AUTHENTICATE, never provision. Every principal
+                # here already exists and outlives the run; nothing below creates,
+                # modifies or deletes a user, so there is no teardown to leak.
+                for pname in _PRINCIPAL_ROLES:
+                    creds = supplied_principals.get(pname)
+                    if creds is None:
                         continue
-                    uid, email = created
-                    provisioned.append(uid)  # track for teardown BEFORE login
+                    email, password = creds
+                    resolved = self.login_principal(pname, email, password)
+                    if resolved is None:
+                        continue
+                    token, uid = resolved
+                    principals[pname] = token
                     self._principal_ids[pname] = uid
-                    try:
-                        principals[pname] = self.login(email, _THROWAWAY_PASSWORD)
-                    except HarnessError as exc:
-                        self.notes.append(f"provisioned {role} ({uid}) but login failed: {exc}")
-                self._log(f"provisioned principals: {sorted(p for p in principals if p != 'owner')}")
+                self._log(
+                    "authenticated supplied principals: "
+                    f"{sorted(p for p in principals if p != 'owner')}"
+                )
                 # Both deny tiers are mandatory. Missing either one would silently
                 # remove half of the role matrix and make a green run ambiguous.
                 for required_role in ("member", "viewer"):
                     if required_role not in principals:
+                        supplied = required_role in supplied_principals
                         self.gaps.append(
                             Gap(
                                 "NO-DENY-PRINCIPAL",
                                 required_role,
                                 "post",
-                                f"{self._prefix}/admin/users",
-                                f"{required_role} provisioned and logged in",
-                                "missing — role matrix did not run",
+                                f"{self._prefix}/auth/login",
+                                f"{required_role} principal supplied and authenticated",
+                                (
+                                    "supplied but could not authenticate"
+                                    if supplied
+                                    else f"absent from {_PRINCIPALS_ENV}"
+                                )
+                                + " — role matrix did not run",
                             )
                         )
 
@@ -3369,6 +3516,11 @@ class RbacVerifier:
                 self.registration_matrix(project_id, principals)
                 self._log("existing-document tenant-scope matrix...")
                 self.document_deny_matrix(project_id, principals)
+                self._log(
+                    "project-owner read positives (over-blocking guard, "
+                    "member-owned fixture)..."
+                )
+                self.project_owner_read_positive_matrix(principals)
                 ctx: dict[str, Any] = {"project": project_id}
                 self._log(
                     f"reusing owner project={project_id}; running non-destructive "
@@ -3423,33 +3575,38 @@ class RbacVerifier:
                     "probes against a document the harness seeded into its own "
                     "fixture, so the SEC-2 probes run live rather than being skipped."
                 )
-                # Sprint 55 RBAC-3, third vacuous row: EXPLICITLY GATED, not closed.
-                # Stated as its own note rather than buried in the paragraph above,
-                # because an unrun positive control is the thing most likely to be
-                # mistaken for a passing one.
-                self.notes.append(
-                    "GATED — project-owner document read positives (the "
-                    "over-blocking guard for a NON-privileged user who owns the "
-                    "parent project) still do not run live; they are covered only by "
-                    "tests/test_rbac_verify_harness.py against a local TestClient. "
-                    "Closing this needs the harness to create a project OWNED BY its "
-                    "member principal, upload a document into it, assert the 200, "
-                    "then delete that project before purging the user. That is a new "
-                    "production-mutating path and was deliberately not shipped "
-                    "untested. Until it runs, a PASS does not prove that enforcement "
-                    "avoids over-blocking legitimate project owners in production."
-                )
+                # Sprint 55 RBAC-3's third vacuous row is CLOSED by Sprint 56
+                # RBAC-5: project_owner_read_positive_matrix runs live against a
+                # durable project owned by the member principal, so a PASS now
+                # includes a NON-privileged owner reading their own project and a
+                # document inside it. Its absence is a gap, not a note.
+                if not self.owner_positive_checks:
+                    self.gaps.append(
+                        Gap(
+                            "OWNER-POSITIVE-NOT-RUN",
+                            "member",
+                            "get",
+                            f"{self._prefix}/projects",
+                            "the over-blocking guard to have run at all",
+                            "it did not run — a deny-only matrix passes just as "
+                            "happily on a system that denies everyone",
+                        )
+                    )
             finally:
                 # Children before parents (mission references project); best-effort.
                 for spec, rid in reversed(seeded):
                     self.delete_resource(owner_key, spec, rid)
                 # A remote create may have committed even when its response timed
-                # out or omitted an id. Reconcile by run tag BEFORE user deletion;
-                # collection/report owner FKs would otherwise become NULL orphans.
+                # out or omitted an id, so reconcile the run-tagged artifacts by
+                # listing rather than trusting the create responses.
+                #
+                # Sprint 56 RBAC-5: there is no user teardown any more, because
+                # there is no user creation. The old ordering comment ("before user
+                # deletion; collection/report owner FKs would otherwise become NULL
+                # orphans") described a hazard that only existed because the harness
+                # purged the accounts it had just made. Supplied principals are
+                # permanent, so nothing they own can be orphaned by this run.
                 self.reconcile_tagged_artifacts(owner_token)
-                for uid in provisioned:
-                    self.purge_user(owner_key, uid)
-                self.reconcile_throwaway_users(owner_token)
         finally:
             # The key create may have committed even if its response was lost, so
             # list/delete/re-list by run tag is the authoritative final cleanup.
@@ -3546,6 +3703,90 @@ def resolve_verification_identity(
     return email, password, "AUTH_USERNAME"
 
 
+def resolve_verification_principals(
+    env: dict[str, str] | Any,
+) -> tuple[dict[str, tuple[str, str]] | None, str]:
+    """Resolve the NON-OWNER principals the matrix runs as, from one env name.
+
+    Returns ``(principals, "")`` on success or ``(None, reason)`` when the run must
+    not start. Sprint 56 RBAC-5: these principals are permanent and pre-existing.
+    The harness authenticates as them and never creates one, because a run that
+    provisions accounts in the environment it is verifying is mutating the auth
+    table it exists to check — on a schedule, forever.
+
+    Format (one repository secret, JSON):
+
+        {"member":       {"email": "...", "password": "..."},
+         "viewer":       {"email": "...", "password": "..."},
+         "second_owner": {"email": "...", "password": "..."},
+         "service":      {"email": "...", "password": "..."}}
+
+    ``member`` and ``viewer`` are the two deny tiers. Their ABSENCE is not refused
+    here: it is reported at run time as a NO-DENY-PRINCIPAL gap, so a partial set
+    produces a loud failing run rather than a quiet start that cannot be
+    distinguished from a passing one. Only an unusable payload stops the run.
+
+    The same two refusals as ``resolve_verification_identity`` apply per principal:
+    a bare username, and any address at the retired fabricated domain.
+    """
+    raw = env.get(_PRINCIPALS_ENV)
+    if not raw:
+        return None, (
+            f"no verification principals. Set {_PRINCIPALS_ENV} to a JSON object "
+            "mapping role -> {\"email\", \"password\"} for PERMANENT, pre-existing, "
+            f"zero-privilege accounts. Recognised roles: {', '.join(_PRINCIPAL_ROLES)}; "
+            "member and viewer are the two deny tiers and are required for the role "
+            "matrix to mean anything. This harness no longer creates them: doing so "
+            "made a role-by-route check mutate the production auth table on every run."
+        )
+    try:
+        parsed = json.loads(raw)
+    except ValueError as exc:
+        return None, (
+            f"{_PRINCIPALS_ENV} is not valid JSON ({exc}). Expected an object "
+            'like {"member": {"email": "...", "password": "..."}, "viewer": {...}}.'
+        )
+    if not isinstance(parsed, dict) or not parsed:
+        return None, (
+            f"{_PRINCIPALS_ENV} must be a non-empty JSON object mapping role -> "
+            '{"email", "password"}; got '
+            f"{type(parsed).__name__}."
+        )
+
+    resolved: dict[str, tuple[str, str]] = {}
+    for role, creds in parsed.items():
+        if role not in _PRINCIPAL_ROLES:
+            return None, (
+                f"{_PRINCIPALS_ENV} names an unknown role {role!r}. Recognised "
+                f"roles: {', '.join(_PRINCIPAL_ROLES)}."
+            )
+        if not isinstance(creds, dict):
+            return None, (
+                f"{_PRINCIPALS_ENV}[{role!r}] must be an object with 'email' and "
+                f"'password'; got {type(creds).__name__}."
+            )
+        email, password = creds.get("email"), creds.get("password")
+        if not email or not password:
+            return None, (
+                f"{_PRINCIPALS_ENV}[{role!r}] is missing "
+                f"{'email' if not email else 'password'}."
+            )
+        if "@" not in email:
+            return None, (
+                f"{_PRINCIPALS_ENV}[{role!r}] email {email!r} is a bare username, "
+                "not an email address. This harness never derives "
+                f"{email}{_FABRICATED_DOMAIN} — that derivation is why every run "
+                "since Sprint 49 authenticated as the fabricated bootstrap account."
+            )
+        if email.lower().endswith(_FABRICATED_DOMAIN):
+            return None, (
+                f"{_PRINCIPALS_ENV}[{role!r}] email {email!r} is at the retired "
+                f"non-routable domain {_FABRICATED_DOMAIN}. Use a real address."
+            )
+        resolved[role] = (str(email), str(password))
+    return resolved, ""
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Live RBAC verification harness (T47.2).")
     parser.add_argument("--base-url", required=True, help="Deployed API base URL, e.g. https://api.tracelab.aquex.ai")
@@ -3561,6 +3802,19 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     print(f"verification identity: {owner_email} (from {source})")
 
+    principals, principals_reason = resolve_verification_principals(os.environ)
+    if principals is None:
+        # Same rule as the identity refusal above: a run that cannot start is a
+        # FAILURE, never a skip. There is deliberately NO fallback to provisioning
+        # and no owner-only mode — an owner-only matrix has no deny tier, so it
+        # would pass vacuously and look exactly like a real green run.
+        print(f"CANNOT START: {principals_reason}", file=sys.stderr)
+        return 2
+    print(
+        "supplied principals: "
+        + ", ".join(f"{role}={email}" for role, (email, _pw) in sorted(principals.items()))
+    )
+
     try:
         import httpx
     except ImportError:
@@ -3570,7 +3824,7 @@ def main(argv: list[str] | None = None) -> int:
     with httpx.Client(base_url=args.base_url, timeout=args.timeout) as http:
         verifier = RbacVerifier(http, prefix=args.prefix)
         try:
-            return verifier.run(owner_email, owner_password)
+            return verifier.run(owner_email, owner_password, principals)
         except HarnessError as exc:
             print(f"\nHARNESS ABORTED (setup/precheck failure): {exc}", file=sys.stderr)
             return 2

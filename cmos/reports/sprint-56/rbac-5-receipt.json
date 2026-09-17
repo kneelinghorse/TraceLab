@@ -1,0 +1,62 @@
+{
+  "mission": "RBAC-5",
+  "name": "Verification without provisioning: retire the throwaway-user path",
+  "sprint": "sprint-56",
+  "session": "PS-2026-09-17-001",
+  "result": "COMPLETE in code, with the one remaining step deliberately left to Derek because automating it would recreate the defect. The harness can no longer create a user. The schedule stays removed until permanent principals exist; re-arming is then a two-line edit the workflow spells out.",
+
+  "why": "Commit 2703c6e disarmed the six-hourly schedule Sprint 55 had shipped ~90 minutes earlier, and named this fix without attempting it: scripts/rbac_verify.py::run() provisioned four real accounts via POST /admin/users using a password committed at line 74, minted API keys for them and purged them at the end. reconcile_throwaway_users() existed precisely because teardown leaks when a run is cancelled. On a cron that is a role-by-route ENFORCEMENT CHECK mutating the production auth table every six hours, forever.",
+
+  "success_criteria": {
+    "1_no_code_path_creates_a_user": {
+      "status": "MET",
+      "removed": "create_throwaway_user (38 lines), purge_user (14), reconcile_throwaway_users (57), _THROWAWAY_PASSWORD, and the `provisioned` teardown list. Deleted, not flag-gated, so it cannot be re-enabled by accident.",
+      "grep": "admin/users now appears exactly twice in the harness, both in prose explaining what was removed. Two stale Gap labels that still pointed operators at POST /admin/users ('throwaway second-owner fixture principal') were retired to NO-SECOND-OWNER-PRINCIPAL against /auth/login and /auth/me.",
+      "asserted_at_the_transport_not_by_reading_source": "tests/test_rbac_verify_harness.py::test_run_never_creates_or_deletes_a_user records every request a full run makes and fails on any POST/PATCH/PUT/DELETE to /admin/users, and separately asserts the user count is unchanged. A future edit that reintroduces provisioning anywhere in the call graph fails there."
+    },
+    "2_one_new_name_not_eight": {
+      "status": "MET",
+      "name": "RBAC_VERIFY_PRINCIPALS — a single JSON object mapping role -> {email, password}.",
+      "why_a_new_name_is_justified_here": "PR #336 deleted RBAC_VERIFY_USERNAME/PASSWORD because they DUPLICATED AUTH_USERNAME/AUTH_PASSWORD and 'added a concept and bought nothing'. This carries information that exists nowhere else — the identities of pre-existing non-owner principals — and deleting it changes behaviour: without it there is no non-owner principal and the role matrix cannot run at all. It is the thing that lets the harness stop provisioning. Stated in the constant's docstring so the next reader does not re-litigate it."
+    },
+    "3_absent_principals_abort_loudly": {
+      "status": "MET",
+      "behaviour": "main() exits 2 (the existing setup-abort code the workflow already renders as a loud ::error) with a named, actionable reason. There is NO fallback to provisioning and NO owner-only mode — an owner-only matrix has no deny tier, so it would pass vacuously and be indistinguishable from a real green run. Malformed JSON, an unknown role, a missing password, a bare username and any @tracelab.local address are each refused with their own message.",
+      "test": "test_main_exits_2_when_principals_are_absent asserts the exit code AND that the message names RBAC_VERIFY_PRINCIPALS — the abort itself, not merely the absence of a crash. Eight more cases in TestResolveVerificationPrincipals."
+    },
+    "4_both_deny_tiers_stay_mandatory": {
+      "status": "MET",
+      "behaviour": "A partial set PARSES (exit 1, the matrix ran and something is wrong) rather than refusing at resolve time (exit 2, could not start). member or viewer missing still records NO-DENY-PRINCIPAL and fails the run; the gap now distinguishes 'supplied but could not authenticate' from 'absent from RBAC_VERIFY_PRINCIPALS'. test_partial_set_parses_so_the_run_can_fail_loudly pins the distinction and says why it matters."
+    },
+    "5_next_step_367_closed": {
+      "status": "MET — and the first implementation was wrong in a way only a mutation test caught",
+      "what_ships": "project_owner_read_positive_matrix: a durable project owned by the MEMBER principal (_MEMBER_FIXTURE_PROJECT_NAME, find-or-create, never deleted), a document seeded into it BY THE OWNER, and a 200 assertion for the member reading it.",
+      "the_mistake_worth_recording": "The first version seeded the document as the MEMBER. That makes document.owner_id == the member, so authorize() returns True at the plain owner clause (app/core/authorization.py:143) and the project-owner path below it never executes. The check passed for the wrong reason. A mutation that disabled the project-owner clause outright left it GREEN. Seeding as the owner produces the only shape that reaches the clause under test: a document the member does NOT own, inside a project the member DOES.",
+      "why_durable_not_per_run": "Sprint 55's plan was to create the project and delete it afterwards. That would not have worked: DELETE /projects only soft-deletes (app/api/v1/projects.py:220), so a per-run project strands a dead row on every tick — the same trap the owner fixture already avoids.",
+      "gated_note_replaced": "The Sprint 55 'GATED —' note is gone. Its absence is now a GAP (OWNER-POSITIVE-NOT-RUN), not a note: a deny-only matrix passes just as happily on a system that denies everyone."
+    },
+    "6_tests_and_mutation_proof": {
+      "status": "MET",
+      "suite": "tests/test_rbac_verify_harness.py 77 passed; with test_pre_flip_gates and test_ownership, 99 passed. ruff 0.8.0 (the version CI pins) clean on every changed file.",
+      "mutation_1_provisioning_returns": "Re-added a POST /admin/users inside run() -> test_run_never_creates_or_deletes_a_user FAILED with the recorded request. Reverted; control green.",
+      "mutation_2_over_blocking_regression": "Disabled the project-owner document read path in authorize() -> OWNER-OVERBLOCK gap, member got 403 where 200 was required. Reverted; control green. This is the mutation that exposed criterion 5's wrong-reason pass.",
+      "incidental_speedup": "The end-to-end test went from 79s to ~7s, because the run no longer creates and bcrypt-hashes four accounts and then purges them."
+    },
+    "7_workflow_note_says_what_is_true": {
+      "status": "MET",
+      "schedule": "STILL REMOVED, deliberately. The note now says the CAUSE is fixed, names the single remaining precondition (an operator creating the principals once and setting the secret), and gives the exact cron slot to restore — '25 */6 * * *', offset from Production Smoke at ':55' so the two never contend for the login rate limit.",
+      "credential_check": "Now also requires RBAC_VERIFY_PRINCIPALS and prints the JSON shape it expects, so a first-time operator is not guessing."
+    }
+  },
+
+  "findings_from_the_work": {
+    "login_budget_has_zero_headroom": "A run performs exactly five logins — owner plus four principals — against a 5-per-60s limit (app/core/rate_limit.py). Discovered because an earlier version of the test fixture minted an owner API key first, which pushed the run's last login to a 429. Unchanged from before this mission (it was five then too), but now recorded in the workflow note: adding a sixth login anywhere breaks the run.",
+    "the_local_suite_never_exercised_pedr_search": "RetrievalService returns [] WITHOUT searching when the caller has no accessible projects. Every earlier version of the harness test sailed past the whole vector stack because its throwaway member owned nothing. Giving the member a project it owns made preflight genuinely run and hit three things this machine does not have, in order: an OpenAI key (401 on the placeholder), a Qdrant collection (400), and PostgreSQL full-text syntax that SQLite cannot parse ('unrecognized token: @'). All three are ENVIRONMENT limits, not enforcement findings — production has all three for real. Stubbed at the single shared seam (HybridSearchService.search -> []), which reproduces exactly what the caller saw before while letting the authorization path execute."
+  },
+
+  "not_done_and_why": {
+    "creating_the_principals": "DEREK. Four permanent, zero-privilege accounts in production (member and viewer at minimum), then RBAC_VERIFY_PRINCIPALS as a repository secret. That this happens ONCE, by hand, on purpose — rather than every six hours by cron — is the entire point of the mission, so automating it would recreate the defect.",
+    "re_arming_the_schedule": "DEREK, after the above. The workflow names the exact line to restore.",
+    "a_green_production_run": "Still none recorded since Sprint 49. Blocked on the same secret. Nothing here was verified against production; every claim above is from the local suite and mutation proofs, and the receipt says so rather than implying a live run."
+  }
+}
