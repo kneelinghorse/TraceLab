@@ -47,7 +47,7 @@ class Settings(BaseSettings):
     openai_chat_model: str = "gpt-5.1"
     openai_escalation_model: str = "gpt-5.2"
     openai_chat_temperature: float = 0.2
-    rag_default_max_tokens: int = 350
+    rag_default_max_tokens: int = 1500
     rag_context_threshold: float = 0.7
     tiered_routing_threshold: float = 0.85
     tiered_weight_linguistic: float = 0.35
