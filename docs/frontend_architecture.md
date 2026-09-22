@@ -94,7 +94,11 @@ pages render not-found as a distinct state), `PaginationBar`, `StatusBadge`, `Ta
 - **Recent activity** (Sprint 53, ACT-1, decision #459): Home shows one newest-first stream over missions,
   reports and evidence groups (`GET /api/v1/activity`, `lib/api/activity.ts`). Status is a label and never
   changes the order. An item is new until the user opens it (mission and report pages call `markViewed`
-  on load; activity rows mark on click) or presses "Mark viewed"; `GET /api/v1/activity/summary` feeds the
+  on load; activity rows mark on click) or presses "Mark viewed". Evidence is one item per group (project,
+  mission, session, origin), and opening the group is what clears it: the Evidence page and a mission's
+  Evidence tab call `markEvidenceSeen` (`PUT /api/v1/activity/viewed/evidence`, scoped by project, mission
+  and session) so a 300-entry run never needs paging through (Sprint 58, BADGE-1, decision #528).
+  `GET /api/v1/activity/summary` feeds the
   sidebar badges on Missions, Evidence and Reports, named "Missions, N new" and hidden at zero. The mission
   dashboards, saved views, priority inbox and "Mark reviewed" from Sprint 52 were removed; `/inbox`
   redirects to Home.

@@ -2,6 +2,7 @@
 
 from datetime import datetime
 from typing import Protocol
+from uuid import UUID
 
 from sqlalchemy.orm import Session
 
@@ -17,3 +18,14 @@ class ActivityRepository(Protocol):
     def summary(self, db: Session, user: AuthenticatedUser, *, now: datetime) -> ActivitySummary: ...
 
     def mark_viewed(self, db: Session, user: AuthenticatedUser, items: list[ViewedItem], *, now: datetime) -> int: ...
+
+    def mark_evidence_groups_viewed(
+        self,
+        db: Session,
+        user: AuthenticatedUser,
+        *,
+        project_id: UUID,
+        mission_id: UUID | None,
+        session_key: str | None,
+        now: datetime,
+    ) -> int: ...

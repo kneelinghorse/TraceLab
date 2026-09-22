@@ -22,7 +22,7 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from app.core.security import ROLE_OWNER
+from app.core.security import ROLE_OWNER, AuthenticatedUser
 from app.models.project import Project
 from app.models.user import User
 from app.models.workspace import DEFAULT_WORKSPACE_ID, Workspace
@@ -30,20 +30,29 @@ from app.models.workspace import DEFAULT_WORKSPACE_ID, Workspace
 logger = logging.getLogger(__name__)
 
 
-def default_workspace_id(db: Session) -> UUID | None:
+def default_workspace_id(db: Session, caller: AuthenticatedUser | None = None) -> UUID | None:
     """Resolve the Space (workspace_id) a newly created resource should belong to.
 
     T44.4: new projects must not be left space-less (workspace_id NULL), otherwise
     T44.3's membership/inheritance has no Space to resolve. The Space is derived
     server-side here and never trusted from a request body.
 
-    This is the single point where a per-user "default Space" will slot in later;
-    for now every new project goes to the seeded Default Workspace (user-confirmed
-    2026-05-29). Returns the Default Workspace's id when that row exists (migration
-    030 guarantees it in any migrated environment), or None when it is absent —
+    GUEST-1 (decision #528, Derek: "ok for now"): when ``caller`` is a
+    non-privileged member of exactly one Space, that Space is the answer, so a
+    guest's work lives where Derek put them instead of pooling in Default
+    Workspace (WALK-1 finding 2). Every other caller, and every call without a
+    caller, gets the seeded Default Workspace (user-confirmed 2026-05-29).
+    Returns the Default Workspace's id when that row exists (migration 030
+    guarantees it in any migrated environment), or None when it is absent —
     degrading gracefully to a NULL Space (tolerated by the NULL-safe membership
     path) instead of failing the FK on insert.
     """
+    if caller is not None:
+        from app.core.authorization import sole_space_id
+
+        sole = sole_space_id(caller, db)
+        if sole is not None:
+            return sole
     default = db.query(Workspace).filter(Workspace.id == DEFAULT_WORKSPACE_ID).first()
     return default.id if default is not None else None
 

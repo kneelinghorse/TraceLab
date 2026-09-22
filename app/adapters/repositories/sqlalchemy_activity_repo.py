@@ -122,6 +122,39 @@ class SQLAlchemyActivityRepository:
         }
         return ActivitySummary(generated_at=now, new_total=sum(by_type.values()), by_type=by_type)
 
+    def mark_evidence_groups_viewed(
+        self,
+        db: Session,
+        user: AuthenticatedUser,
+        *,
+        project_id: uuid.UUID,
+        mission_id: uuid.UUID | None,
+        session_key: str | None,
+        now: datetime,
+    ) -> int:
+        """Mark every readable evidence group in the scope seen at its latest entry.
+
+        BADGE-1 (decision #528): one run writes hundreds of entries but is one
+        group here, and until now nothing but a click on the Home stream ever
+        marked a group viewed. Opening the group is enough. The scope query is
+        the same readable grouping the stream and the summary use, so a caller
+        cannot mark what they cannot see.
+        """
+        groups = evidence_activity_groups(db, user).filter(LedgerEntry.project_id == project_id)
+        if mission_id is not None:
+            groups = groups.filter(LedgerEntry.mission_id == mission_id)
+        if session_key is not None:
+            groups = groups.filter(LedgerEntry.session_key == session_key)
+        items = [
+            ViewedItem(
+                type="evidence",
+                id=evidence_item_id(g.project_id, g.mission_id, g.session_key, g.origin),
+                occurred_at=g.last_created_at,
+            )
+            for g in groups.all()
+        ]
+        return self.mark_viewed(db, user, items, now=now) if items else 0
+
     def mark_viewed(self, db: Session, user: AuthenticatedUser, items: list[ViewedItem], *, now: datetime) -> int:
         readable: set[tuple[str, uuid.UUID]] = set()
         mission_ids = [i.id for i in items if i.type == "mission"]

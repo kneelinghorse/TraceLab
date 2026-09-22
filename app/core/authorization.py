@@ -243,6 +243,19 @@ def _user_space_ids(user: AuthenticatedUser, db: Session) -> list:
     return [row[0] for row in rows]
 
 
+def sole_space_id(user: AuthenticatedUser | None, db: Session) -> UUID | None:
+    """The one Space a non-privileged human belongs to, else None (GUEST-1, decision #528).
+
+    Owner and admin callers keep the seeded default, as does a member of zero or
+    several Spaces; only "exactly one membership" answers where a guest's new
+    project should live. Derek: "ok for now".
+    """
+    if user is None or user.role in _PRIVILEGED_ROLES or user.role == ROLE_SERVICE:
+        return None
+    space_ids = _user_space_ids(user, db)
+    return space_ids[0] if len(space_ids) == 1 else None
+
+
 def accessible_filter(user: AuthenticatedUser, model: type, db: Session):
     """Query-level companion to :func:`authorize` for LIST endpoints (T47.3).
 

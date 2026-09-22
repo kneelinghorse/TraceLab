@@ -664,6 +664,7 @@ def test_pedr1c_anon_routes_cover_exact_alternate_surface():
         ("get", "/api/v1/activity"),
         ("get", "/api/v1/activity/summary"),
         ("put", "/api/v1/activity/viewed"),
+        ("put", "/api/v1/activity/viewed/evidence"),
         ("get", "/api/v1/navigation/search?q=rbac"),
         ("get", "/api/v1/collections"),
         ("post", "/api/v1/collections"),

@@ -22,11 +22,14 @@ export interface ActivityPage {
 }
 export interface ActivitySummary { generated_at: string; new_total: number; by_type: Record<string, number> }
 export interface ViewedItem { type: ActivityType; id: string; occurred_at: string }
+/** Opening a project's evidence, or one run's, marks every group in that scope seen (BADGE-1). */
+export interface EvidenceGroupScope { project_id: string; mission_id?: string; session_key?: string }
 
 export const activityApi = {
   list: (params: { page?: number; page_size?: number } = {}) => httpClient.get<ActivityPage>("/activity", { params }),
   summary: () => httpClient.get<ActivitySummary>("/activity/summary"),
   markViewed: (items: ViewedItem[]) => httpClient.put<{ viewed: number; new_total: number }>("/activity/viewed", { items }),
+  markEvidenceViewed: (scope: EvidenceGroupScope) => httpClient.put<{ viewed: number; new_total: number }>("/activity/viewed/evidence", scope),
 };
 
 export const ACTIVITY_SECTIONS: Record<ActivityType, { label: string; href: string }> = {

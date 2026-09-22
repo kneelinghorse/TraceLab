@@ -46,6 +46,14 @@ class MarkViewedRequest(BaseModel):
     items: list[ViewedItem] = Field(min_length=1, max_length=200)
 
 
+class EvidenceGroupViewedRequest(BaseModel):
+    """Opening a project's evidence, or one run's, marks every group in that scope seen (BADGE-1, decision #528)."""
+
+    project_id: UUID
+    mission_id: UUID | None = None
+    session_key: str | None = None
+
+
 class MarkViewedResponse(BaseModel):
     viewed: int
     new_total: int

@@ -167,3 +167,49 @@ def test_activity_requires_authentication_and_rejects_service_principals(client,
     response = client.get(API, headers=headers)
     assert response.headers["cache-control"] == "private, no-store"
     assert client.put(f"{API}/viewed", headers=headers, json={"items": []}).status_code == 422
+
+
+def test_opening_a_group_of_evidence_marks_the_whole_group_seen(client, db_session):
+    """BADGE-1 (decision #528): one run is one group; opening it clears it without paging.
+
+    WALK-1 finding 7: a 296-entry run meant 29 pages to clear the badge, because
+    nothing on the Evidence page ever marked the group viewed.
+    """
+    _, headers = actor(db_session)
+    project, other = Project(name="Alpha"), Project(name="Beta")
+    db_session.add_all([project, other])
+    db_session.flush()
+    now = datetime.utcnow()
+    run = mission(db_session, "completed", project_id=project.id, completed_at=now)
+    other_run = mission(db_session, "completed", project_id=other.id, completed_at=now)
+    evidence(db_session, project, run, count=300)
+    evidence(db_session, other, other_run, count=2)
+    db_session.commit()
+    assert client.get(f"{API}/summary", headers=headers).json()["by_type"] == {"mission": 2, "report": 0, "evidence": 2}
+
+    response = client.put(f"{API}/viewed/evidence", headers=headers, json={"project_id": str(project.id), "mission_id": str(run.id)})
+    assert response.status_code == 200, response.text
+    assert response.json() == {"viewed": 1, "new_total": 3}
+    assert db_session.query(UserItemView).filter(UserItemView.item_type == "evidence").count() == 1, "300 entries, one mark"
+    assert client.get(f"{API}/summary", headers=headers).json()["by_type"]["evidence"] == 1
+
+    # The project-wide scope reaches the other run; a second call changes nothing.
+    assert client.put(f"{API}/viewed/evidence", headers=headers, json={"project_id": str(other.id)}).json() == {"viewed": 1, "new_total": 2}
+    assert client.put(f"{API}/viewed/evidence", headers=headers, json={"project_id": str(other.id)}).json() == {"viewed": 1, "new_total": 2}
+    assert client.get(f"{API}/summary", headers=headers).json()["by_type"]["evidence"] == 0
+
+
+def test_marking_a_group_seen_is_scoped_to_what_the_caller_can_read(client, db_session, monkeypatch):
+    monkeypatch.setattr(settings, "rbac_enabled", True)
+    _, headers = actor(db_session, role="member")
+    outsider, _ = actor(db_session, role="member")
+    private = Project(name="Private", owner_id=outsider.id)
+    db_session.add(private)
+    db_session.flush()
+    run = mission(db_session, "completed", project_id=private.id, owner_id=outsider.id, completed_at=datetime.utcnow())
+    evidence(db_session, private, run)
+    db_session.commit()
+    response = client.put(f"{API}/viewed/evidence", headers=headers, json={"project_id": str(private.id)})
+    assert response.status_code == 200, response.text
+    assert response.json() == {"viewed": 0, "new_total": 0}
+    assert db_session.query(UserItemView).count() == 0
