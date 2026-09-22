@@ -48,6 +48,14 @@ class Settings(BaseSettings):
     openai_escalation_model: str = "gpt-5.2"
     openai_chat_temperature: float = 0.2
     rag_default_max_tokens: int = 1500
+
+    # Librarian provider seam (LIB-1, decision #518). Each value falls back to the
+    # OpenAI configuration above, so production runs with no new variables; pointing
+    # all three at an OpenAI-compatible provider (e.g. DeepSeek Flash) is a config
+    # change, not a code change. The model is a seam, never a constant.
+    librarian_model: str | None = None
+    librarian_api_key: str | None = None
+    librarian_base_url: str | None = None
     rag_context_threshold: float = 0.7
     tiered_routing_threshold: float = 0.85
     tiered_weight_linguistic: float = 0.35

@@ -29,6 +29,7 @@ from app.api.v1 import (
     graph_neighborhood,
     health,
     home,
+    librarian,
     mission_events,
     missions,
     monitoring,
@@ -372,6 +373,12 @@ app.include_router(
     missions.service_router,
     prefix=f"{settings.api_v1_prefix}/missions",
     tags=["missions"],
+)
+app.include_router(
+    librarian.router,
+    prefix=f"{settings.api_v1_prefix}/librarian",
+    tags=["librarian"],
+    dependencies=protected_dependencies,
 )
 app.include_router(
     relationships.router,

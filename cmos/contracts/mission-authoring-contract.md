@@ -155,6 +155,38 @@ HTTP verbs, authentication, generated URLs and preservation of authored values.
 `TestCanonicalMissionLinks` in `tests/mcp_tools/test_mcp_missions_unit.py`
 exercises all five registered Python tools through an MCP client session.
 
+## Librarian authoring (LIB-1, 2026-09-22)
+
+The Librarian is a fourth authoring entry point beside the MCP, the REST API and
+the mission form. It adds **no field, column, compiler input or worker SELECT
+change**; it produces the same `MissionCreate` the form produces.
+
+- `POST /api/v1/librarian/turns` and `POST /api/v1/librarian/drafts` write
+  nothing. The draft call returns a `MissionDraft` (the `MissionBase` fields plus
+  `background`, `focus`, `required_entities`, `excluded_entities`, `constraints`,
+  `deliverable_format`, `deliverables`, `tags`) validated with `MissionBase`'s own
+  validators, the offline contract preview (`preview_mission_contract`, same
+  `contract_version` / `compiler_revision` / `fidelity` as the form) and the
+  submit linter's errors and warnings.
+- `POST /api/v1/librarian/missions` creates the reviewed draft through
+  `MissionService.create_mission` as a pristine `draft` with
+  `created_by="librarian"` and a `librarian` tag. It is idempotent on
+  `mission_id`: the same draft again returns the existing mission with HTTP 200;
+  a different mission under that id is 409. Submission is not part of the call;
+  it happens on the mission page through `POST /missions/{id}/submit`, so the
+  linter and one-execution guard run unchanged.
+- Every Librarian route requires a human principal and authorizes the project
+  with the caller's own principal (`authorize_or_403`); there is no service-role
+  path. The evidence tool the conversation may use is scoped by
+  `evidence_access_filter`, shared with the ledger routes.
+- The transcript is client-held and resent per call; there is no conversation
+  table and no migration (decision #519).
+
+Regression coverage: `tests/test_librarian_api.py`,
+`tests/unit/test_librarian_provenance.py`, `frontend/src/__tests__/librarian.test.tsx`.
+Parity classification: `rest-only-by-design` rows in
+`cmos/contracts/mcp-parity-manifest.json`.
+
 ## Top-level field map
 
 RECOVER-1 (2026-09-12) restores the legacy protocol adapter boundary: YAML

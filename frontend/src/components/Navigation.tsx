@@ -11,6 +11,7 @@ export const navigationGroups: { label: string; admin?: boolean; items: Navigati
   { label: "", items: [
     { label: "Home", href: "/", icon: "home" },
     { label: "Projects", href: "/projects", icon: "folder" },
+    { label: "Librarian", href: "/librarian", icon: "librarian" },
   ] },
   { label: "Data", items: [
     { label: "Documents", href: "/documents", icon: "document" },
@@ -40,6 +41,7 @@ export const navigationGroups: { label: string; admin?: boolean; items: Navigati
 const iconPaths: Record<string, string> = {
   home: "M3 10 12 3l9 7M5 9v12h5v-7h4v7h5V9",
   folder: "M3 7V5h6l2 2h10v13H3V7Z",
+  librarian: "M4 5h6a2 2 0 0 1 2 2v13a3 3 0 0 0-3-3H4V5Zm16 0h-6a2 2 0 0 0-2 2v13a3 3 0 0 1 3-3h5V5Z",
   document: "M5 3h9l5 5v13H5V3Zm9 0v6h5M8 13h8M8 17h6",
   evidence: "m8 8 3-3a4 4 0 0 1 6 6l-3 3M16 16l-3 3a4 4 0 0 1-6-6l3-3M8 16l8-8",
   collection: "m3 7 9-4 9 4-9 4-9-4Zm0 5 9 4 9-4M3 17l9 4 9-4",
