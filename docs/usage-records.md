@@ -54,9 +54,15 @@ same numbers changes nothing.
 ## Reading it
 
 `GET /api/v1/admin/usage?since=&until=&user_id=` (admin only) returns per-user,
-per-kind, per-model totals over the window, defaulting to the last 30 days. It
-is the answer to "what did this user consume last month" without reading logs.
-There is no user-visible surface.
+per-kind, per-model totals over the window, defaulting to the last 30 days. The
+window is the run's own time (completion, else start, else recording), so a
+backfill does not turn history into last month's usage. It is the answer to
+"what did this user consume last month" without reading logs. There is no
+user-visible surface.
+
+`python -m app.cli.record_mission_usage --recompute --limit 1000` re-reads every
+terminal mission and updates rows whose numbers changed; run it once after any
+change to the extractor.
 
 Regression coverage: `tests/unit/test_usage_extraction.py`,
 `tests/test_usage_records.py`.

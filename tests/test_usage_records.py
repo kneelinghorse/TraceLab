@@ -263,3 +263,34 @@ class TestLibrarianUsage:
         assert row.project_id == project.id and row.mission_id is None
         assert (row.input_tokens, row.output_tokens, row.total_tokens) == (10, 5, 15)
         assert row.model == "fake-librarian" and row.requests == 1
+
+
+class TestTimeAxis:
+    def test_backfilled_history_does_not_land_in_last_month(self, db_session):
+        """The window is the run's own time, not the moment the row was recorded."""
+        owner = db_session.query(User).first()
+        project = _project(db_session, owner_id=owner.id)
+        old = _mission(db_session, project, mission_id="USE-T1", status="completed", owner_id=owner.id, execution_metadata=PRODUCTION_SHAPE)
+        old.completed_at = datetime.utcnow() - timedelta(days=90)
+        old.started_at = old.completed_at - timedelta(minutes=5)
+        recent = _mission(db_session, project, mission_id="USE-T2", status="completed", owner_id=owner.id, execution_metadata=PRODUCTION_SHAPE)
+        db_session.commit()
+        assert sweep_unrecorded_terminal_missions(db_session, limit=10) == 2
+        now = datetime.utcnow()
+        rows = summarize_usage(db_session, since=now - timedelta(days=30), until=now + timedelta(minutes=1))
+        assert [row["records"] for row in rows] == [1]
+        rows = summarize_usage(db_session, since=now - timedelta(days=120), until=now + timedelta(minutes=1))
+        assert [row["records"] for row in rows] == [2]
+        assert {row.mission_id for row in db_session.query(UsageRecord).all()} == {old.id, recent.id}
+
+    def test_recompute_updates_rows_whose_numbers_changed(self, db_session):
+        owner = db_session.query(User).first()
+        project = _project(db_session, owner_id=owner.id)
+        mission = _mission(db_session, project, mission_id="USE-T3", status="completed", owner_id=owner.id, execution_metadata={"total_tokens": 5})
+        assert sweep_unrecorded_terminal_missions(db_session, limit=10) == 1
+        assert _run_row(db_session, mission).total_tokens == 5
+        mission.execution_metadata = json.loads(json.dumps(PRODUCTION_SHAPE))
+        db_session.commit()
+        assert sweep_unrecorded_terminal_missions(db_session, limit=10) == 0
+        assert sweep_unrecorded_terminal_missions(db_session, limit=10, recompute=True) == 1
+        assert _run_row(db_session, mission).total_tokens == 2219061

@@ -84,6 +84,9 @@ def extract_run_usage(execution_metadata: Any) -> RunUsage:
     em = execution_metadata if isinstance(execution_metadata, dict) else {}
     telemetry = _get(em, "synthesis_telemetry") or {}
     accounting = _get(telemetry, "recovery", "attempt_accounting") or {}
+    # The whole token triple comes from ONE source: the attempt accounting when present, else the
+    # synthesis telemetry, else the top-level total alone. Mixing sources produced rows whose input
+    # exceeded their total (21 of 440 on the first production backfill).
     token_usage = _get(accounting, "token_usage") or _get(telemetry, "token_usage") or {}
     if not isinstance(token_usage, dict):
         token_usage = {}
@@ -93,9 +96,9 @@ def extract_run_usage(execution_metadata: Any) -> RunUsage:
         counts = [_int(v) for v in tool_summary.values()]
         tool_calls = sum(c for c in counts if c is not None) if counts else None
 
-    total = _int(_get(em, "total_tokens"))
-    if total is None:
-        total = _int(token_usage.get("total"))
+    total = _int(token_usage.get("total"))
+    if total is None and not token_usage:
+        total = _int(_get(em, "total_tokens"))
     usage_complete = _get(accounting, "token_usage_complete")
     if usage_complete is None:
         usage_complete = _get(telemetry, "token_usage_complete")
@@ -203,16 +206,17 @@ def record_mission_terminal(db: Session, mission: Mission) -> UsageRecord | None
     return row
 
 
-def sweep_unrecorded_terminal_missions(db: Session, *, limit: int = 500) -> int:
-    """Record every terminal mission that has no run row yet. Backfill and safety net in one."""
-    recorded_ids = db.query(UsageRecord.mission_id).filter(UsageRecord.kind == USAGE_KIND_DEEPSEARCH_RUN)
-    missions = (
-        db.query(Mission)
-        .filter(Mission.status.in_(TERMINAL_STATUSES), ~Mission.id.in_(recorded_ids))
-        .order_by(Mission.completed_at.desc().nullslast(), Mission.id)
-        .limit(limit)
-        .all()
-    )
+def sweep_unrecorded_terminal_missions(db: Session, *, limit: int = 500, recompute: bool = False) -> int:
+    """Record every terminal mission that has no run row yet. Backfill and safety net in one.
+
+    ``recompute`` re-reads every terminal mission instead, updating rows whose
+    numbers changed; used once after the extractor is corrected.
+    """
+    query = db.query(Mission).filter(Mission.status.in_(TERMINAL_STATUSES))
+    if not recompute:
+        recorded_ids = db.query(UsageRecord.mission_id).filter(UsageRecord.kind == USAGE_KIND_DEEPSEARCH_RUN)
+        query = query.filter(~Mission.id.in_(recorded_ids))
+    missions = query.order_by(Mission.completed_at.desc().nullslast(), Mission.id).limit(limit).all()
     recorded = 0
     for mission in missions:
         try:
@@ -272,7 +276,13 @@ def summarize_usage(
     until: datetime,
     user_id: UUID | None = None,
 ) -> list[dict[str, Any]]:
-    """Per user, per kind, per model totals over [since, until). One query, no logs."""
+    """Per user, per kind, per model totals over [since, until). One query, no logs.
+
+    The window is the run's own time (completion, else start, else the moment it
+    was recorded), never the recording time alone: a backfill records history in
+    one moment and must not make it look like last month's usage.
+    """
+    occurred_at = func.coalesce(UsageRecord.completed_at, UsageRecord.started_at, UsageRecord.recorded_at)
     query = (
         db.query(
             UsageRecord.user_id,
@@ -285,7 +295,7 @@ def summarize_usage(
             func.coalesce(func.sum(UsageRecord.duration_seconds), 0.0),
             func.sum(UsageRecord.cost_usd),
         )
-        .filter(UsageRecord.recorded_at >= since, UsageRecord.recorded_at < until)
+        .filter(occurred_at >= since, occurred_at < until)
         .group_by(UsageRecord.user_id, UsageRecord.kind, UsageRecord.model)
         .order_by(UsageRecord.user_id, UsageRecord.kind, UsageRecord.model)
     )
