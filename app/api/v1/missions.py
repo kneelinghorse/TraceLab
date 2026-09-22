@@ -31,6 +31,7 @@ from app.core.security import (
     require_authenticated_principal,
     require_authenticated_user,
 )
+from app.models.project import Project
 from app.schemas.evidence_ledger import (
     DeepSearchEvidenceRequest,
     DeepSearchEvidenceResponse,
@@ -498,11 +499,31 @@ def get_mission_status(
     )
 
 
+def _load_project_for_authoring(
+    db: Session,
+    current_user: AuthenticatedUser,
+    project_id: UUID,
+) -> Project:
+    """The caller must be able to reach the project a mission is created in.
+
+    Decision #521: formal research is always attached to a project, and the
+    Librarian's create route already checks the project with the caller's own
+    principal. These routes check the same way, so a signed-in user cannot
+    create a mission inside a project they cannot otherwise see.
+    """
+    project = db.query(Project).filter(Project.id == project_id, Project.deleted_at.is_(None)).first()
+    if project is None:
+        raise HTTPException(status_code=http_status.HTTP_404_NOT_FOUND, detail="Project not found.")
+    authorize_or_403(current_user, "create", project, db)
+    return project
+
+
 @router.post(
     "", response_model=MissionResponse, status_code=http_status.HTTP_201_CREATED
 )
 def create_mission(
     data: MissionCreate,
+    current_user: AuthenticatedUser = Depends(require_authenticated_user),
     db: Session = Depends(get_db),
 ) -> MissionResponse:
     """Create a new mission.
@@ -523,6 +544,7 @@ def create_mission(
     - **status**: Initial status (default: "draft")
     - **created_by**: Agent or user creating the mission
     """
+    _load_project_for_authoring(db, current_user, data.project_id)
     try:
         mission = _service.create_mission(db, data)
         return _to_response(mission)
@@ -566,9 +588,11 @@ def create_mission(
 )
 def create_and_submit_mission(
     data: MissionCreate,
+    current_user: AuthenticatedUser = Depends(require_authenticated_user),
     db: Session = Depends(get_db),
 ) -> MissionSubmitResponse:
     """Create a mission and immediately queue it for DeepSearch execution."""
+    _load_project_for_authoring(db, current_user, data.project_id)
     try:
         mission = _service.create_mission(db, data)
         submit_response = _submit_existing_mission(db=db, mission=mission)
@@ -631,8 +655,6 @@ def update_mission(
         # T41.5: re-parenting requires the target project to exist. Validate
         # here so we can return a clean 404 instead of a FK-violation 500.
         if data.project_id is not None and data.project_id != old_mission.project_id:
-            from app.models.project import Project
-
             target = db.query(Project).filter(Project.id == data.project_id).first()
             if target is None:
                 raise HTTPException(
