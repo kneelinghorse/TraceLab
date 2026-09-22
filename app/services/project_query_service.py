@@ -105,8 +105,8 @@ class ProjectQueryService:
         recorded as the trustworthy owner; the legacy self-asserted user_id is no
         longer accepted from the request body. workspace_id (the project's Space) is
         likewise derived server-side via ``default_workspace_id`` (T44.4), never
-        from the body; with ``caller`` it is the caller's sole Space when they have
-        exactly one (GUEST-1, decision #528).
+        from the body; with a human ``caller`` it is the caller's personal Space
+        (PERSONAL-1, decision #532).
         """
         project = Project(
             name=data.name,

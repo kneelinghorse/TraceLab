@@ -5,6 +5,8 @@
  * Spaces, manage membership (add/remove, with an active-users picker), and
  * assign projects to a Space. Membership and assignment cache-busting are
  * server-side (S47 + T48.3); the client just re-fetches local page state.
+ * Personal Spaces (PERSONAL-1) are labelled with their owner, read "My Space"
+ * to that owner, and take projects but not members.
  * Lives behind RequireAdmin (UX only; the API enforces require_admin).
  */
 
@@ -12,6 +14,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { AuthGate } from "@/components/AuthGate";
 import { RequireAdmin } from "@/components/RequireAdmin";
+import { useAuth } from "@/contexts/AuthContext";
 import { adminSpacesApi, adminUsersApi } from "@/lib/api/admin";
 import type { AdminSpace, AdminUser, SpaceMember } from "@/lib/api/admin";
 import { apiErrorMessage } from "@/lib/api/errors";
@@ -25,6 +28,8 @@ const successBox =
 const cardClass = "rounded-lg bg-surface border border-line p-6";
 
 export function SpacesAdmin() {
+  const { user: self } = useAuth();
+  const selfId = self?.user_id ?? null;
   const [spaces, setSpaces] = useState<AdminSpace[] | null>(null);
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -167,6 +172,17 @@ export function SpacesAdmin() {
   const memberIds = new Set((members ?? []).map((m) => m.user_id));
   const eligibleUsers = users.filter((u) => u.is_active && !memberIds.has(u.id));
   const selectedSpace = spaces?.find((s) => s.id === selectedSpaceId) ?? null;
+  const personalSelected = Boolean(selectedSpace?.personal_owner_id);
+
+  const spaceName = (s: AdminSpace) =>
+    s.personal_owner_id && s.personal_owner_id === selfId ? "My Space" : s.name;
+  const personalTag = (s: AdminSpace) => {
+    if (!s.personal_owner_id) {
+      return null;
+    }
+    const owner = users.find((u) => u.id === s.personal_owner_id);
+    return `Personal · ${owner?.display_name ?? "unknown user"}`;
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -211,7 +227,10 @@ export function SpacesAdmin() {
             <ul className="divide-y divide-line">
               {spaces.map((s) => (
                 <li key={s.id} className="flex items-center justify-between py-3">
-                  <span className="text-foreground">{s.name}</span>
+                  <div className="flex flex-wrap items-center gap-x-2">
+                    <span className="text-foreground">{spaceName(s)}</span>
+                    {personalTag(s) && <span className="text-xs text-muted">{personalTag(s)}</span>}
+                  </div>
                   <button
                     type="button"
                     onClick={() => setSelectedSpaceId(s.id)}
@@ -232,14 +251,20 @@ export function SpacesAdmin() {
         {selectedSpace && (
           <section className={cardClass}>
             <h2 className="text-lg font-semibold text-foreground mb-4">
-              Members of “{selectedSpace.name}”
+              Members of “{spaceName(selectedSpace)}”
             </h2>
 
+            {personalSelected && (
+              <p className="mb-4 text-sm text-muted">
+                A personal Space has one member. Assign projects to it below instead.
+              </p>
+            )}
             <div className="flex flex-col sm:flex-row gap-3 mb-4">
               <select
                 aria-label="Add member to space"
                 value={pickedUserId}
                 onChange={(e) => setPickedUserId(e.target.value)}
+                disabled={personalSelected}
                 className="form-input flex-1"
               >
                 <option value="">Select an active user…</option>
@@ -252,7 +277,7 @@ export function SpacesAdmin() {
               <button
                 type="button"
                 onClick={addMember}
-                disabled={!pickedUserId || memberBusy}
+                disabled={!pickedUserId || memberBusy || personalSelected}
                 className="px-4 py-2 bg-accent text-on-accent rounded-lg hover:bg-accent disabled:opacity-50 text-sm font-medium"
               >
                 Add member
@@ -312,7 +337,7 @@ export function SpacesAdmin() {
                     <option value="">— No Space —</option>
                     {(spaces ?? []).map((s) => (
                       <option key={s.id} value={s.id}>
-                        {s.name}
+                        {personalTag(s) ? `${spaceName(s)} (${personalTag(s)})` : s.name}
                       </option>
                     ))}
                   </select>

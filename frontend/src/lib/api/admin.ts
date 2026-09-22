@@ -60,6 +60,8 @@ export type AdminSpace = {
   id: string;
   name: string;
   created_at: string;
+  // Set on a user's personal Space (PERSONAL-1), which refuses other members.
+  personal_owner_id: string | null;
 };
 
 export type SpaceMember = {

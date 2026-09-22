@@ -22,8 +22,9 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from app.core.security import ROLE_OWNER, AuthenticatedUser
+from app.core.security import ROLE_OWNER, ROLE_SERVICE, AuthenticatedUser
 from app.models.project import Project
+from app.models.space_member import SpaceMember
 from app.models.user import User
 from app.models.workspace import DEFAULT_WORKSPACE_ID, Workspace
 
@@ -37,24 +38,50 @@ def default_workspace_id(db: Session, caller: AuthenticatedUser | None = None) -
     T44.3's membership/inheritance has no Space to resolve. The Space is derived
     server-side here and never trusted from a request body.
 
-    GUEST-1 (decision #528, Derek: "ok for now"): when ``caller`` is a
-    non-privileged member of exactly one Space, that Space is the answer, so a
-    guest's work lives where Derek put them instead of pooling in Default
-    Workspace (WALK-1 finding 2). Every other caller, and every call without a
-    caller, gets the seeded Default Workspace (user-confirmed 2026-05-29).
-    Returns the Default Workspace's id when that row exists (migration 030
-    guarantees it in any migrated environment), or None when it is absent —
-    degrading gracefully to a NULL Space (tolerated by the NULL-safe membership
-    path) instead of failing the FK on insert.
+    PERSONAL-1 (decision #532): a human ``caller`` (any role but service) gets
+    their personal Space, so a new project lands somewhere its creator owns.
+    Only POST /projects passes a caller. The service principal, calls without a
+    caller, and a human whose personal Space is missing (logged, never a NULL
+    Space) get the seeded Default Workspace. Returns the Default Workspace's id
+    when that row exists (migration 030 guarantees it in any migrated
+    environment), or None when it is absent — degrading gracefully to a NULL
+    Space (tolerated by the NULL-safe membership path) instead of failing the FK
+    on insert.
     """
-    if caller is not None:
-        from app.core.authorization import sole_space_id
-
-        sole = sole_space_id(caller, db)
-        if sole is not None:
-            return sole
+    if caller is not None and caller.role != ROLE_SERVICE:
+        personal = (
+            db.query(Workspace.id).filter(Workspace.personal_owner_id == caller.user_id).first()
+            if caller.user_id is not None  # None would compile to IS NULL: a shared Space
+            else None
+        )
+        if personal is not None:
+            return personal[0]
+        logger.warning(
+            "No personal Space for user %s; the new project goes to Default Workspace",
+            caller.user_id,
+        )
     default = db.query(Workspace).filter(Workspace.id == DEFAULT_WORKSPACE_ID).first()
     return default.id if default is not None else None
+
+
+def ensure_personal_space(db: Session, user: User) -> Workspace | None:
+    """The user's personal Space, created with its membership row on the first call.
+
+    PERSONAL-1 (decision #530): called by the two account-creation routes, POST
+    /auth/register and POST /admin/users, and nowhere else. A second call returns
+    the existing Space. The service principal gets none. Flushes without
+    committing, so the route's commit creates the account and its Space together.
+    """
+    if user.role == ROLE_SERVICE:
+        return None
+    space = db.query(Workspace).filter(Workspace.personal_owner_id == user.id).first()
+    if space is None:
+        space = Workspace(name=f"{user.display_name}'s Space", personal_owner_id=user.id)
+        db.add(space)
+        db.flush()
+        db.add(SpaceMember(workspace_id=space.id, user_id=user.id))
+        db.flush()
+    return space
 
 
 def project_owner_workspace(

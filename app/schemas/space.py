@@ -23,11 +23,13 @@ class SpaceCreate(BaseModel):
 
 
 class SpaceResponse(BaseModel):
-    """A Space (workspace) record."""
+    """A Space (workspace) record. ``personal_owner_id`` is set on a user's
+    personal Space (PERSONAL-1) and None on a shared one."""
 
     id: UUID
     name: str
     created_at: datetime
+    personal_owner_id: UUID | None = None
 
     model_config = ConfigDict(from_attributes=True)
 

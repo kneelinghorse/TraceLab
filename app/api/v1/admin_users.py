@@ -32,7 +32,7 @@ from app.models.device_authorization import DeviceAuthorizationGrant
 from app.models.invite_code import InviteCode
 from app.models.user import User
 from app.schemas.auth import AdminUserCreate, AdminUserResponse
-from app.services.ownership import LastOwnerError, assert_not_last_owner
+from app.services.ownership import LastOwnerError, assert_not_last_owner, ensure_personal_space
 
 router = APIRouter(tags=["admin-users"])
 
@@ -87,6 +87,8 @@ def create_user(
         role=payload.role,
     )
     db.add(user)
+    db.flush()
+    ensure_personal_space(db, user)
     db.commit()
     db.refresh(user)
     return user
@@ -106,8 +108,9 @@ def delete_user(
     (400, anti-lockout).
 
     Postgres FKs into users are mixed: owner_id (projects/collections/missions/
-    reports/documents) is ON DELETE SET NULL and space_members is ON DELETE CASCADE
-    — the DB handles those. api_keys, invite_codes, and device_authorization_grants
+    reports/documents) is ON DELETE SET NULL, and space_members and the user's
+    personal Space (workspaces.personal_owner_id) are ON DELETE CASCADE — the DB
+    handles those. api_keys, invite_codes, and device_authorization_grants
     have non-cascading users FKs, so they would block the delete; we clear them
     explicitly. ORDER MATTERS: a device grant references BOTH users.id AND
     api_keys.id, so it must be deleted BEFORE its api_key (else `DELETE FROM

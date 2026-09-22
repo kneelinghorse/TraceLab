@@ -50,9 +50,12 @@ class TestOwnerWorkspaceMigration:
             assert "workspaces" in set(insp.get_table_names())
 
             # exactly one seeded workspace row, with the well-known default id + name
-            # (T43.3 backfill / owner-bootstrap reference this fixed UUID).
+            # (T43.3 backfill / owner-bootstrap reference this fixed UUID). The
+            # personal Spaces migration 052 creates for existing users are not 030's.
             with engine.connect() as conn:
-                rows = conn.execute(text("SELECT id, name FROM workspaces")).all()
+                rows = conn.execute(
+                    text("SELECT id, name FROM workspaces WHERE personal_owner_id IS NULL")
+                ).all()
             assert len(rows) == 1, "migration 030 must seed exactly one workspace row"
             assert str(rows[0].id) == "00000000-0000-0000-0000-000000000001"
             assert rows[0].name == "Default Workspace"

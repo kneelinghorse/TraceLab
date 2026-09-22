@@ -11,7 +11,7 @@ rather than duplicating contracts. Intent and sprint history are in
 | --- | --- | --- |
 | API | `app/` (FastAPI, Python 3.11) | Railway service `TraceLab`, `https://api.tracelab.aquex.ai` |
 | Web UI | `frontend/` (Next.js 16 pages router) | Railway service `frontend`, `https://tracelab.aquex.ai`; see `docs/frontend_architecture.md` |
-| Relational store | PostgreSQL 15 | Railway service; schema owned by Alembic (head `049_recent_activity`) |
+| Relational store | PostgreSQL 15 | Railway service; schema owned by Alembic (head `052_personal_spaces`) |
 | Vector store | Qdrant | Railway service; PEDR retrieval layers |
 | Research worker | DeepSearch (separate repository) | Railway service `worker-service deepSearch`; reached only through the mission lifecycle |
 | Agent surface | `packages/tracelab-mcp` | Local stdio MCP server published as `@aquex/tracelab-mcp` |
@@ -52,6 +52,11 @@ after SUCCESS and only then runs its production checks.
   `False`, so the deploy configuration is the guard). Access is granted by Space membership
   (`workspaces`, `space_members`) with downward inheritance to child rows through `project_id`, plus
   owner and admin allow paths.
+- Every human account has a personal Space (`workspaces.personal_owner_id`, migration 052,
+  PERSONAL-1, decision #532), created with the account by `POST /auth/register` and
+  `POST /admin/users`. `POST /projects` places a new project in its creator's personal Space; a
+  personal Space refuses other members. Default Workspace keeps child-resource and background
+  creates and the owner's legacy projects.
 - `app/core/authorization.py` is the single policy: `authorize` and `authorize_or_403` for per-id
   reads and writes, `accessible_filter` for list queries (applied before count and pagination),
   `accessible_project_ids` for non-relational stores such as Qdrant, and `POLICY_VERSION = "1.1"`.
@@ -86,7 +91,7 @@ after SUCCESS and only then runs its production checks.
 - **Alembic is the sole schema authority.** The runtime no longer calls `create_all`, and
   `tests/integration/test_migration_coverage.py` proves a migrations-only database contains every
   model table. Revision ids must stay at or under 32 characters, the width of
-  `alembic_version.version_num`. The current head is `049_recent_activity`.
+  `alembic_version.version_num`. The current head is `052_personal_spaces`.
 
 ## Retrieval and search
 

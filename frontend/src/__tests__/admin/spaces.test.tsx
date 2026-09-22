@@ -24,8 +24,8 @@ vi.mock("@/lib/api/projects", () => ({ projectsApi: mocks.projects }));
 import { SpacesAdmin } from "@/pages/admin/spaces";
 
 const SPACES = [
-  { id: "s1", name: "Research", created_at: "2026-01-01T00:00:00Z" },
-  { id: "s2", name: "Ops", created_at: "2026-01-02T00:00:00Z" },
+  { id: "s1", name: "Research", created_at: "2026-01-01T00:00:00Z", personal_owner_id: null },
+  { id: "s2", name: "Ops", created_at: "2026-01-02T00:00:00Z", personal_owner_id: null },
 ];
 
 const USERS = [
@@ -231,5 +231,56 @@ describe("SpacesAdmin", () => {
     mocks.spaces.list.mockReset().mockRejectedValue(new Error('{"detail":"Failed to read spaces"}'));
     render(<SpacesAdmin />);
     expect(await screen.findByText("Failed to read spaces")).toBeTruthy();
+  });
+});
+
+describe("SpacesAdmin personal Spaces (PERSONAL-1)", () => {
+  // Alice's personal Space, and the viewing admin's own ("self"), designated from an
+  // existing Space the way Derek-Private was.
+  const PERSONAL = [
+    { id: "pa", name: "Alice's Space", created_at: "", personal_owner_id: "u1" },
+    { id: "pself", name: "Derek-Private", created_at: "", personal_owner_id: "self" },
+  ];
+  const SELF = { id: "self", email: "me@x.com", display_name: "Me", role: "admin", is_active: true, created_at: "", last_login_at: null };
+
+  beforeEach(() => {
+    mocks.spaces.list.mockReset().mockResolvedValue([...SPACES, ...PERSONAL]);
+    mocks.users.list.mockReset().mockResolvedValue([...USERS, SELF]);
+  });
+
+  it("labels a personal Space with its owner, and the viewer's own reads My Space", async () => {
+    await renderLoaded();
+    expect(screen.getByText("Alice's Space", { selector: "span" })).toBeTruthy();
+    expect(await screen.findByText("Personal · Alice")).toBeTruthy();
+    expect(screen.getByText("My Space", { selector: "span" })).toBeTruthy();
+    expect(screen.getByText("Personal · Me")).toBeTruthy();
+    expect(screen.queryByText("Derek-Private", { selector: "span" })).toBeNull();
+    // A shared Space carries no personal label.
+    const research = screen.getByText("Research", { selector: "span" }).closest("li") as HTMLElement;
+    expect(within(research).queryByText(/Personal/)).toBeNull();
+  });
+
+  it("disables adding members to a personal Space, so it never silently becomes shared", async () => {
+    await renderLoaded();
+    await manageMembers("Alice's Space");
+    expect((screen.getByLabelText("Add member to space") as HTMLSelectElement).disabled).toBe(true);
+    expect((screen.getByRole("button", { name: "Add member" }) as HTMLButtonElement).disabled).toBe(true);
+    expect(screen.getByText(/A personal Space has one member/)).toBeTruthy();
+    expect(mocks.spaces.addMember).not.toHaveBeenCalled();
+  });
+
+  it("keeps adding members to a shared Space enabled", async () => {
+    await renderLoaded();
+    await manageMembers("Research");
+    expect((screen.getByLabelText("Add member to space") as HTMLSelectElement).disabled).toBe(false);
+    expect(screen.queryByText(/A personal Space has one member/)).toBeNull();
+  });
+
+  it("still offers personal Spaces for project assignment", async () => {
+    await renderLoaded();
+    const select = screen.getByLabelText("Space for Proj 1");
+    expect(await within(select).findByRole("option", { name: "My Space (Personal · Me)" })).toBeTruthy();
+    fireEvent.change(select, { target: { value: "pself" } });
+    await waitFor(() => expect(mocks.spaces.assignProjectSpace).toHaveBeenCalledWith("p1", "pself"));
   });
 });
