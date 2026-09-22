@@ -247,7 +247,8 @@ class TestMcpCreateInheritsPlacement:
     """The MCP tracelab_project create is the npm client's POST /api/v1/projects with
     an X-API-Key, so it reaches the same service and inherits the placement rule."""
 
-    def test_the_npm_client_creates_through_post_projects_without_a_space(self):
+    def test_the_npm_client_creates_through_post_projects(self):
+        # Omitting workspace_id (PERSONAL-2 made it optional) is the X-API-Key case below.
         client_ts = _REPO / "packages" / "tracelab-mcp" / "src" / "api-client.ts"
         index_ts = _REPO / "packages" / "tracelab-mcp" / "src" / "index.ts"
         if not client_ts.exists():
@@ -255,7 +256,6 @@ class TestMcpCreateInheritsPlacement:
         assert "this.request<Project>('POST', '/api/v1/projects', data)" in client_ts.read_text()
         handler = index_ts.read_text().split("async function handleCreateProject", 1)[1].split("\n}\n", 1)[0]
         assert "client.createProject({" in handler
-        assert "workspace_id" not in handler
 
     def test_an_api_key_create_lands_in_the_callers_personal_space(self, client, db_session):
         _seed_default_workspace(db_session)
