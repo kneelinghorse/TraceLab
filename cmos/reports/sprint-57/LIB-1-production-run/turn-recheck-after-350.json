@@ -1,0 +1,21 @@
+{
+  "status": 200,
+  "body": {
+    "segments": [
+      {
+        "kind": "prose",
+        "text": "You\u2019re essentially comparing two patterns:\n\n1. **Per-project member grants**  \n   - You explicitly add people (or groups) to each project.  \n   - Typical in: GitHub repos, Google Docs (per file/folder), Notion pages, many research tools.  \n   - Pros:\n     - Fine-grained: easy to make a truly private project.  \n     - Mental model is simple: \u201cOnly people listed here can see this.\u201d  \n   - Cons:\n     - Admin overhead: lots of adding/removing as teams change.  \n     - Easy to misconfigure if you also have implicit workspace access.\n\n2. **Workspace membership as the default**  \n   - If you\u2019re in the workspace, you can see (most) projects, unless explicitly restricted.  \n   - Typical in: Slack channels, many SaaS analytics tools, some LLM/research platforms.  \n   - Pros:\n     - Low friction collaboration; onboarding is simple.  \n     - Discovery is easier (fewer \u201cinvisible\u201d projects).  \n   - Cons:\n     - Harder to reason about actual audience: \u201cwho exactly can see this?\u201d  \n     - Risk of oversharing by default; sensitive projects need extra care.\n\n**How tools warn about who else gains access** usually falls into 3 patterns:\n\n- **Explicit audience summaries near the action**  \n  Example patterns:\n  - \u201cYou\u2019re sharing this with 3 people and 2 groups (Marketing, Data Science, ~37 people total).\u201d  \n  - \u201cBecause you selected \u2018Anyone in Acme can view\u2019, this will be visible to everyone in your Acme workspace.\u201d  \n  These usually appear in a share modal right before confirming.\n\n- **Role-based/permission labels in context**  \n  - Badges like \u201cPrivate to you\u201d, \u201cShared with Team A only\u201d, \u201cVisible to entire workspace\u201d at the top of the project.  \n  - Hover/tooltips explain what that means in terms of people count and typical roles.\n\n- **Escalation warnings when broadening scope**  \n  - When changing from private \u2192 workspace-wide, tools often use a stronger visual warning:  \n    - color change, icon, and copy like: \u201cThis change makes the project visible to 58 people in Acme. Continue?\u201d  \n  - For especially sensitive scopes (e.g., public to the internet), an extra confirmation step.\n\nTo design Sprint 58\u2019s model, I\u2019d next pin down:\n- Your **default**: private to creator vs visible to workspace by default.  \n- Whether TraceLab has **roles/groups** (e.g., \u201cOrg Admin\u201d, \u201cWorkspace Member\u201d, \u201cGuest\u201d, \u201cExternal collaborator\u201d).  \n- How important is **discoverability vs confidentiality** on this release?\n\nOnce we clarify those, I can help you sketch:  \n- A concrete permission model (states + transitions).  \n- The copy/UI pattern for share dialogs and warnings tailored to TraceLab.\n\nWhat\u2019s your current default today (private vs workspace-visible), and what\u2019s the biggest *risk* you\u2019re trying to avoid in Sprint 58 (accidental oversharing vs friction to collaborate)?",
+        "citations": []
+      }
+    ],
+    "suggested_action": null,
+    "evidence": [],
+    "withheld_count": 0,
+    "usage": {
+      "prompt_tokens": 1129,
+      "completion_tokens": 769,
+      "total_tokens": 1898
+    },
+    "model": "gpt-5.1"
+  }
+}

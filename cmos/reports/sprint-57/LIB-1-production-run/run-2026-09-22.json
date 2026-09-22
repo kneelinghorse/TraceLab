@@ -1,0 +1,821 @@
+{
+  "started_at": "2026-09-22T02:09:56.076479+00:00",
+  "base": "https://api.tracelab.aquex.ai/api/v1",
+  "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+  "steps": [
+    {
+      "method": "POST",
+      "path": "/librarian/turns",
+      "status": 200,
+      "seconds": 20.69,
+      "response": {
+        "segments": [
+          {
+            "kind": "prose",
+            "text": "{\"segments\":[{\"kind\":\"prose\",\"text\":\"You\u2019re looking at two intertwined questions for Sprint 58:\\n\\n1. **Permission model shape**  \\n   - How tools distinguish **per\u2011project membership** from **workspace\u2011wide membership**.  \\n   - How those roles cascade into access to artifacts (docs, datasets, missions, evidence, etc.).\\n\\n2. **User\u2011facing safety mechanisms**  \\n   - How products **warn or inform** users about who else will gain access when they share something.  \\n   - How they surface this *at the moment of sharing* and later (banners, badges, dialogs, etc.).\\n\\nTo make this concrete for TraceLab, the most relevant real\u2011world patterns usually come from products like:\\n- Notion, Airtable, ClickUp, Linear (project-centric collaboration)  \\n- Figma, Miro (file or project spaces within an org)  \\n- Google Docs/Drive, Dropbox (folder vs. doc vs. org sharing)  \\n- GitHub/GitLab (repo vs. org teams)  \\n\\nBelow is a structured way to think about the design, plus targeted questions so we can narrow down to a Sprint\u2011ready sharing model.\\n\\n---\\n## 1. Conceptual models: project membership vs. workspace membership\\n\\n### A. Common patterns in modern tools\\n\\n**1) Workspace as the security boundary; project as a grouping**  \\nProducts: many SaaS tools for teams (e.g., Notion\u2019s default, Linear, many PM tools).\\n- **Workspace membership**: once you\u2019re in the workspace, you can at least *discover* most projects unless they\u2019re explicitly restricted.  \\n- **Project membership**: usually controls **visibility + editing rights** for a subset of workspace members; however, by default new projects are often visible to everyone in the workspace (or to a broad default group like \u201cAll Members\u201d).\\n- Pros:\\n  - Simple admin story: invite to workspace, done.  \\n  - Fewer \u201cI can\u2019t find anything\u201d issues.  \\n- Cons:\\n  - Harder to guarantee data isolation; sensitive projects require extra configuration.  \\n  - Users often underestimate who can already see a given project.\\n\\n**2) Project as primary access boundary; workspace as meta\u2011container**  \\nProducts: Figma teams/projects, GitHub repositories in an org, some research tools.\\n- **Workspace/Org**: mainly billing, user provisioning, global policies.  \\n- **Project/Repo**: explicit membership lists, often with roles (Admin/Maintainer/Editor/Viewer).  \\n- Non\u2011members in same workspace **may not see or search** restricted projects at all.\\n- Pros:\\n  - Better isolation for research or sensitive topics.  \\n  - Makes \u201cwho has access\u201d easier to reason about at the project level.  \\n- Cons:\\n  - More friction: people must be explicitly added or request access.  \\n  - Harder onboarding for new teammates (\u201cI joined the workspace but see nothing\u201d).\\n\\n**3) Hybrid: tiers of visibility**  \\nProducts: Notion (private vs. shared pages), Google Drive (private, domain, link), Miro boards.\\n- Each project (or folder/board) chooses one of several **visibility modes**, e.g.:\\n  - Private to specific people.  \\n  - Visible to workspace members with explicit role; hidden from others.  \\n  - Discoverable to all workspace members (e.g., searchable and browsable).  \\n  - Public / link\u2011share (if allowed by admins).\\n- This often combines **workspace membership** (who *could* see) with **project membership** (who *actually* has access right now).\\n\\n---\\n## 2. How products warn about who else gains access\\n\\n### A. At the point of sharing\\n\\nCommon UX elements when someone changes sharing on a project or artifact:\\n\\n1. **Explicit confirmation dialogs** when widening access\\n   - Example patterns:\\n     - \u201cYou are making this document visible to *All workspace members (43 people)*. Are you sure?\u201d  \\n     - \u201cAnyone in your organization with the link will be able to view this.\u201d\\n   - Often includes:\\n     - A count: *N additional people will gain access.*  \\n     - A short list of example names/teams (e.g., \u201cincluding Alice, Bob, and Carol\u201d).  \\n     - A textual highlight (color or icon) that this is a *broader* scope than before.\\n\\n2. **Real\u2011time scope preview in the share dialog**\\n   - Share UI typically has a top\u2011level scope selector:\\n     - \u201cRestricted \u00b7 Only people you invite\u201d  \\n     - \u201cWorkspace \u00b7 Anyone in [Org Name] with the link\u201d  \\n     - \u201cPublic \u00b7 Anyone with the link\u201d\\n   - As the user changes the dropdown, the dialog updates a short explanation below it.\\n\\n3. **Role\u2011specific warnings**\\n   - If granting **Editor** vs **Viewer**:\\n     - \u201cEditors can change sharing settings and delete content.\u201d  \\n     - \u201cViewers can only view; they cannot modify.\u201d\\n\\n4. **Special warnings for sensitive content**\\n   - If a project is tagged as sensitive (e.g., PII, confidential client work), some tools show:\\n     - A red or yellow banner in the share dialog: \u201cThis project is marked Confidential. Consider limiting to specific people.\u201d\\n\\n### B. Persistent indicators inside the workspace\\n\\nOnce something is shared, tools use:\\n\\n1. **Banners inside the project**  \\n   - At the top of the project/board/doc:  \\n     - \u201cShared with All workspace members.\u201d  \\n     - \u201cShared publicly. Anyone with the link can view.\u201d\\n\\n2. **Badges / icons in listings**  \\n   - Project cards or row entries show icons for:  \\n     - Lock (private), building/org icon (workspace\u2011wide), globe (public).  \\n   - Hover tooltips spell out the scope in plaintext.\\n\\n3. **Audit-ish views (\u2018Who has access?\u2019)**  \\n   - A dedicated pane or dialog showing:  \\n     - Direct members and their roles.  \\n     - Indirect access via groups (e.g., \u201cAll Workspace Members\u201d) or teams.  \\n   - Often also includes invitations that are pending or link\u2011based.\\n\\n---\\n## 3. Design implications for TraceLab\u2019s Sprint 58 model\\n\\nYou\u2019re likely balancing:  \\n- Research privacy (evidence, missions, notes can be quite sensitive).  \\n- Ease of collaboration (colleagues should be able to discover and join relevant projects).  \\n",
+            "citations": []
+          }
+        ],
+        "suggested_action": null,
+        "evidence": [],
+        "withheld_count": 0,
+        "usage": {
+          "prompt_tokens": 1101,
+          "completion_tokens": 1535,
+          "total_tokens": 2636
+        },
+        "model": "gpt-5.1"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/librarian/turns",
+      "status": 200,
+      "seconds": 18.42,
+      "response": {
+        "segments": [
+          {
+            "kind": "prose",
+            "text": "{\"segments\":[{\"kind\":\"prose\",\"text\":\"I don\u2019t see any existing evidence in this project yet, so we\u2019ll treat this as a fresh mission and lean on general product knowledge.\\n\\nTo design TraceLab\u2019s Sprint 58 sharing model for maintainers, we can explicitly compare a few modern tools on three axes:\\n- **Grant model**: per\u2011project roles, workspace/org inheritance, or both.\\n- **Access graph**: how they actually compute \u201cwho can see this.\u201d\\n- **Blast\u2011radius UX**: how they warn about who else gains access when you share.\\n\\nBelow is a concise comparison across several concrete tools, then a proposal for how to turn this into a DeepSearch mission.\\n\\n---\\n## 1. Notion\\n\\n**Grant model**\\n- **Workspace\u2011level**:\\n  - People are invited to a **workspace** and can be: Members, Guests, Admins.\\n  - Many pages and databases are, by default, visible to all workspace members unless marked private or restricted.\\n- **Per\u2011page / per\u2011database permissions**:\\n  - Each page supports granular sharing to individuals, groups, and the workspace.\\n  - Roles: Full access, Can edit, Can comment, Can view.\\n- **Hybrid**:\\n  - Permissions effectively combine: **direct grants** (individuals, groups) + **workspace\u2011wide group** (e.g., \u201cEveryone in [Workspace]\u201d).\\n\\n**How Notion surfaces blast radius at share time**\\n- **Share dialog scope selector**:\\n  - Options like: \u201cShare to web,\u201d \u201cAllow editing,\u201d \u201cAllow comments,\u201d and \u201cInvite members.\u201d\\n  - Crucially, you can switch between sharing **to specific people** or to the **entire workspace**.\\n- **Explicit workspace\u2011wide labeling**:\\n  - If shared to the whole workspace, the dialog shows text like: \u201cEveryone at [Workspace Name]\u201d or \u201cEveryone in this workspace can access.\u201d\\n- **Icons and badges**:\\n  - Lock icon: private.\\n  - Globe: public to web.\\n  - Building/org icon: visible to workspace.\\n- **Subtle but important limitation**:\\n  - Notion does not enumerate all users who gain access when you choose \u201cEveryone at [Workspace].\u201d It shows the *scope* (the group) but not a count or example members.\\n\\n**Design lessons**\\n- Pros: Very lightweight for collaboration; a single toggle moves a page from private \u2192 workspace\u2011wide.\\n- Cons: Blast radius is abstract (\u201ceveryone at workspace\u201d) rather than concrete (\\n  \u201c43 people including Alice, Bob \u2026\u201d). Easy to under\u2011estimate who can see content.\\n\\n---\\n## 2. Figma\\n\\n**Grant model**\\n- **Org/Workspace** (Enterprise):\\n  - People belong to an **organization** with **teams** and **projects** inside those teams.\\n- **Team & project permissions**:\\n  - Teams have membership and roles (Admin, Editor, Viewer), which typically cascade to projects and files.\\n  - Projects can have their own sharing settings, but they often inherit defaults from the team.\\n- **File\u2011level**:\\n  - Individual files can be shared to: specific people, team, organization, or public.\\n  - Roles: Can view, Can edit.\\n\\n**Blast\u2011radius UX**\\n- **Share dialog levels**:\\n  - A top section usually indicates whether the file is limited to specific people, shared with the team, org\u2011wide, or public.\\n  - Text like \u201cAnyone at [Org Name] with the link can view\u201d or \u201cAnyone with the link can view\u201d is displayed prominently.\\n- **Link sharing dropdown**:\\n  - Options: \u201cOnly people invited,\u201d \u201cAnyone at [Org] with the link,\u201d \u201cAnyone with the link.\u201d\\n  - Changing this is an explicit action, and the updated scope text appears immediately.\\n- **Org\u2011wide warning flavor**:\\n  - When you move from \u201cOnly people invited\u201d \u2192 \u201cAnyone at [Org] with the link,\u201d Figma makes it very clear that *any* org member with the link can view the file, but it does not list all users or give a numeric count in the share dialog.\\n\\n**Design lessons**\\n- Strong **tiered visibility** model: per\u2011file overrides with org/team inheritance.\\n- Clear textual warnings about scope, but not a granular \u201cN new people\u201d indication.\\n\\n---\\n## 3. GitHub (GitHub.com, orgs & repos)\\n\\n**Grant model**\\n- **Organization membership**:\\n  - Users are members of an **organization**; org owners/admins control default repo settings.\\n- **Per\u2011repository roles**:\\n  - Access is essentially **per\u2011repo**, even though repos live under an org.\\n  - Permissions can be granted via:\\n    - **Teams** (groups of users): a team is given a role on a repo.\\n    - **Individual collaborators**.\\n  - Repo visibility tiers: Private, Internal (visible to org members), Public.\\n- **Hybrid**:\\n  - A repo being \u201cInternal\u201d uses **workspace/org membership** as the base; per\u2011repo grants then overlay on top.\\n\\n**Blast\u2011radius UX**\\n- **Visibility change confirmation**:\\n  - When you change a repo from Private \u2192 Internal or Public, GitHub shows a confirmation dialog emphasizing that all organization members or everyone on the internet will be able to see the repository.\\n- **Settings pages**:\\n  - Repo settings clearly show whether it\u2019s Private/Internal/Public with associated icons and labels.\\n- **Access list views**:\\n  - A \u201cManage access\u201d or \u201cCollaborators and teams\u201d page shows:\\n    - Direct collaborators.\\n    - Teams and their roles.\\n    - Organization\u2011wide access via Internal repos.\\n- **Limitations**:\\n  - It surfaces *categories* (all org members, teams) but not a count of \u201cN new members will gain access when you flip this toggle.\u201d\\n\\n**Design lessons**\\n- Strong example of:\\n  - **Per\u2011project (repo) explicit membership**, plus\\n  - **Workspace (org) visibility tier** (private/internal/public).\\n- The \u201cblast radius\u201d is clearly labeled at the level of **audience type**, not individual users.\\n\\n---\\n## 4. Google Docs / Google Drive (Google Workspace)\\n\\n**Grant model**\\n- **Domain / organization layer**:\\n  - Users belong to a Google Workspace domain (e.g., `@company.com`).\\n  - Admins can restrict external sharing policies.\\n- **Folder & file permissions**:\\n  - Each folder/file has its own ACL.\\n  - You can:\\n    - Share with specific users or groups.\\n    - Share with the entire",
+            "citations": []
+          }
+        ],
+        "suggested_action": null,
+        "evidence": [],
+        "withheld_count": 0,
+        "usage": {
+          "prompt_tokens": 4263,
+          "completion_tokens": 1545,
+          "total_tokens": 5808
+        },
+        "model": "gpt-5.1"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/librarian/drafts",
+      "status": 200,
+      "seconds": 9.35,
+      "response": {
+        "draft": {
+          "mission_id": "TRACE-SHARE-58",
+          "title": "Project vs Workspace Sharing Models for TraceLab Sprint 58",
+          "objective": "Analyze how modern research and collaboration tools implement project-level versus workspace-level access control and blast-radius warnings, using concrete, well-documented patterns to inform TraceLab\u2019s Sprint 58 sharing model for maintainers.",
+          "success_criteria": [
+            "Document at least 6 products with clearly described sharing and permission models",
+            "For each product, classify its grant model as per-project, workspace inheritance, or hybrid",
+            "For each product, describe how it computes who can access a given project or artifact",
+            "For each product, document how it surfaces blast radius at the moment of sharing",
+            "Include direct references or screenshots from official docs or credible 2025-2026 sources where available",
+            "Synthesize design implications into a short set of options tailored to TraceLab maintainers"
+          ],
+          "background": "TraceLab maintainers are defining a Sprint 58 sharing model and need to understand how comparable tools structure access. The key tension is between project-level membership (explicit grants per project, good for isolation) and workspace-level membership (broad, discoverable collaboration), plus how tools communicate the blast radius when users widen access. The prior assistant message outlined conceptual patterns (workspace as boundary, project as boundary, hybrid) and named tools like Notion, Figma, GitHub, Google Docs/Drive, Airtable, ClickUp, Linear, Miro, and Dropbox as relevant comparators.",
+          "focus": "Compare specific SaaS products\u2019 documented behavior on: 1) whether access is primarily controlled at the project/file/repo level, workspace/org level, or both; 2) how inheritance and overrides work across workspace, team, project, folder, and artifact; and 3) how the UI warns or informs users about who else gains access when they change sharing settings, especially counts, example users, or group labels at share time.",
+          "required_entities": [
+            "TraceLab",
+            "Notion",
+            "Figma",
+            "GitHub",
+            "GitLab",
+            "Google Docs",
+            "Google Drive",
+            "Airtable",
+            "ClickUp",
+            "Linear",
+            "Miro",
+            "Dropbox"
+          ],
+          "excluded_entities": [
+            "blockchain access control",
+            "operating system file permissions",
+            "active directory on-prem deployments"
+          ],
+          "constraints": [
+            "Prefer sources published in 2025 or 2026",
+            "Rely primarily on official product documentation, help centers, or engineering blog posts",
+            "When 2025-2026 sources are unavailable, clearly mark older sources as such",
+            "Focus on multi-user, team or enterprise use cases rather than purely personal accounts"
+          ],
+          "deliverable_format": "Concise comparative report with one section per product plus a cross-cutting synthesis section.",
+          "deliverables": [
+            "Per-product summaries describing grant model (per-project roles, workspace inheritance, or hybrid), including key roles and inheritance rules",
+            "Per-product description of how the access graph is computed for a project or artifact, including workspace, team, group, and direct grants",
+            "Per-product analysis of blast-radius UX at share time, including exact phrases, counts, and scope indicators where documented",
+            "Table comparing all studied products across dimensions: primary boundary (workspace vs project), visibility tiers, and blast-radius mechanisms",
+            "Synthesis section outlining 2-4 concrete sharing model options for TraceLab Sprint 58, with pros, cons, and example UX patterns",
+            "Citation list with links to all referenced documentation and articles, noting publication year and source type"
+          ],
+          "tags": [
+            "access-control",
+            "sharing-models",
+            "workspace-permissions",
+            "project-permissions",
+            "product-comparative",
+            "ux-blast-radius",
+            "tracelab-sprint-58"
+          ]
+        },
+        "preview": {
+          "contract_version": "1.0",
+          "compiler_revision": "24e88100624e6221e5fa957508ab77c4b0f519f9",
+          "fidelity": "structural_only",
+          "named_entities": [
+            "TraceLab",
+            "Notion",
+            "Figma",
+            "GitHub",
+            "GitLab",
+            "Google Docs",
+            "Google Drive",
+            "Airtable",
+            "ClickUp",
+            "Linear",
+            "Miro",
+            "Dropbox"
+          ],
+          "objectives": [
+            {
+              "id": "objective-0",
+              "text": "Analyze how modern research and collaboration tools implement project-level versus workspace-level access control and blast-radius warnings, using concrete, well-documented patterns to inform TraceLab\u2019s Sprint 58 sharing model for maintainers.",
+              "source": "objective",
+              "required": false
+            },
+            {
+              "id": "objective-1",
+              "text": "Document at least 6 products with clearly described sharing and permission models",
+              "source": "success_criteria",
+              "required": true
+            },
+            {
+              "id": "objective-2",
+              "text": "For each product, classify its grant model as per-project, workspace inheritance, or hybrid",
+              "source": "success_criteria",
+              "required": true
+            },
+            {
+              "id": "objective-3",
+              "text": "For each product, describe how it computes who can access a given project or artifact",
+              "source": "success_criteria",
+              "required": true
+            },
+            {
+              "id": "objective-4",
+              "text": "For each product, document how it surfaces blast radius at the moment of sharing",
+              "source": "success_criteria",
+              "required": true
+            },
+            {
+              "id": "objective-5",
+              "text": "Include direct references or screenshots from official docs or credible 2025-2026 sources where available",
+              "source": "success_criteria",
+              "required": true
+            },
+            {
+              "id": "objective-6",
+              "text": "Synthesize design implications into a short set of options tailored to TraceLab maintainers",
+              "source": "success_criteria",
+              "required": true
+            }
+          ],
+          "evidence_slots": [
+            {
+              "id": "slot-objective-1",
+              "kind": "objective_coverage",
+              "description": "Gather evidence that directly addresses: Document at least 6 products with clearly described sharing and permission models",
+              "source": "success_criteria",
+              "target": {
+                "objective_id": "objective-1"
+              },
+              "required": true
+            },
+            {
+              "id": "slot-objective-2",
+              "kind": "objective_coverage",
+              "description": "Gather evidence that directly addresses: For each product, classify its grant model as per-project, workspace inheritance, or hybrid",
+              "source": "success_criteria",
+              "target": {
+                "objective_id": "objective-2"
+              },
+              "required": true
+            },
+            {
+              "id": "slot-objective-3",
+              "kind": "objective_coverage",
+              "description": "Gather evidence that directly addresses: For each product, describe how it computes who can access a given project or artifact",
+              "source": "success_criteria",
+              "target": {
+                "objective_id": "objective-3"
+              },
+              "required": true
+            },
+            {
+              "id": "slot-objective-4",
+              "kind": "objective_coverage",
+              "description": "Gather evidence that directly addresses: For each product, document how it surfaces blast radius at the moment of sharing",
+              "source": "success_criteria",
+              "target": {
+                "objective_id": "objective-4"
+              },
+              "required": true
+            },
+            {
+              "id": "slot-objective-5",
+              "kind": "objective_coverage",
+              "description": "Gather evidence that directly addresses: Include direct references or screenshots from official docs or credible 2025-2026 sources where available",
+              "source": "success_criteria",
+              "target": {
+                "objective_id": "objective-5"
+              },
+              "required": true
+            },
+            {
+              "id": "slot-objective-6",
+              "kind": "objective_coverage",
+              "description": "Gather evidence that directly addresses: Synthesize design implications into a short set of options tailored to TraceLab maintainers",
+              "source": "success_criteria",
+              "target": {
+                "objective_id": "objective-6"
+              },
+              "required": true
+            },
+            {
+              "id": "slot-entity-tracelab",
+              "kind": "named_entity",
+              "description": "Cover named entity 'TraceLab' with source-grounded evidence.",
+              "source": "named_entities",
+              "target": {
+                "entity": "TraceLab",
+                "entity_name": "TraceLab",
+                "objective_ids": [
+                  "objective-6"
+                ]
+              },
+              "required": true
+            },
+            {
+              "id": "slot-entity-notion",
+              "kind": "named_entity",
+              "description": "Cover named entity 'Notion' with source-grounded evidence.",
+              "source": "named_entities",
+              "target": {
+                "entity": "Notion",
+                "entity_name": "Notion"
+              },
+              "required": true
+            },
+            {
+              "id": "slot-entity-figma",
+              "kind": "named_entity",
+              "description": "Cover named entity 'Figma' with source-grounded evidence.",
+              "source": "named_entities",
+              "target": {
+                "entity": "Figma",
+                "entity_name": "Figma"
+              },
+              "required": true
+            },
+            {
+              "id": "slot-entity-github",
+              "kind": "named_entity",
+              "description": "Cover named entity 'GitHub' with source-grounded evidence.",
+              "source": "named_entities",
+              "target": {
+                "entity": "GitHub",
+                "entity_name": "GitHub"
+              },
+              "required": true
+            },
+            {
+              "id": "slot-entity-gitlab",
+              "kind": "named_entity",
+              "description": "Cover named entity 'GitLab' with source-grounded evidence.",
+              "source": "named_entities",
+              "target": {
+                "entity": "GitLab",
+                "entity_name": "GitLab"
+              },
+              "required": true
+            },
+            {
+              "id": "slot-entity-google-docs",
+              "kind": "named_entity",
+              "description": "Cover named entity 'Google Docs' with source-grounded evidence.",
+              "source": "named_entities",
+              "target": {
+                "entity": "Google Docs",
+                "entity_name": "Google Docs"
+              },
+              "required": true
+            },
+            {
+              "id": "slot-entity-google-drive",
+              "kind": "named_entity",
+              "description": "Cover named entity 'Google Drive' with source-grounded evidence.",
+              "source": "named_entities",
+              "target": {
+                "entity": "Google Drive",
+                "entity_name": "Google Drive"
+              },
+              "required": true
+            },
+            {
+              "id": "slot-entity-airtable",
+              "kind": "named_entity",
+              "description": "Cover named entity 'Airtable' with source-grounded evidence.",
+              "source": "named_entities",
+              "target": {
+                "entity": "Airtable",
+                "entity_name": "Airtable"
+              },
+              "required": true
+            },
+            {
+              "id": "slot-entity-clickup",
+              "kind": "named_entity",
+              "description": "Cover named entity 'ClickUp' with source-grounded evidence.",
+              "source": "named_entities",
+              "target": {
+                "entity": "ClickUp",
+                "entity_name": "ClickUp"
+              },
+              "required": true
+            },
+            {
+              "id": "slot-entity-linear",
+              "kind": "named_entity",
+              "description": "Cover named entity 'Linear' with source-grounded evidence.",
+              "source": "named_entities",
+              "target": {
+                "entity": "Linear",
+                "entity_name": "Linear"
+              },
+              "required": true
+            },
+            {
+              "id": "slot-entity-miro",
+              "kind": "named_entity",
+              "description": "Cover named entity 'Miro' with source-grounded evidence.",
+              "source": "named_entities",
+              "target": {
+                "entity": "Miro",
+                "entity_name": "Miro"
+              },
+              "required": true
+            },
+            {
+              "id": "slot-entity-dropbox",
+              "kind": "named_entity",
+              "description": "Cover named entity 'Dropbox' with source-grounded evidence.",
+              "source": "named_entities",
+              "target": {
+                "entity": "Dropbox",
+                "entity_name": "Dropbox"
+              },
+              "required": true
+            },
+            {
+              "id": "slot-deliverable-schema-1",
+              "kind": "deliverable_schema",
+              "description": "Satisfy structural deliverable 'Required Table'.",
+              "source": "deliverables",
+              "target": {
+                "schema_id": "deliverable-schema-1",
+                "format": "table"
+              },
+              "required": true
+            }
+          ],
+          "acceptance_checks": [
+            {
+              "id": "check-objective-1",
+              "kind": "objective_coverage",
+              "description": "Objective must be substantively addressed: Document at least 6 products with clearly described sharing and permission models",
+              "target": {
+                "objective_id": "objective-1"
+              },
+              "required": true
+            },
+            {
+              "id": "check-objective-2",
+              "kind": "objective_coverage",
+              "description": "Objective must be substantively addressed: For each product, classify its grant model as per-project, workspace inheritance, or hybrid",
+              "target": {
+                "objective_id": "objective-2"
+              },
+              "required": true
+            },
+            {
+              "id": "check-objective-3",
+              "kind": "objective_coverage",
+              "description": "Objective must be substantively addressed: For each product, describe how it computes who can access a given project or artifact",
+              "target": {
+                "objective_id": "objective-3"
+              },
+              "required": true
+            },
+            {
+              "id": "check-objective-4",
+              "kind": "objective_coverage",
+              "description": "Objective must be substantively addressed: For each product, document how it surfaces blast radius at the moment of sharing",
+              "target": {
+                "objective_id": "objective-4"
+              },
+              "required": true
+            },
+            {
+              "id": "check-objective-5",
+              "kind": "objective_coverage",
+              "description": "Objective must be substantively addressed: Include direct references or screenshots from official docs or credible 2025-2026 sources where available",
+              "target": {
+                "objective_id": "objective-5"
+              },
+              "required": true
+            },
+            {
+              "id": "check-objective-6",
+              "kind": "objective_coverage",
+              "description": "Objective must be substantively addressed: Synthesize design implications into a short set of options tailored to TraceLab maintainers",
+              "target": {
+                "objective_id": "objective-6"
+              },
+              "required": true
+            },
+            {
+              "id": "check-entity-tracelab",
+              "kind": "named_entity_coverage",
+              "description": "Named entity 'TraceLab' must appear in grounded evidence or synthesis.",
+              "target": {
+                "entity": "TraceLab"
+              },
+              "required": true
+            },
+            {
+              "id": "check-entity-notion",
+              "kind": "named_entity_coverage",
+              "description": "Named entity 'Notion' must appear in grounded evidence or synthesis.",
+              "target": {
+                "entity": "Notion"
+              },
+              "required": true
+            },
+            {
+              "id": "check-entity-figma",
+              "kind": "named_entity_coverage",
+              "description": "Named entity 'Figma' must appear in grounded evidence or synthesis.",
+              "target": {
+                "entity": "Figma"
+              },
+              "required": true
+            },
+            {
+              "id": "check-entity-github",
+              "kind": "named_entity_coverage",
+              "description": "Named entity 'GitHub' must appear in grounded evidence or synthesis.",
+              "target": {
+                "entity": "GitHub"
+              },
+              "required": true
+            },
+            {
+              "id": "check-entity-gitlab",
+              "kind": "named_entity_coverage",
+              "description": "Named entity 'GitLab' must appear in grounded evidence or synthesis.",
+              "target": {
+                "entity": "GitLab"
+              },
+              "required": true
+            },
+            {
+              "id": "check-entity-google-docs",
+              "kind": "named_entity_coverage",
+              "description": "Named entity 'Google Docs' must appear in grounded evidence or synthesis.",
+              "target": {
+                "entity": "Google Docs"
+              },
+              "required": true
+            },
+            {
+              "id": "check-entity-google-drive",
+              "kind": "named_entity_coverage",
+              "description": "Named entity 'Google Drive' must appear in grounded evidence or synthesis.",
+              "target": {
+                "entity": "Google Drive"
+              },
+              "required": true
+            },
+            {
+              "id": "check-entity-airtable",
+              "kind": "named_entity_coverage",
+              "description": "Named entity 'Airtable' must appear in grounded evidence or synthesis.",
+              "target": {
+                "entity": "Airtable"
+              },
+              "required": true
+            },
+            {
+              "id": "check-entity-clickup",
+              "kind": "named_entity_coverage",
+              "description": "Named entity 'ClickUp' must appear in grounded evidence or synthesis.",
+              "target": {
+                "entity": "ClickUp"
+              },
+              "required": true
+            },
+            {
+              "id": "check-entity-linear",
+              "kind": "named_entity_coverage",
+              "description": "Named entity 'Linear' must appear in grounded evidence or synthesis.",
+              "target": {
+                "entity": "Linear"
+              },
+              "required": true
+            },
+            {
+              "id": "check-entity-miro",
+              "kind": "named_entity_coverage",
+              "description": "Named entity 'Miro' must appear in grounded evidence or synthesis.",
+              "target": {
+                "entity": "Miro"
+              },
+              "required": true
+            },
+            {
+              "id": "check-entity-dropbox",
+              "kind": "named_entity_coverage",
+              "description": "Named entity 'Dropbox' must appear in grounded evidence or synthesis.",
+              "target": {
+                "entity": "Dropbox"
+              },
+              "required": true
+            },
+            {
+              "id": "check-deliverable-schema-1",
+              "kind": "structural_output",
+              "description": "Output must satisfy the 'Required Table' structural contract.",
+              "target": {
+                "schema_id": "deliverable-schema-1",
+                "format": "table"
+              },
+              "required": true
+            }
+          ],
+          "deliverable_schemas": [
+            {
+              "id": "deliverable-schema-1",
+              "kind": "table",
+              "title": "Required Table",
+              "format": "table",
+              "source_text": "Table comparing all studied products across dimensions: primary boundary (workspace vs project), visibility tiers, and blast-radius mechanisms",
+              "min_items": null,
+              "minimum_citation_count": null,
+              "columns": [],
+              "allowed_values": [],
+              "required_sections": [],
+              "entity_extraction_required": false,
+              "entity_types": [],
+              "row_identifier_column": null,
+              "recommendation_required": false,
+              "evidence_gaps_section_required": false,
+              "corpus_reference_required": false,
+              "claim_to_evidence_mapping_required": false,
+              "limitations_section_required": false,
+              "notes": [
+                "Satisfy the required table structure explicitly; do not narrate it away."
+              ]
+            }
+          ],
+          "coverage_thresholds": {},
+          "validation_thresholds": {}
+        },
+        "preview_error": null,
+        "lint_errors": [],
+        "lint_warnings": [],
+        "notes": [
+          "1 success criteria compiled as deliverable schemas rather than research objectives; DeepSearch would format a table instead of gathering evidence for them. Shorten or split those criteria before running."
+        ],
+        "usage": {
+          "prompt_tokens": 3798,
+          "completion_tokens": 844,
+          "total_tokens": 4642
+        },
+        "model": "gpt-5.1"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/librarian/missions",
+      "status": 201,
+      "seconds": 0.52,
+      "response": {
+        "mission": {
+          "mission_id": "TRACE-SHARE-58",
+          "title": "Project vs Workspace Sharing Models for TraceLab Sprint 58",
+          "objective": "Analyze how modern research and collaboration tools implement project-level versus workspace-level access control and blast-radius warnings, using concrete, well-documented patterns to inform TraceLab\u2019s Sprint 58 sharing model for maintainers.",
+          "success_criteria": [
+            "Document at least 6 products with clearly described sharing and permission models",
+            "For each product, classify its grant model as per-project, workspace inheritance, or hybrid",
+            "For each product, describe how it computes who can access a given project or artifact",
+            "For each product, document how it surfaces blast radius at the moment of sharing",
+            "Include direct references or screenshots from official docs or credible 2025-2026 sources where available",
+            "Synthesize design implications into a short set of options tailored to TraceLab maintainers"
+          ],
+          "id": "dca03dd0-e828-4035-87c0-ea5651c72623",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "project_name": "TraceLab Research",
+          "context": {},
+          "deliverables": [
+            "Per-product summaries describing grant model (per-project roles, workspace inheritance, or hybrid), including key roles and inheritance rules",
+            "Per-product description of how the access graph is computed for a project or artifact, including workspace, team, group, and direct grants",
+            "Per-product analysis of blast-radius UX at share time, including exact phrases, counts, and scope indicators where documented",
+            "Table comparing all studied products across dimensions: primary boundary (workspace vs project), visibility tiers, and blast-radius mechanisms",
+            "Synthesis section outlining 2-4 concrete sharing model options for TraceLab Sprint 58, with pros, cons, and example UX patterns",
+            "Citation list with links to all referenced documentation and articles, noting publication year and source type"
+          ],
+          "research_phases": {},
+          "tags": [
+            "access-control",
+            "sharing-models",
+            "workspace-permissions",
+            "project-permissions",
+            "product-comparative",
+            "ux-blast-radius",
+            "tracelab-sprint-58",
+            "librarian"
+          ],
+          "metadata": {},
+          "background": "TraceLab maintainers are defining a Sprint 58 sharing model and need to understand how comparable tools structure access. The key tension is between project-level membership (explicit grants per project, good for isolation) and workspace-level membership (broad, discoverable collaboration), plus how tools communicate the blast radius when users widen access. The prior assistant message outlined conceptual patterns (workspace as boundary, project as boundary, hybrid) and named tools like Notion, Figma, GitHub, Google Docs/Drive, Airtable, ClickUp, Linear, Miro, and Dropbox as relevant comparators.",
+          "focus": "Compare specific SaaS products\u2019 documented behavior on: 1) whether access is primarily controlled at the project/file/repo level, workspace/org level, or both; 2) how inheritance and overrides work across workspace, team, project, folder, and artifact; and 3) how the UI warns or informs users about who else gains access when they change sharing settings, especially counts, example users, or group labels at share time.",
+          "references": null,
+          "required_entities": [
+            "TraceLab",
+            "Notion",
+            "Figma",
+            "GitHub",
+            "GitLab",
+            "Google Docs",
+            "Google Drive",
+            "Airtable",
+            "ClickUp",
+            "Linear",
+            "Miro",
+            "Dropbox"
+          ],
+          "excluded_entities": [
+            "blockchain access control",
+            "operating system file permissions",
+            "active directory on-prem deployments"
+          ],
+          "expected_output_schema": null,
+          "coverage_thresholds": null,
+          "validation_thresholds": null,
+          "deliverable_format": "Concise comparative report with one section per product plus a cross-cutting synthesis section.",
+          "max_loops": null,
+          "min_loops": null,
+          "constraints": [
+            "Prefer sources published in 2025 or 2026",
+            "Rely primarily on official product documentation, help centers, or engineering blog posts",
+            "When 2025-2026 sources are unavailable, clearly mark older sources as such",
+            "Focus on multi-user, team or enterprise use cases rather than purely personal accounts"
+          ],
+          "status": "draft",
+          "queued_at": null,
+          "started_at": null,
+          "completed_at": null,
+          "deepsearch_job_id": null,
+          "execution_metadata": {},
+          "result_document_ids": [],
+          "result_report_id": null,
+          "result_markdown": null,
+          "result_protocol": null,
+          "error_message": null,
+          "created_at": "2026-09-22T02:10:44.970747",
+          "updated_at": "2026-09-22T02:10:44.970751",
+          "created_by": "librarian"
+        },
+        "created": true
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/missions/dca03dd0-e828-4035-87c0-ea5651c72623/submit",
+      "status": 200,
+      "seconds": 0.51,
+      "response": {
+        "status": "queued",
+        "mode": "worker",
+        "mission_id": "TRACE-SHARE-58",
+        "uuid": "dca03dd0-e828-4035-87c0-ea5651c72623",
+        "message": "Mission queued for DeepSearch worker.",
+        "job_id": null,
+        "warnings": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/missions/dca03dd0-e828-4035-87c0-ea5651c72623",
+      "status": 200,
+      "seconds": 0.47,
+      "response": {
+        "id": "dca03dd0-e828-4035-87c0-ea5651c72623",
+        "mission_id": "TRACE-SHARE-58",
+        "status": "completed",
+        "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+        "created_by": "librarian",
+        "tags": [
+          "access-control",
+          "sharing-models",
+          "workspace-permissions",
+          "project-permissions",
+          "product-comparative",
+          "ux-blast-radius",
+          "tracelab-sprint-58",
+          "librarian"
+        ],
+        "queued_at": "2026-09-22T02:10:45.488970",
+        "started_at": "2026-09-22T02:10:50.138965",
+        "completed_at": "2026-09-22T02:15:52.619879",
+        "deepsearch_job_id": "c00c9707-9fcd-46c8-8e45-02e2d8e8d08b",
+        "result_report_id": "e21193eb-2c30-49f7-ad6f-2db0cd2dd1d2",
+        "result_document_ids": [
+          "04ffc800-85cf-4a49-bcec-a856644796a8"
+        ],
+        "error_message": null
+      },
+      "trimmed": "result_protocol, result_markdown and execution_metadata removed; the result document 04ffc800 holds the report"
+    },
+    {
+      "method": "GET",
+      "path": "/missions/dca03dd0-e828-4035-87c0-ea5651c72623/status",
+      "status": 200,
+      "seconds": 0.53,
+      "response": {
+        "id": "dca03dd0-e828-4035-87c0-ea5651c72623",
+        "mission_id": "TRACE-SHARE-58",
+        "status": "queued",
+        "progress_percent": null,
+        "current_phase": null,
+        "queued_at": "2026-09-22T02:10:45.488970",
+        "started_at": null,
+        "completed_at": null,
+        "error_message": null,
+        "deepsearch_job_id": null,
+        "deepsearch_attempt_count": 0,
+        "lease_expires_at": null,
+        "result_document_ids": [],
+        "result_report_id": null,
+        "materialization_pending": false,
+        "materialization_status": null,
+        "materialization_attempt_count": 0,
+        "materialization_error": null,
+        "search_ready": false
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/missions/dca03dd0-e828-4035-87c0-ea5651c72623/status",
+      "status": 200,
+      "seconds": 0.51,
+      "response": {
+        "id": "dca03dd0-e828-4035-87c0-ea5651c72623",
+        "mission_id": "TRACE-SHARE-58",
+        "status": "completed",
+        "progress_percent": null,
+        "current_phase": null,
+        "queued_at": "2026-09-22T02:10:45.488970",
+        "started_at": "2026-09-22T02:10:50.138965",
+        "completed_at": "2026-09-22T02:15:52.619879",
+        "error_message": null,
+        "deepsearch_job_id": "c00c9707-9fcd-46c8-8e45-02e2d8e8d08b",
+        "deepsearch_attempt_count": 1,
+        "lease_expires_at": null,
+        "result_document_ids": [
+          "04ffc800-85cf-4a49-bcec-a856644796a8"
+        ],
+        "result_report_id": "e21193eb-2c30-49f7-ad6f-2db0cd2dd1d2",
+        "materialization_pending": false,
+        "materialization_status": "ready",
+        "materialization_attempt_count": 1,
+        "materialization_error": null,
+        "search_ready": true
+      }
+    }
+  ],
+  "final": {
+    "status": "completed",
+    "completed_at": "2026-09-22T02:15:52.619879",
+    "result_report_id": "e21193eb-2c30-49f7-ad6f-2db0cd2dd1d2",
+    "result_document_ids": [
+      "04ffc800-85cf-4a49-bcec-a856644796a8"
+    ],
+    "deepsearch_job_id": "c00c9707-9fcd-46c8-8e45-02e2d8e8d08b",
+    "ledger_entries": 360,
+    "report_header": {
+      "sources_collected": 226,
+      "verified_references": 41,
+      "agent_steps": "25 / 40",
+      "runtime": "4m 20s",
+      "word_count": 6340
+    }
+  },
+  "note": "Status polls collapsed to first and last; the acceptance script polled every 30 s. No credential material was recorded."
+}
