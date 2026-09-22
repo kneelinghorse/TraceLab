@@ -173,6 +173,7 @@ def pedr1c_anon_routes(
         ("get", f"{prefix}/activity", None),
         ("get", f"{prefix}/activity/summary", None),
         ("put", f"{prefix}/activity/viewed", {}),
+        ("put", f"{prefix}/activity/viewed/evidence", {}),
         ("get", f"{prefix}/navigation/search?q=rbac", None),
         ("get", f"{prefix}/collections", None),
         ("post", f"{prefix}/collections", {}),
