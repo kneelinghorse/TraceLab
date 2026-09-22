@@ -1662,3 +1662,67 @@ class TestCreateAndSubmitMission:
             and err.get("type") == "missing"
             for err in detail
         ), f"Expected missing-project_id field error, got {detail}"
+
+
+class TestMissionCreateAuthorization:
+    """Decision #521: formal research is always attached to a project the caller can reach.
+
+    The Librarian's create route always checked its project; these two routes
+    only checked sign-in, so a signed-in user could create a mission inside a
+    project they cannot otherwise see.
+    """
+
+    def _payload(self, project_id, mission_id="AUTHZ-1"):
+        return {
+            "mission_id": mission_id,
+            "title": "Authorization check",
+            "objective": "Prove the caller must reach the project a mission lands in.",
+            "success_criteria": ["Denied when the project is out of reach"],
+            "project_id": str(project_id),
+        }
+
+    def test_unknown_project_is_404_on_both_routes(self, auth_headers):
+        client = TestClient(app)
+        for path in ("/api/v1/missions", "/api/v1/missions/create-and-submit"):
+            response = client.post(path, json=self._payload(uuid.uuid4()), headers=auth_headers)
+            assert response.status_code == 404, (path, response.text)
+
+    def test_soft_deleted_project_is_404(self, auth_headers, db_session):
+        project = _create_test_project(db_session)
+        from datetime import datetime
+
+        project.deleted_at = datetime.utcnow()
+        db_session.commit()
+        response = TestClient(app).post("/api/v1/missions", json=self._payload(project.id), headers=auth_headers)
+        assert response.status_code == 404, response.text
+
+    def test_stranger_cannot_create_in_a_project_they_cannot_reach(self, auth_headers, db_session, monkeypatch):
+        import app.core.authorization as authorization
+        from app.core.security import AuthenticatedUser, require_authenticated_user
+        from app.models.user import User
+
+        monkeypatch.setattr(authorization.settings, "rbac_enabled", True, raising=False)
+        project = _create_test_project(db_session)
+        project.owner_id = db_session.query(User).first().id
+        db_session.commit()
+        stranger = AuthenticatedUser(
+            user_id=uuid.uuid4(), email="stranger@tracelab.local", display_name="stranger", role="member"
+        )
+        app.dependency_overrides[require_authenticated_user] = lambda: stranger
+        try:
+            client = TestClient(app)
+            for path, mission_id in (
+                ("/api/v1/missions", "AUTHZ-2"),
+                ("/api/v1/missions/create-and-submit", "AUTHZ-3"),
+            ):
+                response = client.post(path, json=self._payload(project.id, mission_id), headers=auth_headers)
+                assert response.status_code == 403, (path, response.text)
+        finally:
+            app.dependency_overrides.pop(require_authenticated_user, None)
+        assert db_session.query(Mission).filter(Mission.mission_id.in_(["AUTHZ-2", "AUTHZ-3"])).count() == 0
+
+    def test_reachable_project_still_creates(self, auth_headers, db_session):
+        project = _create_test_project(db_session)
+        response = TestClient(app).post("/api/v1/missions", json=self._payload(project.id, "AUTHZ-4"), headers=auth_headers)
+        assert response.status_code == 201, response.text
+        assert response.json()["project_id"] == str(project.id)

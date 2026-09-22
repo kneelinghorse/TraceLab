@@ -270,7 +270,7 @@ function ProjectDetail() {
                 <StatCard label="Reports" value={stats.report_count.toLocaleString()} />
                 <StatCard label="Tokens" value={stats.total_tokens.toLocaleString()} />
               </div>}
-              <div className="flex flex-wrap items-center gap-4 text-sm"><RelationshipLink type="project" id={projectId} /><Link className="text-accent-text underline" href={`/projects/${projectId}?tab=Documents`}>Manage documents</Link><Link className="text-accent-text underline" href={`/projects/${projectId}?tab=Missions`}>Inspect missions</Link></div>
+              <div className="flex flex-wrap items-center gap-4 text-sm"><RelationshipLink type="project" id={projectId} /><Link className="text-accent-text underline" href={`/projects/${projectId}?tab=Documents`}>Manage documents</Link><Link className="text-accent-text underline" href={`/projects/${projectId}?tab=Missions`}>Inspect missions</Link><Link className="text-accent-text underline" href={`/librarian?project=${projectId}`}>Ask the Librarian</Link></div>
               {project.methodology && <p className="break-words text-secondary">Methodology: {project.methodology}</p>}
             </section> : <ProjectResources key={`${projectId}-${tab}`} projectId={projectId} tab={tab} refreshStats={mutateStats} onBusyChange={setUploadBusy} />}
           </div>

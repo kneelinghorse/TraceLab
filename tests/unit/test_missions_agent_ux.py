@@ -70,6 +70,21 @@ def _mission_stub(
     )
 
 
+class _FakeQuery:
+    """Enough of a query for the create routes' project check: any project id resolves."""
+
+    def filter(self, *_criteria):
+        return self
+
+    def first(self):
+        return SimpleNamespace(id=uuid4(), deleted_at=None, owner_id=None, workspace_id=None)
+
+
+class _FakeDb:
+    def query(self, _model):
+        return _FakeQuery()
+
+
 class _MissionServiceStub:
     def __init__(self, mission):
         self.mission = mission
@@ -107,7 +122,7 @@ def mission_client(monkeypatch):
     )
 
     def _fake_db():
-        yield object()
+        yield _FakeDb()
 
     app.dependency_overrides[missions_api.get_db] = _fake_db
     with TestClient(app) as client:

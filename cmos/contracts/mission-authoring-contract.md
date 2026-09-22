@@ -155,6 +155,18 @@ HTTP verbs, authentication, generated URLs and preservation of authored values.
 `TestCanonicalMissionLinks` in `tests/mcp_tools/test_mcp_missions_unit.py`
 exercises all five registered Python tools through an MCP client session.
 
+## Create routes authorize the project (2026-09-22)
+
+`POST /missions` and `POST /missions/create-and-submit` now load the named
+`project_id` (404 when missing or soft-deleted) and call `authorize_or_403`
+with the caller's own principal before creating anything, the same check the
+Librarian's create route has always made. Decision #521: formal research is
+always attached to a project the caller can reach. No field, column, MCP
+schema or worker SELECT change; the TS MCP client's `tracelab_mission.create`
+goes through the same route under the caller's device-code credential.
+Regression coverage: `TestMissionCreateAuthorization` in
+`tests/test_missions_api.py`.
+
 ## Librarian authoring (LIB-1, 2026-09-22)
 
 The Librarian is a fourth authoring entry point beside the MCP, the REST API and
