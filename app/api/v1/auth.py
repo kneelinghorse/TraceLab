@@ -34,6 +34,7 @@ from app.schemas.api_key import (
     APIKeyResponse,
 )
 from app.schemas.auth import LoginRequest, ProfileResponse, ProfileUpdate, RegisterRequest, TokenResponse
+from app.services.ownership import ensure_personal_space
 
 router = APIRouter(tags=["auth"])
 
@@ -153,6 +154,7 @@ def register(
     )
     db.add(new_user)
     db.flush()
+    ensure_personal_space(db, new_user)
 
     # Mark invite code as used
     invite.used_by = new_user.id

@@ -1,5 +1,6 @@
 """Tests for project management API endpoints (B15.7)."""
 
+import logging
 from datetime import datetime
 from unittest.mock import MagicMock
 from uuid import uuid4
@@ -316,12 +317,11 @@ class TestProjectDefaultSpaceWritePath:
         assert fetched.workspace_id is None, "must degrade to NULL when no Default Workspace"
 
 
-class TestProjectSpaceForMembers:
-    """GUEST-1 (decision #528, Derek: "ok for now"): a non-privileged member of exactly
-    one Space creates projects in that Space. Everyone else keeps Default Workspace.
-
-    WALK-1 finding 2: the guest's project landed in Default Workspace, not the
-    Space Derek had made for them.
+class TestProjectLandsInPersonalSpace:
+    """PERSONAL-1 (decisions #530, #532): a human's new project lands in their own
+    personal Space, so the first thing a new person does lands somewhere they own
+    instead of pooling in Default Workspace, where any future Default member would
+    see it. Replaces GUEST-1's sole-Space rule (decision #528, "ok for now").
     """
 
     @staticmethod
@@ -342,11 +342,11 @@ class TestProjectSpaceForMembers:
         return user, {"Authorization": f"Bearer {create_access_token(subject=str(user.id))}"}
 
     @staticmethod
-    def _space_for(db, user, name):
+    def _space_for(db, user, name, *, personal=False):
         from app.models.space_member import SpaceMember
         from app.models.workspace import Workspace
 
-        space = Workspace(name=name)
+        space = Workspace(name=name, personal_owner_id=user.id if personal else None)
         db.add(space)
         db.commit()
         db.refresh(space)
@@ -367,29 +367,48 @@ class TestProjectSpaceForMembers:
         project = db.query(Project).filter(Project.id == resp.json()["id"]).first()
         return str(project.workspace_id)
 
-    def test_member_of_exactly_one_space_creates_there(self, db_session):
+    def test_every_human_role_creates_in_their_own_personal_space(self, db_session):
+        """Derek included: "yes to both" put his own new projects in his personal Space."""
+        TestProjectDefaultSpaceWritePath._seed_default_workspace(db_session)
+        for role in ("owner", "admin", "member", "viewer"):
+            user, headers = self._user(db_session, role)
+            personal = self._space_for(db_session, user, f"{role}'s Space", personal=True)
+            assert self._created_workspace(db_session, headers) == str(personal.id), role
+
+    def test_a_shared_space_does_not_capture_the_new_project(self, db_session):
+        """The GUEST-1 case: one shared Space no longer decides placement; choosing a
+        shared Space is PERSONAL-2's picker, never a silent default."""
         TestProjectDefaultSpaceWritePath._seed_default_workspace(db_session)
         guest, headers = self._user(db_session, "member")
-        space = self._space_for(db_session, guest, "Walkthrough Guest")
-        assert self._created_workspace(db_session, headers) == str(space.id)
+        self._space_for(db_session, guest, "Walkthrough Guest")
+        personal = self._space_for(db_session, guest, "Guest's Space", personal=True)
+        assert self._created_workspace(db_session, headers) == str(personal.id)
 
-    def test_members_of_no_space_or_several_keep_the_default(self, db_session):
+    def test_the_service_principal_and_no_caller_keep_the_default(self, db_session):
+        """The route refuses a service principal outright (403), so the rule is proved
+        where it lives. Even a stray personal Space row cannot pull a machine
+        identity's resources out of Default; the role decides."""
+        from app.core.security import AuthenticatedUser
+        from app.models.workspace import DEFAULT_WORKSPACE_ID
+        from app.services.ownership import default_workspace_id
+
+        TestProjectDefaultSpaceWritePath._seed_default_workspace(db_session)
+        service, _headers = self._user(db_session, "service")
+        self._space_for(db_session, service, "stray", personal=True)
+        caller = AuthenticatedUser(
+            user_id=service.id, email=service.email, display_name="DeepSearch", role="service"
+        )
+        assert str(default_workspace_id(db_session, caller)) == DEFAULT_WORKSPACE_ID
+        assert str(default_workspace_id(db_session)) == DEFAULT_WORKSPACE_ID
+
+    def test_a_human_without_a_personal_space_gets_the_default_and_a_warning(
+        self, db_session, caplog
+    ):
+        """Never a NULL Space: a missing row degrades to Default, loudly."""
         from app.models.workspace import DEFAULT_WORKSPACE_ID
 
         TestProjectDefaultSpaceWritePath._seed_default_workspace(db_session)
-        loner, loner_headers = self._user(db_session, "member")
-        assert self._created_workspace(db_session, loner_headers) == DEFAULT_WORKSPACE_ID
-        joiner, joiner_headers = self._user(db_session, "member")
-        self._space_for(db_session, joiner, "One")
-        self._space_for(db_session, joiner, "Two")
-        assert self._created_workspace(db_session, joiner_headers) == DEFAULT_WORKSPACE_ID
-
-    def test_privileged_callers_are_unchanged_even_with_one_space(self, db_session):
-        """Derek is himself a member of exactly one Space; his path must not move."""
-        from app.models.workspace import DEFAULT_WORKSPACE_ID
-
-        TestProjectDefaultSpaceWritePath._seed_default_workspace(db_session)
-        for role in ("owner", "admin"):
-            user, headers = self._user(db_session, role)
-            self._space_for(db_session, user, f"{role}-private")
+        loner, headers = self._user(db_session, "member")
+        with caplog.at_level(logging.WARNING, logger="app.services.ownership"):
             assert self._created_workspace(db_session, headers) == DEFAULT_WORKSPACE_ID
+        assert f"No personal Space for user {loner.id}" in caplog.text

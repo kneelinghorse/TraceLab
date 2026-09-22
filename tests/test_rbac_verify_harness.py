@@ -1238,6 +1238,9 @@ class _Pedr1cTransport:
     foreign_space_id = str(uuid4())
     accessible_project_id = str(uuid4())
     accessible_space_id = str(uuid4())
+    # PERSONAL-1: a personal Space listed first; the server refuses members there.
+    personal_project_id = str(uuid4())
+    personal_space_id = str(uuid4())
     owner_history_id = str(uuid4())
     newer_viewer_history_id = str(uuid4())
     foreign_preview = "foreign preview known only to the fixture owner"
@@ -1355,9 +1358,23 @@ class _Pedr1cTransport:
                 {"id": self.project_id, "workspace_id": self.foreign_space_id},
             )
 
+        if method == "GET" and path.endswith("/admin/spaces"):
+            return _StubResponse(
+                200,
+                [
+                    {"id": self.personal_space_id, "personal_owner_id": _SECOND_OWNER_ID},
+                    {"id": self.foreign_space_id, "personal_owner_id": None},
+                    {"id": self.accessible_space_id, "personal_owner_id": None},
+                ],
+            )
+
         if method == "GET" and "/projects?page_size=100" in path:
             if token == _SECOND_OWNER_TOKEN:
                 rows = [
+                    {
+                        "id": self.personal_project_id,
+                        "workspace_id": self.personal_space_id,
+                    },
                     {
                         "id": self.project_id,
                         "workspace_id": self.foreign_space_id,
@@ -1379,6 +1396,8 @@ class _Pedr1cTransport:
         if method == "POST" and "/admin/spaces/" in path and path.endswith(
             "/members"
         ):
+            if self.personal_space_id in path:
+                return _StubResponse(409, {"detail": "A personal Space has one member"})
             self.memberships.add((path, str(json["user_id"])))
             return _StubResponse(201, {"user_id": json["user_id"]})
 
@@ -1772,6 +1791,16 @@ def test_pedr1c_scope_matrix_accepts_exact_fail_closed_responses():
     assert transport.report_payloads.keys() <= transport.deleted_reports
     assert set(transport.role_collection.values()) <= transport.deleted_collections
     assert transport.foreign_collection_id in transport.deleted_collections
+
+
+def test_pedr1c_disjoint_scope_skips_a_personal_space():
+    """PERSONAL-1: a personal Space answers 409 to a new member, so the harness must
+    grant its temporary scope in a shared Space even when a personal one lists first."""
+    verifier, transport = _run_pedr1c_transport()
+
+    assert verifier.gaps == []
+    granted_paths = {path for path, _user_id in transport.memberships}
+    assert granted_paths == {f"/api/v1/admin/spaces/{transport.accessible_space_id}/members"}
 
 
 def test_pedr1c_history_fixture_uses_exact_owner_id_before_cross_owner_replay():

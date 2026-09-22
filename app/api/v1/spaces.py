@@ -115,14 +115,22 @@ def add_space_member(
     Idempotency is rejected, not silent: re-adding an existing member is a 409 so
     the caller learns the grant already exists (the UNIQUE(workspace_id,user_id)
     constraint also enforces this at the DB).
+
+    A personal Space (PERSONAL-1) refuses anyone but its owner with a 409, so it
+    can never silently become shared; assign projects into it instead.
     """
     if data.role not in _VALID_GRANT_ROLES:
         raise HTTPException(
             status.HTTP_400_BAD_REQUEST, detail=f"Invalid role: {data.role!r}"
         )
-    _get_space_or_404(db, space_id)
+    space = _get_space_or_404(db, space_id)
     if db.query(User).filter(User.id == data.user_id).first() is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="User not found")
+    if space.personal_owner_id is not None and space.personal_owner_id != data.user_id:
+        raise HTTPException(
+            status.HTTP_409_CONFLICT,
+            detail="A personal Space has one member; assign projects to it instead",
+        )
 
     existing = (
         db.query(SpaceMember)

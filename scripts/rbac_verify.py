@@ -2152,7 +2152,11 @@ class RbacVerifier:
         owner_token: str,
         foreign_project_id: str,
     ) -> tuple[str, str] | None:
-        """Find an existing Space whose projects exclude the foreign fixture."""
+        """Find an existing Space whose projects exclude the foreign fixture.
+
+        Personal Spaces (PERSONAL-1) refuse new members with a 409, so they are
+        never candidates for the temporary grant.
+        """
         foreign = self._call(
             "get",
             f"{self._prefix}/projects/{foreign_project_id}",
@@ -2162,6 +2166,19 @@ class RbacVerifier:
         if foreign.status_code != 200 or foreign_payload is None:
             return None
         foreign_space_id = foreign_payload.get("workspace_id")
+
+        spaces = self._call("get", f"{self._prefix}/admin/spaces", token=owner_token)
+        try:
+            space_rows = spaces.json()
+        except Exception:  # pragma: no cover - real HTTP adapters vary
+            return None
+        if spaces.status_code != 200 or not isinstance(space_rows, list):
+            return None
+        personal_space_ids = {
+            str(space.get("id"))
+            for space in space_rows
+            if isinstance(space, dict) and space.get("personal_owner_id")
+        }
 
         listing = self._call(
             "get",
@@ -2182,6 +2199,7 @@ class RbacVerifier:
                 and space_id
                 and str(project_id) != foreign_project_id
                 and str(space_id) != str(foreign_space_id)
+                and str(space_id) not in personal_space_ids
             ):
                 return str(space_id), str(project_id)
         return None
