@@ -36,6 +36,7 @@ from app.core.security import AuthenticatedUser
 from app.models.evidence_ledger import LedgerEntry
 from app.models.mission import Mission
 from app.models.project import Project
+from app.models.usage_record import USAGE_KIND_LIBRARIAN_DRAFT, USAGE_KIND_LIBRARIAN_TURN
 from app.schemas.librarian import (
     AssistantReply,
     LintViolationOut,
@@ -53,6 +54,7 @@ from app.services.evidence_ledger import EvidenceLedgerService, evidence_access_
 from app.services.librarian_model import ModelReply
 from app.services.mission_linter import lint_mission_for_submit
 from app.services.mission_service import MissionNotFoundError, MissionService
+from app.services.usage_recorder import record_librarian_usage
 
 logger = logging.getLogger(__name__)
 
@@ -435,7 +437,7 @@ class LibrarianService:
             if citation in retrieved
         ]
         evidence = list({str(entry.id): entry for entry in cited}.values())
-        self._record_usage(usage, project, stage="turn")
+        self._record_usage(usage, project, stage="turn", db=db, user=user)
         return TurnResult(
             reply=parsed,
             evidence=evidence,
@@ -522,6 +524,9 @@ class LibrarianService:
         self,
         project: Project,
         messages: list[TranscriptMessage],
+        *,
+        db: Session | None = None,
+        user: AuthenticatedUser | None = None,
     ) -> DraftResult:
         transcript: list[dict[str, Any]] = [
             {"role": "system", "content": _draft_system_prompt()},
@@ -554,7 +559,7 @@ class LibrarianService:
             try:
                 draft = parse_draft(repaired.content)
             except (ValueError, ValidationError) as second_error:
-                self._record_usage(usage, project, stage="draft")
+                self._record_usage(usage, project, stage="draft", db=db, user=user)
                 raise LibrarianDraftError(str(second_error)) from second_error
 
         namespace = _as_mission_namespace(draft)
@@ -567,7 +572,7 @@ class LibrarianService:
             preview_error = str(getattr(exc, "detail", None) or exc)
         lint = lint_mission_for_submit(namespace)
         notes = _draft_notes(draft, preview)
-        self._record_usage(usage, project, stage="draft")
+        self._record_usage(usage, project, stage="draft", db=db, user=user)
         return DraftResult(
             draft=draft,
             preview=preview,
@@ -607,10 +612,29 @@ class LibrarianService:
 
     # ----------------------------------------------------------------- bookkeeping
 
-    def _record_usage(self, usage: _UsageTotals, project: Project | None, *, stage: str) -> None:
+    def _record_usage(
+        self,
+        usage: _UsageTotals,
+        project: Project | None,
+        *,
+        stage: str,
+        db: Session | None = None,
+        user: AuthenticatedUser | None = None,
+    ) -> None:
         totals = usage.as_dict()
         if totals is None:
             return
+        if db is not None:
+            # METER-0: durable, per-user (decision #522). The cost monitor below is process-local.
+            record_librarian_usage(
+                db,
+                user_id=getattr(user, "user_id", None),
+                project_id=project.id if project is not None else None,
+                kind=USAGE_KIND_LIBRARIAN_DRAFT if stage == "draft" else USAGE_KIND_LIBRARIAN_TURN,
+                model=str(getattr(self.model, "model_name", "unknown")),
+                usage=totals,
+                requests=usage.calls,
+            )
         try:
             get_cost_monitor().track_usage(
                 model=str(getattr(self.model, "model_name", "unknown")),

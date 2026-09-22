@@ -5,8 +5,10 @@ from __future__ import annotations
 import csv
 import io
 from collections.abc import Iterable
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Literal
+from uuid import UUID
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Query, Request, Response, status
 from fastapi.responses import HTMLResponse, StreamingResponse
@@ -21,9 +23,11 @@ from app.core.security import ROLE_OWNER, AuthenticatedUser, require_admin
 from app.dependencies import get_admin_stats_service
 from app.models.user import User
 from app.schemas.admin_stats import AdminStatsResponse
+from app.schemas.usage import UsageSummaryResponse, UsageSummaryRow
 from app.services.admin_stats import AdminStatsService
 from app.services.metrics_aggregator import MetricsAggregator, get_metrics_aggregator
 from app.services.qdrant_service import QdrantService, get_qdrant_service
+from app.services.usage_recorder import summarize_usage
 
 router = APIRouter(tags=["admin"])
 _EXPECTED_PAYLOAD_INDEXES = ("project_id", "document_id", "source_type")
@@ -267,6 +271,33 @@ def rbac_status(
         owner_count=owner_count,
         your_role=caller.role,
         policy_version=POLICY_VERSION,
+    )
+
+
+@router.get("/usage", response_model=UsageSummaryResponse)
+def usage_summary(
+    response: Response,
+    since: datetime | None = Query(default=None, description="Inclusive lower bound (UTC). Default: 30 days ago."),
+    until: datetime | None = Query(default=None, description="Exclusive upper bound (UTC). Default: now."),
+    user_id: UUID | None = Query(default=None, description="Restrict to one user."),
+    caller: AuthenticatedUser = Depends(require_admin),
+    db: Session = Depends(get_db),
+) -> UsageSummaryResponse:
+    """Admin-only per-user usage totals (METER-0). Data only: nothing here limits or bills."""
+    response.headers["Cache-Control"] = "private, no-store"
+    window_until = (until or datetime.utcnow()).replace(tzinfo=None)
+    window_since = (since or (window_until - timedelta(days=30))).replace(tzinfo=None)
+    if window_since >= window_until:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="since must be before until.")
+    rows = summarize_usage(db, since=window_since, until=window_until, user_id=user_id)
+    user_ids = {row["user_id"] for row in rows if row["user_id"] is not None}
+    emails = {
+        user.id: user.email for user in db.query(User).filter(User.id.in_(user_ids)).all()
+    } if user_ids else {}
+    return UsageSummaryResponse(
+        since=window_since,
+        until=window_until,
+        rows=[UsageSummaryRow(email=emails.get(row["user_id"]), **row) for row in rows],
     )
 
 

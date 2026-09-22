@@ -51,6 +51,7 @@ from app.services.auto_report import (
     is_legacy_auto_generated_draft,
     protocol_uses_current_report_shape,
 )
+from app.services.usage_recorder import record_mission_terminal
 
 logger = logging.getLogger(__name__)
 
@@ -469,6 +470,13 @@ class MissionResultMaterializationService:
         if not result.errors and self.needs_materialization(db, mission):
             result.errors.append(MATERIALIZATION_INCOMPLETE)
         result.errors = normalize_materialization_error_categories(result.errors)
+        # METER-0: both arrival routes (receipt and reconciler) converge here under the
+        # per-mission lock, so this is where the run's usage row is filled (decision #522).
+        try:
+            record_mission_terminal(db, mission)
+        except Exception:  # pragma: no cover - usage bookkeeping must never block materialization
+            logger.warning("usage row could not be recorded for mission %s", mission.id, exc_info=True)
+            db.rollback()
         self._record_state(db, mission, result, document_state=document_state)
         return result
 
