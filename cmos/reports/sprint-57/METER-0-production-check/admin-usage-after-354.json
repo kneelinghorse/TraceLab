@@ -1,0 +1,30 @@
+{
+  "since": "2026-08-23T04:39:53.816525",
+  "until": "2026-09-22T04:39:53.816525",
+  "rows": [
+    {
+      "user_id": "007c8cb6-7d70-48fc-bcb4-3a0e46bc0519",
+      "email": "derek@deniedart.com",
+      "kind": "deepsearch_run",
+      "model": "deepseek-flash",
+      "records": 1,
+      "input_tokens": 2182916,
+      "output_tokens": 36145,
+      "total_tokens": 2219061,
+      "duration_seconds": 302.47,
+      "cost_usd": null
+    },
+    {
+      "user_id": "007c8cb6-7d70-48fc-bcb4-3a0e46bc0519",
+      "email": "derek@deniedart.com",
+      "kind": "deepsearch_run",
+      "model": "deepseek-v4-pro",
+      "records": 21,
+      "input_tokens": 23738861,
+      "output_tokens": 910289,
+      "total_tokens": 24649150,
+      "duration_seconds": 19818.710000000006,
+      "cost_usd": null
+    }
+  ]
+}
