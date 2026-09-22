@@ -1,0 +1,86 @@
+{
+  "answer": "The provided context does not contain any information about \u201czxqv,\u201d \u201cplombus,\u201d \u201cfenwick 91823,\u201d or the referenced \u201cnonexistent topic,\u201d so the answer cannot be determined from the available material. [Document: Unknown, Chunk: N/A]",
+  "citations": [
+    {
+      "document_id": "Unknown",
+      "chunk_id": null,
+      "chunk_index": null,
+      "source_type": null,
+      "score": null,
+      "snippet": null
+    }
+  ],
+  "sources": [
+    {
+      "chunk_id": "00877d28-26cd-4792-968f-a82465ea1d6c",
+      "content": "\u2026",
+      "document_id": null,
+      "project_id": null,
+      "chunk_index": null,
+      "source_type": null,
+      "document_type": null,
+      "collection_date": null,
+      "tags": null,
+      "score": 0.005249,
+      "quality_score": null,
+      "quality_base_score": null,
+      "quality_boost": null,
+      "quality_status": null,
+      "quality_gates_passed": null,
+      "quality_gates_total": null,
+      "quality_validated": null,
+      "quality_mission_id": null,
+      "quality_pii_flagged": null,
+      "element_type": null,
+      "element_type_match": null,
+      "type_boost": null
+    }
+  ],
+  "latency_ms": 3626.39,
+  "compression": {
+    "original_chunks": 3,
+    "filtered_chunks": 1,
+    "original_tokens": 0,
+    "filtered_tokens": 0,
+    "reduction_ratio": 0.0,
+    "threshold": 0.7,
+    "compression_ms": 0.019
+  },
+  "cache": {
+    "hit": false,
+    "score": null,
+    "age_seconds": null,
+    "ttl_seconds": 300.0
+  },
+  "quality": {
+    "composite_score": 0.967,
+    "threshold": 0.85,
+    "pillar_scores": {
+      "linguistic_uncertainty": 1.0,
+      "answer_integrity": 0.95,
+      "source_provenance": 0.95
+    },
+    "hard_failures": [],
+    "reasons": [],
+    "pre_escalation_score": null
+  },
+  "routing": {
+    "selected_model": "gpt-5.1",
+    "escalated": false,
+    "attempts": [
+      {
+        "model": "gpt-5.1",
+        "quality_score": 0.967,
+        "below_threshold": false,
+        "hard_failures": [],
+        "citation_count": 1
+      }
+    ],
+    "estimated_cost_usd": 0.000824,
+    "metrics": {
+      "total_queries": 1,
+      "escalations": 0
+    }
+  },
+  "search_mode": "semantic"
+}
