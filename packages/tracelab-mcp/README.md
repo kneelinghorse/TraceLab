@@ -278,6 +278,15 @@ Marking activity as viewed (`PUT /activity/viewed`) stays in the web UI.
 Home, activity and evidence routes reject service principals: use the
 device-code login or a user API key.
 
+### Creating in a Space (PERSONAL-2, unreleased)
+
+`tracelab_project.create` takes an optional `workspace_id` (UUID), the Space to
+create the project in. Omit it and the project lands in your personal Space. You
+must be a member of the named Space (403 otherwise); owners and admins may name
+any existing Space (404 if it does not exist). The web UI's Space picker sends
+the same field to the same route. `tracelab_project.list` and the `create` result
+now carry each project's `workspace_id`; `get` always did.
+
 ### Example calls
 
 Semantic search:

@@ -260,6 +260,13 @@ app.include_router(
     tags=["admin-spaces"],
     dependencies=[Depends(require_admin)],
 )
+# PERSONAL-2: the caller's own Spaces for the create-form picker (not admin-gated).
+app.include_router(
+    spaces.member_router,
+    prefix=f"{settings.api_v1_prefix}/spaces",
+    tags=["spaces"],
+    dependencies=protected_dependencies,
+)
 app.include_router(
     project_admin.router,
     prefix=f"{settings.api_v1_prefix}/admin/projects",

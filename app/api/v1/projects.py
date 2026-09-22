@@ -9,7 +9,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, R
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
-from app.core.authorization import accessible_filter, authorize_or_403
+from app.core.authorization import accessible_filter, authorize_or_403, authorize_space_placement
 from app.core.database import get_db
 from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.models.document import Document
@@ -166,6 +166,8 @@ def create_project(
         authorize_or_403(current_user, "read", project, db)
         return JSONResponse(content=cached.data, status_code=cached.status_code)
 
+    if data.workspace_id is not None:
+        authorize_space_placement(current_user, data.workspace_id, db)
     project = _service.create_project(db, data, owner_id=current_user.user_id, caller=current_user)
     resource = ProjectRead.model_validate(project)
     response_body = resource.model_dump(mode="json")

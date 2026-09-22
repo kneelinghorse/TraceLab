@@ -43,7 +43,7 @@ export const projectsApi = {
     return httpClient.get(`/projects/${projectId}`);
   },
 
-  createProject(data: { name: string; description?: string; research_type?: string }): Promise<Project> {
+  createProject(data: { name: string; description?: string; research_type?: string; workspace_id?: string }): Promise<Project> {
     return httpClient.post("/projects", data);
   },
 

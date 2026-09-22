@@ -4,12 +4,14 @@ import { useState } from "react";
 import { mutate as globalMutate } from "swr";
 
 import { AuthGate } from "@/components/AuthGate";
+import { SpacePicker } from "@/components/SpacePicker";
 import { projectsApi } from "@/lib/api/projects";
 
 function NewProjectContent() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [spaceId, setSpaceId] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -22,7 +24,11 @@ function NewProjectContent() {
     setSubmitting(true);
     setFormError(null);
     try {
-      const project = await projectsApi.createProject({ name: name.trim(), description: description.trim() || undefined });
+      const project = await projectsApi.createProject({
+        name: name.trim(),
+        description: description.trim() || undefined,
+        ...(spaceId ? { workspace_id: spaceId } : {}),
+      });
       globalMutate((key) => Array.isArray(key) && key[0] === "projects", undefined, { revalidate: true });
       router.push(`/projects/${project.id}`);
     } catch (error) {
@@ -52,6 +58,12 @@ function NewProjectContent() {
             <label htmlFor="project-description" className="block text-sm font-medium text-secondary mb-1">Description (optional)</label>
             <textarea id="project-description" aria-label="Project description" value={description} onChange={(e) => setDescription(e.target.value)} className="w-full px-4 py-2 border border-line-strong rounded-lg bg-surface text-foreground" rows={3} placeholder="Brief description of the project..." />
           </div>
+          <SpacePicker
+            value={spaceId}
+            onChange={setSpaceId}
+            labelClassName="block text-sm font-medium text-secondary mb-1"
+            selectClassName="w-full px-4 py-2 border border-line-strong rounded-lg bg-surface text-foreground"
+          />
           {formError && <p role="alert" className="text-sm text-danger">{formError}</p>}
           <div className="flex gap-3">
             <button type="submit" disabled={submitting} className="px-6 py-2 bg-accent text-on-accent rounded-lg hover:bg-accent disabled:opacity-50">{submitting ? "Creating..." : "Create project"}</button>

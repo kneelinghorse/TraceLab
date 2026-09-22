@@ -166,6 +166,12 @@ export const TOOLS: Tool[] = [
           enum: ['qualitative', 'quantitative', 'mixed'],
           description: 'Research methodology (optional for create/update).',
         },
+        workspace_id: {
+          type: 'string',
+          format: 'uuid',
+          description:
+            'Space to create the project in (optional for action="create"). Omit it for your personal Space. You must be a member of the named Space (403 otherwise); owners and admins may name any existing Space (404 if it does not exist). Projects from action="get" and "list" carry their workspace_id.',
+        },
         status: {
           type: 'string',
           enum: ['active', 'archived', 'completed'],
@@ -788,6 +794,7 @@ const CreateProjectInput = z.object({
   description: z.string().optional(),
   research_type: z.enum(['strategic', 'tactical', 'generative', 'evaluative']).optional(),
   methodology: z.enum(['qualitative', 'quantitative', 'mixed']).optional(),
+  workspace_id: z.string().uuid().optional(),
 });
 
 const UpdateProjectInput = z.object({
@@ -1192,6 +1199,7 @@ async function handleListProjects(args: unknown) {
               description: p.description,
               status: p.status,
               research_type: p.research_type,
+              workspace_id: p.workspace_id,
             })),
             pagination: result.pagination,
           },
@@ -1210,6 +1218,7 @@ async function handleCreateProject(args: unknown) {
     description: input.description,
     research_type: input.research_type,
     methodology: input.methodology,
+    workspace_id: input.workspace_id,
   });
 
   return {
@@ -1226,6 +1235,7 @@ async function handleCreateProject(args: unknown) {
               description: result.description,
               status: result.status,
               research_type: result.research_type,
+              workspace_id: result.workspace_id,
               created_at: result.created_at,
             },
           },
