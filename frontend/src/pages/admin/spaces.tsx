@@ -332,7 +332,7 @@ export function SpacesAdmin() {
                     aria-label={`Space for ${p.name}`}
                     value={p.workspace_id ?? ""}
                     onChange={(e) => assignProject(p, e.target.value)}
-                    className="rounded-md border border-line-strong bg-surface px-2 py-1 text-sm text-foreground"
+                    className="max-w-[50%] rounded-md border border-line-strong bg-surface px-2 py-1 text-sm text-foreground"
                   >
                     <option value="">— No Space —</option>
                     {(spaces ?? []).map((s) => (
