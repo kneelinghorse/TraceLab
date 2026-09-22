@@ -58,7 +58,7 @@ logger = logging.getLogger(__name__)
 
 MAX_TOOL_ROUNDS = 4
 EVIDENCE_PAGE_SIZE = 8
-TURN_MAX_TOKENS = 1500
+TURN_MAX_TOKENS = 3000
 DRAFT_MAX_TOKENS = 2500
 LIBRARIAN_TAG = "librarian"
 LIBRARIAN_AUTHOR = "librarian"
@@ -220,19 +220,65 @@ def _extract_json_object(text: str) -> Any:
         return json.loads(candidate[start : end + 1])
 
 
-def parse_reply(content: str | None) -> AssistantReply:
-    """Parse the model's reply. Anything unparseable becomes prose: it can never pass as a claim."""
+_TEXT_FIELD = re.compile(r'"text"\s*:\s*"((?:[^"\\]|\\.)*)"?', re.DOTALL)
+
+
+def _salvage_text(text: str) -> str:
+    """Pull the human-readable text out of a reply whose JSON never closed.
+
+    Found in production on the first day: a reply longer than the token cap arrives
+    as truncated JSON, and rendering that verbatim shows the user braces and escape
+    codes. Every ``text`` value is recovered and rendered as prose. Citations are
+    deliberately dropped: nothing salvaged from a broken reply may pass as a claim.
+    """
+    pieces = []
+    for match in _TEXT_FIELD.finditer(text):
+        raw = match.group(1)
+        try:
+            pieces.append(json.loads(f'"{raw}"'))
+        except ValueError:
+            pieces.append(raw.replace("\\n", "\n").replace('\\"', '"'))
+    return "\n\n".join(piece.strip() for piece in pieces if piece.strip())
+
+
+def _parse_reply_detailed(content: str | None) -> tuple[AssistantReply, bool]:
+    """Parse the model's reply; the flag says whether the JSON shape was honoured.
+
+    Anything unparseable becomes prose: it can never pass as a claim. Truncated
+    JSON is salvaged to its text values so the user never sees braces.
+    """
     text = (content or "").strip()
     try:
         data = _extract_json_object(text)
         if isinstance(data, dict) and "segments" in data:
-            return AssistantReply.model_validate(data)
+            return AssistantReply.model_validate(data), True
     except (ValueError, ValidationError):
         pass
-    return AssistantReply(
-        segments=[ReplySegment(kind="prose", text=text or "I have nothing to add yet.", citations=[])],
-        suggested_action=None,
+    if text.startswith("{"):
+        text = _salvage_text(text) or text
+    return (
+        AssistantReply(
+            segments=[ReplySegment(kind="prose", text=text or "I have nothing to add yet.", citations=[])],
+            suggested_action=None,
+        ),
+        False,
     )
+
+
+def parse_reply(content: str | None) -> AssistantReply:
+    return _parse_reply_detailed(content)[0]
+
+
+def _broken_json_reply(reply: ModelReply, parsed_ok: bool) -> bool:
+    """The model tried to answer in JSON but the reply was cut off or never parsed."""
+    return reply.truncated or (not parsed_ok and (reply.content or "").strip().startswith("{"))
+
+
+_TRUNCATION_REPAIR = (
+    "Your previous reply was cut off before its JSON closed, so none of it could be shown. Reply again to the "
+    "same message, in the same JSON shape, in under 250 words. Put detail into the mission draft rather than "
+    "into the chat."
+)
 
 
 def _sanitize_mission_id(value: Any) -> str:
@@ -280,7 +326,8 @@ def _turn_system_prompt(project: Project | None) -> str:
         "contain only ids from this turn's search_evidence results.\n"
         "- suggested_action is \"draft_mission\" once the conversation has a clear objective, an "
         "audience, and a picture of what a good answer looks like; otherwise null.\n"
-        "Keep replies focused. Ask one question at a time when something essential is missing."
+        "Keep each reply under 350 words; a long comparison belongs in the mission, not the chat. Ask one "
+        "question at a time when something essential is missing."
     )
 
 
@@ -360,7 +407,16 @@ class LibrarianService:
         tools = [SEARCH_EVIDENCE_TOOL] if project is not None else None
 
         reply = self._run_tool_loop(db, user, project, transcript, tools, retrieved, usage)
-        parsed = parse_reply(reply.content)
+        parsed, parsed_ok = _parse_reply_detailed(reply.content)
+        if _broken_json_reply(reply, parsed_ok):
+            # One concise retry; if that also fails, the salvaged prose is what the user sees.
+            transcript.append({"role": "assistant", "content": reply.content or ""})
+            transcript.append({"role": "user", "content": _TRUNCATION_REPAIR})
+            retry = self.model.complete(transcript, tools=None, max_tokens=TURN_MAX_TOKENS)
+            usage.add(retry.usage)
+            retried, retried_ok = _parse_reply_detailed(retry.content)
+            if not _broken_json_reply(retry, retried_ok):
+                reply, parsed = retry, retried
         violations = validate_provenance(parsed, retrieved)
         if violations:
             transcript.append({"role": "assistant", "content": reply.content or ""})

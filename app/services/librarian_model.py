@@ -54,6 +54,12 @@ class ModelReply:
     content: str | None
     tool_calls: list[ModelToolCall] = field(default_factory=list)
     usage: dict[str, int] | None = None
+    finish_reason: str | None = None
+
+    @property
+    def truncated(self) -> bool:
+        """The provider stopped at the token cap, so the content is cut off mid-reply."""
+        return self.finish_reason == "length"
 
 
 def _uses_completion_tokens(model_name: str) -> bool:
@@ -98,6 +104,7 @@ def _parse_reply(response: Any) -> ModelReply:
     choices = getattr(response, "choices", None) or []
     if not choices:
         return ModelReply(content=None, usage=_extract_usage(response))
+    finish_reason = getattr(choices[0], "finish_reason", None)
     message = getattr(choices[0], "message", None)
     content = getattr(message, "content", None)
     tool_calls: list[ModelToolCall] = []
@@ -117,6 +124,7 @@ def _parse_reply(response: Any) -> ModelReply:
         content=content if isinstance(content, str) else None,
         tool_calls=tool_calls,
         usage=_extract_usage(response),
+        finish_reason=str(finish_reason) if finish_reason else None,
     )
 
 
