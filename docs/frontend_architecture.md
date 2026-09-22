@@ -31,7 +31,7 @@ status. The Sprint 03 "Mission Protocol UI" notes this page replaces are in git 
 | `/missions`, `/missions/[id]`, `/missions/new`, `/missions/queue` | `missions/*.tsx` | Mission list with views and reason filters, run detail, authoring, queue |
 | `/reports`, `/reports/[id]` | `reports/*.tsx` | Reports |
 | `/search` | `search/index.tsx` | Research search |
-| `/librarian` | `librarian.tsx` | The Librarian (Sprint 57, LIB-1): conversation with typed provenance (prose vs cited corpus claims), mission draft with compiled contract and lint, explicit creation of a draft mission |
+| `/librarian` | `librarian.tsx` | The Librarian (Sprint 57, LIB-1): conversation with typed provenance (prose vs cited corpus claims), mission draft with compiled contract and lint, explicit creation of a draft mission. Since LIB-2 the conversation, project and draft persist per user in localStorage (`lib/librarian/storage.ts`), a fresh draft takes focus, the three-step strip (`components/librarian/LibrarianSteps`) and the mission page's `?from=librarian` notice share one "don't show again" preference |
 | `/graph` | `graph.tsx` | Relationship neighborhood (Sprint 52, UX-11) |
 | `/evidence`, `/evidence/[id]` | `evidence.tsx`, `evidence/[id].tsx` | Evidence browser and entry detail (Open report for the capturing mission's result report, from the `mission_result` link flag) |
 | `/saved-searches` | `saved-searches.tsx` | Saved searches |
