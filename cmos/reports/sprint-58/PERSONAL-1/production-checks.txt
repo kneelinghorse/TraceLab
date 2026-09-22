@@ -1,0 +1,40 @@
+# PERSONAL-1 production checks, 2026-09-22 UTC, deployed commit fec1893
+
+## 1. Migration outcome (read-only query inside the TraceLab service via railway ssh)
+alembic [('052_personal_spaces',)]
+personal spaces 8
+   081a5f9a-7629-45b7-bb53-5448bd050aec Derek-Private owner members 1 owner_is_member 1
+   24c1b561-a7d1-41db-9358-42d914f4f1f8 James Jamerson's Space admin members 1 owner_is_member 1
+   095843cd-de14-463e-90b2-460a6697609c Birch's Space admin members 1 owner_is_member 1
+   566e6012-6f6f-48f1-bee4-704519368d0d Test's Space member members 1 owner_is_member 1
+   71e32353-1775-45b9-97f6-db02280f67fe kneelinghorse's Space admin members 1 owner_is_member 1
+   1dbbe76f-fbff-4ca6-8d3b-5f1432c221f8 Walkthrough Guest's Space member members 1 owner_is_member 1
+   1bedd2b6-f6e5-4c6a-b71a-2edabfd3c8cf Syndy's Space member members 1 owner_is_member 1
+   4dccba04-edfe-4e5c-880c-877de0fff7a6 d's Space member members 1 owner_is_member 1
+humans without one []
+service with one [(0,)]
+derek-private owner ['007c8cb6-7d70-48fc-bcb4-3a0e46bc0519']
+guest personal space ['1dbbe76f-fbff-4ca6-8d3b-5f1432c221f8']
+d2d6519c workspace ['1dbbe76f-fbff-4ca6-8d3b-5f1432c221f8']
+  documents [('1dbbe76f-fbff-4ca6-8d3b-5f1432c221f8', 2)]
+  missions [('1dbbe76f-fbff-4ca6-8d3b-5f1432c221f8', 2)]
+  reports [('1dbbe76f-fbff-4ca6-8d3b-5f1432c221f8', 2)]
+default projects by owner role [('owner', 37, 36)]
+child drift {'documents': 176, 'missions': 89, 'reports': 46}
+null-space projects 0
+
+## 2. As the guest walk1-guest (JWT minted inside the service, never printed; calls go to the public API)
+guest /auth/me 200 member 148bcf80-b464-4055-a2a6-eed357ed29b9
+guest POST /projects 201 id 97515363-4388-42a0-9121-747e29683a64 workspace_id 1dbbe76f-fbff-4ca6-8d3b-5f1432c221f8
+guest GET /projects/d2d6519c 200 workspace_id 1dbbe76f-fbff-4ca6-8d3b-5f1432c221f8
+guest soft-delete verification project 200
+
+## 3. As Derek through his MCP credential (X-API-Key), from outside
+owner /auth/me 200 owner 007c8cb6-7d70-48fc-bcb4-3a0e46bc0519
+owner POST /projects 201 id b446cb99-c42c-456c-97a6-f81834b8aa63 workspace_id 081a5f9a-7629-45b7-bb53-5448bd050aec is Derek-Private: True
+owner soft-delete verification project 200
+GET /admin/spaces 200 spaces 12 personal 8
+add Derek to the guest's personal Space -> 409 A personal Space has one member; assign projects to it instead
+
+## 4. Guest disabled again (next-step #428)
+disable guest 200 is_active False
