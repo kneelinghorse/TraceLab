@@ -28,7 +28,7 @@ const projectId = "10000000-0000-4000-8000-000000000001";
 const evidenceId = "20000000-0000-4000-8000-000000000002";
 
 function page() {
-  render(
+  return render(
     <SWRConfig value={{ provider: () => new Map(), dedupingInterval: 0, shouldRetryOnError: false }}>
       <LibrarianPage />
     </SWRConfig>,
@@ -42,6 +42,7 @@ async function chooseProject() {
 
 beforeEach(() => {
   vi.resetAllMocks();
+  window.localStorage.clear();
   mocks.listAllProjects.mockResolvedValue([{ id: projectId, name: "Onboarding" }]);
   mocks.push.mockResolvedValue(true);
 });
@@ -132,9 +133,15 @@ describe("Librarian page", () => {
     fireEvent.change(screen.getByLabelText("Message the Librarian"), { target: { value: "Research onboarding drop-off for new design teams." } });
     fireEvent.click(screen.getByRole("button", { name: "Send" }));
     expect(await screen.findByText("The Librarian thinks there is enough here for a mission.")).toBeVisible();
+    // WALK-1 finding 4: when the model says there is enough, Draft is the primary action.
+    expect(screen.getByRole("button", { name: "Draft a mission" })).toHaveAttribute("data-suggested", "true");
 
     fireEvent.click(screen.getByRole("button", { name: "Draft a mission" }));
     const panel = await screen.findByRole("region", { name: "Mission draft" });
+    // WALK-1 finding 3: a successful draft must be impossible to miss.
+    expect(panel).toHaveFocus();
+    expect(await screen.findByText("Your draft is ready below. Review it, then create it.")).toBeVisible();
+    expect(within(panel).getByText(/Next: the mission page, where you can edit the draft and press Submit to DeepSearch/)).toBeVisible();
     expect(within(panel).getByRole("heading", { name: "Onboarding friction" })).toBeVisible();
     expect(within(panel).getByText(/3 research objectives · 2 evidence slots · 1 acceptance checks · 0 deliverable schemas/)).toBeVisible();
     expect(within(panel).getByText(/Objective is broad\./)).toBeVisible();
@@ -148,7 +155,9 @@ describe("Librarian page", () => {
     );
 
     fireEvent.click(within(panel).getByRole("button", { name: "Create draft mission" }));
-    await waitFor(() => expect(mocks.push).toHaveBeenCalledWith("/missions/mission-uuid"));
+    await waitFor(() => expect(mocks.push).toHaveBeenCalledWith("/missions/mission-uuid?from=librarian"));
+    // The draft is consumed; the conversation stays for the next one.
+    expect(JSON.parse(window.localStorage.getItem("tracelab.librarian.v1:reader") ?? "{}")).toMatchObject({ projectId, draft: null });
     expect(mocks.createMission).toHaveBeenCalledWith(expect.objectContaining({ mission_id: "ONBOARD-1" }), projectId);
   });
 
@@ -162,5 +171,45 @@ describe("Librarian page", () => {
     await waitFor(() => expect(mocks.createProject).toHaveBeenCalledWith({ name: "Fresh start" }));
     await waitFor(() => expect((screen.getByRole("combobox", { name: "Project" }) as HTMLSelectElement).value).toBe(projectId));
     expect(await screen.findByText(/Missions will be created in/)).toBeVisible();
+  });
+
+  it("keeps the conversation and project when the page is left and reopened, until the user starts over", async () => {
+    // WALK-1 finding 1: four paid turns and a draft vanished on one route change.
+    mocks.turn.mockResolvedValue({
+      segments: [{ kind: "prose", text: "Start with who abandons and when.", citations: [] }],
+      suggested_action: null, evidence: [], withheld_count: 0, usage: null, model: "fake",
+    });
+    const first = page();
+    await chooseProject();
+    fireEvent.change(screen.getByLabelText("Message the Librarian"), { target: { value: "Why do users abandon onboarding?" } });
+    fireEvent.click(screen.getByRole("button", { name: "Send" }));
+    expect(await screen.findByText("Start with who abandons and when.")).toBeVisible();
+    first.unmount();
+
+    page();
+    const log = await screen.findByRole("log");
+    expect(await within(log).findByText("Start with who abandons and when.")).toBeVisible();
+    expect(within(log).getByText("Why do users abandon onboarding?")).toBeVisible();
+    await waitFor(() => expect((screen.getByRole("combobox", { name: "Project" }) as HTMLSelectElement).value).toBe(projectId));
+    expect(mocks.turn).toHaveBeenCalledTimes(1);
+
+    fireEvent.click(screen.getByRole("button", { name: "Start over" }));
+    expect(within(screen.getByRole("log")).queryByText("Start with who abandons and when.")).toBeNull();
+    expect(window.localStorage.getItem("tracelab.librarian.v1:reader")).toBeNull();
+  });
+
+  it("explains the three steps until the user asks it not to", async () => {
+    // WALK-1 finding 6 and Derek's "dont show me this anymore".
+    const first = page();
+    await screen.findByRole("option", { name: "Onboarding" });
+    const steps = screen.getByRole("navigation", { name: "Where you are" });
+    expect(within(steps).getByText("Shape it").closest("li")).toHaveAttribute("aria-current", "step");
+    fireEvent.click(within(steps).getByRole("button", { name: "Don't show this again" }));
+    expect(screen.queryByRole("navigation", { name: "Where you are" })).toBeNull();
+    first.unmount();
+
+    page();
+    await screen.findByRole("option", { name: "Onboarding" });
+    expect(screen.queryByRole("navigation", { name: "Where you are" })).toBeNull();
   });
 });

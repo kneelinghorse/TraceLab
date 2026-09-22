@@ -16,7 +16,10 @@ import { useRouter } from "next/router";
 import { formatDistanceToNow } from "date-fns";
 
 import { AuthGate } from "@/components/AuthGate";
+import { LibrarianSteps } from "@/components/librarian/LibrarianSteps";
 import { MarkdownRenderer } from "@/components/MarkdownRenderer";
+import { useAuth } from "@/contexts/AuthContext";
+import { readOrientationDismissed, writeOrientationDismissed } from "@/lib/librarian/storage";
 import { ContractPreviewPanel, ExecutionTimeline, ResearchPhases, ResultLinks, MissionForm } from "@/components/missions";
 import { downloadFile } from "@/lib/api/console";
 import { missionsApi } from "@/lib/api/missions";
@@ -65,6 +68,13 @@ function MissionDetailContent() {
   const [acting, setActing] = useState(false);
   const { askConfirmation, notify, feedback } = useFeedback();
   const { mission, isLoading, error, refresh } = useApiMission(missionId);
+  // A draft reached from the Librarian gets one orienting notice (LIB-2, decision #527):
+  // the create-then-submit shape is deliberate, so it is explained rather than removed.
+  const { user } = useAuth();
+  const fromLibrarian = router.query.from === "librarian";
+  const [orientationHidden, setOrientationHidden] = useState(true);
+  useEffect(() => { setOrientationHidden(readOrientationDismissed(user?.user_id)); }, [user?.user_id]);
+  const dismissOrientation = () => { writeOrientationDismissed(user?.user_id); setOrientationHidden(true); };
   const occurredAt = mission ? missionOccurredAt(mission) : null;
   useEffect(() => {
     // Opening a mission marks it viewed at its current revision (decision #459).
@@ -165,6 +175,14 @@ function MissionDetailContent() {
     <div className="min-h-screen bg-background py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {feedback}
+          {isDraft && fromLibrarian && !orientationHidden && (
+            <section aria-label="Next step" className="mb-6 space-y-3 rounded-xl border border-info-line bg-info-surface p-4">
+              <p className="text-sm text-info">
+                <span className="font-semibold">This is a saved draft.</span> Nothing runs until you press Submit to DeepSearch. Edit it first if you like, or come back and submit it later; it waits here.
+              </p>
+              <LibrarianSteps current={3} onDismiss={dismissOrientation} />
+            </section>
+          )}
           {actionError && !deleteOpen && <p role="alert" className="mb-4 break-words rounded bg-danger-surface p-4 text-danger">{actionError}</p>}
           <Dialog open={deleteOpen} title="Delete mission" onClose={() => { if (!deleting) setDeleteOpen(false); }}>
             <p className="mb-4">Delete this mission? This cannot be undone.</p>

@@ -1,7 +1,7 @@
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent, type RefObject } from "react";
 import useSWR from "swr";
 
 import { AuthGate } from "@/components/AuthGate";
@@ -12,11 +12,19 @@ import {
   librarianApi,
   replyToTranscriptText,
   type DraftResponse,
-  type EvidenceRef,
   type ReplySegment,
   type TranscriptMessage,
 } from "@/lib/api/librarian";
 import { projectsApi } from "@/lib/api/projects";
+import { LibrarianSteps } from "@/components/librarian/LibrarianSteps";
+import {
+  clearLibrarianState,
+  readLibrarianState,
+  readOrientationDismissed,
+  writeLibrarianState,
+  writeOrientationDismissed,
+  type Turn,
+} from "@/lib/librarian/storage";
 
 /**
  * The Librarian, part 1: a conversation that ends in a mission (LIB-1).
@@ -24,13 +32,10 @@ import { projectsApi } from "@/lib/api/projects";
  * Plain text is the Librarian speaking from general knowledge. A highlighted
  * passage is a claim about this project's evidence and links to every entry it
  * cites; the server has already refused anything it could not cite (decision
- * #513). The transcript lives here and is resent on every call: nothing is
- * stored until the user creates the mission (decision #519).
+ * #513). The transcript is resent on every call and the server stores nothing
+ * until the user creates the mission (decision #519); this browser keeps it in
+ * localStorage so leaving the page does not discard it (LIB-2, decision #527).
  */
-
-type Turn =
-  | { role: "user"; text: string }
-  | { role: "assistant"; segments: ReplySegment[]; evidence: EvidenceRef[]; suggested: boolean };
 
 function toTranscript(turns: Turn[]): TranscriptMessage[] {
   return turns.map((turn) =>
@@ -80,11 +85,13 @@ function DraftPanel({
   creating,
   onCreate,
   onDismiss,
+  panelRef,
 }: {
   draft: DraftResponse;
   creating: boolean;
   onCreate: () => void;
   onDismiss: () => void;
+  panelRef: RefObject<HTMLElement | null>;
 }) {
   const mission = draft.draft;
   const preview = draft.preview;
@@ -95,11 +102,11 @@ function DraftPanel({
     ["Deliverables", mission.deliverables],
   ];
   return (
-    <section className="panel space-y-4 p-5" aria-label="Mission draft">
+    <section ref={panelRef} tabIndex={-1} className="panel space-y-4 p-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-focus" aria-label="Mission draft">
       <header className="space-y-1">
-        <p className="text-xs font-semibold uppercase tracking-wide text-secondary">Mission draft · {mission.mission_id}</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-secondary">Step 2 of 3 · Mission draft · {mission.mission_id}</p>
         <h2 className="text-xl font-semibold text-foreground">{mission.title}</h2>
-        <p className="text-sm text-secondary">Review it here. Creating it saves a draft you can edit and submit from the mission page; nothing runs until you submit.</p>
+        <p className="text-sm text-secondary">Review it here. Creating it saves a draft; nothing runs until you submit it from the mission page.</p>
       </header>
       <dl className="space-y-3">
         <div>
@@ -193,6 +200,7 @@ function DraftPanel({
           Keep refining
         </button>
       </div>
+      <p className="text-sm text-secondary">Next: the mission page, where you can edit the draft and press Submit to DeepSearch. It waits there until you do.</p>
     </section>
   );
 }
@@ -212,11 +220,39 @@ function LibrarianContent() {
   const [drafting, setDrafting] = useState(false);
   const [draft, setDraft] = useState<DraftResponse | null>(null);
   const [creating, setCreating] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [orientationHidden, setOrientationHidden] = useState(false);
+  // Which user's stored conversation has been restored; persistence waits for it so a
+  // fresh mount never overwrites a saved conversation with an empty one.
+  const [restoredFor, setRestoredFor] = useState<string | null>(null);
   const logRef = useRef<HTMLDivElement>(null);
+  const draftPanelRef = useRef<HTMLElement>(null);
+  const focusDraftRef = useRef(false);
+  const storageUser = user?.user_id ?? "guest";
 
   useEffect(() => {
     if (queryProject) setProjectId(queryProject);
   }, [queryProject]);
+  useEffect(() => {
+    const stored = readLibrarianState(storageUser);
+    setTurns(stored?.turns ?? []);
+    setDraft(stored?.draft ?? null);
+    if (!queryProject) setProjectId(stored?.projectId ?? "");
+    setOrientationHidden(readOrientationDismissed(storageUser));
+    setRestoredFor(storageUser);
+  }, [storageUser]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (restoredFor === storageUser) writeLibrarianState(storageUser, { projectId, turns, draft });
+  }, [restoredFor, storageUser, projectId, turns, draft]);
+  useEffect(() => {
+    // Only a draft the user just asked for takes focus; a restored one stays where it was.
+    if (!draft || !focusDraftRef.current) return;
+    focusDraftRef.current = false;
+    const panel = draftPanelRef.current;
+    if (!panel) return;
+    if (typeof panel.scrollIntoView === "function") panel.scrollIntoView({ behavior: "smooth", block: "start" });
+    panel.focus({ preventScroll: true });
+  }, [draft]);
   useEffect(() => {
     const log = logRef.current;
     if (log && typeof log.scrollTo === "function") log.scrollTo({ top: log.scrollHeight });
@@ -226,6 +262,21 @@ function LibrarianContent() {
   const lastAssistant = [...turns].reverse().find((turn) => turn.role === "assistant");
   const suggested = lastAssistant?.role === "assistant" && lastAssistant.suggested;
   const canDraft = turns.some((turn) => turn.role === "user") && Boolean(projectId) && !sending;
+  const started = turns.length > 0;
+  const primaryButton = "rounded-xl bg-accent px-5 py-3 font-semibold text-on-accent hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-60";
+  const secondaryButton = "rounded-xl border border-line-strong px-5 py-3 font-semibold text-foreground disabled:cursor-not-allowed disabled:opacity-60";
+
+  function startOver() {
+    setTurns([]);
+    setDraft(null);
+    setInput("");
+    clearLibrarianState(storageUser);
+  }
+
+  function dismissOrientation() {
+    writeOrientationDismissed(storageUser);
+    setOrientationHidden(true);
+  }
 
   async function send(text: string) {
     const trimmed = text.trim();
@@ -253,7 +304,10 @@ function LibrarianContent() {
     if (!projectId || drafting) return;
     setDrafting(true);
     try {
-      setDraft(await librarianApi.draft(toTranscript(turns), projectId));
+      const result = await librarianApi.draft(toTranscript(turns), projectId);
+      focusDraftRef.current = true;
+      setDraft(result);
+      notify("Your draft is ready below. Review it, then create it.", "success");
     } catch (err) {
       notify(err);
     } finally {
@@ -267,7 +321,9 @@ function LibrarianContent() {
     try {
       const result = await librarianApi.createMission(draft.draft, projectId);
       notify(result.created ? "Draft mission created. Review and submit it from the mission page." : "This draft already exists; opening it.", "success");
-      await router.push(`/missions/${result.mission.id}`);
+      // The draft is now a mission; the conversation stays for the next one.
+      writeLibrarianState(storageUser, { projectId, turns, draft: null });
+      await router.push(`/missions/${result.mission.id}?from=librarian`);
     } catch (err) {
       notify(err);
       setCreating(false);
@@ -300,7 +356,7 @@ function LibrarianContent() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6 px-4 py-8 sm:px-6">
+    <div className={`mx-auto space-y-6 px-4 py-8 sm:px-6 ${started ? "max-w-6xl" : "max-w-4xl"}`}>
       <Head>
         <title>Librarian · TraceLab</title>
       </Head>
@@ -313,6 +369,8 @@ function LibrarianContent() {
           Plain text is the Librarian speaking from general knowledge. A highlighted passage is a claim about this project&apos;s evidence and links to the entries it cites.
         </p>
       </header>
+
+      {!orientationHidden && <LibrarianSteps current={draft ? 2 : 1} onDismiss={dismissOrientation} />}
 
       <section className="panel space-y-3 p-5" aria-label="Project">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
@@ -357,7 +415,26 @@ function LibrarianContent() {
       </section>
 
       <section className="panel p-5" aria-label="Conversation with the Librarian">
-        <div ref={logRef} role="log" aria-live="polite" aria-label="Transcript" className="max-h-[60vh] space-y-4 overflow-y-auto pr-1">
+        {started && (
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <p className="text-sm text-secondary">{draft ? "Step 2 of 3 · Review the draft below" : "Step 1 of 3 · Shape it"}</p>
+            <div className="flex gap-2">
+              <button type="button" onClick={() => setExpanded((value) => !value)} aria-pressed={expanded} className="rounded-lg border border-line px-3 py-1 text-xs text-secondary hover:text-foreground">
+                {expanded ? "Compact view" : "Expand transcript"}
+              </button>
+              <button type="button" onClick={startOver} className="rounded-lg border border-line px-3 py-1 text-xs text-secondary hover:text-foreground">
+                Start over
+              </button>
+            </div>
+          </div>
+        )}
+        <div
+          ref={logRef}
+          role="log"
+          aria-live="polite"
+          aria-label="Transcript"
+          className={`space-y-4 overflow-y-auto pr-1 ${expanded ? "" : started ? "min-h-[50vh] max-h-[75vh]" : "max-h-[60vh]"}`}
+        >
           {turns.length === 0 && (
             <div className="space-y-3">
               <p className="text-secondary">Start with the question you cannot quite phrase yet. For example:</p>
@@ -405,7 +482,7 @@ function LibrarianContent() {
             />
           </div>
           <div className="flex gap-2">
-            <button type="submit" disabled={sending || !input.trim()} className="rounded-xl bg-accent px-5 py-3 font-semibold text-on-accent hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-60">
+            <button type="submit" disabled={sending || !input.trim()} className={suggested ? secondaryButton : primaryButton}>
               {sending ? "Sending…" : "Send"}
             </button>
             <button
@@ -413,7 +490,8 @@ function LibrarianContent() {
               onClick={() => void draftMission()}
               disabled={!canDraft || drafting}
               title={projectId ? undefined : "Choose a project to draft a mission into"}
-              className={`rounded-xl border px-5 py-3 font-semibold disabled:cursor-not-allowed disabled:opacity-60 ${suggested ? "border-accent text-accent-text" : "border-line-strong text-foreground"}`}
+              data-suggested={suggested ? "true" : undefined}
+              className={suggested ? primaryButton : secondaryButton}
             >
               {drafting ? "Drafting…" : "Draft a mission"}
             </button>
@@ -422,7 +500,7 @@ function LibrarianContent() {
         {suggested && !draft && <p className="mt-2 text-sm text-accent-text">The Librarian thinks there is enough here for a mission.</p>}
       </section>
 
-      {draft && <DraftPanel draft={draft} creating={creating} onCreate={() => void createMission()} onDismiss={() => setDraft(null)} />}
+      {draft && <DraftPanel draft={draft} creating={creating} onCreate={() => void createMission()} onDismiss={() => setDraft(null)} panelRef={draftPanelRef} />}
       {feedback}
     </div>
   );

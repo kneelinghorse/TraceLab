@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/vitest";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { beforeEach, expect, it, vi } from "vitest";
 import { SWRConfig } from "swr";
@@ -85,4 +85,23 @@ it("marks a mission viewed at its current revision when its page opens", async (
   await screen.findByRole("heading", { name: "Inspect research" });
   await waitFor(() => expect(mocks.markViewed).toHaveBeenCalledWith([{ type: "mission", id: "run-1", occurred_at: "2026-09-13T01:00:00" }]));
   expect(screen.queryByRole("button", { name: "Mark reviewed" })).toBeNull();
+});
+it("orients a draft reached from the Librarian once, and never a draft opened directly", async () => {
+  // LIB-2 (decision #527): the create-then-submit shape is explained, not removed.
+  window.localStorage.clear();
+  mocks.query = { id: "run-1", from: "librarian" };
+  const first = mount(<MissionDetailPage />);
+  const notice = await screen.findByRole("region", { name: "Next step" });
+  expect(notice).toHaveTextContent("Nothing runs until you press Submit to DeepSearch");
+  expect(within(notice).getByText("Run it").closest("li")).toHaveAttribute("aria-current", "step");
+  fireEvent.click(within(notice).getByRole("button", { name: "Don't show this again" }));
+  expect(screen.queryByRole("region", { name: "Next step" })).toBeNull();
+  expect(window.localStorage.getItem("tracelab.librarian.orientation.v1:reader")).toBe("dismissed");
+  first.unmount();
+
+  window.localStorage.clear();
+  mocks.query = { id: "run-1" };
+  mount(<MissionDetailPage />);
+  expect(await screen.findByRole("heading", { name: "Inspect research" })).toBeVisible();
+  expect(screen.queryByRole("region", { name: "Next step" })).toBeNull();
 });
