@@ -168,3 +168,29 @@ class TestDraftParsing:
         message = str(excinfo.value)
         assert "objective" in message
         assert "success_criteria" in message
+
+
+class TestTruncatedReplies:
+    """Found on the first production run: replies past the token cap arrive as truncated JSON."""
+
+    TRUNCATED = (
+        '{"segments":[{"kind":"prose","text":"You are looking at two questions:\\n\\n1. **Grant model**","citations":[]},'
+        '{"kind":"corpus_claim","text":"Your ledger already covers Notion.","citations":["' + OTHER + '"]},'
+        '{"kind":"prose","text":"Second para'
+    )
+
+    def test_truncated_json_is_salvaged_to_prose_without_braces(self):
+        reply = parse_reply(self.TRUNCATED)
+        assert len(reply.segments) == 1
+        segment = reply.segments[0]
+        assert segment.kind == "prose"
+        assert "{" not in segment.text and "segments" not in segment.text
+        assert "You are looking at two questions:\n\n1. **Grant model**" in segment.text
+        assert "Your ledger already covers Notion." in segment.text
+        assert "Second para" in segment.text
+        # Nothing salvaged from a broken reply may pass as a claim.
+        assert segment.citations == []
+        assert reply.suggested_action is None
+
+    def test_salvage_keeps_free_text_replies_untouched(self):
+        assert parse_reply("Plain answer.").segments[0].text == "Plain answer."

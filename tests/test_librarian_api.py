@@ -405,3 +405,58 @@ def test_usage_is_recorded_for_metering(librarian, project, auth_headers):
     # Most recent first: the monitor is a process singleton shared with earlier tests.
     assert matching[0]["model"] == "fake-librarian"
     assert matching[0]["project_id"] == str(project.id)
+
+
+class TestTruncatedTurns:
+    """The first production run cut two replies at the token cap and showed raw JSON. Never again."""
+
+    TRUNCATED = '{"segments":[{"kind":"prose","text":"A long comparison of Notion, Figma and","citations":[]},{"kind":"pro'
+
+    def test_truncated_reply_is_retried_once_concisely(self, librarian, project, auth_headers):
+        model = librarian(
+            ModelReply(content=self.TRUNCATED, usage=_usage(), finish_reason="length"),
+            _json_reply([{"kind": "prose", "text": "Short version: compare grant models first.", "citations": []}]),
+        )
+        response = TestClient(app).post(
+            "/api/v1/librarian/turns",
+            json={"project_id": str(project.id), "messages": _messages("Compare sharing models.")},
+            headers=auth_headers,
+        )
+        assert response.status_code == 200, response.text
+        assert response.json()["segments"] == [
+            {"kind": "prose", "text": "Short version: compare grant models first.", "citations": []}
+        ]
+        retry_prompt = model.calls[1]["messages"][-1]
+        assert retry_prompt["role"] == "user"
+        assert "cut off" in retry_prompt["content"]
+        assert model.calls[1]["tools"] is None
+
+    def test_twice_truncated_reply_shows_salvaged_prose_not_json(self, librarian, project, auth_headers):
+        librarian(
+            ModelReply(content=self.TRUNCATED, usage=_usage(), finish_reason="length"),
+            ModelReply(content=self.TRUNCATED, usage=_usage(), finish_reason="length"),
+        )
+        response = TestClient(app).post(
+            "/api/v1/librarian/turns",
+            json={"project_id": str(project.id), "messages": _messages("Compare sharing models.")},
+            headers=auth_headers,
+        )
+        assert response.status_code == 200, response.text
+        segments = response.json()["segments"]
+        assert len(segments) == 1 and segments[0]["kind"] == "prose"
+        assert segments[0]["text"] == "A long comparison of Notion, Figma and"
+        assert "{" not in segments[0]["text"]
+
+    def test_unparsed_json_without_length_signal_is_also_retried(self, librarian, project, auth_headers):
+        """Some providers do not report finish_reason; the broken shape alone must trigger the retry."""
+        model = librarian(
+            ModelReply(content=self.TRUNCATED, usage=_usage(), finish_reason=None),
+            _json_reply([{"kind": "prose", "text": "Recovered.", "citations": []}]),
+        )
+        response = TestClient(app).post(
+            "/api/v1/librarian/turns",
+            json={"project_id": str(project.id), "messages": _messages("Compare sharing models.")},
+            headers=auth_headers,
+        )
+        assert response.json()["segments"][0]["text"] == "Recovered."
+        assert len(model.calls) == 2
