@@ -807,7 +807,7 @@ class TestScopedReadPaths:
 
     def test_access_filters_are_applied_before_list_and_search_totals(self, client, db_session, rbac_on, monkeypatch):
         """A future query refactor must not count rows hidden by authorization."""
-        from app.api.v1 import evidence as evidence_api
+        import app.services.evidence_ledger as evidence_ledger_service
 
         member = _user(db_session, "filter-wiring@example.com")
         _space, project = _space_project(db_session, member, name="Filter project")
@@ -852,7 +852,8 @@ class TestScopedReadPaths:
                 return LedgerNote.id != hidden_note.id
             raise AssertionError(f"unexpected model passed to accessible_filter: {model}")
 
-        monkeypatch.setattr(evidence_api, "accessible_filter", narrowed_access)
+        # The access predicate lives in the ledger service since LIB-1 (shared with the Librarian).
+        monkeypatch.setattr(evidence_ledger_service, "accessible_filter", narrowed_access)
 
         listed = client.get(
             API,

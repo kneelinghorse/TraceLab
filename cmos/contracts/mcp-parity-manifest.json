@@ -1052,6 +1052,54 @@
       "rationale": "Per-user acknowledgement or preference write. Decisions #395 and #409 make review and acknowledgement explicit human actions, and decision #426 keeps result review, inbox mark-seen, favorites, saved searches and saved views REST/UI-only; an agent must not perform them on the user's behalf."
     },
     {
+      "id": "frontend/src/lib/api/librarian.ts#librarianApi.turn:POST:/librarian/turns",
+      "api_file": "frontend/src/lib/api/librarian.ts",
+      "operation": "librarianApi.turn",
+      "source_line": 93,
+      "method": "POST",
+      "path": "/api/v1/librarian/turns",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/librarian.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "new",
+      "rationale": "LIB-1: an interactive, human-principal conversational surface. MCP callers are agents themselves and author missions directly through tracelab_mission.create; the Librarian's turn, draft and create calls exist to give a person that capability, so they are REST-only by design (decision #519)."
+    },
+    {
+      "id": "frontend/src/lib/api/librarian.ts#librarianApi.draft:POST:/librarian/drafts",
+      "api_file": "frontend/src/lib/api/librarian.ts",
+      "operation": "librarianApi.draft",
+      "source_line": 98,
+      "method": "POST",
+      "path": "/api/v1/librarian/drafts",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/librarian.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "new",
+      "rationale": "LIB-1: an interactive, human-principal conversational surface. MCP callers are agents themselves and author missions directly through tracelab_mission.create; the Librarian's turn, draft and create calls exist to give a person that capability, so they are REST-only by design (decision #519)."
+    },
+    {
+      "id": "frontend/src/lib/api/librarian.ts#librarianApi.createMission:POST:/librarian/missions",
+      "api_file": "frontend/src/lib/api/librarian.ts",
+      "operation": "librarianApi.createMission",
+      "source_line": 103,
+      "method": "POST",
+      "path": "/api/v1/librarian/missions",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/librarian.tsx"
+      ],
+      "mcp": "tracelab_mission.create",
+      "classification": "rest-only-by-design",
+      "baseline": "new",
+      "rationale": "LIB-1: an interactive, human-principal conversational surface. MCP callers are agents themselves and author missions directly through tracelab_mission.create; the Librarian's turn, draft and create calls exist to give a person that capability, so they are REST-only by design (decision #519). Creation itself is the same MissionService path tracelab_mission.create uses, stamped created_by=librarian."
+    },
+    {
       "id": "frontend/src/lib/api/missions.ts#createMission:POST:/mission-protocols",
       "api_file": "frontend/src/lib/api/missions.ts",
       "operation": "createMission",
@@ -1290,6 +1338,7 @@
       "path": "/api/v1/projects",
       "live": true,
       "ui_consumers": [
+        "frontend/src/pages/librarian.tsx",
         "frontend/src/pages/projects/new.tsx"
       ],
       "mcp": "tracelab_project.create",
@@ -1360,6 +1409,7 @@
         "frontend/src/pages/documents/index.tsx",
         "frontend/src/pages/documents/upload.tsx",
         "frontend/src/pages/evidence.tsx",
+        "frontend/src/pages/librarian.tsx",
         "frontend/src/pages/missions/[id].tsx",
         "frontend/src/pages/missions/index.tsx",
         "frontend/src/pages/missions/new.tsx",

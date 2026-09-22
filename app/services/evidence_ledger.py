@@ -15,13 +15,14 @@ from uuid import UUID
 
 from pydantic import AnyHttpUrl, TypeAdapter
 from pydantic import ValidationError as PydanticValidationError
-from sqlalchemy import func, literal_column, or_
+from sqlalchemy import func, literal_column, or_, select
 from sqlalchemy.dialects.postgresql import insert as postgresql_insert
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Query, Session
 from sqlalchemy.sql.elements import ColumnElement
 
+from app.core.authorization import accessible_filter
 from app.models.document import Document
 from app.models.evidence_ledger import (
     DeepSearchLedgerBatch,
@@ -718,6 +719,23 @@ def _render_markdown(
         lines.append("")
 
     return "\n".join(lines).rstrip() + "\n"
+
+
+def evidence_access_filter(
+    current_user: Any,
+    model: type[LedgerEntry] | type[LedgerNote],
+    db: Session,
+):
+    """Extend child-row access with the owning project's owner allow-path.
+
+    Shared by the ledger routes and the Librarian's evidence tool so the two
+    surfaces can never disagree about who may read an entry.
+    """
+    base_filter = accessible_filter(current_user, model, db)
+    if base_filter is None:
+        return None
+    owned_projects = select(Project.id).where(Project.owner_id == current_user.user_id)
+    return or_(base_filter, model.project_id.in_(owned_projects))
 
 
 class EvidenceLedgerService:

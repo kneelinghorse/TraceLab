@@ -6,11 +6,9 @@ from datetime import date
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
-from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
 from app.core.authorization import (
-    accessible_filter,
     accessible_project_ids,
     authorize_or_403,
     is_service_principal,
@@ -38,6 +36,7 @@ from app.schemas.evidence_ledger import (
 from app.services.evidence_browser import document_evidence_filter, entry_links, readable_query, report_evidence_filter
 from app.services.evidence_ledger import (
     EvidenceLedgerService,
+    evidence_access_filter,
     get_evidence_ledger_service,
 )
 from app.services.report_promotion import ReportPromotionError
@@ -112,11 +111,7 @@ def _evidence_access_filter(
     db: Session,
 ):
     """Extend child-row access with the owning project's owner allow-path."""
-    base_filter = accessible_filter(current_user, model, db)
-    if base_filter is None:
-        return None
-    owned_projects = select(Project.id).where(Project.owner_id == current_user.user_id)
-    return or_(base_filter, model.project_id.in_(owned_projects))
+    return evidence_access_filter(current_user, model, db)
 
 
 def _browser_filter(
