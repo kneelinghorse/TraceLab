@@ -75,6 +75,7 @@ from app.services.result_materialization import (
     MissionResultMaterializationService,
     normalize_materialization_error_categories,
 )
+from app.services.usage_recorder import record_mission_submission
 
 logger = logging.getLogger(__name__)
 
@@ -177,6 +178,7 @@ def _submit_existing_mission(
     *,
     db: Session,
     mission,
+    submitted_by: UUID | None = None,
 ) -> MissionSubmitResponse:
     """Validate and queue an existing mission for DeepSearch."""
     if not mission.project_id:
@@ -227,6 +229,12 @@ def _submit_existing_mission(
     deepsearch_mode = getattr(settings, "deepsearch_mode", "worker").lower()
     update_data = MissionUpdate(status="queued")
     updated_mission = _service.update_mission(db, mission.id, update_data)
+    # METER-0: the queued row, attributed to whoever pressed submit (decision #522).
+    try:
+        record_mission_submission(db, updated_mission, submitted_by=submitted_by)
+    except Exception:  # pragma: no cover - usage bookkeeping must never block a submit
+        logger.warning("usage row could not be recorded at submit for %s", mission.id, exc_info=True)
+        db.rollback()
 
     message = (
         "Mission queued for DeepSearch worker."
@@ -595,7 +603,7 @@ def create_and_submit_mission(
     _load_project_for_authoring(db, current_user, data.project_id)
     try:
         mission = _service.create_mission(db, data)
-        submit_response = _submit_existing_mission(db=db, mission=mission)
+        submit_response = _submit_existing_mission(db=db, mission=mission, submitted_by=current_user.user_id)
         submit_response.message = (
             f"Mission created and {submit_response.message.lower()}"
         )
@@ -888,7 +896,7 @@ def submit_mission(
     try:
         mission = _get_mission_by_id_or_mission_id(db, mission_id)
         authorize_or_403(user, "submit", mission, db)
-        return _submit_existing_mission(db=db, mission=mission)
+        return _submit_existing_mission(db=db, mission=mission, submitted_by=user.user_id)
 
     except MissionNotFoundError as exc:
         raise HTTPException(

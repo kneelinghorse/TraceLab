@@ -31,6 +31,7 @@ from app.models.space_member import SpaceMember
 from app.models.sync_state import SyncState
 from app.models.synthesis_cache import SynthesisCache
 from app.models.tag import DocumentTag, Tag
+from app.models.usage_record import UsageRecord
 from app.models.user import User
 from app.models.user_favorite import UserFavorite
 from app.models.user_item_view import UserItemView
@@ -67,6 +68,7 @@ __all__ = [
     "SynthesisCache",
     "GraphEdge",
     "User",
+    "UsageRecord",
     "UserFavorite",
     "UserItemView",
     "InviteCode",

@@ -127,7 +127,7 @@ def librarian_draft(
     _require_human(current_user)
     project = _load_project(db, current_user, payload.project_id, "read")
     try:
-        result = service.draft_mission(project, payload.messages)
+        result = service.draft_mission(project, payload.messages, db=db, user=current_user)
     except LibrarianUnavailable as exc:
         raise HTTPException(status_code=http_status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
     except LibrarianDraftError as exc:

@@ -56,18 +56,22 @@ def reconciler_health() -> dict[str, Any]:
 def run_reconciliation_once() -> dict[str, int]:
     """One bounded reconciliation pass. Sync — callers run it in a worker thread."""
     from app.services.result_materialization import MissionResultMaterializationService
+    from app.services.usage_recorder import sweep_unrecorded_terminal_missions
 
     db = SessionLocal()
     try:
         summary = MissionResultMaterializationService().reconcile_completed(
             db, limit=settings.reconciler_batch_limit
         )
+        # METER-0: record any terminal mission that has no usage row yet (decision #522).
+        usage_recorded = sweep_unrecorded_terminal_missions(db, limit=settings.reconciler_batch_limit)
         return {
             "scanned": summary.scanned,
             "eligible": summary.eligible,
             "repaired": summary.repaired,
             "failed": summary.failed,
             "skipped_soft_deleted": summary.skipped_soft_deleted,
+            "usage_recorded": usage_recorded,
         }
     finally:
         db.close()

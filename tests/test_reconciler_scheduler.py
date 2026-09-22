@@ -139,8 +139,11 @@ def test_run_reconciliation_once_maps_summary(monkeypatch):
             return _summary(7, 3, 3, 0, 4)
 
     import app.services.result_materialization as rm
+    import app.services.usage_recorder as usage
 
     monkeypatch.setattr(rm, "MissionResultMaterializationService", FakeService)
+    # METER-0: the tick also sweeps terminal missions without a usage row.
+    monkeypatch.setattr(usage, "sweep_unrecorded_terminal_missions", lambda db, limit: 2)
     counts = sched.run_reconciliation_once()
     assert counts == {
         "scanned": 7,
@@ -148,6 +151,7 @@ def test_run_reconciliation_once_maps_summary(monkeypatch):
         "repaired": 3,
         "failed": 0,
         "skipped_soft_deleted": 4,
+        "usage_recorded": 2,
     }
 
 

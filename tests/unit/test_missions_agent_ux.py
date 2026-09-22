@@ -84,6 +84,16 @@ class _FakeDb:
     def query(self, _model):
         return _FakeQuery()
 
+    # The submit path records a usage row (METER-0); the stub accepts the writes and drops them.
+    def add(self, _row):
+        return None
+
+    def commit(self):
+        return None
+
+    def rollback(self):
+        return None
+
 
 class _MissionServiceStub:
     def __init__(self, mission):
