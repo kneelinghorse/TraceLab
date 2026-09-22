@@ -89,7 +89,7 @@ The diagnosis in the Sprint 56 review was that the real RBAC backlog ran out aro
 
 ## Implementation Plan
 
-### Sprint 57 — The Librarian, Part 1: Authoring (opened 2026-09-17, runs to 2026-10-01)
+### Sprint 57 — The Librarian, Part 1: Authoring (opened 2026-09-17, closed 2026-09-22, five of five)
 
 **Goal:** Ship the surface that works on day one for a user with no corpus, and find out what breaks when someone other than Derek uses the system.
 
@@ -103,9 +103,24 @@ Missions (CMOS is authoritative for status):
 
 **Out of scope, deliberately:** any corpus Q&A surface, any automatic write to existing records, any RBAC mission, any metering policy.
 
-### Sprint 58 — Sharing, as Derek means it (planned)
+### Sprint 58 — Good working order: the WALK-1 adjustments and the rewalk (opened 2026-09-22, runs to 2026-10-06)
 
-**Moved into this slot 2026-09-18 (decision #514), displacing the writes sprint, because every guest invitation is blocked on it.**
+**Re-scoped at Sprint 57 close (decision #526).** The slot held sharing; Derek moved it: *"i'm not sure what sharing firts means, i want it to be in good working order before i bring people in, so lets proceed with the adjustments we just discussed and i'll rewalk it and go from there."*
+
+**Goal:** Fix what the live guest walk found, then walk it again. Nothing new is designed; every mission traces to a WALK-1 finding and to Derek's decision on it.
+
+Missions (CMOS is authoritative for status):
+
+- **LIB-2 — Librarian orientation and persistence.** Findings 1, 3, 4, 5, 6 under decision #525: the transcript survives navigation, a successful draft is scrolled into view and announced, the mission page orients a user arriving from the Librarian (dismissable, remembered), the Draft button becomes the call to action when the model says there is enough, and the transcript gets room. The two-step create-then-submit stays exactly as it is; the colour meter is not built.
+- **GUEST-1 — A guest's new project lands in the guest's Space.** Finding 2: `default_workspace_id()` sends every new project to Default Workspace regardless of caller. The rule for members with one Space is decided with Derek's words and Derek's own creation path is unchanged unless he says otherwise.
+- **BADGE-1 — The Evidence badge clears without paging through a run.** Finding 7: the badge is the activity new-count per entry and one run adds hundreds.
+- **WALK-2 — The rewalk.** Derek walks the guest path again on the fixed build, ideally with the DeepSearch log flush landed so the Runner logs panel fills during the run (next-step #412). Invites are gated on this walk, not on sharing.
+
+**Out of scope, deliberately:** project-level sharing (below, deferred), corpus Q&A, autonomous writes, RBAC missions, metering policy, the search-page citation fix (next-step #417, before Sprint 59).
+
+### Sharing, as Derek means it (deferred past Sprint 58, decision #526; the analysis stands)
+
+**Moved into the Sprint 58 slot 2026-09-18 (decision #514) because every guest invitation was thought to be blocked on it; moved out again 2026-09-22 because Derek wants the walked path in good working order first. Re-sequence after WALK-2.**
 
 Derek described the model he believed existed:
 
@@ -156,7 +171,7 @@ So the suggestion queue is the **destination**, not a stepping stone, and the ha
 
 > "tracelab has a few friends i've given access to but i think i want to expand that, so it will be for other software design pros to try it out."
 
-Not a sprint of its own; a gate on the others. Invites go out when WALK-1 has been walked, METER-0 is recording, and **Sprint 58 has shipped** — because until it does, a guest cannot share their own work without an admin.
+Not a sprint of its own; a gate on the others. Invites go out when WALK-2 passes on the fixed build (decision #526). WALK-1 has been walked and METER-0 is recording; sharing is no longer the gate, though until it ships a guest cannot share their own work without an admin.
 
 ---
 
@@ -227,3 +242,4 @@ _Truth in data, evidence as the connective tissue, one system._
 - **2026-09-22 UTC, LIB-0 closed and LIB-1 shipped; Sprint 58 shell created.** LIB-0's run was verified against production and closed (decision #517 stands). LIB-1 shipped as PRs #349 and #350 with its design recorded first (decision #519) and its production acceptance recorded on the mission: the deployed Librarian authored `TRACE-SHARE-58` from a two-turn conversation about project-level sharing, and the mission ran unmodified to a 41-reference report, which Sprint 58 planning now starts from. The first production run also found and fixed a truncated-reply rendering defect (learning #236). The Flash-versus-Luna model question was closed as inconclusive with DeepSeek Flash retained and the Librarian's model made a configuration seam (decision #518). The 69 open next-steps were triaged (decision #520) and `sprint-58` exists as a Planned shell so carried items have a target; its missions are scoped at open with Derek's words.
 - **2026-09-22 UTC, later the same day: METER-0 shipped and RAG-1 done; three of five Sprint 57 missions complete.** METER-0 landed as two PRs after its own production backfill exposed two mistakes unit tests could not (learning #237); production now holds 440 usage rows, none inconsistent, and the admin summary answers the per-user question by the runs' own dates. RAG-1 named its root cause (decision #523: a dead constructor seam since B21.8) and repaired the test with a mutation proof; the citation defect it surfaced was confirmed against production and is recorded as a next-step for the Q&A sprint rather than folded in. Derek's answers on the Librarian boundary, keys and DeepSearch logs are decision #521; the plain mission-create routes now authorize the project (PR #352). WALK-1 remains, and needs Derek live.
 - **2026-09-22 UTC, evening: WALK-1 walked; all five Sprint 57 missions complete.** Derek ran the guest path live as a non-privileged account from an empty project to a completed DeepSearch run, the first production mission not his own. Eight findings recorded with evidence and his verbatim words (receipt `cmos/reports/sprint-57/WALK-1-guest-walk/`); his verdict: "overall, very impressed so far" and "a really great first version". The Librarian findings became LIB-2 in Sprint 58 under decision #525, which also fixes the two-step create-then-submit as intentional ("a draft ... can be run at anytime"). Two diagnoses were corrected against the database rather than accepted as reported: the missing in-progress feed is DeepSearch batching its logs after completion, not a credential gap (learning #238, message `1621f451`), and the "translated evidence" is a small share of natively foreign-language sources. The guest account was disabled after the walk.
+- **2026-09-22 UTC, Sprint 57 closed five of five; Sprint 58 re-scoped from sharing to good working order (decision #526).** Derek at close: "i'm not sure what sharing firts means, i want it to be in good working order before i bring people in, so lets proceed with the adjustments we just discussed and i'll rewalk it and go from there." Sprint 58 opened 2026-09-22 with LIB-2, GUEST-1, BADGE-1 and WALK-2, each traced to a WALK-1 finding; the sharing analysis is kept below the sprint as deferred, to be re-sequenced after the rewalk. The invite gate moved from "Sprint 58 has shipped" to "WALK-2 passes".
