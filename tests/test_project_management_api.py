@@ -314,3 +314,82 @@ class TestProjectDefaultSpaceWritePath:
         )
         fetched = db_session.query(Project).filter(Project.id == project.id).first()
         assert fetched.workspace_id is None, "must degrade to NULL when no Default Workspace"
+
+
+class TestProjectSpaceForMembers:
+    """GUEST-1 (decision #528, Derek: "ok for now"): a non-privileged member of exactly
+    one Space creates projects in that Space. Everyone else keeps Default Workspace.
+
+    WALK-1 finding 2: the guest's project landed in Default Workspace, not the
+    Space Derek had made for them.
+    """
+
+    @staticmethod
+    def _user(db, role):
+        from app.core.security import create_access_token
+        from app.models.user import User
+
+        placeholder_hash = "placeholder-not-a-real-hash"
+        user = User(
+            email=f"{uuid4()}@example.test",
+            display_name="Guest",
+            password_hash=placeholder_hash,
+            role=role,
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+        return user, {"Authorization": f"Bearer {create_access_token(subject=str(user.id))}"}
+
+    @staticmethod
+    def _space_for(db, user, name):
+        from app.models.space_member import SpaceMember
+        from app.models.workspace import Workspace
+
+        space = Workspace(name=name)
+        db.add(space)
+        db.commit()
+        db.refresh(space)
+        db.add(SpaceMember(workspace_id=space.id, user_id=user.id))
+        db.commit()
+        return space
+
+    @staticmethod
+    def _created_workspace(db, headers):
+        from fastapi.testclient import TestClient
+
+        from app.main import app
+        from app.models.project import Project
+
+        with TestClient(app) as client:
+            resp = client.post("/api/v1/projects", json={"name": "Guest project"}, headers=headers)
+        assert resp.status_code == 201, resp.text
+        project = db.query(Project).filter(Project.id == resp.json()["id"]).first()
+        return str(project.workspace_id)
+
+    def test_member_of_exactly_one_space_creates_there(self, db_session):
+        TestProjectDefaultSpaceWritePath._seed_default_workspace(db_session)
+        guest, headers = self._user(db_session, "member")
+        space = self._space_for(db_session, guest, "Walkthrough Guest")
+        assert self._created_workspace(db_session, headers) == str(space.id)
+
+    def test_members_of_no_space_or_several_keep_the_default(self, db_session):
+        from app.models.workspace import DEFAULT_WORKSPACE_ID
+
+        TestProjectDefaultSpaceWritePath._seed_default_workspace(db_session)
+        loner, loner_headers = self._user(db_session, "member")
+        assert self._created_workspace(db_session, loner_headers) == DEFAULT_WORKSPACE_ID
+        joiner, joiner_headers = self._user(db_session, "member")
+        self._space_for(db_session, joiner, "One")
+        self._space_for(db_session, joiner, "Two")
+        assert self._created_workspace(db_session, joiner_headers) == DEFAULT_WORKSPACE_ID
+
+    def test_privileged_callers_are_unchanged_even_with_one_space(self, db_session):
+        """Derek is himself a member of exactly one Space; his path must not move."""
+        from app.models.workspace import DEFAULT_WORKSPACE_ID
+
+        TestProjectDefaultSpaceWritePath._seed_default_workspace(db_session)
+        for role in ("owner", "admin"):
+            user, headers = self._user(db_session, role)
+            self._space_for(db_session, user, f"{role}-private")
+            assert self._created_workspace(db_session, headers) == DEFAULT_WORKSPACE_ID

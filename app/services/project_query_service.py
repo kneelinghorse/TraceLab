@@ -8,6 +8,7 @@ from uuid import UUID
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
+from app.core.security import AuthenticatedUser
 from app.models.chunk import DocumentChunk as Chunk
 from app.models.document import Document
 from app.models.project import Project
@@ -91,20 +92,27 @@ class ProjectQueryService:
             query = query.filter(Project.deleted_at.is_(None))
         return query.first()
 
-    def create_project(self, db: Session, data: ProjectCreate, owner_id: UUID | None = None) -> Project:
+    def create_project(
+        self,
+        db: Session,
+        data: ProjectCreate,
+        owner_id: UUID | None = None,
+        caller: AuthenticatedUser | None = None,
+    ) -> Project:
         """Create a new project.
 
         owner_id is derived from the authenticated caller by the route (T43.4) and
         recorded as the trustworthy owner; the legacy self-asserted user_id is no
         longer accepted from the request body. workspace_id (the project's Space) is
         likewise derived server-side via ``default_workspace_id`` (T44.4), never
-        from the body.
+        from the body; with ``caller`` it is the caller's sole Space when they have
+        exactly one (GUEST-1, decision #528).
         """
         project = Project(
             name=data.name,
             description=data.description,
             owner_id=owner_id,
-            workspace_id=default_workspace_id(db),
+            workspace_id=default_workspace_id(db, caller),
             mission_protocol_id=data.mission_protocol_id,
             research_type=data.research_type,
             methodology=data.methodology,

@@ -6,7 +6,13 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.dependencies import get_activity_service
-from app.schemas.activity import ActivityPage, ActivitySummary, MarkViewedRequest, MarkViewedResponse
+from app.schemas.activity import (
+    ActivityPage,
+    ActivitySummary,
+    EvidenceGroupViewedRequest,
+    MarkViewedRequest,
+    MarkViewedResponse,
+)
 from app.services.activity import ActivityService
 
 router = APIRouter()
@@ -46,3 +52,16 @@ def mark_viewed(
 ) -> MarkViewedResponse:
     response.headers["Cache-Control"] = "private, no-store"
     return service.mark_viewed(db, user, request.items)
+
+
+@router.put("/viewed/evidence", response_model=MarkViewedResponse)
+def mark_evidence_groups_viewed(
+    scope: EvidenceGroupViewedRequest,
+    response: Response,
+    db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
+    service: ActivityService = Depends(get_activity_service),
+) -> MarkViewedResponse:
+    """Opening a project's evidence, or one run's, marks every group in that scope seen (BADGE-1)."""
+    response.headers["Cache-Control"] = "private, no-store"
+    return service.mark_evidence_groups_viewed(db, user, scope)

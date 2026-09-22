@@ -6,7 +6,13 @@ from sqlalchemy.orm import Session
 
 from app.core.security import AuthenticatedUser
 from app.ports.activity import ActivityRepository
-from app.schemas.activity import ActivityPage, ActivitySummary, MarkViewedResponse, ViewedItem
+from app.schemas.activity import (
+    ActivityPage,
+    ActivitySummary,
+    EvidenceGroupViewedRequest,
+    MarkViewedResponse,
+    ViewedItem,
+)
 
 
 def _now() -> datetime:
@@ -31,4 +37,14 @@ class ActivityService:
         now = _now()
         normalized = [ViewedItem(type=i.type, id=i.id, occurred_at=naive_utc(i.occurred_at)) for i in items]
         viewed = self.repository.mark_viewed(db, user, normalized, now=now)
+        return MarkViewedResponse(viewed=viewed, new_total=self.repository.summary(db, user, now=now).new_total)
+
+    def mark_evidence_groups_viewed(
+        self, db: Session, user: AuthenticatedUser, scope: EvidenceGroupViewedRequest
+    ) -> MarkViewedResponse:
+        """Opening a group of evidence marks the whole group seen (BADGE-1, decision #528)."""
+        now = _now()
+        viewed = self.repository.mark_evidence_groups_viewed(
+            db, user, project_id=scope.project_id, mission_id=scope.mission_id, session_key=scope.session_key, now=now
+        )
         return MarkViewedResponse(viewed=viewed, new_total=self.repository.summary(db, user, now=now).new_total)

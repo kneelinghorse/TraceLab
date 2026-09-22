@@ -3,10 +3,11 @@ import { act, fireEvent, render, screen, waitFor, within } from "@testing-librar
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { SWRConfig } from "swr";
 import type { ReactNode } from "react";
-const mocks = vi.hoisted(() => ({ list: vi.fn(), search: vi.fn(), get: vi.fn(), promote: vi.fn(), projects: vi.fn(), router: { query: {} as Record<string, string> } }));
+const mocks = vi.hoisted(() => ({ list: vi.fn(), search: vi.fn(), get: vi.fn(), promote: vi.fn(), projects: vi.fn(), markEvidenceViewed: vi.fn(), router: { query: {} as Record<string, string> } }));
 vi.mock("next/router", () => ({ useRouter: () => mocks.router }));
 vi.mock("@/contexts/AuthContext", () => ({ useAuth: () => ({ isReady: true, isAuthenticated: true, user: { user_id: "reader" } }) }));
 vi.mock("@/lib/api/projects", () => ({ projectsApi: { listProjects: mocks.projects } }));
+vi.mock("@/lib/api/activity", async importOriginal => ({ ...await importOriginal<typeof import("@/lib/api/activity")>(), activityApi: { markEvidenceViewed: mocks.markEvidenceViewed, markViewed: vi.fn(), summary: vi.fn().mockResolvedValue({ new_total: 0, by_type: {} }), list: vi.fn() } }));
 vi.mock("@/lib/api/evidence", async importOriginal => ({ ...await importOriginal<typeof import("@/lib/api/evidence")>(), evidenceApi: mocks }));
 import EvidencePage from "@/pages/evidence";
 import EvidenceDetailPage from "@/pages/evidence/[id]";
@@ -19,12 +20,24 @@ beforeEach(() => {
   mocks.search.mockReset().mockResolvedValue({ entries: [entry("search")], notes: [], entry_total: 44, note_total: 0, page: 1, page_size: 20 });
   mocks.get.mockReset().mockResolvedValue({ entry: entry("detail"), links: [{ kind: "report", id: "report", title: "Research output", href: "/reports/report", relationship: "Recorded source" }] });
   mocks.promote.mockReset();
+  mocks.markEvidenceViewed.mockReset().mockResolvedValue({ viewed: 1, new_total: 0 });
   HTMLDialogElement.prototype.showModal = function () { this.setAttribute("open", ""); };
   HTMLDialogElement.prototype.close = function () { this.removeAttribute("open"); };
 });
 async function browser(component: ReactNode = <EvidencePage />) { await act(async () => { render(<SWRConfig value={{ provider: () => new Map(), dedupingInterval: 0, shouldRetryOnError: false }}>{component}</SWRConfig>); }); }
 
 describe("the evidence browser", () => {
+  it("marks the whole opened group seen once, not once per page (BADGE-1)", async () => {
+    mocks.router.query = { project_id: "alpha", mission_id: "mission-1", session_key: "agent & session" };
+    await browser();
+    await screen.findByText("Claim 1");
+    await waitFor(() => expect(mocks.markEvidenceViewed).toHaveBeenCalledWith({ project_id: "alpha", mission_id: "mission-1", session_key: "agent & session" }));
+    fireEvent.click(screen.getByRole("button", { name: "Next", exact: true }));
+    await screen.findByText("Claim 2");
+    expect(mocks.markEvidenceViewed).toHaveBeenCalledTimes(1);
+    fireEvent.change(screen.getByLabelText("Project", { exact: true }), { target: { value: "beta" } });
+    await waitFor(() => expect(mocks.markEvidenceViewed).toHaveBeenLastCalledWith({ project_id: "beta", mission_id: undefined, session_key: undefined }));
+  });
   it("preserves Home's mission and session scope through pagination, then clears it when switching projects", async () => {
     mocks.router.query = { project_id: "alpha", mission_id: "mission-1", session_key: "agent & session" };
     await browser();

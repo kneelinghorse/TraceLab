@@ -1914,6 +1914,23 @@
       "rationale": "The per-user activity viewed watermark is an explicit acknowledgement (it replaced the inbox seen watermark and mission review under decision #459); per-user acknowledgement writes stay REST/UI-only by decisions #426 and #454."
     },
     {
+      "id": "frontend/src/lib/api/activity.ts#activityApi.markEvidenceViewed:PUT:/activity/viewed/evidence",
+      "api_file": "frontend/src/lib/api/activity.ts",
+      "operation": "activityApi.markEvidenceViewed",
+      "source_line": 32,
+      "method": "PUT",
+      "path": "/api/v1/activity/viewed/evidence",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/evidence.tsx",
+        "frontend/src/pages/missions/[id].tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "badge-1-group-preference-write",
+      "rationale": "Opening a group of evidence marks the whole group seen (BADGE-1, decision #528); it is the same per-user acknowledgement write as activityApi.markViewed, scoped by project, mission and session instead of by item id, and stays REST/UI-only by decisions #426 and #454."
+    },
+    {
       "id": "frontend/src/lib/api/activity.ts#activityApi.summary:GET:/activity/summary",
       "api_file": "frontend/src/lib/api/activity.ts",
       "operation": "activityApi.summary",

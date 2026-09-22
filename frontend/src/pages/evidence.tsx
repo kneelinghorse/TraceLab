@@ -1,5 +1,5 @@
 import { PaginationBar } from "@/components/ui/PaginationBar";
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import useSWR from "swr";
 import { useRouter } from "next/router";
 import { AuthGate } from "@/components/AuthGate";
@@ -8,6 +8,7 @@ import { EntryCard } from "@/components/evidence/EntryCard";
 import { SessionNotes } from "@/components/evidence/SessionNotes";
 import { evidenceApi, sourceDomain, type EvidenceFilters } from "@/lib/api/evidence";
 import { projectsApi } from "@/lib/api/projects";
+import { markEvidenceSeen } from "@/lib/hooks/useActivitySummary";
 
 const filterKeys = ["mission_id", "session_key", "disposition", "tag", "created_from", "created_until", "source_id", "report_id", "document_id"] as const;
 export default function EvidencePage() {
@@ -29,6 +30,17 @@ function EvidenceBrowser({ initial }: { initial: Record<string, string | string[
   const projects = useSWR(["evidence-projects", user?.user_id, projectSearch, projectPage], () => projectsApi.listProjects({ search: projectSearch.trim() || undefined, page: projectPage, pageSize: 20 }));
   const ledger = useSWR(projectId ? ["evidence", user?.user_id, projectId, query, filters, page] : null, () => query ? evidenceApi.search(projectId, query, page, filters) : evidenceApi.list(projectId, page, filters));
   const error = projects.error || ledger.error;
+  const loadedTotal = ledger.data?.entry_total ?? 0;
+  const markedScope = useRef("");
+  useEffect(() => {
+    // Opening the group is enough to mark it seen; paging through it is not required (BADGE-1).
+    // The list re-fetches per page, so the scope is remembered and marked once per opening.
+    const scope = { project_id: projectId, mission_id: filters.mission_id, session_key: filters.session_key };
+    const key = JSON.stringify(scope);
+    if (!projectId || loadedTotal === 0 || markedScope.current === key) return;
+    markedScope.current = key;
+    void markEvidenceSeen(scope);
+  }, [projectId, filters.mission_id, filters.session_key, loadedTotal]);
   function apply(event: FormEvent) {
     event.preventDefault();
     setFilters(Object.fromEntries(Object.entries(draft).map(([key, value]) => [key, value?.trim() || undefined])));

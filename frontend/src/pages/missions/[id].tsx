@@ -6,7 +6,7 @@ import { PageState } from "@/components/ui/PageState";
 import { useFeedback } from "@/components/ui/useFeedback";
 import { MissionRunActivity } from "@/components/missions/MissionRunActivity";
 import { missionOccurredAt } from "@/lib/api/activity";
-import { markViewed } from "@/lib/hooks/useActivitySummary";
+import { markEvidenceSeen, markViewed } from "@/lib/hooks/useActivitySummary";
 import { apiErrorMessage } from "@/lib/api/errors";
 import { Dialog } from "@/components/ui/Dialog";
 import { EvidencePanel } from "@/components/evidence/EvidencePanel";
@@ -80,6 +80,10 @@ function MissionDetailContent() {
     // Opening a mission marks it viewed at its current revision (decision #459).
     if (mission && occurredAt) void markViewed([{ type: "mission", id: mission.id, occurred_at: occurredAt }]);
   }, [mission?.id, occurredAt]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    // Opening the run's Evidence tab marks the run's whole evidence group seen (BADGE-1, decision #528).
+    if (detailTab === "evidence" && mission?.project_id) void markEvidenceSeen({ project_id: mission.project_id, mission_id: mission.id });
+  }, [detailTab, mission?.id, mission?.project_id]);
 
   const handleSubmitToDeepSearch = async () => {
     if (!missionId) return;

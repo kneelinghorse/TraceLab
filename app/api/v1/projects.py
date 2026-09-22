@@ -166,7 +166,7 @@ def create_project(
         authorize_or_403(current_user, "read", project, db)
         return JSONResponse(content=cached.data, status_code=cached.status_code)
 
-    project = _service.create_project(db, data, owner_id=current_user.user_id)
+    project = _service.create_project(db, data, owner_id=current_user.user_id, caller=current_user)
     resource = ProjectRead.model_validate(project)
     response_body = resource.model_dump(mode="json")
 

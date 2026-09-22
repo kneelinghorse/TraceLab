@@ -4,9 +4,9 @@ import type { ReactNode } from "react";
 import { beforeEach, expect, it, vi } from "vitest";
 import { SWRConfig } from "swr";
 import type { ApiMission, MissionStatus } from "@/types/mission";
-const mocks = vi.hoisted(() => ({ list: vi.fn(), get: vi.fn(), update: vi.fn(), markViewed: vi.fn(), projects: vi.fn(), httpGet: vi.fn(), push: vi.fn(), replace: vi.fn(), query: {} as Record<string, string | string[]> }));
+const mocks = vi.hoisted(() => ({ list: vi.fn(), get: vi.fn(), update: vi.fn(), markViewed: vi.fn(), markEvidenceViewed: vi.fn(), projects: vi.fn(), httpGet: vi.fn(), push: vi.fn(), replace: vi.fn(), query: {} as Record<string, string | string[]> }));
 vi.mock("@/lib/api/missions", () => ({ missionsApi: mocks }));
-vi.mock("@/lib/api/activity", async original => ({ ...await original<object>(), activityApi: { markViewed: mocks.markViewed, summary: vi.fn().mockResolvedValue({ new_total: 0, by_type: {} }) } }));
+vi.mock("@/lib/api/activity", async original => ({ ...await original<object>(), activityApi: { markViewed: mocks.markViewed, markEvidenceViewed: mocks.markEvidenceViewed, summary: vi.fn().mockResolvedValue({ new_total: 0, by_type: {} }) } }));
 vi.mock("@/lib/api/projects", () => ({ projectsApi: { listAllProjects: mocks.projects } }));
 vi.mock("@/lib/api/http", async importOriginal => ({ ...await importOriginal<object>(), httpClient: { get: mocks.httpGet } }));
 vi.mock("@/components/AuthGate", () => ({ AuthGate: ({ children }: { children: ReactNode }) => children }));
@@ -104,4 +104,13 @@ it("orients a draft reached from the Librarian once, and never a draft opened di
   mount(<MissionDetailPage />);
   expect(await screen.findByRole("heading", { name: "Inspect research" })).toBeVisible();
   expect(screen.queryByRole("region", { name: "Next step" })).toBeNull();
+});
+it("marks the run's evidence group seen when its Evidence tab opens, and only then (BADGE-1)", async () => {
+  mocks.query = { id: "run-1" }; mocks.get.mockResolvedValue(mission("completed"));
+  mocks.markEvidenceViewed.mockResolvedValue({ viewed: 1, new_total: 0 });
+  mount(<MissionDetailPage />);
+  expect(await screen.findByRole("heading", { name: "Inspect research" })).toBeVisible();
+  expect(mocks.markEvidenceViewed).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByRole("tab", { name: "Evidence" }));
+  await waitFor(() => expect(mocks.markEvidenceViewed).toHaveBeenCalledWith({ project_id: "project-1", mission_id: "run-1" }));
 });
