@@ -73,3 +73,16 @@ def test_missing_or_malformed_metadata_yields_an_empty_record():
 def test_falls_back_to_synthesis_token_usage_when_attempt_accounting_is_absent():
     usage = extract_run_usage({"synthesis_telemetry": {"token_usage": {"input": 10, "output": 5, "total": 15}}})
     assert (usage.input_tokens, usage.output_tokens, usage.total_tokens) == (10, 5, 15)
+
+
+def test_token_triple_never_mixes_sources():
+    """21 of the first 440 production rows had input > total: a zero top-level total beside a real telemetry triple."""
+    usage = extract_run_usage(
+        {"total_tokens": 0, "synthesis_telemetry": {"token_usage": {"input": 314794, "total": 327942, "output": 13148}}}
+    )
+    assert (usage.input_tokens, usage.output_tokens, usage.total_tokens) == (314794, 13148, 327942)
+    assert usage.input_tokens <= usage.total_tokens
+
+
+def test_top_level_total_is_used_only_when_no_triple_exists():
+    assert extract_run_usage({"total_tokens": 1200}).total_tokens == 1200

@@ -23,6 +23,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--limit", type=int, default=500, help="Maximum terminal missions to record in one sweep.")
     parser.add_argument("--mission-id", type=UUID, default=None, help="Record (or re-record) one mission by UUID.")
+    parser.add_argument(
+        "--recompute",
+        action="store_true",
+        help="Re-read every terminal mission (up to --limit) and update rows whose numbers changed.",
+    )
     args = parser.parse_args(argv)
 
     db = SessionLocal()
@@ -53,8 +58,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                 )
             )
             return 0
-        recorded = sweep_unrecorded_terminal_missions(db, limit=args.limit)
-        print(json.dumps({"recorded": recorded, "limit": args.limit}))
+        recorded = sweep_unrecorded_terminal_missions(db, limit=args.limit, recompute=args.recompute)
+        print(json.dumps({"recorded": recorded, "limit": args.limit, "recompute": args.recompute}))
         return 0
     finally:
         db.close()
