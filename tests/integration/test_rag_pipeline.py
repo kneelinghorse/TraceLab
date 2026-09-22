@@ -4,9 +4,8 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
-import pytest
-
 from app.services import rag_service as rag_module
+from app.services.pedr.search_orchestrator import PEDRSearchResult
 from app.services.quality_assessment import QualityAssessmentResult
 
 
@@ -19,14 +18,37 @@ class _StubEmbeddingService:
         return [float(len(text)), 0.25, 0.5]
 
 
-class _StubRetrievalService:
+class _StubPEDROrchestrator:
+    """The retrieval seam RagService actually uses (since B21.8, commit f89e965).
+
+    ``retrieval_service`` is still a constructor parameter but nothing in the
+    query path reads it; ``_execute_rag_pipeline`` calls
+    ``pedr_orchestrator.search``. RAG-1, decision #523.
+    """
+
     def __init__(self, results):
         self.results = list(results)
         self.calls = []
 
     def search(self, *, query, **kwargs):
         self.calls.append({"query": query, "kwargs": kwargs})
-        return list(self.results)
+        # Embeddings parallel to the stub query embedding so context compression keeps every chunk.
+        query_embedding = _StubEmbeddingService().generate_embedding(query)
+        return SimpleNamespace(
+            results=[
+                PEDRSearchResult(
+                    chunk_id=item["chunk_id"],
+                    content=item["content"],
+                    document_id=item["document_id"],
+                    project_id=item.get("project_id"),
+                    rrf_score=item["score"],
+                    chunk_index=item["chunk_index"],
+                    source_type=item.get("source_type"),
+                    embedding=list(query_embedding),
+                )
+                for item in self.results
+            ]
+        )
 
 
 class _StubCacheService:
@@ -111,23 +133,23 @@ def _build_service(monkeypatch, *, cache=None, responses=None):
         rag_module.settings, "openai_api_key", "test-key", raising=False
     )
     embedding = _StubEmbeddingService()
-    retrieval = _StubRetrievalService(
+    # doc-2 outranks doc-1 on purpose: the model cites doc-1, so a broken citation parser
+    # would fall back to the top chunk (doc-2) and the assertions below would go red.
+    retrieval = _StubPEDROrchestrator(
         [
-            {
-                "document_id": "doc-1",
-                "chunk_index": 0,
-                "chunk_id": "chunk-0",
-                "content": "Traceability ensures every answer cites a document.",
-                "score": 0.92,
-                "embedding": [0.1, 0.2, 0.3],
-            },
             {
                 "document_id": "doc-2",
                 "chunk_index": 1,
                 "chunk_id": "chunk-1",
                 "content": "Load testing requires 100 concurrent RAG queries.",
+                "score": 0.92,
+            },
+            {
+                "document_id": "doc-1",
+                "chunk_index": 0,
+                "chunk_id": "chunk-0",
+                "content": "Traceability ensures every answer cites a document.",
                 "score": 0.84,
-                "embedding": [0.2, 0.1, 0.3],
             },
         ]
     )
@@ -151,7 +173,7 @@ def _build_service(monkeypatch, *, cache=None, responses=None):
     )
 
     service = rag_module.RagService(
-        retrieval_service=retrieval,
+        pedr_orchestrator=retrieval,
         embedding_service=embedding,
         cache_service=cache_service,
         client=client,
@@ -163,17 +185,6 @@ def _build_service(monkeypatch, *, cache=None, responses=None):
     return service, embedding, retrieval, cache_service, cost_monitor, assessor, client
 
 
-@pytest.mark.skip(
-    # Sprint 56 HYG-2 corrected this reason. The openai/httpx "proxies"
-    # incompatibility is GONE: openai 2.24.0 does not pass that kwarg and neither
-    # does anything in this repo, so an SDK upgrade fixes nothing here. Un-skipped,
-    # this test fails at line 177 with _StubRetrievalService.calls empty — the
-    # pipeline never reaches the stub, which is a real and undiagnosed behaviour
-    # change, not a dependency problem. Its sibling below was skipped for the same
-    # false reason and passes today, so it is no longer skipped.
-    reason="RAG pipeline never calls the stub retrieval service; cause undiagnosed. "
-    "NOT an openai/httpx issue — see the comment above before changing deps."
-)
 def test_rag_pipeline_generates_cited_answer(monkeypatch):
     service, embedding, retrieval, cache_service, cost_monitor, assessor, client = (
         _build_service(monkeypatch)
@@ -182,7 +193,15 @@ def test_rag_pipeline_generates_cited_answer(monkeypatch):
     result = service.run_query("Summarize Mission Protocol quality gates", top_k=2)
 
     assert result["answer"].startswith("Answer")
-    assert result["citations"][0]["document_id"] == "doc-1"
+    # The citation is anchored to the retrieved chunk the model named, not to the top-scoring one.
+    assert len(result["citations"]) == 1, result["citations"]
+    citation = result["citations"][0]
+    assert citation["document_id"] == "doc-1"
+    assert citation["chunk_id"] == "chunk-0"
+    assert citation["chunk_index"] == 0
+    assert citation["score"] == 0.84
+    assert citation["snippet"].startswith("Traceability")
+    assert {chunk["document_id"] for chunk in result["sources"]} == {"doc-1", "doc-2"}
     assert result["cache"]["hit"] is False
     assert result["routing"]["attempts"][0]["usage"]["prompt_tokens"] == 12
     assert (
