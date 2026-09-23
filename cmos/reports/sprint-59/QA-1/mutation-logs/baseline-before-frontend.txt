@@ -1,0 +1,30 @@
+PASSED opens on the Text tab and shows the full text from the content endpoint, not the preview
+PASSED renders markdown documents as markdown and plain text verbatim
+PASSED links straight to the readable report and mission the document came from
+PASSED shows no report or mission link when none is readable
+PASSED moves stats and metadata to Overview and loads chunks only on the Chunks tab
+PASSED honours ?tab= deep links without fetching the text
+PASSED falls back to Text for unknown ?tab= values
+PASSED explains empty text and offers a retry when the text fails to load
+PASSED isMarkdownDocument keys off mime type, file name or synthesis origin, never the file_type category
+PASSED citation deep links opens the Chunks tab on the page holding the chunk, expanded and marked as cited
+PASSED citation deep links scrolls the cited card's top into view, so its header shows even on a long chunk
+PASSED citation deep links says the cited chunk is gone rather than showing another passage
+PASSED Librarian page renders world knowledge as prose and corpus claims as cited passages
+PASSED Librarian page shows a withheld notice instead of an unproven claim and keeps talking without a project
+PASSED Librarian page drafts a mission from the transcript, shows the compiled contract, and creates it on confirmation
+PASSED Librarian page lets a user with no project create one inline and selects it
+PASSED Librarian page shows no Space picker to someone whose only Space is their own
+PASSED Librarian page lets a member of a shared Space create the new project there
+PASSED Librarian page keeps the conversation and project when the page is left and reopened, until the user starts over
+PASSED Librarian page explains the three steps until the user asks it not to
+PASSED Librarian page, asking the documents sends the chosen budget and links each citation to the chunk it came from
+PASSED Librarian page, asking the documents asks for a short answer unless the user chooses a full synthesis
+PASSED Librarian page, asking the documents renders a refusal as a note that asserts nothing, and keeps it that way after a reload
+PASSED Librarian page, asking the documents cannot ask the documents without a project
+PASSED librarianApi.turn HTTP contract a conversational turn sends the transcript and project only
+PASSED librarianApi.turn HTTP contract an answer turn carries answer mode and the chosen budget
+PASSED replyToTranscriptText names a cited chunk by document and number, and evidence by id
+
+JSON report written to /var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/tmp3zvapkm1/vitest.json
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
