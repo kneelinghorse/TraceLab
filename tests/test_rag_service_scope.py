@@ -259,6 +259,7 @@ def test_empty_scope_fails_closed_before_cache_embedding_or_provider(monkeypatch
     assert response.citations == []
     assert response.cache.hit is False
     assert response.routing.attempts == []
+    assert response.no_evidence is True
 
 
 def _route_result(search_mode: str) -> dict[str, Any]:
@@ -426,3 +427,4 @@ def test_route_empty_scope_returns_before_rag_singleton_construction(monkeypatch
     assert len(scope_calls) == 1
     assert response.sources == []
     assert response.cache.hit is False
+    assert response.no_evidence is True
