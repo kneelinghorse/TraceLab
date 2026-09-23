@@ -6,7 +6,7 @@ collection management, mission authoring, DeepSearch execution, and report
 generation, plus cross-session evidence capture — against a TraceLab knowledge
 base.
 
-- **9 action-clustered tools / 49 actions in source** (one tool per noun, dispatched by `action`)
+- **9 action-clustered tools / 50 actions in source** (one tool per noun, dispatched by `action`)
 - **RFC 8628 device-code login** — install, run, click a link, you're in
 - Works out of the box with **Claude Desktop**, **Claude Code**, and any
   Model Context Protocol client over stdio
@@ -174,12 +174,12 @@ never leak across deployments.
 
 ## Tools
 
-Nine action-clustered tools / 49 actions in source. Each cluster exposes multiple actions
+Nine action-clustered tools / 50 actions in source. Each cluster exposes multiple actions
 selected via the `action` parameter.
 
 | Cluster | Actions | Purpose |
 | --- | --- | --- |
-| `tracelab_search` | `knowledge`, `navigate`, `pedr` | Semantic search across the knowledge base. |
+| `tracelab_search` | `knowledge`, `navigate`, `pedr`, `ask` | Semantic search across the knowledge base, and cited answers to a question about one project's documents. |
 | `tracelab_project` | `list`, `get`, `create`, `update`, `stats`, `neighborhood` | Project CRUD, aggregate stats and the scoped relationship neighborhood. |
 | `tracelab_collection` | `list`, `get`, `export`, `create`, `add`, `synthesize`, `documents`, `mission_seed`, `update`, `add_document` | Curate chunks and documents into collections, edit their instructions, then synthesize. |
 | `tracelab_report` | `create`, `list`, `get`, `export`, `update` | Persistent named research reports, including title/status updates. |
@@ -287,6 +287,21 @@ any existing Space (404 if it does not exist). The web UI's Space picker sends
 the same field to the same route. `tracelab_project.list` and the `create` result
 now carry each project's `workspace_id`; `get` always did.
 
+### Asking a project a question (MCP-6, 2.1.0)
+
+`tracelab_search.ask` gives agents the Librarian's "Ask the documents": the same
+Q&A service, the same citation rule and the same access check.
+
+| Action | Route and parameters |
+| --- | --- |
+| `tracelab_search.ask` | `POST /search/ask`. Required `project_id` and `question` (1–20,000 characters). Optional `max_tokens` (64–4000; omitted uses the server default; the Librarian uses 600 for a short answer and 2000 for a full synthesis). Returns `answer`, `passages` (each paragraph with the chunk ids it cites), `citations` (`chunk_id`, `document_id`, `document_name`, `chunk_index`, `snippet`, `href`, and a `url` that opens the chunk in its document), `project_url` and `no_evidence`. |
+
+Every citation is a chunk the answer was written from, in a document that still
+exists. When nothing in the project answers the question, `no_evidence` is true
+and the answer says so instead of guessing. You can ask only a project you can
+read (403 otherwise; 404 when it does not exist), with a human credential. Each
+paid model call is recorded as your usage.
+
 ### Example calls
 
 Semantic search:
@@ -298,6 +313,20 @@ Semantic search:
     "action": "knowledge",
     "query": "user onboarding best practices",
     "limit": 10
+  }
+}
+```
+
+Ask a project a question:
+
+```json
+{
+  "name": "tracelab_search",
+  "arguments": {
+    "action": "ask",
+    "project_id": "fbd3bd03-5ddc-49ee-8013-529163a99290",
+    "question": "What does self-hosting Qdrant cost?",
+    "max_tokens": 600
   }
 }
 ```

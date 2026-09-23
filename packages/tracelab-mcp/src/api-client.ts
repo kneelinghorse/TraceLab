@@ -27,6 +27,11 @@ export interface RetrievalQuery {
 export interface PEDRQuery { query: string; top_k: number; project_id?: string; source_type?: string; date_from?: string; date_to?: string; enable_graph: boolean }
 export interface PEDRResponse { results: (RetrievedChunk & Record<string, unknown>)[]; metadata: Record<string, unknown> }
 
+// MCP-6: corpus Q&A through QA-1's one Q&A service (POST /search/ask).
+export interface AskQuery { project_id: string; question: string; max_tokens?: number }
+export interface AskCitation { chunk_id: string; document_id: string; document_name: string; chunk_index: number | null; snippet: string | null; href: string }
+export interface AskResponse { answer: string; passages: { text: string; citations: string[] }[]; citations: AskCitation[]; no_evidence: boolean; model: string | null }
+
 export interface RetrievedChunk {
   chunk_id: string;
   content: string;
@@ -674,6 +679,10 @@ export class TraceLabClient {
 
   async searchPedr(query: PEDRQuery): Promise<PEDRResponse> {
     return this.request<PEDRResponse>('POST', '/api/v1/pedr/search', query);
+  }
+
+  async askQuestion(query: AskQuery): Promise<AskResponse> {
+    return this.request<AskResponse>('POST', '/api/v1/search/ask', query);
   }
 
   async getHome(): Promise<HomeSnapshot> {

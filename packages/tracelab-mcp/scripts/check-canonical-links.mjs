@@ -89,6 +89,9 @@ route('POST', `/documents/${ids.document}/process`, { document_id: ids.document,
 route('PUT', `/collections/${ids.collection}`, collection);
 route('POST', `/collections/${ids.collection}/documents`, { id: ids.document, name: markdown, project_id: ids.project, file_type: 'md' });
 route('PUT', `/reports/${ids.report}`, report);
+// MCP-6: corpus Q&A through QA-1's one service; the citation href opens the chunk.
+const askHref = `/documents/${ids.document}?chunk=${ids.chunk}&index=0`;
+route('POST', '/search/ask', { answer: markdown, passages: [{ text: markdown, citations: [ids.chunk] }], citations: [{ chunk_id: ids.chunk, document_id: ids.document, document_name: markdown, chunk_index: 0, snippet: markdown, href: askHref }], no_evidence: false, model: 'gpt-test' });
 route('GET', `/reports/${ids.report}/export`, requestUrl => ({ bytes: requestUrl.searchParams.get('format') === 'json' ? jsonExport : markdown, contentType: requestUrl.searchParams.get('format') === 'json' ? 'application/json' : 'text/plain' }));
 
 const server = http.createServer(async (request, response) => {
@@ -135,7 +138,7 @@ try {
   await client.connect(transport);
   const tools = (await client.listTools()).tools;
   assert.equal(tools.length, 9);
-  assert.equal(tools.reduce((count, tool) => count + tool.inputSchema.properties.action.enum.length, 0), 49, 'ACT-1 action count (51 MCP-2 actions minus attention, inbox_summary, inbox_list and views, plus activity and activity_summary)');
+  assert.equal(tools.reduce((count, tool) => count + tool.inputSchema.properties.action.enum.length, 0), 50, 'MCP-6 action count (the 49 ACT-1 actions plus tracelab_search ask)');
   await check('search', { action: 'knowledge', query: 'provenance' }, ['POST /retrieval/search'], { 'results.0.document_url': url('document') });
   await check('project', { action: 'list' }, ['GET /projects'], { 'projects.0.url': url('project') });
   await check('project', { action: 'create', name: 'Project' }, ['POST /projects'], { 'project.url': url('project') });
@@ -205,6 +208,8 @@ try {
   // ACT-1 (decision #459): recent-activity reads.
   await check('home', { action: 'activity', page: 2, page_size: 3 }, ['GET /activity'], { 'items.0.url': url('mission'), 'items.1.url': url('report'), 'items.2.url': `${web}/evidence?project_id=${ids.project}` }, value => { assert.equal(value.total, 83); assert.equal(value.new_total, 2); assert.equal(value.items[0].title, markdown); assert.equal(value.items[0].href, `/missions/${ids.mission}`); assert.equal(value.items[0].new, true); }, ['page=2&page_size=3']);
   await check('home', { action: 'activity_summary' }, ['GET /activity/summary'], {}, value => { assert.equal(value.new_total, 6); assert.deepEqual(value.by_type, activitySummary.by_type); }, ['']);
+  // MCP-6: ask keeps the answer and each citation's href, and adds the chunk's browser url.
+  await check('search', { action: 'ask', project_id: ids.project, question: 'What does the research say?', max_tokens: 600 }, ['POST /search/ask'], { 'citations.0.url': `${web}${askHref}`, project_url: url('project') }, value => { assert.deepEqual(calls.at(-1).body, { project_id: ids.project, question: 'What does the research say?', max_tokens: 600 }); assert.equal(value.answer, markdown); assert.equal(value.citations[0].href, askHref); assert.equal(value.no_evidence, false); }, ['']);
   console.log(JSON.stringify({ passed: checks.length, generatedLinks: checks.reduce((sum, row) => sum + row.links, 0), httpRequests: calls.length, checks }, null, 2));
 } finally {
   await client.close();

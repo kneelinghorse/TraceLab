@@ -133,6 +133,29 @@
         "frontend/src/lib/api/search.ts#searchApi.semanticSearch:POST:/retrieval/search"
       ],
       "explanation": "QA-2 retired the standalone Search page into the Librarian's chunk list. Six search.ts calls lost their only consumer and were deleted from the client with their rows: RAG answers (POST /search), plain retrieval, facets, and search history list, clear and replay. The backend routes stay; POST /search, /retrieval/search (tracelab_search.knowledge) and the history routes are unchanged. The Librarian now consumes searchApi.pedrSearch, savedSearchesApi.execute/list/create and collectionsApi.create/addChunk; the palette no longer reads search history. Tool and action counts are unchanged."
+    },
+    "mcp6": {
+      "decision": 547,
+      "measured_totals": {
+        "operations": 103,
+        "live": 98,
+        "dead": 5,
+        "tools": 9,
+        "actions": 50,
+        "covered": 21,
+        "closed-MCP-1": 17,
+        "closed-MCP-2": 7,
+        "rest-only-by-design": 53,
+        "dead-client-code": 5
+      },
+      "added_actions": [
+        "tracelab_search.ask"
+      ],
+      "added_operations": [],
+      "remapped_operations": [
+        "frontend/src/lib/api/librarian.ts#librarianApi.turn:POST:/librarian/turns"
+      ],
+      "explanation": "MCP-6 gives agents the Librarian's corpus Q&A: tracelab_search.ask calls POST /api/v1/search/ask, a new route that loads and authorizes the project as the Librarian's answer mode does and then calls the same corpus_qa.answer_question. No frontend code calls the new route (the Librarian's answer mode stays on POST /librarian/turns), so the operation count is unchanged at 103. The librarianApi.turn row stays rest-only-by-design, since its conversation is LIB-1's, and now maps to tracelab_search.ask, as librarianApi.createMission maps to tracelab_mission.create. Tools stay at 9; actions go from 49 to 50. The package's next release is the minor 2.1.0."
     }
   },
   "operations": [
@@ -1082,10 +1105,10 @@
       "ui_consumers": [
         "frontend/src/pages/librarian.tsx"
       ],
-      "mcp": null,
+      "mcp": "tracelab_search.ask",
       "classification": "rest-only-by-design",
       "baseline": "new",
-      "rationale": "LIB-1: an interactive, human-principal conversational surface. MCP callers are agents themselves and author missions directly through tracelab_mission.create; the Librarian's turn, draft and create calls exist to give a person that capability, so they are REST-only by design (decision #519)."
+      "rationale": "LIB-1: an interactive, human-principal conversational surface. MCP callers are agents themselves and author missions directly through tracelab_mission.create; the Librarian's turn, draft and create calls exist to give a person that capability, so they are REST-only by design (decision #519). A turn in answer mode (QA-1) is the one capability agents lacked: tracelab_search.ask gives it to them through POST /search/ask, which calls the same corpus_qa.answer_question with the same citation rule and project authorization (MCP-6, decision #547). The conversation itself stays REST-only."
     },
     {
       "id": "frontend/src/lib/api/librarian.ts#librarianApi.draft:POST:/librarian/drafts",

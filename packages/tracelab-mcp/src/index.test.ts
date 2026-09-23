@@ -958,9 +958,10 @@ describe('T41.7 — cluster surface', () => {
     expect(toolNames).toHaveLength(9);
     // MCP-2 (sprint-52): the 40 MCP-1 actions plus 11 closures (51). ACT-1
     // (decision #459) removed attention, inbox_summary, inbox_list and views and
-    // added activity and activity_summary (49). The parity manifest, README and
-    // docs tables are checked against this registry.
-    expect(Object.values(CLUSTER_ACTIONS).reduce((count, actions) => count + actions.length, 0)).toBe(49);
+    // added activity and activity_summary (49). MCP-6 added tracelab_search ask
+    // (50). The parity manifest, README and docs tables are checked against this
+    // registry.
+    expect(Object.values(CLUSTER_ACTIONS).reduce((count, actions) => count + actions.length, 0)).toBe(50);
     expect(toolNames.sort()).toEqual([
       'tracelab_collection',
       'tracelab_document',

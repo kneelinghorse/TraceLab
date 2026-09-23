@@ -1,4 +1,4 @@
-"""API endpoints exposing the full RAG search experience."""
+"""API endpoints exposing the full RAG search experience, and corpus Q&A for the MCP."""
 
 import logging
 from typing import Any
@@ -6,13 +6,17 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app.core.authorization import accessible_project_ids
+from app.core.authorization import accessible_project_ids, authorize_or_403
 from app.core.config import settings
 from app.core.database import get_db
 from app.core.security import ROLE_SERVICE, AuthenticatedUser, require_authenticated_user
-from app.schemas.rag import RagQuery, RagResponse
+from app.models.project import Project
+from app.models.usage_record import USAGE_KIND_SEARCH_ASK
+from app.schemas.rag import AskRequest, AskResponse, RagQuery, RagResponse
+from app.services.corpus_qa import answer_question
 from app.services.rag_service import build_empty_scope_result, get_rag_service
 from app.services.search_history import SearchHistoryService, get_search_history_service
+from app.services.usage_recorder import record_librarian_usage
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -78,6 +82,38 @@ async def run_rag_search(
         history_service=history_service,
     )
     return response
+
+
+@router.post("/search/ask", response_model=AskResponse)
+def ask_question(
+    payload: AskRequest,
+    current_user: AuthenticatedUser = Depends(require_authenticated_user),
+    db: Session = Depends(get_db),
+) -> AskResponse:
+    """Answer a question from one project's documents, or refuse (MCP-6, tracelab_search ask).
+
+    The Librarian's answer mode and this route call the same Q&A service (decision
+    #543), after loading the project and authorizing it for the caller exactly as
+    that mode does: 404, then 403. Every citation opens a chunk the model read;
+    no_evidence marks a question the project cannot support.
+    """
+    project = db.query(Project).filter(Project.id == payload.project_id, Project.deleted_at.is_(None)).first()
+    if project is None:
+        raise HTTPException(status_code=404, detail="Project not found.")
+    authorize_or_403(current_user, "read", project, db)
+    answer = answer_question(db, current_user, project.id, payload.question, max_tokens=payload.max_tokens)
+    for model, usage in answer.usage:
+        # METER-0 (decision #522): a durable row for each paid call, per user.
+        record_librarian_usage(
+            db,
+            user_id=current_user.user_id,
+            project_id=project.id,
+            kind=USAGE_KIND_SEARCH_ASK,
+            model=model,
+            usage=usage,
+            requests=1,
+        )
+    return AskResponse.model_validate(answer, from_attributes=True)
 
 
 def _log_search_history(
