@@ -6,13 +6,12 @@ const mocks = vi.hoisted(() => ({
   auth: { isAuthenticated: true, isReady: true, user: { user_id: "alice", display_name: "Alice", email: "alice@example.test" }, logout: vi.fn() },
   role: { isAdmin: false },
   router: { pathname: "/missions", push: vi.fn() },
-  names: vi.fn(), history: vi.fn(), saved: vi.fn(),
+  names: vi.fn(), saved: vi.fn(),
 }));
 vi.mock("next/router", () => ({ useRouter: () => mocks.router }));
 vi.mock("@/contexts/AuthContext", () => ({ useAuth: () => mocks.auth }));
 vi.mock("@/contexts/RoleContext", () => ({ useRole: () => mocks.role }));
 vi.mock("@/lib/api/navigation", () => ({ navigationApi: { search: mocks.names } }));
-vi.mock("@/lib/api/search", () => ({ searchApi: { history: mocks.history } }));
 vi.mock("@/lib/api/activity", async original => ({ ...await original<object>(), activityApi: { summary: async () => ({ generated_at: "2026-09-13T00:00:00", new_total: 0, by_type: {} }) } }));
 vi.mock("@/lib/api/savedSearches", () => ({ savedSearchesApi: { list: mocks.saved } }));
 
@@ -34,7 +33,6 @@ beforeEach(() => {
   mocks.auth.user.user_id = "alice";
   mocks.role.isAdmin = false;
   mocks.names.mockResolvedValue(response());
-  mocks.history.mockResolvedValue({ entries: [] });
   mocks.saved.mockResolvedValue({ items: [] });
   vi.stubGlobal("matchMedia", vi.fn(() => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
   HTMLDialogElement.prototype.showModal = function () { this.setAttribute("open", ""); };
@@ -128,19 +126,17 @@ describe("scoped palette data and actions", () => {
     expect(screen.queryByRole("dialog", { name: "Search and navigation" })).toBeNull();
   });
 
-  it("routes saved and recent searches to their canonical execution flow and exposes useful actions", async () => {
-    mocks.history.mockResolvedValue({ entries: [{ id: "history-id", query_text: "Recent research" }] });
+  it("runs a saved search in the Librarian, not the retired /search alias, and exposes useful actions", async () => {
+    // /search is a redirect since QA-2; an application link must name the Librarian itself.
     mocks.saved.mockResolvedValue({ items: [{ id: "saved-id", name: "Saved research" }] });
     render(shell());
     open();
     await settle();
+    // Recent searches left with the Search page: nothing records the Librarian's lists (decision #545).
+    expect(screen.queryByRole("region", { name: "Recent searches" })).toBeNull();
     expect(screen.getByRole("button", { name: "Saved research", exact: true })).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Saved research", exact: true }));
-    expect(mocks.router.push).toHaveBeenCalledWith("/search?saved=saved-id");
-    open();
-    await settle();
-    fireEvent.click(screen.getByRole("button", { name: "Recent research", exact: true }));
-    expect(mocks.router.push).toHaveBeenCalledWith("/search?history=history-id");
+    expect(mocks.router.push).toHaveBeenCalledWith("/librarian?saved=saved-id");
     open();
     expect(screen.getByRole("button", { name: "New mission", exact: true })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Upload documents", exact: true })).toBeTruthy();

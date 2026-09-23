@@ -9,7 +9,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useRole } from "@/contexts/RoleContext";
 import { navigationApi, type NavigationEntityType, type NavigationGroup } from "@/lib/api/navigation";
 import { savedSearchesApi } from "@/lib/api/savedSearches";
-import { searchApi } from "@/lib/api/search";
 import { OPEN_COMMAND_PALETTE_EVENT } from "@/lib/command-palette";
 import { keepDialogFocus } from "@/lib/dialog-focus";
 
@@ -65,11 +64,9 @@ export function CommandPalette() {
   }, [term]);
 
   const { data, error, isLoading, mutate } = useSWR(open && userId && term && term === debounced ? ["palette-names", userId, term] : null, () => navigationApi.search(term));
-  const history = useSWR(open && userId ? ["palette-history", userId] : null, () => searchApi.history(5));
   const saved = useSWR(open && userId ? ["palette-saved", userId] : null, () => savedSearchesApi.list());
   const groups = data?.groups?.filter(group => group.total > 0) ?? [];
   const items = navigationGroups.filter(group => !group.admin || isAdmin).flatMap(group => group.items).filter(item => item.label.toLowerCase().includes(term.toLowerCase()));
-  const recent = history.data?.entries?.filter(entry => entry.query_text.toLowerCase().includes(term.toLowerCase())) ?? [];
   const savedItems = saved.data?.items?.filter(entry => entry.name.toLowerCase().includes(term.toLowerCase())) ?? [];
 
   function close() { setOpen(false); dialog.current?.close(); }
@@ -91,11 +88,10 @@ export function CommandPalette() {
     if (!dialog.current?.open) setOpen(false);
   }}>
     <div className="flex items-center justify-between border-b border-line px-5 py-3"><h2 id="command-title" className="text-sm font-medium">Search and navigation</h2><button type="button" aria-label="Close search" className="rounded-lg p-2" onClick={close}><NavigationIcon name="close" /></button></div>
-    <form onSubmit={event => { event.preventDefault(); if (term) go(`/search?q=${encodeURIComponent(term)}`); }} className="flex items-center gap-3 border-b border-line p-4"><NavigationIcon name="search" /><label htmlFor="command-query" className="sr-only">Search research or find a section</label><input ref={input} id="command-query" value={query} maxLength={200} onChange={event => setQuery(event.target.value)} placeholder="Find an object or search research…" className="min-w-0 flex-1 bg-transparent py-2 text-foreground placeholder:text-muted" autoComplete="off" /><button type="submit" className="rounded-lg bg-accent px-3 py-2 text-sm text-on-accent" disabled={!term}>Search</button></form>
+    <form onSubmit={event => { event.preventDefault(); if (term) go(`/librarian?q=${encodeURIComponent(term)}`); }} className="flex items-center gap-3 border-b border-line p-4"><NavigationIcon name="search" /><label htmlFor="command-query" className="sr-only">Search research or find a section</label><input ref={input} id="command-query" value={query} maxLength={200} onChange={event => setQuery(event.target.value)} placeholder="Find an object or search research…" className="min-w-0 flex-1 bg-transparent py-2 text-foreground placeholder:text-muted" autoComplete="off" /><button type="submit" className="rounded-lg bg-accent px-3 py-2 text-sm text-on-accent" disabled={!term}>Search</button></form>
     <div ref={results} className="max-h-[55vh] overflow-y-auto p-3">
       {term && (term !== debounced || isLoading ? <PageState state="loading" title="Finding objects…" /> : error ? <PageState state="error" title="Could not find objects" onRetry={() => void mutate()} /> : groups.length ? groups.map(group => <EntityGroup key={`${term}-${group.entity_type}`} initial={group} query={term} userId={userId} go={go} />) : <PageState state="empty" title="No matching objects">Press Enter to search your research.</PageState>)}
-      {history.error ? <PageState state="error" title="Could not load recent searches" onRetry={() => void history.mutate()} /> : recent.length > 0 && <section aria-label="Recent searches" className="py-2"><h3 className="px-3 py-2 text-xs text-muted">Recent searches</h3>{recent.map(entry => <button key={entry.id} type="button" data-command-item className={commandClass} onClick={() => go(`/search?history=${encodeURIComponent(entry.id)}`)}><span className="line-clamp-2 break-words">{entry.query_text}</span></button>)}</section>}
-      {saved.error ? <PageState state="error" title="Could not load saved searches" onRetry={() => void saved.mutate()} /> : savedItems.length > 0 && <section aria-label="Saved searches" className="py-2"><h3 className="px-3 py-2 text-xs text-muted">Saved searches</h3>{savedItems.map(entry => <button key={entry.id} type="button" data-command-item className={commandClass} onClick={() => go(`/search?saved=${encodeURIComponent(entry.id)}`)}><span className="line-clamp-2 break-words">{entry.name}</span></button>)}</section>}
+      {saved.error ? <PageState state="error" title="Could not load saved searches" onRetry={() => void saved.mutate()} /> : savedItems.length > 0 && <section aria-label="Saved searches" className="py-2"><h3 className="px-3 py-2 text-xs text-muted">Saved searches</h3>{savedItems.map(entry => <button key={entry.id} type="button" data-command-item className={commandClass} onClick={() => go(`/librarian?saved=${encodeURIComponent(entry.id)}`)}><span className="line-clamp-2 break-words">{entry.name}</span></button>)}</section>}
       {!term && <section aria-label="Actions" className="py-2"><h3 className="px-3 py-2 text-xs text-muted">Actions</h3><button type="button" data-command-item className={commandClass} onClick={() => go("/missions/new")}>New mission</button><button type="button" data-command-item className={commandClass} onClick={() => go("/projects/new")}>New project</button><button type="button" data-command-item className={commandClass} onClick={() => go("/collections/new")}>New collection</button><button type="button" data-command-item className={commandClass} onClick={() => go("/documents/upload")}>Upload documents</button></section>}
       {items.length > 0 && <section aria-label="Go to" className="py-2"><h3 className="px-3 py-2 text-xs text-muted">Go to</h3>{items.map(item => <button key={item.href} type="button" data-command-item className="app-nav-link w-full text-left" onClick={() => go(item.href)}><NavigationIcon name={item.icon} />{item.label}</button>)}</section>}
     </div>

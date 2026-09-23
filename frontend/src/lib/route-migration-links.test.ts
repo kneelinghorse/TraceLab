@@ -10,10 +10,10 @@ it("finds every internal alias, including a dynamic mission and trailing slash",
 
 it("preserves canonical and external source links while keeping credentials out of receipts", () => {
   const result = inspectInternalLinks([
-    "/", "/missions/MISSION-1", "/search?q=/console", "/settings?invite=secret#invites",
+    "/", "/missions/MISSION-1", "/librarian?q=/console", "/settings?invite=secret#invites",
     "https://example.test/console", "/projects/project-1", "/projects/project-1?tab=reports",
   ], "https://tracelab.aquex.ai/");
   expect(result.legacyInternalLinks).toEqual([]);
-  expect(result.internalLinks).toEqual(["/", "/missions/MISSION-1", "/projects/project-1", "/search", "/settings"]);
+  expect(result.internalLinks).toEqual(["/", "/librarian", "/missions/MISSION-1", "/projects/project-1", "/settings"]);
   expect(JSON.stringify(result)).not.toContain("secret");
 });

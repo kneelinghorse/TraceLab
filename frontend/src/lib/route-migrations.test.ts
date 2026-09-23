@@ -24,8 +24,9 @@ it("keeps permanent redirects for all aliases without redirecting canonical Home
   const redirects = await config.redirects!();
   const aliases = migrations.filter(row => row.kind === "redirect");
   expect(new Set(migrations.map(row => row.source)).size).toBe(migrations.length);
-  // ALIAS-1 retired seven of the eight; only /inbox, added later by ACT-1, still redirects.
-  expect(aliases).toHaveLength(1);
+  // ALIAS-1 retired seven of the eight; /inbox (ACT-1) and /search (QA-2, retired into the
+  // Librarian) are the live redirects.
+  expect(aliases).toHaveLength(2);
   expect(redirects).toHaveLength(aliases.length);
   for (const row of aliases) {
     expect(redirects).toContainEqual({ source: row.source, destination: row.destination, permanent: true });

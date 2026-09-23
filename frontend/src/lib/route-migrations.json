@@ -52,5 +52,11 @@
     "destination": "/",
     "kind": "redirect",
     "sprint": "53 (ACT-1)"
+  },
+  {
+    "source": "/search",
+    "destination": "/librarian",
+    "kind": "redirect",
+    "sprint": "59 (QA-2)"
   }
 ]

@@ -102,48 +102,6 @@ export interface RagResponsePayload {
   routing: RoutingDetails;
 }
 
-export interface SearchQueryParams {
-  query: string;
-  top_k?: number;
-  project_id?: string;
-  document_id?: string;
-  source_type?: string;
-  date_from?: string;
-  date_to?: string;
-  hnsw_ef?: number;
-  temperature?: number;
-  max_tokens?: number;
-}
-
-export interface SearchHistoryEntryPayload {
-  id: string;
-  query_text: string;
-  search_mode: string;
-  filters: Record<string, unknown>;
-  result_count: number;
-  top_k: number;
-  duration_ms?: number | null;
-  cache_hit: boolean;
-  user_label?: string | null;
-  metadata: Record<string, unknown>;
-  top_chunks: string[];
-  created_at: string;
-}
-
-export interface SearchHistoryResponse {
-  entries: SearchHistoryEntryPayload[];
-  retention: {
-    max_entries: number;
-    max_age_days: number;
-  };
-}
-
-export interface SearchReplayResponse {
-  entry: SearchHistoryEntryPayload;
-  rag: RagResponsePayload;
-  semantic: SemanticSearchResponse;
-}
-
 // PEDR Search Types
 
 export interface PEDRSearchParams {
@@ -237,10 +195,3 @@ export interface PEDRSearchResponse {
   metadata: PEDRSearchMetadata;
 }
 
-export interface SearchFacetResponse {
-  projects: Array<{ value: string; label: string; count: number }>;
-  document_types: Array<{ value: string; label: string; count: number }>;
-  source_types: Array<{ value: string; label: string; count: number }>;
-  tags: Array<{ value: string; label: string; count: number }>;
-  date_range: { min: string | null; max: string | null };
-}

@@ -7,6 +7,7 @@ import useSWR from "swr";
 import { AuthGate } from "@/components/AuthGate";
 import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 import { SpacePicker } from "@/components/SpacePicker";
+import { ChunkList, type ChunkListRequest } from "@/components/librarian/ChunkList";
 import { useFeedback } from "@/components/ui/useFeedback";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -43,9 +44,13 @@ import {
  * "Ask the documents" (QA-1, decision #543) answers a question from the
  * project's documents instead: each cited passage links to the chunk it came
  * from, and a question the project cannot support is refused, never guessed.
+ *
+ * "List the chunks" (QA-2, decision #545) is search inside the Librarian: the ranked
+ * chunks for a phrase, each opening in its document, savable as a collection. The URL
+ * carries it (?q=, or ?saved= for a saved search), which is where /search now redirects.
  */
 
-type Mode = "converse" | "answer";
+type Mode = "converse" | "answer" | "list";
 
 function toTranscript(turns: Turn[]): TranscriptMessage[] {
   return turns.map((turn) =>
@@ -237,6 +242,13 @@ function LibrarianContent() {
   const { notify, feedback } = useFeedback();
   const projects = useSWR(["librarian-projects", user?.user_id], () => projectsApi.listAllProjects());
   const queryProject = typeof router.query.project === "string" ? router.query.project : "";
+  const queryText = typeof router.query.q === "string" ? router.query.q.trim() : "";
+  const savedId = typeof router.query.saved === "string" ? router.query.saved.trim() : "";
+  const listRequest: ChunkListRequest | null = savedId
+    ? { kind: "saved", savedId }
+    : queryText
+      ? { kind: "query", query: queryText, projectId: queryProject }
+      : null;
   const [projectId, setProjectId] = useState(queryProject);
   const [newProjectName, setNewProjectName] = useState("");
   const [newProjectSpace, setNewProjectSpace] = useState("");
@@ -262,6 +274,12 @@ function LibrarianContent() {
   useEffect(() => {
     if (queryProject) setProjectId(queryProject);
   }, [queryProject]);
+  useEffect(() => {
+    // A list named in the URL (a link, a saved search, the /search redirect) opens in list mode.
+    if (!queryText && !savedId) return;
+    setMode("list");
+    if (queryText) setInput(queryText);
+  }, [queryText, savedId]);
   useEffect(() => {
     const stored = readLibrarianState(storageUser);
     setTurns(stored?.turns ?? []);
@@ -290,6 +308,7 @@ function LibrarianContent() {
   const project = useMemo(() => projects.data?.find((item) => item.id === projectId) ?? null, [projects.data, projectId]);
   // Asking needs a project: an answer comes from one project's documents.
   const answering = mode === "answer" && Boolean(projectId);
+  const listing = mode === "list";
   const lastAssistant = [...turns].reverse().find((turn) => turn.role === "assistant");
   const suggested = lastAssistant?.role === "assistant" && lastAssistant.suggested;
   const canDraft = turns.some((turn) => turn.role === "user") && Boolean(projectId) && !sending;
@@ -312,6 +331,11 @@ function LibrarianContent() {
   async function send(text: string) {
     const trimmed = text.trim();
     if (!trimmed || sending) return;
+    if (listing) {
+      // The list lives in the URL, so a reload or a shared link shows the same one.
+      void router.push({ pathname: "/librarian", query: { q: trimmed, ...(projectId ? { project: projectId } : {}) } }, undefined, { shallow: true });
+      return;
+    }
     const next: Turn[] = [...turns, { role: "user", text: trimmed }];
     setTurns(next);
     setInput("");
@@ -405,7 +429,7 @@ function LibrarianContent() {
       <header className="space-y-2">
         <h1 className="text-2xl font-semibold text-foreground">Librarian</h1>
         <p className="text-secondary">
-          Describe what you want to learn. The Librarian helps shape it into a research question, then drafts a DeepSearch mission you review and run. Or ask a question about a project&apos;s documents and get an answer that cites them.
+          Describe what you want to learn. The Librarian helps shape it into a research question, then drafts a DeepSearch mission you review and run. Or ask a question about a project&apos;s documents and get an answer that cites them, or list the chunks that match a phrase.
         </p>
         <p className="text-sm text-muted">
           Plain text is the Librarian speaking from general knowledge. A highlighted passage is a claim about this project&apos;s documents or evidence and links to what it cites.
@@ -485,7 +509,12 @@ function LibrarianContent() {
               Ask a question about {project?.name ?? "this project"}&apos;s documents. The answer comes only from them and every claim links to the chunk it came from; if nothing there answers it, the Librarian says so.
             </p>
           )}
-          {turns.length === 0 && !answering && (
+          {turns.length === 0 && listing && (
+            <p className="text-secondary">
+              List the chunks that match a phrase in {project?.name ?? "all your projects"}, best match first. Each one opens at its place in the document, and the list can be saved as a collection.
+            </p>
+          )}
+          {turns.length === 0 && !answering && !listing && (
             <div className="space-y-3">
               <p className="text-secondary">Start with the question you cannot quite phrase yet. For example:</p>
               <ul className="space-y-2">
@@ -532,12 +561,16 @@ function LibrarianContent() {
         <div className="mt-4 space-y-2 text-sm">
           <div role="radiogroup" aria-label="How the Librarian replies" className="flex flex-wrap items-center gap-x-4 gap-y-1">
             <label className="flex items-center gap-2">
-              <input type="radio" name="librarian-mode" value="converse" checked={!answering} onChange={() => setMode("converse")} />
+              <input type="radio" name="librarian-mode" value="converse" checked={!answering && !listing} onChange={() => setMode("converse")} />
               Talk it through
             </label>
             <label className={`flex items-center gap-2 ${projectId ? "" : "text-muted"}`} title={projectId ? undefined : "Choose a project to ask about its documents"}>
               <input type="radio" name="librarian-mode" value="answer" checked={answering} disabled={!projectId} onChange={() => setMode("answer")} />
               Ask the documents
+            </label>
+            <label className="flex items-center gap-2">
+              <input type="radio" name="librarian-mode" value="list" checked={listing} onChange={() => setMode("list")} />
+              List the chunks
             </label>
           </div>
           {answering && (
@@ -565,13 +598,19 @@ function LibrarianContent() {
               onChange={(event) => setInput(event.target.value)}
               onKeyDown={onComposerKey}
               rows={2}
-              placeholder={answering ? `Ask a question about ${project?.name ?? "this project"}'s documents…` : "Ask anything, or describe what you want to research…"}
+              placeholder={
+                answering
+                  ? `Ask a question about ${project?.name ?? "this project"}'s documents…`
+                  : listing
+                    ? `Words or a phrase to find in ${project?.name ?? "all your projects"}…`
+                    : "Ask anything, or describe what you want to research…"
+              }
               className="w-full resize-none rounded-xl border border-line bg-surface px-4 py-3 text-foreground placeholder:text-muted focus:border-info-line focus:outline-none focus:ring-2 focus:ring-focus"
             />
           </div>
           <div className="flex gap-2">
             <button type="submit" disabled={sending || !input.trim()} className={suggested ? secondaryButton : primaryButton}>
-              {sending ? (answering ? "Asking…" : "Sending…") : answering ? "Ask" : "Send"}
+              {sending ? (answering ? "Asking…" : "Sending…") : answering ? "Ask" : listing ? "List" : "Send"}
             </button>
             <button
               type="button"
@@ -588,6 +627,9 @@ function LibrarianContent() {
         {suggested && !draft && <p className="mt-2 text-sm text-accent-text">The Librarian thinks there is enough here for a mission.</p>}
       </section>
 
+      {listing && listRequest && (
+        <ChunkList key={listRequest.kind === "saved" ? listRequest.savedId : `${listRequest.projectId}:${listRequest.query}`} request={listRequest} projects={projects.data ?? []} />
+      )}
       {draft && <DraftPanel draft={draft} creating={creating} onCreate={() => void createMission()} onDismiss={() => setDraft(null)} panelRef={draftPanelRef} />}
       {feedback}
     </div>

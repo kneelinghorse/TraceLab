@@ -25,7 +25,7 @@ const mission=missions.data.find(m=>m.mission_id==='TL-UX-R001')||missions.data[
 const ids={project:project.id,document:documents.data[0].id,mission:mission.id,report:reports.items[0].id,collection:collections.data[0]?.id};
 await fs.writeFile(out+'/inventory.json',JSON.stringify({ids,projectName:project.name,missionName:mission.mission_id,role:me.role},null,2));
 const evidence = await get('/evidence?project_id='+project.id);
-const routes=['/','/graph',`/graph?root=project:${ids.project}`,'/projects','/projects/new',`/projects/${ids.project}`,'/documents',`/documents/${ids.document}`,'/documents/upload','/collections','/collections/new',`/collections/${ids.collection}`,'/reports',`/reports/${ids.report}`,'/missions',`/missions/${ids.mission}`,`/missions/${ids.mission}?tab=results`,'/missions/new','/missions?status=completed&sort=updated_desc','/search','/librarian','/saved-searches','/settings','/device','/admin/users','/admin/spaces','/404','/evidence','/admin/observability','/admin/corrections',...(evidence.entries[0]?['/evidence/'+evidence.entries[0].id]:[])];
+const routes=['/','/graph',`/graph?root=project:${ids.project}`,'/projects','/projects/new',`/projects/${ids.project}`,'/documents',`/documents/${ids.document}`,'/documents/upload','/collections','/collections/new',`/collections/${ids.collection}`,'/reports',`/reports/${ids.report}`,'/missions',`/missions/${ids.mission}`,`/missions/${ids.mission}?tab=results`,'/missions/new','/missions?status=completed&sort=updated_desc','/search','/librarian',`/librarian?q=Qdrant&project=${ids.project}`,'/saved-searches','/settings','/device','/admin/users','/admin/spaces','/404','/evidence','/admin/observability','/admin/corrections',...(evidence.entries[0]?['/evidence/'+evidence.entries[0].id]:[])];
 const selected=process.env.UI_ROUTE?[process.env.UI_ROUTE]:process.env.UI_PROBE?['/missions','/search','/settings','/admin/users','/evidence']:routes;
 browser=await chromium.launch({headless:true});
 const results=[];
@@ -36,8 +36,8 @@ for (const theme of (process.env.UI_THEME?[process.env.UI_THEME]:['light','dark'
   await context.route(/https?:\/\/(api\.tracelab\.aquex\.ai|localhost:8000|127\.0\.0\.1:8103)\/.*/, async route => {
     const incoming = new URL(route.request().url());
     const method = route.request().method();
-    // Facet metadata is an authenticated read even though its API uses POST.
-    const readOnly = method === 'GET' || (method === 'POST' && incoming.pathname === '/api/v1/facets');
+    // The Librarian's chunk list is an authenticated read even though its API uses POST (QA-2).
+    const readOnly = method === 'GET' || (method === 'POST' && incoming.pathname === '/api/v1/pedr/search');
     // Opening a mission or report marks it viewed (ACT-1). The smoke must not write, so it answers that call locally.
     const localWrite = method === 'PUT' && incoming.pathname === '/api/v1/activity/viewed';
     try {
