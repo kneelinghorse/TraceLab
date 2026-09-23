@@ -24,6 +24,19 @@ Tests: `tests/test_project_management_api.py::TestProjectSpaceForMembers`
 (member of one Space creates there; members of none or several keep Default;
 owner and admin with one Space keep Default).
 
+> **Corrected at the Sprint 58 close (2026-09-23, session `PS-2026-09-22-012`,
+> receipt re-verification per decision #509).** PERSONAL-1 replaced this
+> placement in PR #363 (`fec1893`, decision #532). `sole_space_id()` is gone
+> from `app/core/authorization.py`. `default_workspace_id(db, caller)` now
+> returns the caller's personal Space for every human caller, and
+> `TestProjectSpaceForMembers` became
+> `TestProjectLandsInPersonalSpace`. PERSONAL-2 (PR #366, `2bcc766`, decision
+> #533) then let a caller name one of their own Spaces. The migration moved
+> `d2d6519c` to the guest's personal Space. The table, the test line and the
+> first production line above describe the code at `34b6c30`. Decisions #528
+> and #529 are superseded by #534, which restates their BADGE-1 halves, and
+> the BADGE-1 half of this receipt still holds.
+
 **Production, as the re-enabled guest `walk1-guest@tracelab.local`:**
 
 ```
