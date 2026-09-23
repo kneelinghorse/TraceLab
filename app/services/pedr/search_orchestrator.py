@@ -866,7 +866,11 @@ class PEDRSearchOrchestrator:
                     document_id=document_id,
                 )
                 graph_layer.metadata = dict(graph_layer.metadata or {})
-                graph_layer.metadata["total_candidates"] = len(graph_layer.results)
+                # The graph layer also ranks its seeds (depth 0); only reached
+                # chunks count as expanded.
+                graph_layer.metadata["total_candidates"] = sum(
+                    1 for entry in graph_layer.results if entry.get("depth") != 0
+                )
                 graph_layer_result = graph_layer
                 timings.graph_ms = graph_layer.latency_ms or (
                     (time.perf_counter() - t0) * 1000

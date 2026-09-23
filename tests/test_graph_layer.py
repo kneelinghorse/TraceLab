@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import uuid
+from unittest.mock import MagicMock
 
 import pytest
 from sqlalchemy import (
@@ -21,6 +22,7 @@ from app.core.database import engine
 from app.models import Document, DocumentChunk, GraphEdge, Mission, Project, Report
 from app.models.types import GUID
 from app.services.pedr.graph_layer import GraphLayerConfig, GraphLayerService, URNParser
+from app.services.pedr.search_orchestrator import PEDRSearchOrchestrator
 from app.services.pedr.semantic_protocol import URNGenerator
 
 
@@ -192,8 +194,11 @@ def test_depth_boundary_keeps_candidates_without_reading_their_edges(
         event.remove(bind, "before_cursor_execute", capture_adjacency_reads)
 
     expected = set(mids) | (set(leaves) if max_depth == 2 else set())
-    assert {entry["urn"] for entry in layer.results} == expected
-    for entry in layer.results:
+    # The seed leads the ranking (RAG-4); every other result was reached from it.
+    seed_entry, *reached = layer.results
+    assert (seed_entry["urn"], seed_entry["depth"]) == (seed, 0)
+    assert {entry["urn"] for entry in reached} == expected
+    for entry in reached:
         depth = 1 if entry["urn"] in mids else 2
         assert entry["depth"] == depth
         assert entry["score"] == pytest.approx(0.7**depth)
@@ -268,7 +273,10 @@ def test_cycle_handling(db_session, graph_layer):
     urns = {entry["urn"] for entry in layer.results}
 
     assert other in urns
-    assert seed not in urns
+    # The cycle back does not add the seed again as a reached candidate: it
+    # appears once, at depth 0 with its own score (RAG-4 ranks seeds first).
+    seed_entries = [entry for entry in layer.results if entry["urn"] == seed]
+    assert [(entry["depth"], entry["score"]) for entry in seed_entries] == [(0, 1.0)]
 
 
 def test_expand_from_results_prefers_urn(db_session, graph_layer):
@@ -470,3 +478,118 @@ def test_expand_from_results_top_k_limit(db_session, graph_layer):
     urns = {entry["urn"] for entry in layer.results}
     assert target_a in urns
     assert target_b not in urns
+
+
+def test_seeds_lead_the_ranking_in_retrieval_order(db_session, graph_layer, project):
+    """Seeds rank first in the order retrieval gave them, not by score (RAG-4).
+
+    Seed scores mix scales: a lexical seed carries ts_rank_cd and a semantic seed
+    a cosine. Ranked by score, the semantic seed's neighbour (0.66 x 0.7) would
+    pass the lexical seed (0.05) that retrieval put first.
+    """
+    document, chunks = _create_document_with_chunks(db_session, project, chunk_count=3)
+    lexical_seed, semantic_seed, neighbour = (
+        str(URNGenerator.for_chunk(str(document.id), index)) for index in range(3)
+    )
+    _add_edge(db_session, semantic_seed, neighbour, "related_to")
+
+    results = [
+        {"document_id": str(document.id), "chunk_index": 0, "score": 0.05},
+        {"document_id": str(document.id), "chunk_index": 1, "score": 0.66},
+    ]
+    layer = graph_layer.expand_from_results(
+        results, top_k=2, config=GraphLayerConfig(max_depth=1)
+    )
+
+    assert [(entry["urn"], entry["depth"]) for entry in layer.results] == [
+        (lexical_seed, 0),
+        (semantic_seed, 0),
+        (neighbour, 1),
+    ]
+    assert [entry["chunk_id"] for entry in layer.results] == [
+        str(chunk.id) for chunk in chunks
+    ]
+    # Seeds are ranked, not reached: the metadata still counts reached chunks only.
+    assert layer.metadata["total_candidates"] == 1
+
+
+def test_best_match_keeps_first_place_over_its_graph_neighbours(db_session, project):
+    """RAG-4, in the production shape: the best match ranks first with the graph on.
+
+    On production the chunk that answers a question was semantic rank 1 and came
+    15th with the graph layer on, because the layer never ranked its seeds: their
+    neighbours (semantic rank 11 and worse, graph rank 2 or 3) took a graph share
+    on top of their semantic one and the seed took none. Here the best match links
+    to a neighbour at semantic rank 11, which that ranking put at graph rank 2
+    (behind a semantic-rank-23 neighbour whose URN sorts first), and so first.
+    """
+    main = Document(
+        id=uuid.UUID("b0000000-0000-0000-0000-000000000000"),
+        project_id=project.id,
+        name="Main",
+        content="test",
+    )
+    side = Document(
+        id=uuid.UUID("a0000000-0000-0000-0000-000000000000"),
+        project_id=project.id,
+        name="Side",
+        content="test",
+    )
+    db_session.add_all([main, side])
+    db_session.flush()
+    # Semantic ranks 1-22 are chunks 0-21 of Main, rank 23 is chunk 0 of Side.
+    placed = [(main, index) for index in range(22)] + [(side, 0)]
+    rows = [
+        DocumentChunk(document_id=document.id, chunk_index=index, content=f"text {rank}")
+        for rank, (document, index) in enumerate(placed, start=1)
+    ]
+    db_session.add_all(rows)
+    db_session.commit()
+    semantic = [
+        {
+            "chunk_id": str(row.id),
+            "content": row.content,
+            "document_id": str(row.document_id),
+            "project_id": str(project.id),
+            "chunk_index": row.chunk_index,
+            # Production cosines: 0.664 at rank 1, falling below 0.45 by rank 23.
+            "score": round(0.664 - 0.01 * (rank - 1), 3),
+        }
+        for rank, row in enumerate(rows, start=1)
+    ]
+    best, neighbour, far = rows[0], rows[10], rows[22]
+    for target in (neighbour, far):
+        _add_edge(
+            db_session,
+            str(URNGenerator.for_chunk(str(best.document_id), best.chunk_index)),
+            str(URNGenerator.for_chunk(str(target.document_id), target.chunk_index)),
+            "related_to",
+        )
+
+    orchestrator = PEDRSearchOrchestrator(
+        lexical_search=MagicMock(return_value=[]),
+        semantic_search=MagicMock(return_value=semantic),
+        graph_service=GraphLayerService(session=db_session),
+        telemetry_enabled=False,
+    )
+    response = orchestrator.search(
+        query="rag-4 best match keeps first place", top_k=23, enable_graph=True
+    )
+
+    ranked = {result.chunk_id: result for result in response.results}
+    top = [
+        (result.layer_ranks.get("semantic"), result.layer_ranks.get("graph"))
+        for result in response.results[:3]
+    ]
+    assert response.results[0].chunk_id == str(best.id), (
+        f"(semantic rank, graph rank) of the top three: {top}"
+    )
+    assert ranked[str(best.id)].layer_ranks == {"semantic": 1, "graph": 1}
+    # The ten seeds hold the top ten in semantic order; the neighbour was reached
+    # and ranks below every one of them.
+    assert [result.chunk_id for result in response.results[:10]] == [
+        str(row.id) for row in rows[:10]
+    ]
+    assert ranked[str(neighbour.id)].layer_ranks["semantic"] == 11
+    assert "graph" in ranked[str(neighbour.id)].layer_ranks
+    assert response.metadata.graph_candidates_expanded == 2

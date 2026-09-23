@@ -373,35 +373,30 @@ class TestGraphSearchE2EValidation:
         assert result.metadata.graph_enabled is False
 
     def test_graph_impacts_results(self, graph_search_env):
-        """Graph expansion either surfaces new results or changes rankings."""
-        comparisons = [_compare_query(graph_search_env, q) for q in VALIDATION_QUERIES]
-        queries_with_new = [c for c in comparisons if len(c.new_results_from_graph) > 0]
-        queries_with_rank_changes = [
-            c
-            for c in comparisons
-            if any(delta != 0 for delta in c.rank_changes.values())
-        ]
-        impacted = len(
-            set(c.query for c in queries_with_new + queries_with_rank_changes)
-        )
-        # Graph should impact at least some queries (new results or re-ranking)
-        assert impacted >= 1, (
-            f"Expected graph to impact at least 1 query via new results or re-ranking, "
-            f"but 0/{len(comparisons)} queries were affected"
+        """Graph expansion surfaces chunks that retrieval missed.
+
+        The stub matches whole tokens, so "0]" (from each chunk's "[chunk 0]"
+        marker) finds only the first chunk of every document; the graph reaches
+        their siblings through the document. Before RAG-4 this test counted rank
+        changes on the 12 queries, and every one was a seed's neighbour jumping
+        above the seeds, the defect RAG-4 removes.
+        """
+        comparison = _compare_query(graph_search_env, "0] latency")
+        assert comparison.new_results_from_graph, (
+            f"graph added nothing to {comparison.graph_off_count} retrieval results"
         )
 
-    def test_graph_changes_rankings(self, graph_search_env):
-        """Graph layer affects result rankings for at least some queries."""
-        comparisons = [_compare_query(graph_search_env, q) for q in VALIDATION_QUERIES]
-        queries_with_rank_changes = [
-            c
-            for c in comparisons
-            if any(delta != 0 for delta in c.rank_changes.values())
-        ]
-        # Graph should change rankings for some queries
-        assert len(queries_with_rank_changes) >= 1, (
-            "Graph layer did not change rankings for any of the 12 queries"
-        )
+    def test_graph_never_moves_a_chunk_above_its_seeds(self, graph_search_env):
+        """RAG-4: the graph layer leaves the best matches where retrieval put them.
+
+        The lexical and semantic stubs return the same list, so the ten seeds are
+        the top five chunks. Before RAG-4 the graph layer never ranked a seed, and
+        in four of these queries the first chunk after the seeds took a graph share
+        on top of its retrieval rank and jumped from sixth to first.
+        """
+        for query in VALIDATION_QUERIES:
+            comparison = _compare_query(graph_search_env, query)
+            assert comparison.graph_on_top_ids == comparison.graph_off_top_ids, query
 
     def test_graph_latency_acceptable(self, graph_search_env):
         """Graph layer adds acceptable latency (<500ms per query)."""
