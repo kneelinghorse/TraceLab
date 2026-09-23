@@ -1,7 +1,7 @@
 """Per-user usage records (METER-0, decision #522).
 
-One durable row per DeepSearch run and per Librarian model call, attributed to
-the user who caused it. Data only: no limits, no quotas, no billing. The row
+One durable row per DeepSearch run and per Librarian or search-ask model call,
+attributed to the user who caused it. Data only: no limits, no quotas, no billing. The row
 exists so that "what did this user consume last month" is a query, and so the
 history exists when Derek decides to meter.
 """
@@ -30,6 +30,8 @@ from app.models.types import GUID, CrossDBJSON
 USAGE_KIND_DEEPSEARCH_RUN = "deepsearch_run"
 USAGE_KIND_LIBRARIAN_TURN = "librarian_turn"
 USAGE_KIND_LIBRARIAN_DRAFT = "librarian_draft"
+# POST /search/ask, the MCP's tracelab_search ask (MCP-6).
+USAGE_KIND_SEARCH_ASK = "search_ask"
 
 ATTRIBUTION_SUBMITTER = "submitter"
 ATTRIBUTION_PROJECT_OWNER = "project_owner"

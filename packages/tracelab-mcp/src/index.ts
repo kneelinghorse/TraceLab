@@ -9,7 +9,7 @@
  * parameter to the existing per-action handlers below.
  *
  * Clusters:
- * 1. tracelab_search           — actions: knowledge, navigate, pedr
+ * 1. tracelab_search           — actions: knowledge, navigate, pedr, ask
  * 2. tracelab_project          — actions: list, create, update, stats, get, neighborhood
  * 3. tracelab_collection       — actions: list, get, export, create, add, synthesize, documents, mission_seed, update, add_document
  * 4. tracelab_report           — actions: create, list, get, export, update
@@ -83,7 +83,7 @@ export const TOOLS: Tool[] = [
   {
     name: 'tracelab_search',
     description:
-      'Search TraceLab content and navigate readable entities. Optional pedr performs multi-layer search and exposes graph/diagnostic metadata; no ranking-quality advantage is implied. knowledge remains plain retrieval. navigate uses q, entity_type, page and page_size. Returns ranked chunks with content excerpts and document references. Actions: knowledge (find chunks matching a natural-language query). Required for action="knowledge": query. Related clusters: tracelab_document (read full text), tracelab_collection (organize chunks).',
+      'Search TraceLab content and navigate readable entities. Optional pedr performs multi-layer search and exposes graph/diagnostic metadata; no ranking-quality advantage is implied. knowledge remains plain retrieval. navigate uses q, entity_type, page and page_size. Returns ranked chunks with content excerpts and document references. Actions: knowledge (find chunks matching a natural-language query), ask (answer a question from one project\'s documents through the same Q&A service as the Librarian). Required for action="knowledge": query. Required for action="ask": project_id and question; optional max_tokens. ask returns the answer, passages (each with the chunk ids it cites), citations (chunk_id, document_id, document_name, chunk_index, snippet, href and a browser url) and no_evidence, which is true when nothing in the project answers the question; the answer then asserts nothing. It answers only from a project you can read (403 otherwise). Related clusters: tracelab_document (read full text), tracelab_collection (organize chunks).',
     inputSchema: {
       type: 'object',
       properties: {
@@ -96,10 +96,12 @@ export const TOOLS: Tool[] = [
         entity_type: { type: 'string', enum: ['project', 'document', 'mission', 'report', 'collection', 'evidence'] },
         page: { type: 'integer', minimum: 1 },
         page_size: { type: 'integer', minimum: 1, maximum: 50 },
+        question: { type: 'string', minLength: 1, maxLength: 20000, description: 'The question for action="ask", answered from the documents of project_id.' },
+        max_tokens: { type: 'integer', minimum: 64, maximum: 4000, description: 'Answer budget for action="ask"; omitted uses the server default. The Librarian uses 600 for a short answer and 2000 for a full synthesis.' },
         action: {
           type: 'string',
-          enum: ['knowledge', 'navigate', 'pedr'],
-          description: 'Search action. knowledge: plain semantic retrieval. navigate: name lookup. pedr: multi-layer retrieval with optional graph expansion.',
+          enum: ['knowledge', 'navigate', 'pedr', 'ask'],
+          description: 'Search action. knowledge: plain semantic retrieval. navigate: name lookup. pedr: multi-layer retrieval with optional graph expansion. ask: a cited answer from one project\'s documents, or an explicit nothing-found result.',
         },
         query: {
           type: 'string',
@@ -107,7 +109,7 @@ export const TOOLS: Tool[] = [
         },
         project_id: {
           type: 'string',
-          description: 'Scope search to a specific project UUID. Get project IDs from tracelab_project(action="list").',
+          description: 'Scope search to a specific project UUID. Required for action="ask". Get project IDs from tracelab_project(action="list").',
         },
         limit: {
           type: 'number',
@@ -783,6 +785,13 @@ const SearchKnowledgeInput = z.object({
 
 const PedrSearchInput = z.object({ query: z.string().trim().min(1).max(2000), top_k: z.number().int().min(1).max(100).default(10), project_id: z.string().uuid().optional(), ...SearchFilterFields, enable_graph: z.boolean().default(true) });
 
+// MCP-6: the bounds are the REST AskRequest's (the Librarian's message and answer budget).
+const AskInput = z.object({
+  project_id: z.string().uuid(),
+  question: z.string().trim().min(1).max(20000),
+  max_tokens: z.number().int().min(64).max(4000).optional(),
+});
+
 const ListProjectsInput = z.object({
   page: z.number().min(1).optional().default(1),
   page_size: z.number().min(1).max(100).optional().default(20),
@@ -1135,6 +1144,14 @@ async function handleSearchPedr(args: unknown) {
     document_url: canonicalLink('document', item.document_id),
     project_url: canonicalLink('project', item.project_id),
   })) });
+}
+
+// MCP-6: QA-1's Q&A service over POST /search/ask. Each citation keeps its href
+// and gains the absolute browser url that opens the chunk.
+async function handleSearchAsk(args: unknown) {
+  const input = AskInput.parse(args);
+  const result = await client.askQuestion(input);
+  return rawJsonResponse({ ...result, project_url: canonicalLink('project', input.project_id), citations: result.citations.map(withHrefUrl) });
 }
 
 async function handleSearchKnowledge(args: unknown) {
@@ -2419,10 +2436,12 @@ function unknownAction(tool: string, action: string, valid: readonly string[]) {
   };
 }
 
-const SEARCH_ACTIONS = ['knowledge', 'navigate', 'pedr'] as const;
+const SEARCH_ACTIONS = ['knowledge', 'navigate', 'pedr', 'ask'] as const;
 export async function handleTracelabSearch(args: unknown) {
   const action = getAction(args);
   switch (action) {
+    case 'ask':
+      return await handleSearchAsk(args);
     case 'pedr':
       return await handleSearchPedr(args);
     case 'navigate':

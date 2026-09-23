@@ -43,11 +43,11 @@ reused only when its API base matches `TRACELAB_API_URL`. Automation may set
 
 ## Tool surface
 
-Version 2.0.0 exposes nine action-clustered tools / 49 actions:
+Version 2.1.0 exposes nine action-clustered tools / 50 actions:
 
 | Tool | Actions |
 | --- | --- |
-| `tracelab_search` | `knowledge`, `navigate`, `pedr` |
+| `tracelab_search` | `knowledge`, `navigate`, `pedr`, `ask` |
 | `tracelab_project` | `list`, `get`, `create`, `update`, `stats`, `neighborhood` |
 | `tracelab_collection` | `list`, `get`, `export`, `create`, `add`, `synthesize`, `documents`, `mission_seed`, `update`, `add_document` |
 | `tracelab_report` | `create`, `list`, `get`, `export`, `update` |
@@ -85,7 +85,9 @@ documents the eleven MCP-1 reads and the existing action extensions, and its
 covers the MCP-2 actions and reads. Per-user acknowledgements and every DELETE
 route stay in the web UI by decision #426.
 `knowledge` keeps plain retrieval; optional `pedr` exposes multi-layer and graph
-diagnostics. Logs/events are persisted snapshots and explicitly report empty
+diagnostics. `ask` (2.1.0) answers a question from one project's documents
+through the Librarian's Q&A service: every citation opens a chunk the answer
+was written from, and `no_evidence` marks a question the project cannot support. Logs/events are persisted snapshots and explicitly report empty
 results; they do not promise live streaming.
 
 ## Contract authorities

@@ -1,9 +1,11 @@
 """Schemas for RAG query requests and responses."""
 
 from typing import Literal
+from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
+from app.schemas.librarian import ANSWER_MAX_TOKENS, ANSWER_MIN_TOKENS
 from app.schemas.retrieval import RetrievalQuery, RetrievedChunk
 
 
@@ -125,3 +127,51 @@ class RagResponse(BaseModel):
             "the answer says so, and citations is empty."
         ),
     )
+
+
+class AskRequest(BaseModel):
+    """A question about one project's documents (MCP-6: the MCP's tracelab_search ask)."""
+
+    project_id: UUID = Field(description="The project whose documents answer the question.")
+    question: str = Field(min_length=1, max_length=20_000, description="The question, as the Librarian takes it.")
+    max_tokens: int | None = Field(
+        default=None,
+        ge=ANSWER_MIN_TOKENS,
+        le=ANSWER_MAX_TOKENS,
+        description="Answer budget. Defaults to settings.rag_default_max_tokens.",
+    )
+
+    @field_validator("question")
+    @classmethod
+    def _question_is_not_blank(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("The question must not be empty.")
+        return value
+
+
+class AskPassage(BaseModel):
+    """One paragraph of an answer and the chunk ids it cites; empty when uncited."""
+
+    text: str
+    citations: list[str]
+
+
+class AskCitation(BaseModel):
+    """A chunk the answer cites, and the page that opens it."""
+
+    chunk_id: str
+    document_id: str
+    document_name: str
+    chunk_index: int | None = None
+    snippet: str | None = None
+    href: str
+
+
+class AskResponse(BaseModel):
+    """A cited answer from corpus_qa.answer_question, or its refusal (no_evidence)."""
+
+    answer: str
+    passages: list[AskPassage]
+    citations: list[AskCitation]
+    no_evidence: bool
+    model: str | None = None

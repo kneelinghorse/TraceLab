@@ -10,7 +10,8 @@ Three write paths, all idempotent on (mission_id, kind):
   terminal mission with no row yet, attributed to the project owner because
   the submitter is unknown for history. This is also the backfill.
 
-Librarian calls record one row each through ``record_librarian_usage``.
+Librarian and search-ask model calls record one row each through
+``record_librarian_usage``.
 Nothing here limits, blocks or bills; that is the whole point of the mission.
 """
 
@@ -239,7 +240,7 @@ def record_librarian_usage(
     requests: int,
     provider: str | None = None,
 ) -> UsageRecord | None:
-    """One row per Librarian call. Never raises: telemetry must not fail a turn."""
+    """One row per Librarian or search-ask model call. Never raises: telemetry must not fail a turn."""
     if not usage:
         return None
     try:

@@ -7,6 +7,27 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.1.0] — 2026-09-23
+
+A **minor** release: one new action; nothing is removed or changed (mission
+MCP-6, decision #547).
+
+### Added
+
+- `tracelab_search.ask`: answers a question from one project's documents through
+  the same Q&A service as the Librarian's "Ask the documents", over
+  `POST /search/ask`. Required `project_id` and `question` (1–20,000 characters);
+  optional `max_tokens` answer budget (64–4000; omitted uses the server default;
+  the Librarian offers 600 for a short answer and 2000 for a full synthesis).
+  Returns `answer`, `passages` (each paragraph with the chunk ids it cites),
+  `citations` (`chunk_id`, `document_id`, `document_name`, `chunk_index`,
+  `snippet`, `href` and an absolute `url` that opens the chunk), `project_url`
+  and `no_evidence`, which is true when nothing in the project answers the
+  question; the answer then asserts nothing. Every citation is a chunk the model
+  read, in a document that still exists. It answers only from a project the
+  caller can read (403 otherwise, 404 for an unknown project) and needs a human
+  credential; each paid model call is recorded as the caller's usage.
+
 ## [2.0.0] — 2026-09-23
 
 A **major** release: the removals below break callers of the 1.2.0 action
