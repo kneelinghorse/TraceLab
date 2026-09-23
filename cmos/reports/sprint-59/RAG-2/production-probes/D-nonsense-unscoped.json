@@ -1,0 +1,111 @@
+{
+  "probe": "D-nonsense-unscoped",
+  "sent_at_utc": "2026-09-23T05:36:49Z",
+  "request": {
+    "query": "Summarize the qwibbet flensing ratios recorded at Dornhollow station.",
+    "top_k": 5
+  },
+  "status": 200,
+  "checks": {
+    "deployed_build_has_no_evidence_field": true,
+    "cache_hit": false,
+    "no_evidence": false,
+    "sources": 1,
+    "citations": 0,
+    "labels_in_answer_text": 1,
+    "model_attempts": 2,
+    "completion_tokens": [
+      null,
+      null
+    ],
+    "citation_resolution": [],
+    "every_citation_resolves": true
+  },
+  "response": {
+    "answer": "The provided context contains no information about qwibbet flensing ratios or Dornhollow station, so I can\u2019t summarize the recorded ratios from it. [Document: Unknown, Chunk: N/A]",
+    "citations": [],
+    "sources": [
+      {
+        "chunk_id": "606f3f31-522e-49b6-afd7-f5209136a08e",
+        "content": "",
+        "document_id": null,
+        "project_id": null,
+        "chunk_index": null,
+        "source_type": null,
+        "document_type": null,
+        "collection_date": null,
+        "tags": null,
+        "score": 0.005295,
+        "quality_score": null,
+        "quality_base_score": null,
+        "quality_boost": null,
+        "quality_status": null,
+        "quality_gates_passed": null,
+        "quality_gates_total": null,
+        "quality_validated": null,
+        "quality_mission_id": null,
+        "quality_pii_flagged": null,
+        "element_type": null,
+        "element_type_match": null,
+        "type_boost": null
+      }
+    ],
+    "latency_ms": 3031.46,
+    "compression": {
+      "original_chunks": 5,
+      "filtered_chunks": 1,
+      "original_tokens": 0,
+      "filtered_tokens": 0,
+      "reduction_ratio": 0.0,
+      "threshold": 0.7,
+      "compression_ms": 0.017
+    },
+    "cache": {
+      "hit": false,
+      "score": null,
+      "age_seconds": null,
+      "ttl_seconds": 300.0
+    },
+    "quality": {
+      "composite_score": 0.802,
+      "threshold": 0.85,
+      "pillar_scores": {
+        "linguistic_uncertainty": 1.0,
+        "answer_integrity": 0.95,
+        "source_provenance": 0.4
+      },
+      "hard_failures": [],
+      "reasons": [
+        "score_below_threshold:0.80<0.85"
+      ],
+      "pre_escalation_score": 0.802
+    },
+    "routing": {
+      "selected_model": "gpt-5.2",
+      "escalated": true,
+      "attempts": [
+        {
+          "model": "gpt-5.1",
+          "quality_score": 0.802,
+          "below_threshold": true,
+          "hard_failures": [],
+          "citation_count": 0
+        },
+        {
+          "model": "gpt-5.2",
+          "quality_score": 0.802,
+          "below_threshold": true,
+          "hard_failures": [],
+          "citation_count": 0
+        }
+      ],
+      "estimated_cost_usd": 0.001689,
+      "metrics": {
+        "total_queries": 3,
+        "escalations": 3
+      }
+    },
+    "search_mode": "semantic",
+    "no_evidence": false
+  }
+}
