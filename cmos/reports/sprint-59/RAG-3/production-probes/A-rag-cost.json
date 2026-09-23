@@ -1,0 +1,525 @@
+{
+  "question": "A-rag-cost",
+  "search_sent_at_utc": "2026-09-23T14:35:36Z",
+  "search": {
+    "request": {
+      "query": "According to the RAG cost optimization research, how much cheaper per query is the architecture with context compression than the naive baseline?",
+      "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+      "top_k": 5
+    },
+    "status": 200,
+    "response": {
+      "answer": "The provided context does not state the per-query cost of a \u201cnaive baseline\u201d architecture or an architecture \u201cwith context compression,\u201d nor does it quantify how much cheaper one is than the other per query, so this cannot be determined from the excerpt. [Document: b68f0a3e-b8b5-4056-9628-2aeaccd298d0, Chunk: 2]",
+      "citations": [
+        {
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_id": "a5fa48f5-c33c-47f5-80b6-2f0dbbe4a206",
+          "chunk_index": 2,
+          "source_type": null,
+          "score": 0.006274,
+          "snippet": "For a scenario with 500 queries per month, each averaging 50 tokens, the total monthly cost for query embeddings amounts to approximately $0.0005. The more significant cost is the one-time operation of embedding the entire document corpus. Even for a substantial knowledge base of"
+        }
+      ],
+      "sources": [
+        {
+          "chunk_id": "a5fa48f5-c33c-47f5-80b6-2f0dbbe4a206",
+          "content": "For a scenario with 500 queries per month, each averaging 50 tokens, the total monthly cost for query embeddings amounts to approximately $0.0005. The more significant cost is the one-time operation of embedding the entire document corpus. Even for a substantial knowledge base of 100 million tokens (roughly 75 million words), the total embedding cost would be a mere $2.00. In contrast, the costs of self-hosting are dominated by fixed infrastructure expenses. To run an open-source embedding model with reasonable performance, a cloud-based GPU instance is typically required. An entry-level GPU instance, such as an AWS g4dn.xlarge, costs approximately $0.74 per hour. If this instance were to run continuously, the monthly cost would exceed $500. Even for a personal project where the instance is run only on-demand for a few hours per month, the costs can quickly surpass the minimal expense of the API. For example, 10 hours of usage per month would still amount to over $7. While serverless platforms like AWS Lambda offer a pay-per-invocation model that can be cost-effective for sporadic workloads, they introduce complexities such as package size limits (which can be prohibitive for large models) and cold-start latencies. A low-end Virtual Private Server (VPS) with sufficient resources could cost around $50 per month. Given these figures, the break-even point\u2014where the cumulative cost of API calls equals the fixed cost of self-hosting\u2014is extremely high. For a personal-use case, self-hosting only becomes financially viable at a scale of tens or hundreds of thousands of API calls per month, far exceeding the stated requirements. The strategic pricing of text-embedding-3-small has made the API an economically compelling choice, effectively commoditizing the embedding layer and lowering the barrier to entry for developers, while simultaneously disincentivizing the move to self-hosted solutions for smaller projects. Section 1 Insights and Recommendations\nFor a personal-scale RAG project with a workload of several hundred queries per month, the optimal strategy is to use the text-embedding-3-small API. This recommendation is based on its superior performance, negligible cost, and the elimination of the significant operational and financial overhead associated with self-hosting. The model's support for dimensionality shortening provides an additional lever for optimization; developers should experiment with reducing the embedding dimension (e.g., to 512) to identify the smallest vector size that maintains acceptable retrieval quality for their specific dataset, thereby minimizing vector database storage costs and improving query latency. Table 1: OpenAI Embedding Model Comparison\n\nFeature\ttext-embedding-ada-002\ttext-embedding-3-small\tAdvantage\nPrice (per 1M Tokens)\t$0.10\t$0.02\t3-small (5x cheaper)\nDefault Dimensions\t1536\t1536\t-\nMTEB Score (Avg)\t61.0%\t62.3%\t3-small (Higher Quality)\nMIRACL Score (Avg)\t31.4%\t44.0%\t3-small (Better Multilingual)\nDimensionality Shortening\tNo\tYes (e.g., to 512)\t3-small (Cost/Speed Flexible)\nThe Generation Engine: Selecting a Cost-Effective LLM\nThe generation component of a RAG pipeline, where a Large Language Model (LLM) synthesizes an answer from the retrieved context, represents the most significant and recurring operational cost.",
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "chunk_index": 2,
+          "source_type": null,
+          "document_type": null,
+          "collection_date": null,
+          "tags": null,
+          "score": 0.006274,
+          "quality_score": null,
+          "quality_base_score": null,
+          "quality_boost": null,
+          "quality_status": null,
+          "quality_gates_passed": null,
+          "quality_gates_total": null,
+          "quality_validated": null,
+          "quality_mission_id": null,
+          "quality_pii_flagged": null,
+          "element_type": null,
+          "element_type_match": null,
+          "type_boost": null
+        }
+      ],
+      "latency_ms": 7826.69,
+      "compression": {
+        "original_chunks": 5,
+        "filtered_chunks": 1,
+        "original_tokens": 3999,
+        "filtered_tokens": 826,
+        "reduction_ratio": 0.7934,
+        "threshold": 0.7,
+        "compression_ms": 0.813
+      },
+      "cache": {
+        "hit": false,
+        "score": null,
+        "age_seconds": null,
+        "ttl_seconds": 300.0
+      },
+      "quality": {
+        "composite_score": 0.967,
+        "threshold": 0.85,
+        "pillar_scores": {
+          "linguistic_uncertainty": 1.0,
+          "answer_integrity": 0.95,
+          "source_provenance": 0.95
+        },
+        "hard_failures": [],
+        "reasons": [],
+        "pre_escalation_score": 0.802
+      },
+      "routing": {
+        "selected_model": "gpt-5.2",
+        "escalated": true,
+        "attempts": [
+          {
+            "model": "gpt-5.1",
+            "quality_score": 0.802,
+            "below_threshold": true,
+            "hard_failures": [],
+            "citation_count": 0
+          },
+          {
+            "model": "gpt-5.2",
+            "quality_score": 0.967,
+            "below_threshold": false,
+            "hard_failures": [],
+            "citation_count": 1
+          }
+        ],
+        "estimated_cost_usd": 0.004828,
+        "metrics": {
+          "total_queries": 1,
+          "escalations": 1
+        }
+      },
+      "search_mode": "semantic",
+      "no_evidence": false
+    },
+    "checks": {
+      "cache_hit": false,
+      "no_evidence": false,
+      "sources": 1,
+      "every_source_has_text": true,
+      "compression": {
+        "original_chunks": 5,
+        "filtered_chunks": 1,
+        "original_tokens": 3999,
+        "filtered_tokens": 826,
+        "threshold": 0.7
+      },
+      "labels_in_answer_text": 1,
+      "citations": 1,
+      "citation_resolution": [
+        {
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_id": "a5fa48f5-c33c-47f5-80b6-2f0dbbe4a206",
+          "chunk_index": 2,
+          "in_response_sources": true,
+          "opens_in_document_chunk_list": true
+        }
+      ],
+      "every_citation_resolves": true,
+      "model_attempts": [
+        "gpt-5.1",
+        "gpt-5.2"
+      ],
+      "quality_composite": 0.967
+    }
+  },
+  "pedr_sent_at_utc": "2026-09-23T14:35:46Z",
+  "pedr": {
+    "request": {
+      "query": "According to the RAG cost optimization research, how much cheaper per query is the architecture with context compression than the naive baseline?",
+      "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+      "top_k": 5
+    },
+    "status": 200,
+    "response": {
+      "results": [
+        {
+          "chunk_id": "a5fa48f5-c33c-47f5-80b6-2f0dbbe4a206",
+          "content": "For a scenario with 500 queries per month, each averaging 50 tokens, the total monthly cost for query embeddings amounts to approximately $0.0005. The more significant cost is the one-time operation of embedding the entire document corpus. Even for a substantial knowledge base of 100 million tokens (roughly 75 million words), the total embedding cost would be a mere $2.00. In contrast, the costs of self-hosting are dominated by fixed infrastructure expenses. To run an open-source embedding model with reasonable performance, a cloud-based GPU instance is typically required. An entry-level GPU instance, such as an AWS g4dn.xlarge, costs approximately $0.74 per hour. If this instance were to run continuously, the monthly cost would exceed $500. Even for a personal project where the instance is run only on-demand for a few hours per month, the costs can quickly surpass the minimal expense of the API. For example, 10 hours of usage per month would still amount to over $7. While serverless platforms like AWS Lambda offer a pay-per-invocation model that can be cost-effective for sporadic workloads, they introduce complexities such as package size limits (which can be prohibitive for large models) and cold-start latencies. A low-end Virtual Private Server (VPS) with sufficient resources could cost around $50 per month. Given these figures, the break-even point\u2014where the cumulative cost of API calls equals the fixed cost of self-hosting\u2014is extremely high. For a personal-use case, self-hosting only becomes financially viable at a scale of tens or hundreds of thousands of API calls per month, far exceeding the stated requirements. The strategic pricing of text-embedding-3-small has made the API an economically compelling choice, effectively commoditizing the embedding layer and lowering the barrier to entry for developers, while simultaneously disincentivizing the move to self-hosted solutions for smaller projects. Section 1 Insights and Recommendations\nFor a personal-scale RAG project with a workload of several hundred queries per month, the optimal strategy is to use the text-embedding-3-small API. This recommendation is based on its superior performance, negligible cost, and the elimination of the significant operational and financial overhead associated with self-hosting. The model's support for dimensionality shortening provides an additional lever for optimization; developers should experiment with reducing the embedding dimension (e.g., to 512) to identify the smallest vector size that maintains acceptable retrieval quality for their specific dataset, thereby minimizing vector database storage costs and improving query latency. Table 1: OpenAI Embedding Model Comparison\n\nFeature\ttext-embedding-ada-002\ttext-embedding-3-small\tAdvantage\nPrice (per 1M Tokens)\t$0.10\t$0.02\t3-small (5x cheaper)\nDefault Dimensions\t1536\t1536\t-\nMTEB Score (Avg)\t61.0%\t62.3%\t3-small (Higher Quality)\nMIRACL Score (Avg)\t31.4%\t44.0%\t3-small (Better Multilingual)\nDimensionality Shortening\tNo\tYes (e.g., to 512)\t3-small (Cost/Speed Flexible)\nThe Generation Engine: Selecting a Cost-Effective LLM\nThe generation component of a RAG pipeline, where a Large Language Model (LLM) synthesizes an answer from the retrieved context, represents the most significant and recurring operational cost.",
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "rrf_score": 0.006274,
+          "rrf_rank": 1,
+          "layer_ranks": {
+            "semantic": 11,
+            "graph": 2
+          },
+          "layer_scores": {
+            "semantic": 0.47175547,
+            "graph": 0.46011769999999996
+          },
+          "urn": "urn:research:chunk:a5fa48f5-c33c-47f5-80b6-2f0dbbe4a206",
+          "confidence": 0.1,
+          "criticality": 0.5,
+          "element_type": null,
+          "query_intent": "search",
+          "quality_score": 0.1,
+          "quality_status": "unknown",
+          "quality_gates_passed": 0,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "chunk_index": 2,
+          "source_type": null,
+          "source_origin": null,
+          "score": 0.006274,
+          "combined_score": 0.006274,
+          "embedding": null,
+          "related_entities": null
+        },
+        {
+          "chunk_id": "a848d13f-b0ef-4d29-bc61-7d69e56bd29b",
+          "content": "OpenAI's official guidance recommends using gpt-4o-mini as a replacement for GPT-3.5-Turbo, citing that it is \"cheaper, more capable, multimodal, and just as fast\". This positions GPT-4o-mini as the new, definitive baseline for cost-effective yet high-quality RAG applications. Viable Open-Source Alternatives: Llama 3, Mixtral, and Gemma\nThe open-source community provides powerful LLMs that can serve as alternatives to proprietary APIs, though their economic viability depends heavily on the scale of deployment. Llama 3: Meta's Llama 3 series, particularly the 70-billion-parameter variant, has demonstrated performance on par with GPT-4 across numerous benchmarks, although GPT-4 maintains an edge in specialized reasoning and mathematical tasks. Being open-source, Llama 3 is free to use, but running it effectively requires substantial and costly infrastructure. Cloud hosting for a model of this size is estimated to be in the range of $10-$20 per hour. Furthermore, research indicates that fine-tuning smaller Llama 3 models (e.g., 8B) on domain-specific data can enable them to outperform even GPT-4o on targeted RAG tasks, highlighting the power of customization. Mixtral: Mistral AI's Mixtral models utilize a Sparse Mixture-of-Experts (SMoE) architecture, which provides performance comparable to GPT-3.5 with greater computational efficiency. When accessed through optimized inference providers like Groq, Mixtral can be extremely cost-effective, with pricing as low as $0.24 per million tokens for both input and output. However, its general knowledge and reasoning capabilities typically do not match those of the GPT-4 series. Gemma: Google's Gemma models are designed to be lightweight and efficient, making them well-suited for on-device or low-cost deployments. While they offer strong performance for their size, they are not intended to compete with the advanced synthesis and reasoning capabilities of state-of-the-art models like GPT-4. The economic conclusion for generation models mirrors that for embedding models: the total cost of ownership for self-hosting a powerful open-source LLM is driven by fixed infrastructure costs that are only justified at a large scale. For a personal project with modest query volume, the pay-as-you-go model of an optimized API like GPT-4o-mini is substantially more economical. A Tiered LLM Strategy for Optimal Cost-Performance\nTo achieve the best possible balance between cost and quality, a dynamic, tiered LLM strategy is recommended. This approach, often referred to as a \"router\" or \"cascade\" architecture, moves beyond a static, one-size-fits-all model selection and instead allocates resources intelligently based on query complexity. The core concept is to first route all incoming RAG requests to the most cost-effective, high-capability model, which in this case is GPT-4o-mini. For the majority of queries that are relatively straightforward, this model will provide a satisfactory answer at a minimal cost. The system then incorporates a mechanism to evaluate the quality or confidence of the generated response.",
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "rrf_score": 0.006124,
+          "rrf_rank": 2,
+          "layer_ranks": {
+            "semantic": 13,
+            "graph": 3
+          },
+          "layer_scores": {
+            "semantic": 0.46349996,
+            "graph": 0.3856462399999999
+          },
+          "urn": "urn:research:chunk:a848d13f-b0ef-4d29-bc61-7d69e56bd29b",
+          "confidence": 0.1,
+          "criticality": 0.5,
+          "element_type": null,
+          "query_intent": "search",
+          "quality_score": 0.1,
+          "quality_status": "unknown",
+          "quality_gates_passed": 0,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "chunk_index": 4,
+          "source_type": null,
+          "source_origin": null,
+          "score": 0.006124,
+          "combined_score": 0.006124,
+          "embedding": null,
+          "related_entities": null
+        },
+        {
+          "chunk_id": "af37cee7-d4d8-4928-b7d8-102140eb1aa3",
+          "content": "- eesel AI\nOpens in a new window\n\nplatform.openai.com\nModel - OpenAI API\nOpens in a new window\n\nanotherwrapper.com\nGPT-4 vs GPT-3.5-turbo - LLM Comparison - AnotherWrapper\nOpens in a new window\n\ncommunity.openai.com\nGPT 4 vs 3.5-turbo-instruct - API - OpenAI Developer Community\nOpens in a new window\n\nanyscale.com\nFine-tuning LLMs for longer context and better RAG systems - Anyscale\nOpens in a new window\n\nplatform.openai.com\nPricing - OpenAI API\nOpens in a new window\n\nblog.promptlayer.com\nLlama 3 vs GPT 4: A Detailed Comparison | Which to Choose? Opens in a new window\n\nvellum.ai\nLlama 3 70B vs GPT-4: Comparison Analysis - Vellum AI\nOpens in a new window\n\nsambanova.ai\nOutperforming GPT-4o with Llama 3 8B: Domain Specific Fine Tuning for RAG - SambaNova\nOpens in a new window\n\ne2enetworks.com\nImplementing a RAG Pipeline with Mixtral 8x7B | E2E Networks Blog\nOpens in a new window\n\nanotherwrapper.com\nGPT-4 vs Mixtral 8x7B - LLM Comparison - AnotherWrapper\nOpens in a new window\n\nconcettolabs.com\nGemma AI vs GPT-4: Which Language Model Reigns Supreme? - Concetto Labs\nOpens in a new window\n\nslashdot.org\nCompare GPT-4 vs. Gemma in 2025 - Slashdot\nOpens in a new window\n\narxiv.org\nCost-efficient Knowledge-based Question Answering with Large Language Models - arXiv\nOpens in a new window\n\nuptech.team\nHow to Reduce LLM Costs: 10 Proven Strategies for Budget-Friendly AI - Uptech\nOpens in a new window\n\nmilvus.io\nWhat caching strategies are effective for multimodal RAG? - Milvus\nOpens in a new window\n\nreddit.com\nBest Practices for Caching in a Q&A System to Reduce Latency and LLM Requests : r/Rag\nOpens in a new window\n\nmeilisearch.com\nHow to cache semantic search: a complete guide - Meilisearch\nOpens in a new window\n\nredis.io\nWhats the best embedding model for semantic caching? | Redis\nOpens in a new window\n\nbrain.co\nSemantic Caching: Accelerating beyond basic RAG with up to 65x latency reduction. Opens in a new window\n\npinecone.io\nPricing | Pinecone\nOpens in a new window\n\ng2.com\nWeaviate Pricing 2025\nOpens in a new window\n\nairbyte.com\nMilvus Vector Database Pricing: Cloud vs Self-Hosted Cost Guide - Airbyte\nOpens in a new window\n\nweaviate.io\nVector Database Pricing | Weaviate\nOpens in a new window\n\nportkey.ai\nReducing LLM costs and latency with semantic cache\nOpens in a new window\n\npostman.com\nBatch API Requests | OpenAI | Postman API Network\nOpens in a new window\n\nhelp.openai.com\nBatch API FAQ | OpenAI Help Center\nOpens in a new window\n\neesel.ai\nA practical guide to the OpenAI Batch API: What it is and when to use it - eesel AI\nOpens in a new window\n\nsukalp.medium.com\nBatch API: OpenAI - Sukalp Tripathi - Medium\nOpens in a new window\n\nresearch-it.wharton.upenn.edu\nUsing OpenAI Batch API - Research-IT - University of Pennsylvania\nOpens in a new window\n\ndeveloper.ibm.com\nToken optimization: The backbone of effective prompt engineering - IBM Developer\nOpens in a new window\n\nmedium.com\nPrompt Optimization, Reduce LLM Costs and Latency | by Bijit Ghosh | Medium\nOpens in a new window\n\npromptingguide.ai\nRetrieval Augmented Generation (RAG) for LLMs | Prompt ...",
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "rrf_score": 0.005925,
+          "rrf_rank": 3,
+          "layer_ranks": {
+            "semantic": 15,
+            "graph": 6
+          },
+          "layer_scores": {
+            "semantic": 0.4563744,
+            "graph": 0.32208238999999994
+          },
+          "urn": "urn:research:chunk:af37cee7-d4d8-4928-b7d8-102140eb1aa3",
+          "confidence": 0.1,
+          "criticality": 0.5,
+          "element_type": null,
+          "query_intent": "search",
+          "quality_score": 0.1,
+          "quality_status": "unknown",
+          "quality_gates_passed": 0,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "chunk_index": 11,
+          "source_type": null,
+          "source_origin": null,
+          "score": 0.005925,
+          "combined_score": 0.005925,
+          "embedding": null,
+          "related_entities": null
+        },
+        {
+          "chunk_id": "ed9c1fd6-1b51-4ed2-9809-acd817fe6c76",
+          "content": "# Research Report: R19.0 - Qdrant Optimization Research - PEDR Latency Reduction\n\n**Generated:** 2025-12-10 16:05:23 UTC  \n**Research Loops:** 2  \n**Sources Consulted:** 10\n\n---\n\n## Executive Summary\n\nHNSW Indexing Parameter Optimization for Latency Reduction**: Hierarchical Navigable Small World (HNSW) indexing is a critical component in Qdrant for achieving low-latency semantic search. Optimizing the `ef_search`, `ef_construction`, and `m` parameters within the HNSW configuration directly impacts the trade-off between search accuracy and speed. The `m` parameter controls the maximum number of connections each node can have in the graph, influencing the graph's connectivity and memory footprint; higher `m` values generally lead to better recall but increase indexing time and memory usage. `ef_construction` determines the index construction accuracy; larger values result in a more accurate index but also longer construction times. Finally, `ef_search` controls the search-time accuracy; increasing `ef_search` improves recall at the cost of increased latency [Qdrant.tech](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFPhcTOXyWx_3kL0_45NCAUrKPpTKodCxbyZ26bs1Pm2BAhsrjFa0rx1v-_KOO3C63v4rW_OwmQ9uO4sG-PcrB1l7zxb2LGlmtNyZqrHhc7ffUOQEvkKoMCpkM0QBBgknOf9ZGipRbZc4VwiJXKy7lHQj8bOCil). For interactive search applications requiring sub-200ms latency, a practical approach involves iteratively tuning these parameters. Start with smaller values for `m` (e.g., 8-16) and `ef_construction` (e.g., 100-200) during index creation, then gradually increase `ef_search` during query time until the desired latency target is met while maintaining acceptable recall. A benchmark test plan should include varying these parameters across a range of values, measuring both latency and recall using a ground truth dataset. Monitoring resource utilization (CPU, memory) during indexing and search is also crucial to prevent resource exhaustion. Caching Strategies for Enhanced Qdrant Performance**: Implementing effective caching mechanisms can significantly reduce search latency in Qdrant, particularly for frequently accessed data. Three primary caching strategies can be employed: query caching, result caching, and embedding caching. Query caching stores the results of previous queries, allowing the system to bypass the search process entirely for identical subsequent requests; this is most effective for applications with high query repetition. Result caching stores the results of recent searches, even if the queries are not identical, by caching the nearest neighbor IDs and their associated scores; this approach requires invalidation strategies to handle data updates. Embedding caching stores pre-computed embeddings in memory, reducing the need to recompute embeddings for frequently used data points; this is particularly beneficial when embeddings are computationally expensive to generate [Medium.com](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGbJLzf-V0bCA7JvujvP_QZsnqMZoKVaX0XKj0FgG9aRN36tqRD92qRK7R4pSCQV1xG9v5MOj-loPlDg5P1r953PY9HQCjLHQCTKMVJeXwR2Q4xTiIfJ59q14m7Q9zd2q_4qqmc2Reu0TLQ1rMzDQoKxaD_HL7fSx_YTws2Ndi8v9EUB6P-wv-9IX_LIWbcdlFwO7k4n_zslABdbJMlBIBkaGfP2fI1D7nWpnTUmW7YM61rOw==).",
+          "document_id": "9124e081-59ba-47bb-b34d-96273bd1140a",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "rrf_score": 0.005778,
+          "rrf_rank": 4,
+          "layer_ranks": {
+            "semantic": 12,
+            "graph": 20
+          },
+          "layer_scores": {
+            "semantic": 0.46891958,
+            "graph": 0.23908812549999997
+          },
+          "urn": "urn:research:chunk:ed9c1fd6-1b51-4ed2-9809-acd817fe6c76",
+          "confidence": 0.1,
+          "criticality": 0.5,
+          "element_type": null,
+          "query_intent": "search",
+          "quality_score": 0.1,
+          "quality_status": "unknown",
+          "quality_gates_passed": 0,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "chunk_index": 0,
+          "source_type": null,
+          "source_origin": null,
+          "score": 0.005778,
+          "combined_score": 0.005778,
+          "embedding": null,
+          "related_entities": null
+        },
+        {
+          "chunk_id": "edd2f8a5-9d81-4dda-858a-ca4311328250",
+          "content": "Pre-warming, on the other hand, refers to initializing the system by loading frequently accessed data into memory before the system goes live, reducing the initial latency associated with cold starts and cache misses. Implementing connection pooling typically involves configuring the Qdrant client with parameters such as the maximum pool size, minimum idle connections, and connection timeout [Tigerdata.com](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFSSLMVuBJtEYgtHC_bSCmU5-y2SPNUazrVq5M0p8vQdr3ngCcONR3HYkRorNoZlAKEOnE7pvPzCz-bwZ-1tsnHiFHF3BbB1mqQUSMd88oHWIMqn_HMexfrCfGagz4uANKrBfFEQKvSttNcLA==). Pre-warming can be achieved by running a set of representative queries against the system during startup, forcing the relevant data to be loaded into the cache. These techniques are particularly important in cloud-based deployments where network latency and resource contention can significantly impact performance. By proactively managing connections and data loading, connection pooling and pre-warming contribute to a more stable and predictable latency profile, essential for interactive search applications. 4. Quantifying Accuracy vs. Latency Trade-offs with Approximate Nearest Neighbors**: Achieving sub-200ms latency often requires using approximate nearest neighbor (ANN) search techniques, which inherently involve trade-offs between accuracy and speed. Qdrant leverages HNSW as an ANN indexing method, allowing for tunable approximation levels. The key is to quantify this trade-off for a given dataset and application to select optimal parameters. This involves benchmarking recall (the fraction of true nearest neighbors returned) against latency for different HNSW parameter settings (specifically `ef_search`). For example, one might observe that increasing `ef_search` from 32 to 128 improves recall from 80% to 95% but increases latency from 100ms to 250ms [Qdrant.tech](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFPhcTOXyWx_3kL0_45NCAUrKPpTKodCxbyZ26bs1Pm2BAhsrjFa0rx1v-_KOO3C63v4rW_OwmQ9uO4sG-PcrB1l7zxb2LGlmtNyZqrHhc7ffUOQEvkKoMCpkM0QBBgknOf9ZGipRbZc4VwiJXKy7lHQj8bOCil). The acceptable level of approximation depends on the specific use case; in some applications, a small reduction in accuracy is tolerable if it significantly improves latency. A robust benchmark test plan should systematically vary HNSW parameters, measure both recall and latency, and visualize the trade-off curve to inform parameter selection. Furthermore, the choice of distance metric (e.g., cosine, Euclidean) can also influence the accuracy-latency trade-off, and should be considered during benchmarking. 5. Comprehensive Benchmark Test Plan for Qdrant Optimization**: To systematically optimize Qdrant for PEDR (Perception-Enhanced Document Retrieval) with a target latency under 200ms, a detailed benchmark test plan is crucial. This plan should encompass a range of parameters, datasets, and evaluation metrics to provide a holistic view of performance. The core of the test plan revolves around systematically varying the HNSW indexing parameters (`m`, `ef_construction`, `ef_search`), caching strategies, and connection pooling configurations, while measuring their impact on both latency and recall.",
+          "document_id": "9124e081-59ba-47bb-b34d-96273bd1140a",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "rrf_score": 0.005725,
+          "rrf_rank": 5,
+          "layer_ranks": {
+            "semantic": 20,
+            "graph": 4
+          },
+          "layer_scores": {
+            "semantic": 0.43501922,
+            "graph": 0.341554465
+          },
+          "urn": "urn:research:chunk:edd2f8a5-9d81-4dda-858a-ca4311328250",
+          "confidence": 0.1,
+          "criticality": 0.5,
+          "element_type": null,
+          "query_intent": "search",
+          "quality_score": 0.1,
+          "quality_status": "unknown",
+          "quality_gates_passed": 0,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "chunk_index": 5,
+          "source_type": null,
+          "source_origin": null,
+          "score": 0.005725,
+          "combined_score": 0.005725,
+          "embedding": null,
+          "related_entities": null
+        }
+      ],
+      "metadata": {
+        "query": "According to the RAG cost optimization research, how much cheaper per query is the architecture with context compression than the naive baseline?",
+        "intent": "search",
+        "intent_confidence": 0.9,
+        "detected_type": null,
+        "type_confidence": 0.0,
+        "layers_used": [
+          "semantic",
+          "graph"
+        ],
+        "layer_weights": {
+          "lexical": 0.22,
+          "semantic": 0.308,
+          "syntactic": 0.132,
+          "pragmatic": 0.08800000000000001,
+          "governance": 0.132,
+          "graph": 0.12
+        },
+        "timings": {
+          "lexical_ms": 10.460443794727325,
+          "semantic_ms": 308.6870238184929,
+          "graph_ms": 10.32,
+          "syntactic_ms": 0.21027028560638428,
+          "pragmatic_ms": 0.31932443380355835,
+          "governance_ms": 6.185963749885559,
+          "fusion_ms": 0.7035732269287109,
+          "relational_ms": 0.0,
+          "total_ms": 334.5952481031418
+        },
+        "layer_diagnostics": [
+          {
+            "layer": "lexical",
+            "status": "ok",
+            "duration_ms": 10.46,
+            "result_count": 0,
+            "error": null,
+            "error_type": null
+          },
+          {
+            "layer": "semantic",
+            "status": "ok",
+            "duration_ms": 308.69,
+            "result_count": 60,
+            "error": null,
+            "error_type": null
+          },
+          {
+            "layer": "graph",
+            "status": "ok",
+            "duration_ms": 10.32,
+            "result_count": 25,
+            "error": null,
+            "error_type": null
+          },
+          {
+            "layer": "syntactic",
+            "status": "ok",
+            "duration_ms": 0.21,
+            "result_count": 60,
+            "error": null,
+            "error_type": null
+          },
+          {
+            "layer": "pragmatic",
+            "status": "ok",
+            "duration_ms": 0.32,
+            "result_count": 60,
+            "error": null,
+            "error_type": null
+          },
+          {
+            "layer": "governance",
+            "status": "ok",
+            "duration_ms": 6.19,
+            "result_count": 60,
+            "error": null,
+            "error_type": null
+          }
+        ],
+        "degraded": false,
+        "graph_enabled": true,
+        "graph_candidates_expanded": 25,
+        "total_candidates": 60,
+        "result_count": 5,
+        "rerank_mode": "full",
+        "hybrid_fallback_used": false
+      }
+    },
+    "checks": {
+      "results": 5,
+      "every_result_has_text": true,
+      "every_result_has_document_and_index": true,
+      "every_result_in_requested_project": true,
+      "graph_ranked_better_than_semantic": [
+        "a5fa48f5-c33c-47f5-80b6-2f0dbbe4a206",
+        "a848d13f-b0ef-4d29-bc61-7d69e56bd29b",
+        "af37cee7-d4d8-4928-b7d8-102140eb1aa3",
+        "edd2f8a5-9d81-4dda-858a-ca4311328250"
+      ],
+      "rows": [
+        {
+          "chunk_id": "a5fa48f5-c33c-47f5-80b6-2f0dbbe4a206",
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "chunk_index": 2,
+          "content_chars": 3305,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "layer_ranks": {
+            "semantic": 11,
+            "graph": 2
+          },
+          "layer_scores": {
+            "semantic": 0.47175547,
+            "graph": 0.46011769999999996
+          }
+        },
+        {
+          "chunk_id": "a848d13f-b0ef-4d29-bc61-7d69e56bd29b",
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "chunk_index": 4,
+          "content_chars": 3087,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "layer_ranks": {
+            "semantic": 13,
+            "graph": 3
+          },
+          "layer_scores": {
+            "semantic": 0.46349996,
+            "graph": 0.3856462399999999
+          }
+        },
+        {
+          "chunk_id": "af37cee7-d4d8-4928-b7d8-102140eb1aa3",
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "chunk_index": 11,
+          "content_chars": 3094,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "layer_ranks": {
+            "semantic": 15,
+            "graph": 6
+          },
+          "layer_scores": {
+            "semantic": 0.4563744,
+            "graph": 0.32208238999999994
+          }
+        },
+        {
+          "chunk_id": "ed9c1fd6-1b51-4ed2-9809-acd817fe6c76",
+          "document_id": "9124e081-59ba-47bb-b34d-96273bd1140a",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "chunk_index": 0,
+          "content_chars": 3250,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "layer_ranks": {
+            "semantic": 12,
+            "graph": 20
+          },
+          "layer_scores": {
+            "semantic": 0.46891958,
+            "graph": 0.23908812549999997
+          }
+        },
+        {
+          "chunk_id": "edd2f8a5-9d81-4dda-858a-ca4311328250",
+          "document_id": "9124e081-59ba-47bb-b34d-96273bd1140a",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "chunk_index": 5,
+          "content_chars": 3260,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "layer_ranks": {
+            "semantic": 20,
+            "graph": 4
+          },
+          "layer_scores": {
+            "semantic": 0.43501922,
+            "graph": 0.341554465
+          }
+        }
+      ],
+      "layers_used": [
+        "semantic",
+        "graph"
+      ],
+      "cache_hit": null
+    }
+  }
+}

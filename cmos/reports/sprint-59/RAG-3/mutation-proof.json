@@ -1,0 +1,90 @@
+{
+  "head": "4d8257de36561c8feab34b1a35f3bc80018cce7d",
+  "base": "7167a93",
+  "files_restored_to_head": true,
+  "all_as_expected": true,
+  "runs": [
+    {
+      "label": "baseline-before",
+      "pytest_exit": 0,
+      "tests": {
+        "T1 fusion keeps text": "pass",
+        "T2 search response keeps text": "pass",
+        "T3 hollow chunk left out": "pass",
+        "T4 no text is nothing found": "pass",
+        "T5 unfiltered None scope, no query": "pass",
+        "T6 filter holds for owner": "pass"
+      },
+      "as_expected": true
+    },
+    {
+      "label": "M1",
+      "pytest_exit": 1,
+      "tests": {
+        "T1 fusion keeps text": "FAIL at assert fused.data[field] == semantic_record[field], field (KeyError: 'content')",
+        "T2 search response keeps text": "FAIL at assert shared.content == \"Escalate on low router confidence.\" (AssertionError: assert '' == 'Escalate on ...r confidence.')",
+        "T3 hollow chunk left out": "pass",
+        "T4 no text is nothing found": "pass",
+        "T5 unfiltered None scope, no query": "pass",
+        "T6 filter holds for owner": "pass"
+      },
+      "target": "app/services/pedr/fusion.py",
+      "reverts": "the fusion merge (the best-ranked layer's record is kept whole again)",
+      "expect_red": [
+        "T1 fusion keeps text",
+        "T2 search response keeps text"
+      ],
+      "as_expected": true
+    },
+    {
+      "label": "M2",
+      "pytest_exit": 1,
+      "tests": {
+        "T1 fusion keeps text": "pass",
+        "T2 search response keeps text": "pass",
+        "T3 hollow chunk left out": "FAIL at assert \"[Document: Unknown, Chunk: N/A]\" not in prompt (AssertionError: assert '[Document: ... Chunk: N/A]' not in 'Query:\\nHow...speculation.')",
+        "T4 no text is nothing found": "FAIL at assert fake_client.chat.completions.requests == [] (AssertionError: assert [{'max_tokens... 'none', ...}] == [])",
+        "T5 unfiltered None scope, no query": "pass",
+        "T6 filter holds for owner": "pass"
+      },
+      "target": "app/services/rag_service.py",
+      "reverts": "leaving chunks with no text out of the model's context",
+      "expect_red": [
+        "T3 hollow chunk left out",
+        "T4 no text is nothing found"
+      ],
+      "as_expected": true
+    },
+    {
+      "label": "M3",
+      "pytest_exit": 1,
+      "tests": {
+        "T1 fusion keeps text": "pass",
+        "T2 search response keeps text": "pass",
+        "T3 hollow chunk left out": "pass",
+        "T4 no text is nothing found": "pass",
+        "T5 unfiltered None scope, no query": "pass",
+        "T6 filter holds for owner": "FAIL at assert str(other_chunk.id) not in by_project (AssertionError: assert '8fb679ba-046b-4473-9f29-f67fb95e3fd1' not in {'1dd05067-f591-4161-9097-2b60b410a7f3', '2755c168-4876-44a2-9c32-9ce9f874257e', '499bf392-2a74-460e-98d6-2ac090836af6', '8fb679ba-046b-4473-9f29-f67fb95e3fd1'})"
+      },
+      "target": "app/services/pedr/search_orchestrator.py",
+      "reverts": "explicit filters on graph results for a None scope (it returns them unfiltered again)",
+      "expect_red": [
+        "T6 filter holds for owner"
+      ],
+      "as_expected": true
+    },
+    {
+      "label": "baseline-after",
+      "pytest_exit": 0,
+      "tests": {
+        "T1 fusion keeps text": "pass",
+        "T2 search response keeps text": "pass",
+        "T3 hollow chunk left out": "pass",
+        "T4 no text is nothing found": "pass",
+        "T5 unfiltered None scope, no query": "pass",
+        "T6 filter holds for owner": "pass"
+      },
+      "as_expected": true
+    }
+  ]
+}

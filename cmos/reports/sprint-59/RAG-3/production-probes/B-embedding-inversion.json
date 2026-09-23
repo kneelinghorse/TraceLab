@@ -1,0 +1,518 @@
+{
+  "question": "B-embedding-inversion",
+  "search_sent_at_utc": "2026-09-23T14:35:46Z",
+  "search": {
+    "request": {
+      "query": "What does the PII redaction research say about recovering original text from embeddings, and how much of a short input could be reconstructed?",
+      "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+      "top_k": 5
+    },
+    "status": 200,
+    "response": {
+      "answer": "The provided context discusses different redaction strategies (character masking, label replacement, hashing, pseudonymization, encryption) and evaluates them on readability, semantic integrity, and reversibility, but it does **not** address attacks on embeddings or the possibility of reconstructing original text from embeddings. [Document: 1b6d9489-55ef-4868-b2b4-fa8535e414c4, Chunk: 11]\n\nSpecifically, the context:\n- Describes how each redaction method transforms PII and whether it is reversible in the straightforward sense (e.g., encryption is reversible with a key, others are not). [Document: 1b6d9489-55ef-4868-b2b4-fa8535e414c4, Chunk: 11]  \n- Does not mention embeddings, vector representations, model inversion, or reconstruction of text from embeddings. [Document: 1b6d9489-55ef-4868-b2b4-fa8535e414c4, Chunk: 11]\n\nTherefore, based on the supplied context, the answer to both parts of your question:\n\n1. **What does the PII redaction research say about recovering original text from embeddings?**  \n   \u2192 The context does not provide any information on recovering original text from embeddings. [Document: 1b6d9489-55ef-4868-b2b4-fa8535e414c4, Chunk: 11]\n\n2. **How much of a short input could be reconstructed?**  \n   \u2192 The context does not discuss reconstruction rates or how much of an input could be recovered from embeddings. [",
+      "citations": [
+        {
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_id": "2545f601-0f96-41b1-946b-ca6591542533",
+          "chunk_index": 11,
+          "source_type": null,
+          "score": 0.006243,
+          "snippet": "Faker can generate plausible synthetic data for a wide range of categories, including names, addresses, phone numbers, and more. A custom operator could be designed to detect a PERSON entity and replace it with a randomly generated fake name from Faker. For example, \"The intervie"
+        }
+      ],
+      "sources": [
+        {
+          "chunk_id": "2545f601-0f96-41b1-946b-ca6591542533",
+          "content": "Faker can generate plausible synthetic data for a wide range of categories, including names, addresses, phone numbers, and more. A custom operator could be designed to detect a PERSON entity and replace it with a randomly generated fake name from Faker. For example, \"The interview with Dr. Jane Smith...\" could become \"The interview with Dr. Emily White...\". This approach maintains the grammatical structure and naturalness of the text, making it far more suitable for training language models or for use in RAG systems where semantic context is paramount. 5.4 Redaction Strategy Impact Assessment\nThe choice of a redaction operator is a critical decision that directly impacts the balance between privacy and data utility. The following table provides a structured assessment of each strategy, helping to guide the selection based on the intended use of the de-identified data. Redaction Strategy\tHow It Works\tReadability Impact\tSemantic Integrity\tReversibility\tBest For\nCharacter Masking\tReplaces characters with a placeholder (e.g., ***-**-1234). Medium. Preserves format but obscures content. Low. The semantic value of the token is lost. No\tScenarios where data format/length must be preserved (e.g., UI mockups, limited audit trails). Label Replacement\tReplaces PII with a generic tag (e.g., <PERSON>). Medium. Clearly marks redaction but can be disruptive. Low. Introduces artificial tokens that can confuse NLP models. No\tFull anonymization where downstream NLP utility is low priority; creating datasets for public release. Hashing\tReplaces PII with a consistent hash value. Low. The hash is unreadable and appears as random characters. Medium. Preserves the ability to count unique entities but loses all other semantic meaning. No\tAnonymized analytics where entity linkage (e.g., counting unique users) is required without revealing identities. Pseudonymization\tReplaces PII with realistic but fake data (e.g., \"Jane Doe\" -> \"Anna Smith\"). High. The text remains natural and grammatically correct. High. Preserves the semantic role and structure of the original text. No\tPreparing data for ML model training or RAG systems where preserving semantic context is critical. Encryption\tReplaces PII with an encrypted ciphertext string. Low. The ciphertext is unreadable. Low. The semantic value is lost unless decrypted. Yes (with key)\tSecure data archival or workflows where authorized de-anonymization is a required feature. Section VI: Quantifying Success: Evaluating, Tuning, and Mitigating Errors\nDeploying a PII detection system is not a one-time setup. It is an iterative process of evaluation, analysis, and refinement. No automated system is perfect; it will inevitably produce both false positives and false negatives. The goal is to implement a rigorous, data-driven workflow to systematically measure these errors, understand their root causes, and make targeted interventions to improve the system's accuracy and reliability over time. 6.1 Establishing a Performance Baseline: Metrics for Success\nTo objectively measure the performance of a PII detection system, it is essential to use standardized metrics from the field of information retrieval and Named Entity Recognition.",
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "chunk_index": 11,
+          "source_type": null,
+          "document_type": null,
+          "collection_date": null,
+          "tags": null,
+          "score": 0.006243,
+          "quality_score": null,
+          "quality_base_score": null,
+          "quality_boost": null,
+          "quality_status": null,
+          "quality_gates_passed": null,
+          "quality_gates_total": null,
+          "quality_validated": null,
+          "quality_mission_id": null,
+          "quality_pii_flagged": null,
+          "element_type": null,
+          "element_type_match": null,
+          "type_boost": null
+        }
+      ],
+      "latency_ms": 5305.8,
+      "compression": {
+        "original_chunks": 5,
+        "filtered_chunks": 1,
+        "original_tokens": 3941,
+        "filtered_tokens": 799,
+        "reduction_ratio": 0.7973,
+        "threshold": 0.7,
+        "compression_ms": 0.802
+      },
+      "cache": {
+        "hit": false,
+        "score": null,
+        "age_seconds": null,
+        "ttl_seconds": 300.0
+      },
+      "quality": {
+        "composite_score": 0.897,
+        "threshold": 0.85,
+        "pillar_scores": {
+          "linguistic_uncertainty": 0.8,
+          "answer_integrity": 0.95,
+          "source_provenance": 0.95
+        },
+        "hard_failures": [],
+        "reasons": [],
+        "pre_escalation_score": null
+      },
+      "routing": {
+        "selected_model": "gpt-5.1",
+        "escalated": false,
+        "attempts": [
+          {
+            "model": "gpt-5.1",
+            "quality_score": 0.897,
+            "below_threshold": false,
+            "hard_failures": [],
+            "citation_count": 1
+          }
+        ],
+        "estimated_cost_usd": 0.004541,
+        "metrics": {
+          "total_queries": 2,
+          "escalations": 1
+        }
+      },
+      "search_mode": "semantic",
+      "no_evidence": false
+    },
+    "checks": {
+      "cache_hit": false,
+      "no_evidence": false,
+      "sources": 1,
+      "every_source_has_text": true,
+      "compression": {
+        "original_chunks": 5,
+        "filtered_chunks": 1,
+        "original_tokens": 3941,
+        "filtered_tokens": 799,
+        "threshold": 0.7
+      },
+      "labels_in_answer_text": 4,
+      "citations": 1,
+      "citation_resolution": [
+        {
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_id": "2545f601-0f96-41b1-946b-ca6591542533",
+          "chunk_index": 11,
+          "in_response_sources": true,
+          "opens_in_document_chunk_list": true
+        }
+      ],
+      "every_citation_resolves": true,
+      "model_attempts": [
+        "gpt-5.1"
+      ],
+      "quality_composite": 0.897
+    }
+  },
+  "pedr_sent_at_utc": "2026-09-23T14:35:53Z",
+  "pedr": {
+    "request": {
+      "query": "What does the PII redaction research say about recovering original text from embeddings, and how much of a short input could be reconstructed?",
+      "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+      "top_k": 5
+    },
+    "status": 200,
+    "response": {
+      "results": [
+        {
+          "chunk_id": "2545f601-0f96-41b1-946b-ca6591542533",
+          "content": "Faker can generate plausible synthetic data for a wide range of categories, including names, addresses, phone numbers, and more. A custom operator could be designed to detect a PERSON entity and replace it with a randomly generated fake name from Faker. For example, \"The interview with Dr. Jane Smith...\" could become \"The interview with Dr. Emily White...\". This approach maintains the grammatical structure and naturalness of the text, making it far more suitable for training language models or for use in RAG systems where semantic context is paramount. 5.4 Redaction Strategy Impact Assessment\nThe choice of a redaction operator is a critical decision that directly impacts the balance between privacy and data utility. The following table provides a structured assessment of each strategy, helping to guide the selection based on the intended use of the de-identified data. Redaction Strategy\tHow It Works\tReadability Impact\tSemantic Integrity\tReversibility\tBest For\nCharacter Masking\tReplaces characters with a placeholder (e.g., ***-**-1234). Medium. Preserves format but obscures content. Low. The semantic value of the token is lost. No\tScenarios where data format/length must be preserved (e.g., UI mockups, limited audit trails). Label Replacement\tReplaces PII with a generic tag (e.g., <PERSON>). Medium. Clearly marks redaction but can be disruptive. Low. Introduces artificial tokens that can confuse NLP models. No\tFull anonymization where downstream NLP utility is low priority; creating datasets for public release. Hashing\tReplaces PII with a consistent hash value. Low. The hash is unreadable and appears as random characters. Medium. Preserves the ability to count unique entities but loses all other semantic meaning. No\tAnonymized analytics where entity linkage (e.g., counting unique users) is required without revealing identities. Pseudonymization\tReplaces PII with realistic but fake data (e.g., \"Jane Doe\" -> \"Anna Smith\"). High. The text remains natural and grammatically correct. High. Preserves the semantic role and structure of the original text. No\tPreparing data for ML model training or RAG systems where preserving semantic context is critical. Encryption\tReplaces PII with an encrypted ciphertext string. Low. The ciphertext is unreadable. Low. The semantic value is lost unless decrypted. Yes (with key)\tSecure data archival or workflows where authorized de-anonymization is a required feature. Section VI: Quantifying Success: Evaluating, Tuning, and Mitigating Errors\nDeploying a PII detection system is not a one-time setup. It is an iterative process of evaluation, analysis, and refinement. No automated system is perfect; it will inevitably produce both false positives and false negatives. The goal is to implement a rigorous, data-driven workflow to systematically measure these errors, understand their root causes, and make targeted interventions to improve the system's accuracy and reliability over time. 6.1 Establishing a Performance Baseline: Metrics for Success\nTo objectively measure the performance of a PII detection system, it is essential to use standardized metrics from the field of information retrieval and Named Entity Recognition.",
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "rrf_score": 0.006243,
+          "rrf_rank": 1,
+          "layer_ranks": {
+            "semantic": 11,
+            "graph": 3
+          },
+          "layer_scores": {
+            "semantic": 0.48685718,
+            "graph": 0.32542572859999996
+          },
+          "urn": "urn:research:chunk:2545f601-0f96-41b1-946b-ca6591542533",
+          "confidence": 0.1,
+          "criticality": 0.5,
+          "element_type": null,
+          "query_intent": "search",
+          "quality_score": 0.1,
+          "quality_status": "unknown",
+          "quality_gates_passed": 0,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "chunk_index": 11,
+          "source_type": null,
+          "source_origin": null,
+          "score": 0.006243,
+          "combined_score": 0.006243,
+          "embedding": null,
+          "related_entities": null
+        },
+        {
+          "chunk_id": "2bae6368-b401-4bd1-bb29-742e6e5aaba3",
+          "content": "1.3 The Role of Redaction and Anonymization in Achieving Compliance\nRedaction is the primary technical mechanism for achieving compliance with the principles of data minimization and for mitigating the risks outlined by GDPR and CCPA. It is the process of identifying and removing or obscuring sensitive information from a document before it is stored or shared. Under the CCPA, redaction functions as a powerful \"liability shield.\" The law's private right of action explicitly applies to breaches of \"non-encrypted or non-redacted\" personal information. This means that by properly redacting PII from documents before they are stored, an organization can substantially reduce its legal exposure in the event of a security incident. This transforms redaction from a mere compliance cost into a fundamental risk management strategy. It is critical to distinguish between two key de-identification techniques:\n\nAnonymization: This is the process of irreversibly removing or altering personal data so that the individual can no longer be identified. Common methods include replacing a name with a generic tag like `` or completely removing the data. Pseudonymization: This technique replaces identifying data with a consistent but artificial identifier, or pseudonym. For example, every instance of \"John Smith\" in a document set could be replaced with \"Participant A1B2\". This preserves the ability to link data points related to the same individual without revealing their real-world identity. Libraries like Faker are often used to generate realistic but synthetic data for this purpose. From a regulatory perspective, redaction is the practical application of the data minimization principle. By systematically removing PII that is not essential for the downstream purpose of the research repository (such as semantic search or trend analysis), the system adheres to the GDPR mandate to process only the data that is strictly necessary. An automated redaction pipeline, therefore, becomes an essential tool for enforcing this core principle at scale. Section II: A Multi-Modal Approach to PII Detection: Methodologies and Mechanisms\nEffective PII detection is not a monolithic task solved by a single algorithm. It requires a hybrid, multi-modal approach that combines statistical models, rule-based patterns, and contextual analysis to achieve high accuracy. The nature of PII is diverse; a person's name has no fixed structure, whereas a credit card number follows a predictable pattern validated by a checksum. A successful detection system must leverage a portfolio of specialized techniques, each tailored to the specific characteristics of the PII entity it is designed to find. 2.1 Statistical Detection: Named Entity Recognition (NER)\nThe primary method for detecting PII that lacks a predictable pattern, such as the names of people, locations, and organizations, is Named Entity Recognition (NER). NER is a subfield of Natural Language Processing (NLP) that uses machine learning models to locate and classify named entities within unstructured text.",
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "rrf_score": 0.005984,
+          "rrf_rank": 2,
+          "layer_ranks": {
+            "semantic": 13,
+            "graph": 8
+          },
+          "layer_scores": {
+            "semantic": 0.47592288,
+            "graph": 0.32542572859999996
+          },
+          "urn": "urn:research:chunk:2bae6368-b401-4bd1-bb29-742e6e5aaba3",
+          "confidence": 0.1,
+          "criticality": 0.5,
+          "element_type": null,
+          "query_intent": "search",
+          "quality_score": 0.1,
+          "quality_status": "unknown",
+          "quality_gates_passed": 0,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "chunk_index": 2,
+          "source_type": null,
+          "source_origin": null,
+          "score": 0.005984,
+          "combined_score": 0.005984,
+          "embedding": null,
+          "related_entities": null
+        },
+        {
+          "chunk_id": "bc873851-76a6-4cbc-81a2-c2b16ec5947e",
+          "content": "This validation step dramatically reduces false positives by filtering out random numbers that happen to match the regex pattern but are not valid identifiers. 2.3 Contextual Analysis: The Key to Reducing Errors\nNeither statistical nor rule-based methods are perfect. A random 9-digit number might be flagged as a Social Security Number, or a common word might be misidentified as a name. To improve accuracy, advanced PII systems employ contextual analysis to refine their initial detections. Context-Aware Enhancement is a mechanism that uses the words immediately preceding or following a potential PII entity to adjust the confidence score of the detection. For instance, a PatternRecognizer for a US Social Security Number might be defined with a regex for the ###-##-#### format and a list of context words like \"SSN\", \"Social Security\". If a number matching the pattern is found and one of these context words appears nearby, the system significantly increases its confidence that it has found a true positive. This leads directly to the central challenge in PII detection: the False Positive vs. False Negative Trade-off. False Positives occur when the system incorrectly identifies non-sensitive text as PII. Overly aggressive detection rules lead to a high rate of false positives, which results in excessive redaction. This can damage the utility of the data for downstream analysis by removing important, non-sensitive information. False Negatives occur when the system fails to detect actual PII. A high rate of false negatives means that sensitive data is leaking into the repository, creating a significant compliance and privacy risk. A well-architected PII detection system must be carefully tuned to navigate this trade-off. Contextual analysis, checksum validation, and the use of highly specific rules are the primary tools for reducing false positives without significantly increasing false negatives. The choice of detection methodology is not arbitrary but should be directly mapped to the inherent structure of the PII entity in question. A robust strategy involves creating a layered system of specialized recognizers, which is the architectural philosophy promoted by frameworks like Presidio. Within its RecognizerRegistry, a highly specific CreditCardRecognizer (using Regex and Checksum validation) operates alongside a broad SpacyRecognizer (using NER for names and locations) and a simple custom TitleRecognizer (using a deny-list). This modular, portfolio-based approach, where each recognizer is the right tool for its specific job, is the most effective way to build a system that is both accurate and performant. Section III: The Practitioner's Toolkit: A Comparative Analysis of PII Detection Frameworks\nSelecting the appropriate tool is a critical decision that will shape the architecture, cost, and performance of the PII redaction pipeline. The landscape includes flexible open-source frameworks, lightweight NLP libraries, powerful but costly cloud services, and specialized high-performance tools. The optimal choice depends on the specific project requirements, including the need for customization, performance constraints, budget, and in-house expertise.",
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "rrf_score": 0.005663,
+          "rrf_rank": 3,
+          "layer_ranks": {
+            "semantic": 18,
+            "graph": 10
+          },
+          "layer_scores": {
+            "semantic": 0.44991446,
+            "graph": 0.32542572859999996
+          },
+          "urn": "urn:research:chunk:bc873851-76a6-4cbc-81a2-c2b16ec5947e",
+          "confidence": 0.1,
+          "criticality": 0.5,
+          "element_type": null,
+          "query_intent": "search",
+          "quality_score": 0.1,
+          "quality_status": "unknown",
+          "quality_gates_passed": 0,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "chunk_index": 4,
+          "source_type": null,
+          "source_origin": null,
+          "score": 0.005663,
+          "combined_score": 0.005663,
+          "embedding": null,
+          "related_entities": null
+        },
+        {
+          "chunk_id": "2fe06d06-f658-42c7-ba2a-a3b54d43bf90",
+          "content": "Using Deny-Lists for Correction: If a general NER model frequently misclassifies certain terms (e.g., a company name like \"Unity\" as a person), a PatternRecognizer can be created with a deny_list containing these specific false positives to prevent them from being flagged. Leveraging Context Words: When defining a PatternRecognizer, including a list of context words tells Presidio to boost the score of a match if those words are found nearby, making the detection less likely to be a random coincidence. 4.3 Integrating and Configuring Different NLP Engines\nPresidio's NlpEngine is the component responsible for performing the underlying NLP tasks, including the NER that powers much of its statistical detection. This engine is pluggable, allowing users to choose the model that best fits their needs. spaCy vs. Transformers: By default, Presidio often uses a spaCy model, such as en_core_web_lg. This provides a strong balance of speed and accuracy suitable for many applications. However, for use cases where maximum accuracy is required and performance is less critical, the NlpEngine can be configured to use a larger, more powerful model from the Hugging Face Transformers library. This is done during the initialization of the AnalyzerEngine and allows for a direct trade-off between inference speed and detection quality. Multi-language Support: To process documents in languages other than English, the NlpEngine must be configured with an appropriate model for that language. For example, to handle German text, one would need to download a German spaCy model (e.g., de_core_news_lg) and configure the NlpEngineProvider to use it when processing German documents. This, combined with language-specific custom recognizers, allows Presidio to be adapted to multilingual research corpora. Section V: From Detection to De-Identification: Strategies for PII Redaction\nOnce Personally Identifiable Information has been accurately detected, the next critical step is to de-identify the document. Redaction is not a one-size-fits-all process; the chosen method has significant implications for the readability, utility, and semantic integrity of the resulting text. A strategic choice of redaction technique is crucial, especially when the de-identified data will be used for downstream machine learning tasks like semantic search or model training. 5.1 The Presidio AnonymizerEngine: A Survey of Operators\nMicrosoft Presidio provides a dedicated AnonymizerEngine to handle the redaction process. After the AnalyzerEngine identifies PII entities, its results are passed to the AnonymizerEngine, which applies a specified \"operator\" to each detected entity to transform the text. The engine comes with a suite of built-in operators that support various de-identification strategies :   \n\nRedact: This operator completely removes the PII from the text. This is a strong anonymization method but can disrupt the grammatical structure of a sentence. Replace (Label Replacement): This is the default behavior. The operator replaces the detected PII with a placeholder tag, typically the entity type (e.g., \"My name is John\" becomes \"My name is \").",
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "rrf_score": 0.005653,
+          "rrf_rank": 4,
+          "layer_ranks": {
+            "semantic": 16,
+            "graph": 15
+          },
+          "layer_scores": {
+            "semantic": 0.45868444,
+            "graph": 0.32542572859999996
+          },
+          "urn": "urn:research:chunk:2fe06d06-f658-42c7-ba2a-a3b54d43bf90",
+          "confidence": 0.1,
+          "criticality": 0.5,
+          "element_type": null,
+          "query_intent": "search",
+          "quality_score": 0.1,
+          "quality_status": "unknown",
+          "quality_gates_passed": 0,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "chunk_index": 9,
+          "source_type": null,
+          "source_origin": null,
+          "score": 0.005653,
+          "combined_score": 0.005653,
+          "embedding": null,
+          "related_entities": null
+        },
+        {
+          "chunk_id": "b0892bf2-f15b-4120-a116-735fb2fb27ef",
+          "content": "GDPR's broad definition of personal data and its emphasis on individual rights (like DSARs) defines the vast scope of what must be protected. CCPA, with its direct and financially punitive consequences for breaches involving unredacted data, provides a compelling incentive for how that protection should be technically implemented. One framework provides the mandate for comprehensive detection, while the other provides the sharp-toothed motivation for technical excellence in redaction. This interplay elevates redaction from a compliance checkbox to a critical, risk-mitigating control at the heart of the system architecture. 1.2 Defining \"Personal Data\" in the Context of Research Documents\nTo effectively redact personal data, a system must first be able to identify it in all its forms. Both GDPR and CCPA utilize broad definitions that extend beyond obvious identifiers. Research documents, particularly qualitative data like interview transcripts and survey responses, are often rich with both direct and indirect personal information. Explicit Identifiers are the most straightforward category of Personally Identifiable Information (PII). These are data points that directly identify an individual. A robust detection system must be configured to recognize a wide array of these entities, including:\n\nNames (of individuals, and sometimes organizations)\n\nEmail addresses\n\nPhone numbers\n\nSocial Security Numbers (SSNs) and other national identification numbers\n\nCredit card numbers and financial account details\n\nDriver's license and passport numbers\n\nPhysical addresses and other location data. Quasi-Identifiers and Indirect PII represent a more complex challenge. These are pieces of information that, on their own, may not identify an individual but can do so when combined. Research transcripts are particularly susceptible to containing such data. Examples include job titles, dates of birth, specific dates of events, and geographic subdivisions smaller than a state. A system relying solely on simple pattern matching for fixed formats would fail to detect these contextual identifiers, highlighting the need for more advanced, context-aware detection mechanisms like Named Entity Recognition (NER). Protected Health Information (PHI) is a specialized subset of PII that is subject to even stricter regulations, such as the Health Insurance Portability and Accountability Act (HIPAA) in the United States. PHI includes medical records, patient identifiers, and any health-related information linked to an individual. While a general research repository may not be explicitly governed by HIPAA, the presence of any health-related data necessitates a higher standard of care. Certain PII detection tools, such as Azure AI Language, can be specifically configured to target PHI by specifying a domain=phi parameter in the API request, allowing for more focused and stringent detection in sensitive documents. 1.3 The Role of Redaction and Anonymization in Achieving Compliance\nRedaction is the primary technical mechanism for achieving compliance with the principles of data minimization and for mitigating the risks outlined by GDPR and CCPA.",
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "rrf_score": 0.005646,
+          "rrf_rank": 5,
+          "layer_ranks": {
+            "semantic": 23,
+            "graph": 2
+          },
+          "layer_scores": {
+            "semantic": 0.43492723,
+            "graph": 0.32542572859999996
+          },
+          "urn": "urn:research:chunk:b0892bf2-f15b-4120-a116-735fb2fb27ef",
+          "confidence": 0.1,
+          "criticality": 0.5,
+          "element_type": null,
+          "query_intent": "search",
+          "quality_score": 0.1,
+          "quality_status": "unknown",
+          "quality_gates_passed": 0,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "chunk_index": 1,
+          "source_type": null,
+          "source_origin": null,
+          "score": 0.005646,
+          "combined_score": 0.005646,
+          "embedding": null,
+          "related_entities": null
+        }
+      ],
+      "metadata": {
+        "query": "What does the PII redaction research say about recovering original text from embeddings, and how much of a short input could be reconstructed?",
+        "intent": "search",
+        "intent_confidence": 0.9,
+        "detected_type": null,
+        "type_confidence": 0.0,
+        "layers_used": [
+          "semantic",
+          "graph"
+        ],
+        "layer_weights": {
+          "lexical": 0.22,
+          "semantic": 0.308,
+          "syntactic": 0.132,
+          "pragmatic": 0.08800000000000001,
+          "governance": 0.132,
+          "graph": 0.12
+        },
+        "timings": {
+          "lexical_ms": 9.861767292022705,
+          "semantic_ms": 266.6586562991142,
+          "graph_ms": 19.21,
+          "syntactic_ms": 0.19401311874389648,
+          "pragmatic_ms": 0.18653273582458496,
+          "governance_ms": 5.994774401187897,
+          "fusion_ms": 0.8129328489303589,
+          "relational_ms": 0.0,
+          "total_ms": 303.188718855381
+        },
+        "layer_diagnostics": [
+          {
+            "layer": "lexical",
+            "status": "ok",
+            "duration_ms": 9.86,
+            "result_count": 0,
+            "error": null,
+            "error_type": null
+          },
+          {
+            "layer": "semantic",
+            "status": "ok",
+            "duration_ms": 266.66,
+            "result_count": 60,
+            "error": null,
+            "error_type": null
+          },
+          {
+            "layer": "graph",
+            "status": "ok",
+            "duration_ms": 19.21,
+            "result_count": 71,
+            "error": null,
+            "error_type": null
+          },
+          {
+            "layer": "syntactic",
+            "status": "ok",
+            "duration_ms": 0.19,
+            "result_count": 60,
+            "error": null,
+            "error_type": null
+          },
+          {
+            "layer": "pragmatic",
+            "status": "ok",
+            "duration_ms": 0.19,
+            "result_count": 60,
+            "error": null,
+            "error_type": null
+          },
+          {
+            "layer": "governance",
+            "status": "ok",
+            "duration_ms": 5.99,
+            "result_count": 60,
+            "error": null,
+            "error_type": null
+          }
+        ],
+        "degraded": false,
+        "graph_enabled": true,
+        "graph_candidates_expanded": 71,
+        "total_candidates": 60,
+        "result_count": 5,
+        "rerank_mode": "full",
+        "hybrid_fallback_used": false
+      }
+    },
+    "checks": {
+      "results": 5,
+      "every_result_has_text": true,
+      "every_result_has_document_and_index": true,
+      "every_result_in_requested_project": true,
+      "graph_ranked_better_than_semantic": [
+        "2545f601-0f96-41b1-946b-ca6591542533",
+        "2bae6368-b401-4bd1-bb29-742e6e5aaba3",
+        "bc873851-76a6-4cbc-81a2-c2b16ec5947e",
+        "2fe06d06-f658-42c7-ba2a-a3b54d43bf90",
+        "b0892bf2-f15b-4120-a116-735fb2fb27ef"
+      ],
+      "rows": [
+        {
+          "chunk_id": "2545f601-0f96-41b1-946b-ca6591542533",
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "chunk_index": 11,
+          "content_chars": 3197,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "layer_ranks": {
+            "semantic": 11,
+            "graph": 3
+          },
+          "layer_scores": {
+            "semantic": 0.48685718,
+            "graph": 0.32542572859999996
+          }
+        },
+        {
+          "chunk_id": "2bae6368-b401-4bd1-bb29-742e6e5aaba3",
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "chunk_index": 2,
+          "content_chars": 3061,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "layer_ranks": {
+            "semantic": 13,
+            "graph": 8
+          },
+          "layer_scores": {
+            "semantic": 0.47592288,
+            "graph": 0.32542572859999996
+          }
+        },
+        {
+          "chunk_id": "bc873851-76a6-4cbc-81a2-c2b16ec5947e",
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "chunk_index": 4,
+          "content_chars": 3199,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "layer_ranks": {
+            "semantic": 18,
+            "graph": 10
+          },
+          "layer_scores": {
+            "semantic": 0.44991446,
+            "graph": 0.32542572859999996
+          }
+        },
+        {
+          "chunk_id": "2fe06d06-f658-42c7-ba2a-a3b54d43bf90",
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "chunk_index": 9,
+          "content_chars": 3148,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "layer_ranks": {
+            "semantic": 16,
+            "graph": 15
+          },
+          "layer_scores": {
+            "semantic": 0.45868444,
+            "graph": 0.32542572859999996
+          }
+        },
+        {
+          "chunk_id": "b0892bf2-f15b-4120-a116-735fb2fb27ef",
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "chunk_index": 1,
+          "content_chars": 3158,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "layer_ranks": {
+            "semantic": 23,
+            "graph": 2
+          },
+          "layer_scores": {
+            "semantic": 0.43492723,
+            "graph": 0.32542572859999996
+          }
+        }
+      ],
+      "layers_used": [
+        "semantic",
+        "graph"
+      ],
+      "cache_hit": null
+    }
+  }
+}
