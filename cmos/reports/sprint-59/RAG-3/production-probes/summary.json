@@ -1,0 +1,105 @@
+{
+  "deployed_commit": "4d8257de36561c8feab34b1a35f3bc80018cce7d",
+  "A-rag-cost": {
+    "search_status": 200,
+    "search": {
+      "cache_hit": false,
+      "no_evidence": false,
+      "sources": 1,
+      "every_source_has_text": true,
+      "compression": {
+        "original_chunks": 5,
+        "filtered_chunks": 1,
+        "original_tokens": 3999,
+        "filtered_tokens": 826,
+        "threshold": 0.7
+      },
+      "labels_in_answer_text": 1,
+      "citations": 1,
+      "citation_resolution": [
+        {
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_id": "a5fa48f5-c33c-47f5-80b6-2f0dbbe4a206",
+          "chunk_index": 2,
+          "in_response_sources": true,
+          "opens_in_document_chunk_list": true
+        }
+      ],
+      "every_citation_resolves": true,
+      "model_attempts": [
+        "gpt-5.1",
+        "gpt-5.2"
+      ],
+      "quality_composite": 0.967
+    },
+    "pedr_status": 200,
+    "pedr": {
+      "results": 5,
+      "every_result_has_text": true,
+      "every_result_has_document_and_index": true,
+      "every_result_in_requested_project": true,
+      "graph_ranked_better_than_semantic": [
+        "a5fa48f5-c33c-47f5-80b6-2f0dbbe4a206",
+        "a848d13f-b0ef-4d29-bc61-7d69e56bd29b",
+        "af37cee7-d4d8-4928-b7d8-102140eb1aa3",
+        "edd2f8a5-9d81-4dda-858a-ca4311328250"
+      ],
+      "layers_used": [
+        "semantic",
+        "graph"
+      ],
+      "cache_hit": null
+    }
+  },
+  "B-embedding-inversion": {
+    "search_status": 200,
+    "search": {
+      "cache_hit": false,
+      "no_evidence": false,
+      "sources": 1,
+      "every_source_has_text": true,
+      "compression": {
+        "original_chunks": 5,
+        "filtered_chunks": 1,
+        "original_tokens": 3941,
+        "filtered_tokens": 799,
+        "threshold": 0.7
+      },
+      "labels_in_answer_text": 4,
+      "citations": 1,
+      "citation_resolution": [
+        {
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_id": "2545f601-0f96-41b1-946b-ca6591542533",
+          "chunk_index": 11,
+          "in_response_sources": true,
+          "opens_in_document_chunk_list": true
+        }
+      ],
+      "every_citation_resolves": true,
+      "model_attempts": [
+        "gpt-5.1"
+      ],
+      "quality_composite": 0.897
+    },
+    "pedr_status": 200,
+    "pedr": {
+      "results": 5,
+      "every_result_has_text": true,
+      "every_result_has_document_and_index": true,
+      "every_result_in_requested_project": true,
+      "graph_ranked_better_than_semantic": [
+        "2545f601-0f96-41b1-946b-ca6591542533",
+        "2bae6368-b401-4bd1-bb29-742e6e5aaba3",
+        "bc873851-76a6-4cbc-81a2-c2b16ec5947e",
+        "2fe06d06-f658-42c7-ba2a-a3b54d43bf90",
+        "b0892bf2-f15b-4120-a116-735fb2fb27ef"
+      ],
+      "layers_used": [
+        "semantic",
+        "graph"
+      ],
+      "cache_hit": null
+    }
+  }
+}
