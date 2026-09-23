@@ -268,7 +268,7 @@ See `cmos/docs/mcp-reference.md` for complete parameter documentation.
 
 On **sprint close** with no immediately-following open, use the `-complete` variant and `metadata.sprint_status:"Completed"`.
 
-**Durable fix (cross-project):** the permanent automation belongs in `cmos-mcp-pro`'s sprint-open and `cmos_sprint complete` handlers, which should write these identity pointers whenever a sprint's status changes. Until that lands, this runbook is the mechanism — keep it in the build-session closeout checklist.
+**Durable fix (cross-project), partly shipped:** cmos-mcp 3.1.0 (reply on backlog request 6508d78e, 2026-09-18) keeps `master_context.sprint_tracking.current_sprint` and `last_completed_sprint` in step from the sprint handlers, and deliberately does not write the four pointers above (project_identity.status is the project's status; `metadata.*` had no reader). `cmos_review` still reads `project_identity.status`, so this runbook stays the mechanism for the four pointers — keep it in the build-session closeout checklist. A mission start that activates a Planned shell bypasses the sprint handlers entirely (`sprint_tracking.current_sprint` was null after MCP-5 activated `sprint-59` on 2026-09-23), so on a silent open set that pointer by hand as well.
 
 ### Receipt Re-Verification at Sprint Close (Runbook)
 

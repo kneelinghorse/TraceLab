@@ -313,13 +313,18 @@
   },
   "next_session_context": {
     "when_we_resume": [
-      "PS-2026-09-22-008: Treat the 403 \"Account is disabled\" response like a 401 in frontend/src/lib/api/http.ts (clear stored auth, dispatch tracelab:auth-expired) with a test, so a disabled user is signed out on their next request instead of seeing \"Projects could not load\" on every page. Found 2026-09-22 when Derek's browser still held the disabled walk1-guest session."
+      "PS-2026-09-22-008: Treat the 403 \"Account is disabled\" response like a 401 in frontend/src/lib/api/http.ts (clear stored auth, dispatch tracelab:auth-expired) with a test, so a disabled user is signed out on their next request instead of seeing \"Projects could not load\" on every page. Found 2026-09-22 when Derek's browser still held the disabled walk1-guest session.",
+      "PS-2026-09-23-002: Sprint 59 planning session with Derek is the sprint's real open (decision #537): set an end date (none is set); create the Q&A missions with the citation fix (#417) and the per-request answer-length decision sequenced ahead of any Q&A surface; finalize MCP-6's cluster and argument shape (decision #536); re-sequence sharing (#526, start from TRACE-SHARE-58 per #407, do not re-research); put #403, #405, #415 and #431 to Derek in numbered prose and close them on his words; batch the DeepSearch asks (#406, #412, #416, #422) into one message unless he says otherwise. Then re-plan the roadmap's Sprint 59 section from the CMOS missions with a change-log line, regenerate MASTER_CONTEXT.json, and in the same PR update the runbook's Durable-fix paragraph: cmos-mcp 3.1.0 automates only sprint_tracking.current_sprint (reply on 6508d78e, 2026-09-18), so the four pointers stay manual.",
+      "PS-2026-09-23-002: rag_default_max_tokens (successor of #401): the raise to 1500 shipped in PR #348 (4feb3e3, 2026-09-18). What remains is Derek's call, roadmap open question 2: single default or per-request. If per-request, frontend/src/types/search.ts declares max_tokens but nothing sends it, and tests/test_rag_service.py:359 asserts the outbound request carries the config value. Decide before the Q&A surface reuses the path.",
+      "PS-2026-09-23-002: master_context (successor of #395): 72.4 KB after the 2026-09-23 conservative condense; the conservative and auto strategies are exhausted (their only rule prunes when_we_resume steps for completed missions). The next reduction is a manual prune at the Sprint 59 close boundary (candidates: quality_standards.sprint_evaluation rows for sprints 01 and 02, sprint_history entries for Sprints 19 and 25, archived_sprint_summaries older than three sprints), followed by an export regeneration.",
+      "PS-2026-09-23-002: Sprint 59 close procedure (learning #248): before cmos_sprint complete, set sprint-59's endDate to the close date (complete does not stamp it), carry or complete every open next-step, then read lapsedDroppedIds in the close result and reopen plus carry anything that should survive.",
+      "PS-2026-09-23-003: BUILD HAND-OFF (Derek, 2026-09-23): a fresh build session starts RAG-2 (Queued in sprint-59) first. Read its objective, criteria, context and notes in CMOS; keep the change inside app/services/rag_service.py and tests/test_rag_service.py; prove each test by mutation; run CI's own pytest invocation and ruff check (0.8.0) before pushing; merge only on green CI, never chain push and merge; verify on production and write the receipt under cmos/reports/sprint-59/RAG-2/ with the main-push run ids and both Railway deployment ids. Then QA-1, then QA-2 and MCP-6, each in its own session after the previous is merged and deployed. Report to Derek in plain words."
     ]
   },
   "context_health": {
-    "sessions_since_reset": 245,
-    "last_update": "2026-09-23T02:53:00.461Z",
-    "size_kb": 72.09,
+    "sessions_since_reset": 247,
+    "last_update": "2026-09-23T04:01:37.212Z",
+    "size_kb": 74.96,
     "size_limit_kb": 100,
     "warning_threshold_percent": 75,
     "retention_keep_sprints": 3
@@ -366,12 +371,12 @@
     "CORRECTION to PERSONAL-1's completion (session PS-2026-09-22-011). The mission was completed without rechecking the main-push CI of its own receipt merge, d895664, which the post-merge rule requires. That run's Backend Integration had FAILED on test_graph_layer_depth2_performance_under_200ms: 221.52 ms, of which a generation-2 garbage collection took 209.68 ms, while SQL took 2.7 ms. It is a flake, not PERSONAL-1 code: d895664 is docs-only on top of fe4c112, whose identical code passed. The completion notes' claims (CI green on PRs #363/#364/#365; all eight main-push runs green for fec1893 and fe4c112) are accurate as written, but they omitted d895664. The same flake then hit PR #366's first attempt and main 2bcc766 twice. The root fix is PR #367: the timed search runs with GC off, as timeit does.",
     "MCP-5 state, 2026-09-23. The release PR #370 is merged as a5c882b, with ten of ten checks green. The annotated tag tracelab-mcp-v2.0.0 is pushed. A clean worktree of the tag at scratchpad/mcp-release-2.0.0 passed npm ci, the build, and `npm publish --dry-run`: @aquex/tracelab-mcp 2.0.0, 24 files, package 72.3 kB, shasum 591313b74f7795f1ce1ba4c006e75163987fa14e. `npm whoami` returns 401 on this machine, so the publish waits on Derek's `npm login` and one-time code. The 2.0.0 smoke (cmos/reports/sprint-59/MCP-5, adapted from MCP-3's) already passed 15/15 against the locally packed tarball: 9 tools, 49 actions, server 2.0.0, the ACT-1 and PERSONAL-2 surfaces, read-only production calls, 27 links resolving. After the publish: npm view, the smoke against the published package, the receipt, complete MCP-5 and next-step #434, then remove the worktree. Also done this session: the legacy account renamed to \"kneelinghorse (legacy)\" (its Space to \"kneelinghorse (legacy)'s Space\") in one guarded production transaction; decision #535 records Derek's answers; next-step #432 is closed."
   ],
-  "current_focus": "Plan Sprint 59 with Derek: the Q&A missions (citation fix #417 and the per-request half of #401 first), MCP-6's cluster and argument shape, an end date, and the re-sequencing of sharing (#526) now that the rewalk has passed; then build in a fresh session on his hand-off",
+  "current_focus": "Build Sprint 59 in order: RAG-2 (citations that resolve, or nothing) first, then QA-1 (ask the Librarian a question about the research), then QA-2 (search absorbed into the Librarian) and MCP-6 (the same Q&A over the MCP, released as 2.1.0). Each mission is merged, deployed and verified in production before the next starts. Sharing and invites are out.",
   "current_sprint": {
     "id": "sprint-59",
     "name": "Sprint 59 — Q&A, and the search question answered",
     "status": "Active",
-    "focus": "Opened 2026-09-23 by MCP-5's start (@aquex/tracelab-mcp 2.0.0 published by Derek, decision #535); MCP-6 (corpus Q&A over the MCP, decision #536) is queued with draft criteria. The Q&A missions are scoped with Derek at the planning session, with the citation fix (#417) and the per-request half of the answer-length question (#401; the default has been 1500 since PR #348) ahead of any Q&A surface; sharing (#526) is re-sequenced there now that the rewalk has passed. 15 next-steps carried; no end date set."
+    "focus": "Planned 2026-09-23 on Derek's hand-off. Build order: RAG-2, QA-1, QA-2, MCP-6, each in its own fresh build session, merged and deployed before the next. MCP-5 (2.0.0) shipped. Out: sharing, invites, everything else. End date 2026-10-07."
   },
   "strategic_context": {
     "sprint_13": {
@@ -462,7 +467,7 @@
       }
     }
   },
-  "current_phase": "Sprint 59 active since 2026-09-23 (MCP-5 complete, MCP-6 queued); the Q&A missions are not yet scoped with Derek",
+  "current_phase": "Sprint 59 active and planned 2026-09-23 on Derek's hand-off: MCP-5 complete; RAG-2, QA-1, QA-2, MCP-6 queued in that build order, each in a fresh build session",
   "sprint_history": [
     {
       "sprint": "Sprint 19",
@@ -602,7 +607,12 @@
     }
   },
   "sprint_tracking": {
-    "current_sprint": null,
+    "current_sprint": {
+      "id": "sprint-59",
+      "title": "Sprint 59 — Q&A, and the search question answered",
+      "status": "Active",
+      "focus": "Planned 2026-09-23 on Derek's hand-off. Build order: RAG-2, QA-1, QA-2, MCP-6, each in its own fresh build session. Out: sharing, invites."
+    },
     "last_completed_sprint": "sprint-58"
   }
 }
