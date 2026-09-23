@@ -160,6 +160,23 @@ describe("citation deep links", () => {
     expect(screen.queryByText("Neighbouring text.")).toBeNull();
   });
 
+  it("scrolls the cited card's top into view, so its header shows even on a long chunk", async () => {
+    // Production, QA-1 acceptance: centring a 771-token chunk's text hid its "#9 Cited" header.
+    const scrolled = vi.fn();
+    const original = Element.prototype.scrollIntoView;
+    Element.prototype.scrollIntoView = scrolled;
+    try {
+      mocks.query = { id: "doc-1", chunk: "chunk-14", index: "14" };
+      mocks.listChunks.mockResolvedValue({ data: [neighbour, cited], pagination: { total: 20, pages: 2, page: 2, page_size: 10 } });
+      mount();
+      await screen.findByText("92% of 32-token inputs were recovered.");
+      await waitFor(() => expect(scrolled).toHaveBeenCalledWith({ block: "start" }));
+      expect(scrolled.mock.contexts[0]).toHaveAttribute("data-cited", "true");
+    } finally {
+      Element.prototype.scrollIntoView = original;
+    }
+  });
+
   it("says the cited chunk is gone rather than showing another passage", async () => {
     mocks.query = { id: "doc-1", chunk: "chunk-reprocessed-away", index: "14" };
     mocks.listChunks.mockResolvedValue({ data: [neighbour, cited], pagination: { total: 20, pages: 2, page: 2, page_size: 10 } });

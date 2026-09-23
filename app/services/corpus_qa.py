@@ -23,7 +23,6 @@ from app.core.authorization import accessible_project_ids
 from app.core.security import AuthenticatedUser
 from app.models.document import Document
 from app.services.rag_service import (
-    CITATION_PATTERN,
     NO_EVIDENCE_ANSWER,
     RagService,
     build_empty_scope_result,
@@ -34,8 +33,31 @@ from app.services.rag_service import (
 ANSWER_TOP_K = 5
 
 _PASSAGE_BREAK = re.compile(r"\n[ \t]*\n")
-# A label and the spaces before it, so "fact [Document: d, Chunk: 1]." reads "fact.".
-_LABEL = re.compile(r"[ \t]*" + CITATION_PATTERN.pattern, CITATION_PATTERN.flags)
+# The pipeline's label, "[Document: d, Chunk: 1]", with the spaces before it, so
+# "fact [Document: d, Chunk: 1]." reads "fact.". It also reads a label naming several
+# chunks, "Chunks: 9–10" or "Chunk: 10, 12", which the pipeline's CITATION_PATTERN
+# does not: QA-1's production acceptance found one left in an answer as raw text.
+_LABEL = re.compile(
+    r"[ \t]*\[Document:\s*(?P<document>[^\],]+),\s*Chunks?:\s*(?P<chunks>[^\]]+)\]",
+    re.IGNORECASE,
+)
+_RANGE = re.compile(r"(\d+)\s*[-‐-―]\s*(\d+)")
+_LIST_SEPARATOR = re.compile(r",|;|&|\band\b", re.IGNORECASE)
+# Retrieval returns five chunks, so a longer range names chunks it cannot cite.
+_MAX_RANGE = 20
+
+
+def _chunk_labels(spec: str) -> list[str]:
+    """The chunks one label names: "9", a range "9–10" or a list "9, 10"."""
+    labels: list[str] = []
+    for part in _LIST_SEPARATOR.split(spec):
+        part = part.strip()
+        span = _RANGE.fullmatch(part)
+        if span and 0 <= int(span[2]) - int(span[1]) <= _MAX_RANGE:
+            labels.extend(str(index) for index in range(int(span[1]), int(span[2]) + 1))
+        elif part:
+            labels.append(part)
+    return labels
 
 
 @dataclass(frozen=True)
@@ -179,13 +201,15 @@ def _passages(
     passages: list[AnswerPassage] = []
     for paragraph in _PASSAGE_BREAK.split(answer.strip()):
         cited: list[str] = []
-        for match in CITATION_PATTERN.finditer(paragraph):
-            chunk = RagService.match_chunk(match.group("document").strip(), match.group("chunk").strip(), sources)
-            if chunk is None or not chunk.get("chunk_id") or str(_document_uuid(chunk)) not in live_names:
-                continue
-            chunk_id = str(chunk["chunk_id"])
-            if chunk_id not in cited:
-                cited.append(chunk_id)
+        for match in _LABEL.finditer(paragraph):
+            document = match.group("document").strip()
+            for label in _chunk_labels(match.group("chunks")):
+                chunk = RagService.match_chunk(document, label, sources)
+                if chunk is None or not chunk.get("chunk_id") or str(_document_uuid(chunk)) not in live_names:
+                    continue
+                chunk_id = str(chunk["chunk_id"])
+                if chunk_id not in cited:
+                    cited.append(chunk_id)
         text = "\n".join(line.rstrip() for line in _LABEL.sub("", paragraph).splitlines()).strip()
         if text:
             passages.append(AnswerPassage(text=text, citations=cited))
