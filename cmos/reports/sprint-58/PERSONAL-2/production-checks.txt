@@ -1,0 +1,22 @@
+# PERSONAL-2 production checks, 2026-09-23 UTC, deployed commit 2bcc766
+
+## 1. Setup, as Derek through his MCP credential
+re-enable guest 200 True
+add Test to Walkthrough Guest 201 ok
+Walkthrough Guest roster 200 ['Test', 'Walkthrough Guest']
+
+## 2. As the guest in a browser, through the real Space picker on /projects/new (JWT minted inside the service into a scratch file, never displayed, deleted after)
+{"options":["My Space","Walkthrough Guest"],"defaultValue":"","projectId":"2cd73b8d-af2f-4657-8fc1-13d7ca5601f2","url":"https://tracelab.aquex.ai/projects/2cd73b8d-af2f-4657-8fc1-13d7ca5601f2","pageErrors":0}
+
+## 3. API checks (tokens minted inside the service; calls go to the public API)
+guest GET /spaces 200 [("Walkthrough Guest's Space", 'personal'), ('Walkthrough Guest', 'shared')]
+guest GET the picker-created project 200 workspace_id e0d2ba43-d4ca-4d4e-b59a-0c40d2d6f1ed is Walkthrough Guest: True
+second member GET /spaces 200 [("Test's Space", 'personal'), ('Walkthrough Guest', 'shared')]
+second member GET /projects lists it: 200 True
+guest POST into a Space it is not in -> 403 You are not a member of this Space.
+
+## 4. Cleanup, as Derek
+soft-delete 2cd73b8d-af2f-4657-8fc1-13d7ca5601f2 200
+remove Test from Walkthrough Guest 200
+Walkthrough Guest roster 200 ['Walkthrough Guest']
+disable guest 200 False
