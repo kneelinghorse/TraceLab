@@ -297,6 +297,17 @@ class _Embedding:
         return [1.0, 0.0, 0.0]
 
 
+class _NoCache:
+    """RagService reads cache_service=None as "use the shared Qdrant cache", which a
+    local .env points at a real Qdrant; a test must never reach it."""
+
+    def check_cache(self, **_kwargs):
+        return None
+
+    def store_in_cache(self, **_kwargs):
+        return None
+
+
 def _pipeline(monkeypatch, results, content) -> _FakeOpenAI:
     client = _FakeOpenAI(content)
     monkeypatch.setattr(rag_module, "_openai_import_error", None, raising=False)
@@ -304,7 +315,7 @@ def _pipeline(monkeypatch, results, content) -> _FakeOpenAI:
     service = rag_module.RagService(
         pedr_orchestrator=_FakePEDR(results),
         embedding_service=_Embedding(),
-        cache_service=None,
+        cache_service=_NoCache(),
         client=client,
         model="gpt-test",
         default_temperature=0.0,
