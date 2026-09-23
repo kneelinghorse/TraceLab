@@ -1,0 +1,109 @@
+{
+  "head": "65b11ef5e4a1acfbbb757f781dc712c698a9b9bc",
+  "base": "78bbc7e",
+  "files_restored_to_head": true,
+  "all_as_expected": true,
+  "runs": [
+    {
+      "label": "baseline-before",
+      "pytest_exit": 0,
+      "tests": {
+        "T1 best match first, production shape": "pass",
+        "T2 seeds in retrieval order": "pass",
+        "T3 e2e seeds keep the top five": "pass",
+        "T4 updated: depth boundary [1]": "pass",
+        "T5 updated: depth boundary [2]": "pass",
+        "T6 updated: cycle handling": "pass",
+        "T7 graph still surfaces missed chunks": "pass",
+        "T8 expanded count, integration": "pass",
+        "T9 production similarities reach the model": "pass"
+      },
+      "as_expected": true
+    },
+    {
+      "label": "M1",
+      "pytest_exit": 1,
+      "tests": {
+        "T1 best match first, production shape": "FAIL at assert response.results[0].chunk_id == str(best.id), ( (AssertionError: (semantic rank, graph rank) of the top three: [(11, 2), (23, 1), (1, None)])",
+        "T2 seeds in retrieval order": "FAIL at assert [(entry[\"urn\"], entry[\"depth\"]) for entry in layer.results] == [ (AssertionError: assert [('urn:resear...-chunk-2', 1)] == [('urn:resear...-chunk-2', 1)])",
+        "T3 e2e seeds keep the top five": "FAIL at assert comparison.graph_on_top_ids == comparison.graph_off_top_ids, query (AssertionError: user research onboarding friction)",
+        "T4 updated: depth boundary [1]": "FAIL at assert (seed_entry[\"urn\"], seed_entry[\"depth\"]) == (seed, 0) (AssertionError: assert ('urn:researc...ary-mid-0', 1) == ('urn:researc...dary-seed', 0))",
+        "T5 updated: depth boundary [2]": "FAIL at assert (seed_entry[\"urn\"], seed_entry[\"depth\"]) == (seed, 0) (AssertionError: assert ('urn:researc...ary-mid-0', 1) == ('urn:researc...dary-seed', 0))",
+        "T6 updated: cycle handling": "FAIL at assert [(entry[\"depth\"], entry[\"score\"]) for entry in seed_entries] == [(0, 1.0)] (assert [] == [(0, 1.0)])",
+        "T7 graph still surfaces missed chunks": "pass",
+        "T8 expanded count, integration": "pass",
+        "T9 production similarities reach the model": "pass"
+      },
+      "target": "app/services/pedr/graph_layer.py",
+      "reverts": "seeds ranked first in the graph layer (it ranks only the chunks it reached again)",
+      "expect_red": [
+        "T1 best match first, production shape",
+        "T2 seeds in retrieval order",
+        "T3 e2e seeds keep the top five",
+        "T4 updated: depth boundary [1]",
+        "T5 updated: depth boundary [2]",
+        "T6 updated: cycle handling"
+      ],
+      "as_expected": true
+    },
+    {
+      "label": "M2",
+      "pytest_exit": 1,
+      "tests": {
+        "T1 best match first, production shape": "FAIL at assert response.metadata.graph_candidates_expanded == 2 (AssertionError: assert 12 == 2)",
+        "T2 seeds in retrieval order": "pass",
+        "T3 e2e seeds keep the top five": "pass",
+        "T4 updated: depth boundary [1]": "pass",
+        "T5 updated: depth boundary [2]": "pass",
+        "T6 updated: cycle handling": "pass",
+        "T7 graph still surfaces missed chunks": "pass",
+        "T8 expanded count, integration": "FAIL at assert response.metadata.graph_candidates_expanded == 2 (AssertionError: assert 3 == 2)",
+        "T9 production similarities reach the model": "pass"
+      },
+      "target": "app/services/pedr/search_orchestrator.py",
+      "reverts": "counting only reached chunks as expanded (the seeds are counted again)",
+      "expect_red": [
+        "T1 best match first, production shape",
+        "T8 expanded count, integration"
+      ],
+      "as_expected": true
+    },
+    {
+      "label": "M3",
+      "pytest_exit": 1,
+      "tests": {
+        "T1 best match first, production shape": "pass",
+        "T2 seeds in retrieval order": "pass",
+        "T3 e2e seeds keep the top five": "pass",
+        "T4 updated: depth boundary [1]": "pass",
+        "T5 updated: depth boundary [2]": "pass",
+        "T6 updated: cycle handling": "pass",
+        "T7 graph still surfaces missed chunks": "pass",
+        "T8 expanded count, integration": "pass",
+        "T9 production similarities reach the model": "FAIL at assert [c[\"chunk_id\"] for c in filtered] == [c[\"chunk_id\"] for c in relevant] (AssertionError: assert ['relevant-0.66'] == ['relevant-0....elevant-0.55'])"
+      },
+      "target": "app/core/config.py",
+      "reverts": "the 0.4 compression threshold (0.7 again)",
+      "expect_red": [
+        "T9 production similarities reach the model"
+      ],
+      "as_expected": true
+    },
+    {
+      "label": "baseline-after",
+      "pytest_exit": 0,
+      "tests": {
+        "T1 best match first, production shape": "pass",
+        "T2 seeds in retrieval order": "pass",
+        "T3 e2e seeds keep the top five": "pass",
+        "T4 updated: depth boundary [1]": "pass",
+        "T5 updated: depth boundary [2]": "pass",
+        "T6 updated: cycle handling": "pass",
+        "T7 graph still surfaces missed chunks": "pass",
+        "T8 expanded count, integration": "pass",
+        "T9 production similarities reach the model": "pass"
+      },
+      "as_expected": true
+    }
+  ]
+}
