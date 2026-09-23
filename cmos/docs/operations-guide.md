@@ -241,7 +241,7 @@ See `cmos/docs/mcp-reference.md` for complete parameter documentation.
 
 ### Sprint-Boundary Identity Sync (Runbook)
 
-`project_identity.status` and `master_context.project_identity.status` do **not** auto-update when a sprint opens or closes — `cmos_sprint(action="complete")` and sprint creation only touch the sprint record. Left unsynced, `cmos_review` reports a stale sprint (e.g. project shows `sprint-44-complete` while `sprint-45` is already Active). Run this runbook at **every sprint open and every sprint close** until the sync is automated server-side (see Durable fix below).
+`project_identity.status` and `master_context.project_identity.status` do **not** auto-update when a sprint opens or closes — `cmos_sprint(action="complete")` and sprint creation only touch the sprint record. Left unsynced, `cmos_review` reports a stale sprint (e.g. project shows `sprint-44-complete` while `sprint-45` is already Active). Run this runbook at **every sprint open and every sprint close** until the sync is automated server-side (see Durable fix below). A sprint open includes the silent one: starting a mission inside a Planned shell activates the sprint (its `startDate` becomes the mission's `startedAt`), so the session that starts the first mission in a shell is the open and runs this runbook before it closes. MCP-5 activated `sprint-59` on 2026-09-23 this way while the identity stayed `sprint-58-complete` until the next review.
 
 **Status-string convention** (`project_identity.status` / `master_context.project_identity.status`):
 
