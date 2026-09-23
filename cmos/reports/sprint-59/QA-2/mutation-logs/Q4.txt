@@ -1,0 +1,31 @@
+JSON report written to /var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/tmpk8fl4xl2.json
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+(node:37995) TimeoutNaNWarning: NaN is not a number.
+Timeout duration was set to 1.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+--- Librarian page, listing the chunks puts the phrase in the URL and never sends it to the Librarian model
+AssertionError: expected "spy" to not be called at all, but actually been called 1 times[90m
+
+Received: 
+
+[1m  1st spy call:
+
+[22m    Array [
+      Array [
+        Object {
+          "content": "onboarding friction",
+          "role": "user",
+        },
+      ],
+      "10000000-0000-4000-8000-000000000001",
+    ]
+[39m[90m
+
+Number of calls: [1m1[22m
+[39m
+    at Proxy.<anonymous> (file:///Users/systemsystems/portfolio/TraceLab/frontend/node_modules/@vitest/expect/dist/index.js:1335:10)
+    at Proxy.<anonymous> (file:///Users/systemsystems/portfolio/TraceLab/frontend/node_modules/@vitest/expect/dist/index.js:1029:14)
+    at Proxy.methodWrapper (file:///Users/systemsystems/portfolio/TraceLab/frontend/node_modules/chai/index.js:1686:25)
+    at /Users/systemsystems/portfolio/TraceLab/frontend/src/__tests__/librarian.test.tsx:396:28
+    at file:///Users/systemsystems/portfolio/TraceLab/frontend/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20
