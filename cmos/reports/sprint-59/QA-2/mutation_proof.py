@@ -80,14 +80,20 @@ MUTATIONS = [
 ]
 
 
+def git(*args, **kwargs):
+    # noqa S603/S607: fixed git argv chosen by this script, never external input.
+    return subprocess.run(["git", *args], cwd=ROOT, **kwargs)  # noqa: S603, S607
+
+
 def clean(files):
-    return subprocess.run(["git", "diff", "--quiet", "HEAD", "--", *files], cwd=ROOT).returncode == 0
+    return git("diff", "--quiet", "HEAD", "--", *files).returncode == 0
 
 
 def red_tests():
     with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as handle:
         report = pathlib.Path(handle.name)
-    run = subprocess.run(
+    # noqa S603: the repository's pinned vitest with a fixed argv.
+    run = subprocess.run(  # noqa: S603
         [str(FRONTEND / "node_modules/.bin/vitest"), "run", SPEC, "--reporter=json", f"--outputFile={report}"],
         cwd=FRONTEND, capture_output=True, text=True,
     )
@@ -107,7 +113,7 @@ def main():
     targets = sorted({m["file"] for m in MUTATIONS})
     if not clean(targets):
         sys.exit("Target files differ from HEAD; commit or stash first.")
-    head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
+    head = git("rev-parse", "HEAD", capture_output=True, text=True).stdout.strip()
     logs = OUT / "mutation-logs"
     logs.mkdir(exist_ok=True)
     runs = []
