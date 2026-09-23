@@ -288,7 +288,9 @@ class GraphLayerService:
                         visited.add(next_urn)
                         queue.append((next_urn, hop_depth, seed_urn))
 
-        results = self._build_results(session, candidates, config.max_candidates)
+        results = self._build_results(
+            session, candidates, config.max_candidates, seeds, seed_scores
+        )
         depth_stats = _build_depth_stats(candidates)
         metadata = {
             "seed_count": len(seeds),
@@ -379,19 +381,31 @@ class GraphLayerService:
         session: Session,
         candidates: dict[str, CandidateInfo],
         max_candidates: int,
+        seeds: Sequence[str],
+        seed_scores: dict[str, float],
     ) -> list[dict[str, Any]]:
         if not candidates:
             return []
 
-        chunk_urns = {urn for urn in candidates if URNParser.parse_chunk_urn(urn)}
-        chunk_id_map = self._resolve_chunk_urns(session, chunk_urns)
-
-        sorted_candidates = sorted(
+        # Seeds rank first, in the order retrieval gave them, then the candidates
+        # reached from them, by score. Left out, a seed's neighbours took a graph
+        # share on top of their own retrieval rank and fusion put them above the
+        # best match they were reached from. Position, not score, orders the seeds
+        # because seed scores mix scales (lexical ts_rank_cd, semantic cosine).
+        ranked = [
+            (seed, CandidateInfo(seed_scores.get(seed, 1.0), 0, seed, None))
+            for seed in seeds
+        ]
+        ranked += sorted(
             candidates.items(),
             key=lambda item: (-item[1].score, item[0]),
         )
+
+        chunk_urns = {urn for urn, _ in ranked if URNParser.parse_chunk_urn(urn)}
+        chunk_id_map = self._resolve_chunk_urns(session, chunk_urns)
+
         results: list[dict[str, Any]] = []
-        for urn, info in sorted_candidates[:max_candidates]:
+        for urn, info in ranked[:max_candidates]:
             entry: dict[str, Any] = {
                 "urn": urn,
                 "score": float(info.score),

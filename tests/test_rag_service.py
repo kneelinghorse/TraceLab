@@ -312,7 +312,9 @@ def test_rag_service_run_query(monkeypatch):
     assert result["citations"][0]["chunk_id"] == "chunk-1"
     assert result["sources"][0]["chunk_id"] == "chunk-1"
     assert result["compression"]["original_chunks"] == 2
-    assert result["compression"]["filtered_chunks"] == 1
+    # chunk-2's cosine (0.61) is inside production's range for answering chunks,
+    # so both reach the model (RAG-4).
+    assert result["compression"]["filtered_chunks"] == 2
     assert result["compression"]["threshold"] == settings.rag_context_threshold
     assert fake_embedding.requests == [
         "How does the repository describe experiment-driven delivery?"

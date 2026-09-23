@@ -1,0 +1,2104 @@
+{
+  "top_k": 30,
+  "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+  "questions": [
+    {
+      "id": "A-rag-cost",
+      "answered_in_project": true,
+      "query": "According to the RAG cost optimization research, how much cheaper per query is the architecture with context compression than the naive baseline?",
+      "results": 30,
+      "cosine_max": 0.657311,
+      "cosine_top5": [
+        0.657311,
+        0.63794225,
+        0.5509232,
+        0.5490469,
+        0.53582174
+      ],
+      "cosine_5th": 0.53582174,
+      "cosine_median": 0.455646465,
+      "cosine_min": 0.39956152,
+      "lexical_results": 0,
+      "rows": [
+        {
+          "rank": 1,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 9,
+          "semantic_cosine": 0.657311,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 2,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 8,
+          "semantic_cosine": 0.63794225,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 3,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 5,
+          "semantic_cosine": 0.5509232,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 4,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 7,
+          "semantic_cosine": 0.5490469,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 5,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 6,
+          "semantic_cosine": 0.53582174,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 6,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 0,
+          "semantic_cosine": 0.52053535,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 7,
+          "document_id": "e237cd2b-600e-4b79-af1d-b206f707a591",
+          "chunk_index": 6,
+          "semantic_cosine": 0.5143972,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 8,
+          "document_id": "e237cd2b-600e-4b79-af1d-b206f707a591",
+          "chunk_index": 7,
+          "semantic_cosine": 0.5057962,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 9,
+          "document_id": "9124e081-59ba-47bb-b34d-96273bd1140a",
+          "chunk_index": 1,
+          "semantic_cosine": 0.48793495,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 10,
+          "document_id": "9124e081-59ba-47bb-b34d-96273bd1140a",
+          "chunk_index": 4,
+          "semantic_cosine": 0.4826768,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 11,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 2,
+          "semantic_cosine": 0.47175547,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 12,
+          "document_id": "9124e081-59ba-47bb-b34d-96273bd1140a",
+          "chunk_index": 0,
+          "semantic_cosine": 0.46891958,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 13,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 4,
+          "semantic_cosine": 0.46349996,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 14,
+          "document_id": "b6cf2e2c-8aec-4d7f-84e4-5f4ed2e2e978",
+          "chunk_index": 15,
+          "semantic_cosine": 0.45690578,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 15,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 11,
+          "semantic_cosine": 0.4563744,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 16,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 10,
+          "semantic_cosine": 0.45491853,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 17,
+          "document_id": "9124e081-59ba-47bb-b34d-96273bd1140a",
+          "chunk_index": 3,
+          "semantic_cosine": 0.4528342,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 18,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 0,
+          "semantic_cosine": 0.44687688,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 19,
+          "document_id": "e4f32d07-e596-4c8b-9712-5717a13595ce",
+          "chunk_index": 8,
+          "semantic_cosine": 0.44474304,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 20,
+          "document_id": "9124e081-59ba-47bb-b34d-96273bd1140a",
+          "chunk_index": 5,
+          "semantic_cosine": 0.43501922,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 21,
+          "document_id": "9124e081-59ba-47bb-b34d-96273bd1140a",
+          "chunk_index": 2,
+          "semantic_cosine": 0.43122947,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 22,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 1,
+          "semantic_cosine": 0.43074185,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 23,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 3,
+          "semantic_cosine": 0.42999595,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 24,
+          "document_id": "b6cf2e2c-8aec-4d7f-84e4-5f4ed2e2e978",
+          "chunk_index": 14,
+          "semantic_cosine": 0.42716694,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 25,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 10,
+          "semantic_cosine": 0.4254416,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 26,
+          "document_id": "9124e081-59ba-47bb-b34d-96273bd1140a",
+          "chunk_index": 8,
+          "semantic_cosine": 0.42246968,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 27,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 9,
+          "semantic_cosine": 0.41547287,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 28,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 1,
+          "semantic_cosine": 0.41463268,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 29,
+          "document_id": "9124e081-59ba-47bb-b34d-96273bd1140a",
+          "chunk_index": 6,
+          "semantic_cosine": 0.41059133,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 30,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 7,
+          "semantic_cosine": 0.39956152,
+          "layers": [
+            "semantic"
+          ]
+        }
+      ],
+      "answering_chunks": [
+        {
+          "chunk_index": 10,
+          "found": {
+            "rank": 25,
+            "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+            "chunk_index": 10,
+            "semantic_cosine": 0.4254416,
+            "layers": [
+              "semantic"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "B-embedding-inversion",
+      "answered_in_project": true,
+      "query": "What does the PII redaction research say about recovering original text from embeddings, and how much of a short input could be reconstructed?",
+      "results": 30,
+      "cosine_max": 0.66413414,
+      "cosine_top5": [
+        0.66413414,
+        0.65030104,
+        0.59491843,
+        0.54298514,
+        0.52588606
+      ],
+      "cosine_5th": 0.52588606,
+      "cosine_median": 0.46274722,
+      "cosine_min": 0.4209125,
+      "lexical_results": 0,
+      "rows": [
+        {
+          "rank": 1,
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 14,
+          "semantic_cosine": 0.66413414,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 2,
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 13,
+          "semantic_cosine": 0.65030104,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 3,
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 15,
+          "semantic_cosine": 0.59491843,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 4,
+          "document_id": "e237cd2b-600e-4b79-af1d-b206f707a591",
+          "chunk_index": 5,
+          "semantic_cosine": 0.54298514,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 5,
+          "document_id": "9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+          "chunk_index": 3,
+          "semantic_cosine": 0.52588606,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 6,
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 10,
+          "semantic_cosine": 0.5167581,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 7,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 0,
+          "semantic_cosine": 0.5042329,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 8,
+          "document_id": "f40c4015-87d8-461f-80b5-4b9b653e0efb",
+          "chunk_index": 10,
+          "semantic_cosine": 0.49790567,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 9,
+          "document_id": "9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+          "chunk_index": 5,
+          "semantic_cosine": 0.49565342,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 10,
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 16,
+          "semantic_cosine": 0.4905218,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 11,
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 11,
+          "semantic_cosine": 0.48685718,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 12,
+          "document_id": "9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+          "chunk_index": 6,
+          "semantic_cosine": 0.4841378,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 13,
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 2,
+          "semantic_cosine": 0.47592288,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 14,
+          "document_id": "9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+          "chunk_index": 2,
+          "semantic_cosine": 0.47007626,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 15,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 9,
+          "semantic_cosine": 0.46681,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 16,
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 9,
+          "semantic_cosine": 0.45868444,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 17,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 8,
+          "semantic_cosine": 0.4543327,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 18,
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 4,
+          "semantic_cosine": 0.44991446,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 19,
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 6,
+          "semantic_cosine": 0.4470277,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 20,
+          "document_id": "9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+          "chunk_index": 8,
+          "semantic_cosine": 0.44532603,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 21,
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 18,
+          "semantic_cosine": 0.44123277,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 22,
+          "document_id": "9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+          "chunk_index": 16,
+          "semantic_cosine": 0.4367385,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 23,
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 1,
+          "semantic_cosine": 0.43492723,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 24,
+          "document_id": "9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+          "chunk_index": 7,
+          "semantic_cosine": 0.43061683,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 25,
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 17,
+          "semantic_cosine": 0.43014294,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 26,
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 19,
+          "semantic_cosine": 0.42689878,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 27,
+          "document_id": "9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+          "chunk_index": 15,
+          "semantic_cosine": 0.42675924,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 28,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 2,
+          "semantic_cosine": 0.4241472,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 29,
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 12,
+          "semantic_cosine": 0.4228711,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 30,
+          "document_id": "e237cd2b-600e-4b79-af1d-b206f707a591",
+          "chunk_index": 6,
+          "semantic_cosine": 0.4209125,
+          "layers": [
+            "semantic"
+          ]
+        }
+      ],
+      "answering_chunks": [
+        {
+          "chunk_index": 14,
+          "found": {
+            "rank": 1,
+            "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+            "chunk_index": 14,
+            "semantic_cosine": 0.66413414,
+            "layers": [
+              "semantic"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "B2-embedding-inversion-reworded",
+      "answered_in_project": true,
+      "query": "If someone stole the vectors in our database, could they rebuild the sentences they came from? What share of short inputs did the study recover word for word?",
+      "results": 30,
+      "cosine_max": 0.4916669,
+      "cosine_top5": [
+        0.4916669,
+        0.4667641,
+        0.3992164,
+        0.38794592,
+        0.38617206
+      ],
+      "cosine_5th": 0.38617206,
+      "cosine_median": 0.36043623,
+      "cosine_min": 0.34134227,
+      "lexical_results": 0,
+      "rows": [
+        {
+          "rank": 1,
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 13,
+          "semantic_cosine": 0.4916669,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 2,
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 14,
+          "semantic_cosine": 0.4667641,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 3,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 10,
+          "semantic_cosine": 0.3992164,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 4,
+          "document_id": "e237cd2b-600e-4b79-af1d-b206f707a591",
+          "chunk_index": 5,
+          "semantic_cosine": 0.38794592,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 5,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 11,
+          "semantic_cosine": 0.38617206,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 6,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 1,
+          "semantic_cosine": 0.37901855,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 7,
+          "document_id": "e237cd2b-600e-4b79-af1d-b206f707a591",
+          "chunk_index": 4,
+          "semantic_cosine": 0.37827983,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 8,
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 11,
+          "semantic_cosine": 0.3730325,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 9,
+          "document_id": "9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+          "chunk_index": 6,
+          "semantic_cosine": 0.37300396,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 10,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 0,
+          "semantic_cosine": 0.36945248,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 11,
+          "document_id": "e237cd2b-600e-4b79-af1d-b206f707a591",
+          "chunk_index": 6,
+          "semantic_cosine": 0.36519018,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 12,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 8,
+          "semantic_cosine": 0.36301026,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 13,
+          "document_id": "f40c4015-87d8-461f-80b5-4b9b653e0efb",
+          "chunk_index": 9,
+          "semantic_cosine": 0.36243212,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 14,
+          "document_id": "f40c4015-87d8-461f-80b5-4b9b653e0efb",
+          "chunk_index": 10,
+          "semantic_cosine": 0.36168337,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 15,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 12,
+          "semantic_cosine": 0.36096048,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 16,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 10,
+          "semantic_cosine": 0.35991198,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 17,
+          "document_id": "a86d36c7-80ca-4753-91dd-6f92c5a81c47",
+          "chunk_index": 4,
+          "semantic_cosine": 0.35622704,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 18,
+          "document_id": "3975e217-1c7b-4444-bd66-54c5427a2cf2",
+          "chunk_index": 6,
+          "semantic_cosine": 0.3542802,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 19,
+          "document_id": "e237cd2b-600e-4b79-af1d-b206f707a591",
+          "chunk_index": 3,
+          "semantic_cosine": 0.35322464,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 20,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 1,
+          "semantic_cosine": 0.35165864,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 21,
+          "document_id": "7ffc1da9-6d95-4f76-b1ef-dcdab36a2b5b",
+          "chunk_index": 9,
+          "semantic_cosine": 0.35131577,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 22,
+          "document_id": "9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+          "chunk_index": 16,
+          "semantic_cosine": 0.34999102,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 23,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 6,
+          "semantic_cosine": 0.34920195,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 24,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 9,
+          "semantic_cosine": 0.34908742,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 25,
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 15,
+          "semantic_cosine": 0.3468493,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 26,
+          "document_id": "e237cd2b-600e-4b79-af1d-b206f707a591",
+          "chunk_index": 13,
+          "semantic_cosine": 0.34613186,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 27,
+          "document_id": "9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+          "chunk_index": 3,
+          "semantic_cosine": 0.34421217,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 28,
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 3,
+          "semantic_cosine": 0.34401673,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 29,
+          "document_id": "9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+          "chunk_index": 8,
+          "semantic_cosine": 0.34170538,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 30,
+          "document_id": "3975e217-1c7b-4444-bd66-54c5427a2cf2",
+          "chunk_index": 3,
+          "semantic_cosine": 0.34134227,
+          "layers": [
+            "semantic"
+          ]
+        }
+      ],
+      "answering_chunks": [
+        {
+          "chunk_index": 14,
+          "found": {
+            "rank": 2,
+            "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+            "chunk_index": 14,
+            "semantic_cosine": 0.4667641,
+            "layers": [
+              "semantic"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "C-qdrant-railway-cost",
+      "answered_in_project": true,
+      "query": "What total monthly bill does the Qdrant on Railway report estimate for self-hosting half a million vectors on the Hobby plan?",
+      "results": 30,
+      "cosine_max": 0.6335608,
+      "cosine_top5": [
+        0.6335608,
+        0.59811264,
+        0.553024,
+        0.5198306,
+        0.51100016
+      ],
+      "cosine_5th": 0.51100016,
+      "cosine_median": 0.3600006,
+      "cosine_min": 0.3154227,
+      "lexical_results": 0,
+      "rows": [
+        {
+          "rank": 1,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 8,
+          "semantic_cosine": 0.6335608,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 2,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 9,
+          "semantic_cosine": 0.59811264,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 3,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 7,
+          "semantic_cosine": 0.553024,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 4,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 11,
+          "semantic_cosine": 0.5198306,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 5,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 12,
+          "semantic_cosine": 0.51100016,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 6,
+          "document_id": "e237cd2b-600e-4b79-af1d-b206f707a591",
+          "chunk_index": 3,
+          "semantic_cosine": 0.505919,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 7,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 10,
+          "semantic_cosine": 0.49350485,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 8,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 0,
+          "semantic_cosine": 0.46436042,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 9,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 1,
+          "semantic_cosine": 0.4603333,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 10,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 3,
+          "semantic_cosine": 0.4137743,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 11,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 4,
+          "semantic_cosine": 0.41108978,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 12,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 5,
+          "semantic_cosine": 0.39300838,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 13,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 2,
+          "semantic_cosine": 0.37609118,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 14,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 1,
+          "semantic_cosine": 0.37066555,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 15,
+          "document_id": "e237cd2b-600e-4b79-af1d-b206f707a591",
+          "chunk_index": 13,
+          "semantic_cosine": 0.3690173,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 16,
+          "document_id": "d93f12f6-e474-42ab-b133-6d26919ca7c3",
+          "chunk_index": 9,
+          "semantic_cosine": 0.3509839,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 17,
+          "document_id": "a28eab37-03f3-492e-83fe-f48e502fc223",
+          "chunk_index": 4,
+          "semantic_cosine": 0.3498273,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 18,
+          "document_id": "9124e081-59ba-47bb-b34d-96273bd1140a",
+          "chunk_index": 8,
+          "semantic_cosine": 0.34496346,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 19,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 9,
+          "semantic_cosine": 0.3385591,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 20,
+          "document_id": "9124e081-59ba-47bb-b34d-96273bd1140a",
+          "chunk_index": 0,
+          "semantic_cosine": 0.33646148,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 21,
+          "document_id": "d93f12f6-e474-42ab-b133-6d26919ca7c3",
+          "chunk_index": 5,
+          "semantic_cosine": 0.33620912,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 22,
+          "document_id": "e237cd2b-600e-4b79-af1d-b206f707a591",
+          "chunk_index": 4,
+          "semantic_cosine": 0.33496913,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 23,
+          "document_id": "9124e081-59ba-47bb-b34d-96273bd1140a",
+          "chunk_index": 5,
+          "semantic_cosine": 0.33432633,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 24,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 6,
+          "semantic_cosine": 0.3336721,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 25,
+          "document_id": "4bbe5305-d8d5-498e-b404-426a199b7973",
+          "chunk_index": 7,
+          "semantic_cosine": 0.33228594,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 26,
+          "document_id": "9124e081-59ba-47bb-b34d-96273bd1140a",
+          "chunk_index": 2,
+          "semantic_cosine": 0.3302908,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 27,
+          "document_id": "d93f12f6-e474-42ab-b133-6d26919ca7c3",
+          "chunk_index": 8,
+          "semantic_cosine": 0.32827735,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 28,
+          "document_id": "4bbe5305-d8d5-498e-b404-426a199b7973",
+          "chunk_index": 8,
+          "semantic_cosine": 0.3231423,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 29,
+          "document_id": "a28eab37-03f3-492e-83fe-f48e502fc223",
+          "chunk_index": 8,
+          "semantic_cosine": 0.31622857,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 30,
+          "document_id": "d93f12f6-e474-42ab-b133-6d26919ca7c3",
+          "chunk_index": 3,
+          "semantic_cosine": 0.3154227,
+          "layers": [
+            "semantic"
+          ]
+        }
+      ],
+      "answering_chunks": [
+        {
+          "chunk_index": 8,
+          "found": {
+            "rank": 1,
+            "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+            "chunk_index": 8,
+            "semantic_cosine": 0.6335608,
+            "layers": [
+              "semantic"
+            ]
+          }
+        },
+        {
+          "chunk_index": 9,
+          "found": {
+            "rank": 2,
+            "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+            "chunk_index": 9,
+            "semantic_cosine": 0.59811264,
+            "layers": [
+              "semantic"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "X1-sourdough",
+      "answered_in_project": false,
+      "query": "What is a good recipe for sourdough bread with a crisp crust?",
+      "results": 30,
+      "cosine_max": 0.16553572,
+      "cosine_top5": [
+        0.16553572,
+        0.16265704,
+        0.1599232,
+        0.15402883,
+        0.14845169
+      ],
+      "cosine_5th": 0.14845169,
+      "cosine_median": 0.135587535,
+      "cosine_min": 0.12582985,
+      "lexical_results": 0,
+      "rows": [
+        {
+          "rank": 1,
+          "document_id": "9124e081-59ba-47bb-b34d-96273bd1140a",
+          "chunk_index": 7,
+          "semantic_cosine": 0.16553572,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 2,
+          "document_id": "9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+          "chunk_index": 10,
+          "semantic_cosine": 0.16265704,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 3,
+          "document_id": "4bbe5305-d8d5-498e-b404-426a199b7973",
+          "chunk_index": 11,
+          "semantic_cosine": 0.1599232,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 4,
+          "document_id": "a28eab37-03f3-492e-83fe-f48e502fc223",
+          "chunk_index": 2,
+          "semantic_cosine": 0.15402883,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 5,
+          "document_id": "4bbe5305-d8d5-498e-b404-426a199b7973",
+          "chunk_index": 3,
+          "semantic_cosine": 0.14845169,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 6,
+          "document_id": "d93f12f6-e474-42ab-b133-6d26919ca7c3",
+          "chunk_index": 8,
+          "semantic_cosine": 0.14506024,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 7,
+          "document_id": "9124e081-59ba-47bb-b34d-96273bd1140a",
+          "chunk_index": 2,
+          "semantic_cosine": 0.14470768,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 8,
+          "document_id": "f6c0f798-8c3a-4d1e-b8ea-0633a4d22801",
+          "chunk_index": 17,
+          "semantic_cosine": 0.1427758,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 9,
+          "document_id": "d93f12f6-e474-42ab-b133-6d26919ca7c3",
+          "chunk_index": 9,
+          "semantic_cosine": 0.14177313,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 10,
+          "document_id": "e237cd2b-600e-4b79-af1d-b206f707a591",
+          "chunk_index": 1,
+          "semantic_cosine": 0.14117849,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 11,
+          "document_id": "9124e081-59ba-47bb-b34d-96273bd1140a",
+          "chunk_index": 6,
+          "semantic_cosine": 0.14109433,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 12,
+          "document_id": "9124e081-59ba-47bb-b34d-96273bd1140a",
+          "chunk_index": 0,
+          "semantic_cosine": 0.13997528,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 13,
+          "document_id": "e237cd2b-600e-4b79-af1d-b206f707a591",
+          "chunk_index": 0,
+          "semantic_cosine": 0.1379584,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 14,
+          "document_id": "d93f12f6-e474-42ab-b133-6d26919ca7c3",
+          "chunk_index": 5,
+          "semantic_cosine": 0.13662985,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 15,
+          "document_id": "a28eab37-03f3-492e-83fe-f48e502fc223",
+          "chunk_index": 3,
+          "semantic_cosine": 0.13563277,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 16,
+          "document_id": "d93f12f6-e474-42ab-b133-6d26919ca7c3",
+          "chunk_index": 7,
+          "semantic_cosine": 0.1355423,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 17,
+          "document_id": "9124e081-59ba-47bb-b34d-96273bd1140a",
+          "chunk_index": 4,
+          "semantic_cosine": 0.13497457,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 18,
+          "document_id": "e237cd2b-600e-4b79-af1d-b206f707a591",
+          "chunk_index": 4,
+          "semantic_cosine": 0.13471733,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 19,
+          "document_id": "9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+          "chunk_index": 17,
+          "semantic_cosine": 0.13364685,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 20,
+          "document_id": "9124e081-59ba-47bb-b34d-96273bd1140a",
+          "chunk_index": 3,
+          "semantic_cosine": 0.13305292,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 21,
+          "document_id": "f40c4015-87d8-461f-80b5-4b9b653e0efb",
+          "chunk_index": 4,
+          "semantic_cosine": 0.13256669,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 22,
+          "document_id": "4bbe5305-d8d5-498e-b404-426a199b7973",
+          "chunk_index": 10,
+          "semantic_cosine": 0.13197112,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 23,
+          "document_id": "4bbe5305-d8d5-498e-b404-426a199b7973",
+          "chunk_index": 2,
+          "semantic_cosine": 0.12877932,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 24,
+          "document_id": "a28eab37-03f3-492e-83fe-f48e502fc223",
+          "chunk_index": 0,
+          "semantic_cosine": 0.1277835,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 25,
+          "document_id": "471f28f5-7cd3-4b7f-a973-0108f7f7cebd",
+          "chunk_index": 18,
+          "semantic_cosine": 0.1275627,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 26,
+          "document_id": "f40c4015-87d8-461f-80b5-4b9b653e0efb",
+          "chunk_index": 13,
+          "semantic_cosine": 0.12752187,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 27,
+          "document_id": "e51e0fe0-9a08-4ed0-83ad-041a7396472d",
+          "chunk_index": 11,
+          "semantic_cosine": 0.12751248,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 28,
+          "document_id": "e237cd2b-600e-4b79-af1d-b206f707a591",
+          "chunk_index": 11,
+          "semantic_cosine": 0.12708227,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 29,
+          "document_id": "e237cd2b-600e-4b79-af1d-b206f707a591",
+          "chunk_index": 8,
+          "semantic_cosine": 0.126947,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 30,
+          "document_id": "4bbe5305-d8d5-498e-b404-426a199b7973",
+          "chunk_index": 8,
+          "semantic_cosine": 0.12582985,
+          "layers": [
+            "semantic"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "X2-world-cup",
+      "answered_in_project": false,
+      "query": "Who won the 2018 FIFA World Cup final, and what was the score?",
+      "results": 30,
+      "cosine_max": 0.14310224,
+      "cosine_top5": [
+        0.14310224,
+        0.13930044,
+        0.13723549,
+        0.10790765,
+        0.106103316
+      ],
+      "cosine_5th": 0.106103316,
+      "cosine_median": 0.089708662,
+      "cosine_min": 0.07520663,
+      "lexical_results": 0,
+      "rows": [
+        {
+          "rank": 1,
+          "document_id": "a86d36c7-80ca-4753-91dd-6f92c5a81c47",
+          "chunk_index": 9,
+          "semantic_cosine": 0.14310224,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 2,
+          "document_id": "a86d36c7-80ca-4753-91dd-6f92c5a81c47",
+          "chunk_index": 11,
+          "semantic_cosine": 0.13930044,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 3,
+          "document_id": "a86d36c7-80ca-4753-91dd-6f92c5a81c47",
+          "chunk_index": 8,
+          "semantic_cosine": 0.13723549,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 4,
+          "document_id": "65ee718f-6161-4df7-a4b6-b2fd3e8cac9b",
+          "chunk_index": 10,
+          "semantic_cosine": 0.10790765,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 5,
+          "document_id": "a86d36c7-80ca-4753-91dd-6f92c5a81c47",
+          "chunk_index": 13,
+          "semantic_cosine": 0.106103316,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 6,
+          "document_id": "a86d36c7-80ca-4753-91dd-6f92c5a81c47",
+          "chunk_index": 12,
+          "semantic_cosine": 0.10468235,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 7,
+          "document_id": "9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+          "chunk_index": 13,
+          "semantic_cosine": 0.10423726,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 8,
+          "document_id": "960c52f3-ae2f-4916-9112-51dcf781b470",
+          "chunk_index": 1,
+          "semantic_cosine": 0.103056274,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 9,
+          "document_id": "960c52f3-ae2f-4916-9112-51dcf781b470",
+          "chunk_index": 0,
+          "semantic_cosine": 0.10177703,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 10,
+          "document_id": "a86d36c7-80ca-4753-91dd-6f92c5a81c47",
+          "chunk_index": 5,
+          "semantic_cosine": 0.09652874,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 11,
+          "document_id": "9124e081-59ba-47bb-b34d-96273bd1140a",
+          "chunk_index": 7,
+          "semantic_cosine": 0.09638921,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 12,
+          "document_id": "a86d36c7-80ca-4753-91dd-6f92c5a81c47",
+          "chunk_index": 4,
+          "semantic_cosine": 0.09604664,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 13,
+          "document_id": "a86d36c7-80ca-4753-91dd-6f92c5a81c47",
+          "chunk_index": 16,
+          "semantic_cosine": 0.09317192,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 14,
+          "document_id": "9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+          "chunk_index": 12,
+          "semantic_cosine": 0.09239572,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 15,
+          "document_id": "4bbe5305-d8d5-498e-b404-426a199b7973",
+          "chunk_index": 5,
+          "semantic_cosine": 0.090774864,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 16,
+          "document_id": "65ee718f-6161-4df7-a4b6-b2fd3e8cac9b",
+          "chunk_index": 2,
+          "semantic_cosine": 0.08864246,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 17,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 3,
+          "semantic_cosine": 0.0857137,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 18,
+          "document_id": "b6cf2e2c-8aec-4d7f-84e4-5f4ed2e2e978",
+          "chunk_index": 16,
+          "semantic_cosine": 0.08498466,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 19,
+          "document_id": "960c52f3-ae2f-4916-9112-51dcf781b470",
+          "chunk_index": 4,
+          "semantic_cosine": 0.08329945,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 20,
+          "document_id": "b6cf2e2c-8aec-4d7f-84e4-5f4ed2e2e978",
+          "chunk_index": 9,
+          "semantic_cosine": 0.082324296,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 21,
+          "document_id": "a86d36c7-80ca-4753-91dd-6f92c5a81c47",
+          "chunk_index": 10,
+          "semantic_cosine": 0.081008166,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 22,
+          "document_id": "d8c50c51-11f7-4649-b214-6aff8ed92521",
+          "chunk_index": 14,
+          "semantic_cosine": 0.08054769,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 23,
+          "document_id": "d8c50c51-11f7-4649-b214-6aff8ed92521",
+          "chunk_index": 19,
+          "semantic_cosine": 0.080546394,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 24,
+          "document_id": "d8c50c51-11f7-4649-b214-6aff8ed92521",
+          "chunk_index": 15,
+          "semantic_cosine": 0.07997446,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 25,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 9,
+          "semantic_cosine": 0.07979838,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 26,
+          "document_id": "d8c50c51-11f7-4649-b214-6aff8ed92521",
+          "chunk_index": 16,
+          "semantic_cosine": 0.079618566,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 27,
+          "document_id": "04ffc800-85cf-4a49-bcec-a856644796a8",
+          "chunk_index": 3,
+          "semantic_cosine": 0.07739349,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 28,
+          "document_id": "9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+          "chunk_index": 10,
+          "semantic_cosine": 0.07706882,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 29,
+          "document_id": "b6cf2e2c-8aec-4d7f-84e4-5f4ed2e2e978",
+          "chunk_index": 8,
+          "semantic_cosine": 0.07597977,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 30,
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 14,
+          "semantic_cosine": 0.07520663,
+          "layers": [
+            "semantic"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "X3-kubernetes-autoscaling",
+      "answered_in_project": false,
+      "query": "How should Kubernetes horizontal pod autoscaling be tuned for bursty GPU inference traffic?",
+      "results": 30,
+      "cosine_max": 0.37412822,
+      "cosine_top5": [
+        0.37412822,
+        0.37006032,
+        0.3615889,
+        0.3594432,
+        0.35406882
+      ],
+      "cosine_5th": 0.35406882,
+      "cosine_median": 0.32217715,
+      "cosine_min": 0.27886426,
+      "lexical_results": 0,
+      "rows": [
+        {
+          "rank": 1,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 10,
+          "semantic_cosine": 0.37412822,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 2,
+          "document_id": "9124e081-59ba-47bb-b34d-96273bd1140a",
+          "chunk_index": 2,
+          "semantic_cosine": 0.37006032,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 3,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 5,
+          "semantic_cosine": 0.3615889,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 4,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 9,
+          "semantic_cosine": 0.3594432,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 5,
+          "document_id": "9124e081-59ba-47bb-b34d-96273bd1140a",
+          "chunk_index": 4,
+          "semantic_cosine": 0.35406882,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 6,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 4,
+          "semantic_cosine": 0.349653,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 7,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 7,
+          "semantic_cosine": 0.34567764,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 8,
+          "document_id": "9124e081-59ba-47bb-b34d-96273bd1140a",
+          "chunk_index": 3,
+          "semantic_cosine": 0.3421147,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 9,
+          "document_id": "9124e081-59ba-47bb-b34d-96273bd1140a",
+          "chunk_index": 6,
+          "semantic_cosine": 0.33854514,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 10,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 8,
+          "semantic_cosine": 0.33796018,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 11,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 3,
+          "semantic_cosine": 0.33554506,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 12,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 0,
+          "semantic_cosine": 0.33158624,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 13,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 4,
+          "semantic_cosine": 0.3296606,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 14,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 1,
+          "semantic_cosine": 0.32518303,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 15,
+          "document_id": "9124e081-59ba-47bb-b34d-96273bd1140a",
+          "chunk_index": 1,
+          "semantic_cosine": 0.3225476,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 16,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 11,
+          "semantic_cosine": 0.3218067,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 17,
+          "document_id": "9124e081-59ba-47bb-b34d-96273bd1140a",
+          "chunk_index": 5,
+          "semantic_cosine": 0.32005146,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 18,
+          "document_id": "a86d36c7-80ca-4753-91dd-6f92c5a81c47",
+          "chunk_index": 10,
+          "semantic_cosine": 0.31453,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 19,
+          "document_id": "a28eab37-03f3-492e-83fe-f48e502fc223",
+          "chunk_index": 7,
+          "semantic_cosine": 0.3134057,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 20,
+          "document_id": "9124e081-59ba-47bb-b34d-96273bd1140a",
+          "chunk_index": 0,
+          "semantic_cosine": 0.3057808,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 21,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 6,
+          "semantic_cosine": 0.30472523,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 22,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 6,
+          "semantic_cosine": 0.30422133,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 23,
+          "document_id": "9124e081-59ba-47bb-b34d-96273bd1140a",
+          "chunk_index": 7,
+          "semantic_cosine": 0.29948115,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 24,
+          "document_id": "e237cd2b-600e-4b79-af1d-b206f707a591",
+          "chunk_index": 4,
+          "semantic_cosine": 0.2939005,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 25,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 2,
+          "semantic_cosine": 0.29193896,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 26,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 8,
+          "semantic_cosine": 0.28480676,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 27,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 11,
+          "semantic_cosine": 0.28077242,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 28,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 10,
+          "semantic_cosine": 0.27993912,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 29,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 3,
+          "semantic_cosine": 0.2798554,
+          "layers": [
+            "semantic"
+          ]
+        },
+        {
+          "rank": 30,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 12,
+          "semantic_cosine": 0.27886426,
+          "layers": [
+            "semantic"
+          ]
+        }
+      ]
+    }
+  ]
+}

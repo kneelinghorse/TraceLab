@@ -56,7 +56,10 @@ class Settings(BaseSettings):
     librarian_model: str | None = None
     librarian_api_key: str | None = None
     librarian_base_url: str | None = None
-    rag_context_threshold: float = 0.7
+    # Cosine floor for a chunk to reach the model (RAG-4, decision #541): on
+    # production text-embedding-3-large gave answering chunks 0.425-0.664 and
+    # unrelated ones 0.399 at most, so 0.7 let only compression's one survivor through.
+    rag_context_threshold: float = 0.4
     tiered_routing_threshold: float = 0.85
     tiered_weight_linguistic: float = 0.35
     tiered_weight_integrity: float = 0.35
