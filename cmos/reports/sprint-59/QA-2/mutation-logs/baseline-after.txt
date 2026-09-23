@@ -1,0 +1,5 @@
+JSON report written to /var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/tmpl35z4ith.json
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+(node:51268) TimeoutNaNWarning: NaN is not a number.
+Timeout duration was set to 1.
+(Use `node --trace-warnings ...` to show where the warning was created)

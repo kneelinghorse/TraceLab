@@ -1,0 +1,90 @@
+JSON report written to /var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/tmp0mxazsn5.json
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+(node:51174) TimeoutNaNWarning: NaN is not a number.
+Timeout duration was set to 1.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+--- Librarian page, listing the chunks lists the ranked chunks for the URL's phrase, each linking to its place in its document
+AssertionError: expected "spy" to be called with arguments: [ { …(3) } ][90m
+
+Received: 
+
+[1m  1st spy call:
+
+[22m[2m  [[22m
+[2m    {[22m
+[2m      "project_id": "10000000-0000-4000-8000-000000000001",[22m
+[2m      "query": "onboarding friction",[22m
+[32m-     "top_k": 20,[90m
+[31m+     "top_k": 10,[90m
+[2m    },[22m
+[2m  ][22m
+[39m[90m
+
+Number of calls: [1m1[22m
+[39m
+    at Proxy.<anonymous> (file:///Users/systemsystems/portfolio/TraceLab/frontend/node_modules/@vitest/expect/dist/index.js:1355:10)
+    at Proxy.<anonymous> (file:///Users/systemsystems/portfolio/TraceLab/frontend/node_modules/@vitest/expect/dist/index.js:1029:14)
+    at Proxy.methodWrapper (file:///Users/systemsystems/portfolio/TraceLab/frontend/node_modules/chai/index.js:1686:25)
+    at /Users/systemsystems/portfolio/TraceLab/frontend/src/__tests__/librarian.test.tsx:405:30
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at processTimers (node:internal/timers:543:7)
+    at file:///Users/systemsystems/portfolio/TraceLab/frontend/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20
+--- Librarian page, listing the chunks lists across every readable project when no project is named
+AssertionError: expected "spy" to be called with arguments: [ { query: 'pricing', …(2) } ][90m
+
+Received: 
+
+[1m  1st spy call:
+
+[22m[2m  [[22m
+[2m    {[22m
+[2m      "project_id": undefined,[22m
+[2m      "query": "pricing",[22m
+[32m-     "top_k": 20,[90m
+[31m+     "top_k": 10,[90m
+[2m    },[22m
+[2m  ][22m
+[39m[90m
+
+Number of calls: [1m1[22m
+[39m
+    at Proxy.<anonymous> (file:///Users/systemsystems/portfolio/TraceLab/frontend/node_modules/@vitest/expect/dist/index.js:1355:10)
+    at Proxy.<anonymous> (file:///Users/systemsystems/portfolio/TraceLab/frontend/node_modules/@vitest/expect/dist/index.js:1029:14)
+    at Proxy.methodWrapper (file:///Users/systemsystems/portfolio/TraceLab/frontend/node_modules/chai/index.js:1686:25)
+    at /Users/systemsystems/portfolio/TraceLab/frontend/src/__tests__/librarian.test.tsx:425:30
+    at file:///Users/systemsystems/portfolio/TraceLab/frontend/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20
+--- Librarian page, listing the chunks saves the phrase as a saved search with its project and list size
+AssertionError: expected "spy" to be called with arguments: [ ObjectContaining{…} ][90m
+
+Received: 
+
+[1m  1st spy call:
+
+[22m[2m  [[22m
+[32m-   ObjectContaining {[90m
+[31m+   {[90m
+[31m+     "description": undefined,[90m
+[2m      "filters": {[22m
+[2m        "project_id": "10000000-0000-4000-8000-000000000001",[22m
+[2m      },[22m
+[31m+     "name": "onboarding friction",[90m
+[2m      "query_text": "onboarding friction",[22m
+[32m-     "top_k": 20,[90m
+[31m+     "search_mode": "semantic",[90m
+[31m+     "top_k": 10,[90m
+[2m    },[22m
+[2m  ][22m
+[39m[90m
+
+Number of calls: [1m1[22m
+[39m
+    at Proxy.<anonymous> (file:///Users/systemsystems/portfolio/TraceLab/frontend/node_modules/@vitest/expect/dist/index.js:1355:10)
+    at Proxy.<anonymous> (file:///Users/systemsystems/portfolio/TraceLab/frontend/node_modules/@vitest/expect/dist/index.js:1029:14)
+    at Proxy.methodWrapper (file:///Users/systemsystems/portfolio/TraceLab/frontend/node_modules/chai/index.js:1686:25)
+    at /Users/systemsystems/portfolio/TraceLab/frontend/src/__tests__/librarian.test.tsx:461:31
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at processTimers (node:internal/timers:543:7)
+    at file:///Users/systemsystems/portfolio/TraceLab/frontend/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20

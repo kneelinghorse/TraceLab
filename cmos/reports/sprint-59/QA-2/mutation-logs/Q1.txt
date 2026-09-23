@@ -1,0 +1,10 @@
+JSON report written to /var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/tmpyuzug1x6.json
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+(node:51080) TimeoutNaNWarning: NaN is not a number.
+Timeout duration was set to 1.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+--- Librarian page, listing the chunks runs a saved search once through the call that counts its runs, and shows no answer
+AssertionError: expected "spy" to be called 1 times, but got 2 times
+    at /Users/systemsystems/portfolio/TraceLab/frontend/src/__tests__/librarian.test.tsx:484:27
+    at file:///Users/systemsystems/portfolio/TraceLab/frontend/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20

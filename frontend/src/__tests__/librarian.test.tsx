@@ -156,8 +156,9 @@ describe("Librarian page", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Draft a mission" }));
     const panel = await screen.findByRole("region", { name: "Mission draft" });
-    // WALK-1 finding 3: a successful draft must be impossible to miss.
-    expect(panel).toHaveFocus();
+    // WALK-1 finding 3: a successful draft must be impossible to miss. Focus lands in an
+    // effect after the panel renders, so wait for it rather than race it (seen on cold runs).
+    await waitFor(() => expect(panel).toHaveFocus());
     expect(await screen.findByText("Your draft is ready below. Review it, then create it.")).toBeVisible();
     expect(within(panel).getByText(/Next: the mission page, where you can edit the draft and press Submit to DeepSearch/)).toBeVisible();
     expect(within(panel).getByRole("heading", { name: "Onboarding friction" })).toBeVisible();

@@ -1,0 +1,144 @@
+{
+  "checkedAt": "2026-09-23T21:38:27.723Z",
+  "base": "https://tracelab.aquex.ai",
+  "expectSha": "814c1668791f420287550dea5f62a8a04998a5cc",
+  "passed": true,
+  "checks": [
+    {
+      "name": "frontend serves the merge commit",
+      "passed": true,
+      "served": "814c1668791f420287550dea5f62a8a04998a5cc",
+      "expected": "814c1668791f420287550dea5f62a8a04998a5cc"
+    },
+    {
+      "name": "GET /search",
+      "passed": true,
+      "status": 308,
+      "location": "/librarian",
+      "servedPage": null,
+      "expected": {
+        "path": "/search",
+        "status": 308,
+        "location": "/librarian"
+      }
+    },
+    {
+      "name": "GET /search?q=scope%20%26%20provenance",
+      "passed": true,
+      "status": 308,
+      "location": "/librarian?q=scope%20%26%20provenance",
+      "servedPage": null,
+      "expected": {
+        "path": "/search?q=scope%20%26%20provenance",
+        "status": 308,
+        "location": "/librarian?q=scope%20%26%20provenance"
+      }
+    },
+    {
+      "name": "GET /search?q=Qdrant&project=0afcc588-e722-45bd-8320-f486601b877c",
+      "passed": true,
+      "status": 308,
+      "location": "/librarian?q=Qdrant&project=0afcc588-e722-45bd-8320-f486601b877c",
+      "servedPage": null,
+      "expected": {
+        "path": "/search?q=Qdrant&project=0afcc588-e722-45bd-8320-f486601b877c",
+        "status": 308,
+        "location": "/librarian?q=Qdrant&project=0afcc588-e722-45bd-8320-f486601b877c"
+      }
+    },
+    {
+      "name": "GET /search?saved=00000000-0000-4000-8000-000000000000",
+      "passed": true,
+      "status": 308,
+      "location": "/librarian?saved=00000000-0000-4000-8000-000000000000",
+      "servedPage": null,
+      "expected": {
+        "path": "/search?saved=00000000-0000-4000-8000-000000000000",
+        "status": 308,
+        "location": "/librarian?saved=00000000-0000-4000-8000-000000000000"
+      }
+    },
+    {
+      "name": "GET /search/results?q=scope",
+      "passed": true,
+      "status": 404,
+      "location": null,
+      "servedPage": "/_error",
+      "expected": {
+        "path": "/search/results?q=scope",
+        "status": 404
+      }
+    },
+    {
+      "name": "GET /search/anything",
+      "passed": true,
+      "status": 404,
+      "location": null,
+      "servedPage": "/_error",
+      "expected": {
+        "path": "/search/anything",
+        "status": 404
+      }
+    },
+    {
+      "name": "GET /search/index",
+      "passed": true,
+      "status": 404,
+      "location": null,
+      "servedPage": "/_error",
+      "expected": {
+        "path": "/search/index",
+        "status": 404
+      }
+    },
+    {
+      "name": "GET /features/search",
+      "passed": true,
+      "status": 404,
+      "location": null,
+      "servedPage": "/_error",
+      "expected": {
+        "path": "/features/search",
+        "status": 404
+      }
+    },
+    {
+      "name": "/librarian?q= is served by the Librarian page",
+      "passed": true,
+      "servedPage": "/librarian"
+    },
+    {
+      "name": "build manifest lists /librarian and no /search page",
+      "passed": true,
+      "buildId": "4m0rVnAG1klllhQ81GZUT",
+      "searchPages": [
+        "/saved-searches"
+      ]
+    },
+    {
+      "name": "/search?q= lands on the Librarian list of the project",
+      "passed": true,
+      "url": "https://tracelab.aquex.ai/librarian?q=Qdrant&project=0afcc588-e722-45bd-8320-f486601b877c",
+      "request": {
+        "query": "Qdrant",
+        "top_k": 20,
+        "project_id": "0afcc588-e722-45bd-8320-f486601b877c"
+      },
+      "heading": "20 chunks match “Qdrant”",
+      "rows": 20,
+      "rowsWithDocumentName": 20
+    },
+    {
+      "name": "the first chunk link opens that chunk, marked, in its document",
+      "passed": true,
+      "label": "TR-04Optimizing-Qdrant-on-Railway.md #12",
+      "href": "/documents/bdc8881c-8747-4b5a-8c98-5d360bc0721e?chunk=b9f0be07-ce8c-47f3-8af4-951bb6fe6908&index=12",
+      "marked": "#12Cited751 tokens−"
+    },
+    {
+      "name": "no write left the browser",
+      "passed": true,
+      "blocked": []
+    }
+  ]
+}

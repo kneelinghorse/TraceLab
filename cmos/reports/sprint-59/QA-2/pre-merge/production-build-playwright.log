@@ -1,0 +1,62 @@
+Running 58 tests using 1 worker
+[1/58] [chromium] › tests/e2e/app-shell.spec.ts:34:5 › Home stays at the root and its search opens the shell palette
+[2/58] [chromium] › tests/e2e/app-shell.spec.ts:48:5 › Home keeps viewed activity rows at AA contrast in the light theme
+[3/58] [chromium] › tests/e2e/app-shell.spec.ts:71:5 › document tables scroll sideways on a phone instead of breaking words apart
+[4/58] [chromium] › tests/e2e/app-shell.spec.ts:95:5 › markdown table headers are exposed as column headers to assistive technology
+[5/58] [chromium] › tests/e2e/app-shell.spec.ts:126:5 › theme persists through hydration and OS changes without a wrong-color frame
+[6/58] [chromium] › tests/e2e/app-shell.spec.ts:164:7 › the head bootstrap resolves stored system to System dark before delayed hydration
+[7/58] [chromium] › tests/e2e/app-shell.spec.ts:164:7 › the head bootstrap resolves stored hc to System dark before delayed hydration
+[8/58] [chromium] › tests/e2e/app-shell.spec.ts:185:5 › Light persists across reload and OS changes with native keyboard focus
+[9/58] [chromium] › tests/e2e/app-shell.spec.ts:202:5 › mobile drawer traps focus, closes with Escape, and returns focus to its trigger
+[10/58] [chromium] › tests/e2e/app-shell.spec.ts:223:5 › command palette submits a real search request and supports keyboard dismissal
+[11/58] [chromium] › tests/e2e/app-shell.spec.ts:252:5 › open modal surfaces meet the same axe severity and landmark gates
+[12/58] [chromium] › tests/e2e/app-shell.spec.ts:269:9 › login and registration share accessible light surfaces at 390px
+[13/58] [chromium] › tests/e2e/app-shell.spec.ts:269:9 › login and registration share accessible light surfaces at 1440px
+[14/58] [chromium] › tests/e2e/app-shell.spec.ts:269:9 › login and registration share accessible dark surfaces at 390px
+[15/58] [chromium] › tests/e2e/app-shell.spec.ts:269:9 › login and registration share accessible dark surfaces at 1440px
+[16/58] [chromium] › tests/e2e/collection-context.spec.ts:15:7 › collection context, reviewed seed and evidence citations in light at 390
+[17/58] [chromium] › tests/e2e/collection-context.spec.ts:15:7 › collection context, reviewed seed and evidence citations in light at 820
+[18/58] [chromium] › tests/e2e/collection-context.spec.ts:15:7 › collection context, reviewed seed and evidence citations in light at 1440
+[19/58] [chromium] › tests/e2e/collection-context.spec.ts:15:7 › collection context, reviewed seed and evidence citations in dark at 390
+[20/58] [chromium] › tests/e2e/collection-context.spec.ts:15:7 › collection context, reviewed seed and evidence citations in dark at 820
+[21/58] [chromium] › tests/e2e/collection-context.spec.ts:15:7 › collection context, reviewed seed and evidence citations in dark at 1440
+[22/58] [chromium] › tests/e2e/graph.spec.ts:80:5 › keyboard root selection, depth, every list control and browser Back preserve the neighborhood
+[23/58] [chromium] › tests/e2e/graph.spec.ts:117:7 › the complete light graph and root picker remain accessible at 1440px
+[24/58] [chromium] › tests/e2e/graph.spec.ts:117:7 › the complete light graph and root picker remain accessible at 390px
+[25/58] [chromium] › tests/e2e/graph.spec.ts:117:7 › the complete dark graph and root picker remain accessible at 1440px
+[26/58] [chromium] › tests/e2e/graph.spec.ts:117:7 › the complete dark graph and root picker remain accessible at 390px
+[27/58] [chromium] › tests/e2e/graph.spec.ts:147:5 › all six URL root types reach the same graph endpoint and canonical object link
+[28/58] [chromium] › tests/e2e/graph.spec.ts:157:5 › loading, empty, forbidden, missing and retriable failures have distinct states
+[29/58] [chromium] › tests/e2e/mission-protocol.spec.ts:14:7 › author, inspect, audit and prepare a new run in light at 390
+[30/58] [chromium] › tests/e2e/mission-protocol.spec.ts:14:7 › author, inspect, audit and prepare a new run in light at 820
+[31/58] [chromium] › tests/e2e/mission-protocol.spec.ts:14:7 › author, inspect, audit and prepare a new run in light at 1440
+[32/58] [chromium] › tests/e2e/mission-protocol.spec.ts:14:7 › author, inspect, audit and prepare a new run in dark at 390
+[33/58] [chromium] › tests/e2e/mission-protocol.spec.ts:14:7 › author, inspect, audit and prepare a new run in dark at 820
+[34/58] [chromium] › tests/e2e/mission-protocol.spec.ts:14:7 › author, inspect, audit and prepare a new run in dark at 1440
+[35/58] [chromium] › tests/e2e/mission-protocol.spec.ts:94:5 › the mission Results tab is addressable by URL so it can be linked and captured
+[36/58] [chromium] › tests/e2e/mission-protocol.spec.ts:135:5 › the retired /missions/queue alias is gone rather than silently redirecting
+[37/58] [chromium] › tests/e2e/project-bundles.spec.ts:14:7 › project tabs, independent uploads, chunks and personal favorites in light at 390
+[38/58] [chromium] › tests/e2e/project-bundles.spec.ts:14:7 › project tabs, independent uploads, chunks and personal favorites in light at 820
+[39/58] [chromium] › tests/e2e/project-bundles.spec.ts:14:7 › project tabs, independent uploads, chunks and personal favorites in light at 1440
+[40/58] [chromium] › tests/e2e/project-bundles.spec.ts:14:7 › project tabs, independent uploads, chunks and personal favorites in dark at 390
+[41/58] [chromium] › tests/e2e/project-bundles.spec.ts:14:7 › project tabs, independent uploads, chunks and personal favorites in dark at 820
+[42/58] [chromium] › tests/e2e/project-bundles.spec.ts:14:7 › project tabs, independent uploads, chunks and personal favorites in dark at 1440
+[43/58] [chromium] › tests/e2e/route-migration.spec.ts:5:5 › every maintained migration preserves its destination and query parameters
+[chromium] › tests/e2e/route-migration.spec.ts:5:5 › every maintained migration preserves its destination and query parameters
+{"routeMigration":{"mapRows":10,"coveredRows":10,"checks":20,"passed":20}}
+[44/58] [chromium] › tests/e2e/search-command.spec.ts:65:9 › palette keyboard reach, paging and focus in light at 390px
+[45/58] [chromium] › tests/e2e/search-command.spec.ts:114:9 › the Librarian lists what /search found, keeps it as a collection and reruns a saved search in light at 390px
+[46/58] [chromium] › tests/e2e/search-command.spec.ts:65:9 › palette keyboard reach, paging and focus in light at 820px
+[47/58] [chromium] › tests/e2e/search-command.spec.ts:114:9 › the Librarian lists what /search found, keeps it as a collection and reruns a saved search in light at 820px
+[48/58] [chromium] › tests/e2e/search-command.spec.ts:65:9 › palette keyboard reach, paging and focus in light at 1440px
+[49/58] [chromium] › tests/e2e/search-command.spec.ts:114:9 › the Librarian lists what /search found, keeps it as a collection and reruns a saved search in light at 1440px
+[50/58] [chromium] › tests/e2e/search-command.spec.ts:65:9 › palette keyboard reach, paging and focus in dark at 390px
+[51/58] [chromium] › tests/e2e/search-command.spec.ts:114:9 › the Librarian lists what /search found, keeps it as a collection and reruns a saved search in dark at 390px
+[52/58] [chromium] › tests/e2e/search-command.spec.ts:65:9 › palette keyboard reach, paging and focus in dark at 820px
+[53/58] [chromium] › tests/e2e/search-command.spec.ts:114:9 › the Librarian lists what /search found, keeps it as a collection and reruns a saved search in dark at 820px
+[54/58] [chromium] › tests/e2e/search-command.spec.ts:65:9 › palette keyboard reach, paging and focus in dark at 1440px
+[55/58] [chromium] › tests/e2e/search-command.spec.ts:114:9 › the Librarian lists what /search found, keeps it as a collection and reruns a saved search in dark at 1440px
+[56/58] [chromium] › tests/e2e/search-command.spec.ts:159:5 › saved search times use UTC even outside the UTC timezone
+[57/58] [chromium] › tests/e2e/search-command.spec.ts:168:5 › the retired /search/results alias is gone rather than silently redirecting
+[58/58] [chromium] › tests/e2e/search-command.spec.ts:175:5 › loading, no matches, service failure and missing saved search stay distinct
+  58 passed (3.1m)

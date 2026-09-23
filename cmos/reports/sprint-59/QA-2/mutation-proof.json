@@ -1,0 +1,106 @@
+{
+  "commit": "39887d73e2d5d08a793b9175f3d613b6f22f3ee5",
+  "spec": "frontend/src/__tests__/librarian.test.tsx",
+  "runs": [
+    {
+      "id": "baseline-before",
+      "red": [],
+      "total": 19,
+      "expected": [],
+      "as_expected": true
+    },
+    {
+      "id": "Q1",
+      "disables": "a saved search's list is never refetched on focus (each execute call counts a run and spends a model call)",
+      "file": "frontend/src/components/librarian/ChunkList.tsx",
+      "red": [
+        "Librarian page, listing the chunks runs a saved search once through the call that counts its runs, and shows no answer"
+      ],
+      "total": 19,
+      "expected": [
+        "Librarian page, listing the chunks runs a saved search once through the call that counts its runs, and shows no answer"
+      ],
+      "as_expected": true
+    },
+    {
+      "id": "Q2",
+      "disables": "a retry adds only the chunks still missing from the collection",
+      "file": "frontend/src/components/librarian/ChunkList.tsx",
+      "red": [
+        "Librarian page, listing the chunks keeps the list as one collection in rank order, and a retry adds only what is missing"
+      ],
+      "total": 19,
+      "expected": [
+        "Librarian page, listing the chunks keeps the list as one collection in rank order, and a retry adds only what is missing"
+      ],
+      "as_expected": true
+    },
+    {
+      "id": "Q3",
+      "disables": "a retry reuses the collection it already created",
+      "file": "frontend/src/components/librarian/ChunkList.tsx",
+      "red": [
+        "Librarian page, listing the chunks keeps the list as one collection in rank order, and a retry adds only what is missing"
+      ],
+      "total": 19,
+      "expected": [
+        "Librarian page, listing the chunks keeps the list as one collection in rank order, and a retry adds only what is missing"
+      ],
+      "as_expected": true
+    },
+    {
+      "id": "Q4",
+      "disables": "a listed phrase goes to the URL and never to the Librarian model",
+      "file": "frontend/src/pages/librarian.tsx",
+      "red": [
+        "Librarian page, listing the chunks puts the phrase in the URL and never sends it to the Librarian model"
+      ],
+      "total": 19,
+      "expected": [
+        "Librarian page, listing the chunks puts the phrase in the URL and never sends it to the Librarian model"
+      ],
+      "as_expected": true
+    },
+    {
+      "id": "Q5",
+      "disables": "the list asks for twenty chunks",
+      "file": "frontend/src/components/librarian/ChunkList.tsx",
+      "red": [
+        "Librarian page, listing the chunks lists across every readable project when no project is named",
+        "Librarian page, listing the chunks lists the ranked chunks for the URL's phrase, each linking to its place in its document",
+        "Librarian page, listing the chunks saves the phrase as a saved search with its project and list size"
+      ],
+      "total": 19,
+      "expected": [
+        "Librarian page, listing the chunks lists across every readable project when no project is named",
+        "Librarian page, listing the chunks lists the ranked chunks for the URL's phrase, each linking to its place in its document",
+        "Librarian page, listing the chunks saves the phrase as a saved search with its project and list size"
+      ],
+      "as_expected": true
+    },
+    {
+      "id": "Q6",
+      "disables": "a chunk link names the chunk's index, so the document opens on the right page",
+      "file": "frontend/src/components/librarian/ChunkList.tsx",
+      "red": [
+        "Librarian page, listing the chunks lists the ranked chunks for the URL's phrase, each linking to its place in its document",
+        "Librarian page, listing the chunks runs a saved search once through the call that counts its runs, and shows no answer"
+      ],
+      "total": 19,
+      "expected": [
+        "Librarian page, listing the chunks lists the ranked chunks for the URL's phrase, each linking to its place in its document",
+        "Librarian page, listing the chunks runs a saved search once through the call that counts its runs, and shows no answer"
+      ],
+      "as_expected": true
+    },
+    {
+      "id": "baseline-after",
+      "red": [],
+      "total": 19,
+      "expected": [],
+      "as_expected": true
+    }
+  ],
+  "files_match_head_after": true,
+  "all_as_expected": true
+}

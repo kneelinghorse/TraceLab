@@ -1,0 +1,27 @@
+JSON report written to /var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/tmp8wtlkr6g.json
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+
+--- Librarian page, listing the chunks lists the ranked chunks for the URL's phrase, each linking to its place in its document
+Error: [2mexpect([22m[31melement[39m[2m).toHaveAttribute([22m[32m[32m"href"[32m[39m[2m, [22m[32m[32m"/documents/50000000-0000-4000-8000-000000000005?chunk=70000000-0000-4000-8000-000000000007&index=3"[32m[39m[2m) // element.getAttribute("href") === "/documents/50000000-0000-4000-8000-000000000005?chunk=70000000-0000-4000-8000-000000000007&index=3"[22m
+
+Expected the element to have attribute:
+[32m  href="/documents/50000000-0000-4000-8000-000000000005?chunk=70000000-0000-4000-8000-000000000007&index=3"[39m
+Received:
+[31m  href="/documents/50000000-0000-4000-8000-000000000005?chunk=70000000-0000-4000-8000-000000000007"[39m
+    at Proxy.expectWrapper (file:///Users/systemsystems/portfolio/TraceLab/frontend/node_modules/@vitest/expect/dist/index.js:1745:12)
+    at Proxy.<anonymous> (file:///Users/systemsystems/portfolio/TraceLab/frontend/node_modules/@vitest/expect/dist/index.js:1029:14)
+    at Proxy.methodWrapper (file:///Users/systemsystems/portfolio/TraceLab/frontend/node_modules/chai/index.js:1686:25)
+    at /Users/systemsystems/portfolio/TraceLab/frontend/src/__tests__/librarian.test.tsx:411:84
+    at file:///Users/systemsystems/portfolio/TraceLab/frontend/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20
+--- Librarian page, listing the chunks runs a saved search once through the call that counts its runs, and shows no answer
+Error: [2mexpect([22m[31melement[39m[2m).toHaveAttribute([22m[32m[32m"href"[32m[39m[2m, [22m[32m[32m"/documents/50000000-0000-4000-8000-000000000005?chunk=70000000-0000-4000-8000-000000000007&index=3"[32m[39m[2m) // element.getAttribute("href") === "/documents/50000000-0000-4000-8000-000000000005?chunk=70000000-0000-4000-8000-000000000007&index=3"[22m
+
+Expected the element to have attribute:
+[32m  href="/documents/50000000-0000-4000-8000-000000000005?chunk=70000000-0000-4000-8000-000000000007&index=3"[39m
+Received:
+[31m  href="/documents/50000000-0000-4000-8000-000000000005?chunk=70000000-0000-4000-8000-000000000007"[39m
+    at Proxy.expectWrapper (file:///Users/systemsystems/portfolio/TraceLab/frontend/node_modules/@vitest/expect/dist/index.js:1745:12)
+    at Proxy.<anonymous> (file:///Users/systemsystems/portfolio/TraceLab/frontend/node_modules/@vitest/expect/dist/index.js:1029:14)
+    at Proxy.methodWrapper (file:///Users/systemsystems/portfolio/TraceLab/frontend/node_modules/chai/index.js:1686:25)
+    at /Users/systemsystems/portfolio/TraceLab/frontend/src/__tests__/librarian.test.tsx:476:81
+    at file:///Users/systemsystems/portfolio/TraceLab/frontend/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20
