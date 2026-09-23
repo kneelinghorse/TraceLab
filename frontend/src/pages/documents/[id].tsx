@@ -85,8 +85,9 @@ function DocumentDetail() {
 
   useEffect(() => {
     if (!cited || !citedOnPage) return;
-    const element = window.document.getElementById(`chunk-${cited.id}`);
-    if (element && typeof element.scrollIntoView === "function") element.scrollIntoView({ block: "center" });
+    // The card's top, so its "#n Cited" header shows even when the chunk is long.
+    const card = window.document.querySelector('[data-cited="true"]');
+    if (card && typeof card.scrollIntoView === "function") card.scrollIntoView({ block: "start" });
   }, [cited, citedOnPage]);
 
   const toggleChunk = (chunkId: string) => {
@@ -407,7 +408,7 @@ function DocumentDetail() {
                       <div
                         key={chunk.id}
                         data-cited={chunk.id === cited?.id ? "true" : undefined}
-                        className={`border rounded-lg overflow-hidden ${chunk.id === cited?.id ? "border-accent ring-2 ring-accent" : "border-line"}`}
+                        className={`border rounded-lg overflow-hidden ${chunk.id === cited?.id ? "scroll-mt-24 border-accent ring-2 ring-accent" : "border-line"}`}
                       >
                         <div className="px-4 py-3 flex items-center justify-between bg-background">
                           <button

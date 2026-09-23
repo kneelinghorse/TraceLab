@@ -143,6 +143,26 @@ def test_a_paragraph_of_labels_lends_them_to_the_paragraph_before_it(monkeypatch
     assert result.no_evidence is False
 
 
+def test_a_label_naming_several_chunks_cites_each_and_leaves_no_raw_text(monkeypatch, db_session, project):
+    """Production, QA-1 acceptance: a synthesis closed with "[Document: <id>, Chunks: 9–10]",
+    which the pipeline's pattern does not read, so the label showed as raw text."""
+    document = _document(db_session, project)
+    ninth, tenth, twelfth = _source(document, 9), _source(document, 10), _source(document, 12)
+    answer = (
+        f"It recommends a hybrid, project-bounded model. [Document: {document.id}, Chunks: 9–10]\n\n"
+        f"Option 4 adds an admin warning gate. [Document: {document.id}, Chunk: 10, 12]"
+    )
+    _install(monkeypatch, _result(answer, [ninth, tenth, twelfth]))
+
+    result = answer_question(db_session, READER, project.id, "Which option does the research recommend?")
+
+    assert [(passage.text, passage.citations) for passage in result.passages] == [
+        ("It recommends a hybrid, project-bounded model.", [ninth["chunk_id"], tenth["chunk_id"]]),
+        ("Option 4 adds an admin warning gate.", [tenth["chunk_id"], twelfth["chunk_id"]]),
+    ]
+    assert "Document:" not in result.answer
+
+
 def test_an_answer_that_cites_nothing_is_refused_not_shown(monkeypatch, db_session, project):
     """The model read chunks at the floor and cited none: nothing the user could open backs it."""
     document = _document(db_session, project)
