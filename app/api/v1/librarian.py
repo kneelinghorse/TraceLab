@@ -2,7 +2,8 @@
 
 Three calls, all human-principal only and all authorized against the project
 with the caller's own principal (criterion 7): a conversational turn, a mission
-draft, and the explicit creation of that draft as a pristine mission.
+draft, and the explicit creation of that draft as a pristine mission. A turn in
+answer mode (QA-1) answers a question from the project's documents instead.
 """
 
 from __future__ import annotations
@@ -20,6 +21,7 @@ from app.core.database import get_db
 from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.models.project import Project
 from app.schemas.librarian import (
+    ChunkRef,
     CreatedMissionResponse,
     CreateFromDraftRequest,
     DraftRequest,
@@ -88,11 +90,15 @@ def librarian_turn(
     db: Session = Depends(get_db),
     service: LibrarianService = Depends(get_librarian_service),
 ) -> TurnResponse:
-    """One conversational turn. Corpus claims are validated against evidence retrieved in this turn."""
+    """One turn. Corpus claims are validated against evidence or chunks retrieved in this turn."""
     _require_human(current_user)
     project = _load_project(db, current_user, payload.project_id, "read") if payload.project_id else None
     try:
-        result = service.converse(db, current_user, project, payload.messages)
+        # The schema guarantees a project in answer mode.
+        if project is not None and payload.mode == "answer":
+            result = service.answer(db, current_user, project, payload.messages[-1].content, payload.max_tokens)
+        else:
+            result = service.converse(db, current_user, project, payload.messages)
     except LibrarianUnavailable as exc:
         raise HTTPException(status_code=http_status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
     except (RateLimitError, APIError) as exc:
@@ -110,6 +116,18 @@ def librarian_turn(
             )
             for entry in result.evidence
         ],
+        chunks=[
+            ChunkRef(
+                id=chunk.chunk_id,
+                document_id=chunk.document_id,
+                document_name=chunk.document_name,
+                chunk_index=chunk.chunk_index,
+                snippet=chunk.snippet,
+                href=chunk.href,
+            )
+            for chunk in result.chunks
+        ],
+        no_evidence=result.no_evidence,
         withheld_count=result.withheld_count,
         usage=result.usage,
         model=result.model,

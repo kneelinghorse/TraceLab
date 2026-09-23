@@ -895,3 +895,186 @@ def test_retrieval_with_no_text_returns_nothing_found_without_asking_the_model(
     assert result["sources"] == []
     assert result["citations"] == []
     assert cache.stored == 0
+
+
+# QA-1: a caller that refuses unsupported questions (the corpus Q&A service) gets the
+# nothing-found result when no retrieved chunk reaches the compression floor, before
+# any model call. The Search page keeps answering from compression's best chunk.
+
+_BELOW_FLOOR_CHUNK = {
+    **_TEXT_CHUNK,
+    # Cosine 0.374 to the query: RAG-4's unsupported in-domain question on production.
+    "embedding": [0.374, 0.927, 0.0],
+}
+
+
+def test_refusing_caller_is_not_answered_from_a_chunk_below_the_floor(monkeypatch):
+    service, fake_client, cache = _service_answering(
+        monkeypatch,
+        "Pods scale on CPU. [Document: doc-1, Chunk: 0]",
+        results=[_BELOW_FLOOR_CHUNK],
+    )
+
+    result = service.run_query(
+        query="How does Kubernetes autoscale pods?",
+        top_k=5,
+        project_id="proj-qa1-floor",
+        refuse_unsupported=True,
+    )
+
+    assert fake_client.chat.completions.requests == []
+    assert result["no_evidence"] is True
+    assert result["answer"] == rag_module.NO_EVIDENCE_ANSWER
+    assert result["citations"] == []
+    assert result["quality"]["reasons"] == [
+        "No retrieved chunk reached the relevance floor for this query."
+    ]
+    assert cache.stored == 0
+
+    # The same question without the flag is answered from compression's best chunk,
+    # as the Search page always has been.
+    answered = service.run_query(
+        query="How does Kubernetes autoscale pods?",
+        top_k=5,
+        project_id="proj-qa1-floor",
+    )
+    assert len(fake_client.chat.completions.requests) == 1
+    assert answered["no_evidence"] is False
+
+
+def test_refusing_caller_asks_again_when_the_cached_answer_rests_below_the_floor(
+    monkeypatch,
+):
+    """The semantic cache matches on project and filters, not on the refusal rule."""
+    cached = {
+        "answer": "Pods scale on CPU. [Document: doc-1, Chunk: 0]",
+        "citations": [],
+        "sources": [{**_TEXT_CHUNK, "similarity": 0.374}],
+        "compression": {},
+        "cache": {"hit": True},
+        "search_mode": "semantic",
+    }
+    fake_client = _FakeOpenAIClient("Pods scale on CPU. [Document: doc-1, Chunk: 0]")
+    pedr = _FakePEDROrchestrator(results=[_BELOW_FLOOR_CHUNK])
+    monkeypatch.setattr(rag_module, "_openai_import_error", None, raising=False)
+    monkeypatch.setattr(rag_module, "OpenAI", object, raising=False)
+    service = rag_module.RagService(
+        pedr_orchestrator=pedr,
+        embedding_service=_FakeEmbeddingService(),
+        cache_service=_HitCacheService(cached),
+        client=fake_client,
+        model="gpt-test",
+        default_temperature=0.0,
+        cost_monitor=None,
+    )
+
+    result = service.run_query(
+        query="Does the project cover pod autoscaling?",
+        top_k=5,
+        project_id="proj-qa1-cache",
+        refuse_unsupported=True,
+    )
+
+    assert len(pedr.calls) == 1, "the cached answer is not served; retrieval runs"
+    assert result["no_evidence"] is True
+    assert result["cache"]["hit"] is False
+
+    served = service.run_query(
+        query="Does the project cover pod autoscaling?",
+        top_k=5,
+        project_id="proj-qa1-cache",
+    )
+    assert served["answer"] == cached["answer"], "an ordinary caller is still served it"
+    assert len(pedr.calls) == 1
+
+
+def test_the_model_is_told_its_answer_budget(monkeypatch):
+    """A citation label costs 33 tokens; an answer not told its budget is cut off (QA-1)."""
+    service, fake_client, _cache = _service_answering(
+        monkeypatch, "Measurement is iterative. [Document: doc-1, Chunk: 0]"
+    )
+
+    service.run_query(
+        query="How is experimentation measured?",
+        top_k=5,
+        project_id="proj-qa1-budget",
+        max_tokens=2000,
+    )
+    service.run_query(
+        query="How is experimentation measured, briefly?",
+        top_k=5,
+        project_id="proj-qa1-budget",
+    )
+
+    full, default = fake_client.chat.completions.requests
+    assert full["max_tokens"] == 2000
+    assert "within about 500 words" in full["messages"][1]["content"]
+    assert default["max_tokens"] == settings.rag_default_max_tokens
+    assert (
+        f"within about {settings.rag_default_max_tokens // 4} words"
+        in default["messages"][1]["content"]
+    )
+
+
+def test_a_refusing_caller_never_shares_an_application_cache_entry():
+    from app.services.cache_manager import CacheManager
+
+    kwargs = {
+        "query": "Q",
+        "project_id": "p",
+        "document_id": None,
+        "source_type": None,
+        "top_k": 5,
+        "temperature": None,
+        "max_tokens": 600,
+        "search_mode": "semantic",
+    }
+    legacy = ("Q", "p", "*", "*", 5, 0.0, 600, "semantic", "*", "*", "no-graph")
+    assert CacheManager.rag_query_key(**kwargs) == legacy
+    assert CacheManager.rag_query_key(**kwargs, refuse_unsupported=True) == (
+        *legacy,
+        "refuse-unsupported",
+    )
+
+
+class _RecordingQdrant:
+    """Just enough of the Qdrant client for SemanticCacheService."""
+
+    def __init__(self):
+        self.indexes: list[tuple[str, Any]] = []
+        self.filters: list[Any] = []
+
+    def get_collections(self):
+        collection = type("Collection", (), {"name": settings.semantic_cache_collection_name})
+        return type("Collections", (), {"collections": [collection]})
+
+    def get_collection(self, _name):
+        raise RuntimeError("no collection info in this fake")
+
+    def create_payload_index(self, *, collection_name, field_name, field_schema):
+        self.indexes.append((field_name, field_schema))
+
+    def search(self, **kwargs):
+        self.filters.append(kwargs["query_filter"])
+        return []
+
+
+def test_semantic_cache_serves_only_answers_written_for_the_same_budget():
+    """A full synthesis must never be served an earlier short answer (QA-1)."""
+    from qdrant_client.models import FieldCondition, MatchValue, PayloadSchemaType
+
+    from app.services.semantic_cache import SemanticCacheService
+
+    qdrant = _RecordingQdrant()
+    cache = SemanticCacheService(client=qdrant, enabled=True)
+
+    cache.check_cache(
+        query_embedding=[1.0, 0.0, 0.0],
+        metadata={"project_id": "p", "filters_signature": "sig", "max_tokens": 2000},
+    )
+
+    assert (
+        FieldCondition(key="max_tokens", match=MatchValue(value=2000))
+        in qdrant.filters[0].must
+    )
+    assert ("max_tokens", PayloadSchemaType.INTEGER) in qdrant.indexes

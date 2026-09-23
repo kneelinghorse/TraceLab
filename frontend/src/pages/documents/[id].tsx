@@ -15,7 +15,8 @@ import { parseApiTimestamp } from "@/lib/api/timestamps";
  *
  * The extracted text is the first thing on the page (DOCV-1); stats, metadata
  * and processing history live on the Overview tab, chunks and evidence keep
- * their own tabs. `?tab=` selects the initial tab.
+ * their own tabs. `?tab=` selects the initial tab. `?chunk=<id>&index=<n>` is a
+ * citation's link (QA-1): it opens the Chunks tab on that chunk, expanded.
  */
 
 import { AddToCollection } from "@/components/AddToCollection";
@@ -26,14 +27,23 @@ import type { PaginatedResponse } from "@/types/pagination";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useSWR from "swr";
 
 const TABS = ["Text", "Overview", "Chunks", "Evidence"] as const;
 type Tab = (typeof TABS)[number];
+const CHUNKS_PAGE_SIZE = 10;
 
 function initialTab(value: string | string[] | undefined): Tab {
   return typeof value === "string" && (TABS as readonly string[]).includes(value) ? (value as Tab) : "Text";
+}
+
+/** The chunk a citation link names, and the page of the list it is on (chunks are numbered from 0). */
+function citedChunk(query: Record<string, string | string[] | undefined>) {
+  if (typeof query.chunk !== "string" || !query.chunk) return null;
+  const index = typeof query.index === "string" ? Number.parseInt(query.index, 10) : Number.NaN;
+  const known = Number.isInteger(index) && index >= 0;
+  return { id: query.chunk, index: known ? index : null, page: known ? Math.floor(index / CHUNKS_PAGE_SIZE) + 1 : 1 };
 }
 
 export default function DocumentDetailPage() {
@@ -50,9 +60,10 @@ function DocumentDetail() {
   const [deleting, setDeleting] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [downloading, setDownloading] = useState(false);
-  const [chunksPage, setChunksPage] = useState(1);
-  const [expandedChunks, setExpandedChunks] = useState<Set<string>>(new Set());
-  const [tab, setTab] = useState<Tab>(() => initialTab(router.query.tab));
+  const [cited] = useState(() => citedChunk(router.query));
+  const [chunksPage, setChunksPage] = useState(cited?.page ?? 1);
+  const [expandedChunks, setExpandedChunks] = useState<Set<string>>(() => new Set(cited ? [cited.id] : []));
+  const [tab, setTab] = useState<Tab>(() => (cited ? "Chunks" : initialTab(router.query.tab)));
 
   const { data: document, mutate, error: loadError, isLoading } = useSWR<Document>(
     id ? ["document", user?.user_id, id] : null,
@@ -66,8 +77,17 @@ function DocumentDetail() {
 
   const { data: chunksResponse, isLoading: chunksLoading, error: chunksError, mutate: mutateChunks } = useSWR<PaginatedResponse<DocumentChunk>>(
     document && id && tab === "Chunks" ? ["chunks", user?.user_id, id, chunksPage] : null,
-    () => documentsApi.listChunks(id as string, { page: chunksPage, pageSize: 10 })
+    () => documentsApi.listChunks(id as string, { page: chunksPage, pageSize: CHUNKS_PAGE_SIZE })
   );
+  const citedOnPage = Boolean(cited && chunksResponse?.data.some((chunk) => chunk.id === cited.id));
+  // Said aloud rather than showing another passage: a reprocessed document has new chunks.
+  const citedMissing = Boolean(cited && chunksResponse && chunksPage === cited.page && !citedOnPage);
+
+  useEffect(() => {
+    if (!cited || !citedOnPage) return;
+    const element = window.document.getElementById(`chunk-${cited.id}`);
+    if (element && typeof element.scrollIntoView === "function") element.scrollIntoView({ block: "center" });
+  }, [cited, citedOnPage]);
 
   const toggleChunk = (chunkId: string) => {
     setExpandedChunks((prev) => {
@@ -372,6 +392,13 @@ function DocumentDetail() {
                 <p role="status" className="text-muted">Loading chunks...</p>
               )}
               {chunksError && <PageState state="error" title="Chunks could not load." onRetry={() => void mutateChunks()} />}
+              {citedMissing && (
+                <p role="alert" className="mb-4 rounded-lg border border-warning-line bg-warning-surface px-3 py-2 text-sm text-warning">
+                  {cited?.index != null
+                    ? `The cited chunk (#${cited.index}) is no longer in this document; it may have been reprocessed since it was cited.`
+                    : "The cited chunk is not on this page."}
+                </p>
+              )}
 
               {chunksResponse && chunksResponse.data.length > 0 && (
                 <>
@@ -379,7 +406,8 @@ function DocumentDetail() {
                     {chunksResponse.data.map((chunk) => (
                       <div
                         key={chunk.id}
-                        className="border border-line rounded-lg overflow-hidden"
+                        data-cited={chunk.id === cited?.id ? "true" : undefined}
+                        className={`border rounded-lg overflow-hidden ${chunk.id === cited?.id ? "border-accent ring-2 ring-accent" : "border-line"}`}
                       >
                         <div className="px-4 py-3 flex items-center justify-between bg-background">
                           <button
@@ -391,6 +419,9 @@ function DocumentDetail() {
                             <span className="font-mono text-sm text-accent-text">
                               #{chunk.chunk_index}
                             </span>
+                            {chunk.id === cited?.id && (
+                              <span className="rounded bg-accent px-2 py-0.5 text-xs font-semibold text-on-accent">Cited</span>
+                            )}
                             {chunk.token_count && (
                               <span className="text-xs text-muted bg-surface-alt px-2 py-0.5 rounded">
                                 {chunk.token_count} tokens

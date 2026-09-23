@@ -138,3 +138,35 @@ describe("isMarkdownDocument", () => {
     expect(isMarkdownDocument({ mime_type: "application/pdf", name: "report.pdf" })).toBe(false);
   });
 });
+
+// QA-1: a citation's link opens the document at the chunk it cites.
+describe("citation deep links", () => {
+  const cited = { id: "chunk-14", document_id: "doc-1", chunk_index: 14, content: "92% of 32-token inputs were recovered.", token_count: 180, created_at: "2026-09-23T00:00:00" };
+  const neighbour = { id: "chunk-13", document_id: "doc-1", chunk_index: 13, content: "Neighbouring text.", token_count: 170, created_at: "2026-09-23T00:00:00" };
+
+  it("opens the Chunks tab on the page holding the chunk, expanded and marked as cited", async () => {
+    mocks.query = { id: "doc-1", chunk: "chunk-14", index: "14" };
+    mocks.listChunks.mockResolvedValue({ data: [neighbour, cited], pagination: { total: 20, pages: 2, page: 2, page_size: 10 } });
+    mount();
+
+    expect(await screen.findByText("92% of 32-token inputs were recovered.")).toBeVisible();
+    expect(screen.getByRole("tab", { name: "Chunks" })).toHaveAttribute("aria-selected", "true");
+    expect(mocks.listChunks).toHaveBeenCalledWith("doc-1", { page: 2, pageSize: 10 });
+    expect(mocks.getContent).not.toHaveBeenCalled();
+    const card = screen.getByText("92% of 32-token inputs were recovered.").closest("[data-cited]");
+    expect(card).toHaveAttribute("data-cited", "true");
+    expect(screen.getByText("Cited")).toBeVisible();
+    // Only the cited chunk opens; its neighbour stays collapsed.
+    expect(screen.queryByText("Neighbouring text.")).toBeNull();
+  });
+
+  it("says the cited chunk is gone rather than showing another passage", async () => {
+    mocks.query = { id: "doc-1", chunk: "chunk-reprocessed-away", index: "14" };
+    mocks.listChunks.mockResolvedValue({ data: [neighbour, cited], pagination: { total: 20, pages: 2, page: 2, page_size: 10 } });
+    mount();
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("The cited chunk (#14) is no longer in this document");
+    expect(screen.queryByText("Cited")).toBeNull();
+  });
+
+});

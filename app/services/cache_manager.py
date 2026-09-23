@@ -135,8 +135,9 @@ class CacheManager:
         filters_signature: str | None = None,
         quality_signature: str | None = None,
         graph_context_enabled: bool = False,
+        refuse_unsupported: bool = False,
     ) -> tuple[Any, ...]:
-        return (
+        key = (
             query.strip(),
             project_id or "*",
             document_id or "*",
@@ -149,6 +150,9 @@ class CacheManager:
             quality_signature or "*",
             "graph" if graph_context_enabled else "no-graph",
         )
+        # A refusing caller (QA-1) never shares an entry with one that answers from
+        # compression's best chunk; every other key is unchanged.
+        return (*key, "refuse-unsupported") if refuse_unsupported else key
 
     @staticmethod
     def document_list_key(

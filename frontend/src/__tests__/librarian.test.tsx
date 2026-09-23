@@ -243,3 +243,106 @@ describe("Librarian page", () => {
     expect(screen.queryByRole("navigation", { name: "Where you are" })).toBeNull();
   });
 });
+
+// QA-1: asking a project's documents. The answer's every citation opens the chunk it
+// came from, a question the project cannot support is refused and asserts nothing,
+// and the answer budget the user chose goes out with the request.
+describe("Librarian page, asking the documents", () => {
+  const documentId = "30000000-0000-4000-8000-000000000003";
+  const chunkId = "40000000-0000-4000-8000-000000000004";
+  const chunk = {
+    id: chunkId,
+    document_id: documentId,
+    document_name: "qdrant-on-railway.md",
+    chunk_index: 9,
+    snippet: "The Hobby plan bill is approximately $48-$63 a month.",
+    href: `/documents/${documentId}?chunk=${chunkId}&index=9`,
+  };
+
+  function answer(overrides: Record<string, unknown> = {}) {
+    return {
+      segments: [
+        { kind: "corpus_claim", text: "The bill is **$48–$63** a month.", citations: [chunkId] },
+        { kind: "prose", text: "Managed hosting usually costs more.", citations: [] },
+      ],
+      suggested_action: null,
+      evidence: [],
+      chunks: [chunk],
+      no_evidence: false,
+      withheld_count: 0,
+      usage: null,
+      model: "gpt-5.1",
+      ...overrides,
+    };
+  }
+
+  async function ask(question: string) {
+    fireEvent.change(screen.getByLabelText("Message the Librarian"), { target: { value: question } });
+    fireEvent.click(screen.getByRole("button", { name: "Ask" }));
+  }
+
+  it("sends the chosen budget and links each citation to the chunk it came from", async () => {
+    mocks.turn.mockResolvedValue(answer());
+    page();
+    await chooseProject();
+    fireEvent.click(screen.getByRole("radio", { name: "Ask the documents" }));
+    expect(screen.getByRole("radio", { name: "Short answer" })).toBeChecked();
+    fireEvent.click(screen.getByRole("radio", { name: "Full synthesis" }));
+    await ask("What does self-hosting Qdrant cost?");
+
+    const log = await screen.findByRole("log");
+    const claim = (await within(log).findByText(/a month\./)).closest("[data-kind='corpus_claim']") as HTMLElement;
+    expect(claim).not.toBeNull();
+    expect(within(claim).getByText("From this project's documents")).toBeVisible();
+    expect(within(claim).getByRole("link", { name: "qdrant-on-railway.md #9" })).toHaveAttribute("href", chunk.href);
+    // Uncited text is not dressed as a claim.
+    expect(within(log).getByText("Managed hosting usually costs more.").closest("[data-kind='corpus_claim']")).toBeNull();
+
+    const [messages, sentProject, options] = mocks.turn.mock.calls[0];
+    expect(messages).toEqual([{ role: "user", content: "What does self-hosting Qdrant cost?" }]);
+    expect(sentProject).toBe(projectId);
+    expect(options).toEqual({ maxTokens: 2000 });
+  });
+
+  it("asks for a short answer unless the user chooses a full synthesis", async () => {
+    mocks.turn.mockResolvedValue(answer());
+    page();
+    await chooseProject();
+    fireEvent.click(screen.getByRole("radio", { name: "Ask the documents" }));
+    await ask("What does it cost?");
+    await waitFor(() => expect(mocks.turn).toHaveBeenCalledWith(expect.any(Array), projectId, { maxTokens: 600 }));
+  });
+
+  it("renders a refusal as a note that asserts nothing, and keeps it that way after a reload", async () => {
+    mocks.turn.mockResolvedValue(
+      answer({
+        segments: [{ kind: "prose", text: "Nothing in this project answers that question.", citations: [] }],
+        chunks: [],
+        no_evidence: true,
+      }),
+    );
+    const first = page();
+    await chooseProject();
+    fireEvent.click(screen.getByRole("radio", { name: "Ask the documents" }));
+    await ask("How does Kubernetes autoscale pods?");
+
+    const refusal = await screen.findByRole("note");
+    expect(refusal).toHaveAttribute("data-kind", "refusal");
+    expect(refusal).toHaveTextContent("Nothing in this project answers that question.");
+    const log = screen.getByRole("log");
+    expect(log.querySelector("[data-kind='corpus_claim']")).toBeNull();
+    expect(within(log).queryByRole("link")).toBeNull();
+    first.unmount();
+
+    page();
+    expect(await screen.findByRole("note")).toHaveAttribute("data-kind", "refusal");
+  });
+
+  it("cannot ask the documents without a project", async () => {
+    page();
+    await screen.findByRole("option", { name: "Onboarding" });
+    expect(screen.getByRole("radio", { name: "Ask the documents" })).toBeDisabled();
+    expect(screen.getByRole("radio", { name: "Talk it through" })).toBeChecked();
+    expect(screen.queryByRole("radio", { name: "Full synthesis" })).toBeNull();
+  });
+});
