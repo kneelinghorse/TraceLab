@@ -1,0 +1,92 @@
+...................                                                      [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/_pytest/config/__init__.py:852
+  /Users/systemsystems/portfolio/TraceLab/.venv/lib/python3.11/site-packages/_pytest/config/__init__.py:852: PytestAssertRewriteWarning: Module already imported so cannot be rewritten; cmos_pytest_telemetry_plugin
+    self.import_plugin(import_spec)
+
+app/core/config.py:11
+  /Users/systemsystems/portfolio/TraceLab/app/core/config.py:11: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class Settings(BaseSettings):
+
+app/core/database.py:29
+  /Users/systemsystems/portfolio/TraceLab/app/core/database.py:29: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+.venv/lib/python3.11/site-packages/passlib/utils/__init__.py:854
+  /Users/systemsystems/portfolio/TraceLab/.venv/lib/python3.11/site-packages/passlib/utils/__init__.py:854: DeprecationWarning: 'crypt' is deprecated and slated for removal in Python 3.13
+    from crypt import crypt as _crypt
+
+app/schemas/pagination.py:8
+  /Users/systemsystems/portfolio/TraceLab/app/schemas/pagination.py:8: PydanticDeprecatedSince20: `pydantic.generics:GenericModel` has been moved to `pydantic.BaseModel`. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    from pydantic.generics import GenericModel
+
+app/schemas/api_key.py:23
+  /Users/systemsystems/portfolio/TraceLab/app/schemas/api_key.py:23: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class APIKeyResponse(BaseModel):
+
+app/schemas/api_key.py:39
+  /Users/systemsystems/portfolio/TraceLab/app/schemas/api_key.py:39: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class APIKeyInfo(BaseModel):
+
+app/schemas/saved_searches.py:41
+  /Users/systemsystems/portfolio/TraceLab/app/schemas/saved_searches.py:41: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class SavedSearchResponse(SavedSearchBase):
+
+app/schemas/search_history.py:15
+  /Users/systemsystems/portfolio/TraceLab/app/schemas/search_history.py:15: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class SearchHistoryEntry(BaseModel):
+
+app/schemas/webhook.py:22
+  /Users/systemsystems/portfolio/TraceLab/app/schemas/webhook.py:22: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class ExecutionMetadata(BaseModel):
+
+app/main.py:161
+  /Users/systemsystems/portfolio/TraceLab/app/main.py:161: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+.venv/lib/python3.11/site-packages/fastapi/applications.py:4599
+.venv/lib/python3.11/site-packages/fastapi/applications.py:4599
+  /Users/systemsystems/portfolio/TraceLab/.venv/lib/python3.11/site-packages/fastapi/applications.py:4599: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)
+
+app/main.py:210
+  /Users/systemsystems/portfolio/TraceLab/app/main.py:210: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("shutdown")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+PASSED tests/test_rag_service.py::test_refusing_caller_is_not_answered_from_a_chunk_below_the_floor
+PASSED tests/test_rag_service.py::test_refusing_caller_asks_again_when_the_cached_answer_rests_below_the_floor
+PASSED tests/test_rag_service.py::test_the_model_is_told_its_answer_budget
+PASSED tests/test_rag_service.py::test_a_refusing_caller_never_shares_an_application_cache_entry
+PASSED tests/test_rag_service.py::test_semantic_cache_serves_only_answers_written_for_the_same_budget
+PASSED tests/test_corpus_qa.py::test_each_passage_cites_only_chunks_the_model_read
+PASSED tests/test_corpus_qa.py::test_a_paragraph_of_labels_lends_them_to_the_paragraph_before_it
+PASSED tests/test_corpus_qa.py::test_an_answer_that_cites_nothing_is_refused_not_shown
+PASSED tests/test_corpus_qa.py::test_a_citation_into_a_deleted_document_is_dropped
+PASSED tests/test_corpus_qa.py::TestScope::test_a_member_cannot_get_an_answer_from_a_project_they_cannot_read
+PASSED tests/test_corpus_qa.py::test_through_the_pipeline_a_supported_question_is_answered_with_resolving_citations
+PASSED tests/test_corpus_qa.py::test_through_the_pipeline_an_unsupported_question_is_refused_before_the_model
+PASSED tests/test_librarian_api.py::TestAnswer::test_routes_to_the_qa_service_and_renders_cited_passages
+PASSED tests/test_librarian_api.py::TestAnswer::test_every_rendered_citation_passes_the_provenance_validator
+PASSED tests/test_librarian_api.py::TestAnswer::test_a_citation_the_answer_was_not_written_from_is_withheld
+PASSED tests/test_librarian_api.py::TestAnswer::test_nothing_found_renders_the_refusal_and_asserts_nothing
+PASSED tests/test_librarian_api.py::TestAnswer::test_a_project_the_user_cannot_read_is_403_before_retrieval
+PASSED tests/test_librarian_api.py::TestAnswer::test_each_paid_call_is_metered_and_a_cached_answer_is_not
+PASSED tests/test_corpus_qa.py::test_a_label_naming_several_chunks_cites_each_and_leaves_no_raw_text
+19 passed, 14 warnings in 3.71s

@@ -1,0 +1,729 @@
+{
+  "web": "https://tracelab.aquex.ai",
+  "timezone": "America/Chicago",
+  "started_at_utc": "2026-09-23T20:07:00.734Z",
+  "health_commit": "b140085baa499f2d4ffb1e75956519b7f78b19ea",
+  "role": "owner",
+  "project": "0afcc588-e722-45bd-8320-f486601b877c",
+  "floor": 0.4,
+  "questions": [
+    {
+      "id": "Q1-miro-highest-access",
+      "budget": "Short answer",
+      "question": "When a Miro board is shared at more than one level at the same time, which access level does a user actually get?",
+      "expect": "answered",
+      "similarity": {
+        "status": 200,
+        "cosine_max": 0.5842912,
+        "cosine_top5": [
+          0.5842912,
+          0.50898194,
+          0.50064707,
+          0.4814146,
+          0.47130528
+        ],
+        "reaches_floor": true,
+        "answering": [
+          {
+            "chunk_index": 6,
+            "found": {
+              "rank": 1,
+              "document_id": "04ffc800-85cf-4a49-bcec-a856644796a8",
+              "chunk_index": 6,
+              "semantic_cosine": 0.5842912
+            }
+          }
+        ]
+      },
+      "sent_at_utc": "2026-09-23T20:07:04.862Z",
+      "request": {
+        "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+        "messages": [
+          {
+            "role": "user",
+            "content": "When a Miro board is shared at more than one level at the same time, which access level does a user actually get?"
+          }
+        ],
+        "mode": "answer",
+        "max_tokens": 600
+      },
+      "status": 200,
+      "response": {
+        "segments": [
+          {
+            "kind": "prose",
+            "text": "Miro uses a “highest access wins” rule when a board is shared at multiple levels.",
+            "citations": []
+          },
+          {
+            "kind": "corpus_claim",
+            "text": "If a user receives different permissions from different sharing paths (for example, invited directly as a commenter but also covered by a team-level setting that allows team members to edit the board), the more permissive level applies, so in that case the user would effectively get edit access.",
+            "citations": [
+              "22dc10c0-b9ea-401c-9e00-aa6de3560a20"
+            ]
+          }
+        ],
+        "suggested_action": null,
+        "evidence": [],
+        "chunks": [
+          {
+            "id": "22dc10c0-b9ea-401c-9e00-aa6de3560a20",
+            "document_id": "04ffc800-85cf-4a49-bcec-a856644796a8",
+            "document_name": "TRACE-SHARE-58_report.md",
+            "chunk_index": 6,
+            "snippet": "Boards can be set to **Anyone with the link** with **view, comment, or edit** access , and admins set **default sharing settings** (including \"Only board owner can access\") . Enterprise adds a team-level **sharing policy** blocking disallowed domains . **Access graph:** **Highest",
+            "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=22dc10c0-b9ea-401c-9e00-aa6de3560a20&index=6"
+          }
+        ],
+        "no_evidence": false,
+        "withheld_count": 0,
+        "usage": null,
+        "model": "gpt-5.1"
+      },
+      "ui": {
+        "corpus_claims": 1,
+        "refusal_note": null,
+        "citation_links": [
+          {
+            "text": "TRACE-SHARE-58_report.md #6",
+            "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=22dc10c0-b9ea-401c-9e00-aa6de3560a20&index=6"
+          }
+        ],
+        "page_errors": [],
+        "blocked_writes": []
+      },
+      "screenshots": [
+        {
+          "file": "Q1-miro-highest-access-light-1440.png",
+          "theme": "light",
+          "width": 1440,
+          "horizontal_overflow": false
+        },
+        {
+          "file": "Q1-miro-highest-access-light-390.png",
+          "theme": "light",
+          "width": 390,
+          "horizontal_overflow": false
+        },
+        {
+          "file": "Q1-miro-highest-access-dark-1440.png",
+          "theme": "dark",
+          "width": 1440,
+          "horizontal_overflow": false
+        },
+        {
+          "file": "Q1-miro-highest-access-dark-390.png",
+          "theme": "dark",
+          "width": 390,
+          "horizontal_overflow": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=22dc10c0-b9ea-401c-9e00-aa6de3560a20&index=6",
+          "chunk_id": "22dc10c0-b9ea-401c-9e00-aa6de3560a20",
+          "document_id": "04ffc800-85cf-4a49-bcec-a856644796a8",
+          "document_name": "TRACE-SHARE-58_report.md",
+          "chunk_index": 6,
+          "api_chunk_at_index": true,
+          "chunks_tab_selected": true,
+          "marked_cited": true,
+          "cited_label": "#6 Cited 714 tokens −",
+          "expanded_text_is_the_chunk": true,
+          "snippet_in_expanded_text": true,
+          "screenshot": "Q1-miro-highest-access-link-6.png"
+        }
+      ],
+      "checks": {
+        "status_200": true,
+        "budget_sent": true,
+        "served_as_expected": true,
+        "no_page_errors": true,
+        "no_other_writes": true,
+        "no_horizontal_overflow": true,
+        "no_raw_citation_labels": true,
+        "not_refused": true,
+        "cited_passage_states_the_fact": true,
+        "cites_an_answering_chunk": true,
+        "every_citation_listed": true,
+        "ui_links_match_response": true,
+        "every_link_opens_its_chunk": true,
+        "answering_chunk_at_the_floor": true
+      },
+      "met": true
+    },
+    {
+      "id": "Q2-sharing-options-synthesis",
+      "budget": "Full synthesis",
+      "question": "Compare the workspace-inheritance and project-level sharing archetypes from the research, and explain which option it recommends for TraceLab and why.",
+      "expect": "answered",
+      "similarity": {
+        "status": 200,
+        "cosine_max": 0.7154237,
+        "cosine_top5": [
+          0.7154237,
+          0.6136639,
+          0.6088444,
+          0.6011257,
+          0.587548
+        ],
+        "reaches_floor": true,
+        "answering": [
+          {
+            "chunk_index": 9,
+            "found": {
+              "rank": 2,
+              "document_id": "04ffc800-85cf-4a49-bcec-a856644796a8",
+              "chunk_index": 9,
+              "semantic_cosine": 0.6136639
+            }
+          },
+          {
+            "chunk_index": 10,
+            "found": {
+              "rank": 5,
+              "document_id": "04ffc800-85cf-4a49-bcec-a856644796a8",
+              "chunk_index": 10,
+              "semantic_cosine": 0.587548
+            }
+          }
+        ]
+      },
+      "sent_at_utc": "2026-09-23T20:07:22.408Z",
+      "request": {
+        "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Compare the workspace-inheritance and project-level sharing archetypes from the research, and explain which option it recommends for TraceLab and why."
+          }
+        ],
+        "mode": "answer",
+        "max_tokens": 2000
+      },
+      "status": 200,
+      "response": {
+        "segments": [
+          {
+            "kind": "prose",
+            "text": "Workspace-inheritance and project-level sharing are presented as two of the three main archetypes in the research, with explicit pros/cons and a concrete recommendation for TraceLab.",
+            "citations": []
+          },
+          {
+            "kind": "prose",
+            "text": "**Workspace-inheritance archetype**",
+            "citations": []
+          },
+          {
+            "kind": "corpus_claim",
+            "text": "- Definition: Membership is granted at the container (workspace/teamspace) level, and everything created inside is visible to all members by default.\n- Examples: Notion teamspaces, Miro teams, ClickUp Spaces, Google shared drives.\n- Pros: Very low friction; new projects are instantly collaborative and the access graph is trivial (mirror workspace membership).\n- Cons: Highest blast radius—expanding workspace membership silently expands access to every project; the Linear 2026 incident is cited as evidence that such broad boundaries tend to leak into notifications and cached clients.",
+            "citations": [
+              "495844eb-ec3b-42d4-81b8-d2d2005c62f6",
+              "b4713fac-2d20-45b5-9e51-c52fa6c80d11"
+            ]
+          },
+          {
+            "kind": "prose",
+            "text": "**Project-level (per-project) sharing archetype**",
+            "citations": []
+          },
+          {
+            "kind": "corpus_claim",
+            "text": "- Definition: Access is granted explicitly per project or artifact; there is no automatic workspace-wide baseline in the pure form.\n- Examples: GitHub repositories, GitLab projects, Dropbox shared folders, Airtable bases are cited as project/artifact-level products in general.\n- Pros (pure per-project rosters option): Smallest possible blast radius per grant; guarantees are simple to state and test.\n- Cons: Onboarding becomes a per-project chore; maintainers accumulate “grant debt,” and vendors often reintroduce broad access via an all-members team, effectively drifting back toward a hybrid model.",
+            "citations": [
+              "b4713fac-2d20-45b5-9e51-c52fa6c80d11",
+              "495844eb-ec3b-42d4-81b8-d2d2005c62f6"
+            ]
+          },
+          {
+            "kind": "prose",
+            "text": "**Which option the research recommends for TraceLab**",
+            "citations": []
+          },
+          {
+            "kind": "corpus_claim",
+            "text": "The report does not recommend a pure workspace-inheritance or pure per-project model for TraceLab; instead it recommends a **hybrid, project-bounded model** as Option 1.",
+            "citations": [
+              "b4713fac-2d20-45b5-9e51-c52fa6c80d11"
+            ]
+          },
+          {
+            "kind": "corpus_claim",
+            "text": "- In this recommended model, the workspace provides discovery, naming, and a baseline role, but each project has its own explicit roster that can override the baseline, governed by a clear resolution rule.\n- This is justified as giving isolation by default (explicit project rosters) while preserving discoverability and a path to future federation.\n- The UX guidance is to use a Figma-style share modal that enumerates access sources from broadest to most specific, plus conflict indicators similar to GitHub’s “Mixed roles.”",
+            "citations": [
+              "b4713fac-2d20-45b5-9e51-c52fa6c80d11"
+            ]
+          },
+          {
+            "kind": "prose",
+            "text": "**How the recommendation relates to workspace-inheritance vs project-level**",
+            "citations": []
+          },
+          {
+            "kind": "corpus_claim",
+            "text": "- Workspace-inheritance (Option 3) is explicitly labeled the **runner-up** and is recommended only if TraceLab’s projects become short-lived and cross-cutting—i.e., when project participant sets churn so fast that explicit rosters are unreasonable to maintain.\n- The report states that, given the declared “maintainer-and-project” profile for TraceLab, that trigger condition is **not** met, so the hybrid, project-bounded model is a better fit than workspace-inheritance.",
+            "citations": [
+              "12ede311-cf0d-47ef-9299-6c35846d84fc"
+            ]
+          },
+          {
+            "kind": "corpus_claim",
+            "text": "In summary, the research views pure workspace-inheritance as simpler but too risky in blast radius, and pure per-project sharing as safest but operationally heavy. For TraceLab’s current use case, it recommends a hybrid with project-bounded rosters (plus an optional admin warning gate) rather than either extreme.",
+            "citations": [
+              "b4713fac-2d20-45b5-9e51-c52fa6c80d11",
+              "12ede311-cf0d-47ef-9299-6c35846d84fc"
+            ]
+          }
+        ],
+        "suggested_action": null,
+        "evidence": [],
+        "chunks": [
+          {
+            "id": "495844eb-ec3b-42d4-81b8-d2d2005c62f6",
+            "document_id": "04ffc800-85cf-4a49-bcec-a856644796a8",
+            "document_name": "TRACE-SHARE-58_report.md",
+            "chunk_index": 0,
+            "snippet": "# Research Report: TRACE-SHARE-58 - Project vs Workspace Sharing Models for TraceLab Sprint 58\n\n**Sources collected:** 226\n**Verified references:** 41\n**Agent steps:** 25 / 40\n**Runtime:** 4m 20s\n\n## 1. Executive Summary\n\nTraceLab's Sprint 58 sharing model must resolve one struct",
+            "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=495844eb-ec3b-42d4-81b8-d2d2005c62f6&index=0"
+          },
+          {
+            "id": "b4713fac-2d20-45b5-9e51-c52fa6c80d11",
+            "document_id": "04ffc800-85cf-4a49-bcec-a856644796a8",
+            "document_name": "TRACE-SHARE-58_report.md",
+            "chunk_index": 9,
+            "snippet": "**Pattern F — Derived-surface leakage.** Linear's 2026 incident shows access-control integrity must extend to notifications, cached client data, and mobile sessions, which can leak private-team data without the UI ever rendering it . This is the strongest argument in the evidence",
+            "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=b4713fac-2d20-45b5-9e51-c52fa6c80d11&index=9"
+          },
+          {
+            "id": "12ede311-cf0d-47ef-9299-6c35846d84fc",
+            "document_id": "04ffc800-85cf-4a49-bcec-a856644796a8",
+            "document_name": "TRACE-SHARE-58_report.md",
+            "chunk_index": 10,
+            "snippet": "- *Cons:* highest blast radius — widening workspace membership silently widens every project; the Linear 2026 incident shows how quickly this boundary can leak into notifications and client caches . - *UX pattern:* container-level defaults that admins set once (Miro's \"Only board",
+            "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=12ede311-cf0d-47ef-9299-6c35846d84fc&index=10"
+          }
+        ],
+        "no_evidence": false,
+        "withheld_count": 0,
+        "usage": null,
+        "model": "gpt-5.1"
+      },
+      "ui": {
+        "corpus_claims": 6,
+        "refusal_note": null,
+        "citation_links": [
+          {
+            "text": "TRACE-SHARE-58_report.md #0",
+            "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=495844eb-ec3b-42d4-81b8-d2d2005c62f6&index=0"
+          },
+          {
+            "text": "TRACE-SHARE-58_report.md #9",
+            "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=b4713fac-2d20-45b5-9e51-c52fa6c80d11&index=9"
+          },
+          {
+            "text": "TRACE-SHARE-58_report.md #9",
+            "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=b4713fac-2d20-45b5-9e51-c52fa6c80d11&index=9"
+          },
+          {
+            "text": "TRACE-SHARE-58_report.md #0",
+            "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=495844eb-ec3b-42d4-81b8-d2d2005c62f6&index=0"
+          },
+          {
+            "text": "TRACE-SHARE-58_report.md #9",
+            "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=b4713fac-2d20-45b5-9e51-c52fa6c80d11&index=9"
+          },
+          {
+            "text": "TRACE-SHARE-58_report.md #9",
+            "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=b4713fac-2d20-45b5-9e51-c52fa6c80d11&index=9"
+          },
+          {
+            "text": "TRACE-SHARE-58_report.md #10",
+            "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=12ede311-cf0d-47ef-9299-6c35846d84fc&index=10"
+          },
+          {
+            "text": "TRACE-SHARE-58_report.md #9",
+            "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=b4713fac-2d20-45b5-9e51-c52fa6c80d11&index=9"
+          },
+          {
+            "text": "TRACE-SHARE-58_report.md #10",
+            "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=12ede311-cf0d-47ef-9299-6c35846d84fc&index=10"
+          }
+        ],
+        "page_errors": [],
+        "blocked_writes": []
+      },
+      "screenshots": [
+        {
+          "file": "Q2-sharing-options-synthesis-light-1440.png",
+          "theme": "light",
+          "width": 1440,
+          "horizontal_overflow": false
+        },
+        {
+          "file": "Q2-sharing-options-synthesis-light-390.png",
+          "theme": "light",
+          "width": 390,
+          "horizontal_overflow": false
+        },
+        {
+          "file": "Q2-sharing-options-synthesis-dark-1440.png",
+          "theme": "dark",
+          "width": 1440,
+          "horizontal_overflow": false
+        },
+        {
+          "file": "Q2-sharing-options-synthesis-dark-390.png",
+          "theme": "dark",
+          "width": 390,
+          "horizontal_overflow": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=495844eb-ec3b-42d4-81b8-d2d2005c62f6&index=0",
+          "chunk_id": "495844eb-ec3b-42d4-81b8-d2d2005c62f6",
+          "document_id": "04ffc800-85cf-4a49-bcec-a856644796a8",
+          "document_name": "TRACE-SHARE-58_report.md",
+          "chunk_index": 0,
+          "api_chunk_at_index": true,
+          "chunks_tab_selected": true,
+          "marked_cited": true,
+          "cited_label": "#0 Cited 781 tokens −",
+          "expanded_text_is_the_chunk": true,
+          "snippet_in_expanded_text": true,
+          "screenshot": "Q2-sharing-options-synthesis-link-0.png"
+        },
+        {
+          "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=b4713fac-2d20-45b5-9e51-c52fa6c80d11&index=9",
+          "chunk_id": "b4713fac-2d20-45b5-9e51-c52fa6c80d11",
+          "document_id": "04ffc800-85cf-4a49-bcec-a856644796a8",
+          "document_name": "TRACE-SHARE-58_report.md",
+          "chunk_index": 9,
+          "api_chunk_at_index": true,
+          "chunks_tab_selected": true,
+          "marked_cited": true,
+          "cited_label": "#9 Cited 771 tokens −",
+          "expanded_text_is_the_chunk": true,
+          "snippet_in_expanded_text": true,
+          "screenshot": "Q2-sharing-options-synthesis-link-9.png"
+        },
+        {
+          "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=12ede311-cf0d-47ef-9299-6c35846d84fc&index=10",
+          "chunk_id": "12ede311-cf0d-47ef-9299-6c35846d84fc",
+          "document_id": "04ffc800-85cf-4a49-bcec-a856644796a8",
+          "document_name": "TRACE-SHARE-58_report.md",
+          "chunk_index": 10,
+          "api_chunk_at_index": true,
+          "chunks_tab_selected": true,
+          "marked_cited": true,
+          "cited_label": "#10 Cited 586 tokens −",
+          "expanded_text_is_the_chunk": true,
+          "snippet_in_expanded_text": true,
+          "screenshot": "Q2-sharing-options-synthesis-link-10.png"
+        }
+      ],
+      "checks": {
+        "status_200": true,
+        "budget_sent": true,
+        "served_as_expected": true,
+        "no_page_errors": true,
+        "no_other_writes": true,
+        "no_horizontal_overflow": true,
+        "no_raw_citation_labels": true,
+        "not_refused": true,
+        "cited_passage_states_the_fact": true,
+        "cites_an_answering_chunk": true,
+        "every_citation_listed": true,
+        "ui_links_match_response": true,
+        "every_link_opens_its_chunk": true,
+        "answering_chunk_at_the_floor": true
+      },
+      "met": true
+    },
+    {
+      "id": "Q3-airtable-toggle-default",
+      "budget": "Short answer",
+      "question": "Out of the box, does Airtable's workspace setting that restricts adding new collaborators start switched on or off?",
+      "expect": "answered",
+      "similarity": {
+        "status": 200,
+        "cosine_max": 0.51182795,
+        "cosine_top5": [
+          0.51182795,
+          0.49161863,
+          0.46465266,
+          0.45004445,
+          0.44548386
+        ],
+        "reaches_floor": true,
+        "answering": [
+          {
+            "chunk_index": 5,
+            "found": {
+              "rank": 1,
+              "document_id": "04ffc800-85cf-4a49-bcec-a856644796a8",
+              "chunk_index": 5,
+              "semantic_cosine": 0.51182795
+            }
+          },
+          {
+            "chunk_index": 10,
+            "found": {
+              "rank": 2,
+              "document_id": "04ffc800-85cf-4a49-bcec-a856644796a8",
+              "chunk_index": 10,
+              "semantic_cosine": 0.49161863
+            }
+          }
+        ]
+      },
+      "sent_at_utc": "2026-09-23T20:07:43.716Z",
+      "request": {
+        "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Out of the box, does Airtable's workspace setting that restricts adding new collaborators start switched on or off?"
+          }
+        ],
+        "mode": "answer",
+        "max_tokens": 600
+      },
+      "status": 200,
+      "response": {
+        "segments": [
+          {
+            "kind": "corpus_claim",
+            "text": "Airtable’s workspace-level setting **“Restrict adding new collaborators to this workspace, its bases, and its interfaces”** is **off by default** out of the box.",
+            "citations": [
+              "e9d4c409-16c7-4af1-9ced-23d9d1f05774"
+            ]
+          },
+          {
+            "kind": "corpus_claim",
+            "text": "This is reiterated in the design discussion, which notes that Airtable’s workspace-owner “Restrict adding new collaborators…” toggle **defaults to off**, and further warns that an off‑by‑default gate provides no protection until someone explicitly enables it.",
+            "citations": [
+              "12ede311-cf0d-47ef-9299-6c35846d84fc"
+            ]
+          }
+        ],
+        "suggested_action": null,
+        "evidence": [],
+        "chunks": [
+          {
+            "id": "e9d4c409-16c7-4af1-9ced-23d9d1f05774",
+            "document_id": "04ffc800-85cf-4a49-bcec-a856644796a8",
+            "document_name": "TRACE-SHARE-58_report.md",
+            "chunk_index": 5,
+            "snippet": "Airtable surfaces a **WORKSPACE** marker in the Permission column when a grant originates above the base, so it must be changed at the workspace level . Collaborators may invite at the same or lower level — a Commenter can invite Commenters or Read-only users . **Blast-radius UX:",
+            "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=e9d4c409-16c7-4af1-9ced-23d9d1f05774&index=5"
+          },
+          {
+            "id": "12ede311-cf0d-47ef-9299-6c35846d84fc",
+            "document_id": "04ffc800-85cf-4a49-bcec-a856644796a8",
+            "document_name": "TRACE-SHARE-58_report.md",
+            "chunk_index": 10,
+            "snippet": "- *Cons:* highest blast radius — widening workspace membership silently widens every project; the Linear 2026 incident shows how quickly this boundary can leak into notifications and client caches . - *UX pattern:* container-level defaults that admins set once (Miro's \"Only board",
+            "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=12ede311-cf0d-47ef-9299-6c35846d84fc&index=10"
+          }
+        ],
+        "no_evidence": false,
+        "withheld_count": 0,
+        "usage": {
+          "prompt_tokens": 3824,
+          "completion_tokens": 151,
+          "total_tokens": 3975
+        },
+        "model": "gpt-5.1"
+      },
+      "ui": {
+        "corpus_claims": 2,
+        "refusal_note": null,
+        "citation_links": [
+          {
+            "text": "TRACE-SHARE-58_report.md #5",
+            "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=e9d4c409-16c7-4af1-9ced-23d9d1f05774&index=5"
+          },
+          {
+            "text": "TRACE-SHARE-58_report.md #10",
+            "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=12ede311-cf0d-47ef-9299-6c35846d84fc&index=10"
+          }
+        ],
+        "page_errors": [],
+        "blocked_writes": []
+      },
+      "screenshots": [
+        {
+          "file": "Q3-airtable-toggle-default-light-1440.png",
+          "theme": "light",
+          "width": 1440,
+          "horizontal_overflow": false
+        },
+        {
+          "file": "Q3-airtable-toggle-default-light-390.png",
+          "theme": "light",
+          "width": 390,
+          "horizontal_overflow": false
+        },
+        {
+          "file": "Q3-airtable-toggle-default-dark-1440.png",
+          "theme": "dark",
+          "width": 1440,
+          "horizontal_overflow": false
+        },
+        {
+          "file": "Q3-airtable-toggle-default-dark-390.png",
+          "theme": "dark",
+          "width": 390,
+          "horizontal_overflow": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=e9d4c409-16c7-4af1-9ced-23d9d1f05774&index=5",
+          "chunk_id": "e9d4c409-16c7-4af1-9ced-23d9d1f05774",
+          "document_id": "04ffc800-85cf-4a49-bcec-a856644796a8",
+          "document_name": "TRACE-SHARE-58_report.md",
+          "chunk_index": 5,
+          "api_chunk_at_index": true,
+          "chunks_tab_selected": true,
+          "marked_cited": true,
+          "cited_label": "#5 Cited 788 tokens −",
+          "expanded_text_is_the_chunk": true,
+          "snippet_in_expanded_text": true,
+          "screenshot": "Q3-airtable-toggle-default-link-5.png"
+        },
+        {
+          "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=12ede311-cf0d-47ef-9299-6c35846d84fc&index=10",
+          "chunk_id": "12ede311-cf0d-47ef-9299-6c35846d84fc",
+          "document_id": "04ffc800-85cf-4a49-bcec-a856644796a8",
+          "document_name": "TRACE-SHARE-58_report.md",
+          "chunk_index": 10,
+          "api_chunk_at_index": true,
+          "chunks_tab_selected": true,
+          "marked_cited": true,
+          "cited_label": "#10 Cited 586 tokens −",
+          "expanded_text_is_the_chunk": true,
+          "snippet_in_expanded_text": true,
+          "screenshot": "Q3-airtable-toggle-default-link-10.png"
+        }
+      ],
+      "checks": {
+        "status_200": true,
+        "budget_sent": true,
+        "served_as_expected": true,
+        "no_page_errors": true,
+        "no_other_writes": true,
+        "no_horizontal_overflow": true,
+        "no_raw_citation_labels": true,
+        "not_refused": true,
+        "cited_passage_states_the_fact": true,
+        "cites_an_answering_chunk": true,
+        "every_citation_listed": true,
+        "ui_links_match_response": true,
+        "every_link_opens_its_chunk": true,
+        "answering_chunk_at_the_floor": true
+      },
+      "met": true
+    },
+    {
+      "id": "R1-kubernetes-autoscaling",
+      "budget": "Short answer",
+      "question": "How should Kubernetes horizontal pod autoscaling be tuned for bursty GPU inference traffic?",
+      "expect": "refused",
+      "similarity": {
+        "status": 200,
+        "cosine_max": 0.37412822,
+        "cosine_top5": [
+          0.37412822,
+          0.37006032,
+          0.3615889,
+          0.3594432,
+          0.35406882
+        ],
+        "reaches_floor": false
+      },
+      "sent_at_utc": "2026-09-23T20:08:05.366Z",
+      "request": {
+        "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+        "messages": [
+          {
+            "role": "user",
+            "content": "How should Kubernetes horizontal pod autoscaling be tuned for bursty GPU inference traffic?"
+          }
+        ],
+        "mode": "answer",
+        "max_tokens": 600
+      },
+      "status": 200,
+      "response": {
+        "segments": [
+          {
+            "kind": "prose",
+            "text": "Nothing in this project answers that question.",
+            "citations": []
+          }
+        ],
+        "suggested_action": null,
+        "evidence": [],
+        "chunks": [],
+        "no_evidence": true,
+        "withheld_count": 0,
+        "usage": null,
+        "model": "gpt-5.1"
+      },
+      "ui": {
+        "corpus_claims": 0,
+        "refusal_note": "Nothing in this project answers that question.",
+        "citation_links": [],
+        "page_errors": [],
+        "blocked_writes": []
+      },
+      "screenshots": [
+        {
+          "file": "R1-kubernetes-autoscaling-light-1440.png",
+          "theme": "light",
+          "width": 1440,
+          "horizontal_overflow": false
+        },
+        {
+          "file": "R1-kubernetes-autoscaling-light-390.png",
+          "theme": "light",
+          "width": 390,
+          "horizontal_overflow": false
+        },
+        {
+          "file": "R1-kubernetes-autoscaling-dark-1440.png",
+          "theme": "dark",
+          "width": 1440,
+          "horizontal_overflow": false
+        },
+        {
+          "file": "R1-kubernetes-autoscaling-dark-390.png",
+          "theme": "dark",
+          "width": 390,
+          "horizontal_overflow": false
+        }
+      ],
+      "links": [],
+      "checks": {
+        "status_200": true,
+        "budget_sent": true,
+        "served_as_expected": true,
+        "no_page_errors": true,
+        "no_other_writes": true,
+        "no_horizontal_overflow": true,
+        "no_raw_citation_labels": true,
+        "refused": true,
+        "refusal_text": true,
+        "asserts_nothing": true,
+        "ui_shows_refusal_note": true,
+        "below_the_floor": true,
+        "no_model_call": true
+      },
+      "met": true
+    }
+  ],
+  "finished_at_utc": "2026-09-23T20:08:16.068Z",
+  "all_met": true
+}
