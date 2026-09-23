@@ -1,0 +1,189 @@
+health attempt 0: status 200, commit 65b11ef5e4a1acfbbb757f781dc712c698a9b9bc
+{
+  "deployed_commit": "65b11ef5e4a1acfbbb757f781dc712c698a9b9bc",
+  "questions": {
+    "B2-embedding-inversion-reworded": {
+      "search_status": 200,
+      "pedr_status": 200,
+      "answer": "If an attacker stole the vectors in your database, current research shows they could often reconstruct the original text with high fidelity, so the vectors should be treated as sensitive as the raw sentences themselves. [Document: 1b6d9489-55ef-4868-b2b4-fa8535e414c4, Chunk: 13] [Document: 1b6d9489-55ef-4868-b2b4-fa8535e414c4, Chunk: 14]\n\nIn particular, one study cited in your context found that **92% of 32\u2011token (short) text inputs were recovered word\u2011for\u2011word from their embeddings.** [Document: 1b6d9489-55ef-4868-b2b4-fa8535e414c4, Chunk: 14]",
+      "cache_hit": false,
+      "answering_chunk_top5_rank": {
+        "14": 2
+      },
+      "answering_chunk_reached_model": {
+        "14": true
+      },
+      "chunks_reaching_model": [
+        {
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 13,
+          "semantic_cosine": 0.4916669
+        },
+        {
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 14,
+          "semantic_cosine": 0.4667641
+        }
+      ],
+      "compression": {
+        "original_chunks": 5,
+        "filtered_chunks": 2,
+        "original_tokens": 3614,
+        "filtered_tokens": 1549,
+        "threshold": 0.4
+      },
+      "answer_states_fact": {
+        "92\\s*(%|percent)": true,
+        "32[\\s-]*token": false
+      },
+      "citations": 2,
+      "every_citation_resolves": true,
+      "pedr_top5_semantic_ranks": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "model_attempts": [
+        "gpt-5.1"
+      ],
+      "met": false
+    },
+    "C-qdrant-railway-cost": {
+      "search_status": 200,
+      "pedr_status": 200,
+      "answer": "The Qdrant on Railway report estimates a **total monthly bill of approximately $48\u2013$63** for self-hosting half a million vectors on the Hobby plan. [Document: bdc8881c-8747-4b5a-8c98-5d360bc0721e, Chunk: 8][Document: bdc8881c-8747-4b5a-8c98-5d360bc0721e, Chunk: 9]",
+      "cache_hit": false,
+      "answering_chunk_top5_rank": {
+        "8": 1,
+        "9": 2
+      },
+      "answering_chunk_reached_model": {
+        "8": true,
+        "9": true
+      },
+      "chunks_reaching_model": [
+        {
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 8,
+          "semantic_cosine": 0.6335608
+        },
+        {
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 9,
+          "semantic_cosine": 0.59811264
+        },
+        {
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 7,
+          "semantic_cosine": 0.553024
+        },
+        {
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 11,
+          "semantic_cosine": 0.5198306
+        },
+        {
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 12,
+          "semantic_cosine": 0.51100016
+        }
+      ],
+      "compression": {
+        "original_chunks": 5,
+        "filtered_chunks": 5,
+        "original_tokens": 3605,
+        "filtered_tokens": 3605,
+        "threshold": 0.4
+      },
+      "answer_states_fact": {
+        "\\$\\s*48": true,
+        "\\$?\\s*63\\b": true
+      },
+      "citations": 2,
+      "every_citation_resolves": true,
+      "pedr_top5_semantic_ranks": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "model_attempts": [
+        "gpt-5.1"
+      ],
+      "met": true
+    }
+  },
+  "ranking": [
+    {
+      "id": "A-rag-cost",
+      "graph_on": {
+        "9": 1,
+        "10": 16
+      },
+      "graph_off": {
+        "9": 1,
+        "10": "not in top 20"
+      },
+      "graph_on_top_5_semantic_ranks": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "id": "B-embedding-inversion",
+      "graph_on": {
+        "14": 1
+      },
+      "graph_off": {
+        "14": 1
+      },
+      "graph_on_top_5_semantic_ranks": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "id": "B2-embedding-inversion-reworded",
+      "graph_on": {
+        "14": 2
+      },
+      "graph_off": {
+        "14": 2
+      },
+      "graph_on_top_5_semantic_ranks": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "id": "C-qdrant-railway-cost",
+      "graph_on": {
+        "8": 1,
+        "9": 2
+      },
+      "graph_off": {
+        "8": 1,
+        "9": 2
+      },
+      "graph_on_top_5_semantic_ranks": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ]
+}

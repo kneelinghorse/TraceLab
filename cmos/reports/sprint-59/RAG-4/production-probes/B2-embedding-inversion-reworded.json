@@ -1,0 +1,602 @@
+{
+  "question": "B2-embedding-inversion-reworded",
+  "answering": [
+    "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+    [
+      14
+    ]
+  ],
+  "search_sent_at_utc": "2026-09-23T17:03:37Z",
+  "search": {
+    "request": {
+      "query": "If someone stole the vectors in our database, could they rebuild the sentences they came from? What share of short inputs did the study recover word for word?",
+      "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+      "top_k": 5
+    },
+    "status": 200,
+    "response": {
+      "answer": "If an attacker stole the vectors in your database, current research shows they could often reconstruct the original text with high fidelity, so the vectors should be treated as sensitive as the raw sentences themselves. [Document: 1b6d9489-55ef-4868-b2b4-fa8535e414c4, Chunk: 13] [Document: 1b6d9489-55ef-4868-b2b4-fa8535e414c4, Chunk: 14]\n\nIn particular, one study cited in your context found that **92% of 32\u2011token (short) text inputs were recovered word\u2011for\u2011word from their embeddings.** [Document: 1b6d9489-55ef-4868-b2b4-fa8535e414c4, Chunk: 14]",
+      "citations": [
+        {
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_id": "2b4d473a-f4e9-4700-a3b1-ad9fe3fbd711",
+          "chunk_index": 13,
+          "source_type": null,
+          "score": 0.007016,
+          "snippet": "Run this dataset through the current Presidio configuration and use presidio-research to calculate baseline precision, recall, and F1-scores for each entity type. Analyze Errors (Qualitative Analysis): The quantitative metrics point to where the problems are, but not what they ar"
+        },
+        {
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_id": "fdacea63-c500-47ee-b437-f025c3feab57",
+          "chunk_index": 14,
+          "source_type": null,
+          "score": 0.006903,
+          "snippet": "Models like Vec2Text have shown that, even with black-box access to the embedding model, a significant portion of the original text can be recovered. One study found that 92% of 32-token text inputs could be reconstructed exactly from their embeddings. This has profound implicati"
+        }
+      ],
+      "sources": [
+        {
+          "chunk_id": "2b4d473a-f4e9-4700-a3b1-ad9fe3fbd711",
+          "content": "Run this dataset through the current Presidio configuration and use presidio-research to calculate baseline precision, recall, and F1-scores for each entity type. Analyze Errors (Qualitative Analysis): The quantitative metrics point to where the problems are, but not what they are. The next step is a qualitative review of the errors:\n\nAnalyze False Positives: Examine the text that was incorrectly flagged as PII. Are there recurring patterns? For example, is a particular project name or technical acronym consistently being misidentified as a PERSON or ORGANIZATION?. Analyze False Negatives: Look at the PII that the system missed. Is it a new format of an ID number that the current regex doesn't cover? Is it a name in a language the current NLP model wasn't trained on? Implement Targeted Interventions: Based on the error analysis, make specific, targeted changes to the recognizer registry:\n\nTo fix false positives: Create a new PatternRecognizer with a deny_list containing the commonly misidentified terms. This acts as a high-precision corrective layer. To fix false negatives: If the missed PII follows a pattern, create or refine a regex-based PatternRecognizer. If the missed PII is contextual (like a name), it may signal that the underlying NLP model is insufficient. The intervention here could be to switch to a more powerful Transformer-based model or, in advanced cases, to fine-tune an NER model on domain-specific annotated data. Iterate and Re-evaluate: After implementing the changes, re-run the evaluation on the ground truth dataset. Compare the new metrics to the baseline to confirm that the change had the desired effect (e.g., increased recall for a specific entity) and did not introduce new, unintended errors (e.g., a drastic drop in precision). This iterative loop\u2014Measure, Analyze, Intervene, and Re-measure\u2014is the core process for systematically hardening and improving the accuracy of the PII detection pipeline. Section VII: The Final Frontier: Redaction's Impact on Vector Embeddings\nThe user's requirement to perform PII redaction before generating vector embeddings is not merely a procedural preference; it is a critical security measure grounded in emerging research. For years, text embeddings\u2014dense numerical representations of text\u2014were considered a form of anonymization. The assumption was that the transformation from discrete text to a high-dimensional vector was a one-way process that obscured the original content. Recent studies have decisively proven this assumption to be false, creating a new frontier of privacy risk for AI systems that rely on vector databases, such as Retrieval-Augmented Generation (RAG). 7.1 The Inversion Risk: Why PII is Recoverable from Embeddings\nRecent research has demonstrated that it is possible to perform \"embedding inversion\" attacks, where the original text is reconstructed with surprisingly high fidelity from its embedding vector alone. Models like Vec2Text have shown that, even with black-box access to the embedding model, a significant portion of the original text can be recovered.",
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "chunk_index": 13,
+          "source_type": null,
+          "document_type": null,
+          "collection_date": null,
+          "tags": null,
+          "score": 0.007016,
+          "quality_score": null,
+          "quality_base_score": null,
+          "quality_boost": null,
+          "quality_status": null,
+          "quality_gates_passed": null,
+          "quality_gates_total": null,
+          "quality_validated": null,
+          "quality_mission_id": null,
+          "quality_pii_flagged": null,
+          "element_type": null,
+          "element_type_match": null,
+          "type_boost": null
+        },
+        {
+          "chunk_id": "fdacea63-c500-47ee-b437-f025c3feab57",
+          "content": "Models like Vec2Text have shown that, even with black-box access to the embedding model, a significant portion of the original text can be recovered. One study found that 92% of 32-token text inputs could be reconstructed exactly from their embeddings. This has profound implications for data privacy. It means that text embeddings should be treated with the same level of security and caution as the raw text they represent. Storing embeddings of text that contains PII in a vector database is functionally equivalent to storing the PII itself in plain text. A data breach that exposes the vector database could lead to the reconstruction of the original sensitive information. This validates the core architectural principle of this report: redaction is not an optional post-processing step but a mandatory pre-processing step that must occur before any text is passed to an embedding model. 7.2 Analyzing the \"Semantic Scar\": Quantifying Distortion from Redaction\nWhile necessary for privacy, redaction is not a benign operation. By altering or removing words from the source text, it inevitably distorts the semantic meaning that an embedding model is designed to capture. This alteration creates a \"semantic scar\" on the resulting vector embedding, which can degrade the performance of any downstream task that relies on that embedding, most notably semantic search. For example, consider the sentence: \"The study was led by Dr. Evelyn Reed at the University of Cambridge.\"\n\nOriginal Embedding: Captures the full semantic context, including the specific person and institution. Label-Replaced Text: \"The study was led by at .\" The embedding for this text has lost the specific identities, and the artificial tags <PERSON> and <ORGANIZATION> may introduce noise or be treated as out-of-vocabulary tokens, shifting the vector to a different region of the embedding space. Pseudonymized Text: \"The study was led by Dr. Olivia Grant at the University of Oxford.\" The embedding for this text preserves the semantic structure (\"a person at an institution\") but points to different specific entities, which will also alter its position in the embedding space. Quantifying this semantic distortion directly is challenging. However, its impact can be measured indirectly by evaluating the performance of the downstream application. For a semantic search system, one could measure retrieval accuracy (e.g., using metrics like Mean Reciprocal Rank or nDCG) on a benchmark query set, comparing the results obtained using embeddings from original text versus embeddings from redacted text. A significant drop in these metrics would quantify the negative impact of the \"semantic scar.\"   \n\n7.3 Techniques for Mitigating Negative Impacts and Preserving Utility\nThe central tension in this final stage is the trade-off between privacy and utility. The more aggressively information is redacted to enhance privacy, the more semantic fidelity is lost, harming the utility of the embeddings. The choice of redaction operator is, therefore, not just a formatting decision but a direct control knob on this privacy-utility spectrum.",
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "chunk_index": 14,
+          "source_type": null,
+          "document_type": null,
+          "collection_date": null,
+          "tags": null,
+          "score": 0.006903,
+          "quality_score": null,
+          "quality_base_score": null,
+          "quality_boost": null,
+          "quality_status": null,
+          "quality_gates_passed": null,
+          "quality_gates_total": null,
+          "quality_validated": null,
+          "quality_mission_id": null,
+          "quality_pii_flagged": null,
+          "element_type": null,
+          "element_type_match": null,
+          "type_boost": null
+        }
+      ],
+      "latency_ms": 6793.83,
+      "compression": {
+        "original_chunks": 5,
+        "filtered_chunks": 2,
+        "original_tokens": 3614,
+        "filtered_tokens": 1549,
+        "reduction_ratio": 0.5714,
+        "threshold": 0.4,
+        "compression_ms": 0.429
+      },
+      "cache": {
+        "hit": false,
+        "score": null,
+        "age_seconds": null,
+        "ttl_seconds": 300.0
+      },
+      "quality": {
+        "composite_score": 0.932,
+        "threshold": 0.85,
+        "pillar_scores": {
+          "linguistic_uncertainty": 0.9,
+          "answer_integrity": 0.95,
+          "source_provenance": 0.95
+        },
+        "hard_failures": [],
+        "reasons": [],
+        "pre_escalation_score": null
+      },
+      "routing": {
+        "selected_model": "gpt-5.1",
+        "escalated": false,
+        "attempts": [
+          {
+            "model": "gpt-5.1",
+            "quality_score": 0.932,
+            "below_threshold": false,
+            "hard_failures": [],
+            "citation_count": 2
+          }
+        ],
+        "estimated_cost_usd": 0.003591,
+        "metrics": {
+          "total_queries": 1,
+          "escalations": 0
+        }
+      },
+      "search_mode": "semantic",
+      "no_evidence": false
+    },
+    "checks": {
+      "cache_hit": false,
+      "no_evidence": false,
+      "sources": 2,
+      "every_source_has_text": true,
+      "compression": {
+        "original_chunks": 5,
+        "filtered_chunks": 2,
+        "original_tokens": 3614,
+        "filtered_tokens": 1549,
+        "threshold": 0.4
+      },
+      "labels_in_answer_text": 3,
+      "citations": 2,
+      "citation_resolution": [
+        {
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_id": "2b4d473a-f4e9-4700-a3b1-ad9fe3fbd711",
+          "chunk_index": 13,
+          "in_response_sources": true,
+          "opens_in_document_chunk_list": true
+        },
+        {
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_id": "fdacea63-c500-47ee-b437-f025c3feab57",
+          "chunk_index": 14,
+          "in_response_sources": true,
+          "opens_in_document_chunk_list": true
+        }
+      ],
+      "every_citation_resolves": true,
+      "model_attempts": [
+        "gpt-5.1"
+      ],
+      "quality_composite": 0.932
+    }
+  },
+  "pedr_sent_at_utc": "2026-09-23T17:03:44Z",
+  "pedr": {
+    "request": {
+      "query": "If someone stole the vectors in our database, could they rebuild the sentences they came from? What share of short inputs did the study recover word for word?",
+      "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+      "top_k": 5
+    },
+    "status": 200,
+    "response": {
+      "results": [
+        {
+          "chunk_id": "2b4d473a-f4e9-4700-a3b1-ad9fe3fbd711",
+          "content": "Run this dataset through the current Presidio configuration and use presidio-research to calculate baseline precision, recall, and F1-scores for each entity type. Analyze Errors (Qualitative Analysis): The quantitative metrics point to where the problems are, but not what they are. The next step is a qualitative review of the errors:\n\nAnalyze False Positives: Examine the text that was incorrectly flagged as PII. Are there recurring patterns? For example, is a particular project name or technical acronym consistently being misidentified as a PERSON or ORGANIZATION?. Analyze False Negatives: Look at the PII that the system missed. Is it a new format of an ID number that the current regex doesn't cover? Is it a name in a language the current NLP model wasn't trained on? Implement Targeted Interventions: Based on the error analysis, make specific, targeted changes to the recognizer registry:\n\nTo fix false positives: Create a new PatternRecognizer with a deny_list containing the commonly misidentified terms. This acts as a high-precision corrective layer. To fix false negatives: If the missed PII follows a pattern, create or refine a regex-based PatternRecognizer. If the missed PII is contextual (like a name), it may signal that the underlying NLP model is insufficient. The intervention here could be to switch to a more powerful Transformer-based model or, in advanced cases, to fine-tune an NER model on domain-specific annotated data. Iterate and Re-evaluate: After implementing the changes, re-run the evaluation on the ground truth dataset. Compare the new metrics to the baseline to confirm that the change had the desired effect (e.g., increased recall for a specific entity) and did not introduce new, unintended errors (e.g., a drastic drop in precision). This iterative loop\u2014Measure, Analyze, Intervene, and Re-measure\u2014is the core process for systematically hardening and improving the accuracy of the PII detection pipeline. Section VII: The Final Frontier: Redaction's Impact on Vector Embeddings\nThe user's requirement to perform PII redaction before generating vector embeddings is not merely a procedural preference; it is a critical security measure grounded in emerging research. For years, text embeddings\u2014dense numerical representations of text\u2014were considered a form of anonymization. The assumption was that the transformation from discrete text to a high-dimensional vector was a one-way process that obscured the original content. Recent studies have decisively proven this assumption to be false, creating a new frontier of privacy risk for AI systems that rely on vector databases, such as Retrieval-Augmented Generation (RAG). 7.1 The Inversion Risk: Why PII is Recoverable from Embeddings\nRecent research has demonstrated that it is possible to perform \"embedding inversion\" attacks, where the original text is reconstructed with surprisingly high fidelity from its embedding vector alone. Models like Vec2Text have shown that, even with black-box access to the embedding model, a significant portion of the original text can be recovered.",
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "rrf_score": 0.007016,
+          "rrf_rank": 1,
+          "layer_ranks": {
+            "semantic": 1,
+            "graph": 1
+          },
+          "layer_scores": {
+            "semantic": 0.4916669,
+            "graph": 0.4916669
+          },
+          "urn": "urn:research:chunk:2b4d473a-f4e9-4700-a3b1-ad9fe3fbd711",
+          "confidence": 0.1,
+          "criticality": 0.5,
+          "element_type": null,
+          "query_intent": "search",
+          "quality_score": 0.1,
+          "quality_status": "unknown",
+          "quality_gates_passed": 0,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "chunk_index": 13,
+          "source_type": null,
+          "source_origin": null,
+          "score": 0.007016,
+          "combined_score": 0.007016,
+          "embedding": null,
+          "related_entities": null
+        },
+        {
+          "chunk_id": "fdacea63-c500-47ee-b437-f025c3feab57",
+          "content": "Models like Vec2Text have shown that, even with black-box access to the embedding model, a significant portion of the original text can be recovered. One study found that 92% of 32-token text inputs could be reconstructed exactly from their embeddings. This has profound implications for data privacy. It means that text embeddings should be treated with the same level of security and caution as the raw text they represent. Storing embeddings of text that contains PII in a vector database is functionally equivalent to storing the PII itself in plain text. A data breach that exposes the vector database could lead to the reconstruction of the original sensitive information. This validates the core architectural principle of this report: redaction is not an optional post-processing step but a mandatory pre-processing step that must occur before any text is passed to an embedding model. 7.2 Analyzing the \"Semantic Scar\": Quantifying Distortion from Redaction\nWhile necessary for privacy, redaction is not a benign operation. By altering or removing words from the source text, it inevitably distorts the semantic meaning that an embedding model is designed to capture. This alteration creates a \"semantic scar\" on the resulting vector embedding, which can degrade the performance of any downstream task that relies on that embedding, most notably semantic search. For example, consider the sentence: \"The study was led by Dr. Evelyn Reed at the University of Cambridge.\"\n\nOriginal Embedding: Captures the full semantic context, including the specific person and institution. Label-Replaced Text: \"The study was led by at .\" The embedding for this text has lost the specific identities, and the artificial tags <PERSON> and <ORGANIZATION> may introduce noise or be treated as out-of-vocabulary tokens, shifting the vector to a different region of the embedding space. Pseudonymized Text: \"The study was led by Dr. Olivia Grant at the University of Oxford.\" The embedding for this text preserves the semantic structure (\"a person at an institution\") but points to different specific entities, which will also alter its position in the embedding space. Quantifying this semantic distortion directly is challenging. However, its impact can be measured indirectly by evaluating the performance of the downstream application. For a semantic search system, one could measure retrieval accuracy (e.g., using metrics like Mean Reciprocal Rank or nDCG) on a benchmark query set, comparing the results obtained using embeddings from original text versus embeddings from redacted text. A significant drop in these metrics would quantify the negative impact of the \"semantic scar.\"   \n\n7.3 Techniques for Mitigating Negative Impacts and Preserving Utility\nThe central tension in this final stage is the trade-off between privacy and utility. The more aggressively information is redacted to enhance privacy, the more semantic fidelity is lost, harming the utility of the embeddings. The choice of redaction operator is, therefore, not just a formatting decision but a direct control knob on this privacy-utility spectrum.",
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "rrf_score": 0.006903,
+          "rrf_rank": 2,
+          "layer_ranks": {
+            "semantic": 2,
+            "graph": 2
+          },
+          "layer_scores": {
+            "semantic": 0.4667641,
+            "graph": 0.4667641
+          },
+          "urn": "urn:research:chunk:fdacea63-c500-47ee-b437-f025c3feab57",
+          "confidence": 0.1,
+          "criticality": 0.5,
+          "element_type": null,
+          "query_intent": "search",
+          "quality_score": 0.1,
+          "quality_status": "unknown",
+          "quality_gates_passed": 0,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "chunk_index": 14,
+          "source_type": null,
+          "source_origin": null,
+          "score": 0.006903,
+          "combined_score": 0.006903,
+          "embedding": null,
+          "related_entities": null
+        },
+        {
+          "chunk_id": "00c03c45-0fec-4dd3-b1bd-5932cef5118d",
+          "content": "on_disk_payload\ttrue\tReduces RAM usage by storing metadata on disk. hnsw_config.m\t16\tBalanced graph density for high recall and moderate memory use. hnsw_config.ef_construct\t100\tPrioritizes faster index build time. hnsw_config.on_disk\tfalse\tKeeps the HNSW graph in RAM for fast query traversal. quantization_config\tScalarQuantization\tEnables 4x memory compression with minimal accuracy loss. ...scalar.type\tint8\tSpecifies 8-bit integer compression. ...scalar.quantile\t0.99\tExcludes top/bottom 0.5% of values to prevent outliers from skewing quantization. ...scalar.always_ram\ttrue\tEnsures compressed vectors are kept in RAM for fast initial search. optimizer_config.indexing_threshold\t1000000\t(During bulk import) Prevents premature indexing. 5.2 Benchmarks and Performance Expectations\nPublic performance benchmarks conducted by Qdrant provide a strong basis for setting realistic performance expectations. The dbpedia-openai-1M-1536-angular dataset, which consists of 1 million 1536-dimensional vectors, is a relevant analogue for this project's workload. Analysis: In these benchmarks, Qdrant consistently demonstrates industry-leading performance, achieving the highest Requests-per-Second (RPS) and lowest latencies in nearly all scenarios. For the 1M vector dataset, Qdrant achieves a p99 latency well under 10ms with a throughput of over 1200 RPS for unfiltered searches. Expectation: For the target workload of up to 500,000 vectors, and with the recommended optimized configuration, query performance is expected to be excellent. Latency: Semantic search queries, even with metadata filters applied, should comfortably remain well below the 2-second target. After an initial cache warm-up, typical query times are expected to be in the low-to-mid double-digit millisecond range. Filter Performance: The performance impact of filtering will depend on the cardinality (selectivity) of the filter conditions. In cases where a filter is highly selective (matching only a small number of points), Qdrant's query planner may intelligently switch from an HNSW search to a direct full scan over the small, filtered subset, which can result in queries that are even faster than unfiltered searches. 5.3 Strategic Roadmap for Future Scaling\nAs the dataset grows beyond the initial 500,000 vectors, the system's configuration may need to be adjusted to maintain optimal performance. The following roadmap outlines a strategic approach to scaling. Scaling to 1 Million+ Vectors:\n\nIncrease Graph Density: As the number of points in the graph increases, it may be beneficial to increase the HNSW m parameter to 24 or 32 to maintain high recall by creating a denser graph. Vertical Scaling on Railway: The most direct path to scaling is to upgrade the service instance on Railway to the Pro plan, allocating more RAM and vCPU resources as dictated by updated resource calculations. Scaling to 5 Million+ Vectors:\n\nRe-evaluate Quantization: At a multi-million vector scale, the memory savings offered by Binary Quantization (32x compression) become increasingly compelling.",
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "rrf_score": 0.006794,
+          "rrf_rank": 3,
+          "layer_ranks": {
+            "semantic": 3,
+            "graph": 3
+          },
+          "layer_scores": {
+            "semantic": 0.3992164,
+            "graph": 0.3992164
+          },
+          "urn": "urn:research:chunk:00c03c45-0fec-4dd3-b1bd-5932cef5118d",
+          "confidence": 0.1,
+          "criticality": 0.5,
+          "element_type": null,
+          "query_intent": "search",
+          "quality_score": 0.1,
+          "quality_status": "unknown",
+          "quality_gates_passed": 0,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "chunk_index": 10,
+          "source_type": null,
+          "source_origin": null,
+          "score": 0.006794,
+          "combined_score": 0.006794,
+          "embedding": null,
+          "related_entities": null
+        },
+        {
+          "chunk_id": "1ef80aaa-9ffa-44c2-a426-c0274142abd5",
+          "content": "\"\"\"\n    sentences = split_into_sentences(text)\n    chunks = []\n    current_chunk = []\n    current_tokens = 0\n    \n    for sentence in sentences:\n        sentence_tokens = count_tokens(sentence)\n        \n        if current_tokens + sentence_tokens > chunk_size and current_chunk:\n            # Save current chunk\n            chunks.append(create_chunk(current_chunk, start_pos, end_pos))\n            \n            # Start new chunk with overlap\n            overlap_sentences = get_last_n_sentences(current_chunk, overlap_tokens)\n            current_chunk = overlap_sentences + [sentence]\n            current_tokens = sum(count_tokens(s) for s in current_chunk)\n        else:\n            current_chunk.append(sentence)\n            current_tokens += sentence_tokens\n    \n    return chunks\n```\n\n### 3. PII Detection and Redaction (Pre-Embedding)\n\n**Critical Security Requirement**: PII must be redacted **before** embedding generation. Recent research demonstrates that text embeddings can be inverted to reconstruct original text, meaning embeddings containing PII pose the same privacy risk as storing raw PII. **Implementation: Microsoft Presidio**\n- **Framework**: Microsoft Presidio (open-source PII detection and anonymization)\n- **NLP Engine**: spaCy `en_core_web_lg` for Named Entity Recognition\n- **Redaction Strategy**: **Pseudonymization** using Faker library (preserves semantic integrity for RAG)\n- **Pipeline**: Document \u2192 Presidio Analyzer \u2192 Presidio Anonymizer \u2192 Clean Text \u2192 Embedding\n\n**Architecture:**\n```python\nfrom presidio_analyzer import AnalyzerEngine\nfrom presidio_anonymizer import AnonymizerEngine\nfrom faker import Faker\n\n# Initialize Presidio with custom recognizers\nanalyzer = AnalyzerEngine()\nanonymizer = AnonymizerEngine()\nfake = Faker()\n\n# Custom pseudonymization operator\ndef fake_name(value):\n    return fake.name()\n\n# Redaction pipeline\nanalyzer_results = analyzer.analyze(text=document_text, language='en')\nredacted_text = anonymizer.anonymize(\n    text=document_text,\n    analyzer_results=analyzer_results,\n    operators={\n        \"PERSON\": OperatorConfig(\"custom\", {\"lambda\": fake_name}),\n        \"EMAIL_ADDRESS\": OperatorConfig(\"replace\", {\"new_value\": \"<EMAIL>\"})\n    }\n).text\n```\n\n**Storage Strategy:**\n- Store **only redacted text** in main repository\n- Original sensitive documents: securely delete or move to encrypted cold storage (audit/legal use only)\n\n### 4. Embedding Generation\n\n**Model Selection:**\n- **Primary**: OpenAI `text-embedding-3-small` (1536 dimensions, configurable down to 512)\n  - Cost: **$0.02 per 1M tokens** (5x cheaper than ada-002)\n  - Performance: 62.3% MTEB score (vs 61.0% for ada-002)\n  - **Dimensionality Shortening**: Can reduce to 512 dimensions with minimal accuracy loss (61.6% MTEB)\n- **Legacy**: `text-embedding-ada-002` - **Not recommended** (obsolete for new implementations)\n\n**Batch Processing:**\n- **Initial Corpus Embedding**: Use OpenAI Batch API for 50% cost discount on bulk operations\n- **Regular Embedding**: Process chunks in batches of 100-500\n- Store embeddings in PostgreSQL temporarily before vector DB upload\n- Handle rate limits with exponential backoff\n\n### 5.",
+          "document_id": "e237cd2b-600e-4b79-af1d-b206f707a591",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "rrf_score": 0.006687,
+          "rrf_rank": 4,
+          "layer_ranks": {
+            "semantic": 4,
+            "graph": 4
+          },
+          "layer_scores": {
+            "semantic": 0.38794592,
+            "graph": 0.38794592
+          },
+          "urn": "urn:research:chunk:1ef80aaa-9ffa-44c2-a426-c0274142abd5",
+          "confidence": 0.1,
+          "criticality": 0.5,
+          "element_type": null,
+          "query_intent": "search",
+          "quality_score": 0.1,
+          "quality_status": "unknown",
+          "quality_gates_passed": 0,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "chunk_index": 5,
+          "source_type": null,
+          "source_origin": null,
+          "score": 0.006687,
+          "combined_score": 0.006687,
+          "embedding": null,
+          "related_entities": null
+        },
+        {
+          "chunk_id": "94bc97e4-5224-407c-b7d3-0b94969dcf6e",
+          "content": "Scaling to 5 Million+ Vectors:\n\nRe-evaluate Quantization: At a multi-million vector scale, the memory savings offered by Binary Quantization (32x compression) become increasingly compelling. At this stage, it would be prudent to conduct an internal benchmark comparing the accuracy of BQ against the established SQ baseline for the specific research document embeddings. The potential for significant cost savings may justify a tolerable reduction in recall. Scaling to 10 Million+ Vectors (and Beyond):\n\nHorizontal Scaling (Sharding): For datasets in the tens of millions, a single-node deployment will likely become a bottleneck. The next architectural step is to implement horizontal scaling using Qdrant's native sharding capabilities. This distributes the collection across multiple nodes, allowing for parallel processing of queries. This level of complexity typically warrants a move from a simple Docker deployment on Railway to a more robust orchestration platform like Kubernetes, or transitioning to the managed Qdrant Cloud, which handles sharding and replication automatically. qdrant.tech\nStorage - Qdrant\nOpens in a new window\n\nanalyticsvidhya.com\nA Deep Dive into Qdrant, the Rust-Based Vector Database - Analytics Vidhya\nOpens in a new window\n\nrailway.com\nDeploy Qdrant (Open-Source Vector Database for AI & Semantic Search) - Railway\nOpens in a new window\n\ndrdroid.io\nQdrant Memory Limit Exceeded - Doctor Droid\nOpens in a new window\n\nrailway.com\nRailway Pricing and Plans\nOpens in a new window\n\nqdrant.tech\nVector Search Resource Optimization Guide - Qdrant\nOpens in a new window\n\nqdrant.tech\nLarge-Scale Data Ingestion - Qdrant\nOpens in a new window\n\nqdrant.tech\nOptimizing Memory for Bulk Uploads - Qdrant\nOpens in a new window\n\nqdrant.tech\nQuantization - Qdrant\nOpens in a new window\n\nqdrant.tech\nVector Quantization Methods - Qdrant\nOpens in a new window\n\nmedium.com\nMaster Qdrant Quantization: The Complete Toolkit for Every Vector Optimization Method\nOpens in a new window\n\nqdrant.tech\nWhat is Vector Quantization?",
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "rrf_score": 0.006585,
+          "rrf_rank": 5,
+          "layer_ranks": {
+            "semantic": 5,
+            "graph": 5
+          },
+          "layer_scores": {
+            "semantic": 0.38617206,
+            "graph": 0.38617206
+          },
+          "urn": "urn:research:chunk:94bc97e4-5224-407c-b7d3-0b94969dcf6e",
+          "confidence": 0.1,
+          "criticality": 0.5,
+          "element_type": null,
+          "query_intent": "search",
+          "quality_score": 0.1,
+          "quality_status": "unknown",
+          "quality_gates_passed": 0,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "chunk_index": 11,
+          "source_type": null,
+          "source_origin": null,
+          "score": 0.006585,
+          "combined_score": 0.006585,
+          "embedding": null,
+          "related_entities": null
+        }
+      ],
+      "metadata": {
+        "query": "If someone stole the vectors in our database, could they rebuild the sentences they came from? What share of short inputs did the study recover word for word?",
+        "intent": "search",
+        "intent_confidence": 0.5,
+        "detected_type": null,
+        "type_confidence": 0.0,
+        "layers_used": [
+          "semantic",
+          "graph"
+        ],
+        "layer_weights": {
+          "lexical": 0.22,
+          "semantic": 0.308,
+          "syntactic": 0.132,
+          "pragmatic": 0.08800000000000001,
+          "governance": 0.132,
+          "graph": 0.12
+        },
+        "timings": {
+          "lexical_ms": 11.574406875297427,
+          "semantic_ms": 278.7133790552616,
+          "graph_ms": 15.07,
+          "syntactic_ms": 0.10793004184961319,
+          "pragmatic_ms": 0.11246907524764538,
+          "governance_ms": 7.060884963721037,
+          "fusion_ms": 0.46162819489836693,
+          "relational_ms": 0.0,
+          "total_ms": 312.57895403541625
+        },
+        "layer_diagnostics": [
+          {
+            "layer": "lexical",
+            "status": "ok",
+            "duration_ms": 11.57,
+            "result_count": 0,
+            "error": null,
+            "error_type": null
+          },
+          {
+            "layer": "semantic",
+            "status": "ok",
+            "duration_ms": 278.71,
+            "result_count": 60,
+            "error": null,
+            "error_type": null
+          },
+          {
+            "layer": "graph",
+            "status": "ok",
+            "duration_ms": 15.07,
+            "result_count": 68,
+            "error": null,
+            "error_type": null
+          },
+          {
+            "layer": "syntactic",
+            "status": "ok",
+            "duration_ms": 0.11,
+            "result_count": 60,
+            "error": null,
+            "error_type": null
+          },
+          {
+            "layer": "pragmatic",
+            "status": "ok",
+            "duration_ms": 0.11,
+            "result_count": 60,
+            "error": null,
+            "error_type": null
+          },
+          {
+            "layer": "governance",
+            "status": "ok",
+            "duration_ms": 7.06,
+            "result_count": 60,
+            "error": null,
+            "error_type": null
+          }
+        ],
+        "degraded": false,
+        "graph_enabled": true,
+        "graph_candidates_expanded": 68,
+        "total_candidates": 60,
+        "result_count": 5,
+        "rerank_mode": "full",
+        "hybrid_fallback_used": false
+      }
+    },
+    "checks": {
+      "results": 5,
+      "every_result_has_text": true,
+      "every_result_has_document_and_index": true,
+      "every_result_in_requested_project": true,
+      "graph_ranked_better_than_semantic": [],
+      "rows": [
+        {
+          "chunk_id": "2b4d473a-f4e9-4700-a3b1-ad9fe3fbd711",
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "chunk_index": 13,
+          "content_chars": 3082,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "layer_ranks": {
+            "semantic": 1,
+            "graph": 1
+          },
+          "layer_scores": {
+            "semantic": 0.4916669,
+            "graph": 0.4916669
+          }
+        },
+        {
+          "chunk_id": "fdacea63-c500-47ee-b437-f025c3feab57",
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "chunk_index": 14,
+          "content_chars": 3116,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "layer_ranks": {
+            "semantic": 2,
+            "graph": 2
+          },
+          "layer_scores": {
+            "semantic": 0.4667641,
+            "graph": 0.4667641
+          }
+        },
+        {
+          "chunk_id": "00c03c45-0fec-4dd3-b1bd-5932cef5118d",
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "chunk_index": 10,
+          "content_chars": 3066,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "layer_ranks": {
+            "semantic": 3,
+            "graph": 3
+          },
+          "layer_scores": {
+            "semantic": 0.3992164,
+            "graph": 0.3992164
+          }
+        },
+        {
+          "chunk_id": "1ef80aaa-9ffa-44c2-a426-c0274142abd5",
+          "document_id": "e237cd2b-600e-4b79-af1d-b206f707a591",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "chunk_index": 5,
+          "content_chars": 3156,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "layer_ranks": {
+            "semantic": 4,
+            "graph": 4
+          },
+          "layer_scores": {
+            "semantic": 0.38794592,
+            "graph": 0.38794592
+          }
+        },
+        {
+          "chunk_id": "94bc97e4-5224-407c-b7d3-0b94969dcf6e",
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "chunk_index": 11,
+          "content_chars": 2039,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "layer_ranks": {
+            "semantic": 5,
+            "graph": 5
+          },
+          "layer_scores": {
+            "semantic": 0.38617206,
+            "graph": 0.38617206
+          }
+        }
+      ],
+      "layers_used": [
+        "semantic",
+        "graph"
+      ],
+      "cache_hit": null
+    }
+  },
+  "checks": {
+    "cache_hit": false,
+    "answering_chunk_top5_rank": {
+      "14": 2
+    },
+    "answering_chunk_reached_model": {
+      "14": true
+    },
+    "chunks_reaching_model": [
+      {
+        "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+        "chunk_index": 13,
+        "semantic_cosine": 0.4916669
+      },
+      {
+        "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+        "chunk_index": 14,
+        "semantic_cosine": 0.4667641
+      }
+    ],
+    "compression": {
+      "original_chunks": 5,
+      "filtered_chunks": 2,
+      "original_tokens": 3614,
+      "filtered_tokens": 1549,
+      "threshold": 0.4
+    },
+    "answer_states_fact": {
+      "92\\s*(%|percent)": true,
+      "32[\\s\\-\\u2010-\\u2015]*token": true
+    },
+    "citations": 2,
+    "every_citation_resolves": true,
+    "pedr_top5_semantic_ranks": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "model_attempts": [
+      "gpt-5.1"
+    ],
+    "met": true
+  }
+}

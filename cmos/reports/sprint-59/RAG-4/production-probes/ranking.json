@@ -1,0 +1,554 @@
+[
+  {
+    "id": "A-rag-cost",
+    "query": "According to the RAG cost optimization research, how much cheaper per query is the architecture with context compression than the naive baseline?",
+    "graph_on": {
+      "answering_chunk_rank": {
+        "9": 1,
+        "10": 16
+      },
+      "top_5_semantic_ranks": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "top_5": [
+        {
+          "rank": 1,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 9,
+          "layer_ranks": {
+            "semantic": 1,
+            "graph": 1
+          },
+          "semantic_cosine": 0.657311,
+          "rrf_score": 0.007016
+        },
+        {
+          "rank": 2,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 8,
+          "layer_ranks": {
+            "semantic": 2,
+            "graph": 2
+          },
+          "semantic_cosine": 0.63794225,
+          "rrf_score": 0.006903
+        },
+        {
+          "rank": 3,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 5,
+          "layer_ranks": {
+            "semantic": 3,
+            "graph": 3
+          },
+          "semantic_cosine": 0.5509232,
+          "rrf_score": 0.006794
+        },
+        {
+          "rank": 4,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 7,
+          "layer_ranks": {
+            "semantic": 4,
+            "graph": 4
+          },
+          "semantic_cosine": 0.5490469,
+          "rrf_score": 0.006687
+        },
+        {
+          "rank": 5,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 6,
+          "layer_ranks": {
+            "semantic": 5,
+            "graph": 5
+          },
+          "semantic_cosine": 0.53582174,
+          "rrf_score": 0.006585
+        }
+      ]
+    },
+    "graph_off": {
+      "answering_chunk_rank": {
+        "9": 1,
+        "10": "not in top 20"
+      },
+      "top_5_semantic_ranks": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "top_5": [
+        {
+          "rank": 1,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 9,
+          "layer_ranks": {
+            "semantic": 1
+          },
+          "semantic_cosine": 0.657311,
+          "rrf_score": 0.005738
+        },
+        {
+          "rank": 2,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 8,
+          "layer_ranks": {
+            "semantic": 2
+          },
+          "semantic_cosine": 0.63794225,
+          "rrf_score": 0.005645
+        },
+        {
+          "rank": 3,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 5,
+          "layer_ranks": {
+            "semantic": 3
+          },
+          "semantic_cosine": 0.5509232,
+          "rrf_score": 0.005556
+        },
+        {
+          "rank": 4,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 7,
+          "layer_ranks": {
+            "semantic": 4
+          },
+          "semantic_cosine": 0.5490469,
+          "rrf_score": 0.005469
+        },
+        {
+          "rank": 5,
+          "document_id": "b68f0a3e-b8b5-4056-9628-2aeaccd298d0",
+          "chunk_index": 6,
+          "layer_ranks": {
+            "semantic": 5
+          },
+          "semantic_cosine": 0.53582174,
+          "rrf_score": 0.005385
+        }
+      ]
+    }
+  },
+  {
+    "id": "B-embedding-inversion",
+    "query": "What does the PII redaction research say about recovering original text from embeddings, and how much of a short input could be reconstructed?",
+    "graph_on": {
+      "answering_chunk_rank": {
+        "14": 1
+      },
+      "top_5_semantic_ranks": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "top_5": [
+        {
+          "rank": 1,
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 14,
+          "layer_ranks": {
+            "semantic": 1,
+            "graph": 1
+          },
+          "semantic_cosine": 0.6641277,
+          "rrf_score": 0.007016
+        },
+        {
+          "rank": 2,
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 13,
+          "layer_ranks": {
+            "semantic": 2,
+            "graph": 2
+          },
+          "semantic_cosine": 0.6502906,
+          "rrf_score": 0.006903
+        },
+        {
+          "rank": 3,
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 15,
+          "layer_ranks": {
+            "semantic": 3,
+            "graph": 3
+          },
+          "semantic_cosine": 0.5948812,
+          "rrf_score": 0.006794
+        },
+        {
+          "rank": 4,
+          "document_id": "e237cd2b-600e-4b79-af1d-b206f707a591",
+          "chunk_index": 5,
+          "layer_ranks": {
+            "semantic": 4,
+            "graph": 4
+          },
+          "semantic_cosine": 0.54300153,
+          "rrf_score": 0.006687
+        },
+        {
+          "rank": 5,
+          "document_id": "9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+          "chunk_index": 3,
+          "layer_ranks": {
+            "semantic": 5,
+            "graph": 5
+          },
+          "semantic_cosine": 0.52588856,
+          "rrf_score": 0.006585
+        }
+      ]
+    },
+    "graph_off": {
+      "answering_chunk_rank": {
+        "14": 1
+      },
+      "top_5_semantic_ranks": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "top_5": [
+        {
+          "rank": 1,
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 14,
+          "layer_ranks": {
+            "semantic": 1
+          },
+          "semantic_cosine": 0.66413414,
+          "rrf_score": 0.005738
+        },
+        {
+          "rank": 2,
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 13,
+          "layer_ranks": {
+            "semantic": 2
+          },
+          "semantic_cosine": 0.65030104,
+          "rrf_score": 0.005645
+        },
+        {
+          "rank": 3,
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 15,
+          "layer_ranks": {
+            "semantic": 3
+          },
+          "semantic_cosine": 0.59491843,
+          "rrf_score": 0.005556
+        },
+        {
+          "rank": 4,
+          "document_id": "e237cd2b-600e-4b79-af1d-b206f707a591",
+          "chunk_index": 5,
+          "layer_ranks": {
+            "semantic": 4
+          },
+          "semantic_cosine": 0.54298514,
+          "rrf_score": 0.005469
+        },
+        {
+          "rank": 5,
+          "document_id": "9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+          "chunk_index": 3,
+          "layer_ranks": {
+            "semantic": 5
+          },
+          "semantic_cosine": 0.52588606,
+          "rrf_score": 0.005385
+        }
+      ]
+    }
+  },
+  {
+    "id": "B2-embedding-inversion-reworded",
+    "query": "If someone stole the vectors in our database, could they rebuild the sentences they came from? What share of short inputs did the study recover word for word?",
+    "graph_on": {
+      "answering_chunk_rank": {
+        "14": 2
+      },
+      "top_5_semantic_ranks": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "top_5": [
+        {
+          "rank": 1,
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 13,
+          "layer_ranks": {
+            "semantic": 1,
+            "graph": 1
+          },
+          "semantic_cosine": 0.4916669,
+          "rrf_score": 0.007016
+        },
+        {
+          "rank": 2,
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 14,
+          "layer_ranks": {
+            "semantic": 2,
+            "graph": 2
+          },
+          "semantic_cosine": 0.4667641,
+          "rrf_score": 0.006903
+        },
+        {
+          "rank": 3,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 10,
+          "layer_ranks": {
+            "semantic": 3,
+            "graph": 3
+          },
+          "semantic_cosine": 0.3992164,
+          "rrf_score": 0.006794
+        },
+        {
+          "rank": 4,
+          "document_id": "e237cd2b-600e-4b79-af1d-b206f707a591",
+          "chunk_index": 5,
+          "layer_ranks": {
+            "semantic": 4,
+            "graph": 4
+          },
+          "semantic_cosine": 0.38794592,
+          "rrf_score": 0.006687
+        },
+        {
+          "rank": 5,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 11,
+          "layer_ranks": {
+            "semantic": 5,
+            "graph": 5
+          },
+          "semantic_cosine": 0.38617206,
+          "rrf_score": 0.006585
+        }
+      ]
+    },
+    "graph_off": {
+      "answering_chunk_rank": {
+        "14": 2
+      },
+      "top_5_semantic_ranks": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "top_5": [
+        {
+          "rank": 1,
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 13,
+          "layer_ranks": {
+            "semantic": 1
+          },
+          "semantic_cosine": 0.4916669,
+          "rrf_score": 0.005738
+        },
+        {
+          "rank": 2,
+          "document_id": "1b6d9489-55ef-4868-b2b4-fa8535e414c4",
+          "chunk_index": 14,
+          "layer_ranks": {
+            "semantic": 2
+          },
+          "semantic_cosine": 0.4667641,
+          "rrf_score": 0.005645
+        },
+        {
+          "rank": 3,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 10,
+          "layer_ranks": {
+            "semantic": 3
+          },
+          "semantic_cosine": 0.3992164,
+          "rrf_score": 0.005556
+        },
+        {
+          "rank": 4,
+          "document_id": "e237cd2b-600e-4b79-af1d-b206f707a591",
+          "chunk_index": 5,
+          "layer_ranks": {
+            "semantic": 4
+          },
+          "semantic_cosine": 0.38794592,
+          "rrf_score": 0.005469
+        },
+        {
+          "rank": 5,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 11,
+          "layer_ranks": {
+            "semantic": 5
+          },
+          "semantic_cosine": 0.38617206,
+          "rrf_score": 0.005385
+        }
+      ]
+    }
+  },
+  {
+    "id": "C-qdrant-railway-cost",
+    "query": "What total monthly bill does the Qdrant on Railway report estimate for self-hosting half a million vectors on the Hobby plan?",
+    "graph_on": {
+      "answering_chunk_rank": {
+        "8": 1,
+        "9": 2
+      },
+      "top_5_semantic_ranks": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "top_5": [
+        {
+          "rank": 1,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 8,
+          "layer_ranks": {
+            "semantic": 1,
+            "graph": 1
+          },
+          "semantic_cosine": 0.6335608,
+          "rrf_score": 0.007016
+        },
+        {
+          "rank": 2,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 9,
+          "layer_ranks": {
+            "semantic": 2,
+            "graph": 2
+          },
+          "semantic_cosine": 0.59811264,
+          "rrf_score": 0.006903
+        },
+        {
+          "rank": 3,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 7,
+          "layer_ranks": {
+            "semantic": 3,
+            "graph": 3
+          },
+          "semantic_cosine": 0.553024,
+          "rrf_score": 0.006794
+        },
+        {
+          "rank": 4,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 11,
+          "layer_ranks": {
+            "semantic": 4,
+            "graph": 4
+          },
+          "semantic_cosine": 0.5198306,
+          "rrf_score": 0.006687
+        },
+        {
+          "rank": 5,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 12,
+          "layer_ranks": {
+            "semantic": 5,
+            "graph": 5
+          },
+          "semantic_cosine": 0.51100016,
+          "rrf_score": 0.006585
+        }
+      ]
+    },
+    "graph_off": {
+      "answering_chunk_rank": {
+        "8": 1,
+        "9": 2
+      },
+      "top_5_semantic_ranks": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "top_5": [
+        {
+          "rank": 1,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 8,
+          "layer_ranks": {
+            "semantic": 1
+          },
+          "semantic_cosine": 0.6335608,
+          "rrf_score": 0.005738
+        },
+        {
+          "rank": 2,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 9,
+          "layer_ranks": {
+            "semantic": 2
+          },
+          "semantic_cosine": 0.59811264,
+          "rrf_score": 0.005645
+        },
+        {
+          "rank": 3,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 7,
+          "layer_ranks": {
+            "semantic": 3
+          },
+          "semantic_cosine": 0.553024,
+          "rrf_score": 0.005556
+        },
+        {
+          "rank": 4,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 11,
+          "layer_ranks": {
+            "semantic": 4
+          },
+          "semantic_cosine": 0.5198306,
+          "rrf_score": 0.005469
+        },
+        {
+          "rank": 5,
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_index": 12,
+          "layer_ranks": {
+            "semantic": 5
+          },
+          "semantic_cosine": 0.51100016,
+          "rrf_score": 0.005385
+        }
+      ]
+    }
+  }
+]

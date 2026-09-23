@@ -1,0 +1,692 @@
+{
+  "question": "C-qdrant-railway-cost",
+  "answering": [
+    "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+    [
+      8,
+      9
+    ]
+  ],
+  "search_sent_at_utc": "2026-09-23T17:03:45Z",
+  "search": {
+    "request": {
+      "query": "What total monthly bill does the Qdrant on Railway report estimate for self-hosting half a million vectors on the Hobby plan?",
+      "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+      "top_k": 5
+    },
+    "status": 200,
+    "response": {
+      "answer": "The Qdrant on Railway report estimates a **total monthly bill of approximately $48\u2013$63** for self-hosting half a million vectors on the Hobby plan. [Document: bdc8881c-8747-4b5a-8c98-5d360bc0721e, Chunk: 8][Document: bdc8881c-8747-4b5a-8c98-5d360bc0721e, Chunk: 9]",
+      "citations": [
+        {
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_id": "384007d3-be90-46ab-a17f-232b25410b43",
+          "chunk_index": 8,
+          "source_type": null,
+          "score": 0.007016,
+          "snippet": "Recommendation: The Hobby plan on Railway is projected to be sufficient for the specified workload of 50,000 to 500,000 vectors, provided that the memory-optimization strategies outlined in Section 1 (on-disk storage and scalar quantization) are correctly implemented. The Pro pla"
+        },
+        {
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_id": "6cd5c0b9-4a87-4d28-846b-1ee7a9f310be",
+          "chunk_index": 9,
+          "source_type": null,
+          "score": 0.006903,
+          "snippet": "Resource\tEstimated Requirement\tRailway Plan\tEstimated Monthly Cost (USD)\nRAM\t~2.5 GB\tHobby\t$25 - $35\nCPU\t1 vCPU\tHobby\t$20 - $25\nPersistent Storage\t20 GB\tHobby\t~$3\nTotal\t\tHobby\t$48 - $63\nNote: Cost estimates are based on Railway's public pricing as of the time of this report and a"
+        }
+      ],
+      "sources": [
+        {
+          "chunk_id": "384007d3-be90-46ab-a17f-232b25410b43",
+          "content": "Recommendation: The Hobby plan on Railway is projected to be sufficient for the specified workload of 50,000 to 500,000 vectors, provided that the memory-optimization strategies outlined in Section 1 (on-disk storage and scalar quantization) are correctly implemented. The Pro plan provides a seamless and immediate path for vertical scaling should the dataset size, query volume, or concurrency requirements increase in the future. 4.2 Resource Consumption Estimation for 500K Vectors\nA precise estimation of resource requirements is crucial for both capacity planning and cost forecasting. The following calculations are based on established formulas and the parameters from the recommended configuration. RAM Calculation: The general formula for estimating the RAM required to hold vectors and their associated indexes in memory is: memory_size = number_of_vectors * vector_dimension * data_type_bytes * 1.5. The 1.5 multiplier is a heuristic that accounts for the overhead of the HNSW index, point versioning, metadata, and temporary segments used by optimizers. Baseline (Full Precision, for comparison): If the vectors were stored in memory without quantization, the requirement would be: 500,000 vectors * 1536 dimensions * 4 bytes/dim * 1.5 overhead = 4,608,000,000 bytes \u2248 4.3 GB\n\nRecommended (With Scalar Quantization): With the recommended architecture, only the quantized vectors (int8, 1 byte) and the HNSW index/metadata are kept in RAM. The vector portion of the memory requirement is thus reduced by a factor of 4. A conservative estimate is:\n\nQuantized Vectors: 500,000 * 1536 * 1 byte = 768 MB\n\nIndex & Overhead (approximated as 50% of the original full-precision vector size): (500,000 * 1536 * 4 bytes) * 0.5 = 1,536 MB \u2248 1.5 GB\n\nTotal Estimated RAM: 768 MB + 1.5 GB \u2248 2.3 GB\n\nThis total estimated RAM requirement of approximately 2.3 GB fits comfortably within the 8 GB limit of Railway's Hobby plan. Persistent Storage Calculation: The primary storage cost will be for the full-precision (float32) original vectors, which are stored on disk. Vectors (on-disk): 500,000 vectors * 1536 dimensions * 4 bytes/dim = 3,072,000,000 bytes \u2248 2.9 GB\n\nPayloads, Indexes, and WAL: The storage for payloads, payload indexes, and Qdrant's write-ahead-log (WAL) will add to this footprint. The exact size depends on the payload content. Recommendation: A starting persistent volume of 10 GB to 20 GB is recommended. This provides ample capacity for the vector data, associated metadata, and operational overhead, with room for future growth. CPU Calculation: A starting allocation of 1 to 2 vCPUs is a reasonable baseline for handling moderate query loads. The most CPU-intensive operation will be the one-time index build after the initial data ingestion. The following table summarizes the estimated resource requirements and associated costs for the target workload on Railway. Resource\tEstimated Requirement\tRailway Plan\tEstimated Monthly Cost (USD)\nRAM\t~2.5 GB\tHobby\t$25 - $35\nCPU\t1 vCPU\tHobby\t$20 - $25\nPersistent Storage\t20 GB\tHobby\t~$3\nTotal\t\tHobby\t$48 - $63\nNote: Cost estimates are based on Railway's public pricing as of the time of this report and assume continuous usage.",
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "chunk_index": 8,
+          "source_type": null,
+          "document_type": null,
+          "collection_date": null,
+          "tags": null,
+          "score": 0.007016,
+          "quality_score": null,
+          "quality_base_score": null,
+          "quality_boost": null,
+          "quality_status": null,
+          "quality_gates_passed": null,
+          "quality_gates_total": null,
+          "quality_validated": null,
+          "quality_mission_id": null,
+          "quality_pii_flagged": null,
+          "element_type": null,
+          "element_type_match": null,
+          "type_boost": null
+        },
+        {
+          "chunk_id": "6cd5c0b9-4a87-4d28-846b-1ee7a9f310be",
+          "content": "Resource\tEstimated Requirement\tRailway Plan\tEstimated Monthly Cost (USD)\nRAM\t~2.5 GB\tHobby\t$25 - $35\nCPU\t1 vCPU\tHobby\t$20 - $25\nPersistent Storage\t20 GB\tHobby\t~$3\nTotal\t\tHobby\t$48 - $63\nNote: Cost estimates are based on Railway's public pricing as of the time of this report and assume continuous usage. Actual costs may vary. 4.3 Economic Analysis: Self-Hosted on Railway vs. Qdrant Cloud\nA crucial decision is whether to self-host Qdrant on a PaaS like Railway or to use the fully managed Qdrant Cloud service. Self-Hosted on Railway: This approach offers maximum control over the deployment environment and data, along with significant potential for cost savings. The estimated monthly cost of $48-$63 for the required resources is highly competitive. The trade-off is that the operational burden\u2014including updates, monitoring for platform-specific issues, and managing backups\u2014falls on the development team. Qdrant Cloud: The managed service abstracts away all operational complexity. It provides automated high availability, backup and disaster recovery, zero-downtime upgrades, and dedicated support, which are not included out-of-the-box with a self-hosted deployment. Qdrant Cloud offers a free tier for up to 1 GB of data. For the estimated ~2.3 GB RAM requirement of this project, a paid cluster would be necessary. Based on the public pricing calculator, a comparable cluster on Qdrant Cloud would cost approximately $25 to $70 per month, depending on the chosen cloud provider and region. Recommendation:\n\nSelf-hosting on Railway is the recommended path for teams that prioritize cost savings and data sovereignty, and are comfortable with the operational responsibilities of managing a Docker-based service. The potential cost savings can be substantial as the system scales. Qdrant Cloud is the superior choice for teams that wish to minimize operational overhead and are willing to pay a premium for a fully managed, production-ready service with enterprise-grade features like automated backups and high-availability configurations. Section 5: Synthesis and Prescriptive Recommendations\nThis final section consolidates the report's findings into a concise, actionable summary. It provides a final configuration profile that can be used for direct implementation, sets clear performance expectations based on public benchmarks, and offers a strategic roadmap for future scaling of the system. 5.1 Final Recommended Configuration Profile\nThe following table serves as a definitive checklist and configuration manifest for setting up the Qdrant collection. Adhering to these parameters will instantiate the optimized architecture described throughout this report. Parameter Path\tRecommended Value\tRationale\nvectors.size\t1536\tMust match the dimensionality of the source embeddings. vectors.distance\tCosine\tStandard for sentence and document embeddings. vectors.on_disk\ttrue\tCritical for reducing RAM usage and cost on Railway. on_disk_payload\ttrue\tReduces RAM usage by storing metadata on disk. hnsw_config.m\t16\tBalanced graph density for high recall and moderate memory use.",
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "chunk_index": 9,
+          "source_type": null,
+          "document_type": null,
+          "collection_date": null,
+          "tags": null,
+          "score": 0.006903,
+          "quality_score": null,
+          "quality_base_score": null,
+          "quality_boost": null,
+          "quality_status": null,
+          "quality_gates_passed": null,
+          "quality_gates_total": null,
+          "quality_validated": null,
+          "quality_mission_id": null,
+          "quality_pii_flagged": null,
+          "element_type": null,
+          "element_type_match": null,
+          "type_boost": null
+        },
+        {
+          "chunk_id": "c3bd577e-f98f-46a7-85bd-2049e7868d75",
+          "content": "Rescoring: In the second stage, Qdrant fetches the full-precision original vectors only for this small, oversampled set of candidates from disk. It then re-calculates the exact similarity scores between the query vector and these candidates. The final results returned to the user are the top-K candidates from this resorted, high-precision list. This two-stage process is a profound architectural advantage. It decouples the system's persistent memory footprint from its search accuracy. The memory footprint is dictated by the small, compressed vectors, allowing for a cost-effective deployment. However, the final accuracy is determined by the original, full-precision vectors, ensuring high-quality results. The performance impact of rescoring is minimal because the expensive disk I/O and float32 computations are confined to a very small subset of the total data. Recommendation: For the primary search functionality involving research documents, it is highly recommended to enable rescoring to guarantee the highest possible accuracy. A starting oversampling factor between 1.5 and 2.0 is a reasonable choice. Rescoring can be selectively disabled on a per-query basis for use cases where raw speed is more critical than absolute precision. The following code demonstrates a complete search query incorporating filtering, hnsw_ef tuning, and the rescoring pipeline. Python\nfrom qdrant_client import QdrantClient, models\n\n# Assume `client`, `query_embedding`, and `my_filter` are defined\n\nhits = client.search(\n    collection_name=\"research_documents\",\n    query_vector=query_embedding,\n    query_filter=my_filter,\n    limit=10,\n    search_params=models.SearchParams(\n        hnsw_ef=128,  # Tune for speed vs. accuracy\n        quantization=models.QuantizationSearchParams(\n            rescore=True,       # Enable high-accuracy rescoring\n            oversampling=1.5    # Retrieve 1.5x candidates for rescoring\n        )\n    )\n)\nSection 4: Deployment and Cost Analysis on Railway\nThis section provides a practical guide for deploying the optimized Qdrant configuration on the Railway platform. It includes detailed resource estimations based on the recommended architecture and a comparative economic analysis of self-hosting on Railway versus utilizing the managed Qdrant Cloud service. 4.1 Mapping Qdrant's Resource Profile to Railway Plans\nRailway offers a flexible, usage-based pricing model with distinct service plans that cater to different scales of deployment. The Hobby plan supports services up to 8 GB of RAM and 8 vCPUs, while the Pro plan scales significantly higher, up to 32 GB of RAM and 32 vCPUs. Deploying Qdrant on Railway is straightforward, involving the use of the official Qdrant Docker image and the attachment of a persistent volume to ensure data durability across restarts and deployments. Recommendation: The Hobby plan on Railway is projected to be sufficient for the specified workload of 50,000 to 500,000 vectors, provided that the memory-optimization strategies outlined in Section 1 (on-disk storage and scalar quantization) are correctly implemented.",
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "chunk_index": 7,
+          "source_type": null,
+          "document_type": null,
+          "collection_date": null,
+          "tags": null,
+          "score": 0.006794,
+          "quality_score": null,
+          "quality_base_score": null,
+          "quality_boost": null,
+          "quality_status": null,
+          "quality_gates_passed": null,
+          "quality_gates_total": null,
+          "quality_validated": null,
+          "quality_mission_id": null,
+          "quality_pii_flagged": null,
+          "element_type": null,
+          "element_type_match": null,
+          "type_boost": null
+        },
+        {
+          "chunk_id": "94bc97e4-5224-407c-b7d3-0b94969dcf6e",
+          "content": "Scaling to 5 Million+ Vectors:\n\nRe-evaluate Quantization: At a multi-million vector scale, the memory savings offered by Binary Quantization (32x compression) become increasingly compelling. At this stage, it would be prudent to conduct an internal benchmark comparing the accuracy of BQ against the established SQ baseline for the specific research document embeddings. The potential for significant cost savings may justify a tolerable reduction in recall. Scaling to 10 Million+ Vectors (and Beyond):\n\nHorizontal Scaling (Sharding): For datasets in the tens of millions, a single-node deployment will likely become a bottleneck. The next architectural step is to implement horizontal scaling using Qdrant's native sharding capabilities. This distributes the collection across multiple nodes, allowing for parallel processing of queries. This level of complexity typically warrants a move from a simple Docker deployment on Railway to a more robust orchestration platform like Kubernetes, or transitioning to the managed Qdrant Cloud, which handles sharding and replication automatically. qdrant.tech\nStorage - Qdrant\nOpens in a new window\n\nanalyticsvidhya.com\nA Deep Dive into Qdrant, the Rust-Based Vector Database - Analytics Vidhya\nOpens in a new window\n\nrailway.com\nDeploy Qdrant (Open-Source Vector Database for AI & Semantic Search) - Railway\nOpens in a new window\n\ndrdroid.io\nQdrant Memory Limit Exceeded - Doctor Droid\nOpens in a new window\n\nrailway.com\nRailway Pricing and Plans\nOpens in a new window\n\nqdrant.tech\nVector Search Resource Optimization Guide - Qdrant\nOpens in a new window\n\nqdrant.tech\nLarge-Scale Data Ingestion - Qdrant\nOpens in a new window\n\nqdrant.tech\nOptimizing Memory for Bulk Uploads - Qdrant\nOpens in a new window\n\nqdrant.tech\nQuantization - Qdrant\nOpens in a new window\n\nqdrant.tech\nVector Quantization Methods - Qdrant\nOpens in a new window\n\nmedium.com\nMaster Qdrant Quantization: The Complete Toolkit for Every Vector Optimization Method\nOpens in a new window\n\nqdrant.tech\nWhat is Vector Quantization?",
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "chunk_index": 11,
+          "source_type": null,
+          "document_type": null,
+          "collection_date": null,
+          "tags": null,
+          "score": 0.006687,
+          "quality_score": null,
+          "quality_base_score": null,
+          "quality_boost": null,
+          "quality_status": null,
+          "quality_gates_passed": null,
+          "quality_gates_total": null,
+          "quality_validated": null,
+          "quality_mission_id": null,
+          "quality_pii_flagged": null,
+          "element_type": null,
+          "element_type_match": null,
+          "type_boost": null
+        },
+        {
+          "chunk_id": "b9f0be07-ce8c-47f3-8af4-951bb6fe6908",
+          "content": "qdrant.tech\nStorage - Qdrant\nOpens in a new window\n\nanalyticsvidhya.com\nA Deep Dive into Qdrant, the Rust-Based Vector Database - Analytics Vidhya\nOpens in a new window\n\nrailway.com\nDeploy Qdrant (Open-Source Vector Database for AI & Semantic Search) - Railway\nOpens in a new window\n\ndrdroid.io\nQdrant Memory Limit Exceeded - Doctor Droid\nOpens in a new window\n\nrailway.com\nRailway Pricing and Plans\nOpens in a new window\n\nqdrant.tech\nVector Search Resource Optimization Guide - Qdrant\nOpens in a new window\n\nqdrant.tech\nLarge-Scale Data Ingestion - Qdrant\nOpens in a new window\n\nqdrant.tech\nOptimizing Memory for Bulk Uploads - Qdrant\nOpens in a new window\n\nqdrant.tech\nQuantization - Qdrant\nOpens in a new window\n\nqdrant.tech\nVector Quantization Methods - Qdrant\nOpens in a new window\n\nmedium.com\nMaster Qdrant Quantization: The Complete Toolkit for Every Vector Optimization Method\nOpens in a new window\n\nqdrant.tech\nWhat is Vector Quantization? - Qdrant\nOpens in a new window\n\ncohorte.co\nA Developer's Friendly Guide to Qdrant Vector Database - Cohorte Projects\nOpens in a new window\n\nqdrant.tech\nHNSW Indexing Fundamentals - Qdrant\nOpens in a new window\n\nqdrant.tech\nDemo: HNSW Performance Tuning - Qdrant\nOpens in a new window\n\nqdrant.tech\nBuilt for Vector Search - Qdrant\nOpens in a new window\n\ncommunity.n8n.io\nUploading a large dataset to Qdrant - Data Loader slowing down - n8n Community\nOpens in a new window\n\nqdrant.tech\nOptimizer - Qdrant\nOpens in a new window\n\nqdrant.tech\nCombining Vector Search and Filtering - Qdrant\nOpens in a new window\n\nqdrant.tech\nA Complete Guide to Filtering in Vector Search - Qdrant\nOpens in a new window\n\nyudhiesh.github.io\nThe Achilles Heel of Vector Search: Filters | Bits & Backprops\nOpens in a new window\n\nqdrant.tech\nIndexing - Qdrant\nOpens in a new window\n\nqdrant.tech\nPayload - Qdrant\nOpens in a new window\n\nqdrant.tech\nFinal Project: Production-Ready Documentation Search Engine - Qdrant\nOpens in a new window\n\nairbyte.com\nThe Fundamentals of Qdrant: Understanding the 6 Core Concepts - Airbyte\nOpens in a new window\n\nqdrant.tech\nAccuracy Recovery with Rescoring - Qdrant\nOpens in a new window\n\nqdrant.tech\nOptimize Performance - Qdrant\nOpens in a new window\n\nreddit.com\nCalculating Storage Requirements for Vector Embeddings : r/vectordatabase - Reddit\nOpens in a new window\n\nqdrant.tech\nCapacity Planning - Qdrant\nOpens in a new window\n\nqdrant.tech\nQdrant 1.8.0: Enhanced Search Capabilities for Better Results\nOpens in a new window\n\nsliplane.io\nSelf-hosting Qdrant the easy way - Sliplane\nOpens in a new window\n\nqdrant.tech\nPricing for Cloud and Vector Database Solutions Qdrant - Qdrant\nOpens in a new window\n\nqdrant.tech\nInstallation - Qdrant\nOpens in a new window\n\nqdrant.tech\nQdrant Documentation\nOpens in a new window\n\nreddit.com\nQdrant is too expensive, how to replace (2M vectors) : r/vectordatabase - Reddit\nOpens in a new window\n\nqdrant.tech\nVector Database Benchmarks - Qdrant\nOpens in a new window\n\nqdrant.tech\nSingle node benchmarks - Qdrant",
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "chunk_index": 12,
+          "source_type": null,
+          "document_type": null,
+          "collection_date": null,
+          "tags": null,
+          "score": 0.006585,
+          "quality_score": null,
+          "quality_base_score": null,
+          "quality_boost": null,
+          "quality_status": null,
+          "quality_gates_passed": null,
+          "quality_gates_total": null,
+          "quality_validated": null,
+          "quality_mission_id": null,
+          "quality_pii_flagged": null,
+          "element_type": null,
+          "element_type_match": null,
+          "type_boost": null
+        }
+      ],
+      "latency_ms": 3456.19,
+      "compression": {
+        "original_chunks": 5,
+        "filtered_chunks": 5,
+        "original_tokens": 3605,
+        "filtered_tokens": 3605,
+        "reduction_ratio": 0.0,
+        "threshold": 0.4,
+        "compression_ms": 0.387
+      },
+      "cache": {
+        "hit": false,
+        "score": null,
+        "age_seconds": null,
+        "ttl_seconds": 300.0
+      },
+      "quality": {
+        "composite_score": 0.967,
+        "threshold": 0.85,
+        "pillar_scores": {
+          "linguistic_uncertainty": 1.0,
+          "answer_integrity": 0.95,
+          "source_provenance": 0.95
+        },
+        "hard_failures": [],
+        "reasons": [],
+        "pre_escalation_score": null
+      },
+      "routing": {
+        "selected_model": "gpt-5.1",
+        "escalated": false,
+        "attempts": [
+          {
+            "model": "gpt-5.1",
+            "quality_score": 0.967,
+            "below_threshold": false,
+            "hard_failures": [],
+            "citation_count": 2
+          }
+        ],
+        "estimated_cost_usd": 0.005678,
+        "metrics": {
+          "total_queries": 2,
+          "escalations": 0
+        }
+      },
+      "search_mode": "semantic",
+      "no_evidence": false
+    },
+    "checks": {
+      "cache_hit": false,
+      "no_evidence": false,
+      "sources": 5,
+      "every_source_has_text": true,
+      "compression": {
+        "original_chunks": 5,
+        "filtered_chunks": 5,
+        "original_tokens": 3605,
+        "filtered_tokens": 3605,
+        "threshold": 0.4
+      },
+      "labels_in_answer_text": 2,
+      "citations": 2,
+      "citation_resolution": [
+        {
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_id": "384007d3-be90-46ab-a17f-232b25410b43",
+          "chunk_index": 8,
+          "in_response_sources": true,
+          "opens_in_document_chunk_list": true
+        },
+        {
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "chunk_id": "6cd5c0b9-4a87-4d28-846b-1ee7a9f310be",
+          "chunk_index": 9,
+          "in_response_sources": true,
+          "opens_in_document_chunk_list": true
+        }
+      ],
+      "every_citation_resolves": true,
+      "model_attempts": [
+        "gpt-5.1"
+      ],
+      "quality_composite": 0.967
+    }
+  },
+  "pedr_sent_at_utc": "2026-09-23T17:03:49Z",
+  "pedr": {
+    "request": {
+      "query": "What total monthly bill does the Qdrant on Railway report estimate for self-hosting half a million vectors on the Hobby plan?",
+      "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+      "top_k": 5
+    },
+    "status": 200,
+    "response": {
+      "results": [
+        {
+          "chunk_id": "384007d3-be90-46ab-a17f-232b25410b43",
+          "content": "Recommendation: The Hobby plan on Railway is projected to be sufficient for the specified workload of 50,000 to 500,000 vectors, provided that the memory-optimization strategies outlined in Section 1 (on-disk storage and scalar quantization) are correctly implemented. The Pro plan provides a seamless and immediate path for vertical scaling should the dataset size, query volume, or concurrency requirements increase in the future. 4.2 Resource Consumption Estimation for 500K Vectors\nA precise estimation of resource requirements is crucial for both capacity planning and cost forecasting. The following calculations are based on established formulas and the parameters from the recommended configuration. RAM Calculation: The general formula for estimating the RAM required to hold vectors and their associated indexes in memory is: memory_size = number_of_vectors * vector_dimension * data_type_bytes * 1.5. The 1.5 multiplier is a heuristic that accounts for the overhead of the HNSW index, point versioning, metadata, and temporary segments used by optimizers. Baseline (Full Precision, for comparison): If the vectors were stored in memory without quantization, the requirement would be: 500,000 vectors * 1536 dimensions * 4 bytes/dim * 1.5 overhead = 4,608,000,000 bytes \u2248 4.3 GB\n\nRecommended (With Scalar Quantization): With the recommended architecture, only the quantized vectors (int8, 1 byte) and the HNSW index/metadata are kept in RAM. The vector portion of the memory requirement is thus reduced by a factor of 4. A conservative estimate is:\n\nQuantized Vectors: 500,000 * 1536 * 1 byte = 768 MB\n\nIndex & Overhead (approximated as 50% of the original full-precision vector size): (500,000 * 1536 * 4 bytes) * 0.5 = 1,536 MB \u2248 1.5 GB\n\nTotal Estimated RAM: 768 MB + 1.5 GB \u2248 2.3 GB\n\nThis total estimated RAM requirement of approximately 2.3 GB fits comfortably within the 8 GB limit of Railway's Hobby plan. Persistent Storage Calculation: The primary storage cost will be for the full-precision (float32) original vectors, which are stored on disk. Vectors (on-disk): 500,000 vectors * 1536 dimensions * 4 bytes/dim = 3,072,000,000 bytes \u2248 2.9 GB\n\nPayloads, Indexes, and WAL: The storage for payloads, payload indexes, and Qdrant's write-ahead-log (WAL) will add to this footprint. The exact size depends on the payload content. Recommendation: A starting persistent volume of 10 GB to 20 GB is recommended. This provides ample capacity for the vector data, associated metadata, and operational overhead, with room for future growth. CPU Calculation: A starting allocation of 1 to 2 vCPUs is a reasonable baseline for handling moderate query loads. The most CPU-intensive operation will be the one-time index build after the initial data ingestion. The following table summarizes the estimated resource requirements and associated costs for the target workload on Railway. Resource\tEstimated Requirement\tRailway Plan\tEstimated Monthly Cost (USD)\nRAM\t~2.5 GB\tHobby\t$25 - $35\nCPU\t1 vCPU\tHobby\t$20 - $25\nPersistent Storage\t20 GB\tHobby\t~$3\nTotal\t\tHobby\t$48 - $63\nNote: Cost estimates are based on Railway's public pricing as of the time of this report and assume continuous usage.",
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "rrf_score": 0.007016,
+          "rrf_rank": 1,
+          "layer_ranks": {
+            "semantic": 1,
+            "graph": 1
+          },
+          "layer_scores": {
+            "semantic": 0.6335608,
+            "graph": 0.6335608
+          },
+          "urn": "urn:research:chunk:384007d3-be90-46ab-a17f-232b25410b43",
+          "confidence": 0.1,
+          "criticality": 0.5,
+          "element_type": null,
+          "query_intent": "search",
+          "quality_score": 0.1,
+          "quality_status": "unknown",
+          "quality_gates_passed": 0,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "chunk_index": 8,
+          "source_type": null,
+          "source_origin": null,
+          "score": 0.007016,
+          "combined_score": 0.007016,
+          "embedding": null,
+          "related_entities": null
+        },
+        {
+          "chunk_id": "6cd5c0b9-4a87-4d28-846b-1ee7a9f310be",
+          "content": "Resource\tEstimated Requirement\tRailway Plan\tEstimated Monthly Cost (USD)\nRAM\t~2.5 GB\tHobby\t$25 - $35\nCPU\t1 vCPU\tHobby\t$20 - $25\nPersistent Storage\t20 GB\tHobby\t~$3\nTotal\t\tHobby\t$48 - $63\nNote: Cost estimates are based on Railway's public pricing as of the time of this report and assume continuous usage. Actual costs may vary. 4.3 Economic Analysis: Self-Hosted on Railway vs. Qdrant Cloud\nA crucial decision is whether to self-host Qdrant on a PaaS like Railway or to use the fully managed Qdrant Cloud service. Self-Hosted on Railway: This approach offers maximum control over the deployment environment and data, along with significant potential for cost savings. The estimated monthly cost of $48-$63 for the required resources is highly competitive. The trade-off is that the operational burden\u2014including updates, monitoring for platform-specific issues, and managing backups\u2014falls on the development team. Qdrant Cloud: The managed service abstracts away all operational complexity. It provides automated high availability, backup and disaster recovery, zero-downtime upgrades, and dedicated support, which are not included out-of-the-box with a self-hosted deployment. Qdrant Cloud offers a free tier for up to 1 GB of data. For the estimated ~2.3 GB RAM requirement of this project, a paid cluster would be necessary. Based on the public pricing calculator, a comparable cluster on Qdrant Cloud would cost approximately $25 to $70 per month, depending on the chosen cloud provider and region. Recommendation:\n\nSelf-hosting on Railway is the recommended path for teams that prioritize cost savings and data sovereignty, and are comfortable with the operational responsibilities of managing a Docker-based service. The potential cost savings can be substantial as the system scales. Qdrant Cloud is the superior choice for teams that wish to minimize operational overhead and are willing to pay a premium for a fully managed, production-ready service with enterprise-grade features like automated backups and high-availability configurations. Section 5: Synthesis and Prescriptive Recommendations\nThis final section consolidates the report's findings into a concise, actionable summary. It provides a final configuration profile that can be used for direct implementation, sets clear performance expectations based on public benchmarks, and offers a strategic roadmap for future scaling of the system. 5.1 Final Recommended Configuration Profile\nThe following table serves as a definitive checklist and configuration manifest for setting up the Qdrant collection. Adhering to these parameters will instantiate the optimized architecture described throughout this report. Parameter Path\tRecommended Value\tRationale\nvectors.size\t1536\tMust match the dimensionality of the source embeddings. vectors.distance\tCosine\tStandard for sentence and document embeddings. vectors.on_disk\ttrue\tCritical for reducing RAM usage and cost on Railway. on_disk_payload\ttrue\tReduces RAM usage by storing metadata on disk. hnsw_config.m\t16\tBalanced graph density for high recall and moderate memory use.",
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "rrf_score": 0.006903,
+          "rrf_rank": 2,
+          "layer_ranks": {
+            "semantic": 2,
+            "graph": 2
+          },
+          "layer_scores": {
+            "semantic": 0.59811264,
+            "graph": 0.59811264
+          },
+          "urn": "urn:research:chunk:6cd5c0b9-4a87-4d28-846b-1ee7a9f310be",
+          "confidence": 0.1,
+          "criticality": 0.5,
+          "element_type": null,
+          "query_intent": "search",
+          "quality_score": 0.1,
+          "quality_status": "unknown",
+          "quality_gates_passed": 0,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "chunk_index": 9,
+          "source_type": null,
+          "source_origin": null,
+          "score": 0.006903,
+          "combined_score": 0.006903,
+          "embedding": null,
+          "related_entities": null
+        },
+        {
+          "chunk_id": "c3bd577e-f98f-46a7-85bd-2049e7868d75",
+          "content": "Rescoring: In the second stage, Qdrant fetches the full-precision original vectors only for this small, oversampled set of candidates from disk. It then re-calculates the exact similarity scores between the query vector and these candidates. The final results returned to the user are the top-K candidates from this resorted, high-precision list. This two-stage process is a profound architectural advantage. It decouples the system's persistent memory footprint from its search accuracy. The memory footprint is dictated by the small, compressed vectors, allowing for a cost-effective deployment. However, the final accuracy is determined by the original, full-precision vectors, ensuring high-quality results. The performance impact of rescoring is minimal because the expensive disk I/O and float32 computations are confined to a very small subset of the total data. Recommendation: For the primary search functionality involving research documents, it is highly recommended to enable rescoring to guarantee the highest possible accuracy. A starting oversampling factor between 1.5 and 2.0 is a reasonable choice. Rescoring can be selectively disabled on a per-query basis for use cases where raw speed is more critical than absolute precision. The following code demonstrates a complete search query incorporating filtering, hnsw_ef tuning, and the rescoring pipeline. Python\nfrom qdrant_client import QdrantClient, models\n\n# Assume `client`, `query_embedding`, and `my_filter` are defined\n\nhits = client.search(\n    collection_name=\"research_documents\",\n    query_vector=query_embedding,\n    query_filter=my_filter,\n    limit=10,\n    search_params=models.SearchParams(\n        hnsw_ef=128,  # Tune for speed vs. accuracy\n        quantization=models.QuantizationSearchParams(\n            rescore=True,       # Enable high-accuracy rescoring\n            oversampling=1.5    # Retrieve 1.5x candidates for rescoring\n        )\n    )\n)\nSection 4: Deployment and Cost Analysis on Railway\nThis section provides a practical guide for deploying the optimized Qdrant configuration on the Railway platform. It includes detailed resource estimations based on the recommended architecture and a comparative economic analysis of self-hosting on Railway versus utilizing the managed Qdrant Cloud service. 4.1 Mapping Qdrant's Resource Profile to Railway Plans\nRailway offers a flexible, usage-based pricing model with distinct service plans that cater to different scales of deployment. The Hobby plan supports services up to 8 GB of RAM and 8 vCPUs, while the Pro plan scales significantly higher, up to 32 GB of RAM and 32 vCPUs. Deploying Qdrant on Railway is straightforward, involving the use of the official Qdrant Docker image and the attachment of a persistent volume to ensure data durability across restarts and deployments. Recommendation: The Hobby plan on Railway is projected to be sufficient for the specified workload of 50,000 to 500,000 vectors, provided that the memory-optimization strategies outlined in Section 1 (on-disk storage and scalar quantization) are correctly implemented.",
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "rrf_score": 0.006794,
+          "rrf_rank": 3,
+          "layer_ranks": {
+            "semantic": 3,
+            "graph": 3
+          },
+          "layer_scores": {
+            "semantic": 0.553024,
+            "graph": 0.553024
+          },
+          "urn": "urn:research:chunk:c3bd577e-f98f-46a7-85bd-2049e7868d75",
+          "confidence": 0.1,
+          "criticality": 0.5,
+          "element_type": null,
+          "query_intent": "search",
+          "quality_score": 0.1,
+          "quality_status": "unknown",
+          "quality_gates_passed": 0,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "chunk_index": 7,
+          "source_type": null,
+          "source_origin": null,
+          "score": 0.006794,
+          "combined_score": 0.006794,
+          "embedding": null,
+          "related_entities": null
+        },
+        {
+          "chunk_id": "94bc97e4-5224-407c-b7d3-0b94969dcf6e",
+          "content": "Scaling to 5 Million+ Vectors:\n\nRe-evaluate Quantization: At a multi-million vector scale, the memory savings offered by Binary Quantization (32x compression) become increasingly compelling. At this stage, it would be prudent to conduct an internal benchmark comparing the accuracy of BQ against the established SQ baseline for the specific research document embeddings. The potential for significant cost savings may justify a tolerable reduction in recall. Scaling to 10 Million+ Vectors (and Beyond):\n\nHorizontal Scaling (Sharding): For datasets in the tens of millions, a single-node deployment will likely become a bottleneck. The next architectural step is to implement horizontal scaling using Qdrant's native sharding capabilities. This distributes the collection across multiple nodes, allowing for parallel processing of queries. This level of complexity typically warrants a move from a simple Docker deployment on Railway to a more robust orchestration platform like Kubernetes, or transitioning to the managed Qdrant Cloud, which handles sharding and replication automatically. qdrant.tech\nStorage - Qdrant\nOpens in a new window\n\nanalyticsvidhya.com\nA Deep Dive into Qdrant, the Rust-Based Vector Database - Analytics Vidhya\nOpens in a new window\n\nrailway.com\nDeploy Qdrant (Open-Source Vector Database for AI & Semantic Search) - Railway\nOpens in a new window\n\ndrdroid.io\nQdrant Memory Limit Exceeded - Doctor Droid\nOpens in a new window\n\nrailway.com\nRailway Pricing and Plans\nOpens in a new window\n\nqdrant.tech\nVector Search Resource Optimization Guide - Qdrant\nOpens in a new window\n\nqdrant.tech\nLarge-Scale Data Ingestion - Qdrant\nOpens in a new window\n\nqdrant.tech\nOptimizing Memory for Bulk Uploads - Qdrant\nOpens in a new window\n\nqdrant.tech\nQuantization - Qdrant\nOpens in a new window\n\nqdrant.tech\nVector Quantization Methods - Qdrant\nOpens in a new window\n\nmedium.com\nMaster Qdrant Quantization: The Complete Toolkit for Every Vector Optimization Method\nOpens in a new window\n\nqdrant.tech\nWhat is Vector Quantization?",
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "rrf_score": 0.006687,
+          "rrf_rank": 4,
+          "layer_ranks": {
+            "semantic": 4,
+            "graph": 4
+          },
+          "layer_scores": {
+            "semantic": 0.5198306,
+            "graph": 0.5198306
+          },
+          "urn": "urn:research:chunk:94bc97e4-5224-407c-b7d3-0b94969dcf6e",
+          "confidence": 0.1,
+          "criticality": 0.5,
+          "element_type": null,
+          "query_intent": "search",
+          "quality_score": 0.1,
+          "quality_status": "unknown",
+          "quality_gates_passed": 0,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "chunk_index": 11,
+          "source_type": null,
+          "source_origin": null,
+          "score": 0.006687,
+          "combined_score": 0.006687,
+          "embedding": null,
+          "related_entities": null
+        },
+        {
+          "chunk_id": "b9f0be07-ce8c-47f3-8af4-951bb6fe6908",
+          "content": "qdrant.tech\nStorage - Qdrant\nOpens in a new window\n\nanalyticsvidhya.com\nA Deep Dive into Qdrant, the Rust-Based Vector Database - Analytics Vidhya\nOpens in a new window\n\nrailway.com\nDeploy Qdrant (Open-Source Vector Database for AI & Semantic Search) - Railway\nOpens in a new window\n\ndrdroid.io\nQdrant Memory Limit Exceeded - Doctor Droid\nOpens in a new window\n\nrailway.com\nRailway Pricing and Plans\nOpens in a new window\n\nqdrant.tech\nVector Search Resource Optimization Guide - Qdrant\nOpens in a new window\n\nqdrant.tech\nLarge-Scale Data Ingestion - Qdrant\nOpens in a new window\n\nqdrant.tech\nOptimizing Memory for Bulk Uploads - Qdrant\nOpens in a new window\n\nqdrant.tech\nQuantization - Qdrant\nOpens in a new window\n\nqdrant.tech\nVector Quantization Methods - Qdrant\nOpens in a new window\n\nmedium.com\nMaster Qdrant Quantization: The Complete Toolkit for Every Vector Optimization Method\nOpens in a new window\n\nqdrant.tech\nWhat is Vector Quantization? - Qdrant\nOpens in a new window\n\ncohorte.co\nA Developer's Friendly Guide to Qdrant Vector Database - Cohorte Projects\nOpens in a new window\n\nqdrant.tech\nHNSW Indexing Fundamentals - Qdrant\nOpens in a new window\n\nqdrant.tech\nDemo: HNSW Performance Tuning - Qdrant\nOpens in a new window\n\nqdrant.tech\nBuilt for Vector Search - Qdrant\nOpens in a new window\n\ncommunity.n8n.io\nUploading a large dataset to Qdrant - Data Loader slowing down - n8n Community\nOpens in a new window\n\nqdrant.tech\nOptimizer - Qdrant\nOpens in a new window\n\nqdrant.tech\nCombining Vector Search and Filtering - Qdrant\nOpens in a new window\n\nqdrant.tech\nA Complete Guide to Filtering in Vector Search - Qdrant\nOpens in a new window\n\nyudhiesh.github.io\nThe Achilles Heel of Vector Search: Filters | Bits & Backprops\nOpens in a new window\n\nqdrant.tech\nIndexing - Qdrant\nOpens in a new window\n\nqdrant.tech\nPayload - Qdrant\nOpens in a new window\n\nqdrant.tech\nFinal Project: Production-Ready Documentation Search Engine - Qdrant\nOpens in a new window\n\nairbyte.com\nThe Fundamentals of Qdrant: Understanding the 6 Core Concepts - Airbyte\nOpens in a new window\n\nqdrant.tech\nAccuracy Recovery with Rescoring - Qdrant\nOpens in a new window\n\nqdrant.tech\nOptimize Performance - Qdrant\nOpens in a new window\n\nreddit.com\nCalculating Storage Requirements for Vector Embeddings : r/vectordatabase - Reddit\nOpens in a new window\n\nqdrant.tech\nCapacity Planning - Qdrant\nOpens in a new window\n\nqdrant.tech\nQdrant 1.8.0: Enhanced Search Capabilities for Better Results\nOpens in a new window\n\nsliplane.io\nSelf-hosting Qdrant the easy way - Sliplane\nOpens in a new window\n\nqdrant.tech\nPricing for Cloud and Vector Database Solutions Qdrant - Qdrant\nOpens in a new window\n\nqdrant.tech\nInstallation - Qdrant\nOpens in a new window\n\nqdrant.tech\nQdrant Documentation\nOpens in a new window\n\nreddit.com\nQdrant is too expensive, how to replace (2M vectors) : r/vectordatabase - Reddit\nOpens in a new window\n\nqdrant.tech\nVector Database Benchmarks - Qdrant\nOpens in a new window\n\nqdrant.tech\nSingle node benchmarks - Qdrant",
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "rrf_score": 0.006585,
+          "rrf_rank": 5,
+          "layer_ranks": {
+            "semantic": 5,
+            "graph": 5
+          },
+          "layer_scores": {
+            "semantic": 0.51100016,
+            "graph": 0.51100016
+          },
+          "urn": "urn:research:chunk:b9f0be07-ce8c-47f3-8af4-951bb6fe6908",
+          "confidence": 0.1,
+          "criticality": 0.5,
+          "element_type": null,
+          "query_intent": "search",
+          "quality_score": 0.1,
+          "quality_status": "unknown",
+          "quality_gates_passed": 0,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "chunk_index": 12,
+          "source_type": null,
+          "source_origin": null,
+          "score": 0.006585,
+          "combined_score": 0.006585,
+          "embedding": null,
+          "related_entities": null
+        }
+      ],
+      "metadata": {
+        "query": "What total monthly bill does the Qdrant on Railway report estimate for self-hosting half a million vectors on the Hobby plan?",
+        "intent": "search",
+        "intent_confidence": 0.7,
+        "detected_type": null,
+        "type_confidence": 0.0,
+        "layers_used": [
+          "semantic",
+          "graph"
+        ],
+        "layer_weights": {
+          "lexical": 0.22,
+          "semantic": 0.308,
+          "syntactic": 0.132,
+          "pragmatic": 0.08800000000000001,
+          "governance": 0.132,
+          "graph": 0.12
+        },
+        "timings": {
+          "lexical_ms": 10.539383860304952,
+          "semantic_ms": 189.43747505545616,
+          "graph_ms": 8.18,
+          "syntactic_ms": 0.10619894601404667,
+          "pragmatic_ms": 0.11217896826565266,
+          "governance_ms": 5.414424929767847,
+          "fusion_ms": 0.4270069766789675,
+          "relational_ms": 0.0,
+          "total_ms": 211.50983590632677
+        },
+        "layer_diagnostics": [
+          {
+            "layer": "lexical",
+            "status": "ok",
+            "duration_ms": 10.54,
+            "result_count": 0,
+            "error": null,
+            "error_type": null
+          },
+          {
+            "layer": "semantic",
+            "status": "ok",
+            "duration_ms": 189.44,
+            "result_count": 60,
+            "error": null,
+            "error_type": null
+          },
+          {
+            "layer": "graph",
+            "status": "ok",
+            "duration_ms": 8.18,
+            "result_count": 17,
+            "error": null,
+            "error_type": null
+          },
+          {
+            "layer": "syntactic",
+            "status": "ok",
+            "duration_ms": 0.11,
+            "result_count": 60,
+            "error": null,
+            "error_type": null
+          },
+          {
+            "layer": "pragmatic",
+            "status": "ok",
+            "duration_ms": 0.11,
+            "result_count": 60,
+            "error": null,
+            "error_type": null
+          },
+          {
+            "layer": "governance",
+            "status": "ok",
+            "duration_ms": 5.41,
+            "result_count": 60,
+            "error": null,
+            "error_type": null
+          }
+        ],
+        "degraded": false,
+        "graph_enabled": true,
+        "graph_candidates_expanded": 17,
+        "total_candidates": 60,
+        "result_count": 5,
+        "rerank_mode": "full",
+        "hybrid_fallback_used": false
+      }
+    },
+    "checks": {
+      "results": 5,
+      "every_result_has_text": true,
+      "every_result_has_document_and_index": true,
+      "every_result_in_requested_project": true,
+      "graph_ranked_better_than_semantic": [],
+      "rows": [
+        {
+          "chunk_id": "384007d3-be90-46ab-a17f-232b25410b43",
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "chunk_index": 8,
+          "content_chars": 3191,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "layer_ranks": {
+            "semantic": 1,
+            "graph": 1
+          },
+          "layer_scores": {
+            "semantic": 0.6335608,
+            "graph": 0.6335608
+          }
+        },
+        {
+          "chunk_id": "6cd5c0b9-4a87-4d28-846b-1ee7a9f310be",
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "chunk_index": 9,
+          "content_chars": 3087,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "layer_ranks": {
+            "semantic": 2,
+            "graph": 2
+          },
+          "layer_scores": {
+            "semantic": 0.59811264,
+            "graph": 0.59811264
+          }
+        },
+        {
+          "chunk_id": "c3bd577e-f98f-46a7-85bd-2049e7868d75",
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "chunk_index": 7,
+          "content_chars": 3093,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "layer_ranks": {
+            "semantic": 3,
+            "graph": 3
+          },
+          "layer_scores": {
+            "semantic": 0.553024,
+            "graph": 0.553024
+          }
+        },
+        {
+          "chunk_id": "94bc97e4-5224-407c-b7d3-0b94969dcf6e",
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "chunk_index": 11,
+          "content_chars": 2039,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "layer_ranks": {
+            "semantic": 4,
+            "graph": 4
+          },
+          "layer_scores": {
+            "semantic": 0.5198306,
+            "graph": 0.5198306
+          }
+        },
+        {
+          "chunk_id": "b9f0be07-ce8c-47f3-8af4-951bb6fe6908",
+          "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+          "chunk_index": 12,
+          "content_chars": 3007,
+          "contributing_layers": [
+            "semantic",
+            "graph"
+          ],
+          "layer_ranks": {
+            "semantic": 5,
+            "graph": 5
+          },
+          "layer_scores": {
+            "semantic": 0.51100016,
+            "graph": 0.51100016
+          }
+        }
+      ],
+      "layers_used": [
+        "semantic",
+        "graph"
+      ],
+      "cache_hit": null
+    }
+  },
+  "checks": {
+    "cache_hit": false,
+    "answering_chunk_top5_rank": {
+      "8": 1,
+      "9": 2
+    },
+    "answering_chunk_reached_model": {
+      "8": true,
+      "9": true
+    },
+    "chunks_reaching_model": [
+      {
+        "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+        "chunk_index": 8,
+        "semantic_cosine": 0.6335608
+      },
+      {
+        "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+        "chunk_index": 9,
+        "semantic_cosine": 0.59811264
+      },
+      {
+        "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+        "chunk_index": 7,
+        "semantic_cosine": 0.553024
+      },
+      {
+        "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+        "chunk_index": 11,
+        "semantic_cosine": 0.5198306
+      },
+      {
+        "document_id": "bdc8881c-8747-4b5a-8c98-5d360bc0721e",
+        "chunk_index": 12,
+        "semantic_cosine": 0.51100016
+      }
+    ],
+    "compression": {
+      "original_chunks": 5,
+      "filtered_chunks": 5,
+      "original_tokens": 3605,
+      "filtered_tokens": 3605,
+      "threshold": 0.4
+    },
+    "answer_states_fact": {
+      "\\$\\s*48": true,
+      "\\$?\\s*63\\b": true
+    },
+    "citations": 2,
+    "every_citation_resolves": true,
+    "pedr_top5_semantic_ranks": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "model_attempts": [
+      "gpt-5.1"
+    ],
+    "met": true
+  }
+}
