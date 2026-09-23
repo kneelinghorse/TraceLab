@@ -15,6 +15,11 @@ Two stages behind one provider seam (decision #517, #519):
 
 Creating the mission is a separate, human-confirmed, idempotent call (decision
 #515). Nothing here persists between requests.
+
+``answer`` (QA-1, decision #543) is the turn that answers a question from the
+project's documents. It never calls the Librarian's model: the corpus Q&A service
+answers or refuses, and the same provenance validator checks every citation
+against the chunks that answer was written from.
 """
 
 from __future__ import annotations
@@ -45,6 +50,7 @@ from app.schemas.librarian import (
     TranscriptMessage,
 )
 from app.schemas.mission import MissionCreate
+from app.services.corpus_qa import AnswerCitation, answer_question
 from app.services.cost_monitor import get_cost_monitor
 from app.services.deepsearch_preview_client import (
     ContractPreviewError,
@@ -140,6 +146,8 @@ class TurnResult:
     withheld_count: int
     usage: dict[str, int] | None
     model: str
+    chunks: list[AnswerCitation] = field(default_factory=list)
+    no_evidence: bool = False
 
 
 @dataclass
@@ -517,6 +525,59 @@ class LibrarianService:
                 for entry in entries
             ],
         }
+
+    # ----------------------------------------------------------------- answer mode
+
+    def answer(
+        self,
+        db: Session,
+        user: AuthenticatedUser,
+        project: Project,
+        question: str,
+        max_tokens: int | None,
+    ) -> TurnResult:
+        """Answer a question from the project's documents, or refuse (QA-1).
+
+        A cited passage is a corpus claim; an uncited one is the answering model's
+        own words, so it renders as prose. A refusal is one prose segment.
+        """
+        answer = answer_question(db, user, project.id, question, max_tokens=max_tokens)
+        reply = AssistantReply(
+            segments=[
+                ReplySegment(
+                    kind="corpus_claim" if passage.citations else "prose",
+                    text=passage.text,
+                    citations=passage.citations,
+                )
+                for passage in answer.passages
+            ]
+        )
+        violations = validate_provenance(reply, answer.source_chunk_ids)
+        if violations:
+            reply = withhold(reply, violations)
+        totals = _UsageTotals()
+        for model, usage in answer.usage:
+            totals.add(usage)
+            # METER-0 (decision #522): a durable row for each paid call, per user.
+            record_librarian_usage(
+                db,
+                user_id=getattr(user, "user_id", None),
+                project_id=project.id,
+                kind=USAGE_KIND_LIBRARIAN_TURN,
+                model=model,
+                usage=usage,
+                requests=1,
+            )
+        cited = {citation for segment in reply.segments for citation in segment.citations}
+        return TurnResult(
+            reply=reply,
+            evidence=[],
+            withheld_count=len(violations),
+            usage=totals.as_dict(),
+            model=answer.model or "",
+            chunks=[citation for citation in answer.citations if citation.chunk_id in cited],
+            no_evidence=answer.no_evidence,
+        )
 
     # ----------------------------------------------------------------- stage B: draft
 

@@ -16,8 +16,10 @@ from fastapi.testclient import TestClient
 
 import app.api.v1.librarian as librarian_api
 import app.core.authorization as authorization
+import app.services.corpus_qa as corpus_qa
 from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.main import app
+from app.models.document import Document
 from app.models.user import User
 from app.schemas.evidence_ledger import CaptureItem, CaptureRequest
 from app.services.evidence_ledger import EvidenceLedgerService
@@ -460,3 +462,224 @@ class TestTruncatedTurns:
         )
         assert response.json()["segments"][0]["text"] == "Recovered."
         assert len(model.calls) == 2
+
+
+class TestAnswer:
+    """QA-1: a turn in answer mode goes to the corpus Q&A service, never the Librarian's model.
+
+    Every citation it renders opens a chunk the answer was written from, and a
+    question the project cannot support is refused with nothing asserted.
+    """
+
+    USAGE = {"prompt_tokens": 900, "completion_tokens": 120, "total_tokens": 1020}
+
+    class FakeRag:
+        def __init__(self, result):
+            self.result = result
+            self.calls: list[dict] = []
+
+        def run_query(self, **kwargs):
+            self.calls.append(kwargs)
+            return self.result
+
+    def _rag(self, monkeypatch, answer, sources, *, no_evidence=False, cache_hit=False, attempts=None):
+        fake = self.FakeRag(
+            {
+                "answer": answer,
+                "citations": [],
+                "sources": sources,
+                "cache": {"hit": cache_hit},
+                "routing": {
+                    "selected_model": "gpt-test",
+                    "attempts": attempts if attempts is not None else [{"model": "gpt-test", "usage": self.USAGE}],
+                },
+                "no_evidence": no_evidence,
+            }
+        )
+        monkeypatch.setattr(corpus_qa, "get_rag_service", lambda: fake)
+        return fake
+
+    @staticmethod
+    def _chunk(db_session, project, index=9):
+        document = Document(project_id=project.id, name="qdrant-on-railway.md", mime_type="text/markdown")
+        db_session.add(document)
+        db_session.commit()
+        db_session.refresh(document)
+        source = {
+            "chunk_id": str(uuid.uuid4()),
+            "content": "The Hobby plan bill is approximately $48-$63 a month.",
+            "document_id": str(document.id),
+            "chunk_index": index,
+            "similarity": 0.63,
+        }
+        return document, source
+
+    @staticmethod
+    def _ask(project, headers, question="What does self-hosting Qdrant cost?", **extra):
+        return TestClient(app).post(
+            "/api/v1/librarian/turns",
+            json={"project_id": str(project.id), "messages": _messages(question), "mode": "answer", **extra},
+            headers=headers,
+        )
+
+    def test_routes_to_the_qa_service_and_renders_cited_passages(
+        self, librarian, monkeypatch, db_session, project, auth_headers
+    ):
+        model = librarian()
+        document, source = self._chunk(db_session, project)
+        rag = self._rag(
+            monkeypatch,
+            f"The bill is **$48–$63** a month. [Document: {document.id}, Chunk: 9]\n\nManaged hosting costs more.",
+            [source],
+        )
+
+        response = self._ask(project, auth_headers, max_tokens=2000)
+
+        assert response.status_code == 200, response.text
+        body = response.json()
+        assert body["segments"] == [
+            {"kind": "corpus_claim", "text": "The bill is **$48–$63** a month.", "citations": [source["chunk_id"]]},
+            {"kind": "prose", "text": "Managed hosting costs more.", "citations": []},
+        ]
+        assert body["chunks"] == [
+            {
+                "id": source["chunk_id"],
+                "document_id": str(document.id),
+                "document_name": "qdrant-on-railway.md",
+                "chunk_index": 9,
+                "snippet": source["content"],
+                "href": f"/documents/{document.id}?chunk={source['chunk_id']}&index=9",
+            }
+        ]
+        assert body["no_evidence"] is False
+        assert body["evidence"] == []
+        assert body["withheld_count"] == 0
+        assert body["model"] == "gpt-test"
+        assert model.calls == [], "answer mode never calls the Librarian's model"
+        assert rag.calls[0]["query"] == "What does self-hosting Qdrant cost?"
+        assert rag.calls[0]["max_tokens"] == 2000
+        assert rag.calls[0]["refuse_unsupported"] is True
+
+    def test_every_rendered_citation_passes_the_provenance_validator(
+        self, librarian, monkeypatch, db_session, project, auth_headers
+    ):
+        from app.schemas.librarian import AssistantReply, ReplySegment
+        from app.services.librarian import validate_provenance
+
+        librarian()
+        document, source = self._chunk(db_session, project)
+        other_document, other = self._chunk(db_session, project, index=10)
+        self._rag(
+            monkeypatch,
+            f"Cost is $48. [Document: {document.id}, Chunk: 9]\n\n"
+            f"Quantization cuts memory. [Document: {other_document.id}, Chunk: 10] [Document: {document.id}, Chunk: 9]",
+            [source, other],
+        )
+
+        body = self._ask(project, auth_headers).json()
+
+        reply = AssistantReply(segments=[ReplySegment(**segment) for segment in body["segments"]])
+        assert validate_provenance(reply, {source["chunk_id"], other["chunk_id"]}) == []
+        rendered = {citation for segment in body["segments"] for citation in segment["citations"]}
+        assert rendered == {chunk["id"] for chunk in body["chunks"]}
+
+    def test_a_citation_the_answer_was_not_written_from_is_withheld(self, librarian, monkeypatch, project, auth_headers):
+        """The validator runs on answer turns too, whatever the service hands back."""
+        import app.services.librarian as librarian_service
+        from app.services.corpus_qa import AnswerCitation, AnswerPassage, CorpusAnswer
+
+        librarian()
+        stray = str(uuid.uuid4())
+        monkeypatch.setattr(
+            librarian_service,
+            "answer_question",
+            lambda *args, **kwargs: CorpusAnswer(
+                passages=[AnswerPassage(text="Budgets doubled.", citations=[stray])],
+                citations=[AnswerCitation(stray, str(uuid.uuid4()), "x.md", 1, None, "/documents/x")],
+                no_evidence=False,
+                source_chunk_ids=[str(uuid.uuid4())],
+            ),
+        )
+
+        body = self._ask(project, auth_headers).json()
+
+        assert body["withheld_count"] == 1
+        assert body["segments"][0]["kind"] == "withheld"
+        assert "Budgets doubled." not in str(body)
+        assert body["chunks"] == []
+
+    def test_nothing_found_renders_the_refusal_and_asserts_nothing(self, librarian, monkeypatch, project, auth_headers):
+        librarian()
+        self._rag(monkeypatch, "Nothing in this project answers that question.", [], no_evidence=True, attempts=[])
+
+        body = self._ask(project, auth_headers, "How does Kubernetes autoscale pods?").json()
+
+        assert body["no_evidence"] is True
+        assert body["segments"] == [
+            {"kind": "prose", "text": "Nothing in this project answers that question.", "citations": []}
+        ]
+        assert body["chunks"] == [] and body["evidence"] == []
+        assert body["usage"] is None
+
+    def test_request_rules(self, librarian, project, auth_headers):
+        model = librarian()
+        client = TestClient(app)
+        cases = [
+            {"project_id": None, "messages": _messages("What does it cost?"), "mode": "answer"},
+            {"project_id": str(project.id), "messages": _messages("   "), "mode": "answer"},
+            {"project_id": str(project.id), "messages": _messages("Hi"), "max_tokens": 600},
+            {"project_id": str(project.id), "messages": _messages("Hi"), "mode": "answer", "max_tokens": 63},
+            {"project_id": str(project.id), "messages": _messages("Hi"), "mode": "answer", "max_tokens": 4001},
+            {"project_id": str(project.id), "messages": _messages("Hi"), "mode": "search"},
+        ]
+        for payload in cases:
+            response = client.post("/api/v1/librarian/turns", json=payload, headers=auth_headers)
+            assert response.status_code == 422, (payload, response.text)
+        assert model.calls == []
+
+    def test_a_project_the_user_cannot_read_is_403_before_retrieval(
+        self, librarian, monkeypatch, db_session, project, auth_headers
+    ):
+        monkeypatch.setattr(authorization.settings, "rbac_enabled", True, raising=False)
+        project.owner_id = _seed_user(db_session).id
+        db_session.commit()
+        stranger = AuthenticatedUser(user_id=uuid.uuid4(), email="guest@tracelab.local", display_name="g", role="member")
+        app.dependency_overrides[require_authenticated_user] = lambda: stranger
+        librarian()
+        rag = self._rag(monkeypatch, "The bill is $48.", [])
+
+        response = self._ask(project, auth_headers)
+
+        assert response.status_code == 403
+        assert rag.calls == []
+
+    def test_each_paid_call_is_metered_and_a_cached_answer_is_not(
+        self, librarian, monkeypatch, db_session, project, auth_headers
+    ):
+        from app.models.usage_record import USAGE_KIND_LIBRARIAN_TURN, UsageRecord
+
+        librarian()
+        document, source = self._chunk(db_session, project)
+        answer = f"The bill is $48. [Document: {document.id}, Chunk: 9]"
+        escalated = [
+            {"model": "gpt-5.1", "usage": self.USAGE},
+            {"model": "gpt-5.2", "usage": {"prompt_tokens": 950, "completion_tokens": 140, "total_tokens": 1090}},
+        ]
+        self._rag(monkeypatch, answer, [source], attempts=escalated)
+
+        body = self._ask(project, auth_headers).json()
+
+        rows = (
+            db_session.query(UsageRecord)
+            .filter(UsageRecord.project_id == project.id, UsageRecord.kind == USAGE_KIND_LIBRARIAN_TURN)
+            .all()
+        )
+        assert sorted((row.model, row.total_tokens, row.requests) for row in rows) == [
+            ("gpt-5.1", 1020, 1),
+            ("gpt-5.2", 1090, 1),
+        ]
+        assert body["usage"] == {"prompt_tokens": 1850, "completion_tokens": 260, "total_tokens": 2110}
+
+        self._rag(monkeypatch, answer, [source], cache_hit=True, attempts=escalated)
+        assert self._ask(project, auth_headers, "What does it cost to self-host?").json()["usage"] is None
+        assert db_session.query(UsageRecord).filter(UsageRecord.project_id == project.id).count() == 2

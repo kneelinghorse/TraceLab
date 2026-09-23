@@ -27,14 +27,36 @@ export interface EvidenceRef {
   href: string;
 }
 
+/** A document chunk an answer cites; `href` opens the document at that chunk (QA-1). */
+export interface ChunkRef {
+  id: string;
+  document_id: string;
+  document_name: string;
+  chunk_index: number | null;
+  snippet: string | null;
+  href: string;
+}
+
 export interface TurnResponse {
   segments: ReplySegment[];
   suggested_action: "draft_mission" | null;
   evidence: EvidenceRef[];
+  /** Chunks an answer turn cites; empty for a conversational turn. */
+  chunks: ChunkRef[];
+  /** True when an answer turn was refused: nothing in the project answers the question. */
+  no_evidence: boolean;
   withheld_count: number;
   usage: Record<string, number> | null;
   model: string;
 }
+
+/**
+ * The answer budgets, in tokens (decision #543). A citation label costs about 33
+ * tokens, so 600 fits a short answer of about 150 words with its citations, and
+ * 2000 a full synthesis of about 500. The server tells the model the length.
+ */
+export const ANSWER_BUDGETS = { short: 600, full: 2000 } as const;
+export type AnswerBudget = keyof typeof ANSWER_BUDGETS;
 
 export interface MissionDraft {
   mission_id: string;
@@ -88,9 +110,22 @@ export interface CreatedMissionResponse {
 }
 
 export const librarianApi = {
-  /** One conversational turn; `projectId` scopes the evidence the Librarian may cite. */
-  turn(messages: TranscriptMessage[], projectId: string | null): Promise<TurnResponse> {
-    return httpClient.post<TurnResponse>("/librarian/turns", { project_id: projectId, messages });
+  /**
+   * One turn; `projectId` scopes the evidence the Librarian may cite. With
+   * `answer`, the last message is a question answered from the project's
+   * documents within `maxTokens`, or refused.
+   */
+  turn(
+    messages: TranscriptMessage[],
+    projectId: string | null,
+    answer?: { maxTokens: number },
+  ): Promise<TurnResponse> {
+    return httpClient.post<TurnResponse>(
+      "/librarian/turns",
+      answer
+        ? { project_id: projectId, messages, mode: "answer", max_tokens: answer.maxTokens }
+        : { project_id: projectId, messages },
+    );
   },
 
   /** Turn the conversation into a compiled, linted mission draft. Nothing is saved. */
@@ -105,13 +140,18 @@ export const librarianApi = {
 };
 
 /** Plain-text form of a reply, used when the transcript is resent to the server. */
-export function replyToTranscriptText(segments: ReplySegment[]): string {
+export function replyToTranscriptText(segments: ReplySegment[], chunks: ChunkRef[] = []): string {
+  const byId = new Map(chunks.map((chunk) => [chunk.id, chunk]));
+  const cite = (id: string) => {
+    const chunk = byId.get(id);
+    return chunk ? `[document ${chunk.document_name}, chunk ${chunk.chunk_index ?? "?"}]` : `[evidence:${id}]`;
+  };
   return segments
     .map((segment) =>
       segment.kind === "withheld"
         ? "[withheld claim]"
         : segment.citations.length
-          ? `${segment.text} ${segment.citations.map((id) => `[evidence:${id}]`).join(" ")}`
+          ? `${segment.text} ${segment.citations.map(cite).join(" ")}`
           : segment.text,
     )
     .join("\n\n")

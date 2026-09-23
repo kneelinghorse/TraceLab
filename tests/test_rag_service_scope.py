@@ -221,6 +221,7 @@ def test_none_scope_preserves_legacy_application_key_and_semantic_signature(
         "filters_signature": base_signature,
         "quality_signature": "*|*|any|strict",
         "graph_context_enabled": False,
+        "refuse_unsupported": False,
     }
 
     service.run_query(query="legacy cache")

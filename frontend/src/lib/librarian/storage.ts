@@ -1,4 +1,4 @@
-import type { DraftResponse, EvidenceRef, ReplySegment } from "@/lib/api/librarian";
+import type { ChunkRef, DraftResponse, EvidenceRef, ReplySegment } from "@/lib/api/librarian";
 
 /**
  * What the Librarian page keeps in this browser (LIB-2, decision #527).
@@ -13,7 +13,15 @@ import type { DraftResponse, EvidenceRef, ReplySegment } from "@/lib/api/librari
 
 export type Turn =
   | { role: "user"; text: string }
-  | { role: "assistant"; segments: ReplySegment[]; evidence: EvidenceRef[]; suggested: boolean };
+  | {
+      role: "assistant";
+      segments: ReplySegment[];
+      evidence: EvidenceRef[];
+      suggested: boolean;
+      /** An answer turn's cited chunks and refusal flag (QA-1); absent on turns stored before it. */
+      chunks?: ChunkRef[];
+      noEvidence?: boolean;
+    };
 
 export interface StoredLibrarianState {
   projectId: string;

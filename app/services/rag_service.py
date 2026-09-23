@@ -43,7 +43,7 @@ logger = logging.getLogger(__name__)
 _UNSET = object()
 
 
-_CITATION_PATTERN = re.compile(
+CITATION_PATTERN = re.compile(
     r"\[Document:\s*(?P<document>[^\],]+),\s*Chunk:\s*(?P<chunk>[^\]]+)\]",
     re.IGNORECASE,
 )
@@ -54,6 +54,8 @@ MODEL_COST_ESTIMATES = {
     "gpt-5.1": 0.0010,
     "gpt-5.2": 0.0016,
 }
+
+NO_EVIDENCE_ANSWER = "Nothing in this project answers that question."
 
 
 def build_empty_scope_result(
@@ -230,9 +232,14 @@ class RagService:
         type_boost_enabled: bool = True,
         include_graph_context: bool = False,
         allowed_project_ids: list[UUID] | None = None,
+        refuse_unsupported: bool = False,
     ) -> dict[str, Any]:
         """
         Execute a full RAG workflow: retrieve context and synthesize an answer.
+
+        ``refuse_unsupported`` (QA-1) returns the nothing-found result, without
+        asking the model, when no retrieved chunk reaches the compression floor
+        on its own; by default compression's best chunk is still answered from.
         """
         normalized_mode = (search_mode or "semantic").strip().lower()
         allowed_project_scope = self._normalize_project_scope(allowed_project_ids)
@@ -275,6 +282,7 @@ class RagService:
                 governance_mode=governance_mode,
             ),
             graph_context_enabled=include_graph_context,
+            refuse_unsupported=refuse_unsupported,
         )
         start = time.perf_counter()
 
@@ -309,6 +317,7 @@ class RagService:
                     else None
                 ),
                 filters_signature=filters_signature,
+                refuse_unsupported=refuse_unsupported,
             )
 
         result, hit = self.cache_manager.cached_value(
@@ -363,9 +372,13 @@ class RagService:
         include_graph_context: bool = False,
         allowed_project_ids: list[UUID] | None = None,
         filters_signature: str | None = None,
+        refuse_unsupported: bool = False,
     ) -> dict[str, Any]:
         start = time.perf_counter()
         normalized_mode = (search_mode or "semantic").strip().lower()
+        effective_max_tokens = (
+            max_tokens if max_tokens is not None else self.default_max_tokens
+        )
         query_embedding = self.embedding_service.generate_embedding(query)
         cache_metadata = {
             "query": query,
@@ -381,9 +394,7 @@ class RagService:
             "temperature": temperature
             if temperature is not None
             else self.default_temperature,
-            "max_tokens": max_tokens
-            if max_tokens is not None
-            else self.default_max_tokens,
+            "max_tokens": effective_max_tokens,
             "search_mode": normalized_mode,
             "filters_signature": (
                 filters_signature
@@ -410,7 +421,12 @@ class RagService:
                 query_embedding=query_embedding,
                 metadata=cache_metadata,
             )
-            if cached_result:
+            # An answer cached for a caller that answers from compression's best
+            # chunk may rest on nothing at the floor; a refusing caller asks again.
+            if cached_result and (
+                not refuse_unsupported
+                or self._reaches_floor(cached_result.get("sources"))
+            ):
                 response = dict(cached_result)
                 response.setdefault("search_mode", normalized_mode)
                 latency_ms = round((time.perf_counter() - start) * 1000, 2)
@@ -486,6 +502,18 @@ class RagService:
                 latency_ms=(time.perf_counter() - start) * 1000,
             )
 
+        if refuse_unsupported and not self._reaches_floor(compressed_chunks):
+            # Compression kept its best chunk only because it keeps at least one.
+            # On production an unsupported question peaked at 0.374 and supported
+            # ones at 0.49-0.66 (RAG-4), so the project does not answer this one.
+            return self._no_evidence_result(
+                search_mode=normalized_mode,
+                project_id=project_id,
+                compression=compression_metrics,
+                latency_ms=(time.perf_counter() - start) * 1000,
+                reason="No retrieved chunk reached the relevance floor for this query.",
+            )
+
         graph_context = None
         if include_graph_context:
             graph_context = self._build_graph_context(
@@ -497,6 +525,7 @@ class RagService:
             query=query,
             chunks=compressed_chunks,
             graph_context=graph_context,
+            max_tokens=effective_max_tokens,
         )
         (
             answer,
@@ -511,9 +540,7 @@ class RagService:
             temperature=temperature
             if temperature is not None
             else self.default_temperature,
-            max_tokens=max_tokens
-            if max_tokens is not None
-            else self.default_max_tokens,
+            max_tokens=effective_max_tokens,
         )
         latency_ms = (time.perf_counter() - start) * 1000
 
@@ -590,25 +617,32 @@ class RagService:
         project_id: str | None,
         compression: dict[str, Any],
         latency_ms: float,
+        reason: str = "Retrieval returned no chunks with text for this query.",
     ) -> dict[str, Any]:
-        """Return the nothing-found result for a scope where retrieval found no text.
+        """Return the nothing-found result for a scope with no evidence to answer from.
 
         It has the empty-scope result's shape, since both are answers with no
         evidence behind them and no model call.
         """
         result = self._empty_scope_result(search_mode=search_mode)
         result["answer"] = (
-            "Nothing in this project answers that question."
+            NO_EVIDENCE_ANSWER
             if project_id
             else "Nothing in your projects answers that question."
         )
         result["latency_ms"] = round(latency_ms, 2)
         result["compression"] = compression
         result["quality"]["hard_failures"] = ["no_evidence"]
-        result["quality"]["reasons"] = [
-            "Retrieval returned no chunks with text for this query."
-        ]
+        result["quality"]["reasons"] = [reason]
         return result
+
+    def _reaches_floor(self, chunks: list[dict[str, Any]] | None) -> bool:
+        """Whether any chunk's similarity to the query meets the compression floor."""
+        return any(
+            isinstance(chunk.get("similarity"), int | float)
+            and chunk["similarity"] >= self.compression_threshold
+            for chunk in chunks or []
+        )
 
     @staticmethod
     def _quality_filter_signature(
@@ -651,12 +685,19 @@ class RagService:
         query: str,
         chunks: list[dict[str, Any]],
         graph_context: str | None = None,
+        max_tokens: int | None = None,
     ) -> list[dict[str, str]]:
         """Compose chat messages incorporating retrieved context.
 
         Only called with at least one chunk: an empty retrieval returns the
         nothing-found result before any prompt is built.
+
+        The model is told its length (QA-1): about a quarter of the token budget in
+        words. A citation label costs 33 tokens, since it carries a document id, and
+        RAG-3's answer B spent 341 of 350 tokens on 157 words and four labels, so an
+        answer not told its budget is cut off mid-sentence.
         """
+        budget = max_tokens if max_tokens is not None else self.default_max_tokens
         context_blocks = []
         for chunk in chunks:
             document_id = chunk.get("document_id") or "Unknown"
@@ -680,6 +721,7 @@ class RagService:
             f"{context_text}\n\n"
             "Guidelines:\n"
             "- Answer concisely while covering the key points relevant to the query.\n"
+            f"- Keep the answer within about {budget // 4} words; citations do not count toward that.\n"
             "- Include citations immediately after each sentence or claim that uses context.\n"
             "- Do not fabricate information or citations.\n"
             "- If the context is not helpful, say so and avoid speculation."
@@ -927,7 +969,7 @@ class RagService:
         citations: list[dict[str, Any]] = []
         seen: set[tuple[str, str]] = set()
 
-        for match in _CITATION_PATTERN.finditer(answer):
+        for match in CITATION_PATTERN.finditer(answer):
             document_label = match.group("document").strip()
             chunk_label = match.group("chunk").strip()
             key = (document_label.lower(), chunk_label.lower())
@@ -935,14 +977,14 @@ class RagService:
                 continue
             seen.add(key)
 
-            chunk = self._match_chunk(document_label, chunk_label, chunks)
+            chunk = self.match_chunk(document_label, chunk_label, chunks)
             if chunk is not None:
                 citations.append(self._build_citation(chunk))
 
         return citations
 
     @staticmethod
-    def _match_chunk(
+    def match_chunk(
         document_label: str,
         chunk_label: str,
         chunks: list[dict[str, Any]],

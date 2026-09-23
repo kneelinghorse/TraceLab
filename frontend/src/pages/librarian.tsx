@@ -10,8 +10,11 @@ import { SpacePicker } from "@/components/SpacePicker";
 import { useFeedback } from "@/components/ui/useFeedback";
 import { useAuth } from "@/contexts/AuthContext";
 import {
+  ANSWER_BUDGETS,
   librarianApi,
   replyToTranscriptText,
+  type AnswerBudget,
+  type ChunkRef,
   type DraftResponse,
   type ReplySegment,
   type TranscriptMessage,
@@ -36,13 +39,19 @@ import {
  * #513). The transcript is resent on every call and the server stores nothing
  * until the user creates the mission (decision #519); this browser keeps it in
  * localStorage so leaving the page does not discard it (LIB-2, decision #527).
+ *
+ * "Ask the documents" (QA-1, decision #543) answers a question from the
+ * project's documents instead: each cited passage links to the chunk it came
+ * from, and a question the project cannot support is refused, never guessed.
  */
+
+type Mode = "converse" | "answer";
 
 function toTranscript(turns: Turn[]): TranscriptMessage[] {
   return turns.map((turn) =>
     turn.role === "user"
       ? { role: "user", content: turn.text }
-      : { role: "assistant", content: replyToTranscriptText(turn.segments) || "…" },
+      : { role: "assistant", content: replyToTranscriptText(turn.segments, turn.chunks) || "…" },
   );
 }
 
@@ -52,7 +61,11 @@ const STARTERS = [
   "What would a good mission look like for comparing design-system adoption strategies?",
 ];
 
-function SegmentView({ segment }: { segment: ReplySegment }) {
+function chunkLabel(chunk: ChunkRef) {
+  return chunk.chunk_index == null ? chunk.document_name : `${chunk.document_name} #${chunk.chunk_index}`;
+}
+
+function SegmentView({ segment, chunks }: { segment: ReplySegment; chunks: Map<string, ChunkRef> }) {
   if (segment.kind === "withheld") {
     return (
       <p role="note" className="rounded-lg border border-warning-line bg-warning-surface px-3 py-2 text-sm text-warning">
@@ -62,18 +75,30 @@ function SegmentView({ segment }: { segment: ReplySegment }) {
   }
   const cited = segment.citations.length > 0;
   if (segment.kind === "corpus_claim" || cited) {
+    const fromDocuments = cited && segment.citations.every((id) => chunks.has(id));
     return (
       <div className="rounded-lg border-l-4 border-accent bg-surface-alt px-3 py-2" data-kind="corpus_claim">
-        <p className="text-xs font-semibold uppercase tracking-wide text-accent-text">From this project&apos;s evidence</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-accent-text">
+          {fromDocuments ? "From this project's documents" : "From this project's evidence"}
+        </p>
         <MarkdownRenderer content={segment.text} className="mt-1" />
         <ul className="mt-2 flex flex-wrap gap-2" aria-label="Citations">
-          {segment.citations.map((id, index) => (
-            <li key={id}>
-              <Link href={`/evidence/${id}`} className="rounded bg-surface px-2 py-0.5 text-xs text-accent-text underline">
-                Evidence {index + 1}
-              </Link>
-            </li>
-          ))}
+          {segment.citations.map((id, index) => {
+            const chunk = chunks.get(id);
+            return (
+              <li key={id} className="min-w-0 max-w-full">
+                {chunk ? (
+                  <Link href={chunk.href} title={chunk.snippet ?? undefined} className="block max-w-full truncate rounded bg-surface px-2 py-0.5 text-xs text-accent-text underline">
+                    {chunkLabel(chunk)}
+                  </Link>
+                ) : (
+                  <Link href={`/evidence/${id}`} className="rounded bg-surface px-2 py-0.5 text-xs text-accent-text underline">
+                    Evidence {index + 1}
+                  </Link>
+                )}
+              </li>
+            );
+          })}
         </ul>
       </div>
     );
@@ -218,6 +243,8 @@ function LibrarianContent() {
   const [creatingProject, setCreatingProject] = useState(false);
   const [turns, setTurns] = useState<Turn[]>([]);
   const [input, setInput] = useState("");
+  const [mode, setMode] = useState<Mode>("converse");
+  const [budget, setBudget] = useState<AnswerBudget>("short");
   const [sending, setSending] = useState(false);
   const [drafting, setDrafting] = useState(false);
   const [draft, setDraft] = useState<DraftResponse | null>(null);
@@ -261,6 +288,8 @@ function LibrarianContent() {
   }, [turns.length, sending]);
 
   const project = useMemo(() => projects.data?.find((item) => item.id === projectId) ?? null, [projects.data, projectId]);
+  // Asking needs a project: an answer comes from one project's documents.
+  const answering = mode === "answer" && Boolean(projectId);
   const lastAssistant = [...turns].reverse().find((turn) => turn.role === "assistant");
   const suggested = lastAssistant?.role === "assistant" && lastAssistant.suggested;
   const canDraft = turns.some((turn) => turn.role === "user") && Boolean(projectId) && !sending;
@@ -288,10 +317,18 @@ function LibrarianContent() {
     setInput("");
     setSending(true);
     try {
-      const reply = await librarianApi.turn(toTranscript(next), projectId || null);
+      const reply = answering
+        ? await librarianApi.turn(toTranscript(next), projectId, { maxTokens: ANSWER_BUDGETS[budget] })
+        : await librarianApi.turn(toTranscript(next), projectId || null);
       setTurns([
         ...next,
-        { role: "assistant", segments: reply.segments, evidence: reply.evidence, suggested: reply.suggested_action === "draft_mission" },
+        {
+          role: "assistant",
+          segments: reply.segments,
+          evidence: reply.evidence,
+          suggested: reply.suggested_action === "draft_mission",
+          ...(answering ? { chunks: reply.chunks, noEvidence: reply.no_evidence } : {}),
+        },
       ]);
     } catch (err) {
       notify(err);
@@ -368,10 +405,10 @@ function LibrarianContent() {
       <header className="space-y-2">
         <h1 className="text-2xl font-semibold text-foreground">Librarian</h1>
         <p className="text-secondary">
-          Describe what you want to learn. The Librarian helps shape it into a research question, then drafts a DeepSearch mission you review and run.
+          Describe what you want to learn. The Librarian helps shape it into a research question, then drafts a DeepSearch mission you review and run. Or ask a question about a project&apos;s documents and get an answer that cites them.
         </p>
         <p className="text-sm text-muted">
-          Plain text is the Librarian speaking from general knowledge. A highlighted passage is a claim about this project&apos;s evidence and links to the entries it cites.
+          Plain text is the Librarian speaking from general knowledge. A highlighted passage is a claim about this project&apos;s documents or evidence and links to what it cites.
         </p>
       </header>
 
@@ -443,7 +480,12 @@ function LibrarianContent() {
           aria-label="Transcript"
           className={`space-y-4 overflow-y-auto pr-1 ${expanded ? "" : started ? "min-h-[50vh] max-h-[75vh]" : "max-h-[60vh]"}`}
         >
-          {turns.length === 0 && (
+          {turns.length === 0 && answering && (
+            <p className="text-secondary">
+              Ask a question about {project?.name ?? "this project"}&apos;s documents. The answer comes only from them and every claim links to the chunk it came from; if nothing there answers it, the Librarian says so.
+            </p>
+          )}
+          {turns.length === 0 && !answering && (
             <div className="space-y-3">
               <p className="text-secondary">Start with the question you cannot quite phrase yet. For example:</p>
               <ul className="space-y-2">
@@ -457,25 +499,63 @@ function LibrarianContent() {
               </ul>
             </div>
           )}
-          {turns.map((turn, index) =>
-            turn.role === "user" ? (
-              <article key={index} className="ml-auto max-w-[85%] rounded-2xl bg-accent px-4 py-2 text-on-accent" aria-label="You">
-                <p className="whitespace-pre-wrap break-words">{turn.text}</p>
-              </article>
-            ) : (
+          {turns.map((turn, index) => {
+            if (turn.role === "user") {
+              return (
+                <article key={index} className="ml-auto max-w-[85%] rounded-2xl bg-accent px-4 py-2 text-on-accent" aria-label="You">
+                  <p className="whitespace-pre-wrap break-words">{turn.text}</p>
+                </article>
+              );
+            }
+            if (turn.noEvidence) {
+              // The refusal asserts nothing, so it is never styled as a claim.
+              return (
+                <article key={index} className="max-w-[95%]" aria-label="Librarian">
+                  <p role="note" data-kind="refusal" className="rounded-lg border border-line bg-surface-alt px-3 py-2 text-sm text-secondary">
+                    {turn.segments.map((segment) => segment.text).join(" ")}
+                  </p>
+                </article>
+              );
+            }
+            const chunks = new Map((turn.chunks ?? []).map((chunk) => [chunk.id, chunk]));
+            return (
               <article key={index} className="max-w-[95%] space-y-2" aria-label="Librarian">
                 {turn.segments.map((segment, segmentIndex) => (
-                  <SegmentView key={segmentIndex} segment={segment} />
+                  <SegmentView key={segmentIndex} segment={segment} chunks={chunks} />
                 ))}
               </article>
-            ),
-          )}
-          {sending && <p role="status" className="text-sm text-muted">The Librarian is thinking…</p>}
+            );
+          })}
+          {sending && <p role="status" className="text-sm text-muted">{answering ? "The Librarian is reading the documents…" : "The Librarian is thinking…"}</p>}
         </div>
 
+        <div className="mt-4 space-y-2 text-sm">
+          <div role="radiogroup" aria-label="How the Librarian replies" className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <label className="flex items-center gap-2">
+              <input type="radio" name="librarian-mode" value="converse" checked={!answering} onChange={() => setMode("converse")} />
+              Talk it through
+            </label>
+            <label className={`flex items-center gap-2 ${projectId ? "" : "text-muted"}`} title={projectId ? undefined : "Choose a project to ask about its documents"}>
+              <input type="radio" name="librarian-mode" value="answer" checked={answering} disabled={!projectId} onChange={() => setMode("answer")} />
+              Ask the documents
+            </label>
+          </div>
+          {answering && (
+            <div role="radiogroup" aria-label="Answer length" className="flex flex-wrap items-center gap-x-4 gap-y-1">
+              <label className="flex items-center gap-2">
+                <input type="radio" name="librarian-budget" value="short" checked={budget === "short"} onChange={() => setBudget("short")} />
+                Short answer
+              </label>
+              <label className="flex items-center gap-2">
+                <input type="radio" name="librarian-budget" value="full" checked={budget === "full"} onChange={() => setBudget("full")} />
+                Full synthesis
+              </label>
+            </div>
+          )}
+        </div>
         <form
           onSubmit={(event) => { event.preventDefault(); void send(input); }}
-          className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end"
+          className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end"
         >
           <div className="flex-1">
             <label htmlFor="librarian-composer" className="sr-only">Message the Librarian</label>
@@ -485,13 +565,13 @@ function LibrarianContent() {
               onChange={(event) => setInput(event.target.value)}
               onKeyDown={onComposerKey}
               rows={2}
-              placeholder="Ask anything, or describe what you want to research…"
+              placeholder={answering ? `Ask a question about ${project?.name ?? "this project"}'s documents…` : "Ask anything, or describe what you want to research…"}
               className="w-full resize-none rounded-xl border border-line bg-surface px-4 py-3 text-foreground placeholder:text-muted focus:border-info-line focus:outline-none focus:ring-2 focus:ring-focus"
             />
           </div>
           <div className="flex gap-2">
             <button type="submit" disabled={sending || !input.trim()} className={suggested ? secondaryButton : primaryButton}>
-              {sending ? "Sending…" : "Send"}
+              {sending ? (answering ? "Asking…" : "Sending…") : answering ? "Ask" : "Send"}
             </button>
             <button
               type="button"

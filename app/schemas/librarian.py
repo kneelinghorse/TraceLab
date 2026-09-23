@@ -18,8 +18,12 @@ from app.schemas.mission import MissionBase, MissionResponse
 TranscriptRole = Literal["user", "assistant"]
 SegmentKind = Literal["prose", "corpus_claim", "withheld"]
 SuggestedAction = Literal["draft_mission"]
+TurnMode = Literal["converse", "answer"]
 
 MAX_TRANSCRIPT_MESSAGES = 60
+# The answer budget's bounds: RagQuery's floor, and twice the page's full synthesis.
+ANSWER_MIN_TOKENS = 64
+ANSWER_MAX_TOKENS = 4000
 
 
 class TranscriptMessage(BaseModel):
@@ -83,11 +87,35 @@ class TurnRequest(BaseModel):
         description="Project whose evidence the Librarian may search. Omit for planning-only conversation.",
     )
     messages: list[TranscriptMessage] = Field(min_length=1, max_length=MAX_TRANSCRIPT_MESSAGES)
+    mode: TurnMode = Field(
+        default="converse",
+        description=(
+            "converse: the Librarian talks it through (LIB-1). answer: the last message is a question "
+            "answered from the project's documents with citations, or refused (QA-1)."
+        ),
+    )
+    max_tokens: int | None = Field(
+        default=None,
+        ge=ANSWER_MIN_TOKENS,
+        le=ANSWER_MAX_TOKENS,
+        description="Answer budget for mode 'answer'. Defaults to settings.rag_default_max_tokens.",
+    )
 
     @model_validator(mode="after")
     def _last_message_is_from_user(self) -> TurnRequest:
         if self.messages[-1].role != "user":
             raise ValueError("The last transcript message must be from the user.")
+        return self
+
+    @model_validator(mode="after")
+    def _answer_mode_fields(self) -> TurnRequest:
+        if self.mode == "answer":
+            if self.project_id is None:
+                raise ValueError("Mode 'answer' needs a project_id: a question is answered from one project.")
+            if not self.messages[-1].content.strip():
+                raise ValueError("The question must not be empty.")
+        elif self.max_tokens is not None:
+            raise ValueError("max_tokens applies only to mode 'answer'.")
         return self
 
 
@@ -101,10 +129,26 @@ class EvidenceRef(BaseModel):
     href: str
 
 
+class ChunkRef(BaseModel):
+    """A document chunk an answer cites, as the UI resolves it (QA-1)."""
+
+    id: str
+    document_id: str
+    document_name: str
+    chunk_index: int | None = None
+    snippet: str | None = None
+    href: str
+
+
 class TurnResponse(BaseModel):
     segments: list[ReplySegment]
     suggested_action: SuggestedAction | None = None
     evidence: list[EvidenceRef] = Field(default_factory=list)
+    chunks: list[ChunkRef] = Field(default_factory=list)
+    no_evidence: bool = Field(
+        default=False,
+        description="True when an answer turn was refused: nothing in the project answers the question.",
+    )
     withheld_count: int = 0
     usage: dict[str, int] | None = None
     model: str

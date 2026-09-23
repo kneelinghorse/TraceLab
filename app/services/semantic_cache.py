@@ -141,12 +141,17 @@ class SemanticCacheService:
 
     def _create_payload_indexes(self) -> None:
         """Ensure common filter fields are indexed for quick lookups."""
-        for field in ("project_id", "document_id", "source_type", "filters_signature"):
+        fields = [
+            (field, PayloadSchemaType.KEYWORD)
+            for field in ("project_id", "document_id", "source_type", "filters_signature")
+        ]
+        fields.append(("max_tokens", PayloadSchemaType.INTEGER))
+        for field, schema in fields:
             try:
                 self.client.create_payload_index(
                     collection_name=self.collection_name,
                     field_name=field,
-                    field_schema=PayloadSchemaType.KEYWORD,
+                    field_schema=schema,
                 )
             except Exception:  # pragma: no cover - idempotent create
                 logger.debug("Could not ensure semantic cache payload index %s", field)
@@ -189,6 +194,13 @@ class SemanticCacheService:
                     key="filters_signature",
                     match=MatchValue(value=str(filters_signature)),
                 )
+            )
+        max_tokens = metadata.get("max_tokens")
+        if max_tokens is not None:
+            # An answer written for one budget is not an answer for another (QA-1):
+            # a full synthesis must never be served an earlier short answer.
+            filters.append(
+                FieldCondition(key="max_tokens", match=MatchValue(value=int(max_tokens)))
             )
         query_filter = Filter(must=filters) if filters else None
 
