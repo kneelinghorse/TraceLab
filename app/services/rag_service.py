@@ -113,6 +113,7 @@ def build_empty_scope_result(
             "metrics": dict(routing_metrics or {"total_queries": 0, "escalations": 0}),
         },
         "search_mode": (search_mode or "semantic").strip().lower(),
+        "no_evidence": True,
     }
 
 
@@ -317,6 +318,7 @@ class RagService:
         cache_info.setdefault("layer", "ttl")
         cache_info["ttl_seconds"] = self.cache_manager.ttl_seconds("rag_query_results")
         result.setdefault("search_mode", normalized_mode)
+        result.setdefault("no_evidence", False)
 
         if hit:
             latency_ms = round((time.perf_counter() - start) * 1000, 2)
@@ -471,6 +473,17 @@ class RagService:
             threshold=self.compression_threshold,
         )
 
+        if not compressed_chunks:
+            # Nothing to cite, so nothing is asserted: the model is not asked. The
+            # result also skips the semantic cache, where it would hide a document
+            # indexed later for the cache's whole TTL.
+            return self._no_evidence_result(
+                search_mode=normalized_mode,
+                project_id=project_id,
+                compression=compression_metrics,
+                latency_ms=(time.perf_counter() - start) * 1000,
+            )
+
         graph_context = None
         if include_graph_context:
             graph_context = self._build_graph_context(
@@ -568,6 +581,31 @@ class RagService:
             routing_metrics=self.routing_metrics,
         )
 
+    def _no_evidence_result(
+        self,
+        *,
+        search_mode: str,
+        project_id: str | None,
+        compression: dict[str, Any],
+        latency_ms: float,
+    ) -> dict[str, Any]:
+        """Return the nothing-found result for a scope where retrieval found nothing.
+
+        It has the empty-scope result's shape, since both are answers with no
+        evidence behind them and no model call.
+        """
+        result = self._empty_scope_result(search_mode=search_mode)
+        result["answer"] = (
+            "Nothing in this project answers that question."
+            if project_id
+            else "Nothing in your projects answers that question."
+        )
+        result["latency_ms"] = round(latency_ms, 2)
+        result["compression"] = compression
+        result["quality"]["hard_failures"] = ["no_evidence"]
+        result["quality"]["reasons"] = ["Retrieval returned no chunks for this query."]
+        return result
+
     @staticmethod
     def _quality_filter_signature(
         *,
@@ -610,21 +648,19 @@ class RagService:
         chunks: list[dict[str, Any]],
         graph_context: str | None = None,
     ) -> list[dict[str, str]]:
-        """Compose chat messages incorporating retrieved context."""
-        if chunks:
-            context_blocks = []
-            for chunk in chunks:
-                document_id = chunk.get("document_id") or "Unknown"
-                chunk_index = chunk.get("chunk_index")
-                chunk_label = f"[Document: {document_id}, Chunk: {chunk_index if chunk_index is not None else 'N/A'}]"
-                content = (chunk.get("content") or "").strip()
-                context_blocks.append(f"{chunk_label}\n{content}")
-            context_text = "\n\n".join(context_blocks)
-        else:
-            context_text = (
-                "No relevant context was retrieved. If the query cannot be answered, "
-                "state that the repository does not contain sufficient information."
-            )
+        """Compose chat messages incorporating retrieved context.
+
+        Only called with at least one chunk: an empty retrieval returns the
+        nothing-found result before any prompt is built.
+        """
+        context_blocks = []
+        for chunk in chunks:
+            document_id = chunk.get("document_id") or "Unknown"
+            chunk_index = chunk.get("chunk_index")
+            chunk_label = f"[Document: {document_id}, Chunk: {chunk_index if chunk_index is not None else 'N/A'}]"
+            content = (chunk.get("content") or "").strip()
+            context_blocks.append(f"{chunk_label}\n{content}")
+        context_text = "\n\n".join(context_blocks)
 
         if graph_context:
             context_text = f"{context_text}\n\n{graph_context}".strip()
@@ -878,7 +914,12 @@ class RagService:
     def _extract_citations(
         self, answer: str, chunks: list[dict[str, Any]]
     ) -> list[dict[str, Any]]:
-        """Parse citations in the model output and align them with retrieved chunks."""
+        """Parse citations in the model output and keep those naming a retrieved chunk.
+
+        A citation must resolve to evidence that was retrieved, so a label that
+        matches no retrieved chunk is dropped, and an answer that cites nothing
+        gets no citations rather than one made up for it.
+        """
         citations: list[dict[str, Any]] = []
         seen: set[tuple[str, str]] = set()
 
@@ -891,22 +932,8 @@ class RagService:
             seen.add(key)
 
             chunk = self._match_chunk(document_label, chunk_label, chunks)
-            citations.append(self._build_citation(chunk, document_label, chunk_label))
-
-        if not citations and chunks:
-            # Provide a fallback citation anchored to the highest-scoring chunk.
-            top_chunk = chunks[0]
-            citations.append(
-                self._build_citation(
-                    top_chunk,
-                    str(top_chunk.get("document_id") or ""),
-                    str(
-                        top_chunk.get("chunk_index")
-                        if top_chunk.get("chunk_index") is not None
-                        else ""
-                    ),
-                )
-            )
+            if chunk is not None:
+                citations.append(self._build_citation(chunk))
 
         return citations
 
@@ -942,36 +969,16 @@ class RagService:
         return None
 
     @staticmethod
-    def _build_citation(
-        chunk: dict[str, Any] | None,
-        document_label: str,
-        chunk_label: str,
-    ) -> dict[str, Any]:
-        """Create a structured citation payload."""
-        chunk_index: int | None = None
-        if chunk is not None:
-            chunk_index = chunk.get("chunk_index")
-        else:
-            try:
-                chunk_index = int(chunk_label)
-            except (ValueError, TypeError):
-                chunk_index = None
-
+    def _build_citation(chunk: dict[str, Any]) -> dict[str, Any]:
+        """Create a structured citation payload for a retrieved chunk."""
+        content = chunk.get("content")
         return {
-            "document_id": (
-                chunk.get("document_id")
-                if chunk is not None
-                else (document_label or None)
-            ),
-            "chunk_id": chunk.get("chunk_id") if chunk is not None else None,
-            "chunk_index": chunk_index,
-            "source_type": chunk.get("source_type") if chunk is not None else None,
-            "score": chunk.get("score") if chunk is not None else None,
-            "snippet": (
-                chunk.get("content")[:280]
-                if chunk is not None and chunk.get("content")
-                else None
-            ),
+            "document_id": chunk.get("document_id"),
+            "chunk_id": chunk.get("chunk_id"),
+            "chunk_index": chunk.get("chunk_index"),
+            "source_type": chunk.get("source_type"),
+            "score": chunk.get("score"),
+            "snippet": content[:280] if content else None,
         }
 
     def _record_cost_events(

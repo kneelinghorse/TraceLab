@@ -10,6 +10,7 @@ from fastapi.testclient import TestClient
 from app.api.v1 import search as search_router
 from app.core.config import settings
 from app.main import app
+from app.schemas.rag import RagResponse
 from app.services import rag_service as rag_module
 from app.services.cache_metrics import CacheMetrics
 from app.services.pedr.search_orchestrator import (
@@ -65,7 +66,7 @@ class _FakePEDROrchestrator:
 
     def __init__(self, results: list[dict[str, Any]] | None = None):
         self.calls: list[dict[str, Any]] = []
-        default_results = results or [
+        default_results = results if results is not None else [
             {
                 "chunk_id": "chunk-1",
                 "content": "Policy frameworks emphasize iterative experimentation and measurement.",
@@ -728,3 +729,96 @@ def test_semantic_cache_hit_rate_reaches_target(monkeypatch):
     hit_rate = workload_cache.metrics.hit_rate()
     assert 0.15 <= hit_rate <= 0.25
     assert len(fake_pedr.calls) == 8  # 8 cache misses = 8 PEDR calls
+
+
+# RAG-2: a citation resolves to a chunk that was retrieved, or it is not made (Rule 2
+# of the Librarian roadmap: if it cannot cite, it does not assert). Each of the three
+# tests below fails when its fix is reverted; the mutation runs are in the receipt.
+
+
+def _service_answering(monkeypatch, content, *, results=None):
+    """A RagService over the fake retrieval whose model always replies ``content``."""
+    fake_client = _FakeOpenAIClient(content)
+    cache = _NoOpCacheService()
+    monkeypatch.setattr(rag_module, "_openai_import_error", None, raising=False)
+    monkeypatch.setattr(rag_module, "OpenAI", object, raising=False)
+    service = rag_module.RagService(
+        pedr_orchestrator=_FakePEDROrchestrator(results=results),
+        embedding_service=_FakeEmbeddingService(),
+        cache_service=cache,
+        client=fake_client,
+        model="gpt-test",
+        default_temperature=0.0,
+        cost_monitor=None,
+    )
+    return service, fake_client, cache
+
+
+def test_empty_retrieval_returns_nothing_found_without_asking_the_model(monkeypatch):
+    """With nothing retrieved there is nothing to cite, so the model is never asked.
+
+    Asked anyway, it answered and cited a chunk that did not exist ("[Document:
+    Unknown, Chunk: N/A]" in production, found by RAG-1). The nothing-found result
+    also stays out of the semantic cache, which would otherwise keep answering
+    "nothing" for a day after a matching document was indexed.
+    """
+    service, fake_client, cache = _service_answering(
+        monkeypatch, "An invented answer. [Document: doc-1, Chunk: 0]", results=[]
+    )
+
+    result = service.run_query(
+        query="What does the corpus say about lunar agriculture?",
+        top_k=5,
+        project_id="proj-1",
+    )
+
+    assert fake_client.chat.completions.requests == []
+    assert result["no_evidence"] is True
+    assert result["answer"] == "Nothing in this project answers that question."
+    assert result["citations"] == []
+    assert result["sources"] == []
+    assert cache.stored == 0
+    assert RagResponse.model_validate(result).no_evidence is True
+
+
+def test_citation_to_an_unretrieved_document_is_dropped(monkeypatch):
+    """A label that names no retrieved chunk is a fabricated citation; it never reaches the caller.
+
+    Before RAG-2 any "[Document: X, Chunk: N]" in the model output became a
+    citation with document_id X and chunk_id None, a link to nothing.
+    """
+    service, _client, _cache = _service_answering(
+        monkeypatch,
+        "Delivery is iterative. [Document: doc-1, Chunk: 0] "
+        "Budgets doubled last year. [Document: doc-404, Chunk: 7]",
+    )
+
+    result = service.run_query(
+        query="How are delivery budgets described?", top_k=5, project_id="proj-1"
+    )
+
+    cited = result["citations"]
+    retrieved = {source["chunk_id"] for source in result["sources"]}
+    assert "doc-404" not in {citation["document_id"] for citation in cited}
+    assert cited, "the citation that does resolve is kept"
+    assert all(citation["chunk_id"] in retrieved for citation in cited)
+
+
+def test_uncited_answer_gets_no_citation_to_the_top_chunk(monkeypatch):
+    """An answer that cites nothing is not handed a citation it never made.
+
+    Before RAG-2 the top-scoring chunk was attached as a fallback, so an answer
+    grounded in nothing looked grounded. Retrieval did find chunks here, so it is
+    an ordinary uncited answer, not the nothing-found result.
+    """
+    service, _client, _cache = _service_answering(
+        monkeypatch, "Delivery is described as iterative throughout the corpus."
+    )
+
+    result = service.run_query(
+        query="Summarize the delivery philosophy.", top_k=5, project_id="proj-1"
+    )
+
+    assert result["sources"], "chunks were retrieved, so a fallback had one to cite"
+    assert result["citations"] == []
+    assert result["no_evidence"] is False

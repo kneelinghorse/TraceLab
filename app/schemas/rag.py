@@ -118,3 +118,10 @@ class RagResponse(BaseModel):
     quality: QualityReport
     routing: RoutingDetails
     search_mode: Literal["semantic", "keyword", "hybrid"]
+    no_evidence: bool = Field(
+        default=False,
+        description=(
+            "True when nothing in scope was retrieved: the model was not asked, "
+            "the answer says so, and citations is empty."
+        ),
+    )
