@@ -452,7 +452,8 @@ class RagService:
             search_kwargs["allowed_project_ids"] = allowed_project_ids
         pedr_response = self.pedr_orchestrator.search(**search_kwargs)
 
-        # Convert PEDR results to dict format for context compression
+        # Convert PEDR results to dict format for context compression. A chunk with
+        # no text gives the model nothing to read or cite, so it is left out.
         retrieved_chunks = [
             {
                 "chunk_id": r.chunk_id,
@@ -465,6 +466,7 @@ class RagService:
                 "embedding": r.embedding,
             }
             for r in pedr_response.results
+            if (r.content or "").strip()
         ]
 
         compressed_chunks, compression_metrics = compress_context(
@@ -589,7 +591,7 @@ class RagService:
         compression: dict[str, Any],
         latency_ms: float,
     ) -> dict[str, Any]:
-        """Return the nothing-found result for a scope where retrieval found nothing.
+        """Return the nothing-found result for a scope where retrieval found no text.
 
         It has the empty-scope result's shape, since both are answers with no
         evidence behind them and no model call.
@@ -603,7 +605,9 @@ class RagService:
         result["latency_ms"] = round(latency_ms, 2)
         result["compression"] = compression
         result["quality"]["hard_failures"] = ["no_evidence"]
-        result["quality"]["reasons"] = ["Retrieval returned no chunks for this query."]
+        result["quality"]["reasons"] = [
+            "Retrieval returned no chunks with text for this query."
+        ]
         return result
 
     @staticmethod

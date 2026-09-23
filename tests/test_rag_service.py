@@ -822,3 +822,74 @@ def test_uncited_answer_gets_no_citation_to_the_top_chunk(monkeypatch):
     assert result["sources"], "chunks were retrieved, so a fallback had one to cite"
     assert result["citations"] == []
     assert result["no_evidence"] is False
+
+
+# RAG-3: the model only ever sees chunks with text. In production every retrieved
+# chunk arrived with no text, so the model was asked about "[Document: Unknown,
+# Chunk: N/A]" with nothing under it and answered that the context was empty.
+
+_TEXT_CHUNK = {
+    "chunk_id": "chunk-1",
+    "content": "Policy frameworks emphasize iterative experimentation and measurement.",
+    "document_id": "doc-1",
+    "project_id": "proj-1",
+    "chunk_index": 0,
+    "source_type": "report",
+    "rrf_score": 0.93,
+    "embedding": [0.92, 0.2, 0.0],
+}
+
+
+def test_chunk_without_text_never_reaches_the_model(monkeypatch):
+    """A hollow chunk is left out of the prompt, so only real text can be cited.
+
+    The hollow chunk scores 0.9 here, above the compression threshold, so only
+    leaving it out keeps it from the model.
+    """
+    hollow = {"chunk_id": "graph-only", "content": "", "rrf_score": 0.9}
+    service, fake_client, _cache = _service_answering(
+        monkeypatch,
+        "Measurement is iterative. [Document: doc-1, Chunk: 0]",
+        results=[hollow, _TEXT_CHUNK],
+    )
+
+    result = service.run_query(
+        query="How is experimentation measured?", top_k=5, project_id="proj-1"
+    )
+
+    prompt = fake_client.chat.completions.requests[0]["messages"][1]["content"]
+    assert "[Document: Unknown, Chunk: N/A]" not in prompt
+    assert _TEXT_CHUNK["content"] in prompt
+    assert [source["chunk_id"] for source in result["sources"]] == ["chunk-1"]
+    assert [citation["chunk_id"] for citation in result["citations"]] == ["chunk-1"]
+
+
+def test_retrieval_with_no_text_returns_nothing_found_without_asking_the_model(
+    monkeypatch,
+):
+    """When no retrieved chunk has text there is nothing to cite, so nothing is asserted.
+
+    This was production's shape before RAG-3: five hollow chunks, compression
+    keeping one under its at-least-one rule, and a model call over empty context.
+    """
+    service, fake_client, cache = _service_answering(
+        monkeypatch,
+        "The provided context contains no information. [Document: Unknown, Chunk: N/A]",
+        results=[
+            {"chunk_id": "graph-1", "content": "", "rrf_score": 0.006},
+            {"chunk_id": "graph-2", "content": "   ", "rrf_score": 0.005},
+        ],
+    )
+
+    result = service.run_query(
+        query="Which signals trigger escalation to a stronger model?",
+        top_k=5,
+        project_id="proj-1",
+    )
+
+    assert fake_client.chat.completions.requests == []
+    assert result["no_evidence"] is True
+    assert result["answer"] == "Nothing in this project answers that question."
+    assert result["sources"] == []
+    assert result["citations"] == []
+    assert cache.stored == 0

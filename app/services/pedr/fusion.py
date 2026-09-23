@@ -60,7 +60,7 @@ class FusedResult:
     # Layer contributions
     layer_ranks: dict[str, int]  # layer_name -> rank (0 if not present)
     layer_scores: dict[str, float]  # layer_name -> original score
-    # Original data from best-ranked layer
+    # Data from the best-ranked layer, with the fields it lacks from the others
     data: dict[str, Any]
     # Metadata
     contributing_layers: list[str]
@@ -132,7 +132,8 @@ class RRFFusion:
         start = time.perf_counter()
 
         # Collect all unique result IDs and their layer contributions
-        result_data: dict[str, dict[str, Any]] = {}  # id -> best result data
+        # id -> [(rank, record)], one entry per layer that returned it
+        layer_records: dict[str, list[tuple[int, dict[str, Any]]]] = {}
         layer_ranks: dict[str, dict[str, int]] = {}  # id -> {layer: rank}
         layer_scores: dict[str, dict[str, float]] = {}  # id -> {layer: score}
 
@@ -149,21 +150,21 @@ class RRFFusion:
                 if result_id not in layer_ranks:
                     layer_ranks[result_id] = {}
                     layer_scores[result_id] = {}
-                    result_data[result_id] = {}
+                    layer_records[result_id] = []
 
                 # Store rank and score
                 layer_ranks[result_id][layer_name] = rank_idx
                 layer_scores[result_id][layer_name] = float(
                     result.get("score") or result.get("combined_score") or 0.0
                 )
+                layer_records[result_id].append((rank_idx, result))
 
-                # Keep best (lowest rank) result data
-                if not result_data[result_id] or rank_idx < min(
-                    layer_ranks[result_id].get(ln, float("inf"))
-                    for ln in layer_ranks[result_id]
-                    if ln != layer_name
-                ):
-                    result_data[result_id] = dict(result)
+        # One record per ID: the best-ranked layer's, with every field it lacks
+        # filled from the other layers
+        result_data = {
+            result_id: _merge_layer_records(records)
+            for result_id, records in layer_records.items()
+        }
 
         # Calculate RRF scores
         fused_results: list[tuple[str, float, dict[str, int], dict[str, float]]] = []
@@ -252,7 +253,7 @@ class RRFFusion:
 
         layer_results = [
             LayerResult(layer_name=name, results=results)
-            for name, results in zip(layer_names, layer_dicts)
+            for name, results in zip(layer_names, layer_dicts, strict=False)
         ]
 
         output = self.fuse(layer_results, id_key=id_key, limit=limit)
@@ -324,6 +325,32 @@ def rrf_score(ranks: Sequence[int], *, k: int = RRF_K) -> float:
         if rank > 0:
             score += 1.0 / (k + rank)
     return score
+
+
+def _merge_layer_records(records: list[tuple[int, dict[str, Any]]]) -> dict[str, Any]:
+    """Merge one result's records from several layers, best rank first.
+
+    The best-ranked record keeps every field it supplies, and each field it lacks
+    comes from the next-best record that has it. A graph record carries only the
+    chunk id and traversal fields, so keeping it whole would drop the text and
+    ids the semantic and lexical layers supplied for the same chunk.
+    """
+    ordered = sorted(records, key=lambda record: record[0])
+    merged = dict(ordered[0][1])
+    for _, record in ordered[1:]:
+        for key, value in record.items():
+            if _is_missing(merged.get(key)) and not _is_missing(value):
+                merged[key] = value
+    return merged
+
+
+def _is_missing(value: Any) -> bool:
+    """True for a field a layer did not supply: None, or an empty string or collection."""
+    if value is None:
+        return True
+    if isinstance(value, str | list | tuple | dict):
+        return len(value) == 0
+    return False
 
 
 def _build_fusion_telemetry(

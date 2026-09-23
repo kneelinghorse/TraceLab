@@ -1506,13 +1506,19 @@ def _filter_graph_payloads_by_scope(
     project_id: str | None = None,
     document_id: str | None = None,
 ) -> list[dict[str, Any]]:
-    """Scope graph payloads using authoritative chunk ownership in one query."""
-    if allowed_project_scope is None:
+    """Scope graph payloads using authoritative chunk ownership in one query.
+
+    Graph expansion follows edges across projects, so an explicit project or
+    document filter applies here for every caller. The authorization scope
+    applies only when there is one: with a None scope and no filter, the
+    payloads pass through untouched.
+    """
+    if allowed_project_scope is None and project_id is None and document_id is None:
         return results
     if allowed_project_scope == () or not results:
         return []
 
-    allowed = set(allowed_project_scope)
+    allowed = set(allowed_project_scope) if allowed_project_scope is not None else None
     parsed_chunk_ids: dict[int, str] = {}
     valid_chunk_ids: dict[str, UUID] = {}
     for index, result in enumerate(results):
@@ -1575,7 +1581,7 @@ def _filter_graph_payloads_by_scope(
             and str(claimed_document_id) != resolved_document_id
         ):
             continue
-        if resolved_project_id not in allowed:
+        if allowed is not None and resolved_project_id not in allowed:
             continue
         if project_id is not None and resolved_project_id != str(project_id):
             continue
