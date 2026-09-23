@@ -38,7 +38,7 @@ The feature merged as PR #383 (`814c166`, squash). This receipt PR also carries 
 
 ## Mutation proof
 
-`mutation_proof.py` disables one chunk-list rule at a time and runs the Librarian tests through vitest's JSON reporter. Each run must turn exactly its expected tests red. The script refuses to start unless the target files match HEAD, restores each file after its run, and checks them against HEAD again at the end. On `bb0e0c4` (main plus this receipt's test fix), all 8 runs came out as expected (`mutation-proof.json`, logs in `mutation-logs/`).
+`mutation_proof.py` disables one chunk-list rule at a time and runs the Librarian tests through vitest's JSON reporter. Each run must turn exactly its expected tests red. The script refuses to start unless the target files match HEAD, restores each file after its run, and checks them against HEAD again at the end. On `39887d7` (main plus this receipt's test fix and the script as committed), all 8 runs came out as expected (`mutation-proof.json`, logs in `mutation-logs/`).
 
 | run | what is disabled | red tests (the rest pass) |
 | --- | --- | --- |

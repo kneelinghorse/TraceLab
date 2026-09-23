@@ -1,6 +1,6 @@
-JSON report written to /var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/tmp32150aw1.json
+JSON report written to /var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/tmp0mxazsn5.json
 [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
-(node:38077) TimeoutNaNWarning: NaN is not a number.
+(node:51174) TimeoutNaNWarning: NaN is not a number.
 Timeout duration was set to 1.
 (Use `node --trace-warnings ...` to show where the warning was created)
 
@@ -84,4 +84,7 @@ Number of calls: [1m1[22m
     at Proxy.<anonymous> (file:///Users/systemsystems/portfolio/TraceLab/frontend/node_modules/@vitest/expect/dist/index.js:1029:14)
     at Proxy.methodWrapper (file:///Users/systemsystems/portfolio/TraceLab/frontend/node_modules/chai/index.js:1686:25)
     at /Users/systemsystems/portfolio/TraceLab/frontend/src/__tests__/librarian.test.tsx:461:31
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at processTimers (node:internal/timers:543:7)
     at file:///Users/systemsystems/portfolio/TraceLab/frontend/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20
