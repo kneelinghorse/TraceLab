@@ -414,12 +414,20 @@ def test_graph_layer_depth2_performance_under_200ms(db_session):
     event.listen(bind, "before_cursor_execute", before_sql)
     event.listen(bind, "after_cursor_execute", after_sql)
     gc.callbacks.append(observe_gc)
+    # Time the graph layer, not the heap the integration suite has built up in this
+    # process: on four CI runs (2026-09-22/23) a generation-2 collection that heap
+    # triggered took 210-255 ms inside this call while its SQL took under 4 ms.
+    # timeit switches collection off while timing for the same reason.
+    gc_was_enabled = gc.isenabled()
+    gc.disable()
     try:
         result = service.search(
             [seed_urn],
             config=GraphLayerConfig(max_depth=2, max_candidates=2000),
         )
     finally:
+        if gc_was_enabled:
+            gc.enable()
         gc.callbacks.remove(observe_gc)
         event.remove(bind, "before_cursor_execute", before_sql)
         event.remove(bind, "after_cursor_execute", after_sql)
