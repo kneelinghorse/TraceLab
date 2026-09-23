@@ -43,7 +43,7 @@ reused only when its API base matches `TRACELAB_API_URL`. Automation may set
 
 ## Tool surface
 
-Version 1.2.0 exposes nine action-clustered tools / 51 actions:
+Version 2.0.0 exposes nine action-clustered tools / 49 actions:
 
 | Tool | Actions |
 | --- | --- |

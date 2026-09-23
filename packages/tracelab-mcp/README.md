@@ -6,7 +6,7 @@ collection management, mission authoring, DeepSearch execution, and report
 generation, plus cross-session evidence capture — against a TraceLab knowledge
 base.
 
-- **9 action-clustered tools / 51 actions in source** (one tool per noun, dispatched by `action`)
+- **9 action-clustered tools / 49 actions in source** (one tool per noun, dispatched by `action`)
 - **RFC 8628 device-code login** — install, run, click a link, you're in
 - Works out of the box with **Claude Desktop**, **Claude Code**, and any
   Model Context Protocol client over stdio
@@ -174,7 +174,7 @@ never leak across deployments.
 
 ## Tools
 
-Nine action-clustered tools / 51 actions in source. Each cluster exposes multiple actions
+Nine action-clustered tools / 49 actions in source. Each cluster exposes multiple actions
 selected via the `action` parameter.
 
 | Cluster | Actions | Purpose |
@@ -228,7 +228,7 @@ Existing actions also gain UI parameters:
 - `tracelab_mission.list`: optional `sort` = `created_desc` (default),
   `created_asc`, `updated_desc` or `updated_asc`. Without `sort` the request URL
   is unchanged. (The 1.2.0 `view` and `reason` parameters were removed with the
-  attention surface; see the unreleased notes below.)
+  attention surface; see the 2.0.0 notes below.)
 - `tracelab_collection.list`: optional `project_id`, `page`, `page_size` (max 100).
   `get` returns `instructions`; `create` accepts optional `instructions` (max
   20,000 characters).
@@ -259,7 +259,7 @@ the web UI by decision #426; the MCP never performs them on the user's behalf.
 | `tracelab_report.update` | `PUT /reports/{id}`. Required `report_id` plus `title` and/or `status` (`draft` or `final`). |
 | `tracelab_project.neighborhood` | `GET /graph/neighborhood`. Required `root_type` (project/document/mission/report/collection/evidence) and `root_id`. Optional `depth` (1, max 2), `per_relation_limit` (12, max 50), `max_nodes` (60, max 150). Nodes carry canonical links; groups carry server totals. |
 
-### Recent activity (ACT-1, unreleased — next major)
+### Recent activity (ACT-1, 2.0.0)
 
 Decision #459 replaced the inbox, "needs attention", mission reviews and saved
 mission views with one recency-ordered activity stream. The 1.2.0 actions
@@ -278,7 +278,7 @@ Marking activity as viewed (`PUT /activity/viewed`) stays in the web UI.
 Home, activity and evidence routes reject service principals: use the
 device-code login or a user API key.
 
-### Creating in a Space (PERSONAL-2, unreleased)
+### Creating in a Space (PERSONAL-2, 2.0.0)
 
 `tracelab_project.create` takes an optional `workspace_id` (UUID), the Space to
 create the project in. Omit it and the project lands in your personal Space. You
