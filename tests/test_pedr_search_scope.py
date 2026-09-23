@@ -921,11 +921,8 @@ def test_graph_scope_resolves_missing_project_ids_in_one_batch(
     assert response.scope_verified is True
 
 
-def test_graph_none_scope_with_explicit_filters_preserves_legacy_results(
-    monkeypatch,
-):
-    """None scope adds no graph resolver or post-filter to the legacy path."""
-    project_id, document_id = uuid4(), uuid4()
+def test_graph_none_scope_without_filters_adds_no_resolver(monkeypatch):
+    """With no scope and no explicit filter there is nothing to enforce, so no graph query."""
     graph_chunk_id = uuid4()
     provider_calls: list[dict[str, Any]] = []
 
@@ -934,8 +931,8 @@ def test_graph_none_scope_with_explicit_filters_preserves_legacy_results(
         return [
             {
                 "chunk_id": str(uuid4()),
-                "document_id": str(document_id),
-                "project_id": str(project_id),
+                "document_id": str(uuid4()),
+                "project_id": str(uuid4()),
                 "content": "seed",
                 "score": 1.0,
             }
@@ -948,7 +945,7 @@ def test_graph_none_scope_with_explicit_filters_preserves_legacy_results(
                 results=[
                     {
                         "chunk_id": str(graph_chunk_id),
-                        "content": "legacy cross-expansion",
+                        "content": "unrestricted cross-expansion",
                         "score": 0.8,
                     }
                 ],
@@ -959,7 +956,7 @@ def test_graph_none_scope_with_explicit_filters_preserves_legacy_results(
         orchestrator_module,
         "SessionLocal",
         lambda: (_ for _ in ()).throw(
-            AssertionError("None scope reached the graph ownership resolver")
+            AssertionError("an unfiltered None scope reached the graph resolver")
         ),
     )
     monkeypatch.setattr(settings, "pedr_cache_enabled", False)
@@ -977,19 +974,117 @@ def test_graph_none_scope_with_explicit_filters_preserves_legacy_results(
     )
 
     response = orchestrator.search(
-        query="legacy explicit graph",
+        query="unrestricted unfiltered graph",
         top_k=10,
-        project_id=str(project_id),
-        document_id=str(document_id),
         allowed_project_ids=None,
     )
 
     assert graph_chunk_id in {UUID(result.chunk_id) for result in response.results}
     assert response.metadata.graph_candidates_expanded == 1
     assert response.scope_verified is False
-    assert provider_calls[0]["project_id"] == str(project_id)
-    assert provider_calls[0]["document_id"] == str(document_id)
     assert "allowed_project_ids" not in provider_calls[0]
+
+
+def test_explicit_filters_apply_to_graph_results_for_an_unrestricted_caller(
+    monkeypatch, db_session
+):
+    """An owner's search of one document cannot pull another project's chunk in through graph.
+
+    Owners and admins search with a None scope, and before RAG-3 their graph
+    results skipped the filter they asked for, because graph expansion follows
+    edges across projects and only a scoped caller's results were checked.
+    """
+    project = Project(name="Searched project")
+    other_project = Project(name="Other project")
+    db_session.add_all([project, other_project])
+    db_session.flush()
+    document = Document(project_id=project.id, name="Searched document")
+    sibling_document = Document(project_id=project.id, name="Sibling document")
+    other_document = Document(project_id=other_project.id, name="Other document")
+    db_session.add_all([document, sibling_document, other_document])
+    db_session.flush()
+    seed_chunk = DocumentChunk(document_id=document.id, chunk_index=0, content="seed")
+    graph_chunk = DocumentChunk(
+        document_id=document.id, chunk_index=1, content="same document"
+    )
+    sibling_chunk = DocumentChunk(
+        document_id=sibling_document.id, chunk_index=0, content="same project"
+    )
+    other_chunk = DocumentChunk(
+        document_id=other_document.id, chunk_index=0, content="other project"
+    )
+    db_session.add_all([seed_chunk, graph_chunk, sibling_chunk, other_chunk])
+    db_session.commit()
+
+    def _lexical(**_kwargs: Any) -> list[dict[str, Any]]:
+        return [
+            {
+                "chunk_id": str(seed_chunk.id),
+                "document_id": str(document.id),
+                "project_id": str(project.id),
+                "content": "seed",
+                "score": 1.0,
+            }
+        ]
+
+    class _Graph:
+        def expand_from_results(self, _results, **_kwargs):
+            return LayerResult(
+                layer_name="graph",
+                results=[
+                    {"chunk_id": str(other_chunk.id), "score": 0.9},
+                    {"chunk_id": str(sibling_chunk.id), "score": 0.85},
+                    {"chunk_id": str(graph_chunk.id), "score": 0.8},
+                ],
+                metadata={"total_candidates": 3},
+            )
+
+    class _SessionProxy:
+        def __init__(self) -> None:
+            self.execute_count = 0
+
+        def execute(self, statement):
+            self.execute_count += 1
+            return db_session.execute(statement)
+
+        def close(self) -> None:
+            return None
+
+    session_proxy = _SessionProxy()
+    monkeypatch.setattr(orchestrator_module, "SessionLocal", lambda: session_proxy)
+    monkeypatch.setattr(settings, "pedr_cache_enabled", False)
+
+    def _search(**filters: Any) -> set[str]:
+        orchestrator = PEDRSearchOrchestrator(
+            config=PEDRConfig(
+                enable_semantic=False,
+                enable_syntactic=False,
+                enable_pragmatic=False,
+                enable_governance=False,
+                enable_graph=True,
+            ),
+            lexical_search=_lexical,
+            graph_service=_Graph(),
+            telemetry_enabled=False,
+        )
+        response = orchestrator.search(
+            query="owner search of one project",
+            top_k=10,
+            allowed_project_ids=None,
+            **filters,
+        )
+        assert response.scope_verified is False
+        return {result.chunk_id for result in response.results}
+
+    by_project = _search(project_id=str(project.id))
+    by_document = _search(project_id=str(project.id), document_id=str(document.id))
+
+    assert str(other_chunk.id) not in by_project
+    assert {str(graph_chunk.id), str(sibling_chunk.id)} <= by_project
+    assert str(other_chunk.id) not in by_document
+    assert str(sibling_chunk.id) not in by_document
+    assert str(graph_chunk.id) in by_document
+    assert session_proxy.execute_count == 2
 
 
 class _PassThroughQuality:

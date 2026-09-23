@@ -212,6 +212,70 @@ class TestRRFFusion:
         assert merged[0]["rrf_score"] > 0
         assert merged[0]["contributing_layers"] == ["l1", "l2"]
 
+    def test_graph_ranked_chunk_keeps_the_semantic_text_and_ids(self):
+        """A chunk the graph ranks above semantic keeps the text and ids semantic supplied.
+
+        Graph records carry only a chunk id and traversal fields. Fusion used to keep
+        the best-ranked layer's record whole, so in production every chunk the graph
+        ranked better (here semantic 18, graph 2, as in RAG-2's probe) reached the
+        model with no text, and the answer said the context contained nothing.
+        """
+        semantic_record = {
+            "chunk_id": "c1",
+            "content": "Escalate when the router's confidence falls below 0.85.",
+            "document_id": "doc-1",
+            "project_id": "proj-1",
+            "chunk_index": 4,
+            "source_type": "report",
+            "source_origin": "upload",
+            "score": 0.41,
+            "embedding": [0.1, 0.2],
+        }
+        semantic = LayerResult(
+            layer_name="semantic",
+            results=[
+                *(
+                    {"chunk_id": f"s{i}", "content": "other", "score": 0.5}
+                    for i in range(17)
+                ),
+                semantic_record,
+            ],
+        )
+        graph = LayerResult(
+            layer_name="graph",
+            results=[
+                {"urn": "urn:research:chunk:doc-2-chunk-0", "chunk_id": "g0", "score": 0.5},
+                {
+                    "urn": "urn:research:chunk:doc-1-chunk-4",
+                    "chunk_id": "c1",
+                    "score": 0.4,
+                    "combined_score": 0.4,
+                    "depth": 1,
+                    "seed_urn": "urn:research:chunk:doc-1-chunk-3",
+                    "entity_type": "chunk",
+                    "entity_id": "doc-1-chunk-4",
+                },
+            ],
+        )
+
+        output = RRFFusion().fuse([semantic, graph])
+        fused = next(result for result in output.results if result.id == "c1")
+
+        assert fused.layer_ranks == {"semantic": 18, "graph": 2}
+        for field in (
+            "content",
+            "document_id",
+            "project_id",
+            "chunk_index",
+            "source_type",
+            "source_origin",
+            "embedding",
+        ):
+            assert fused.data[field] == semantic_record[field], field
+        # The best-ranked record still wins every field it did supply.
+        assert fused.data["score"] == 0.4
+        assert fused.data["depth"] == 1
+
     def test_fusion_output_emits_telemetry(self):
         """Fusion output includes aggregated telemetry stats."""
         fusion = RRFFusion()
@@ -651,6 +715,46 @@ class TestPEDRSearchOrchestrator:
         graph_service.expand_from_results.assert_called_once()
         assert "graph" in response.metadata.layers_used
         assert "graph1" in [r.chunk_id for r in response.results]
+
+    def test_graph_ranked_chunk_reaches_the_response_with_its_text(self):
+        """POST /pedr/search and RAG get the chunk's text when the graph outranks semantic."""
+        semantic_search = MagicMock(
+            return_value=[
+                {"chunk_id": "top", "content": "top", "score": 0.5},
+                {
+                    "chunk_id": "shared",
+                    "content": "Escalate on low router confidence.",
+                    "document_id": "doc-1",
+                    "project_id": "proj-1",
+                    "chunk_index": 4,
+                    "source_type": "report",
+                    "score": 0.41,
+                },
+            ]
+        )
+        graph_service = MagicMock()
+        graph_service.expand_from_results.return_value = LayerResult(
+            layer_name="graph",
+            results=[{"chunk_id": "shared", "score": 0.4, "depth": 1}],
+        )
+        orchestrator = PEDRSearchOrchestrator(
+            lexical_search=MagicMock(return_value=[]),
+            semantic_search=semantic_search,
+            graph_service=graph_service,
+            telemetry_enabled=False,
+        )
+
+        response = orchestrator.search(
+            query="rag-3 graph-ranked chunk keeps its text", enable_graph=True
+        )
+
+        shared = next(r for r in response.results if r.chunk_id == "shared")
+        assert shared.layer_ranks == {"semantic": 2, "graph": 1}
+        assert shared.content == "Escalate on low router confidence."
+        assert shared.document_id == "doc-1"
+        assert shared.project_id == "proj-1"
+        assert shared.chunk_index == 4
+        assert shared.source_type == "report"
 
     def test_graph_layer_config_passed_through(self, mock_lexical, mock_semantic):
         """Graph layer receives the configured traversal settings."""
