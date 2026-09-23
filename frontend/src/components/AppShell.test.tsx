@@ -11,7 +11,6 @@ vi.mock("next/router", () => ({ useRouter: () => mocks.router }));
 vi.mock("@/contexts/AuthContext", () => ({ useAuth: () => mocks.auth }));
 vi.mock("@/contexts/RoleContext", () => ({ useRole: () => mocks.role }));
 vi.mock("@/lib/api/navigation", () => ({ navigationApi: { search: async () => ({ groups: [] }) } }));
-vi.mock("@/lib/api/search", () => ({ searchApi: { history: async () => ({ entries: [] }) } }));
 vi.mock("@/lib/api/savedSearches", () => ({ savedSearchesApi: { list: async () => ({ items: [] }) } }));
 vi.mock("@/lib/api/activity", async original => ({ ...await original<object>(), activityApi: { summary: async () => ({ generated_at: "2026-09-13T00:00:00", new_total: mocks.activity.mission + mocks.activity.evidence + mocks.activity.report, by_type: { ...mocks.activity } }), markViewed: async () => ({ viewed: 0, new_total: 0 }) } }));
 vi.mock("@/components/LoginPanel", () => ({ LoginPanel: () => <p>Sign in form</p> }));
@@ -21,6 +20,7 @@ import { SWRConfig } from "swr";
 import { AppShell } from "@/components/AppShell";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { openCommandPalette } from "@/lib/command-palette";
+import migrations from "@/lib/route-migrations.json";
 
 beforeEach(() => {
   localStorage.clear();
@@ -52,6 +52,9 @@ describe("the shared shell", () => {
     expect(screen.getByRole("link", { name: "Skip to content" }).getAttribute("href")).toBe("#main-content");
     expect(screen.getByRole("link", { name: "Saved searches" })).toBeTruthy();
     expect(within(nav).getByRole("link", { name: "Relationships" }).getAttribute("href")).toBe("/graph");
+    // A retired or redirecting alias (such as /search since QA-2) is never a navigation target.
+    const aliases = migrations.filter((row) => row.kind !== "page").map((row) => row.source);
+    expect(within(nav).getAllByRole("link").map((link) => link.getAttribute("href")).filter((href) => aliases.includes(href ?? ""))).toEqual([]);
   });
 
   it("shows new-item counts on the Missions, Evidence and Reports entries in the sidebar and the drawer, hidden at zero", async () => {
@@ -87,7 +90,7 @@ describe("the shared shell", () => {
     expect(document.activeElement).toBe(input);
     fireEvent.change(input, { target: { value: "evidence & citations" } });
     fireEvent.submit(input.closest("form")!);
-    expect(mocks.router.push).toHaveBeenCalledWith("/search?q=evidence%20%26%20citations");
+    expect(mocks.router.push).toHaveBeenCalledWith("/librarian?q=evidence%20%26%20citations");
     expect(screen.queryByRole("dialog", { name: "Search and navigation" })).toBeNull();
   });
 

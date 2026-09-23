@@ -44,15 +44,18 @@ derivative usage.
 
 ## Frontend Integration
 
-- **Search experience (`SearchExperience.tsx`)**
-  - Adds SWR-powered saved-search quick access alongside query history.
-  - Inline `SaveSearchButton` handles creation from the active query or from a history entry.
-  - `SavedSearchesList` surfaces run, load filters, and delete actions with usage stats.
-  - Running a saved search calls the execute endpoint, updates UI state, and refreshes SWR caches.
+- **The Librarian's chunk list (`components/librarian/ChunkList.tsx`)**, since Sprint 59 (QA-2,
+  decision #545), when the standalone Search page retired into the Librarian.
+  - "Save current search" (`SaveSearchButton`) saves the listed phrase with its project and a `top_k` of 20.
+  - `/librarian?saved=<id>` runs a saved search through the execute endpoint, the call that counts the run
+    and records it in search history, and lists the ranked semantic chunks it returns. The RAG answer the
+    endpoint also returns is not shown; "Ask the documents" is the Librarian's answer path.
+  - The list is never refetched on focus, because each execute call counts a run.
 
 - **Management page (`pages/saved-searches.tsx`)**
   - Dedicated AuthGate-protected page for editing metadata, adjusting `Top K`, or cleaning up entries.
-  - Shares the same SWR key so updates propagate instantly back to the search experience.
+  - Shares the same SWR key as the chunk list's save control. "Run now" opens `/librarian?saved=<id>`, as
+    does a saved search chosen in the command palette.
 
 All client requests go through `frontend/src/lib/api/savedSearches.ts`, which keeps
 snake_case payloads aligned with the FastAPI schema.
@@ -60,7 +63,8 @@ snake_case payloads aligned with the FastAPI schema.
 ## Validation & Tests
 
 - **Pytest**: `tests/test_saved_searches.py` covers CRUD, retention limits, and execute flow (with stubbed RAG/retrieval services).
-- **Manual checks**: exercise `/saved-searches` UI, leverage quick access panel on `/search`, and confirm history entries can be saved.
+- **Browser checks**: `frontend/tests/e2e/search-command.spec.ts` saves a search from the Librarian's chunk
+  list and reruns it from `/saved-searches` and from the command palette.
 - **Docs + Parity**: Exported backlog/context mirrors via `./cmos/cli.py db export backlog|contexts`,
   regenerated `cmos/SESSIONS.jsonl`, and ran `python cmos/scripts/validate_parity.py --check` (green).
 

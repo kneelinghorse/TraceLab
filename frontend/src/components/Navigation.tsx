@@ -27,7 +27,6 @@ export const navigationGroups: { label: string; admin?: boolean; items: Navigati
     { label: "Reports", href: "/reports", icon: "report" },
   ] },
   { label: "Discover", items: [
-    { label: "Search", href: "/search", icon: "search" },
     { label: "Relationships", href: "/graph", icon: "graph" },
     { label: "Saved searches", href: "/saved-searches", icon: "bookmark" },
   ] },

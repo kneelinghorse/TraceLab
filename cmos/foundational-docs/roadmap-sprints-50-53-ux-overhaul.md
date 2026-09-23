@@ -360,6 +360,7 @@ A UI mission is not done until all of the following are true. Each rule exists b
 | `/search/results` | `/search` | 51 (UX-9); retired 54 (ALIAS-1) | Retired; returns 404 |
 | `/missions/queue` | `/missions?status=queued` | 51 (UX-6); retargeted 53 (ACT-1); retired 54 (ALIAS-1) | Retired; returns 404 |
 | `/inbox` | `/` | 53 (ACT-1) | Permanent 308; the inbox was replaced by the recent activity stream on Home |
+| `/search` | `/librarian` | 59 (QA-2) | Permanent 308; the Search page retired into the Librarian's chunk list, which runs `?q=` and `?saved=` |
 
 Live redirects retain query parameters, including repeated values. Home is a replacement page, not an alias or a self-redirect. The executable map is `frontend/src/lib/route-migrations.json`; unit tests bind it to this maintained table, and the production smoke walks every row.
 

@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { savedSearchesApi } from "@/lib/api/savedSearches";
-import type { SearchFiltersState } from "@/components/SearchBar";
-import type { SaveSearchPreset } from "@/types/saved-searches";
+import type { SaveSearchPreset, SearchFiltersState } from "@/types/saved-searches";
 
 type SaveSearchButtonProps = {
   currentQuery: string;

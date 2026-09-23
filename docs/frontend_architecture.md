@@ -30,17 +30,16 @@ status. The Sprint 03 "Mission Protocol UI" notes this page replaces are in git 
 | `/collections`, `/collections/[id]` | `collections/*.tsx` | Collections and collection context |
 | `/missions`, `/missions/[id]`, `/missions/new`, `/missions/queue` | `missions/*.tsx` | Mission list with views and reason filters, run detail, authoring, queue |
 | `/reports`, `/reports/[id]` | `reports/*.tsx` | Reports |
-| `/search` | `search/index.tsx` | Research search |
-| `/librarian` | `librarian.tsx` | The Librarian (Sprint 57, LIB-1): conversation with typed provenance (prose vs cited corpus claims), mission draft with compiled contract and lint, explicit creation of a draft mission. Since LIB-2 the conversation, project and draft persist per user in localStorage (`lib/librarian/storage.ts`), a fresh draft takes focus, the three-step strip (`components/librarian/LibrarianSteps`) and the mission page's `?from=librarian` notice share one "don't show again" preference. Since QA-1, "Ask the documents" sends a turn in answer mode with a chosen budget (Short answer 600 tokens, Full synthesis 2000, `ANSWER_BUDGETS` in `lib/api/librarian.ts`): cited passages link to their chunks, uncited text renders as prose, and a refusal renders as a note that asserts nothing |
+| `/librarian` | `librarian.tsx` | The Librarian (Sprint 57, LIB-1): conversation with typed provenance (prose vs cited corpus claims), mission draft with compiled contract and lint, explicit creation of a draft mission. Since LIB-2 the conversation, project and draft persist per user in localStorage (`lib/librarian/storage.ts`), a fresh draft takes focus, the three-step strip (`components/librarian/LibrarianSteps`) and the mission page's `?from=librarian` notice share one "don't show again" preference. Since QA-1, "Ask the documents" sends a turn in answer mode with a chosen budget (Short answer 600 tokens, Full synthesis 2000, `ANSWER_BUDGETS` in `lib/api/librarian.ts`): cited passages link to their chunks, uncited text renders as prose, and a refusal renders as a note that asserts nothing. Since QA-2 (Sprint 59, decision #545), "List the chunks" is search inside the Librarian: `components/librarian/ChunkList.tsx` lists the 20 best chunks for a phrase from `POST /pedr/search` (the selected project, or every readable project), each linking to its `?chunk=&index=` place in the document, and saves the list as a collection or the phrase as a saved search. The URL carries it: `?q=<phrase>&project=<id>`, or `?saved=<id>`, which runs a saved search through `POST /saved-searches/{id}/execute` and lists its ranked chunks. The standalone Search page is retired and `/search` redirects here with its query |
 | `/graph` | `graph.tsx` | Relationship neighborhood (Sprint 52, UX-11) |
 | `/evidence`, `/evidence/[id]` | `evidence.tsx`, `evidence/[id].tsx` | Evidence browser and entry detail (Open report for the capturing mission's result report, from the `mission_result` link flag) |
-| `/saved-searches` | `saved-searches.tsx` | Saved searches |
+| `/saved-searches` | `saved-searches.tsx` | Saved searches; Run now opens `/librarian?saved=<id>` |
 | `/settings`, `/device` | `settings.tsx`, `device.tsx` | Account settings, device-code approval |
 | `/admin/users`, `/admin/spaces`, `/admin/observability`, `/admin/corrections` | `admin/*.tsx` | Admin surfaces behind `RequireAdmin` |
 
 `_app.tsx` mounts `AuthProvider`, `RoleProvider`, `ThemeProvider` and `AppShell`; `_document.tsx`
 carries the theme bootstrap. Legacy routes redirect: `frontend/src/lib/route-migrations.json`
-(eight mappings) feeds `redirects()` in `frontend/next.config.ts`, and the canonical map is the
+(ten rows: one page, two live redirects, seven retired aliases) feeds `redirects()` in `frontend/next.config.ts`, and the canonical map is the
 roadmap's Route Migration Map section. Redirects are covered by `frontend/tests/e2e/route-migration.spec.ts`.
 
 ## Shell
@@ -61,8 +60,10 @@ roadmap's Route Migration Map section. Redirects are covered by `frontend/tests/
   `data-theme` with semantic tokens only: no fixed palette classes and no `dark:` utilities, enforced by
   `frontend/scripts/check-token-colors.mjs`. High contrast is deferred to THEME-2 in Sprint 54.
 - **Command palette.** ⌘K / Ctrl-K opens `CommandPalette.tsx`: name lookup through
-  `lib/api/navigation.ts` (`GET /api/v1/navigation/search`), recent and saved searches, saved mission
-  views, and "Go to" entries derived from `navigationGroups`.
+  `lib/api/navigation.ts` (`GET /api/v1/navigation/search`), saved searches, saved mission
+  views, and "Go to" entries derived from `navigationGroups`. Enter searches research in the
+  Librarian's chunk list (`/librarian?q=`); a saved search opens `/librarian?saved=<id>`. Recent searches
+  left with the Search page in QA-2: the chunk list records no search history.
 
 ## Data layer (`frontend/src/lib/api`)
 

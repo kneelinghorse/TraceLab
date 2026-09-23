@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { SWRConfig } from "swr";
 
+import { HttpError } from "@/lib/api/http";
 import LibrarianPage from "@/pages/librarian";
 
 const mocks = vi.hoisted(() => ({
@@ -13,6 +14,14 @@ const mocks = vi.hoisted(() => ({
   createProject: vi.fn(),
   listSpaces: vi.fn(),
   push: vi.fn(),
+  query: {} as Record<string, string>,
+  pedrSearch: vi.fn(),
+  execute: vi.fn(),
+  savedList: vi.fn(),
+  createSaved: vi.fn(),
+  getDocument: vi.fn(),
+  createCollection: vi.fn(),
+  addChunk: vi.fn(),
 }));
 vi.mock("@/lib/api/librarian", async () => {
   const actual = await vi.importActual<typeof import("@/lib/api/librarian")>("@/lib/api/librarian");
@@ -24,14 +33,18 @@ vi.mock("@/contexts/AuthContext", () => ({
   useAuth: () => ({ isReady: true, isAuthenticated: true, user: { user_id: "reader" } }),
 }));
 vi.mock("@/components/AuthGate", () => ({ AuthGate: ({ children }: { children: React.ReactNode }) => <>{children}</> }));
-vi.mock("next/router", () => ({ useRouter: () => ({ query: {}, push: mocks.push, pathname: "/librarian" }) }));
+vi.mock("@/lib/api/search", () => ({ searchApi: { pedrSearch: mocks.pedrSearch } }));
+vi.mock("@/lib/api/savedSearches", () => ({ savedSearchesApi: { execute: mocks.execute, list: mocks.savedList, create: mocks.createSaved } }));
+vi.mock("@/lib/api/documents", () => ({ documentsApi: { getDocument: mocks.getDocument } }));
+vi.mock("@/lib/api/collections", () => ({ collectionsApi: { create: mocks.createCollection, addChunk: mocks.addChunk } }));
+vi.mock("next/router", () => ({ useRouter: () => ({ query: mocks.query, push: mocks.push, pathname: "/librarian" }) }));
 
 const projectId = "10000000-0000-4000-8000-000000000001";
 const evidenceId = "20000000-0000-4000-8000-000000000002";
 
-function page() {
+function page(swr: Record<string, unknown> = {}) {
   return render(
-    <SWRConfig value={{ provider: () => new Map(), dedupingInterval: 0, shouldRetryOnError: false }}>
+    <SWRConfig value={{ provider: () => new Map(), dedupingInterval: 0, shouldRetryOnError: false, ...swr }}>
       <LibrarianPage />
     </SWRConfig>,
   );
@@ -49,6 +62,7 @@ beforeEach(() => {
   // One Space, the reader's own: no picker, as for most members.
   mocks.listSpaces.mockResolvedValue([{ id: "space-mine", name: "Reader's Space", created_at: "", personal_owner_id: "reader" }]);
   mocks.push.mockResolvedValue(true);
+  mocks.query = {};
 });
 
 describe("Librarian page", () => {
@@ -344,5 +358,138 @@ describe("Librarian page, asking the documents", () => {
     expect(screen.getByRole("radio", { name: "Ask the documents" })).toBeDisabled();
     expect(screen.getByRole("radio", { name: "Talk it through" })).toBeChecked();
     expect(screen.queryByRole("radio", { name: "Full synthesis" })).toBeNull();
+  });
+});
+
+// QA-2: search absorbed into the Librarian. A phrase lists the ranked chunks that match
+// it, each opening at its place in the document; the list can be kept as a collection;
+// a saved search runs here, through the call that counts its runs (decision #545).
+describe("Librarian page, listing the chunks", () => {
+  const firstDocument = "50000000-0000-4000-8000-000000000005";
+  const secondDocument = "60000000-0000-4000-8000-000000000006";
+  const chunks = ["70000000-0000-4000-8000-000000000007", "80000000-0000-4000-8000-000000000008", "90000000-0000-4000-8000-000000000009"];
+
+  function hit(chunk_id: string, document_id: string | undefined, chunk_index: number, content: string, rrf_score: number) {
+    return { chunk_id, content, document_id, project_id: projectId, chunk_index, rrf_score, rrf_rank: 1, layer_ranks: {}, layer_scores: {}, confidence: 0.5, criticality: 0.5, quality_score: 1, quality_gates_passed: 0, contributing_layers: ["lexical"] };
+  }
+  const hits = [
+    hit(chunks[0], firstDocument, 3, "Users stall at the second onboarding step.", 0.033),
+    hit(chunks[1], secondDocument, 0, "Pricing confusion drives early churn.", 0.032),
+    hit(chunks[2], undefined, 4, "A related finding with no parent document.", 0.016),
+  ];
+
+  beforeEach(() => {
+    mocks.pedrSearch.mockResolvedValue({ results: hits, metadata: null });
+    mocks.getDocument.mockImplementation(async (id: string) => ({ id, name: id === firstDocument ? "interviews.md" : "survey.pdf" }));
+    mocks.savedList.mockResolvedValue({ items: [], limit_per_user: 50 });
+  });
+
+  it("puts the phrase in the URL and never sends it to the Librarian model", async () => {
+    // The URL is what /search?q= redirects to and what a reload reruns.
+    page();
+    await chooseProject();
+    fireEvent.click(screen.getByRole("radio", { name: "List the chunks" }));
+    fireEvent.change(screen.getByLabelText("Message the Librarian"), { target: { value: "onboarding friction" } });
+    fireEvent.click(screen.getByRole("button", { name: "List" }));
+    expect(mocks.push).toHaveBeenCalledWith({ pathname: "/librarian", query: { q: "onboarding friction", project: projectId } }, undefined, { shallow: true });
+    expect(mocks.turn).not.toHaveBeenCalled();
+    expect(screen.queryByRole("log")?.textContent).not.toContain("onboarding friction");
+  });
+
+  it("lists the ranked chunks for the URL's phrase, each linking to its place in its document", async () => {
+    mocks.query = { q: "onboarding friction", project: projectId };
+    page();
+    const list = await screen.findByRole("region", { name: "Matching chunks" });
+    expect(screen.getByRole("radio", { name: "List the chunks" })).toBeChecked();
+    expect(mocks.pedrSearch).toHaveBeenCalledWith({ query: "onboarding friction", top_k: 20, project_id: projectId });
+    expect(await within(list).findByRole("heading", { name: "3 chunks match “onboarding friction”" })).toBeVisible();
+    expect(within(list).getByText(/^In Onboarding, best match first/)).toBeVisible();
+
+    const rows = within(list).getAllByRole("listitem");
+    expect(rows.map((row) => row.querySelector("p")?.textContent)).toEqual(["1.interviews.md #3", "2.survey.pdf #0", "3.Chunk without a document #4"]);
+    expect(await within(rows[0]).findByRole("link", { name: "interviews.md #3" })).toHaveAttribute("href", `/documents/${firstDocument}?chunk=${chunks[0]}&index=3`);
+    expect(within(rows[1]).getByRole("link", { name: "survey.pdf #0" })).toHaveAttribute("href", `/documents/${secondDocument}?chunk=${chunks[1]}&index=0`);
+    // A chunk with no document cannot be opened, so it is not dressed as a link.
+    expect(within(rows[2]).queryByRole("link")).toBeNull();
+    expect(within(rows[0]).getByText("Score 0.0330")).toBeVisible();
+    expect(within(rows[0]).getByText("Users stall at the second onboarding step.")).toBeVisible();
+    expect(mocks.turn).not.toHaveBeenCalled();
+  });
+
+  it("lists across every readable project when no project is named", async () => {
+    mocks.query = { q: "pricing" };
+    page();
+    const list = await screen.findByRole("region", { name: "Matching chunks" });
+    expect(await within(list).findByText(/^Across all your projects, best match first/)).toBeVisible();
+    expect(mocks.pedrSearch).toHaveBeenCalledWith({ query: "pricing", top_k: 20, project_id: undefined });
+  });
+
+  it("keeps the list as one collection in rank order, and a retry adds only what is missing", async () => {
+    // A failed add must not leave a second, duplicate collection behind on retry.
+    mocks.query = { q: "onboarding friction", project: projectId };
+    mocks.createCollection.mockResolvedValue({ id: "collection-1", name: "onboarding friction" });
+    mocks.addChunk.mockResolvedValueOnce({}).mockRejectedValueOnce(new Error("The chunk could not be added.")).mockResolvedValue({});
+    page();
+    const list = await screen.findByRole("region", { name: "Matching chunks" });
+    expect(within(list).getByLabelText("Collection name")).toHaveValue("onboarding friction");
+    fireEvent.click(await within(list).findByRole("button", { name: "Save 3 chunks as a collection" }));
+
+    expect(await within(list).findByRole("alert")).toHaveTextContent("Created onboarding friction with 1 of 3 chunks. The chunk could not be added.");
+    fireEvent.click(within(list).getByRole("button", { name: "Add the remaining 2" }));
+    const saved = await within(list).findByText(/^Saved 3 chunks to/);
+    expect(within(saved).getByRole("link", { name: "onboarding friction" })).toHaveAttribute("href", "/collections/collection-1");
+
+    expect(mocks.createCollection).toHaveBeenCalledTimes(1);
+    expect(mocks.createCollection).toHaveBeenCalledWith({ name: "onboarding friction" });
+    expect(mocks.addChunk.mock.calls.map(([collection, body]) => [collection, body.chunk_id])).toEqual([
+      ["collection-1", chunks[0]],
+      ["collection-1", chunks[1]],
+      ["collection-1", chunks[1]],
+      ["collection-1", chunks[2]],
+    ]);
+  });
+
+  it("saves the phrase as a saved search with its project and list size", async () => {
+    mocks.query = { q: "onboarding friction", project: projectId };
+    mocks.createSaved.mockResolvedValue({ id: "saved-1" });
+    page();
+    const list = await screen.findByRole("region", { name: "Matching chunks" });
+    fireEvent.click(await within(list).findByRole("button", { name: "Save current search" }));
+    fireEvent.click(within(list).getByRole("button", { name: "Save search" }));
+    expect(await within(list).findByText(/^Search saved\./)).toBeVisible();
+    expect(mocks.createSaved).toHaveBeenCalledWith(expect.objectContaining({ query_text: "onboarding friction", top_k: 20, filters: { project_id: projectId } }));
+  });
+
+  it("runs a saved search once through the call that counts its runs, and shows no answer", async () => {
+    mocks.query = { saved: "saved-1" };
+    mocks.execute.mockResolvedValue({
+      saved_search: { id: "saved-1", name: "Weekly onboarding", query_text: "onboarding", filters: { project_id: projectId }, top_k: 5 },
+      semantic: { results: [{ chunk_id: chunks[0], content: "Users stall at the second onboarding step.", document_id: firstDocument, project_id: projectId, chunk_index: 3, score: 0.82 }] },
+      rag: { answer: "A synthesized answer the chunk list does not show." },
+    });
+    // No focus throttle, so a focus event right after mount would revalidate if the list allowed it.
+    page({ focusThrottleInterval: 0 });
+    const list = await screen.findByRole("region", { name: "Matching chunks" });
+    expect(await within(list).findByRole("heading", { name: "Saved search “Weekly onboarding”: 1 chunk matches" })).toBeVisible();
+    expect(within(list).getByText(/^In Onboarding, best match first, for “onboarding”/)).toBeVisible();
+    expect(await within(list).findByRole("link", { name: "interviews.md #3" })).toHaveAttribute("href", `/documents/${firstDocument}?chunk=${chunks[0]}&index=3`);
+    expect(screen.queryByText("A synthesized answer the chunk list does not show.")).toBeNull();
+    expect(mocks.pedrSearch).not.toHaveBeenCalled();
+
+    // Each execute call counts a run and spends a model call, so returning to the tab must not rerun it.
+    fireEvent(window, new Event("focus"));
+    document.dispatchEvent(new Event("visibilitychange"));
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(mocks.execute).toHaveBeenCalledTimes(1);
+    expect(mocks.execute).toHaveBeenCalledWith("saved-1");
+  });
+
+  it("says a deleted saved search no longer exists instead of offering a retry", async () => {
+    mocks.query = { saved: "gone" };
+    mocks.execute.mockRejectedValue(new HttpError("Saved search not found.", 404));
+    page();
+    const list = await screen.findByRole("region", { name: "Matching chunks" });
+    expect(await within(list).findByRole("alert")).toHaveTextContent("This saved search no longer exists");
+    expect(within(list).queryByRole("button", { name: "Retry" })).toBeNull();
   });
 });

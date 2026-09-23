@@ -121,6 +121,18 @@
         "tracelab_mission.list sort"
       ],
       "explanation": "ACT-1 replaced the inbox, needs-attention, mission reviews and saved mission views with one recency-ordered activity stream. Nine manifest rows left with their API routes (three inbox, four mission-view, home attention and home review); three activity rows were added: list and summary are covered by the two new tracelab_home reads, and the viewed watermark is a per-user preference write kept REST/UI-only. homeApi.get lost its missions-page consumers. Tool count stays 9; actions go from 51 to 49. The package's next release is a major bump."
+    },
+    "qa2": {
+      "decision": 545,
+      "removed_operations": [
+        "frontend/src/lib/api/search.ts#searchApi.clearHistory:DELETE:/search/history",
+        "frontend/src/lib/api/search.ts#searchApi.facets:POST:/facets",
+        "frontend/src/lib/api/search.ts#searchApi.history:GET:/search/history",
+        "frontend/src/lib/api/search.ts#searchApi.ragQuery:POST:/search",
+        "frontend/src/lib/api/search.ts#searchApi.replay:POST:/search/replay/{historyId}",
+        "frontend/src/lib/api/search.ts#searchApi.semanticSearch:POST:/retrieval/search"
+      ],
+      "explanation": "QA-2 retired the standalone Search page into the Librarian's chunk list. Six search.ts calls lost their only consumer and were deleted from the client with their rows: RAG answers (POST /search), plain retrieval, facets, and search history list, clear and replay. The backend routes stay; POST /search, /retrieval/search (tracelab_search.knowledge) and the history routes are unchanged. The Librarian now consumes searchApi.pedrSearch, savedSearchesApi.execute/list/create and collectionsApi.create/addChunk; the palette no longer reads search history. Tool and action counts are unchanged."
     }
   },
   "operations": [
@@ -178,7 +190,7 @@
       "id": "frontend/src/lib/api/admin.ts#adminSpacesApi.addMember:POST:/admin/spaces/{spaceId}/members",
       "api_file": "frontend/src/lib/api/admin.ts",
       "operation": "adminSpacesApi.addMember",
-      "source_line": 89,
+      "source_line": 91,
       "method": "POST",
       "path": "/api/v1/admin/spaces/{spaceId}/members",
       "live": true,
@@ -194,7 +206,7 @@
       "id": "frontend/src/lib/api/admin.ts#adminSpacesApi.assignProjectSpace:PATCH:/admin/projects/{projectId}/space",
       "api_file": "frontend/src/lib/api/admin.ts",
       "operation": "adminSpacesApi.assignProjectSpace",
-      "source_line": 97,
+      "source_line": 99,
       "method": "PATCH",
       "path": "/api/v1/admin/projects/{projectId}/space",
       "live": true,
@@ -210,7 +222,7 @@
       "id": "frontend/src/lib/api/admin.ts#adminSpacesApi.create:POST:/admin/spaces",
       "api_file": "frontend/src/lib/api/admin.ts",
       "operation": "adminSpacesApi.create",
-      "source_line": 81,
+      "source_line": 83,
       "method": "POST",
       "path": "/api/v1/admin/spaces",
       "live": true,
@@ -226,7 +238,7 @@
       "id": "frontend/src/lib/api/admin.ts#adminSpacesApi.list:GET:/admin/spaces",
       "api_file": "frontend/src/lib/api/admin.ts",
       "operation": "adminSpacesApi.list",
-      "source_line": 78,
+      "source_line": 80,
       "method": "GET",
       "path": "/api/v1/admin/spaces",
       "live": true,
@@ -242,7 +254,7 @@
       "id": "frontend/src/lib/api/admin.ts#adminSpacesApi.listMembers:GET:/admin/spaces/{spaceId}/members",
       "api_file": "frontend/src/lib/api/admin.ts",
       "operation": "adminSpacesApi.listMembers",
-      "source_line": 84,
+      "source_line": 86,
       "method": "GET",
       "path": "/api/v1/admin/spaces/{spaceId}/members",
       "live": true,
@@ -258,7 +270,7 @@
       "id": "frontend/src/lib/api/admin.ts#adminSpacesApi.removeMember:DELETE:/admin/spaces/{spaceId}/members/{userId}",
       "api_file": "frontend/src/lib/api/admin.ts",
       "operation": "adminSpacesApi.removeMember",
-      "source_line": 92,
+      "source_line": 94,
       "method": "DELETE",
       "path": "/api/v1/admin/spaces/{spaceId}/members/{userId}",
       "live": true,
@@ -412,7 +424,9 @@
       "live": true,
       "ui_consumers": [
         "frontend/src/components/AddToCollection.tsx",
-        "frontend/src/pages/documents/[id].tsx"
+        "frontend/src/components/librarian/ChunkList.tsx",
+        "frontend/src/pages/documents/[id].tsx",
+        "frontend/src/pages/librarian.tsx"
       ],
       "mcp": "tracelab_collection.add",
       "classification": "covered",
@@ -429,7 +443,9 @@
       "live": true,
       "ui_consumers": [
         "frontend/src/components/AddToCollection.tsx",
-        "frontend/src/pages/documents/[id].tsx"
+        "frontend/src/components/librarian/ChunkList.tsx",
+        "frontend/src/pages/documents/[id].tsx",
+        "frontend/src/pages/librarian.tsx"
       ],
       "mcp": "tracelab_collection.add_document",
       "classification": "closed-MCP-2",
@@ -446,8 +462,10 @@
       "live": true,
       "ui_consumers": [
         "frontend/src/components/AddToCollection.tsx",
+        "frontend/src/components/librarian/ChunkList.tsx",
         "frontend/src/pages/collections/new.tsx",
-        "frontend/src/pages/documents/[id].tsx"
+        "frontend/src/pages/documents/[id].tsx",
+        "frontend/src/pages/librarian.tsx"
       ],
       "mcp": "tracelab_collection.create",
       "classification": "closed-MCP-1",
@@ -530,9 +548,11 @@
       "live": true,
       "ui_consumers": [
         "frontend/src/components/AddToCollection.tsx",
+        "frontend/src/components/librarian/ChunkList.tsx",
         "frontend/src/components/projects/ProjectResources.tsx",
         "frontend/src/pages/collections/index.tsx",
         "frontend/src/pages/documents/[id].tsx",
+        "frontend/src/pages/librarian.tsx",
         "frontend/src/pages/projects/[id].tsx"
       ],
       "mcp": "tracelab_collection.list",
@@ -809,7 +829,9 @@
       "path": "/api/v1/documents/{documentId}",
       "live": true,
       "ui_consumers": [
-        "frontend/src/pages/documents/[id].tsx"
+        "frontend/src/components/librarian/ChunkList.tsx",
+        "frontend/src/pages/documents/[id].tsx",
+        "frontend/src/pages/librarian.tsx"
       ],
       "mcp": "tracelab_document.get_content",
       "classification": "covered",
@@ -842,10 +864,8 @@
       "live": true,
       "ui_consumers": [
         "frontend/src/components/projects/ProjectResources.tsx",
-        "frontend/src/features/search/SearchExperience.tsx",
         "frontend/src/pages/documents/index.tsx",
-        "frontend/src/pages/projects/[id].tsx",
-        "frontend/src/pages/search/index.tsx"
+        "frontend/src/pages/projects/[id].tsx"
       ],
       "mcp": "tracelab_document.list",
       "classification": "closed-MCP-1",
@@ -1055,7 +1075,7 @@
       "id": "frontend/src/lib/api/librarian.ts#librarianApi.turn:POST:/librarian/turns",
       "api_file": "frontend/src/lib/api/librarian.ts",
       "operation": "librarianApi.turn",
-      "source_line": 93,
+      "source_line": 123,
       "method": "POST",
       "path": "/api/v1/librarian/turns",
       "live": true,
@@ -1071,7 +1091,7 @@
       "id": "frontend/src/lib/api/librarian.ts#librarianApi.draft:POST:/librarian/drafts",
       "api_file": "frontend/src/lib/api/librarian.ts",
       "operation": "librarianApi.draft",
-      "source_line": 98,
+      "source_line": 133,
       "method": "POST",
       "path": "/api/v1/librarian/drafts",
       "live": true,
@@ -1087,7 +1107,7 @@
       "id": "frontend/src/lib/api/librarian.ts#librarianApi.createMission:POST:/librarian/missions",
       "api_file": "frontend/src/lib/api/librarian.ts",
       "operation": "librarianApi.createMission",
-      "source_line": 103,
+      "source_line": 138,
       "method": "POST",
       "path": "/api/v1/librarian/missions",
       "live": true,
@@ -1404,7 +1424,6 @@
       "live": true,
       "ui_consumers": [
         "frontend/src/components/missions/MissionForm.tsx",
-        "frontend/src/features/search/SearchExperience.tsx",
         "frontend/src/pages/admin/spaces.tsx",
         "frontend/src/pages/documents/index.tsx",
         "frontend/src/pages/documents/upload.tsx",
@@ -1414,8 +1433,7 @@
         "frontend/src/pages/missions/index.tsx",
         "frontend/src/pages/missions/new.tsx",
         "frontend/src/pages/projects/index.tsx",
-        "frontend/src/pages/reports/index.tsx",
-        "frontend/src/pages/search/index.tsx"
+        "frontend/src/pages/reports/index.tsx"
       ],
       "mcp": "tracelab_project.list",
       "classification": "covered",
@@ -1547,8 +1565,8 @@
       "live": true,
       "ui_consumers": [
         "frontend/src/components/SaveSearchButton.tsx",
-        "frontend/src/features/search/SearchExperience.tsx",
-        "frontend/src/pages/search/index.tsx"
+        "frontend/src/components/librarian/ChunkList.tsx",
+        "frontend/src/pages/librarian.tsx"
       ],
       "mcp": null,
       "classification": "rest-only-by-design",
@@ -1564,8 +1582,8 @@
       "path": "/api/v1/saved-searches/{id}/execute",
       "live": true,
       "ui_consumers": [
-        "frontend/src/features/search/SearchExperience.tsx",
-        "frontend/src/pages/search/index.tsx"
+        "frontend/src/components/librarian/ChunkList.tsx",
+        "frontend/src/pages/librarian.tsx"
       ],
       "mcp": null,
       "classification": "rest-only-by-design",
@@ -1583,10 +1601,10 @@
       "ui_consumers": [
         "frontend/src/components/AppShell.tsx",
         "frontend/src/components/CommandPalette.tsx",
-        "frontend/src/features/search/SearchExperience.tsx",
+        "frontend/src/components/librarian/ChunkList.tsx",
         "frontend/src/pages/_app.tsx",
-        "frontend/src/pages/saved-searches.tsx",
-        "frontend/src/pages/search/index.tsx"
+        "frontend/src/pages/librarian.tsx",
+        "frontend/src/pages/saved-searches.tsx"
       ],
       "mcp": null,
       "classification": "rest-only-by-design",
@@ -1602,9 +1620,7 @@
       "path": "/api/v1/saved-searches/{id}",
       "live": true,
       "ui_consumers": [
-        "frontend/src/features/search/SearchExperience.tsx",
-        "frontend/src/pages/saved-searches.tsx",
-        "frontend/src/pages/search/index.tsx"
+        "frontend/src/pages/saved-searches.tsx"
       ],
       "mcp": null,
       "classification": "rest-only-by-design",
@@ -1628,126 +1644,21 @@
       "rationale": "Per-user acknowledgement or preference write. Decisions #395 and #409 make review and acknowledgement explicit human actions, and decision #426 keeps result review, inbox mark-seen, favorites, saved searches and saved views REST/UI-only; an agent must not perform them on the user's behalf."
     },
     {
-      "id": "frontend/src/lib/api/search.ts#searchApi.clearHistory:DELETE:/search/history",
-      "api_file": "frontend/src/lib/api/search.ts",
-      "operation": "searchApi.clearHistory",
-      "source_line": 36,
-      "method": "DELETE",
-      "path": "/api/v1/search/history",
-      "live": true,
-      "ui_consumers": [
-        "frontend/src/features/search/SearchExperience.tsx",
-        "frontend/src/pages/search/index.tsx"
-      ],
-      "mcp": null,
-      "classification": "rest-only-by-design",
-      "baseline": "action-gap",
-      "rationale": "Per-user acknowledgement or preference write. Decisions #395 and #409 make review and acknowledgement explicit human actions, and decision #426 keeps result review, inbox mark-seen, favorites, saved searches and saved views REST/UI-only; an agent must not perform them on the user's behalf."
-    },
-    {
-      "id": "frontend/src/lib/api/search.ts#searchApi.facets:POST:/facets",
-      "api_file": "frontend/src/lib/api/search.ts",
-      "operation": "searchApi.facets",
-      "source_line": 20,
-      "method": "POST",
-      "path": "/api/v1/facets",
-      "live": true,
-      "ui_consumers": [
-        "frontend/src/features/search/SearchExperience.tsx",
-        "frontend/src/pages/search/index.tsx"
-      ],
-      "mcp": null,
-      "classification": "rest-only-by-design",
-      "baseline": "read-gap",
-      "rationale": "Facet counts support the interactive search filter UI; raw knowledge/PEDR results remain agent-facing."
-    },
-    {
-      "id": "frontend/src/lib/api/search.ts#searchApi.history:GET:/search/history",
-      "api_file": "frontend/src/lib/api/search.ts",
-      "operation": "searchApi.history",
-      "source_line": 32,
-      "method": "GET",
-      "path": "/api/v1/search/history",
-      "live": true,
-      "ui_consumers": [
-        "frontend/src/components/AppShell.tsx",
-        "frontend/src/components/CommandPalette.tsx",
-        "frontend/src/features/search/SearchExperience.tsx",
-        "frontend/src/pages/_app.tsx",
-        "frontend/src/pages/search/index.tsx"
-      ],
-      "mcp": null,
-      "classification": "rest-only-by-design",
-      "baseline": "read-gap",
-      "rationale": "Per-user search history is UI state (decision 426)."
-    },
-    {
       "id": "frontend/src/lib/api/search.ts#searchApi.pedrSearch:POST:/pedr/search",
       "api_file": "frontend/src/lib/api/search.ts",
       "operation": "searchApi.pedrSearch",
-      "source_line": 48,
+      "source_line": 12,
       "method": "POST",
       "path": "/api/v1/pedr/search",
       "live": true,
       "ui_consumers": [
-        "frontend/src/features/search/SearchExperience.tsx",
-        "frontend/src/pages/search/index.tsx"
+        "frontend/src/components/librarian/ChunkList.tsx",
+        "frontend/src/pages/librarian.tsx"
       ],
       "mcp": "tracelab_search.pedr",
       "classification": "closed-MCP-1",
       "baseline": "read-gap",
       "rationale": "Decision 435: user approved optional PEDR with graph toggle and UI filters after live verification; knowledge remains plain retrieval."
-    },
-    {
-      "id": "frontend/src/lib/api/search.ts#searchApi.ragQuery:POST:/search",
-      "api_file": "frontend/src/lib/api/search.ts",
-      "operation": "searchApi.ragQuery",
-      "source_line": 28,
-      "method": "POST",
-      "path": "/api/v1/search",
-      "live": true,
-      "ui_consumers": [
-        "frontend/src/features/search/SearchExperience.tsx",
-        "frontend/src/pages/search/index.tsx"
-      ],
-      "mcp": null,
-      "classification": "rest-only-by-design",
-      "baseline": "read-gap",
-      "rationale": "LLM answer generation overlaps collection synthesis and is not a retrieval read; stays REST-only by design."
-    },
-    {
-      "id": "frontend/src/lib/api/search.ts#searchApi.replay:POST:/search/replay/{historyId}",
-      "api_file": "frontend/src/lib/api/search.ts",
-      "operation": "searchApi.replay",
-      "source_line": 40,
-      "method": "POST",
-      "path": "/api/v1/search/replay/{historyId}",
-      "live": true,
-      "ui_consumers": [
-        "frontend/src/features/search/SearchExperience.tsx",
-        "frontend/src/pages/search/index.tsx"
-      ],
-      "mcp": null,
-      "classification": "rest-only-by-design",
-      "baseline": "read-gap",
-      "rationale": "Search-history replay is UI state (decision 426); agents can issue explicit knowledge or PEDR queries."
-    },
-    {
-      "id": "frontend/src/lib/api/search.ts#searchApi.semanticSearch:POST:/retrieval/search",
-      "api_file": "frontend/src/lib/api/search.ts",
-      "operation": "searchApi.semanticSearch",
-      "source_line": 24,
-      "method": "POST",
-      "path": "/api/v1/retrieval/search",
-      "live": true,
-      "ui_consumers": [
-        "frontend/src/features/search/SearchExperience.tsx",
-        "frontend/src/pages/search/index.tsx"
-      ],
-      "mcp": "tracelab_search.knowledge",
-      "classification": "closed-MCP-1",
-      "baseline": "partial",
-      "rationale": "Decision 435 also closes source_type/date_from/date_to forwarding to plain retrieval."
     },
     {
       "id": "frontend/src/lib/api/settings.ts#apiKeysApi.create:POST:/auth/api-keys",
@@ -1883,7 +1794,7 @@
       "id": "frontend/src/lib/api/activity.ts#activityApi.list:GET:/activity",
       "api_file": "frontend/src/lib/api/activity.ts",
       "operation": "activityApi.list",
-      "source_line": 27,
+      "source_line": 29,
       "method": "GET",
       "path": "/api/v1/activity",
       "live": true,
@@ -1899,7 +1810,7 @@
       "id": "frontend/src/lib/api/activity.ts#activityApi.markViewed:PUT:/activity/viewed",
       "api_file": "frontend/src/lib/api/activity.ts",
       "operation": "activityApi.markViewed",
-      "source_line": 29,
+      "source_line": 31,
       "method": "PUT",
       "path": "/api/v1/activity/viewed",
       "live": true,
@@ -1934,7 +1845,7 @@
       "id": "frontend/src/lib/api/activity.ts#activityApi.summary:GET:/activity/summary",
       "api_file": "frontend/src/lib/api/activity.ts",
       "operation": "activityApi.summary",
-      "source_line": 28,
+      "source_line": 30,
       "method": "GET",
       "path": "/api/v1/activity/summary",
       "live": true,

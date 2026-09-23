@@ -1,5 +1,12 @@
 import type { RagResponsePayload, SemanticSearchResponse } from "@/types/search";
-import type { SearchFiltersState } from "@/components/SearchBar";
+
+/** The filters a saved search stores, as its save form holds them. */
+export type SearchFiltersState = {
+  projectId: string;
+  documentType: string;
+  startDate: string;
+  endDate: string;
+};
 
 export interface SavedSearch {
   id: string;

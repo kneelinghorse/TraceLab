@@ -43,7 +43,7 @@ function SavedSearchesManager() {
     setError(null);
   };
 
-  const handleExecute = (entry: SavedSearch) => void router.push(`/search?saved=${encodeURIComponent(entry.id)}`);
+  const handleExecute = (entry: SavedSearch) => void router.push(`/librarian?saved=${encodeURIComponent(entry.id)}`);
 
   const handleDelete = async (entry: SavedSearch) => {
     setMessage(null);
