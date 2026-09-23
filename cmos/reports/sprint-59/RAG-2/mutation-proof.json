@@ -1,0 +1,64 @@
+{
+  "head": "949c7a61f23ee7a0221d296306d152b796030018",
+  "base": "659a08a",
+  "file_restored_to_head": true,
+  "all_as_expected": true,
+  "runs": [
+    {
+      "label": "baseline-before",
+      "pytest_exit": 0,
+      "tests": {
+        "T1 empty retrieval": "pass",
+        "T2 unresolved label": "pass",
+        "T3 no fallback": "pass"
+      },
+      "as_expected": true
+    },
+    {
+      "label": "M1",
+      "pytest_exit": 1,
+      "tests": {
+        "T1 empty retrieval": "FAIL at assert fake_client.chat.completions.requests == [] (AssertionError: assert [{'max_tokens... 'none', ...}] == [])",
+        "T2 unresolved label": "pass",
+        "T3 no fallback": "pass"
+      },
+      "reverts": "empty-retrieval short-circuit (the model is asked with no context again)",
+      "expect_red": "T1 empty retrieval",
+      "as_expected": true
+    },
+    {
+      "label": "M2",
+      "pytest_exit": 1,
+      "tests": {
+        "T1 empty retrieval": "pass",
+        "T2 unresolved label": "FAIL at assert \"doc-404\" not in {citation[\"document_id\"] for citation in cited} (AssertionError: assert 'doc-404' not in {'doc-1', 'doc-404'})",
+        "T3 no fallback": "pass"
+      },
+      "reverts": "dropping unresolved labels (a label becomes a citation with chunk_id None again)",
+      "expect_red": "T2 unresolved label",
+      "as_expected": true
+    },
+    {
+      "label": "M3",
+      "pytest_exit": 1,
+      "tests": {
+        "T1 empty retrieval": "pass",
+        "T2 unresolved label": "pass",
+        "T3 no fallback": "FAIL at assert result[\"citations\"] == [] (AssertionError: assert [{'chunk_id':...': 0.93, ...}] == [])"
+      },
+      "reverts": "removal of the top-chunk fallback citation",
+      "expect_red": "T3 no fallback",
+      "as_expected": true
+    },
+    {
+      "label": "baseline-after",
+      "pytest_exit": 0,
+      "tests": {
+        "T1 empty retrieval": "pass",
+        "T2 unresolved label": "pass",
+        "T3 no fallback": "pass"
+      },
+      "as_expected": true
+    }
+  ]
+}

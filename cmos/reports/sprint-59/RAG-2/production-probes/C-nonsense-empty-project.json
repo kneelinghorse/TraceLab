@@ -1,0 +1,71 @@
+{
+  "probe": "C-nonsense-empty-project",
+  "sent_at_utc": "2026-09-23T05:36:48Z",
+  "request": {
+    "query": "What did the Vantor expedition conclude about krellium yields and zorblax tides?",
+    "project_id": "d5bdd379-ce47-475b-af7a-1876db30b105",
+    "top_k": 5
+  },
+  "status": 200,
+  "checks": {
+    "deployed_build_has_no_evidence_field": true,
+    "cache_hit": false,
+    "no_evidence": true,
+    "sources": 0,
+    "citations": 0,
+    "labels_in_answer_text": 0,
+    "model_attempts": 0,
+    "completion_tokens": [],
+    "citation_resolution": [],
+    "every_citation_resolves": true
+  },
+  "response": {
+    "answer": "Nothing in this project answers that question.",
+    "citations": [],
+    "sources": [],
+    "latency_ms": 279.81,
+    "compression": {
+      "original_chunks": 0,
+      "filtered_chunks": 0,
+      "original_tokens": 0,
+      "filtered_tokens": 0,
+      "reduction_ratio": 0.0,
+      "threshold": 0.7,
+      "compression_ms": 0.014
+    },
+    "cache": {
+      "hit": false,
+      "score": null,
+      "age_seconds": null,
+      "ttl_seconds": 300.0
+    },
+    "quality": {
+      "composite_score": 0.0,
+      "threshold": 0.85,
+      "pillar_scores": {
+        "linguistic_uncertainty": 0.0,
+        "answer_integrity": 0.0,
+        "source_provenance": 0.0
+      },
+      "hard_failures": [
+        "no_evidence"
+      ],
+      "reasons": [
+        "Retrieval returned no chunks for this query."
+      ],
+      "pre_escalation_score": null
+    },
+    "routing": {
+      "selected_model": "gpt-5.1",
+      "escalated": false,
+      "attempts": [],
+      "estimated_cost_usd": 0.0,
+      "metrics": {
+        "total_queries": 2,
+        "escalations": 2
+      }
+    },
+    "search_mode": "semantic",
+    "no_evidence": true
+  }
+}

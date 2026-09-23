@@ -1,0 +1,275 @@
+{
+  "purpose": "Why RAG-2's production probes got hollow chunks: POST /api/v1/pedr/search with probe A's question and project, 2026-09-23, deployed commit 949c7a6. Read-only, no model call.",
+  "request": {
+    "query": "What signals does the tiered LLM routing research recommend for deciding when to escalate a query to a stronger model?",
+    "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+    "top_k": 5
+  },
+  "finding": "Every top-5 fused result has contributing_layers ['semantic', 'graph'] and a better graph rank than semantic rank, and every one lacks content, document_id, project_id, chunk_index and embedding. app/services/pedr/fusion.py keeps the whole record from the best-ranked layer; the graph layer's records carry only urn, score, depth, seed_urn, entity fields and chunk_id.",
+  "response": {
+    "results": [
+      {
+        "chunk_id": "19ab36d4-49d8-46b6-9f39-68ba81d3d590",
+        "content": "",
+        "document_id": null,
+        "project_id": null,
+        "rrf_score": 0.006037,
+        "rrf_rank": 1,
+        "layer_ranks": {
+          "semantic": 13,
+          "graph": 6
+        },
+        "layer_scores": {
+          "semantic": 0.4381668,
+          "graph": 0.2991464504
+        },
+        "urn": "urn:research:chunk:19ab36d4-49d8-46b6-9f39-68ba81d3d590",
+        "confidence": 0.6,
+        "criticality": 0.5,
+        "element_type": null,
+        "query_intent": "search",
+        "quality_score": 0.6,
+        "quality_status": "unknown",
+        "quality_gates_passed": 0,
+        "contributing_layers": [
+          "semantic",
+          "graph"
+        ],
+        "chunk_index": null,
+        "source_type": null,
+        "source_origin": null,
+        "score": 0.006037,
+        "combined_score": 0.006037,
+        "embedding": null,
+        "related_entities": null
+      },
+      {
+        "chunk_id": "7521f08a-eda5-413d-8c22-52035f7766e8",
+        "content": "",
+        "document_id": null,
+        "project_id": null,
+        "rrf_score": 0.006017,
+        "rrf_rank": 2,
+        "layer_ranks": {
+          "semantic": 12,
+          "graph": 9
+        },
+        "layer_scores": {
+          "semantic": 0.4399823,
+          "graph": 0.2991464504
+        },
+        "urn": "urn:research:chunk:7521f08a-eda5-413d-8c22-52035f7766e8",
+        "confidence": 0.6,
+        "criticality": 0.5,
+        "element_type": null,
+        "query_intent": "search",
+        "quality_score": 0.6,
+        "quality_status": "unknown",
+        "quality_gates_passed": 0,
+        "contributing_layers": [
+          "semantic",
+          "graph"
+        ],
+        "chunk_index": null,
+        "source_type": null,
+        "source_origin": null,
+        "score": 0.006017,
+        "combined_score": 0.006017,
+        "embedding": null,
+        "related_entities": null
+      },
+      {
+        "chunk_id": "027916c0-1d64-4096-9560-1bd5897a846a",
+        "content": "",
+        "document_id": null,
+        "project_id": null,
+        "rrf_score": 0.005884,
+        "rrf_rank": 3,
+        "layer_ranks": {
+          "semantic": 18,
+          "graph": 2
+        },
+        "layer_scores": {
+          "semantic": 0.41393092,
+          "graph": 0.404320168
+        },
+        "urn": "urn:research:chunk:027916c0-1d64-4096-9560-1bd5897a846a",
+        "confidence": 0.6,
+        "criticality": 0.5,
+        "element_type": null,
+        "query_intent": "search",
+        "quality_score": 0.6,
+        "quality_status": "unknown",
+        "quality_gates_passed": 0,
+        "contributing_layers": [
+          "semantic",
+          "graph"
+        ],
+        "chunk_index": null,
+        "source_type": null,
+        "source_origin": null,
+        "score": 0.005884,
+        "combined_score": 0.005884,
+        "embedding": null,
+        "related_entities": null
+      },
+      {
+        "chunk_id": "7deeaea5-4bb7-4bf4-bf5f-7a8ac131bb95",
+        "content": "",
+        "document_id": null,
+        "project_id": null,
+        "rrf_score": 0.005844,
+        "rrf_rank": 4,
+        "layer_ranks": {
+          "semantic": 16,
+          "graph": 7
+        },
+        "layer_scores": {
+          "semantic": 0.42618394,
+          "graph": 0.2991464504
+        },
+        "urn": "urn:research:chunk:7deeaea5-4bb7-4bf4-bf5f-7a8ac131bb95",
+        "confidence": 0.6,
+        "criticality": 0.5,
+        "element_type": null,
+        "query_intent": "search",
+        "quality_score": 0.6,
+        "quality_status": "unknown",
+        "quality_gates_passed": 0,
+        "contributing_layers": [
+          "semantic",
+          "graph"
+        ],
+        "chunk_index": null,
+        "source_type": null,
+        "source_origin": null,
+        "score": 0.005844,
+        "combined_score": 0.005844,
+        "embedding": null,
+        "related_entities": null
+      },
+      {
+        "chunk_id": "8d6d3fdb-2fb0-4957-9ff6-e063c6a8d621",
+        "content": "",
+        "document_id": null,
+        "project_id": null,
+        "rrf_score": 0.005677,
+        "rrf_rank": 5,
+        "layer_ranks": {
+          "semantic": 21,
+          "graph": 4
+        },
+        "layer_scores": {
+          "semantic": 0.41154444,
+          "graph": 0.2991464504
+        },
+        "urn": "urn:research:chunk:8d6d3fdb-2fb0-4957-9ff6-e063c6a8d621",
+        "confidence": 0.6,
+        "criticality": 0.5,
+        "element_type": null,
+        "query_intent": "search",
+        "quality_score": 0.6,
+        "quality_status": "unknown",
+        "quality_gates_passed": 0,
+        "contributing_layers": [
+          "semantic",
+          "graph"
+        ],
+        "chunk_index": null,
+        "source_type": null,
+        "source_origin": null,
+        "score": 0.005677,
+        "combined_score": 0.005677,
+        "embedding": null,
+        "related_entities": null
+      }
+    ],
+    "metadata": {
+      "query": "What signals does the tiered LLM routing research recommend for deciding when to escalate a query to a stronger model?",
+      "intent": "search",
+      "intent_confidence": 0.9,
+      "detected_type": null,
+      "type_confidence": 0.0,
+      "layers_used": [
+        "semantic",
+        "graph"
+      ],
+      "layer_weights": {
+        "lexical": 0.22,
+        "semantic": 0.308,
+        "syntactic": 0.132,
+        "pragmatic": 0.08800000000000001,
+        "governance": 0.132,
+        "graph": 0.12
+      },
+      "timings": {
+        "lexical_ms": 10.948658920824528,
+        "semantic_ms": 304.47177099995315,
+        "graph_ms": 7.1,
+        "syntactic_ms": 0.07767905481159687,
+        "pragmatic_ms": 0.09467010386288166,
+        "governance_ms": 3.1817229464650154,
+        "fusion_ms": 0.19700895063579082,
+        "relational_ms": 0.0,
+        "total_ms": 316.9689760543406
+      },
+      "layer_diagnostics": [
+        {
+          "layer": "lexical",
+          "status": "ok",
+          "duration_ms": 10.95,
+          "result_count": 0,
+          "error": null,
+          "error_type": null
+        },
+        {
+          "layer": "semantic",
+          "status": "ok",
+          "duration_ms": 304.47,
+          "result_count": 60,
+          "error": null,
+          "error_type": null
+        },
+        {
+          "layer": "graph",
+          "status": "ok",
+          "duration_ms": 7.1,
+          "result_count": 23,
+          "error": null,
+          "error_type": null
+        },
+        {
+          "layer": "syntactic",
+          "status": "ok",
+          "duration_ms": 0.08,
+          "result_count": 60,
+          "error": null,
+          "error_type": null
+        },
+        {
+          "layer": "pragmatic",
+          "status": "ok",
+          "duration_ms": 0.09,
+          "result_count": 60,
+          "error": null,
+          "error_type": null
+        },
+        {
+          "layer": "governance",
+          "status": "ok",
+          "duration_ms": 3.18,
+          "result_count": 60,
+          "error": null,
+          "error_type": null
+        }
+      ],
+      "degraded": false,
+      "graph_enabled": true,
+      "graph_candidates_expanded": 23,
+      "total_candidates": 60,
+      "result_count": 5,
+      "rerank_mode": "full",
+      "hybrid_fallback_used": false
+    }
+  }
+}

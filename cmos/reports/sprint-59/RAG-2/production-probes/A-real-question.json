@@ -1,0 +1,112 @@
+{
+  "probe": "A-real-question",
+  "sent_at_utc": "2026-09-23T05:36:39Z",
+  "request": {
+    "query": "What signals does the tiered LLM routing research recommend for deciding when to escalate a query to a stronger model?",
+    "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+    "top_k": 5
+  },
+  "status": 200,
+  "checks": {
+    "deployed_build_has_no_evidence_field": true,
+    "cache_hit": false,
+    "no_evidence": false,
+    "sources": 1,
+    "citations": 0,
+    "labels_in_answer_text": 2,
+    "model_attempts": 2,
+    "completion_tokens": [
+      null,
+      null
+    ],
+    "citation_resolution": [],
+    "every_citation_resolves": true
+  },
+  "response": {
+    "answer": "The provided context contains no information about tiered LLM routing research or any recommended escalation signals (it only shows \u201c[Document: Unknown, Chunk: N/A]\u201d), so the specific signals cannot be determined from the materials you supplied. [Document: Unknown, Chunk: N/A]",
+    "citations": [],
+    "sources": [
+      {
+        "chunk_id": "19ab36d4-49d8-46b6-9f39-68ba81d3d590",
+        "content": "",
+        "document_id": null,
+        "project_id": null,
+        "chunk_index": null,
+        "source_type": null,
+        "document_type": null,
+        "collection_date": null,
+        "tags": null,
+        "score": 0.006037,
+        "quality_score": null,
+        "quality_base_score": null,
+        "quality_boost": null,
+        "quality_status": null,
+        "quality_gates_passed": null,
+        "quality_gates_total": null,
+        "quality_validated": null,
+        "quality_mission_id": null,
+        "quality_pii_flagged": null,
+        "element_type": null,
+        "element_type_match": null,
+        "type_boost": null
+      }
+    ],
+    "latency_ms": 4586.34,
+    "compression": {
+      "original_chunks": 5,
+      "filtered_chunks": 1,
+      "original_tokens": 0,
+      "filtered_tokens": 0,
+      "reduction_ratio": 0.0,
+      "threshold": 0.7,
+      "compression_ms": 0.018
+    },
+    "cache": {
+      "hit": false,
+      "score": null,
+      "age_seconds": null,
+      "ttl_seconds": 300.0
+    },
+    "quality": {
+      "composite_score": 0.802,
+      "threshold": 0.85,
+      "pillar_scores": {
+        "linguistic_uncertainty": 1.0,
+        "answer_integrity": 0.95,
+        "source_provenance": 0.4
+      },
+      "hard_failures": [],
+      "reasons": [
+        "score_below_threshold:0.80<0.85"
+      ],
+      "pre_escalation_score": 0.802
+    },
+    "routing": {
+      "selected_model": "gpt-5.2",
+      "escalated": true,
+      "attempts": [
+        {
+          "model": "gpt-5.1",
+          "quality_score": 0.802,
+          "below_threshold": true,
+          "hard_failures": [],
+          "citation_count": 0
+        },
+        {
+          "model": "gpt-5.2",
+          "quality_score": 0.802,
+          "below_threshold": true,
+          "hard_failures": [],
+          "citation_count": 0
+        }
+      ],
+      "estimated_cost_usd": 0.002004,
+      "metrics": {
+        "total_queries": 1,
+        "escalations": 1
+      }
+    },
+    "search_mode": "semantic",
+    "no_evidence": false
+  }
+}

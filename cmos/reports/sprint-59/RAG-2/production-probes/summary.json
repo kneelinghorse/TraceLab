@@ -1,0 +1,64 @@
+{
+  "deployed_commit": "949c7a61f23ee7a0221d296306d152b796030018",
+  "A-real-question": {
+    "status": 200,
+    "deployed_build_has_no_evidence_field": true,
+    "cache_hit": false,
+    "no_evidence": false,
+    "sources": 1,
+    "citations": 0,
+    "labels_in_answer_text": 2,
+    "model_attempts": 2,
+    "completion_tokens": [
+      null,
+      null
+    ],
+    "citation_resolution": [],
+    "every_citation_resolves": true
+  },
+  "B-nonsense-populated-project": {
+    "status": 200,
+    "deployed_build_has_no_evidence_field": true,
+    "cache_hit": false,
+    "no_evidence": false,
+    "sources": 1,
+    "citations": 0,
+    "labels_in_answer_text": 1,
+    "model_attempts": 2,
+    "completion_tokens": [
+      null,
+      null
+    ],
+    "citation_resolution": [],
+    "every_citation_resolves": true
+  },
+  "C-nonsense-empty-project": {
+    "status": 200,
+    "deployed_build_has_no_evidence_field": true,
+    "cache_hit": false,
+    "no_evidence": true,
+    "sources": 0,
+    "citations": 0,
+    "labels_in_answer_text": 0,
+    "model_attempts": 0,
+    "completion_tokens": [],
+    "citation_resolution": [],
+    "every_citation_resolves": true
+  },
+  "D-nonsense-unscoped": {
+    "status": 200,
+    "deployed_build_has_no_evidence_field": true,
+    "cache_hit": false,
+    "no_evidence": false,
+    "sources": 1,
+    "citations": 0,
+    "labels_in_answer_text": 1,
+    "model_attempts": 2,
+    "completion_tokens": [
+      null,
+      null
+    ],
+    "citation_resolution": [],
+    "every_citation_resolves": true
+  }
+}
