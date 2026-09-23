@@ -1080,6 +1080,50 @@ describe('T41.7 — cluster dispatch (per-cluster smoke)', () => {
     expect(res.content[0].text).toContain('projects');
   });
 
+  // PERSONAL-2 (decision #533): an agent names a Space the same way the UI picker does,
+  // and the server holds it to the same membership check.
+  it('tracelab_project create sends workspace_id in the POST /projects body and echoes where it landed', async () => {
+    const space = '9863b9a0-5381-461c-8eaf-14d656795cbd';
+    mockFetch.mockResolvedValueOnce(
+      okJson({ id: 'p-1', name: 'Catalog audit', workspace_id: space, created_at: '2026-09-22T00:00:00Z', updated_at: '2026-09-22T00:00:00Z' })
+    );
+    const { handleTracelabProject } = (await import('./index.js')) as unknown as {
+      handleTracelabProject: (args: unknown) => Promise<{ content: { text: string }[] }>;
+    };
+    const res = await handleTracelabProject({ action: 'create', name: 'Catalog audit', workspace_id: space });
+
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    const [url, request] = mockFetch.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe('http://localhost:8000/api/v1/projects');
+    expect(request.method).toBe('POST');
+    expect(JSON.parse(request.body as string)).toMatchObject({ name: 'Catalog audit', workspace_id: space });
+    expect(JSON.parse(res.content[0].text).project.workspace_id).toBe(space);
+  });
+
+  it('tracelab_project create refuses a workspace_id that is not a UUID before any request', async () => {
+    const { handleTracelabProject } = (await import('./index.js')) as unknown as {
+      handleTracelabProject: (args: unknown) => Promise<unknown>;
+    };
+    await expect(
+      handleTracelabProject({ action: 'create', name: 'x', workspace_id: 'parts-town' })
+    ).rejects.toThrow();
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
+
+  it('tracelab_project list carries each project workspace_id', async () => {
+    mockFetch.mockResolvedValueOnce(
+      okJson({
+        data: [{ id: 'p-1', name: 'Catalog audit', workspace_id: 'space-1' }],
+        pagination: { page: 1, page_size: 20, total: 1, pages: 1 },
+      })
+    );
+    const { handleTracelabProject } = (await import('./index.js')) as unknown as {
+      handleTracelabProject: (args: unknown) => Promise<{ content: { text: string }[] }>;
+    };
+    const res = await handleTracelabProject({ action: 'list' });
+    expect(JSON.parse(res.content[0].text).projects[0].workspace_id).toBe('space-1');
+  });
+
   it('tracelab_collection routes action="list" to handleListCollections', async () => {
     mockFetch.mockResolvedValueOnce(okJson({ data: [], total: 0 }));
     const { handleTracelabCollection } = (await import('./index.js')) as unknown as {

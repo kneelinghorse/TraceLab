@@ -281,12 +281,14 @@ class TestProjectDefaultSpaceWritePath:
             "new project must be assigned the Default Workspace, not left NULL"
         )
 
-    def test_create_ignores_client_supplied_workspace_id(self, db_session, auth_headers):
+    def test_create_validates_a_client_supplied_workspace_id(self, db_session, auth_headers):
+        """T44.4 made a body workspace_id something never honored; PERSONAL-2 (decision
+        #533) makes it a request the route validates, never a value it trusts. A Space
+        that does not exist is refused and nothing is created."""
         from fastapi.testclient import TestClient
 
         from app.main import app
         from app.models.project import Project
-        from app.models.workspace import DEFAULT_WORKSPACE_ID
 
         self._seed_default_workspace(db_session)
         bogus = str(uuid4())
@@ -294,14 +296,11 @@ class TestProjectDefaultSpaceWritePath:
         with TestClient(app) as client:
             resp = client.post(
                 "/api/v1/projects",
-                # a self-asserted workspace_id in the body must NEVER be honored
                 json={"name": "Hijack Attempt", "workspace_id": bogus},
                 headers=auth_headers,
             )
-        assert resp.status_code == 201, resp.text
-        project = db_session.query(Project).filter(Project.id == resp.json()["id"]).first()
-        assert str(project.workspace_id) == DEFAULT_WORKSPACE_ID
-        assert str(project.workspace_id) != bogus, "client workspace_id must be ignored"
+        assert resp.status_code == 404, resp.text
+        assert db_session.query(Project).filter(Project.name == "Hijack Attempt").count() == 0
 
     def test_create_degrades_to_null_when_default_workspace_absent(self, db_session):
         """No Default Workspace row -> graceful NULL Space, no FK crash (legacy

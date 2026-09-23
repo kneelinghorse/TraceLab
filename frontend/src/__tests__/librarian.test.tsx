@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => ({
   createMission: vi.fn(),
   listAllProjects: vi.fn(),
   createProject: vi.fn(),
+  listSpaces: vi.fn(),
   push: vi.fn(),
 }));
 vi.mock("@/lib/api/librarian", async () => {
@@ -18,6 +19,7 @@ vi.mock("@/lib/api/librarian", async () => {
   return { ...actual, librarianApi: { turn: mocks.turn, draft: mocks.draft, createMission: mocks.createMission } };
 });
 vi.mock("@/lib/api/projects", () => ({ projectsApi: { listAllProjects: mocks.listAllProjects, createProject: mocks.createProject } }));
+vi.mock("@/lib/api/spaces", () => ({ spacesApi: { list: mocks.listSpaces } }));
 vi.mock("@/contexts/AuthContext", () => ({
   useAuth: () => ({ isReady: true, isAuthenticated: true, user: { user_id: "reader" } }),
 }));
@@ -44,6 +46,8 @@ beforeEach(() => {
   vi.resetAllMocks();
   window.localStorage.clear();
   mocks.listAllProjects.mockResolvedValue([{ id: projectId, name: "Onboarding" }]);
+  // One Space, the reader's own: no picker, as for most members.
+  mocks.listSpaces.mockResolvedValue([{ id: "space-mine", name: "Reader's Space", created_at: "", personal_owner_id: "reader" }]);
   mocks.push.mockResolvedValue(true);
 });
 
@@ -171,6 +175,32 @@ describe("Librarian page", () => {
     await waitFor(() => expect(mocks.createProject).toHaveBeenCalledWith({ name: "Fresh start" }));
     await waitFor(() => expect((screen.getByRole("combobox", { name: "Project" }) as HTMLSelectElement).value).toBe(projectId));
     expect(await screen.findByText(/Missions will be created in/)).toBeVisible();
+  });
+
+  // PERSONAL-2 (decision #533): the picker appears only for someone in more than one Space.
+  it("shows no Space picker to someone whose only Space is their own", async () => {
+    page();
+    await screen.findByRole("option", { name: "Onboarding" });
+    await waitFor(() => expect(mocks.listSpaces).toHaveBeenCalled());
+    expect(screen.queryByRole("combobox", { name: "Space" })).toBeNull();
+  });
+
+  it("lets a member of a shared Space create the new project there", async () => {
+    mocks.listSpaces.mockResolvedValue([
+      { id: "space-mine", name: "Reader's Space", created_at: "", personal_owner_id: "reader" },
+      { id: "space-parts", name: "Parts Town", created_at: "", personal_owner_id: null },
+    ]);
+    mocks.createProject.mockResolvedValue({ id: projectId, name: "Catalog audit" });
+    page();
+    const picker = (await screen.findByRole("combobox", { name: "Space" })) as HTMLSelectElement;
+    expect(picker.value).toBe("");
+    expect(within(picker).getByRole("option", { name: "My Space" })).toBeInTheDocument();
+    fireEvent.change(picker, { target: { value: "space-parts" } });
+    fireEvent.change(screen.getByLabelText("New project"), { target: { value: "Catalog audit" } });
+    fireEvent.click(screen.getByRole("button", { name: "Create" }));
+    await waitFor(() =>
+      expect(mocks.createProject).toHaveBeenCalledWith({ name: "Catalog audit", workspace_id: "space-parts" }),
+    );
   });
 
   it("keeps the conversation and project when the page is left and reopened, until the user starts over", async () => {

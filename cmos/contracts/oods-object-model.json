@@ -196,6 +196,10 @@
           "last_quality_check": {
             "annotation": "datetime.datetime | None",
             "mapping": "Project.last_quality_check"
+          },
+          "workspace_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Project.workspace_id (requested Space, validated by the route; absent means the caller's personal Space)"
           }
         },
         "ProjectUpdate": {

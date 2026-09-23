@@ -24,6 +24,11 @@ The next release is a **major** bump: the removals below break callers of the
 
 ### Added
 
+- `tracelab_project.create`: optional `workspace_id` (UUID), the Space to create
+  in; omitted means the caller's personal Space. The server requires membership
+  of the named Space (403), and owners and admins may name any existing Space
+  (404 when missing). `tracelab_project.list` items and the `create` result now
+  include `workspace_id` (PERSONAL-2, decision #533).
 - `tracelab_home.activity`: `GET /activity` with optional `page` (1) and
   `page_size` (20, max 100). One recency-ordered stream of missions, reports and
   evidence; each item carries `type`, `id`, `title`, `subtitle`, `status`,

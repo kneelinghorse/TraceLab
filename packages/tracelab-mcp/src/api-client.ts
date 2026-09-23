@@ -55,6 +55,7 @@ export interface Project {
   methodology?: string;
   status?: string;
   quality_score?: number;
+  workspace_id?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -65,6 +66,7 @@ export interface ProjectCreate {
   research_type?: string;
   methodology?: string;
   status?: string;
+  workspace_id?: string;
 }
 
 export interface ProjectUpdate {

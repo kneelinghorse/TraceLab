@@ -10,6 +10,10 @@ sprint, so populating these rows does not change any data-access behavior today.
 Owner-safety: managing Space membership can never strand the owner, because the
 owner/admin tier is allowed by ROLE regardless of Space membership (see
 authorize() — privileged roles short-circuit before the membership branch).
+
+``member_router`` (PERSONAL-2) is the one non-admin read: the Spaces a caller may
+create a project in, mounted at /spaces behind the ordinary authenticated
+dependency for the create-form picker.
 """
 
 from __future__ import annotations
@@ -17,10 +21,18 @@ from __future__ import annotations
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.core.security import ROLE_ADMIN, ROLE_MEMBER, ROLE_OWNER, ROLE_VIEWER
+from app.core.security import (
+    ROLE_ADMIN,
+    ROLE_MEMBER,
+    ROLE_OWNER,
+    ROLE_VIEWER,
+    AuthenticatedUser,
+    require_authenticated_user,
+)
 from app.models.space_member import SpaceMember
 from app.models.user import User
 from app.models.workspace import Workspace
@@ -34,6 +46,7 @@ from app.schemas.space import (
 from app.services.cache_manager import get_cache_manager
 
 router = APIRouter(tags=["admin-spaces"])
+member_router = APIRouter(tags=["spaces"])
 
 _VALID_GRANT_ROLES = frozenset({ROLE_OWNER, ROLE_ADMIN, ROLE_MEMBER, ROLE_VIEWER})
 _cache_manager = get_cache_manager()
@@ -178,3 +191,30 @@ def remove_space_member(
     db.commit()
     _invalidate_membership_caches()
     return {"status": "removed", "space_id": str(space_id), "user_id": str(user_id)}
+
+
+@member_router.get("", response_model=list[SpaceResponse])
+def list_my_spaces(
+    db: Session = Depends(get_db),
+    current_user: AuthenticatedUser = Depends(require_authenticated_user),
+) -> list[Workspace]:
+    """The Spaces the caller may create a project in (PERSONAL-2, decision #533).
+
+    Members and viewers get the Spaces they belong to; owner and admin get every
+    Space, as POST /projects lets them name any. The caller's own personal Space
+    comes first, then shared Spaces, then other users' personal Spaces (owner and
+    admin only), by name within each group.
+    """
+    query = db.query(Workspace)
+    if current_user.role not in (ROLE_OWNER, ROLE_ADMIN):
+        memberships = select(SpaceMember.workspace_id).where(
+            SpaceMember.user_id == current_user.user_id
+        )
+        query = query.filter(Workspace.id.in_(memberships))
+
+    def group(space: Workspace) -> int:
+        if space.personal_owner_id is None:
+            return 1
+        return 0 if space.personal_owner_id == current_user.user_id else 2
+
+    return sorted(query.all(), key=lambda space: (group(space), space.name.lower()))

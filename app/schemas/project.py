@@ -24,7 +24,9 @@ class ProjectBase(BaseModel):
 class ProjectCreate(ProjectBase):
     """Payload for creating a project."""
 
-    pass
+    # PERSONAL-2 (decision #533): the Space to create in. Validated by the route
+    # (authorize_space_placement) before use; absent means the caller's personal Space.
+    workspace_id: UUID | None = None
 
 
 class ProjectUpdate(BaseModel):

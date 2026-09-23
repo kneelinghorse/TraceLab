@@ -54,9 +54,11 @@ after SUCCESS and only then runs its production checks.
   owner and admin allow paths.
 - Every human account has a personal Space (`workspaces.personal_owner_id`, migration 052,
   PERSONAL-1, decision #532), created with the account by `POST /auth/register` and
-  `POST /admin/users`. `POST /projects` places a new project in its creator's personal Space; a
-  personal Space refuses other members. Default Workspace keeps child-resource and background
-  creates and the owner's legacy projects.
+  `POST /admin/users`. `POST /projects` places a new project in its creator's personal Space unless
+  the body names another Space the caller belongs to (owners and admins may name any; PERSONAL-2,
+  decision #533); `GET /spaces` lists the caller's Spaces for the create-form picker. A personal
+  Space refuses other members. Default Workspace keeps child-resource and background creates and
+  the owner's legacy projects.
 - `app/core/authorization.py` is the single policy: `authorize` and `authorize_or_403` for per-id
   reads and writes, `accessible_filter` for list queries (applied before count and pagination),
   `accessible_project_ids` for non-relational stores such as Qdrant, and `POLICY_VERSION = "1.1"`.

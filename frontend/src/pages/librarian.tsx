@@ -6,6 +6,7 @@ import useSWR from "swr";
 
 import { AuthGate } from "@/components/AuthGate";
 import { MarkdownRenderer } from "@/components/MarkdownRenderer";
+import { SpacePicker } from "@/components/SpacePicker";
 import { useFeedback } from "@/components/ui/useFeedback";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -213,6 +214,7 @@ function LibrarianContent() {
   const queryProject = typeof router.query.project === "string" ? router.query.project : "";
   const [projectId, setProjectId] = useState(queryProject);
   const [newProjectName, setNewProjectName] = useState("");
+  const [newProjectSpace, setNewProjectSpace] = useState("");
   const [creatingProject, setCreatingProject] = useState(false);
   const [turns, setTurns] = useState<Turn[]>([]);
   const [input, setInput] = useState("");
@@ -336,10 +338,13 @@ function LibrarianContent() {
     if (!name || creatingProject) return;
     setCreatingProject(true);
     try {
-      const created = await projectsApi.createProject({ name });
+      const created = await projectsApi.createProject(
+        newProjectSpace ? { name, workspace_id: newProjectSpace } : { name },
+      );
       await projects.mutate();
       setProjectId(created.id);
       setNewProjectName("");
+      setNewProjectSpace("");
       notify(`Project "${created.name}" created. The Librarian's missions will land there.`, "success");
     } catch (err) {
       notify(err);
@@ -373,7 +378,7 @@ function LibrarianContent() {
       {!orientationHidden && <LibrarianSteps current={draft ? 2 : 1} onDismiss={dismissOrientation} />}
 
       <section className="panel space-y-3 p-5" aria-label="Project">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
           <div className="flex-1">
             <label htmlFor="librarian-project" className="form-label">Project</label>
             <select
@@ -389,20 +394,23 @@ function LibrarianContent() {
               ))}
             </select>
           </div>
-          <form onSubmit={createProject} className="flex flex-1 items-end gap-2">
-            <div className="flex-1">
-              <label htmlFor="librarian-new-project" className="form-label">New project</label>
-              <input
-                id="librarian-new-project"
-                className="form-input"
-                value={newProjectName}
-                onChange={(event) => setNewProjectName(event.target.value)}
-                placeholder="Name a project to hold the mission"
-              />
+          <form onSubmit={createProject} className="flex flex-1 flex-col gap-2">
+            <div className="flex items-end gap-2">
+              <div className="flex-1">
+                <label htmlFor="librarian-new-project" className="form-label">New project</label>
+                <input
+                  id="librarian-new-project"
+                  className="form-input"
+                  value={newProjectName}
+                  onChange={(event) => setNewProjectName(event.target.value)}
+                  placeholder="Name a project to hold the mission"
+                />
+              </div>
+              <button type="submit" disabled={creatingProject || !newProjectName.trim()} className="rounded-lg border border-line-strong px-3 py-2 text-sm disabled:opacity-60">
+                {creatingProject ? "Creating…" : "Create"}
+              </button>
             </div>
-            <button type="submit" disabled={creatingProject || !newProjectName.trim()} className="rounded-lg border border-line-strong px-3 py-2 text-sm disabled:opacity-60">
-              {creatingProject ? "Creating…" : "Create"}
-            </button>
+            <SpacePicker value={newProjectSpace} onChange={setNewProjectSpace} />
           </form>
         </div>
         {projects.error && <p role="alert" className="text-sm text-danger">Projects could not load. <button type="button" className="underline" onClick={() => void projects.mutate()}>Retry</button></p>}

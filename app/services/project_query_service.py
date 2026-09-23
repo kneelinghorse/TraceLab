@@ -104,15 +104,16 @@ class ProjectQueryService:
         owner_id is derived from the authenticated caller by the route (T43.4) and
         recorded as the trustworthy owner; the legacy self-asserted user_id is no
         longer accepted from the request body. workspace_id (the project's Space) is
-        likewise derived server-side via ``default_workspace_id`` (T44.4), never
-        from the body; with a human ``caller`` it is the caller's personal Space
-        (PERSONAL-1, decision #532).
+        derived server-side via ``default_workspace_id`` (T44.4); with a human
+        ``caller`` it is the caller's personal Space (PERSONAL-1, decision #532).
+        A body ``workspace_id`` is used only after the route has validated it with
+        ``authorize_space_placement`` (PERSONAL-2, decision #533).
         """
         project = Project(
             name=data.name,
             description=data.description,
             owner_id=owner_id,
-            workspace_id=default_workspace_id(db, caller),
+            workspace_id=data.workspace_id or default_workspace_id(db, caller),
             mission_protocol_id=data.mission_protocol_id,
             research_type=data.research_type,
             methodology=data.methodology,

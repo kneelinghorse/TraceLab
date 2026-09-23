@@ -243,6 +243,27 @@ def _user_space_ids(user: AuthenticatedUser, db: Session) -> list:
     return [row[0] for row in rows]
 
 
+def authorize_space_placement(user: AuthenticatedUser, space_id: UUID, db: Session) -> None:
+    """Allow ``user`` to create a project in Space ``space_id``, or raise (PERSONAL-2).
+
+    Owner and admin may name any existing Space (404 when it does not exist).
+    Everyone else must be a member of it: 403 otherwise, whether or not the Space
+    exists, so a member cannot probe for Space ids. Unconditional rather than gated
+    by ``rbac_enabled``: placement is not enforcement (decision #533).
+    """
+    if user.role in _PRIVILEGED_ROLES:
+        from app.models.workspace import Workspace
+
+        if db.get(Workspace, space_id) is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Space not found")
+        return
+    if space_id not in _user_space_ids(user, db):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not a member of this Space.",
+        )
+
+
 def accessible_filter(user: AuthenticatedUser, model: type, db: Session):
     """Query-level companion to :func:`authorize` for LIST endpoints (T47.3).
 
