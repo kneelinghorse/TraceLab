@@ -7,8 +7,10 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-The next release is a **major** bump: the removals below break callers of the
-1.2.0 action surface (decision #459, mission ACT-1).
+## [2.0.0] — 2026-09-23
+
+A **major** release: the removals below break callers of the 1.2.0 action
+surface (decision #459, mission ACT-1).
 
 ### Removed
 
@@ -250,6 +252,7 @@ swap the install line to `npm install -g @aquex/tracelab-mcp` (or `npx
 Calls against legacy flat tool names continue to return a friendly
 migration error pointing at the cluster equivalent.
 
+[2.0.0]: https://github.com/kneelinghorse/TraceLab/releases/tag/tracelab-mcp-v2.0.0
 [1.2.0]: https://github.com/kneelinghorse/TraceLab/releases/tag/tracelab-mcp-v1.2.0
 [1.1.1]: https://github.com/kneelinghorse/TraceLab/releases/tag/tracelab-mcp-v1.1.1
 [1.1.0]: https://github.com/kneelinghorse/TraceLab/releases/tag/tracelab-mcp-v1.1.0
