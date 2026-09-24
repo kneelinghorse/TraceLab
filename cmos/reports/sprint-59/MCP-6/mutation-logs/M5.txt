@@ -1,0 +1,2812 @@
+== backend
+.........F                                                               [100%]
+=================================== FAILURES ===================================
+_ TestAnswer.test_each_paid_call_is_metered_to_the_caller_and_a_cached_answer_is_not _
+
+self = <test_search_ask.TestAnswer object at 0x115c612d0>
+client = <starlette.testclient.TestClient object at 0x115a95650>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x115e43cd0>
+db_session = <sqlalchemy.orm.session.Session object at 0x116122050>
+project = <app.models.project.Project object at 0x115db4090>
+
+    def test_each_paid_call_is_metered_to_the_caller_and_a_cached_answer_is_not(
+        self, client, monkeypatch, db_session, project
+    ):
+        owner, headers = _owned(db_session, project)
+        _, source = _chunk(db_session, project)
+        answer = f"The bill is $48. {_label(source)}"
+        escalated = [
+            {"model": "gpt-5.1", "usage": USAGE},
+            {"model": "gpt-5.2", "usage": {"prompt_tokens": 950, "completion_tokens": 140, "total_tokens": 1090}},
+        ]
+        _rag(monkeypatch, answer, [source], attempts=escalated)
+    
+        assert _ask(client, project.id, headers).status_code == 200
+    
+        rows = db_session.query(UsageRecord).filter(UsageRecord.project_id == project.id).all()
+        # The literal kind, so asks stay apart from the Librarian's librarian_turn rows in any usage query.
+>       assert USAGE_KIND_SEARCH_ASK == "search_ask"
+E       AssertionError: assert 'librarian_turn' == 'search_ask'
+E         
+E         - search_ask
+E         + librarian_turn
+
+tests/test_search_ask.py:319: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+2026-09-23 18:45:49,951 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-23 18:45:49,951 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("api_keys")
+2026-09-23 18:45:49,951 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,951 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("document_chunks")
+2026-09-23 18:45:49,951 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,951 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("collections")
+2026-09-23 18:45:49,951 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,951 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("collection_items")
+2026-09-23 18:45:49,951 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,951 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("collection_documents")
+2026-09-23 18:45:49,951 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,951 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("device_authorization_grants")
+2026-09-23 18:45:49,951 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,951 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("documents")
+2026-09-23 18:45:49,951 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,951 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("ledger_sources")
+2026-09-23 18:45:49,952 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,952 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("deepsearch_ledger_batches")
+2026-09-23 18:45:49,952 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,952 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("deepsearch_evidence_outbox")
+2026-09-23 18:45:49,952 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,952 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("ledger_entries")
+2026-09-23 18:45:49,952 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,952 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("ledger_notes")
+2026-09-23 18:45:49,952 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,952 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("graph_edges")
+2026-09-23 18:45:49,952 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,952 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("idempotency_records")
+2026-09-23 18:45:49,952 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,952 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("ingestion_jobs")
+2026-09-23 18:45:49,952 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,952 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("insights")
+2026-09-23 18:45:49,952 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,952 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("insight_sources")
+2026-09-23 18:45:49,952 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,952 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("invite_codes")
+2026-09-23 18:45:49,952 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,952 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("missions")
+2026-09-23 18:45:49,952 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,953 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("document_processing_statuses")
+2026-09-23 18:45:49,953 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,953 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("projects")
+2026-09-23 18:45:49,953 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,953 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("project_tags")
+2026-09-23 18:45:49,953 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,953 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("quality_checks")
+2026-09-23 18:45:49,953 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,953 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("reports")
+2026-09-23 18:45:49,953 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,953 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("report_sources")
+2026-09-23 18:45:49,953 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,953 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("saved_searches")
+2026-09-23 18:45:49,953 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,953 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("search_history")
+2026-09-23 18:45:49,953 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,953 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("space_members")
+2026-09-23 18:45:49,953 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,953 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("sync_states")
+2026-09-23 18:45:49,953 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,953 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("synthesis_cache")
+2026-09-23 18:45:49,953 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,954 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("tags")
+2026-09-23 18:45:49,954 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,954 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("document_tags")
+2026-09-23 18:45:49,954 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,954 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("usage_records")
+2026-09-23 18:45:49,954 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,954 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("users")
+2026-09-23 18:45:49,954 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,954 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("user_favorites")
+2026-09-23 18:45:49,954 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,954 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("user_item_views")
+2026-09-23 18:45:49,954 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,954 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("workspaces")
+2026-09-23 18:45:49,954 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,954 INFO sqlalchemy.engine.Engine 
+DROP TABLE insight_sources
+2026-09-23 18:45:49,954 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,955 INFO sqlalchemy.engine.Engine 
+DROP TABLE collection_items
+2026-09-23 18:45:49,955 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,956 INFO sqlalchemy.engine.Engine 
+DROP TABLE document_tags
+2026-09-23 18:45:49,956 INFO sqlalchemy.engine.Engine [no key 0.00005s] ()
+2026-09-23 18:45:49,956 INFO sqlalchemy.engine.Engine 
+DROP TABLE document_processing_statuses
+2026-09-23 18:45:49,956 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:49,957 INFO sqlalchemy.engine.Engine 
+DROP TABLE ingestion_jobs
+2026-09-23 18:45:49,957 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,957 INFO sqlalchemy.engine.Engine 
+DROP TABLE ledger_entries
+2026-09-23 18:45:49,957 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,960 INFO sqlalchemy.engine.Engine 
+DROP TABLE collection_documents
+2026-09-23 18:45:49,960 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:49,961 INFO sqlalchemy.engine.Engine 
+DROP TABLE document_chunks
+2026-09-23 18:45:49,961 INFO sqlalchemy.engine.Engine [no key 0.00005s] ()
+2026-09-23 18:45:49,961 INFO sqlalchemy.engine.Engine 
+DROP TABLE usage_records
+2026-09-23 18:45:49,961 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:49,964 INFO sqlalchemy.engine.Engine 
+DROP TABLE ledger_notes
+2026-09-23 18:45:49,964 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:49,964 INFO sqlalchemy.engine.Engine 
+DROP TABLE deepsearch_evidence_outbox
+2026-09-23 18:45:49,964 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,965 INFO sqlalchemy.engine.Engine 
+DROP TABLE deepsearch_ledger_batches
+2026-09-23 18:45:49,965 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,965 INFO sqlalchemy.engine.Engine 
+DROP TABLE documents
+2026-09-23 18:45:49,965 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,966 INFO sqlalchemy.engine.Engine 
+DROP TABLE report_sources
+2026-09-23 18:45:49,966 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:49,966 INFO sqlalchemy.engine.Engine 
+DROP TABLE missions
+2026-09-23 18:45:49,966 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,968 INFO sqlalchemy.engine.Engine 
+DROP TABLE user_favorites
+2026-09-23 18:45:49,968 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,968 INFO sqlalchemy.engine.Engine 
+DROP TABLE reports
+2026-09-23 18:45:49,968 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,969 INFO sqlalchemy.engine.Engine 
+DROP TABLE project_tags
+2026-09-23 18:45:49,969 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,969 INFO sqlalchemy.engine.Engine 
+DROP TABLE insights
+2026-09-23 18:45:49,969 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,970 INFO sqlalchemy.engine.Engine 
+DROP TABLE ledger_sources
+2026-09-23 18:45:49,970 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,970 INFO sqlalchemy.engine.Engine 
+DROP TABLE space_members
+2026-09-23 18:45:49,970 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,970 INFO sqlalchemy.engine.Engine 
+DROP TABLE projects
+2026-09-23 18:45:49,970 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,971 INFO sqlalchemy.engine.Engine 
+DROP TABLE device_authorization_grants
+2026-09-23 18:45:49,971 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,972 INFO sqlalchemy.engine.Engine 
+DROP TABLE collections
+2026-09-23 18:45:49,972 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,972 INFO sqlalchemy.engine.Engine 
+DROP TABLE workspaces
+2026-09-23 18:45:49,972 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,973 INFO sqlalchemy.engine.Engine 
+DROP TABLE user_item_views
+2026-09-23 18:45:49,973 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,973 INFO sqlalchemy.engine.Engine 
+DROP TABLE search_history
+2026-09-23 18:45:49,973 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,974 INFO sqlalchemy.engine.Engine 
+DROP TABLE saved_searches
+2026-09-23 18:45:49,974 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,974 INFO sqlalchemy.engine.Engine 
+DROP TABLE invite_codes
+2026-09-23 18:45:49,974 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,975 INFO sqlalchemy.engine.Engine 
+DROP TABLE api_keys
+2026-09-23 18:45:49,975 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:49,975 INFO sqlalchemy.engine.Engine 
+DROP TABLE users
+2026-09-23 18:45:49,975 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,975 INFO sqlalchemy.engine.Engine 
+DROP TABLE tags
+2026-09-23 18:45:49,975 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,976 INFO sqlalchemy.engine.Engine 
+DROP TABLE synthesis_cache
+2026-09-23 18:45:49,976 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,976 INFO sqlalchemy.engine.Engine 
+DROP TABLE sync_states
+2026-09-23 18:45:49,976 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,977 INFO sqlalchemy.engine.Engine 
+DROP TABLE quality_checks
+2026-09-23 18:45:49,977 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,977 INFO sqlalchemy.engine.Engine 
+DROP TABLE idempotency_records
+2026-09-23 18:45:49,977 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,978 INFO sqlalchemy.engine.Engine 
+DROP TABLE graph_edges
+2026-09-23 18:45:49,978 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,978 INFO sqlalchemy.engine.Engine COMMIT
+2026-09-23 18:45:49,979 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-23 18:45:49,979 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("api_keys")
+2026-09-23 18:45:49,979 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,979 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("api_keys")
+2026-09-23 18:45:49,979 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,979 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("document_chunks")
+2026-09-23 18:45:49,979 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,979 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("document_chunks")
+2026-09-23 18:45:49,979 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,979 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("collections")
+2026-09-23 18:45:49,979 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,979 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("collections")
+2026-09-23 18:45:49,979 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,979 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("collection_items")
+2026-09-23 18:45:49,979 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,979 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("collection_items")
+2026-09-23 18:45:49,979 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,980 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("collection_documents")
+2026-09-23 18:45:49,980 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,980 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("collection_documents")
+2026-09-23 18:45:49,980 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,980 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("device_authorization_grants")
+2026-09-23 18:45:49,980 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,980 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("device_authorization_grants")
+2026-09-23 18:45:49,980 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,980 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("documents")
+2026-09-23 18:45:49,980 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,980 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("documents")
+2026-09-23 18:45:49,980 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,980 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("ledger_sources")
+2026-09-23 18:45:49,980 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,980 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("ledger_sources")
+2026-09-23 18:45:49,980 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,980 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("deepsearch_ledger_batches")
+2026-09-23 18:45:49,980 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,980 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("deepsearch_ledger_batches")
+2026-09-23 18:45:49,980 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,980 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("deepsearch_evidence_outbox")
+2026-09-23 18:45:49,980 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,980 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("deepsearch_evidence_outbox")
+2026-09-23 18:45:49,980 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,980 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("ledger_entries")
+2026-09-23 18:45:49,980 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,980 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("ledger_entries")
+2026-09-23 18:45:49,980 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,980 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("ledger_notes")
+2026-09-23 18:45:49,981 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,981 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("ledger_notes")
+2026-09-23 18:45:49,981 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,981 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("graph_edges")
+2026-09-23 18:45:49,981 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,981 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("graph_edges")
+2026-09-23 18:45:49,981 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,981 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("idempotency_records")
+2026-09-23 18:45:49,981 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,981 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("idempotency_records")
+2026-09-23 18:45:49,981 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,981 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("ingestion_jobs")
+2026-09-23 18:45:49,981 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,981 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("ingestion_jobs")
+2026-09-23 18:45:49,981 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,981 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("insights")
+2026-09-23 18:45:49,981 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,981 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("insights")
+2026-09-23 18:45:49,981 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,981 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("insight_sources")
+2026-09-23 18:45:49,981 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,981 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("insight_sources")
+2026-09-23 18:45:49,981 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,981 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("invite_codes")
+2026-09-23 18:45:49,981 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,981 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("invite_codes")
+2026-09-23 18:45:49,981 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,981 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("missions")
+2026-09-23 18:45:49,981 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,981 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("missions")
+2026-09-23 18:45:49,982 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,982 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("document_processing_statuses")
+2026-09-23 18:45:49,982 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,982 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("document_processing_statuses")
+2026-09-23 18:45:49,982 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,982 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("projects")
+2026-09-23 18:45:49,982 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,982 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("projects")
+2026-09-23 18:45:49,982 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,982 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("project_tags")
+2026-09-23 18:45:49,982 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,982 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("project_tags")
+2026-09-23 18:45:49,982 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,982 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("quality_checks")
+2026-09-23 18:45:49,982 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,982 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("quality_checks")
+2026-09-23 18:45:49,982 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,982 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("reports")
+2026-09-23 18:45:49,982 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,982 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("reports")
+2026-09-23 18:45:49,982 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,982 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("report_sources")
+2026-09-23 18:45:49,982 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,982 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("report_sources")
+2026-09-23 18:45:49,982 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,982 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("saved_searches")
+2026-09-23 18:45:49,982 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,982 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("saved_searches")
+2026-09-23 18:45:49,982 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,982 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("search_history")
+2026-09-23 18:45:49,983 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,983 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("search_history")
+2026-09-23 18:45:49,983 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,983 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("space_members")
+2026-09-23 18:45:49,983 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,983 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("space_members")
+2026-09-23 18:45:49,983 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,983 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("sync_states")
+2026-09-23 18:45:49,983 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,983 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("sync_states")
+2026-09-23 18:45:49,983 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,983 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("synthesis_cache")
+2026-09-23 18:45:49,983 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,983 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("synthesis_cache")
+2026-09-23 18:45:49,983 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,983 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("tags")
+2026-09-23 18:45:49,983 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,983 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("tags")
+2026-09-23 18:45:49,983 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,983 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("document_tags")
+2026-09-23 18:45:49,983 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,983 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("document_tags")
+2026-09-23 18:45:49,983 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,983 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("usage_records")
+2026-09-23 18:45:49,983 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,984 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("usage_records")
+2026-09-23 18:45:49,984 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,984 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("users")
+2026-09-23 18:45:49,984 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,984 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("users")
+2026-09-23 18:45:49,984 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,984 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("user_favorites")
+2026-09-23 18:45:49,984 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,984 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("user_favorites")
+2026-09-23 18:45:49,984 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,984 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("user_item_views")
+2026-09-23 18:45:49,984 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,984 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("user_item_views")
+2026-09-23 18:45:49,984 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,984 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("workspaces")
+2026-09-23 18:45:49,984 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,984 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("workspaces")
+2026-09-23 18:45:49,984 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-23 18:45:49,984 INFO sqlalchemy.engine.Engine 
+CREATE TABLE graph_edges (
+	id CHAR(36) NOT NULL, 
+	from_urn VARCHAR(512) NOT NULL, 
+	to_urn VARCHAR(512) NOT NULL, 
+	edge_type VARCHAR(50) NOT NULL, 
+	direction VARCHAR(20) NOT NULL, 
+	weight FLOAT NOT NULL, 
+	reason TEXT, 
+	via VARCHAR(50), 
+	evidence JSON, 
+	created_at DATETIME NOT NULL, 
+	updated_at DATETIME NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_graph_edges_from_to_type_direction UNIQUE (from_urn, to_urn, edge_type, direction)
+)
+
+
+2026-09-23 18:45:49,984 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:49,987 INFO sqlalchemy.engine.Engine CREATE INDEX idx_graph_edges_from_type ON graph_edges (from_urn, edge_type)
+2026-09-23 18:45:49,987 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:49,987 INFO sqlalchemy.engine.Engine CREATE INDEX ix_graph_edges_edge_type ON graph_edges (edge_type)
+2026-09-23 18:45:49,988 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:49,988 INFO sqlalchemy.engine.Engine CREATE INDEX ix_graph_edges_from_urn ON graph_edges (from_urn)
+2026-09-23 18:45:49,988 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,988 INFO sqlalchemy.engine.Engine CREATE INDEX idx_graph_edges_to_type ON graph_edges (to_urn, edge_type)
+2026-09-23 18:45:49,988 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,989 INFO sqlalchemy.engine.Engine CREATE INDEX ix_graph_edges_to_urn ON graph_edges (to_urn)
+2026-09-23 18:45:49,989 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,989 INFO sqlalchemy.engine.Engine 
+CREATE TABLE idempotency_records (
+	"key" VARCHAR(255) NOT NULL, 
+	method VARCHAR(16) NOT NULL, 
+	path VARCHAR(255) NOT NULL, 
+	request_hash VARCHAR(128) NOT NULL, 
+	status_code INTEGER NOT NULL, 
+	response_data JSON NOT NULL, 
+	error_message TEXT, 
+	created_at DATETIME NOT NULL, 
+	updated_at DATETIME NOT NULL, 
+	PRIMARY KEY ("key")
+)
+
+
+2026-09-23 18:45:49,989 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:49,990 INFO sqlalchemy.engine.Engine 
+CREATE TABLE quality_checks (
+	id CHAR(36) NOT NULL, 
+	entity_type VARCHAR NOT NULL, 
+	entity_id CHAR(36) NOT NULL, 
+	check_type VARCHAR NOT NULL, 
+	status VARCHAR NOT NULL, 
+	details JSON, 
+	recommendations JSON, 
+	performed_by VARCHAR, 
+	performed_at DATETIME, 
+	PRIMARY KEY (id)
+)
+
+
+2026-09-23 18:45:49,990 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:49,990 INFO sqlalchemy.engine.Engine CREATE INDEX idx_quality_checks_entity ON quality_checks (entity_type, entity_id)
+2026-09-23 18:45:49,990 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,991 INFO sqlalchemy.engine.Engine 
+CREATE TABLE sync_states (
+	id CHAR(36) NOT NULL, 
+	entity_type VARCHAR(50) NOT NULL, 
+	last_sync_at DATETIME, 
+	sync_count INTEGER, 
+	last_entity_id VARCHAR(255), 
+	sync_metadata JSON, 
+	created_at DATETIME, 
+	updated_at DATETIME, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_sync_state_entity_type UNIQUE (entity_type)
+)
+
+
+2026-09-23 18:45:49,991 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:49,991 INFO sqlalchemy.engine.Engine 
+CREATE TABLE synthesis_cache (
+	id CHAR(36) NOT NULL, 
+	input_hash VARCHAR(64) NOT NULL, 
+	content TEXT NOT NULL, 
+	citations JSON, 
+	model_used VARCHAR(50), 
+	tokens_used INTEGER NOT NULL, 
+	created_at DATETIME NOT NULL, 
+	hit_count INTEGER NOT NULL, 
+	last_hit_at DATETIME, 
+	PRIMARY KEY (id), 
+	UNIQUE (input_hash)
+)
+
+
+2026-09-23 18:45:49,991 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:49,992 INFO sqlalchemy.engine.Engine CREATE INDEX ix_synthesis_cache_input_hash ON synthesis_cache (input_hash)
+2026-09-23 18:45:49,992 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,992 INFO sqlalchemy.engine.Engine 
+CREATE TABLE tags (
+	id CHAR(36) NOT NULL, 
+	name VARCHAR NOT NULL, 
+	user_id CHAR(36), 
+	category VARCHAR, 
+	color VARCHAR, 
+	parent_id CHAR(36), 
+	created_at DATETIME, 
+	updated_at DATETIME, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_user_tag UNIQUE (user_id, name), 
+	FOREIGN KEY(parent_id) REFERENCES tags (id)
+)
+
+
+2026-09-23 18:45:49,992 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,992 INFO sqlalchemy.engine.Engine 
+CREATE TABLE users (
+	id CHAR(36) NOT NULL, 
+	email VARCHAR(255) NOT NULL, 
+	display_name VARCHAR(255) NOT NULL, 
+	password_hash VARCHAR(255) NOT NULL, 
+	email_notifications_enabled BOOLEAN DEFAULT '1' NOT NULL, 
+	role VARCHAR(50) NOT NULL, 
+	is_active BOOLEAN NOT NULL, 
+	invite_code_used VARCHAR(50), 
+	created_at DATETIME NOT NULL, 
+	updated_at DATETIME NOT NULL, 
+	last_login_at DATETIME, 
+	PRIMARY KEY (id), 
+	UNIQUE (email)
+)
+
+
+2026-09-23 18:45:49,993 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:49,993 INFO sqlalchemy.engine.Engine CREATE UNIQUE INDEX ix_users_email ON users (email)
+2026-09-23 18:45:49,993 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,993 INFO sqlalchemy.engine.Engine 
+CREATE TABLE api_keys (
+	id CHAR(36) NOT NULL, 
+	user_id CHAR(36) NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	key_hash VARCHAR(255) NOT NULL, 
+	key_prefix VARCHAR(12) NOT NULL, 
+	created_at DATETIME NOT NULL, 
+	last_used_at DATETIME, 
+	expires_at DATETIME, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(user_id) REFERENCES users (id)
+)
+
+
+2026-09-23 18:45:49,993 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,994 INFO sqlalchemy.engine.Engine CREATE INDEX ix_api_keys_user_id ON api_keys (user_id)
+2026-09-23 18:45:49,994 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,994 INFO sqlalchemy.engine.Engine CREATE INDEX ix_api_keys_key_prefix ON api_keys (key_prefix)
+2026-09-23 18:45:49,994 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,995 INFO sqlalchemy.engine.Engine 
+CREATE TABLE invite_codes (
+	id CHAR(36) NOT NULL, 
+	code VARCHAR(8) NOT NULL, 
+	created_by CHAR(36) NOT NULL, 
+	used_by CHAR(36), 
+	created_at DATETIME NOT NULL, 
+	used_at DATETIME, 
+	expires_at DATETIME, 
+	PRIMARY KEY (id), 
+	UNIQUE (code), 
+	FOREIGN KEY(created_by) REFERENCES users (id), 
+	FOREIGN KEY(used_by) REFERENCES users (id)
+)
+
+
+2026-09-23 18:45:49,995 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:49,995 INFO sqlalchemy.engine.Engine 
+CREATE TABLE saved_searches (
+	id CHAR(36) NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	description TEXT, 
+	query_text TEXT NOT NULL, 
+	search_mode VARCHAR(32) NOT NULL, 
+	filters JSON NOT NULL, 
+	top_k INTEGER NOT NULL, 
+	owner_id CHAR(36), 
+	owner VARCHAR(128) NOT NULL, 
+	use_count INTEGER NOT NULL, 
+	last_used_at DATETIME, 
+	created_at DATETIME NOT NULL, 
+	updated_at DATETIME NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_saved_search_owner_id_name UNIQUE (owner_id, name), 
+	FOREIGN KEY(owner_id) REFERENCES users (id) ON DELETE CASCADE
+)
+
+
+2026-09-23 18:45:49,995 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,995 INFO sqlalchemy.engine.Engine CREATE INDEX ix_saved_searches_owner_id_created_at ON saved_searches (owner_id, created_at)
+2026-09-23 18:45:49,995 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,996 INFO sqlalchemy.engine.Engine 
+CREATE TABLE search_history (
+	id CHAR(36) NOT NULL, 
+	query_text TEXT NOT NULL, 
+	search_mode VARCHAR(32) NOT NULL, 
+	filters JSON NOT NULL, 
+	result_count INTEGER NOT NULL, 
+	top_k INTEGER NOT NULL, 
+	duration_ms INTEGER, 
+	cache_hit BOOLEAN NOT NULL, 
+	owner_id CHAR(36), 
+	user_label VARCHAR(255), 
+	metadata_payload JSON NOT NULL, 
+	top_chunks JSON NOT NULL, 
+	created_at DATETIME NOT NULL, 
+	updated_at DATETIME NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(owner_id) REFERENCES users (id) ON DELETE CASCADE
+)
+
+
+2026-09-23 18:45:49,996 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,996 INFO sqlalchemy.engine.Engine CREATE INDEX ix_search_history_owner_id_created_at ON search_history (owner_id, created_at)
+2026-09-23 18:45:49,996 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,997 INFO sqlalchemy.engine.Engine CREATE INDEX ix_search_history_query_mode ON search_history (search_mode)
+2026-09-23 18:45:49,997 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,997 INFO sqlalchemy.engine.Engine CREATE INDEX ix_search_history_created_at ON search_history (created_at)
+2026-09-23 18:45:49,997 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,998 INFO sqlalchemy.engine.Engine 
+CREATE TABLE user_item_views (
+	user_id CHAR(36) NOT NULL, 
+	item_type VARCHAR(32) NOT NULL, 
+	item_id CHAR(36) NOT NULL, 
+	occurred_at DATETIME NOT NULL, 
+	viewed_at DATETIME NOT NULL, 
+	PRIMARY KEY (user_id, item_type, item_id), 
+	CONSTRAINT ck_user_item_views_type CHECK (item_type IN ('mission', 'report', 'evidence')), 
+	FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE
+)
+
+
+2026-09-23 18:45:49,998 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:49,998 INFO sqlalchemy.engine.Engine 
+CREATE TABLE workspaces (
+	id CHAR(36) NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	created_at DATETIME NOT NULL, 
+	personal_owner_id CHAR(36), 
+	PRIMARY KEY (id), 
+	UNIQUE (personal_owner_id), 
+	FOREIGN KEY(personal_owner_id) REFERENCES users (id) ON DELETE CASCADE
+)
+
+
+2026-09-23 18:45:49,998 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,998 INFO sqlalchemy.engine.Engine 
+CREATE TABLE collections (
+	id CHAR(36) NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	description TEXT, 
+	instructions TEXT, 
+	created_at DATETIME NOT NULL, 
+	updated_at DATETIME NOT NULL, 
+	owner_id CHAR(36), 
+	workspace_id CHAR(36), 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(owner_id) REFERENCES users (id) ON DELETE SET NULL, 
+	FOREIGN KEY(workspace_id) REFERENCES workspaces (id) ON DELETE SET NULL
+)
+
+
+2026-09-23 18:45:49,998 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,999 INFO sqlalchemy.engine.Engine CREATE INDEX ix_collections_created_at ON collections (created_at)
+2026-09-23 18:45:49,999 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:49,999 INFO sqlalchemy.engine.Engine CREATE INDEX ix_collections_workspace_owner_created_at ON collections (workspace_id, owner_id, created_at)
+2026-09-23 18:45:49,999 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:50,000 INFO sqlalchemy.engine.Engine 
+CREATE TABLE device_authorization_grants (
+	id CHAR(36) NOT NULL, 
+	device_code VARCHAR(64) NOT NULL, 
+	user_code VARCHAR(16) NOT NULL, 
+	client_label VARCHAR(255) NOT NULL, 
+	status VARCHAR(16) NOT NULL, 
+	interval_seconds INTEGER NOT NULL, 
+	user_id CHAR(36), 
+	api_key_id CHAR(36), 
+	created_at DATETIME NOT NULL, 
+	expires_at DATETIME NOT NULL, 
+	last_polled_at DATETIME, 
+	approved_at DATETIME, 
+	PRIMARY KEY (id), 
+	UNIQUE (device_code), 
+	UNIQUE (user_code), 
+	FOREIGN KEY(user_id) REFERENCES users (id), 
+	FOREIGN KEY(api_key_id) REFERENCES api_keys (id)
+)
+
+
+2026-09-23 18:45:50,000 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:50,000 INFO sqlalchemy.engine.Engine CREATE INDEX ix_device_grants_status ON device_authorization_grants (status)
+2026-09-23 18:45:50,000 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,001 INFO sqlalchemy.engine.Engine CREATE INDEX ix_device_grants_user_code ON device_authorization_grants (user_code)
+2026-09-23 18:45:50,001 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,001 INFO sqlalchemy.engine.Engine CREATE INDEX ix_device_grants_device_code ON device_authorization_grants (device_code)
+2026-09-23 18:45:50,001 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,001 INFO sqlalchemy.engine.Engine 
+CREATE TABLE projects (
+	id CHAR(36) NOT NULL, 
+	name VARCHAR NOT NULL, 
+	description TEXT, 
+	user_id CHAR(36), 
+	mission_protocol_id CHAR(36), 
+	owner_id CHAR(36), 
+	workspace_id CHAR(36), 
+	research_type VARCHAR, 
+	methodology VARCHAR, 
+	status VARCHAR, 
+	quality_score INTEGER, 
+	last_quality_check DATETIME, 
+	created_at DATETIME, 
+	updated_at DATETIME, 
+	deleted_at DATETIME, 
+	deleted_by VARCHAR(100), 
+	PRIMARY KEY (id), 
+	CONSTRAINT valid_research_type CHECK (research_type IS NULL OR research_type IN ('strategic', 'tactical', 'generative', 'evaluative')), 
+	FOREIGN KEY(owner_id) REFERENCES users (id) ON DELETE SET NULL, 
+	FOREIGN KEY(workspace_id) REFERENCES workspaces (id) ON DELETE SET NULL
+)
+
+
+2026-09-23 18:45:50,002 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:50,002 INFO sqlalchemy.engine.Engine CREATE INDEX ix_projects_workspace_owner_created_at ON projects (workspace_id, owner_id, created_at)
+2026-09-23 18:45:50,002 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,002 INFO sqlalchemy.engine.Engine CREATE INDEX ix_projects_deleted_at ON projects (deleted_at)
+2026-09-23 18:45:50,002 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,003 INFO sqlalchemy.engine.Engine 
+CREATE TABLE space_members (
+	id CHAR(36) NOT NULL, 
+	workspace_id CHAR(36) NOT NULL, 
+	user_id CHAR(36) NOT NULL, 
+	role VARCHAR(50) NOT NULL, 
+	created_at DATETIME NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_space_members_workspace_user UNIQUE (workspace_id, user_id), 
+	FOREIGN KEY(workspace_id) REFERENCES workspaces (id) ON DELETE CASCADE, 
+	FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE
+)
+
+
+2026-09-23 18:45:50,003 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:50,003 INFO sqlalchemy.engine.Engine CREATE INDEX ix_space_members_user_id ON space_members (user_id)
+2026-09-23 18:45:50,003 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,004 INFO sqlalchemy.engine.Engine 
+CREATE TABLE ledger_sources (
+	id CHAR(36) NOT NULL, 
+	project_id CHAR(36) NOT NULL, 
+	source_url TEXT NOT NULL, 
+	source_url_hash VARCHAR(64) NOT NULL, 
+	sighting_count INTEGER DEFAULT 1 NOT NULL, 
+	first_seen_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	last_seen_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT ck_ledger_sources_nonempty_url CHECK (length(trim(source_url)) > 0), 
+	CONSTRAINT ck_ledger_sources_hash_length CHECK (length(source_url_hash) = 64), 
+	CONSTRAINT ck_ledger_sources_positive_sightings CHECK (sighting_count > 0), 
+	CONSTRAINT uq_ledger_sources_project_url_hash UNIQUE (project_id, source_url_hash), 
+	CONSTRAINT uq_ledger_sources_id_project UNIQUE (id, project_id), 
+	FOREIGN KEY(project_id) REFERENCES projects (id) ON DELETE CASCADE
+)
+
+
+2026-09-23 18:45:50,004 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:50,004 INFO sqlalchemy.engine.Engine CREATE INDEX ix_ledger_sources_project_last_seen ON ledger_sources (project_id, last_seen_at)
+2026-09-23 18:45:50,004 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,005 INFO sqlalchemy.engine.Engine 
+CREATE TABLE insights (
+	id CHAR(36) NOT NULL, 
+	project_id CHAR(36) NOT NULL, 
+	title VARCHAR NOT NULL, 
+	content TEXT NOT NULL, 
+	insight_type VARCHAR, 
+	created_by VARCHAR, 
+	validated BOOLEAN, 
+	validation_date DATETIME, 
+	created_at DATETIME, 
+	updated_at DATETIME, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(project_id) REFERENCES projects (id) ON DELETE CASCADE
+)
+
+
+2026-09-23 18:45:50,005 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:50,005 INFO sqlalchemy.engine.Engine CREATE INDEX idx_insights_project_id ON insights (project_id)
+2026-09-23 18:45:50,005 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:50,005 INFO sqlalchemy.engine.Engine 
+CREATE TABLE project_tags (
+	project_id CHAR(36) NOT NULL, 
+	tag_id CHAR(36) NOT NULL, 
+	PRIMARY KEY (project_id, tag_id), 
+	FOREIGN KEY(project_id) REFERENCES projects (id) ON DELETE CASCADE, 
+	FOREIGN KEY(tag_id) REFERENCES tags (id) ON DELETE CASCADE
+)
+
+
+2026-09-23 18:45:50,006 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,006 INFO sqlalchemy.engine.Engine CREATE INDEX ix_project_tags_tag_id ON project_tags (tag_id)
+2026-09-23 18:45:50,006 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,006 INFO sqlalchemy.engine.Engine 
+CREATE TABLE reports (
+	id CHAR(36) NOT NULL, 
+	project_id CHAR(36), 
+	title VARCHAR(255) NOT NULL, 
+	report_type VARCHAR(50) NOT NULL, 
+	prompt TEXT, 
+	content TEXT NOT NULL, 
+	content_hash VARCHAR(64), 
+	version INTEGER NOT NULL, 
+	parent_id CHAR(36), 
+	status VARCHAR(20) NOT NULL, 
+	tokens_used INTEGER NOT NULL, 
+	chunk_count INTEGER NOT NULL, 
+	created_at DATETIME NOT NULL, 
+	updated_at DATETIME NOT NULL, 
+	created_by VARCHAR(100), 
+	owner_id CHAR(36), 
+	workspace_id CHAR(36), 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(project_id) REFERENCES projects (id) ON DELETE SET NULL, 
+	FOREIGN KEY(parent_id) REFERENCES reports (id) ON DELETE SET NULL, 
+	FOREIGN KEY(owner_id) REFERENCES users (id) ON DELETE SET NULL, 
+	FOREIGN KEY(workspace_id) REFERENCES workspaces (id) ON DELETE SET NULL
+)
+
+
+2026-09-23 18:45:50,007 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,007 INFO sqlalchemy.engine.Engine CREATE INDEX ix_reports_created_at ON reports (created_at)
+2026-09-23 18:45:50,007 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,007 INFO sqlalchemy.engine.Engine CREATE INDEX ix_reports_status ON reports (status)
+2026-09-23 18:45:50,007 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,008 INFO sqlalchemy.engine.Engine CREATE INDEX ix_reports_project_id ON reports (project_id)
+2026-09-23 18:45:50,008 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,008 INFO sqlalchemy.engine.Engine CREATE INDEX ix_reports_workspace_owner_created_at ON reports (workspace_id, owner_id, created_at)
+2026-09-23 18:45:50,008 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,008 INFO sqlalchemy.engine.Engine 
+CREATE TABLE user_favorites (
+	user_id CHAR(36) NOT NULL, 
+	entity_type VARCHAR(32) NOT NULL, 
+	entity_id CHAR(36) NOT NULL, 
+	created_at DATETIME NOT NULL, 
+	PRIMARY KEY (user_id, entity_type, entity_id), 
+	CONSTRAINT ck_user_favorites_project CHECK (entity_type = 'project'), 
+	FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE, 
+	FOREIGN KEY(entity_id) REFERENCES projects (id) ON DELETE CASCADE
+)
+
+
+2026-09-23 18:45:50,008 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,009 INFO sqlalchemy.engine.Engine 
+CREATE TABLE missions (
+	id CHAR(36) NOT NULL, 
+	project_id CHAR(36), 
+	mission_id VARCHAR(50) NOT NULL, 
+	title VARCHAR(255) NOT NULL, 
+	objective TEXT NOT NULL, 
+	success_criteria JSON NOT NULL, 
+	context JSON, 
+	deliverables JSON, 
+	research_phases JSON, 
+	tags JSON, 
+	mission_metadata JSON, 
+	background TEXT, 
+	focus TEXT, 
+	"references" JSON, 
+	required_entities JSON, 
+	excluded_entities JSON, 
+	expected_output_schema JSON, 
+	coverage_thresholds JSON, 
+	validation_thresholds JSON, 
+	deliverable_format TEXT, 
+	max_loops INTEGER, 
+	min_loops INTEGER, 
+	constraints JSON, 
+	status VARCHAR(20) NOT NULL, 
+	queued_at DATETIME, 
+	started_at DATETIME, 
+	completed_at DATETIME, 
+	deepsearch_job_id VARCHAR(100), 
+	deepsearch_lease_owner TEXT, 
+	deepsearch_lease_token TEXT, 
+	deepsearch_leased_at DATETIME, 
+	deepsearch_heartbeat_at DATETIME, 
+	deepsearch_lease_expires_at DATETIME, 
+	deepsearch_attempt_count INTEGER DEFAULT '0' NOT NULL, 
+	deepsearch_result_key TEXT, 
+	execution_metadata JSON, 
+	result_document_ids JSON, 
+	result_report_id CHAR(36), 
+	result_markdown TEXT, 
+	result_protocol JSON, 
+	error_message TEXT, 
+	created_at DATETIME NOT NULL, 
+	updated_at DATETIME NOT NULL, 
+	created_by VARCHAR(100), 
+	owner_id CHAR(36), 
+	workspace_id CHAR(36), 
+	PRIMARY KEY (id), 
+	CONSTRAINT success_criteria_not_empty CHECK (jsonb_array_length(success_criteria) > 0), 
+	CONSTRAINT title_length CHECK (length(title) >= 3 AND length(title) <= 255), 
+	CONSTRAINT valid_mission_status CHECK (status IN ('draft', 'queued', 'in_progress', 'completed', 'blocked', 'cancelled', 'validation_failed')), 
+	FOREIGN KEY(project_id) REFERENCES projects (id) ON DELETE CASCADE, 
+	UNIQUE (mission_id), 
+	FOREIGN KEY(result_report_id) REFERENCES reports (id) ON DELETE SET NULL, 
+	FOREIGN KEY(owner_id) REFERENCES users (id) ON DELETE SET NULL, 
+	FOREIGN KEY(workspace_id) REFERENCES workspaces (id) ON DELETE SET NULL
+)
+
+
+2026-09-23 18:45:50,009 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:50,010 INFO sqlalchemy.engine.Engine CREATE INDEX ix_missions_status_completed_at ON missions (status, completed_at)
+2026-09-23 18:45:50,010 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,010 INFO sqlalchemy.engine.Engine CREATE INDEX idx_missions_project_status ON missions (project_id, status)
+2026-09-23 18:45:50,010 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,010 INFO sqlalchemy.engine.Engine CREATE INDEX ix_missions_workspace_owner_created_at ON missions (workspace_id, owner_id, created_at)
+2026-09-23 18:45:50,010 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,011 INFO sqlalchemy.engine.Engine CREATE UNIQUE INDEX missions_deepsearch_lease_token_active_uq ON missions (deepsearch_lease_token) WHERE deepsearch_lease_token IS NOT NULL
+2026-09-23 18:45:50,011 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:50,012 INFO sqlalchemy.engine.Engine CREATE INDEX missions_deepsearch_claim_scan_idx ON missions (status, deepsearch_lease_expires_at, queued_at)
+2026-09-23 18:45:50,012 INFO sqlalchemy.engine.Engine [no key 0.00005s] ()
+2026-09-23 18:45:50,013 INFO sqlalchemy.engine.Engine CREATE INDEX ix_missions_project_id ON missions (project_id)
+2026-09-23 18:45:50,013 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:50,014 INFO sqlalchemy.engine.Engine CREATE UNIQUE INDEX missions_deepsearch_result_key_uq ON missions (deepsearch_result_key) WHERE deepsearch_result_key IS NOT NULL
+2026-09-23 18:45:50,014 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,015 INFO sqlalchemy.engine.Engine CREATE INDEX idx_missions_mission_id ON missions (mission_id)
+2026-09-23 18:45:50,015 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,015 INFO sqlalchemy.engine.Engine CREATE INDEX ix_missions_status ON missions (status)
+2026-09-23 18:45:50,015 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,016 INFO sqlalchemy.engine.Engine CREATE INDEX ix_missions_deepsearch_job_id ON missions (deepsearch_job_id)
+2026-09-23 18:45:50,016 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,017 INFO sqlalchemy.engine.Engine 
+CREATE TABLE report_sources (
+	id CHAR(36) NOT NULL, 
+	report_id CHAR(36) NOT NULL, 
+	source_type VARCHAR(20) NOT NULL, 
+	source_id CHAR(36) NOT NULL, 
+	added_at DATETIME NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(report_id) REFERENCES reports (id) ON DELETE CASCADE
+)
+
+
+2026-09-23 18:45:50,017 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:50,017 INFO sqlalchemy.engine.Engine CREATE INDEX ix_report_sources_report_id ON report_sources (report_id)
+2026-09-23 18:45:50,017 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,018 INFO sqlalchemy.engine.Engine CREATE INDEX ix_report_sources_source_type_source_id ON report_sources (source_type, source_id)
+2026-09-23 18:45:50,018 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,018 INFO sqlalchemy.engine.Engine 
+CREATE TABLE documents (
+	id CHAR(36) NOT NULL, 
+	project_id CHAR(36) NOT NULL, 
+	name VARCHAR NOT NULL, 
+	file_path VARCHAR, 
+	file_type VARCHAR, 
+	content TEXT, 
+	raw_content BLOB, 
+	uploaded_at DATETIME, 
+	updated_at DATETIME, 
+	file_size BIGINT, 
+	mime_type VARCHAR, 
+	source_type VARCHAR, 
+	participant_count INTEGER, 
+	collection_date DATE, 
+	processed BOOLEAN, 
+	chunked BOOLEAN, 
+	embedded BOOLEAN, 
+	transcription_accuracy NUMERIC(3, 2), 
+	validation_status VARCHAR, 
+	document_metadata JSON, 
+	source_report_id CHAR(36), 
+	source_mission_id CHAR(36), 
+	source_origin VARCHAR(20), 
+	owner_id CHAR(36), 
+	workspace_id CHAR(36), 
+	deleted_at DATETIME, 
+	deleted_by VARCHAR(100), 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(project_id) REFERENCES projects (id) ON DELETE CASCADE, 
+	FOREIGN KEY(source_report_id) REFERENCES reports (id) ON DELETE SET NULL, 
+	FOREIGN KEY(source_mission_id) REFERENCES missions (id) ON DELETE SET NULL, 
+	FOREIGN KEY(owner_id) REFERENCES users (id) ON DELETE SET NULL, 
+	FOREIGN KEY(workspace_id) REFERENCES workspaces (id) ON DELETE SET NULL
+)
+
+
+2026-09-23 18:45:50,018 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:50,019 INFO sqlalchemy.engine.Engine CREATE INDEX idx_documents_source_origin ON documents (source_origin)
+2026-09-23 18:45:50,019 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,019 INFO sqlalchemy.engine.Engine CREATE INDEX ix_documents_workspace_owner_uploaded_at ON documents (workspace_id, owner_id, uploaded_at)
+2026-09-23 18:45:50,019 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,019 INFO sqlalchemy.engine.Engine CREATE INDEX ix_documents_collection_date ON documents (collection_date)
+2026-09-23 18:45:50,019 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,020 INFO sqlalchemy.engine.Engine CREATE INDEX ix_documents_deleted_at ON documents (deleted_at)
+2026-09-23 18:45:50,020 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:50,020 INFO sqlalchemy.engine.Engine CREATE INDEX ix_documents_file_type ON documents (file_type)
+2026-09-23 18:45:50,020 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,020 INFO sqlalchemy.engine.Engine CREATE INDEX ix_documents_source_type ON documents (source_type)
+2026-09-23 18:45:50,021 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,021 INFO sqlalchemy.engine.Engine CREATE INDEX idx_documents_project_id ON documents (project_id)
+2026-09-23 18:45:50,021 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,021 INFO sqlalchemy.engine.Engine 
+CREATE TABLE deepsearch_ledger_batches (
+	id CHAR(36) NOT NULL, 
+	mission_id CHAR(36) NOT NULL, 
+	deepsearch_job_id VARCHAR(100) NOT NULL, 
+	session_key VARCHAR(255) NOT NULL, 
+	payload_hash VARCHAR(64) NOT NULL, 
+	entry_count INTEGER NOT NULL, 
+	created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT ck_deepsearch_ledger_batches_nonempty_job CHECK (length(trim(deepsearch_job_id)) > 0), 
+	CONSTRAINT ck_deepsearch_ledger_batches_nonempty_session CHECK (length(trim(session_key)) > 0), 
+	CONSTRAINT ck_deepsearch_ledger_batches_hash_length CHECK (length(payload_hash) = 64), 
+	CONSTRAINT ck_deepsearch_ledger_batches_entry_count CHECK (entry_count > 0 AND entry_count <= 1000), 
+	CONSTRAINT uq_deepsearch_ledger_batches_mission_job UNIQUE (mission_id, deepsearch_job_id), 
+	CONSTRAINT fk_deepsearch_ledger_batches_mission FOREIGN KEY(mission_id) REFERENCES missions (id) ON DELETE CASCADE
+)
+
+
+2026-09-23 18:45:50,021 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:50,022 INFO sqlalchemy.engine.Engine CREATE INDEX ix_deepsearch_ledger_batches_mission_created ON deepsearch_ledger_batches (mission_id, created_at)
+2026-09-23 18:45:50,022 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,022 INFO sqlalchemy.engine.Engine 
+CREATE TABLE deepsearch_evidence_outbox (
+	mission_id CHAR(36) NOT NULL, 
+	deepsearch_job_id VARCHAR(100) NOT NULL, 
+	deepsearch_result_key TEXT NOT NULL, 
+	mission_attempt_count INTEGER NOT NULL, 
+	terminal_status VARCHAR(32) NOT NULL, 
+	schema_version SMALLINT DEFAULT 1 NOT NULL, 
+	state VARCHAR(16) DEFAULT 'pending' NOT NULL, 
+	delivery_attempt_count INTEGER DEFAULT 0 NOT NULL, 
+	next_attempt_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	lease_token CHAR(36), 
+	lease_expires_at DATETIME, 
+	acked_at DATETIME, 
+	last_http_status SMALLINT, 
+	last_error_code VARCHAR(100), 
+	created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	CONSTRAINT pk_deepsearch_evidence_outbox PRIMARY KEY (mission_id, deepsearch_job_id), 
+	CONSTRAINT ck_deepsearch_evidence_outbox_nonempty_job CHECK (length(trim(deepsearch_job_id)) > 0), 
+	CONSTRAINT ck_deepsearch_evidence_outbox_nonempty_result_key CHECK (length(trim(deepsearch_result_key)) > 0), 
+	CONSTRAINT ck_deepsearch_evidence_outbox_positive_attempt CHECK (mission_attempt_count > 0), 
+	CONSTRAINT ck_deepsearch_evidence_outbox_terminal_status CHECK (terminal_status IN ('completed', 'validation_failed')), 
+	CONSTRAINT ck_deepsearch_evidence_outbox_schema_version CHECK (schema_version = 1), 
+	CONSTRAINT ck_deepsearch_evidence_outbox_state CHECK (state IN ('pending', 'leased', 'acked', 'dead_letter')), 
+	CONSTRAINT ck_deepsearch_evidence_outbox_delivery_attempts CHECK (delivery_attempt_count >= 0), 
+	CONSTRAINT ck_deepsearch_evidence_outbox_http_status CHECK (last_http_status IS NULL OR (last_http_status >= 100 AND last_http_status <= 599)), 
+	CONSTRAINT ck_deepsearch_evidence_outbox_state_coherence CHECK ((state = 'leased' AND lease_token IS NOT NULL AND lease_expires_at IS NOT NULL AND next_attempt_at = lease_expires_at AND acked_at IS NULL) OR (state = 'acked' AND lease_token IS NULL AND lease_expires_at IS NULL AND acked_at IS NOT NULL) OR (state IN ('pending', 'dead_letter') AND lease_token IS NULL AND lease_expires_at IS NULL AND acked_at IS NULL)), 
+	CONSTRAINT fk_deepsearch_evidence_outbox_mission FOREIGN KEY(mission_id) REFERENCES missions (id) ON DELETE CASCADE
+)
+
+
+2026-09-23 18:45:50,023 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:50,023 INFO sqlalchemy.engine.Engine CREATE INDEX ix_deepsearch_evidence_outbox_delivery ON deepsearch_evidence_outbox (state, next_attempt_at, created_at)
+2026-09-23 18:45:50,023 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,024 INFO sqlalchemy.engine.Engine 
+CREATE TABLE ledger_notes (
+	id CHAR(36) NOT NULL, 
+	project_id CHAR(36) NOT NULL, 
+	mission_id CHAR(36), 
+	session_key VARCHAR(255) NOT NULL, 
+	note_key VARCHAR(100) NOT NULL, 
+	origin VARCHAR(32) DEFAULT 'mcp-agent' NOT NULL, 
+	content TEXT NOT NULL, 
+	tags JSON DEFAULT '[]' NOT NULL, 
+	owner_id CHAR(36), 
+	workspace_id CHAR(36), 
+	created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT ck_ledger_notes_origin CHECK (origin IN ('mcp-agent', 'deepsearch-worker')), 
+	CONSTRAINT ck_ledger_notes_nonempty_session CHECK (length(trim(session_key)) > 0), 
+	CONSTRAINT ck_ledger_notes_nonempty_key CHECK (length(trim(note_key)) > 0), 
+	CONSTRAINT ck_ledger_notes_nonempty_content CHECK (length(trim(content)) > 0), 
+	CONSTRAINT uq_ledger_notes_project_session_key UNIQUE (project_id, session_key, note_key), 
+	FOREIGN KEY(project_id) REFERENCES projects (id) ON DELETE CASCADE, 
+	FOREIGN KEY(mission_id) REFERENCES missions (id) ON DELETE SET NULL, 
+	FOREIGN KEY(owner_id) REFERENCES users (id) ON DELETE SET NULL, 
+	FOREIGN KEY(workspace_id) REFERENCES workspaces (id) ON DELETE SET NULL
+)
+
+
+2026-09-23 18:45:50,024 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:50,024 INFO sqlalchemy.engine.Engine CREATE INDEX ix_ledger_notes_project_session_updated ON ledger_notes (project_id, session_key, updated_at)
+2026-09-23 18:45:50,024 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,024 INFO sqlalchemy.engine.Engine CREATE INDEX ix_ledger_notes_workspace_owner_updated ON ledger_notes (workspace_id, owner_id, updated_at)
+2026-09-23 18:45:50,025 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,025 INFO sqlalchemy.engine.Engine CREATE INDEX ix_ledger_notes_project_mission_updated ON ledger_notes (project_id, mission_id, updated_at)
+2026-09-23 18:45:50,025 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,025 INFO sqlalchemy.engine.Engine 
+CREATE TABLE usage_records (
+	id CHAR(36) NOT NULL, 
+	user_id CHAR(36), 
+	project_id CHAR(36), 
+	mission_id CHAR(36), 
+	kind VARCHAR(32) NOT NULL, 
+	status VARCHAR(32) NOT NULL, 
+	attribution VARCHAR(32) NOT NULL, 
+	provider VARCHAR(64), 
+	model VARCHAR(128), 
+	input_tokens INTEGER, 
+	output_tokens INTEGER, 
+	total_tokens INTEGER, 
+	requests INTEGER, 
+	steps INTEGER, 
+	tool_calls INTEGER, 
+	duration_seconds FLOAT, 
+	usage_complete BOOLEAN, 
+	cost_usd NUMERIC(12, 6), 
+	details JSON, 
+	started_at DATETIME, 
+	completed_at DATETIME, 
+	recorded_at DATETIME NOT NULL, 
+	updated_at DATETIME NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_usage_records_mission_kind UNIQUE (mission_id, kind), 
+	FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE SET NULL, 
+	FOREIGN KEY(project_id) REFERENCES projects (id) ON DELETE SET NULL, 
+	FOREIGN KEY(mission_id) REFERENCES missions (id) ON DELETE SET NULL
+)
+
+
+2026-09-23 18:45:50,025 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:50,026 INFO sqlalchemy.engine.Engine CREATE INDEX ix_usage_records_user_recorded ON usage_records (user_id, recorded_at)
+2026-09-23 18:45:50,026 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,026 INFO sqlalchemy.engine.Engine CREATE INDEX ix_usage_records_recorded_at ON usage_records (recorded_at)
+2026-09-23 18:45:50,026 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,027 INFO sqlalchemy.engine.Engine 
+CREATE TABLE document_chunks (
+	id CHAR(36) NOT NULL, 
+	document_id CHAR(36) NOT NULL, 
+	chunk_index INTEGER NOT NULL, 
+	content TEXT NOT NULL, 
+	content_tsv TEXT, 
+	embedding_id VARCHAR, 
+	token_count INTEGER, 
+	start_char INTEGER, 
+	end_char INTEGER, 
+	prev_chunk_id CHAR(36), 
+	next_chunk_id CHAR(36), 
+	created_at DATETIME, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_document_chunks_document_index UNIQUE (document_id, chunk_index), 
+	FOREIGN KEY(document_id) REFERENCES documents (id) ON DELETE CASCADE, 
+	FOREIGN KEY(prev_chunk_id) REFERENCES document_chunks (id), 
+	FOREIGN KEY(next_chunk_id) REFERENCES document_chunks (id)
+)
+
+
+2026-09-23 18:45:50,027 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:50,027 INFO sqlalchemy.engine.Engine CREATE INDEX idx_document_chunks_document_id ON document_chunks (document_id)
+2026-09-23 18:45:50,027 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,027 INFO sqlalchemy.engine.Engine CREATE INDEX idx_document_chunks_embedding_id ON document_chunks (embedding_id)
+2026-09-23 18:45:50,027 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,028 INFO sqlalchemy.engine.Engine 
+CREATE TABLE collection_documents (
+	collection_id CHAR(36) NOT NULL, 
+	document_id CHAR(36) NOT NULL, 
+	added_at DATETIME NOT NULL, 
+	PRIMARY KEY (collection_id, document_id), 
+	FOREIGN KEY(collection_id) REFERENCES collections (id) ON DELETE CASCADE, 
+	FOREIGN KEY(document_id) REFERENCES documents (id) ON DELETE CASCADE
+)
+
+
+2026-09-23 18:45:50,028 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,028 INFO sqlalchemy.engine.Engine 
+CREATE TABLE ledger_entries (
+	id CHAR(36) NOT NULL, 
+	project_id CHAR(36) NOT NULL, 
+	mission_id CHAR(36), 
+	deepsearch_batch_id CHAR(36), 
+	session_key VARCHAR(255) NOT NULL, 
+	origin VARCHAR(32) DEFAULT 'mcp-agent' NOT NULL, 
+	claim TEXT NOT NULL, 
+	summary TEXT, 
+	source_url TEXT NOT NULL, 
+	source_id CHAR(36) NOT NULL, 
+	snippet TEXT, 
+	"query" TEXT, 
+	disposition VARCHAR(32) NOT NULL, 
+	tags JSON DEFAULT '[]' NOT NULL, 
+	owner_id CHAR(36), 
+	workspace_id CHAR(36), 
+	created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT fk_ledger_entries_source_project FOREIGN KEY(source_id, project_id) REFERENCES ledger_sources (id, project_id) ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED, 
+	CONSTRAINT ck_ledger_entries_origin CHECK (origin IN ('mcp-agent', 'deepsearch-worker')), 
+	CONSTRAINT ck_ledger_entries_disposition CHECK (disposition IN ('supporting', 'contradicting', 'rejected', 'background')), 
+	CONSTRAINT ck_ledger_entries_nonempty_session CHECK (length(trim(session_key)) > 0), 
+	CONSTRAINT ck_ledger_entries_nonempty_claim CHECK (length(trim(claim)) > 0), 
+	CONSTRAINT ck_ledger_entries_nonempty_source_url CHECK (length(trim(source_url)) > 0), 
+	FOREIGN KEY(project_id) REFERENCES projects (id) ON DELETE CASCADE, 
+	FOREIGN KEY(mission_id) REFERENCES missions (id) ON DELETE SET NULL, 
+	CONSTRAINT fk_ledger_entries_deepsearch_batch FOREIGN KEY(deepsearch_batch_id) REFERENCES deepsearch_ledger_batches (id) ON DELETE SET NULL, 
+	FOREIGN KEY(owner_id) REFERENCES users (id) ON DELETE SET NULL, 
+	FOREIGN KEY(workspace_id) REFERENCES workspaces (id) ON DELETE SET NULL
+)
+
+
+2026-09-23 18:45:50,029 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:50,029 INFO sqlalchemy.engine.Engine CREATE INDEX ix_ledger_entries_project_session_created ON ledger_entries (project_id, session_key, created_at)
+2026-09-23 18:45:50,029 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,029 INFO sqlalchemy.engine.Engine CREATE INDEX ix_ledger_entries_project_created ON ledger_entries (project_id, created_at)
+2026-09-23 18:45:50,029 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,030 INFO sqlalchemy.engine.Engine CREATE INDEX ix_ledger_entries_project_mission_created ON ledger_entries (project_id, mission_id, created_at)
+2026-09-23 18:45:50,030 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,030 INFO sqlalchemy.engine.Engine CREATE INDEX ix_ledger_entries_deepsearch_batch_created ON ledger_entries (deepsearch_batch_id, created_at)
+2026-09-23 18:45:50,030 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,030 INFO sqlalchemy.engine.Engine CREATE INDEX ix_ledger_entries_workspace_owner_created ON ledger_entries (workspace_id, owner_id, created_at)
+2026-09-23 18:45:50,030 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:50,031 INFO sqlalchemy.engine.Engine CREATE INDEX ix_ledger_entries_source_created ON ledger_entries (source_id, created_at)
+2026-09-23 18:45:50,031 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,032 INFO sqlalchemy.engine.Engine 
+CREATE TABLE ingestion_jobs (
+	id CHAR(36) NOT NULL, 
+	project_id CHAR(36) NOT NULL, 
+	document_id CHAR(36) NOT NULL, 
+	status VARCHAR(32) NOT NULL, 
+	status_detail TEXT, 
+	created_at DATETIME NOT NULL, 
+	updated_at DATETIME NOT NULL, 
+	started_at DATETIME, 
+	completed_at DATETIME, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(project_id) REFERENCES projects (id) ON DELETE CASCADE, 
+	FOREIGN KEY(document_id) REFERENCES documents (id) ON DELETE CASCADE
+)
+
+
+2026-09-23 18:45:50,032 INFO sqlalchemy.engine.Engine [no key 0.00005s] ()
+2026-09-23 18:45:50,033 INFO sqlalchemy.engine.Engine 
+CREATE TABLE document_processing_statuses (
+	id CHAR(36) NOT NULL, 
+	document_id CHAR(36) NOT NULL, 
+	stage VARCHAR NOT NULL, 
+	status VARCHAR NOT NULL, 
+	message TEXT, 
+	details JSON NOT NULL, 
+	created_at DATETIME NOT NULL, 
+	updated_at DATETIME NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(document_id) REFERENCES documents (id) ON DELETE CASCADE
+)
+
+
+2026-09-23 18:45:50,033 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:50,033 INFO sqlalchemy.engine.Engine 
+CREATE TABLE document_tags (
+	document_id CHAR(36) NOT NULL, 
+	tag_id CHAR(36) NOT NULL, 
+	PRIMARY KEY (document_id, tag_id), 
+	FOREIGN KEY(document_id) REFERENCES documents (id) ON DELETE CASCADE, 
+	FOREIGN KEY(tag_id) REFERENCES tags (id) ON DELETE CASCADE
+)
+
+
+2026-09-23 18:45:50,033 INFO sqlalchemy.engine.Engine [no key 0.00007s] ()
+2026-09-23 18:45:50,034 INFO sqlalchemy.engine.Engine CREATE INDEX ix_document_tags_tag_id ON document_tags (tag_id)
+2026-09-23 18:45:50,034 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:50,035 INFO sqlalchemy.engine.Engine 
+CREATE TABLE collection_items (
+	id CHAR(36) NOT NULL, 
+	collection_id CHAR(36) NOT NULL, 
+	chunk_id CHAR(36) NOT NULL, 
+	notes TEXT, 
+	added_at DATETIME NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_collection_item_collection_chunk UNIQUE (collection_id, chunk_id), 
+	FOREIGN KEY(collection_id) REFERENCES collections (id) ON DELETE CASCADE, 
+	FOREIGN KEY(chunk_id) REFERENCES document_chunks (id) ON DELETE CASCADE
+)
+
+
+2026-09-23 18:45:50,035 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:50,035 INFO sqlalchemy.engine.Engine CREATE INDEX ix_collection_items_chunk_id ON collection_items (chunk_id)
+2026-09-23 18:45:50,035 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:50,036 INFO sqlalchemy.engine.Engine CREATE INDEX ix_collection_items_collection_id ON collection_items (collection_id)
+2026-09-23 18:45:50,036 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,037 INFO sqlalchemy.engine.Engine 
+CREATE TABLE insight_sources (
+	insight_id CHAR(36) NOT NULL, 
+	chunk_id CHAR(36) NOT NULL, 
+	relevance_score NUMERIC(3, 2), 
+	PRIMARY KEY (insight_id, chunk_id), 
+	FOREIGN KEY(insight_id) REFERENCES insights (id) ON DELETE CASCADE, 
+	FOREIGN KEY(chunk_id) REFERENCES document_chunks (id) ON DELETE CASCADE
+)
+
+
+2026-09-23 18:45:50,037 INFO sqlalchemy.engine.Engine [no key 0.00004s] ()
+2026-09-23 18:45:50,037 INFO sqlalchemy.engine.Engine CREATE INDEX idx_insight_sources_chunk_id ON insight_sources (chunk_id)
+2026-09-23 18:45:50,037 INFO sqlalchemy.engine.Engine [no key 0.00003s] ()
+2026-09-23 18:45:50,037 INFO sqlalchemy.engine.Engine COMMIT
+2026-09-23 18:45:50,038 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-23 18:45:50,038 INFO sqlalchemy.engine.Engine INSERT INTO users (id, email, display_name, password_hash, email_notifications_enabled, role, is_active, invite_code_used, created_at, updated_at, last_login_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-09-23 18:45:50,038 INFO sqlalchemy.engine.Engine [cached since 6.603s ago] ('71a9d9e4-0451-41e9-a389-26dc16736e3e', 'tracelab-admin@tracelab.local', 'tracelab-admin@tracelab.local', '$2b$12$akDDNNwX4W4ASme.o5s3Gujxxf19OA8VASHvrt7Lku7K3TXahLHp2', 1, 'admin', 1, None, '2026-09-23 23:45:50.038315', '2026-09-23 23:45:50.038317', None)
+2026-09-23 18:45:50,038 INFO sqlalchemy.engine.Engine COMMIT
+2026-09-23 18:45:50,101 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-23 18:45:50,101 INFO sqlalchemy.engine.Engine INSERT INTO projects (id, name, description, user_id, mission_protocol_id, owner_id, workspace_id, research_type, methodology, status, quality_score, last_quality_check, created_at, updated_at, deleted_at, deleted_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-09-23 18:45:50,101 INFO sqlalchemy.engine.Engine [cached since 6.275s ago] ('1235dc94-0ad2-41af-aa3c-2572a2379c50', 'TraceLab Test Project', 'Pipeline validation', None, None, None, None, None, None, 'active', None, None, '2026-09-23 23:45:50.101739', '2026-09-23 23:45:50.101751', None, None)
+2026-09-23 18:45:50,102 INFO sqlalchemy.engine.Engine COMMIT
+2026-09-23 18:45:50,103 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-23 18:45:50,103 INFO sqlalchemy.engine.Engine SELECT projects.id, projects.name, projects.description, projects.user_id, projects.mission_protocol_id, projects.owner_id, projects.workspace_id, projects.research_type, projects.methodology, projects.status, projects.quality_score, projects.last_quality_check, projects.created_at, projects.updated_at, projects.deleted_at, projects.deleted_by 
+FROM projects 
+WHERE projects.id = ?
+2026-09-23 18:45:50,103 INFO sqlalchemy.engine.Engine [cached since 6.274s ago] ('1235dc94-0ad2-41af-aa3c-2572a2379c50',)
+------------------------------ Captured log setup ------------------------------
+INFO     sqlalchemy.engine.Engine:base.py:2689 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("api_keys")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("document_chunks")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("collections")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("collection_items")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("collection_documents")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("device_authorization_grants")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("documents")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("ledger_sources")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("deepsearch_ledger_batches")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("deepsearch_evidence_outbox")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("ledger_entries")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("ledger_notes")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("graph_edges")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("idempotency_records")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("ingestion_jobs")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("insights")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("insight_sources")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("invite_codes")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("missions")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("document_processing_statuses")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("projects")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("project_tags")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("quality_checks")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("reports")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("report_sources")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("saved_searches")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("search_history")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("space_members")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("sync_states")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("synthesis_cache")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("tags")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("document_tags")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("usage_records")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("users")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("user_favorites")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("user_item_views")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("workspaces")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE insight_sources
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE collection_items
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE document_tags
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00005s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE document_processing_statuses
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE ingestion_jobs
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE ledger_entries
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE collection_documents
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE document_chunks
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00005s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE usage_records
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE ledger_notes
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE deepsearch_evidence_outbox
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE deepsearch_ledger_batches
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE documents
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE report_sources
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE missions
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE user_favorites
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE reports
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE project_tags
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE insights
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE ledger_sources
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE space_members
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE projects
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE device_authorization_grants
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE collections
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE workspaces
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE user_item_views
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE search_history
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE saved_searches
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE invite_codes
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE api_keys
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE users
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE tags
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE synthesis_cache
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE sync_states
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE quality_checks
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE idempotency_records
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+DROP TABLE graph_edges
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:2695 COMMIT
+INFO     sqlalchemy.engine.Engine:base.py:2689 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("api_keys")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("api_keys")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("document_chunks")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("document_chunks")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("collections")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("collections")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("collection_items")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("collection_items")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("collection_documents")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("collection_documents")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("device_authorization_grants")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("device_authorization_grants")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("documents")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("documents")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("ledger_sources")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("ledger_sources")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("deepsearch_ledger_batches")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("deepsearch_ledger_batches")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("deepsearch_evidence_outbox")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("deepsearch_evidence_outbox")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("ledger_entries")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("ledger_entries")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("ledger_notes")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("ledger_notes")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("graph_edges")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("graph_edges")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("idempotency_records")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("idempotency_records")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("ingestion_jobs")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("ingestion_jobs")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("insights")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("insights")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("insight_sources")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("insight_sources")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("invite_codes")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("invite_codes")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("missions")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("missions")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("document_processing_statuses")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("document_processing_statuses")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("projects")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("projects")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("project_tags")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("project_tags")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("quality_checks")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("quality_checks")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("reports")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("reports")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("report_sources")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("report_sources")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("saved_searches")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("saved_searches")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("search_history")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("search_history")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("space_members")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("space_members")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("sync_states")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("sync_states")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("synthesis_cache")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("synthesis_cache")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("tags")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("tags")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("document_tags")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("document_tags")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("usage_records")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("usage_records")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("users")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("users")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("user_favorites")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("user_favorites")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("user_item_views")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("user_item_views")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA main.table_info("workspaces")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 PRAGMA temp.table_info("workspaces")
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE graph_edges (
+	id CHAR(36) NOT NULL, 
+	from_urn VARCHAR(512) NOT NULL, 
+	to_urn VARCHAR(512) NOT NULL, 
+	edge_type VARCHAR(50) NOT NULL, 
+	direction VARCHAR(20) NOT NULL, 
+	weight FLOAT NOT NULL, 
+	reason TEXT, 
+	via VARCHAR(50), 
+	evidence JSON, 
+	created_at DATETIME NOT NULL, 
+	updated_at DATETIME NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_graph_edges_from_to_type_direction UNIQUE (from_urn, to_urn, edge_type, direction)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX idx_graph_edges_from_type ON graph_edges (from_urn, edge_type)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_graph_edges_edge_type ON graph_edges (edge_type)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_graph_edges_from_urn ON graph_edges (from_urn)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX idx_graph_edges_to_type ON graph_edges (to_urn, edge_type)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_graph_edges_to_urn ON graph_edges (to_urn)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE idempotency_records (
+	"key" VARCHAR(255) NOT NULL, 
+	method VARCHAR(16) NOT NULL, 
+	path VARCHAR(255) NOT NULL, 
+	request_hash VARCHAR(128) NOT NULL, 
+	status_code INTEGER NOT NULL, 
+	response_data JSON NOT NULL, 
+	error_message TEXT, 
+	created_at DATETIME NOT NULL, 
+	updated_at DATETIME NOT NULL, 
+	PRIMARY KEY ("key")
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE quality_checks (
+	id CHAR(36) NOT NULL, 
+	entity_type VARCHAR NOT NULL, 
+	entity_id CHAR(36) NOT NULL, 
+	check_type VARCHAR NOT NULL, 
+	status VARCHAR NOT NULL, 
+	details JSON, 
+	recommendations JSON, 
+	performed_by VARCHAR, 
+	performed_at DATETIME, 
+	PRIMARY KEY (id)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX idx_quality_checks_entity ON quality_checks (entity_type, entity_id)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE sync_states (
+	id CHAR(36) NOT NULL, 
+	entity_type VARCHAR(50) NOT NULL, 
+	last_sync_at DATETIME, 
+	sync_count INTEGER, 
+	last_entity_id VARCHAR(255), 
+	sync_metadata JSON, 
+	created_at DATETIME, 
+	updated_at DATETIME, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_sync_state_entity_type UNIQUE (entity_type)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE synthesis_cache (
+	id CHAR(36) NOT NULL, 
+	input_hash VARCHAR(64) NOT NULL, 
+	content TEXT NOT NULL, 
+	citations JSON, 
+	model_used VARCHAR(50), 
+	tokens_used INTEGER NOT NULL, 
+	created_at DATETIME NOT NULL, 
+	hit_count INTEGER NOT NULL, 
+	last_hit_at DATETIME, 
+	PRIMARY KEY (id), 
+	UNIQUE (input_hash)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_synthesis_cache_input_hash ON synthesis_cache (input_hash)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE tags (
+	id CHAR(36) NOT NULL, 
+	name VARCHAR NOT NULL, 
+	user_id CHAR(36), 
+	category VARCHAR, 
+	color VARCHAR, 
+	parent_id CHAR(36), 
+	created_at DATETIME, 
+	updated_at DATETIME, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_user_tag UNIQUE (user_id, name), 
+	FOREIGN KEY(parent_id) REFERENCES tags (id)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE users (
+	id CHAR(36) NOT NULL, 
+	email VARCHAR(255) NOT NULL, 
+	display_name VARCHAR(255) NOT NULL, 
+	password_hash VARCHAR(255) NOT NULL, 
+	email_notifications_enabled BOOLEAN DEFAULT '1' NOT NULL, 
+	role VARCHAR(50) NOT NULL, 
+	is_active BOOLEAN NOT NULL, 
+	invite_code_used VARCHAR(50), 
+	created_at DATETIME NOT NULL, 
+	updated_at DATETIME NOT NULL, 
+	last_login_at DATETIME, 
+	PRIMARY KEY (id), 
+	UNIQUE (email)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE UNIQUE INDEX ix_users_email ON users (email)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE api_keys (
+	id CHAR(36) NOT NULL, 
+	user_id CHAR(36) NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	key_hash VARCHAR(255) NOT NULL, 
+	key_prefix VARCHAR(12) NOT NULL, 
+	created_at DATETIME NOT NULL, 
+	last_used_at DATETIME, 
+	expires_at DATETIME, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(user_id) REFERENCES users (id)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_api_keys_user_id ON api_keys (user_id)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_api_keys_key_prefix ON api_keys (key_prefix)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE invite_codes (
+	id CHAR(36) NOT NULL, 
+	code VARCHAR(8) NOT NULL, 
+	created_by CHAR(36) NOT NULL, 
+	used_by CHAR(36), 
+	created_at DATETIME NOT NULL, 
+	used_at DATETIME, 
+	expires_at DATETIME, 
+	PRIMARY KEY (id), 
+	UNIQUE (code), 
+	FOREIGN KEY(created_by) REFERENCES users (id), 
+	FOREIGN KEY(used_by) REFERENCES users (id)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE saved_searches (
+	id CHAR(36) NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	description TEXT, 
+	query_text TEXT NOT NULL, 
+	search_mode VARCHAR(32) NOT NULL, 
+	filters JSON NOT NULL, 
+	top_k INTEGER NOT NULL, 
+	owner_id CHAR(36), 
+	owner VARCHAR(128) NOT NULL, 
+	use_count INTEGER NOT NULL, 
+	last_used_at DATETIME, 
+	created_at DATETIME NOT NULL, 
+	updated_at DATETIME NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_saved_search_owner_id_name UNIQUE (owner_id, name), 
+	FOREIGN KEY(owner_id) REFERENCES users (id) ON DELETE CASCADE
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_saved_searches_owner_id_created_at ON saved_searches (owner_id, created_at)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE search_history (
+	id CHAR(36) NOT NULL, 
+	query_text TEXT NOT NULL, 
+	search_mode VARCHAR(32) NOT NULL, 
+	filters JSON NOT NULL, 
+	result_count INTEGER NOT NULL, 
+	top_k INTEGER NOT NULL, 
+	duration_ms INTEGER, 
+	cache_hit BOOLEAN NOT NULL, 
+	owner_id CHAR(36), 
+	user_label VARCHAR(255), 
+	metadata_payload JSON NOT NULL, 
+	top_chunks JSON NOT NULL, 
+	created_at DATETIME NOT NULL, 
+	updated_at DATETIME NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(owner_id) REFERENCES users (id) ON DELETE CASCADE
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_search_history_owner_id_created_at ON search_history (owner_id, created_at)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_search_history_query_mode ON search_history (search_mode)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_search_history_created_at ON search_history (created_at)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE user_item_views (
+	user_id CHAR(36) NOT NULL, 
+	item_type VARCHAR(32) NOT NULL, 
+	item_id CHAR(36) NOT NULL, 
+	occurred_at DATETIME NOT NULL, 
+	viewed_at DATETIME NOT NULL, 
+	PRIMARY KEY (user_id, item_type, item_id), 
+	CONSTRAINT ck_user_item_views_type CHECK (item_type IN ('mission', 'report', 'evidence')), 
+	FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE workspaces (
+	id CHAR(36) NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	created_at DATETIME NOT NULL, 
+	personal_owner_id CHAR(36), 
+	PRIMARY KEY (id), 
+	UNIQUE (personal_owner_id), 
+	FOREIGN KEY(personal_owner_id) REFERENCES users (id) ON DELETE CASCADE
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE collections (
+	id CHAR(36) NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	description TEXT, 
+	instructions TEXT, 
+	created_at DATETIME NOT NULL, 
+	updated_at DATETIME NOT NULL, 
+	owner_id CHAR(36), 
+	workspace_id CHAR(36), 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(owner_id) REFERENCES users (id) ON DELETE SET NULL, 
+	FOREIGN KEY(workspace_id) REFERENCES workspaces (id) ON DELETE SET NULL
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_collections_created_at ON collections (created_at)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_collections_workspace_owner_created_at ON collections (workspace_id, owner_id, created_at)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE device_authorization_grants (
+	id CHAR(36) NOT NULL, 
+	device_code VARCHAR(64) NOT NULL, 
+	user_code VARCHAR(16) NOT NULL, 
+	client_label VARCHAR(255) NOT NULL, 
+	status VARCHAR(16) NOT NULL, 
+	interval_seconds INTEGER NOT NULL, 
+	user_id CHAR(36), 
+	api_key_id CHAR(36), 
+	created_at DATETIME NOT NULL, 
+	expires_at DATETIME NOT NULL, 
+	last_polled_at DATETIME, 
+	approved_at DATETIME, 
+	PRIMARY KEY (id), 
+	UNIQUE (device_code), 
+	UNIQUE (user_code), 
+	FOREIGN KEY(user_id) REFERENCES users (id), 
+	FOREIGN KEY(api_key_id) REFERENCES api_keys (id)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_device_grants_status ON device_authorization_grants (status)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_device_grants_user_code ON device_authorization_grants (user_code)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_device_grants_device_code ON device_authorization_grants (device_code)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE projects (
+	id CHAR(36) NOT NULL, 
+	name VARCHAR NOT NULL, 
+	description TEXT, 
+	user_id CHAR(36), 
+	mission_protocol_id CHAR(36), 
+	owner_id CHAR(36), 
+	workspace_id CHAR(36), 
+	research_type VARCHAR, 
+	methodology VARCHAR, 
+	status VARCHAR, 
+	quality_score INTEGER, 
+	last_quality_check DATETIME, 
+	created_at DATETIME, 
+	updated_at DATETIME, 
+	deleted_at DATETIME, 
+	deleted_by VARCHAR(100), 
+	PRIMARY KEY (id), 
+	CONSTRAINT valid_research_type CHECK (research_type IS NULL OR research_type IN ('strategic', 'tactical', 'generative', 'evaluative')), 
+	FOREIGN KEY(owner_id) REFERENCES users (id) ON DELETE SET NULL, 
+	FOREIGN KEY(workspace_id) REFERENCES workspaces (id) ON DELETE SET NULL
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_projects_workspace_owner_created_at ON projects (workspace_id, owner_id, created_at)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_projects_deleted_at ON projects (deleted_at)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE space_members (
+	id CHAR(36) NOT NULL, 
+	workspace_id CHAR(36) NOT NULL, 
+	user_id CHAR(36) NOT NULL, 
+	role VARCHAR(50) NOT NULL, 
+	created_at DATETIME NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_space_members_workspace_user UNIQUE (workspace_id, user_id), 
+	FOREIGN KEY(workspace_id) REFERENCES workspaces (id) ON DELETE CASCADE, 
+	FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_space_members_user_id ON space_members (user_id)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE ledger_sources (
+	id CHAR(36) NOT NULL, 
+	project_id CHAR(36) NOT NULL, 
+	source_url TEXT NOT NULL, 
+	source_url_hash VARCHAR(64) NOT NULL, 
+	sighting_count INTEGER DEFAULT 1 NOT NULL, 
+	first_seen_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	last_seen_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT ck_ledger_sources_nonempty_url CHECK (length(trim(source_url)) > 0), 
+	CONSTRAINT ck_ledger_sources_hash_length CHECK (length(source_url_hash) = 64), 
+	CONSTRAINT ck_ledger_sources_positive_sightings CHECK (sighting_count > 0), 
+	CONSTRAINT uq_ledger_sources_project_url_hash UNIQUE (project_id, source_url_hash), 
+	CONSTRAINT uq_ledger_sources_id_project UNIQUE (id, project_id), 
+	FOREIGN KEY(project_id) REFERENCES projects (id) ON DELETE CASCADE
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_ledger_sources_project_last_seen ON ledger_sources (project_id, last_seen_at)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE insights (
+	id CHAR(36) NOT NULL, 
+	project_id CHAR(36) NOT NULL, 
+	title VARCHAR NOT NULL, 
+	content TEXT NOT NULL, 
+	insight_type VARCHAR, 
+	created_by VARCHAR, 
+	validated BOOLEAN, 
+	validation_date DATETIME, 
+	created_at DATETIME, 
+	updated_at DATETIME, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(project_id) REFERENCES projects (id) ON DELETE CASCADE
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX idx_insights_project_id ON insights (project_id)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE project_tags (
+	project_id CHAR(36) NOT NULL, 
+	tag_id CHAR(36) NOT NULL, 
+	PRIMARY KEY (project_id, tag_id), 
+	FOREIGN KEY(project_id) REFERENCES projects (id) ON DELETE CASCADE, 
+	FOREIGN KEY(tag_id) REFERENCES tags (id) ON DELETE CASCADE
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_project_tags_tag_id ON project_tags (tag_id)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE reports (
+	id CHAR(36) NOT NULL, 
+	project_id CHAR(36), 
+	title VARCHAR(255) NOT NULL, 
+	report_type VARCHAR(50) NOT NULL, 
+	prompt TEXT, 
+	content TEXT NOT NULL, 
+	content_hash VARCHAR(64), 
+	version INTEGER NOT NULL, 
+	parent_id CHAR(36), 
+	status VARCHAR(20) NOT NULL, 
+	tokens_used INTEGER NOT NULL, 
+	chunk_count INTEGER NOT NULL, 
+	created_at DATETIME NOT NULL, 
+	updated_at DATETIME NOT NULL, 
+	created_by VARCHAR(100), 
+	owner_id CHAR(36), 
+	workspace_id CHAR(36), 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(project_id) REFERENCES projects (id) ON DELETE SET NULL, 
+	FOREIGN KEY(parent_id) REFERENCES reports (id) ON DELETE SET NULL, 
+	FOREIGN KEY(owner_id) REFERENCES users (id) ON DELETE SET NULL, 
+	FOREIGN KEY(workspace_id) REFERENCES workspaces (id) ON DELETE SET NULL
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_reports_created_at ON reports (created_at)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_reports_status ON reports (status)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_reports_project_id ON reports (project_id)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_reports_workspace_owner_created_at ON reports (workspace_id, owner_id, created_at)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE user_favorites (
+	user_id CHAR(36) NOT NULL, 
+	entity_type VARCHAR(32) NOT NULL, 
+	entity_id CHAR(36) NOT NULL, 
+	created_at DATETIME NOT NULL, 
+	PRIMARY KEY (user_id, entity_type, entity_id), 
+	CONSTRAINT ck_user_favorites_project CHECK (entity_type = 'project'), 
+	FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE, 
+	FOREIGN KEY(entity_id) REFERENCES projects (id) ON DELETE CASCADE
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE missions (
+	id CHAR(36) NOT NULL, 
+	project_id CHAR(36), 
+	mission_id VARCHAR(50) NOT NULL, 
+	title VARCHAR(255) NOT NULL, 
+	objective TEXT NOT NULL, 
+	success_criteria JSON NOT NULL, 
+	context JSON, 
+	deliverables JSON, 
+	research_phases JSON, 
+	tags JSON, 
+	mission_metadata JSON, 
+	background TEXT, 
+	focus TEXT, 
+	"references" JSON, 
+	required_entities JSON, 
+	excluded_entities JSON, 
+	expected_output_schema JSON, 
+	coverage_thresholds JSON, 
+	validation_thresholds JSON, 
+	deliverable_format TEXT, 
+	max_loops INTEGER, 
+	min_loops INTEGER, 
+	constraints JSON, 
+	status VARCHAR(20) NOT NULL, 
+	queued_at DATETIME, 
+	started_at DATETIME, 
+	completed_at DATETIME, 
+	deepsearch_job_id VARCHAR(100), 
+	deepsearch_lease_owner TEXT, 
+	deepsearch_lease_token TEXT, 
+	deepsearch_leased_at DATETIME, 
+	deepsearch_heartbeat_at DATETIME, 
+	deepsearch_lease_expires_at DATETIME, 
+	deepsearch_attempt_count INTEGER DEFAULT '0' NOT NULL, 
+	deepsearch_result_key TEXT, 
+	execution_metadata JSON, 
+	result_document_ids JSON, 
+	result_report_id CHAR(36), 
+	result_markdown TEXT, 
+	result_protocol JSON, 
+	error_message TEXT, 
+	created_at DATETIME NOT NULL, 
+	updated_at DATETIME NOT NULL, 
+	created_by VARCHAR(100), 
+	owner_id CHAR(36), 
+	workspace_id CHAR(36), 
+	PRIMARY KEY (id), 
+	CONSTRAINT success_criteria_not_empty CHECK (jsonb_array_length(success_criteria) > 0), 
+	CONSTRAINT title_length CHECK (length(title) >= 3 AND length(title) <= 255), 
+	CONSTRAINT valid_mission_status CHECK (status IN ('draft', 'queued', 'in_progress', 'completed', 'blocked', 'cancelled', 'validation_failed')), 
+	FOREIGN KEY(project_id) REFERENCES projects (id) ON DELETE CASCADE, 
+	UNIQUE (mission_id), 
+	FOREIGN KEY(result_report_id) REFERENCES reports (id) ON DELETE SET NULL, 
+	FOREIGN KEY(owner_id) REFERENCES users (id) ON DELETE SET NULL, 
+	FOREIGN KEY(workspace_id) REFERENCES workspaces (id) ON DELETE SET NULL
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_missions_status_completed_at ON missions (status, completed_at)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX idx_missions_project_status ON missions (project_id, status)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_missions_workspace_owner_created_at ON missions (workspace_id, owner_id, created_at)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE UNIQUE INDEX missions_deepsearch_lease_token_active_uq ON missions (deepsearch_lease_token) WHERE deepsearch_lease_token IS NOT NULL
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX missions_deepsearch_claim_scan_idx ON missions (status, deepsearch_lease_expires_at, queued_at)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00005s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_missions_project_id ON missions (project_id)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE UNIQUE INDEX missions_deepsearch_result_key_uq ON missions (deepsearch_result_key) WHERE deepsearch_result_key IS NOT NULL
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX idx_missions_mission_id ON missions (mission_id)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_missions_status ON missions (status)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_missions_deepsearch_job_id ON missions (deepsearch_job_id)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE report_sources (
+	id CHAR(36) NOT NULL, 
+	report_id CHAR(36) NOT NULL, 
+	source_type VARCHAR(20) NOT NULL, 
+	source_id CHAR(36) NOT NULL, 
+	added_at DATETIME NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(report_id) REFERENCES reports (id) ON DELETE CASCADE
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_report_sources_report_id ON report_sources (report_id)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_report_sources_source_type_source_id ON report_sources (source_type, source_id)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE documents (
+	id CHAR(36) NOT NULL, 
+	project_id CHAR(36) NOT NULL, 
+	name VARCHAR NOT NULL, 
+	file_path VARCHAR, 
+	file_type VARCHAR, 
+	content TEXT, 
+	raw_content BLOB, 
+	uploaded_at DATETIME, 
+	updated_at DATETIME, 
+	file_size BIGINT, 
+	mime_type VARCHAR, 
+	source_type VARCHAR, 
+	participant_count INTEGER, 
+	collection_date DATE, 
+	processed BOOLEAN, 
+	chunked BOOLEAN, 
+	embedded BOOLEAN, 
+	transcription_accuracy NUMERIC(3, 2), 
+	validation_status VARCHAR, 
+	document_metadata JSON, 
+	source_report_id CHAR(36), 
+	source_mission_id CHAR(36), 
+	source_origin VARCHAR(20), 
+	owner_id CHAR(36), 
+	workspace_id CHAR(36), 
+	deleted_at DATETIME, 
+	deleted_by VARCHAR(100), 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(project_id) REFERENCES projects (id) ON DELETE CASCADE, 
+	FOREIGN KEY(source_report_id) REFERENCES reports (id) ON DELETE SET NULL, 
+	FOREIGN KEY(source_mission_id) REFERENCES missions (id) ON DELETE SET NULL, 
+	FOREIGN KEY(owner_id) REFERENCES users (id) ON DELETE SET NULL, 
+	FOREIGN KEY(workspace_id) REFERENCES workspaces (id) ON DELETE SET NULL
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX idx_documents_source_origin ON documents (source_origin)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_documents_workspace_owner_uploaded_at ON documents (workspace_id, owner_id, uploaded_at)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_documents_collection_date ON documents (collection_date)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_documents_deleted_at ON documents (deleted_at)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_documents_file_type ON documents (file_type)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_documents_source_type ON documents (source_type)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX idx_documents_project_id ON documents (project_id)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE deepsearch_ledger_batches (
+	id CHAR(36) NOT NULL, 
+	mission_id CHAR(36) NOT NULL, 
+	deepsearch_job_id VARCHAR(100) NOT NULL, 
+	session_key VARCHAR(255) NOT NULL, 
+	payload_hash VARCHAR(64) NOT NULL, 
+	entry_count INTEGER NOT NULL, 
+	created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT ck_deepsearch_ledger_batches_nonempty_job CHECK (length(trim(deepsearch_job_id)) > 0), 
+	CONSTRAINT ck_deepsearch_ledger_batches_nonempty_session CHECK (length(trim(session_key)) > 0), 
+	CONSTRAINT ck_deepsearch_ledger_batches_hash_length CHECK (length(payload_hash) = 64), 
+	CONSTRAINT ck_deepsearch_ledger_batches_entry_count CHECK (entry_count > 0 AND entry_count <= 1000), 
+	CONSTRAINT uq_deepsearch_ledger_batches_mission_job UNIQUE (mission_id, deepsearch_job_id), 
+	CONSTRAINT fk_deepsearch_ledger_batches_mission FOREIGN KEY(mission_id) REFERENCES missions (id) ON DELETE CASCADE
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_deepsearch_ledger_batches_mission_created ON deepsearch_ledger_batches (mission_id, created_at)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE deepsearch_evidence_outbox (
+	mission_id CHAR(36) NOT NULL, 
+	deepsearch_job_id VARCHAR(100) NOT NULL, 
+	deepsearch_result_key TEXT NOT NULL, 
+	mission_attempt_count INTEGER NOT NULL, 
+	terminal_status VARCHAR(32) NOT NULL, 
+	schema_version SMALLINT DEFAULT 1 NOT NULL, 
+	state VARCHAR(16) DEFAULT 'pending' NOT NULL, 
+	delivery_attempt_count INTEGER DEFAULT 0 NOT NULL, 
+	next_attempt_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	lease_token CHAR(36), 
+	lease_expires_at DATETIME, 
+	acked_at DATETIME, 
+	last_http_status SMALLINT, 
+	last_error_code VARCHAR(100), 
+	created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	CONSTRAINT pk_deepsearch_evidence_outbox PRIMARY KEY (mission_id, deepsearch_job_id), 
+	CONSTRAINT ck_deepsearch_evidence_outbox_nonempty_job CHECK (length(trim(deepsearch_job_id)) > 0), 
+	CONSTRAINT ck_deepsearch_evidence_outbox_nonempty_result_key CHECK (length(trim(deepsearch_result_key)) > 0), 
+	CONSTRAINT ck_deepsearch_evidence_outbox_positive_attempt CHECK (mission_attempt_count > 0), 
+	CONSTRAINT ck_deepsearch_evidence_outbox_terminal_status CHECK (terminal_status IN ('completed', 'validation_failed')), 
+	CONSTRAINT ck_deepsearch_evidence_outbox_schema_version CHECK (schema_version = 1), 
+	CONSTRAINT ck_deepsearch_evidence_outbox_state CHECK (state IN ('pending', 'leased', 'acked', 'dead_letter')), 
+	CONSTRAINT ck_deepsearch_evidence_outbox_delivery_attempts CHECK (delivery_attempt_count >= 0), 
+	CONSTRAINT ck_deepsearch_evidence_outbox_http_status CHECK (last_http_status IS NULL OR (last_http_status >= 100 AND last_http_status <= 599)), 
+	CONSTRAINT ck_deepsearch_evidence_outbox_state_coherence CHECK ((state = 'leased' AND lease_token IS NOT NULL AND lease_expires_at IS NOT NULL AND next_attempt_at = lease_expires_at AND acked_at IS NULL) OR (state = 'acked' AND lease_token IS NULL AND lease_expires_at IS NULL AND acked_at IS NOT NULL) OR (state IN ('pending', 'dead_letter') AND lease_token IS NULL AND lease_expires_at IS NULL AND acked_at IS NULL)), 
+	CONSTRAINT fk_deepsearch_evidence_outbox_mission FOREIGN KEY(mission_id) REFERENCES missions (id) ON DELETE CASCADE
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_deepsearch_evidence_outbox_delivery ON deepsearch_evidence_outbox (state, next_attempt_at, created_at)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE ledger_notes (
+	id CHAR(36) NOT NULL, 
+	project_id CHAR(36) NOT NULL, 
+	mission_id CHAR(36), 
+	session_key VARCHAR(255) NOT NULL, 
+	note_key VARCHAR(100) NOT NULL, 
+	origin VARCHAR(32) DEFAULT 'mcp-agent' NOT NULL, 
+	content TEXT NOT NULL, 
+	tags JSON DEFAULT '[]' NOT NULL, 
+	owner_id CHAR(36), 
+	workspace_id CHAR(36), 
+	created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT ck_ledger_notes_origin CHECK (origin IN ('mcp-agent', 'deepsearch-worker')), 
+	CONSTRAINT ck_ledger_notes_nonempty_session CHECK (length(trim(session_key)) > 0), 
+	CONSTRAINT ck_ledger_notes_nonempty_key CHECK (length(trim(note_key)) > 0), 
+	CONSTRAINT ck_ledger_notes_nonempty_content CHECK (length(trim(content)) > 0), 
+	CONSTRAINT uq_ledger_notes_project_session_key UNIQUE (project_id, session_key, note_key), 
+	FOREIGN KEY(project_id) REFERENCES projects (id) ON DELETE CASCADE, 
+	FOREIGN KEY(mission_id) REFERENCES missions (id) ON DELETE SET NULL, 
+	FOREIGN KEY(owner_id) REFERENCES users (id) ON DELETE SET NULL, 
+	FOREIGN KEY(workspace_id) REFERENCES workspaces (id) ON DELETE SET NULL
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_ledger_notes_project_session_updated ON ledger_notes (project_id, session_key, updated_at)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_ledger_notes_workspace_owner_updated ON ledger_notes (workspace_id, owner_id, updated_at)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_ledger_notes_project_mission_updated ON ledger_notes (project_id, mission_id, updated_at)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE usage_records (
+	id CHAR(36) NOT NULL, 
+	user_id CHAR(36), 
+	project_id CHAR(36), 
+	mission_id CHAR(36), 
+	kind VARCHAR(32) NOT NULL, 
+	status VARCHAR(32) NOT NULL, 
+	attribution VARCHAR(32) NOT NULL, 
+	provider VARCHAR(64), 
+	model VARCHAR(128), 
+	input_tokens INTEGER, 
+	output_tokens INTEGER, 
+	total_tokens INTEGER, 
+	requests INTEGER, 
+	steps INTEGER, 
+	tool_calls INTEGER, 
+	duration_seconds FLOAT, 
+	usage_complete BOOLEAN, 
+	cost_usd NUMERIC(12, 6), 
+	details JSON, 
+	started_at DATETIME, 
+	completed_at DATETIME, 
+	recorded_at DATETIME NOT NULL, 
+	updated_at DATETIME NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_usage_records_mission_kind UNIQUE (mission_id, kind), 
+	FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE SET NULL, 
+	FOREIGN KEY(project_id) REFERENCES projects (id) ON DELETE SET NULL, 
+	FOREIGN KEY(mission_id) REFERENCES missions (id) ON DELETE SET NULL
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_usage_records_user_recorded ON usage_records (user_id, recorded_at)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_usage_records_recorded_at ON usage_records (recorded_at)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE document_chunks (
+	id CHAR(36) NOT NULL, 
+	document_id CHAR(36) NOT NULL, 
+	chunk_index INTEGER NOT NULL, 
+	content TEXT NOT NULL, 
+	content_tsv TEXT, 
+	embedding_id VARCHAR, 
+	token_count INTEGER, 
+	start_char INTEGER, 
+	end_char INTEGER, 
+	prev_chunk_id CHAR(36), 
+	next_chunk_id CHAR(36), 
+	created_at DATETIME, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_document_chunks_document_index UNIQUE (document_id, chunk_index), 
+	FOREIGN KEY(document_id) REFERENCES documents (id) ON DELETE CASCADE, 
+	FOREIGN KEY(prev_chunk_id) REFERENCES document_chunks (id), 
+	FOREIGN KEY(next_chunk_id) REFERENCES document_chunks (id)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX idx_document_chunks_document_id ON document_chunks (document_id)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX idx_document_chunks_embedding_id ON document_chunks (embedding_id)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE collection_documents (
+	collection_id CHAR(36) NOT NULL, 
+	document_id CHAR(36) NOT NULL, 
+	added_at DATETIME NOT NULL, 
+	PRIMARY KEY (collection_id, document_id), 
+	FOREIGN KEY(collection_id) REFERENCES collections (id) ON DELETE CASCADE, 
+	FOREIGN KEY(document_id) REFERENCES documents (id) ON DELETE CASCADE
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE ledger_entries (
+	id CHAR(36) NOT NULL, 
+	project_id CHAR(36) NOT NULL, 
+	mission_id CHAR(36), 
+	deepsearch_batch_id CHAR(36), 
+	session_key VARCHAR(255) NOT NULL, 
+	origin VARCHAR(32) DEFAULT 'mcp-agent' NOT NULL, 
+	claim TEXT NOT NULL, 
+	summary TEXT, 
+	source_url TEXT NOT NULL, 
+	source_id CHAR(36) NOT NULL, 
+	snippet TEXT, 
+	"query" TEXT, 
+	disposition VARCHAR(32) NOT NULL, 
+	tags JSON DEFAULT '[]' NOT NULL, 
+	owner_id CHAR(36), 
+	workspace_id CHAR(36), 
+	created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT fk_ledger_entries_source_project FOREIGN KEY(source_id, project_id) REFERENCES ledger_sources (id, project_id) ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED, 
+	CONSTRAINT ck_ledger_entries_origin CHECK (origin IN ('mcp-agent', 'deepsearch-worker')), 
+	CONSTRAINT ck_ledger_entries_disposition CHECK (disposition IN ('supporting', 'contradicting', 'rejected', 'background')), 
+	CONSTRAINT ck_ledger_entries_nonempty_session CHECK (length(trim(session_key)) > 0), 
+	CONSTRAINT ck_ledger_entries_nonempty_claim CHECK (length(trim(claim)) > 0), 
+	CONSTRAINT ck_ledger_entries_nonempty_source_url CHECK (length(trim(source_url)) > 0), 
+	FOREIGN KEY(project_id) REFERENCES projects (id) ON DELETE CASCADE, 
+	FOREIGN KEY(mission_id) REFERENCES missions (id) ON DELETE SET NULL, 
+	CONSTRAINT fk_ledger_entries_deepsearch_batch FOREIGN KEY(deepsearch_batch_id) REFERENCES deepsearch_ledger_batches (id) ON DELETE SET NULL, 
+	FOREIGN KEY(owner_id) REFERENCES users (id) ON DELETE SET NULL, 
+	FOREIGN KEY(workspace_id) REFERENCES workspaces (id) ON DELETE SET NULL
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_ledger_entries_project_session_created ON ledger_entries (project_id, session_key, created_at)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_ledger_entries_project_created ON ledger_entries (project_id, created_at)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_ledger_entries_project_mission_created ON ledger_entries (project_id, mission_id, created_at)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_ledger_entries_deepsearch_batch_created ON ledger_entries (deepsearch_batch_id, created_at)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_ledger_entries_workspace_owner_created ON ledger_entries (workspace_id, owner_id, created_at)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_ledger_entries_source_created ON ledger_entries (source_id, created_at)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE ingestion_jobs (
+	id CHAR(36) NOT NULL, 
+	project_id CHAR(36) NOT NULL, 
+	document_id CHAR(36) NOT NULL, 
+	status VARCHAR(32) NOT NULL, 
+	status_detail TEXT, 
+	created_at DATETIME NOT NULL, 
+	updated_at DATETIME NOT NULL, 
+	started_at DATETIME, 
+	completed_at DATETIME, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(project_id) REFERENCES projects (id) ON DELETE CASCADE, 
+	FOREIGN KEY(document_id) REFERENCES documents (id) ON DELETE CASCADE
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00005s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE document_processing_statuses (
+	id CHAR(36) NOT NULL, 
+	document_id CHAR(36) NOT NULL, 
+	stage VARCHAR NOT NULL, 
+	status VARCHAR NOT NULL, 
+	message TEXT, 
+	details JSON NOT NULL, 
+	created_at DATETIME NOT NULL, 
+	updated_at DATETIME NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(document_id) REFERENCES documents (id) ON DELETE CASCADE
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE document_tags (
+	document_id CHAR(36) NOT NULL, 
+	tag_id CHAR(36) NOT NULL, 
+	PRIMARY KEY (document_id, tag_id), 
+	FOREIGN KEY(document_id) REFERENCES documents (id) ON DELETE CASCADE, 
+	FOREIGN KEY(tag_id) REFERENCES tags (id) ON DELETE CASCADE
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00007s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_document_tags_tag_id ON document_tags (tag_id)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE collection_items (
+	id CHAR(36) NOT NULL, 
+	collection_id CHAR(36) NOT NULL, 
+	chunk_id CHAR(36) NOT NULL, 
+	notes TEXT, 
+	added_at DATETIME NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_collection_item_collection_chunk UNIQUE (collection_id, chunk_id), 
+	FOREIGN KEY(collection_id) REFERENCES collections (id) ON DELETE CASCADE, 
+	FOREIGN KEY(chunk_id) REFERENCES document_chunks (id) ON DELETE CASCADE
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_collection_items_chunk_id ON collection_items (chunk_id)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX ix_collection_items_collection_id ON collection_items (collection_id)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE insight_sources (
+	insight_id CHAR(36) NOT NULL, 
+	chunk_id CHAR(36) NOT NULL, 
+	relevance_score NUMERIC(3, 2), 
+	PRIMARY KEY (insight_id, chunk_id), 
+	FOREIGN KEY(insight_id) REFERENCES insights (id) ON DELETE CASCADE, 
+	FOREIGN KEY(chunk_id) REFERENCES document_chunks (id) ON DELETE CASCADE
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00004s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE INDEX idx_insight_sources_chunk_id ON insight_sources (chunk_id)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00003s] ()
+INFO     sqlalchemy.engine.Engine:base.py:2695 COMMIT
+INFO     sqlalchemy.engine.Engine:base.py:2689 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1848 INSERT INTO users (id, email, display_name, password_hash, email_notifications_enabled, role, is_active, invite_code_used, created_at, updated_at, last_login_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 6.603s ago] ('71a9d9e4-0451-41e9-a389-26dc16736e3e', 'tracelab-admin@tracelab.local', 'tracelab-admin@tracelab.local', '$2b$12$akDDNNwX4W4ASme.o5s3Gujxxf19OA8VASHvrt7Lku7K3TXahLHp2', 1, 'admin', 1, None, '2026-09-23 23:45:50.038315', '2026-09-23 23:45:50.038317', None)
+INFO     sqlalchemy.engine.Engine:base.py:2695 COMMIT
+INFO     sqlalchemy.engine.Engine:base.py:2689 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1848 INSERT INTO projects (id, name, description, user_id, mission_protocol_id, owner_id, workspace_id, research_type, methodology, status, quality_score, last_quality_check, created_at, updated_at, deleted_at, deleted_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 6.275s ago] ('1235dc94-0ad2-41af-aa3c-2572a2379c50', 'TraceLab Test Project', 'Pipeline validation', None, None, None, None, None, None, 'active', None, None, '2026-09-23 23:45:50.101739', '2026-09-23 23:45:50.101751', None, None)
+INFO     sqlalchemy.engine.Engine:base.py:2695 COMMIT
+INFO     sqlalchemy.engine.Engine:base.py:2689 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT projects.id, projects.name, projects.description, projects.user_id, projects.mission_protocol_id, projects.owner_id, projects.workspace_id, projects.research_type, projects.methodology, projects.status, projects.quality_score, projects.last_quality_check, projects.created_at, projects.updated_at, projects.deleted_at, projects.deleted_by 
+FROM projects 
+WHERE projects.id = ?
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 6.274s ago] ('1235dc94-0ad2-41af-aa3c-2572a2379c50',)
+----------------------------- Captured stdout call -----------------------------
+2026-09-23 18:45:50,104 INFO sqlalchemy.engine.Engine INSERT INTO users (id, email, display_name, password_hash, email_notifications_enabled, role, is_active, invite_code_used, created_at, updated_at, last_login_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-09-23 18:45:50,104 INFO sqlalchemy.engine.Engine [cached since 6.669s ago] ('c637fc8d-5c5d-4729-b706-279da0d10c6f', '26e8f303@example.com', 'Project owner', 'placeholder-not-a-real-hash', 1, 'member', 1, None, '2026-09-23 23:45:50.104111', '2026-09-23 23:45:50.104112', None)
+2026-09-23 18:45:50,104 INFO sqlalchemy.engine.Engine COMMIT
+2026-09-23 18:45:50,104 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-23 18:45:50,105 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.display_name, users.password_hash, users.email_notifications_enabled, users.role, users.is_active, users.invite_code_used, users.created_at, users.updated_at, users.last_login_at 
+FROM users 
+WHERE users.id = ?
+2026-09-23 18:45:50,105 INFO sqlalchemy.engine.Engine [cached since 6.272s ago] ('c637fc8d-5c5d-4729-b706-279da0d10c6f',)
+2026-09-23 18:45:50,105 INFO sqlalchemy.engine.Engine SELECT projects.id AS projects_id, projects.name AS projects_name, projects.description AS projects_description, projects.user_id AS projects_user_id, projects.mission_protocol_id AS projects_mission_protocol_id, projects.workspace_id AS projects_workspace_id, projects.research_type AS projects_research_type, projects.methodology AS projects_methodology, projects.status AS projects_status, projects.quality_score AS projects_quality_score, projects.last_quality_check AS projects_last_quality_check, projects.created_at AS projects_created_at, projects.updated_at AS projects_updated_at, projects.deleted_at AS projects_deleted_at, projects.deleted_by AS projects_deleted_by 
+FROM projects 
+WHERE projects.id = ?
+2026-09-23 18:45:50,105 INFO sqlalchemy.engine.Engine [cached since 6.272s ago] ('1235dc94-0ad2-41af-aa3c-2572a2379c50',)
+2026-09-23 18:45:50,105 INFO sqlalchemy.engine.Engine UPDATE projects SET owner_id=?, updated_at=? WHERE projects.id = ?
+2026-09-23 18:45:50,105 INFO sqlalchemy.engine.Engine [cached since 6.271s ago] ('c637fc8d-5c5d-4729-b706-279da0d10c6f', '2026-09-23 23:45:50.105625', '1235dc94-0ad2-41af-aa3c-2572a2379c50')
+2026-09-23 18:45:50,105 INFO sqlalchemy.engine.Engine COMMIT
+2026-09-23 18:45:50,106 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-23 18:45:50,106 INFO sqlalchemy.engine.Engine SELECT users.id AS users_id, users.email AS users_email, users.display_name AS users_display_name, users.password_hash AS users_password_hash, users.email_notifications_enabled AS users_email_notifications_enabled, users.role AS users_role, users.is_active AS users_is_active, users.invite_code_used AS users_invite_code_used, users.created_at AS users_created_at, users.updated_at AS users_updated_at, users.last_login_at AS users_last_login_at 
+FROM users 
+WHERE users.id = ?
+2026-09-23 18:45:50,106 INFO sqlalchemy.engine.Engine [cached since 6.27s ago] ('c637fc8d-5c5d-4729-b706-279da0d10c6f',)
+2026-09-23 18:45:50,336 INFO sqlalchemy.engine.Engine INSERT INTO api_keys (id, user_id, name, key_hash, key_prefix, created_at, last_used_at, expires_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+2026-09-23 18:45:50,336 INFO sqlalchemy.engine.Engine [cached since 6.265s ago] ('731fce0c-e204-4637-ac91-f03b97bbfe1e', 'c637fc8d-5c5d-4729-b706-279da0d10c6f', 'MCP', '$2b$12$4cxFM7JUjdiDsJcPHmlfxOJHjWqi/PfcbUOepOVVHETKMdnYVR5tm', 'tl_Tjxh2dZM', '2026-09-23 23:45:50.336390', None, None)
+2026-09-23 18:45:50,337 INFO sqlalchemy.engine.Engine COMMIT
+2026-09-23 18:45:50,340 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-23 18:45:50,340 INFO sqlalchemy.engine.Engine SELECT projects.id AS projects_id, projects.name AS projects_name, projects.description AS projects_description, projects.user_id AS projects_user_id, projects.mission_protocol_id AS projects_mission_protocol_id, projects.owner_id AS projects_owner_id, projects.workspace_id AS projects_workspace_id, projects.research_type AS projects_research_type, projects.methodology AS projects_methodology, projects.status AS projects_status, projects.quality_score AS projects_quality_score, projects.last_quality_check AS projects_last_quality_check, projects.created_at AS projects_created_at, projects.updated_at AS projects_updated_at, projects.deleted_at AS projects_deleted_at, projects.deleted_by AS projects_deleted_by 
+FROM projects 
+WHERE projects.id = ?
+2026-09-23 18:45:50,340 INFO sqlalchemy.engine.Engine [cached since 6.267s ago] ('1235dc94-0ad2-41af-aa3c-2572a2379c50',)
+2026-09-23 18:45:50,340 INFO sqlalchemy.engine.Engine INSERT INTO documents (id, project_id, name, file_path, file_type, content, raw_content, uploaded_at, updated_at, file_size, mime_type, source_type, participant_count, collection_date, processed, chunked, embedded, transcription_accuracy, validation_status, document_metadata, source_report_id, source_mission_id, source_origin, owner_id, workspace_id, deleted_at, deleted_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-09-23 18:45:50,340 INFO sqlalchemy.engine.Engine [cached since 6.267s ago] ('927e7ab4-0613-42d2-b3a4-fc1d62c9091e', '1235dc94-0ad2-41af-aa3c-2572a2379c50', 'qdrant-on-railway.md', None, None, None, None, '2026-09-23 23:45:50.340780', '2026-09-23 23:45:50.340781', None, 'text/markdown', None, None, None, 0, 0, 0, None, 'pending', '{}', None, None, 'upload', None, None, None, None)
+2026-09-23 18:45:50,341 INFO sqlalchemy.engine.Engine COMMIT
+2026-09-23 18:45:50,341 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-23 18:45:50,341 INFO sqlalchemy.engine.Engine SELECT documents.id, documents.project_id, documents.name, documents.file_path, documents.file_type, documents.content, documents.raw_content, documents.uploaded_at, documents.updated_at, documents.file_size, documents.mime_type, documents.source_type, documents.participant_count, documents.collection_date, documents.processed, documents.chunked, documents.embedded, documents.transcription_accuracy, documents.validation_status, documents.document_metadata, documents.source_report_id, documents.source_mission_id, documents.source_origin, documents.owner_id, documents.workspace_id, documents.deleted_at, documents.deleted_by 
+FROM documents 
+WHERE documents.id = ?
+2026-09-23 18:45:50,341 INFO sqlalchemy.engine.Engine [cached since 6.266s ago] ('927e7ab4-0613-42d2-b3a4-fc1d62c9091e',)
+2026-09-23 18:45:50,342 INFO sqlalchemy.engine.Engine SELECT projects.id AS projects_id, projects.name AS projects_name, projects.description AS projects_description, projects.user_id AS projects_user_id, projects.mission_protocol_id AS projects_mission_protocol_id, projects.owner_id AS projects_owner_id, projects.workspace_id AS projects_workspace_id, projects.research_type AS projects_research_type, projects.methodology AS projects_methodology, projects.status AS projects_status, projects.quality_score AS projects_quality_score, projects.last_quality_check AS projects_last_quality_check, projects.created_at AS projects_created_at, projects.updated_at AS projects_updated_at, projects.deleted_at AS projects_deleted_at, projects.deleted_by AS projects_deleted_by 
+FROM projects 
+WHERE projects.id = ?
+2026-09-23 18:45:50,342 INFO sqlalchemy.engine.Engine [cached since 6.269s ago] ('1235dc94-0ad2-41af-aa3c-2572a2379c50',)
+2026-09-23 18:45:50,343 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-23 18:45:50,343 INFO sqlalchemy.engine.Engine SELECT api_keys.id AS api_keys_id, api_keys.user_id AS api_keys_user_id, api_keys.name AS api_keys_name, api_keys.key_hash AS api_keys_key_hash, api_keys.key_prefix AS api_keys_key_prefix, api_keys.created_at AS api_keys_created_at, api_keys.last_used_at AS api_keys_last_used_at, api_keys.expires_at AS api_keys_expires_at 
+FROM api_keys 
+WHERE api_keys.key_prefix = ?
+2026-09-23 18:45:50,343 INFO sqlalchemy.engine.Engine [cached since 6.036s ago] ('tl_Tjxh2dZM',)
+2026-09-23 18:45:50,567 INFO sqlalchemy.engine.Engine UPDATE api_keys SET last_used_at=? WHERE api_keys.id = ?
+2026-09-23 18:45:50,568 INFO sqlalchemy.engine.Engine [cached since 6.041s ago] ('2026-09-23 23:45:50.567767', '731fce0c-e204-4637-ac91-f03b97bbfe1e')
+2026-09-23 18:45:50,568 INFO sqlalchemy.engine.Engine COMMIT
+2026-09-23 18:45:50,569 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-23 18:45:50,569 INFO sqlalchemy.engine.Engine SELECT api_keys.id AS api_keys_id, api_keys.user_id AS api_keys_user_id, api_keys.name AS api_keys_name, api_keys.key_hash AS api_keys_key_hash, api_keys.key_prefix AS api_keys_key_prefix, api_keys.created_at AS api_keys_created_at, api_keys.last_used_at AS api_keys_last_used_at, api_keys.expires_at AS api_keys_expires_at 
+FROM api_keys 
+WHERE api_keys.id = ?
+2026-09-23 18:45:50,569 INFO sqlalchemy.engine.Engine [cached since 6.041s ago] ('731fce0c-e204-4637-ac91-f03b97bbfe1e',)
+2026-09-23 18:45:50,569 INFO sqlalchemy.engine.Engine SELECT users.id AS users_id, users.email AS users_email, users.display_name AS users_display_name, users.password_hash AS users_password_hash, users.email_notifications_enabled AS users_email_notifications_enabled, users.role AS users_role, users.is_active AS users_is_active, users.invite_code_used AS users_invite_code_used, users.created_at AS users_created_at, users.updated_at AS users_updated_at, users.last_login_at AS users_last_login_at 
+FROM users 
+WHERE users.id = ?
+ LIMIT ? OFFSET ?
+2026-09-23 18:45:50,569 INFO sqlalchemy.engine.Engine [cached since 6.04s ago] ('c637fc8d-5c5d-4729-b706-279da0d10c6f', 1, 0)
+2026-09-23 18:45:50,569 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-09-23 18:45:50,570 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-23 18:45:50,570 INFO sqlalchemy.engine.Engine SELECT projects.id AS projects_id, projects.name AS projects_name, projects.description AS projects_description, projects.user_id AS projects_user_id, projects.mission_protocol_id AS projects_mission_protocol_id, projects.owner_id AS projects_owner_id, projects.workspace_id AS projects_workspace_id, projects.research_type AS projects_research_type, projects.methodology AS projects_methodology, projects.status AS projects_status, projects.quality_score AS projects_quality_score, projects.last_quality_check AS projects_last_quality_check, projects.created_at AS projects_created_at, projects.updated_at AS projects_updated_at, projects.deleted_at AS projects_deleted_at, projects.deleted_by AS projects_deleted_by 
+FROM projects 
+WHERE projects.id = ? AND projects.deleted_at IS NULL
+ LIMIT ? OFFSET ?
+2026-09-23 18:45:50,570 INFO sqlalchemy.engine.Engine [cached since 6.04s ago] ('1235dc94-0ad2-41af-aa3c-2572a2379c50', 1, 0)
+2026-09-23 18:45:50,571 INFO sqlalchemy.engine.Engine SELECT documents.id AS documents_id, documents.name AS documents_name 
+FROM documents 
+WHERE documents.id IN (?) AND documents.deleted_at IS NULL
+2026-09-23 18:45:50,571 INFO sqlalchemy.engine.Engine [cached since 5.456s ago] ('927e7ab4-0613-42d2-b3a4-fc1d62c9091e',)
+2026-09-23 18:45:50,571 INFO sqlalchemy.engine.Engine INSERT INTO usage_records (id, user_id, project_id, mission_id, kind, status, attribution, provider, model, input_tokens, output_tokens, total_tokens, requests, steps, tool_calls, duration_seconds, usage_complete, cost_usd, details, started_at, completed_at, recorded_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-09-23 18:45:50,571 INFO sqlalchemy.engine.Engine [cached since 5.456s ago] ('a12930a4-d3c0-4ff6-bad6-7b639548b83f', 'c637fc8d-5c5d-4729-b706-279da0d10c6f', '1235dc94-0ad2-41af-aa3c-2572a2379c50', None, 'librarian_turn', 'completed', 'caller', None, 'gpt-5.1', 900, 120, 1020, 1, None, None, None, 1, None, 'null', '2026-09-23 23:45:50.571533', '2026-09-23 23:45:50.571534', '2026-09-23 23:45:50.571691', '2026-09-23 23:45:50.571692')
+2026-09-23 18:45:50,572 INFO sqlalchemy.engine.Engine COMMIT
+2026-09-23 18:45:50,572 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-23 18:45:50,572 INFO sqlalchemy.engine.Engine SELECT projects.id AS projects_id, projects.name AS projects_name, projects.description AS projects_description, projects.user_id AS projects_user_id, projects.mission_protocol_id AS projects_mission_protocol_id, projects.owner_id AS projects_owner_id, projects.workspace_id AS projects_workspace_id, projects.research_type AS projects_research_type, projects.methodology AS projects_methodology, projects.status AS projects_status, projects.quality_score AS projects_quality_score, projects.last_quality_check AS projects_last_quality_check, projects.created_at AS projects_created_at, projects.updated_at AS projects_updated_at, projects.deleted_at AS projects_deleted_at, projects.deleted_by AS projects_deleted_by 
+FROM projects 
+WHERE projects.id = ?
+2026-09-23 18:45:50,572 INFO sqlalchemy.engine.Engine [cached since 6.5s ago] ('1235dc94-0ad2-41af-aa3c-2572a2379c50',)
+2026-09-23 18:45:50,572 INFO sqlalchemy.engine.Engine INSERT INTO usage_records (id, user_id, project_id, mission_id, kind, status, attribution, provider, model, input_tokens, output_tokens, total_tokens, requests, steps, tool_calls, duration_seconds, usage_complete, cost_usd, details, started_at, completed_at, recorded_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-09-23 18:45:50,572 INFO sqlalchemy.engine.Engine [cached since 5.457s ago] ('6d3946e3-4b0b-4295-bea2-9d0db30adcba', 'c637fc8d-5c5d-4729-b706-279da0d10c6f', '1235dc94-0ad2-41af-aa3c-2572a2379c50', None, 'librarian_turn', 'completed', 'caller', None, 'gpt-5.2', 950, 140, 1090, 1, None, None, None, 1, None, 'null', '2026-09-23 23:45:50.572681', '2026-09-23 23:45:50.572682', '2026-09-23 23:45:50.572778', '2026-09-23 23:45:50.572779')
+2026-09-23 18:45:50,573 INFO sqlalchemy.engine.Engine COMMIT
+2026-09-23 18:45:50,574 INFO sqlalchemy.engine.Engine SELECT usage_records.id AS usage_records_id, usage_records.user_id AS usage_records_user_id, usage_records.project_id AS usage_records_project_id, usage_records.mission_id AS usage_records_mission_id, usage_records.kind AS usage_records_kind, usage_records.status AS usage_records_status, usage_records.attribution AS usage_records_attribution, usage_records.provider AS usage_records_provider, usage_records.model AS usage_records_model, usage_records.input_tokens AS usage_records_input_tokens, usage_records.output_tokens AS usage_records_output_tokens, usage_records.total_tokens AS usage_records_total_tokens, usage_records.requests AS usage_records_requests, usage_records.steps AS usage_records_steps, usage_records.tool_calls AS usage_records_tool_calls, usage_records.duration_seconds AS usage_records_duration_seconds, usage_records.usage_complete AS usage_records_usage_complete, usage_records.cost_usd AS usage_records_cost_usd, usage_records.details AS usage_records_details, usage_records.started_at AS usage_records_started_at, usage_records.completed_at AS usage_records_completed_at, usage_records.recorded_at AS usage_records_recorded_at, usage_records.updated_at AS usage_records_updated_at 
+FROM usage_records 
+WHERE usage_records.project_id = ?
+2026-09-23 18:45:50,574 INFO sqlalchemy.engine.Engine [generated in 0.00008s] ('1235dc94-0ad2-41af-aa3c-2572a2379c50',)
+------------------------------ Captured log call -------------------------------
+INFO     sqlalchemy.engine.Engine:base.py:1848 INSERT INTO users (id, email, display_name, password_hash, email_notifications_enabled, role, is_active, invite_code_used, created_at, updated_at, last_login_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 6.669s ago] ('c637fc8d-5c5d-4729-b706-279da0d10c6f', '26e8f303@example.com', 'Project owner', 'placeholder-not-a-real-hash', 1, 'member', 1, None, '2026-09-23 23:45:50.104111', '2026-09-23 23:45:50.104112', None)
+INFO     sqlalchemy.engine.Engine:base.py:2695 COMMIT
+INFO     sqlalchemy.engine.Engine:base.py:2689 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT users.id, users.email, users.display_name, users.password_hash, users.email_notifications_enabled, users.role, users.is_active, users.invite_code_used, users.created_at, users.updated_at, users.last_login_at 
+FROM users 
+WHERE users.id = ?
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 6.272s ago] ('c637fc8d-5c5d-4729-b706-279da0d10c6f',)
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT projects.id AS projects_id, projects.name AS projects_name, projects.description AS projects_description, projects.user_id AS projects_user_id, projects.mission_protocol_id AS projects_mission_protocol_id, projects.workspace_id AS projects_workspace_id, projects.research_type AS projects_research_type, projects.methodology AS projects_methodology, projects.status AS projects_status, projects.quality_score AS projects_quality_score, projects.last_quality_check AS projects_last_quality_check, projects.created_at AS projects_created_at, projects.updated_at AS projects_updated_at, projects.deleted_at AS projects_deleted_at, projects.deleted_by AS projects_deleted_by 
+FROM projects 
+WHERE projects.id = ?
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 6.272s ago] ('1235dc94-0ad2-41af-aa3c-2572a2379c50',)
+INFO     sqlalchemy.engine.Engine:base.py:1848 UPDATE projects SET owner_id=?, updated_at=? WHERE projects.id = ?
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 6.271s ago] ('c637fc8d-5c5d-4729-b706-279da0d10c6f', '2026-09-23 23:45:50.105625', '1235dc94-0ad2-41af-aa3c-2572a2379c50')
+INFO     sqlalchemy.engine.Engine:base.py:2695 COMMIT
+INFO     sqlalchemy.engine.Engine:base.py:2689 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT users.id AS users_id, users.email AS users_email, users.display_name AS users_display_name, users.password_hash AS users_password_hash, users.email_notifications_enabled AS users_email_notifications_enabled, users.role AS users_role, users.is_active AS users_is_active, users.invite_code_used AS users_invite_code_used, users.created_at AS users_created_at, users.updated_at AS users_updated_at, users.last_login_at AS users_last_login_at 
+FROM users 
+WHERE users.id = ?
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 6.27s ago] ('c637fc8d-5c5d-4729-b706-279da0d10c6f',)
+INFO     sqlalchemy.engine.Engine:base.py:1848 INSERT INTO api_keys (id, user_id, name, key_hash, key_prefix, created_at, last_used_at, expires_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 6.265s ago] ('731fce0c-e204-4637-ac91-f03b97bbfe1e', 'c637fc8d-5c5d-4729-b706-279da0d10c6f', 'MCP', '$2b$12$4cxFM7JUjdiDsJcPHmlfxOJHjWqi/PfcbUOepOVVHETKMdnYVR5tm', 'tl_Tjxh2dZM', '2026-09-23 23:45:50.336390', None, None)
+INFO     sqlalchemy.engine.Engine:base.py:2695 COMMIT
+INFO     sqlalchemy.engine.Engine:base.py:2689 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT projects.id AS projects_id, projects.name AS projects_name, projects.description AS projects_description, projects.user_id AS projects_user_id, projects.mission_protocol_id AS projects_mission_protocol_id, projects.owner_id AS projects_owner_id, projects.workspace_id AS projects_workspace_id, projects.research_type AS projects_research_type, projects.methodology AS projects_methodology, projects.status AS projects_status, projects.quality_score AS projects_quality_score, projects.last_quality_check AS projects_last_quality_check, projects.created_at AS projects_created_at, projects.updated_at AS projects_updated_at, projects.deleted_at AS projects_deleted_at, projects.deleted_by AS projects_deleted_by 
+FROM projects 
+WHERE projects.id = ?
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 6.267s ago] ('1235dc94-0ad2-41af-aa3c-2572a2379c50',)
+INFO     sqlalchemy.engine.Engine:base.py:1848 INSERT INTO documents (id, project_id, name, file_path, file_type, content, raw_content, uploaded_at, updated_at, file_size, mime_type, source_type, participant_count, collection_date, processed, chunked, embedded, transcription_accuracy, validation_status, document_metadata, source_report_id, source_mission_id, source_origin, owner_id, workspace_id, deleted_at, deleted_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 6.267s ago] ('927e7ab4-0613-42d2-b3a4-fc1d62c9091e', '1235dc94-0ad2-41af-aa3c-2572a2379c50', 'qdrant-on-railway.md', None, None, None, None, '2026-09-23 23:45:50.340780', '2026-09-23 23:45:50.340781', None, 'text/markdown', None, None, None, 0, 0, 0, None, 'pending', '{}', None, None, 'upload', None, None, None, None)
+INFO     sqlalchemy.engine.Engine:base.py:2695 COMMIT
+INFO     sqlalchemy.engine.Engine:base.py:2689 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT documents.id, documents.project_id, documents.name, documents.file_path, documents.file_type, documents.content, documents.raw_content, documents.uploaded_at, documents.updated_at, documents.file_size, documents.mime_type, documents.source_type, documents.participant_count, documents.collection_date, documents.processed, documents.chunked, documents.embedded, documents.transcription_accuracy, documents.validation_status, documents.document_metadata, documents.source_report_id, documents.source_mission_id, documents.source_origin, documents.owner_id, documents.workspace_id, documents.deleted_at, documents.deleted_by 
+FROM documents 
+WHERE documents.id = ?
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 6.266s ago] ('927e7ab4-0613-42d2-b3a4-fc1d62c9091e',)
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT projects.id AS projects_id, projects.name AS projects_name, projects.description AS projects_description, projects.user_id AS projects_user_id, projects.mission_protocol_id AS projects_mission_protocol_id, projects.owner_id AS projects_owner_id, projects.workspace_id AS projects_workspace_id, projects.research_type AS projects_research_type, projects.methodology AS projects_methodology, projects.status AS projects_status, projects.quality_score AS projects_quality_score, projects.last_quality_check AS projects_last_quality_check, projects.created_at AS projects_created_at, projects.updated_at AS projects_updated_at, projects.deleted_at AS projects_deleted_at, projects.deleted_by AS projects_deleted_by 
+FROM projects 
+WHERE projects.id = ?
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 6.269s ago] ('1235dc94-0ad2-41af-aa3c-2572a2379c50',)
+INFO     sqlalchemy.engine.Engine:base.py:2689 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT api_keys.id AS api_keys_id, api_keys.user_id AS api_keys_user_id, api_keys.name AS api_keys_name, api_keys.key_hash AS api_keys_key_hash, api_keys.key_prefix AS api_keys_key_prefix, api_keys.created_at AS api_keys_created_at, api_keys.last_used_at AS api_keys_last_used_at, api_keys.expires_at AS api_keys_expires_at 
+FROM api_keys 
+WHERE api_keys.key_prefix = ?
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 6.036s ago] ('tl_Tjxh2dZM',)
+INFO     sqlalchemy.engine.Engine:base.py:1848 UPDATE api_keys SET last_used_at=? WHERE api_keys.id = ?
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 6.041s ago] ('2026-09-23 23:45:50.567767', '731fce0c-e204-4637-ac91-f03b97bbfe1e')
+INFO     sqlalchemy.engine.Engine:base.py:2695 COMMIT
+INFO     sqlalchemy.engine.Engine:base.py:2689 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT api_keys.id AS api_keys_id, api_keys.user_id AS api_keys_user_id, api_keys.name AS api_keys_name, api_keys.key_hash AS api_keys_key_hash, api_keys.key_prefix AS api_keys_key_prefix, api_keys.created_at AS api_keys_created_at, api_keys.last_used_at AS api_keys_last_used_at, api_keys.expires_at AS api_keys_expires_at 
+FROM api_keys 
+WHERE api_keys.id = ?
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 6.041s ago] ('731fce0c-e204-4637-ac91-f03b97bbfe1e',)
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT users.id AS users_id, users.email AS users_email, users.display_name AS users_display_name, users.password_hash AS users_password_hash, users.email_notifications_enabled AS users_email_notifications_enabled, users.role AS users_role, users.is_active AS users_is_active, users.invite_code_used AS users_invite_code_used, users.created_at AS users_created_at, users.updated_at AS users_updated_at, users.last_login_at AS users_last_login_at 
+FROM users 
+WHERE users.id = ?
+ LIMIT ? OFFSET ?
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 6.04s ago] ('c637fc8d-5c5d-4729-b706-279da0d10c6f', 1, 0)
+INFO     sqlalchemy.engine.Engine:base.py:2692 ROLLBACK
+INFO     sqlalchemy.engine.Engine:base.py:2689 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT projects.id AS projects_id, projects.name AS projects_name, projects.description AS projects_description, projects.user_id AS projects_user_id, projects.mission_protocol_id AS projects_mission_protocol_id, projects.owner_id AS projects_owner_id, projects.workspace_id AS projects_workspace_id, projects.research_type AS projects_research_type, projects.methodology AS projects_methodology, projects.status AS projects_status, projects.quality_score AS projects_quality_score, projects.last_quality_check AS projects_last_quality_check, projects.created_at AS projects_created_at, projects.updated_at AS projects_updated_at, projects.deleted_at AS projects_deleted_at, projects.deleted_by AS projects_deleted_by 
+FROM projects 
+WHERE projects.id = ? AND projects.deleted_at IS NULL
+ LIMIT ? OFFSET ?
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 6.04s ago] ('1235dc94-0ad2-41af-aa3c-2572a2379c50', 1, 0)
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT documents.id AS documents_id, documents.name AS documents_name 
+FROM documents 
+WHERE documents.id IN (?) AND documents.deleted_at IS NULL
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 5.456s ago] ('927e7ab4-0613-42d2-b3a4-fc1d62c9091e',)
+INFO     sqlalchemy.engine.Engine:base.py:1848 INSERT INTO usage_records (id, user_id, project_id, mission_id, kind, status, attribution, provider, model, input_tokens, output_tokens, total_tokens, requests, steps, tool_calls, duration_seconds, usage_complete, cost_usd, details, started_at, completed_at, recorded_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 5.456s ago] ('a12930a4-d3c0-4ff6-bad6-7b639548b83f', 'c637fc8d-5c5d-4729-b706-279da0d10c6f', '1235dc94-0ad2-41af-aa3c-2572a2379c50', None, 'librarian_turn', 'completed', 'caller', None, 'gpt-5.1', 900, 120, 1020, 1, None, None, None, 1, None, 'null', '2026-09-23 23:45:50.571533', '2026-09-23 23:45:50.571534', '2026-09-23 23:45:50.571691', '2026-09-23 23:45:50.571692')
+INFO     sqlalchemy.engine.Engine:base.py:2695 COMMIT
+INFO     sqlalchemy.engine.Engine:base.py:2689 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT projects.id AS projects_id, projects.name AS projects_name, projects.description AS projects_description, projects.user_id AS projects_user_id, projects.mission_protocol_id AS projects_mission_protocol_id, projects.owner_id AS projects_owner_id, projects.workspace_id AS projects_workspace_id, projects.research_type AS projects_research_type, projects.methodology AS projects_methodology, projects.status AS projects_status, projects.quality_score AS projects_quality_score, projects.last_quality_check AS projects_last_quality_check, projects.created_at AS projects_created_at, projects.updated_at AS projects_updated_at, projects.deleted_at AS projects_deleted_at, projects.deleted_by AS projects_deleted_by 
+FROM projects 
+WHERE projects.id = ?
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 6.5s ago] ('1235dc94-0ad2-41af-aa3c-2572a2379c50',)
+INFO     sqlalchemy.engine.Engine:base.py:1848 INSERT INTO usage_records (id, user_id, project_id, mission_id, kind, status, attribution, provider, model, input_tokens, output_tokens, total_tokens, requests, steps, tool_calls, duration_seconds, usage_complete, cost_usd, details, started_at, completed_at, recorded_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 5.457s ago] ('6d3946e3-4b0b-4295-bea2-9d0db30adcba', 'c637fc8d-5c5d-4729-b706-279da0d10c6f', '1235dc94-0ad2-41af-aa3c-2572a2379c50', None, 'librarian_turn', 'completed', 'caller', None, 'gpt-5.2', 950, 140, 1090, 1, None, None, None, 1, None, 'null', '2026-09-23 23:45:50.572681', '2026-09-23 23:45:50.572682', '2026-09-23 23:45:50.572778', '2026-09-23 23:45:50.572779')
+INFO     sqlalchemy.engine.Engine:base.py:2695 COMMIT
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT usage_records.id AS usage_records_id, usage_records.user_id AS usage_records_user_id, usage_records.project_id AS usage_records_project_id, usage_records.mission_id AS usage_records_mission_id, usage_records.kind AS usage_records_kind, usage_records.status AS usage_records_status, usage_records.attribution AS usage_records_attribution, usage_records.provider AS usage_records_provider, usage_records.model AS usage_records_model, usage_records.input_tokens AS usage_records_input_tokens, usage_records.output_tokens AS usage_records_output_tokens, usage_records.total_tokens AS usage_records_total_tokens, usage_records.requests AS usage_records_requests, usage_records.steps AS usage_records_steps, usage_records.tool_calls AS usage_records_tool_calls, usage_records.duration_seconds AS usage_records_duration_seconds, usage_records.usage_complete AS usage_records_usage_complete, usage_records.cost_usd AS usage_records_cost_usd, usage_records.details AS usage_records_details, usage_records.started_at AS usage_records_started_at, usage_records.completed_at AS usage_records_completed_at, usage_records.recorded_at AS usage_records_recorded_at, usage_records.updated_at AS usage_records_updated_at 
+FROM usage_records 
+WHERE usage_records.project_id = ?
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00008s] ('1235dc94-0ad2-41af-aa3c-2572a2379c50',)
+--------------------------- Captured stdout teardown ---------------------------
+2026-09-23 18:45:50,663 INFO sqlalchemy.engine.Engine COMMIT
+---------------------------- Captured log teardown -----------------------------
+INFO     sqlalchemy.engine.Engine:base.py:2695 COMMIT
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/_pytest/config/__init__.py:852
+  /Users/systemsystems/portfolio/TraceLab/.venv/lib/python3.11/site-packages/_pytest/config/__init__.py:852: PytestAssertRewriteWarning: Module already imported so cannot be rewritten; cmos_pytest_telemetry_plugin
+    self.import_plugin(import_spec)
+
+app/core/config.py:11
+  /Users/systemsystems/portfolio/TraceLab/app/core/config.py:11: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class Settings(BaseSettings):
+
+app/core/database.py:29
+  /Users/systemsystems/portfolio/TraceLab/app/core/database.py:29: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+.venv/lib/python3.11/site-packages/passlib/utils/__init__.py:854
+  /Users/systemsystems/portfolio/TraceLab/.venv/lib/python3.11/site-packages/passlib/utils/__init__.py:854: DeprecationWarning: 'crypt' is deprecated and slated for removal in Python 3.13
+    from crypt import crypt as _crypt
+
+app/schemas/pagination.py:8
+  /Users/systemsystems/portfolio/TraceLab/app/schemas/pagination.py:8: PydanticDeprecatedSince20: `pydantic.generics:GenericModel` has been moved to `pydantic.BaseModel`. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    from pydantic.generics import GenericModel
+
+app/schemas/api_key.py:23
+  /Users/systemsystems/portfolio/TraceLab/app/schemas/api_key.py:23: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class APIKeyResponse(BaseModel):
+
+app/schemas/api_key.py:39
+  /Users/systemsystems/portfolio/TraceLab/app/schemas/api_key.py:39: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class APIKeyInfo(BaseModel):
+
+app/schemas/saved_searches.py:41
+  /Users/systemsystems/portfolio/TraceLab/app/schemas/saved_searches.py:41: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class SavedSearchResponse(SavedSearchBase):
+
+app/schemas/search_history.py:15
+  /Users/systemsystems/portfolio/TraceLab/app/schemas/search_history.py:15: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class SearchHistoryEntry(BaseModel):
+
+app/schemas/webhook.py:22
+  /Users/systemsystems/portfolio/TraceLab/app/schemas/webhook.py:22: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class ExecutionMetadata(BaseModel):
+
+app/main.py:161
+  /Users/systemsystems/portfolio/TraceLab/app/main.py:161: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+.venv/lib/python3.11/site-packages/fastapi/applications.py:4599
+.venv/lib/python3.11/site-packages/fastapi/applications.py:4599
+  /Users/systemsystems/portfolio/TraceLab/.venv/lib/python3.11/site-packages/fastapi/applications.py:4599: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)
+
+app/main.py:210
+  /Users/systemsystems/portfolio/TraceLab/app/main.py:210: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("shutdown")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_search_ask.py::TestAnswer::test_each_paid_call_is_metered_to_the_caller_and_a_cached_answer_is_not
+1 failed, 9 passed, 14 warnings in 9.73s
+
+== package
+JSON report written to /var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/tmpbap1jwcf.json
+
+== audit
+{
+  "totals": {
+    "operations": 103,
+    "live": 98,
+    "dead": 5,
+    "tools": 9,
+    "actions": 50,
+    "classifications": {
+      "covered": 21,
+      "partial": 0,
+      "closed-MCP-1": 17,
+      "closed-MCP-2": 7,
+      "rest-only-by-design": 53,
+      "deferred-MCP-2": 0,
+      "needs-derek": 0,
+      "dead-client-code": 5
+    }
+  },
+  "errors": []
+}

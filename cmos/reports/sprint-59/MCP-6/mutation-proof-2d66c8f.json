@@ -1,0 +1,223 @@
+{
+  "commit": "2d66c8f794bd2a84186f8be25e64ab483775fe5f",
+  "suites": [
+    "tests/test_search_ask.py",
+    "packages/tracelab-mcp/src/ask.test.ts",
+    "packages/tracelab-mcp/src/index.test.ts",
+    "scripts/mcp_parity_audit.mjs"
+  ],
+  "runs": [
+    {
+      "id": "baseline-before",
+      "red": [],
+      "totals": {
+        "backend": 10,
+        "package": 74
+      },
+      "expected": [],
+      "as_expected": true
+    },
+    {
+      "id": "M1",
+      "disables": "the project is authorized for the caller before the Q&A service runs",
+      "file": "app/api/v1/search.py",
+      "red": [
+        "TestAccess::test_a_caller_cannot_get_an_answer_from_a_project_they_cannot_read"
+      ],
+      "totals": {
+        "backend": 10,
+        "package": 74
+      },
+      "expected": [
+        "TestAccess::test_a_caller_cannot_get_an_answer_from_a_project_they_cannot_read"
+      ],
+      "as_expected": true
+    },
+    {
+      "id": "M2",
+      "disables": "a soft-deleted project is 404, like an unknown one",
+      "file": "app/api/v1/search.py",
+      "red": [
+        "TestAccess::test_an_unknown_or_deleted_project_is_404"
+      ],
+      "totals": {
+        "backend": 10,
+        "package": 74
+      },
+      "expected": [
+        "TestAccess::test_an_unknown_or_deleted_project_is_404"
+      ],
+      "as_expected": true
+    },
+    {
+      "id": "M3",
+      "disables": "the route reaches the pipeline only through corpus_qa.answer_question (a parallel path)",
+      "file": "app/api/v1/search.py",
+      "red": [
+        "TestAccess::test_the_projects_owner_gets_an_answer_whose_citations_resolve",
+        "TestAnswer::test_an_answer_that_cites_nothing_is_refused_not_shown",
+        "TestAnswer::test_each_paid_call_is_metered_to_the_caller_and_a_cached_answer_is_not",
+        "TestAnswer::test_nothing_found_is_the_refusal_and_asserts_nothing"
+      ],
+      "totals": {
+        "backend": 10,
+        "package": 74
+      },
+      "expected": [
+        "TestAccess::test_the_projects_owner_gets_an_answer_whose_citations_resolve",
+        "TestAnswer::test_an_answer_that_cites_nothing_is_refused_not_shown",
+        "TestAnswer::test_each_paid_call_is_metered_to_the_caller_and_a_cached_answer_is_not",
+        "TestAnswer::test_nothing_found_is_the_refusal_and_asserts_nothing"
+      ],
+      "as_expected": true
+    },
+    {
+      "id": "M4",
+      "disables": "each paid model call is recorded as usage",
+      "file": "app/api/v1/search.py",
+      "red": [
+        "TestAnswer::test_each_paid_call_is_metered_to_the_caller_and_a_cached_answer_is_not"
+      ],
+      "totals": {
+        "backend": 10,
+        "package": 74
+      },
+      "expected": [
+        "TestAnswer::test_each_paid_call_is_metered_to_the_caller_and_a_cached_answer_is_not"
+      ],
+      "as_expected": true
+    },
+    {
+      "id": "M5",
+      "disables": "asks are metered under their own kind, apart from Librarian turns",
+      "file": "app/models/usage_record.py",
+      "red": [
+        "TestAnswer::test_each_paid_call_is_metered_to_the_caller_and_a_cached_answer_is_not"
+      ],
+      "totals": {
+        "backend": 10,
+        "package": 74
+      },
+      "expected": [
+        "TestAnswer::test_each_paid_call_is_metered_to_the_caller_and_a_cached_answer_is_not"
+      ],
+      "as_expected": true
+    },
+    {
+      "id": "M6",
+      "disables": "the answer budget is bounded 64-4000",
+      "file": "app/schemas/rag.py",
+      "red": [
+        "TestAnswer::test_request_rules"
+      ],
+      "totals": {
+        "backend": 10,
+        "package": 74
+      },
+      "expected": [
+        "TestAnswer::test_request_rules"
+      ],
+      "as_expected": true
+    },
+    {
+      "id": "M7",
+      "disables": "a blank question is refused before retrieval",
+      "file": "app/schemas/rag.py",
+      "red": [
+        "TestAnswer::test_request_rules"
+      ],
+      "totals": {
+        "backend": 10,
+        "package": 74
+      },
+      "expected": [
+        "TestAnswer::test_request_rules"
+      ],
+      "as_expected": true
+    },
+    {
+      "id": "M8",
+      "disables": "the npm client sends POST /api/v1/search/ask (the verb the server serves)",
+      "file": "packages/tracelab-mcp/src/api-client.ts",
+      "red": [
+        "MCP-6 tracelab_search ask asks through POST /search/ask and links every citation to its chunk",
+        "TestMcpContract::test_the_npm_client_asks_through_post_search_ask"
+      ],
+      "totals": {
+        "backend": 10,
+        "package": 74
+      },
+      "expected": [
+        "MCP-6 tracelab_search ask asks through POST /search/ask and links every citation to its chunk",
+        "TestMcpContract::test_the_npm_client_asks_through_post_search_ask"
+      ],
+      "as_expected": true
+    },
+    {
+      "id": "M9",
+      "disables": "each citation gains the browser url that opens its chunk",
+      "file": "packages/tracelab-mcp/src/index.ts",
+      "red": [
+        "MCP-6 tracelab_search ask asks through POST /search/ask and links every citation to its chunk"
+      ],
+      "totals": {
+        "backend": 10,
+        "package": 74
+      },
+      "expected": [
+        "MCP-6 tracelab_search ask asks through POST /search/ask and links every citation to its chunk"
+      ],
+      "as_expected": true
+    },
+    {
+      "id": "M10",
+      "disables": "the MCP rejects an answer budget the API would refuse, before any request",
+      "file": "packages/tracelab-mcp/src/index.ts",
+      "red": [
+        "MCP-6 tracelab_search ask rejects invalid ask input before HTTP: {\"project_id\":\"00000000-0000-4000-8000-000000000001\",\"question\":\"Cost?\",\"max_tokens\":4001}",
+        "MCP-6 tracelab_search ask rejects invalid ask input before HTTP: {\"project_id\":\"00000000-0000-4000-8000-000000000001\",\"question\":\"Cost?\",\"max_tokens\":600.5}",
+        "MCP-6 tracelab_search ask rejects invalid ask input before HTTP: {\"project_id\":\"00000000-0000-4000-8000-000000000001\",\"question\":\"Cost?\",\"max_tokens\":63}"
+      ],
+      "totals": {
+        "backend": 10,
+        "package": 74
+      },
+      "expected": [
+        "MCP-6 tracelab_search ask rejects invalid ask input before HTTP: {\"project_id\":\"00000000-0000-4000-8000-000000000001\",\"question\":\"Cost?\",\"max_tokens\":4001}",
+        "MCP-6 tracelab_search ask rejects invalid ask input before HTTP: {\"project_id\":\"00000000-0000-4000-8000-000000000001\",\"question\":\"Cost?\",\"max_tokens\":600.5}",
+        "MCP-6 tracelab_search ask rejects invalid ask input before HTTP: {\"project_id\":\"00000000-0000-4000-8000-000000000001\",\"question\":\"Cost?\",\"max_tokens\":63}"
+      ],
+      "as_expected": true
+    },
+    {
+      "id": "M11",
+      "disables": "ask is a registered tracelab_search action, which the parity manifest's Librarian turn row maps to",
+      "file": "packages/tracelab-mcp/src/index.ts",
+      "red": [
+        "T41.7 \u2014 cluster surface exposes exactly 9 tracelab_* tools and keeps descriptors aligned with action enums",
+        "audit: Missing CLUSTER_ACTIONS action tracelab_search.ask: frontend/src/lib/api/librarian.ts#librarianApi.turn:POST:/librarian/turns"
+      ],
+      "totals": {
+        "backend": 10,
+        "package": 74
+      },
+      "expected": [
+        "T41.7 \u2014 cluster surface exposes exactly 9 tracelab_* tools and keeps descriptors aligned with action enums",
+        "audit: Missing CLUSTER_ACTIONS action tracelab_search.ask: frontend/src/lib/api/librarian.ts#librarianApi.turn:POST:/librarian/turns"
+      ],
+      "as_expected": true
+    },
+    {
+      "id": "baseline-after",
+      "red": [],
+      "totals": {
+        "backend": 10,
+        "package": 74
+      },
+      "expected": [],
+      "as_expected": true
+    }
+  ],
+  "files_match_head_after": true,
+  "all_as_expected": true
+}

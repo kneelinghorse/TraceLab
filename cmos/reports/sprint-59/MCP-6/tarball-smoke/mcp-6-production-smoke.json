@@ -1,0 +1,205 @@
+{
+  "mission_id": "MCP-6",
+  "sprint_id": "sprint-59",
+  "started_at": "2026-09-23T23:48:23.848Z",
+  "finished_at": "2026-09-23T23:48:36.755Z",
+  "version": "2.1.0",
+  "api": "https://api.tracelab.aquex.ai",
+  "frontend": "https://tracelab.aquex.ai",
+  "read_only": false,
+  "writes": "the usage rows a paid ask records",
+  "install": {
+    "command": "npx -y --package aquex-tracelab-mcp-2.1.0.tgz tracelab-mcp",
+    "fresh_directory": true,
+    "minimal_environment": [
+      "PATH",
+      "HOME",
+      "TRACELAB_API_URL",
+      "TRACELAB_API_KEY",
+      "TRACELAB_FRONTEND_URL"
+    ],
+    "server_version": "2.1.0"
+  },
+  "authentication": {
+    "kind": "human X-API-Key",
+    "source": "existing local credential store",
+    "credential_logged": false,
+    "credential_in_receipt": false
+  },
+  "checks": [
+    {
+      "label": "published package starts and lists tools",
+      "passed": true,
+      "tools": 9,
+      "actions": 50,
+      "server_version": "2.1.0",
+      "startup_stderr": [
+        "TraceLab MCP server started",
+        "API URL: https://api.tracelab.aquex.ai",
+        "Auth: API Key (env)"
+      ]
+    },
+    {
+      "label": "ACT-1 surface: activity present, attention and inbox gone",
+      "passed": true,
+      "tracelab_home": [
+        "snapshot",
+        "favorites",
+        "activity",
+        "activity_summary"
+      ]
+    },
+    {
+      "label": "PERSONAL-2 surface: tracelab_project advertises workspace_id",
+      "passed": true
+    },
+    {
+      "label": "MCP-6 surface: tracelab_search offers ask with question and max_tokens",
+      "passed": true,
+      "tracelab_search": [
+        "knowledge",
+        "navigate",
+        "pedr",
+        "ask"
+      ]
+    },
+    {
+      "label": "listTools matches the parity manifest tool set",
+      "passed": true,
+      "manifest_tools": [
+        "tracelab_collection",
+        "tracelab_document",
+        "tracelab_evidence",
+        "tracelab_home",
+        "tracelab_mission",
+        "tracelab_mission_execution",
+        "tracelab_project",
+        "tracelab_report",
+        "tracelab_search"
+      ]
+    },
+    {
+      "label": "tracelab_search.navigate read-only",
+      "passed": true,
+      "ms": 314,
+      "generated_links": 1
+    },
+    {
+      "label": "tracelab_project.get read-only",
+      "passed": true,
+      "ms": 246,
+      "generated_links": 1
+    },
+    {
+      "label": "tracelab_collection.list read-only",
+      "passed": true,
+      "ms": 274,
+      "generated_links": 1
+    },
+    {
+      "label": "tracelab_report.list read-only",
+      "passed": true,
+      "ms": 254,
+      "generated_links": 5
+    },
+    {
+      "label": "tracelab_document.list read-only",
+      "passed": true,
+      "ms": 247,
+      "generated_links": 5
+    },
+    {
+      "label": "tracelab_mission.list read-only",
+      "passed": true,
+      "ms": 509,
+      "generated_links": 5
+    },
+    {
+      "label": "tracelab_mission_execution.status read-only",
+      "passed": true,
+      "ms": 480,
+      "generated_links": 1
+    },
+    {
+      "label": "tracelab_evidence.list read-only",
+      "passed": true,
+      "ms": 254,
+      "generated_links": 6
+    },
+    {
+      "label": "tracelab_home.activity_summary read-only",
+      "passed": true,
+      "ms": 265,
+      "generated_links": 0
+    },
+    {
+      "label": "tracelab_project.list read-only",
+      "passed": true,
+      "ms": 234,
+      "generated_links": 5
+    },
+    {
+      "label": "tracelab_search.ask answers with citations that open their chunks",
+      "passed": true,
+      "ms": 4131,
+      "citations": 1,
+      "cited_documents": [
+        "TRACE-SHARE-58_report.md"
+      ],
+      "passages": 1,
+      "cited_text": "Airtable’s workspace-level sharing restriction setting — “Restrict adding new collaborators to this workspace, its bases, and its interfaces” — is off by default out of the box.",
+      "model": "gpt-5.1"
+    },
+    {
+      "label": "tracelab_search.ask returns the nothing-found result for a question the project cannot support",
+      "passed": true,
+      "ms": 989,
+      "answer": "Nothing in this project answers that question."
+    },
+    {
+      "label": "tracelab_search.ask on an unknown project is the API 404, not an answer",
+      "passed": true,
+      "ms": 227,
+      "error": "API Error (404): API request failed: 404 Not Found\nDetails: {\"detail\":\"Project not found.\"}"
+    },
+    {
+      "label": "canonical links resolve with HTTP 200",
+      "passed": true,
+      "checked": 28,
+      "non_200": [],
+      "sample": [
+        {
+          "tool": "search.ask",
+          "url": "https://tracelab.aquex.ai/projects/0afcc588-e722-45bd-8320-f486601b877c",
+          "status": 200
+        },
+        {
+          "tool": "collection",
+          "url": "https://tracelab.aquex.ai/collections/a3e6d809-af90-4652-903f-5ce5c8842bf8",
+          "status": 200
+        },
+        {
+          "tool": "report",
+          "url": "https://tracelab.aquex.ai/reports/df29feae-0ffd-456d-90f8-d4f8d282416f",
+          "status": 200
+        },
+        {
+          "tool": "report",
+          "url": "https://tracelab.aquex.ai/reports/c59172e7-cfaa-443b-b94f-bcd7f8938bf5",
+          "status": 200
+        },
+        {
+          "tool": "report",
+          "url": "https://tracelab.aquex.ai/reports/d29b4d4a-f6d7-4f00-b46d-795fa8025cdd",
+          "status": 200
+        },
+        {
+          "tool": "report",
+          "url": "https://tracelab.aquex.ai/reports/3850be92-dae6-4672-aa73-9376ad6f8b0e",
+          "status": 200
+        }
+      ]
+    }
+  ],
+  "passed": true
+}
