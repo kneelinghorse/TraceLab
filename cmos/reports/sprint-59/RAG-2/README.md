@@ -75,6 +75,17 @@ So the model answered a real question about a project whose documents cover it (
 
 **Why exactly one chunk reaches the model.** With no embedding, context compression scores each chunk by its RRF score (about 0.006), drops them all below 0.7, and keeps one under its at-least-one rule.
 
+> **Corrected at the Sprint 59 close (2026-09-24, session `PS-2026-09-23-009`,
+> receipt re-verification per decision #509).** These two paragraphs describe
+> the code at `949c7a6`, and later Sprint 59 missions fixed what they found.
+> RAG-3 (PR #376, `4d8257d`, decision #540) made fusion merge a chunk's
+> records across layers, so `fusion.py:160-166` now holds that merge
+> (`_merge_layer_records`), not the whole-record rule. The graph layer's
+> records still carry no chunk text. RAG-4 (PR #378, `65b11ef`,
+> decision #542) put the seeds first, which moved the code that builds those
+> records to `graph_layer.py:409-415`. RAG-4 also lowered compression's floor
+> from 0.7 to 0.4.
+
 **This is not new.** RAG-1's 2026-09-22 probe shows the same zero-token signature and was read then as an irrelevant match. RAG-2 does not touch retrieval.
 
 **Criterion 5 against this.** Its first half, "only resolving citations" on a real project, holds only in the empty sense: with no text to cite, none were made. The real demonstration moves to RAG-3, whose criteria require a real question on this project to come back with citations that open. Its second half holds where retrieval is empty (C). Against a populated project, a nonsense question still retrieves nearest neighbours: Qdrant search has no score threshold, and compression keeps one chunk. So B gets a model answer, not the refusal. That case belongs to QA-1's "refused when unsupported" rule, not to this flag.
@@ -115,3 +126,14 @@ This ends when retrieval returns text.
   - The Search page's answer budget is 350 tokens, not 1500. `RagQuery.max_tokens` defaults to 350 and is capped at 1024 (`app/schemas/rag.py:17-22`), and POST /search always passes it (`app/api/v1/search.py:59`), so PR #348's raise never reached that page. Found by reading the code; the API does not expose per-attempt usage to confirm it from production.
   - `no_evidence` covers empty retrieval only.
   - Citations are rendered from the list, not by linking labels in the answer text.
+
+> **Corrected at the Sprint 59 close (2026-09-24, session `PS-2026-09-23-009`,
+> receipt re-verification per decision #509).** QA-2 (PR #383, `814c166`)
+> retired the Search page. QA-1 (PR #380, `ccade35`) made the answer budget
+> per request: the Librarian sends 600 or 2000. `RagQuery.max_tokens` still
+> defaults to 350 with a cap of 1024 for POST /search. After MCP-6's imports
+> (PR #385, `0bff859`), that field sits at `app/schemas/rag.py:19-22` and the
+> route passes it at `app/api/v1/search.py:63`. `no_evidence` now covers more
+> than empty retrieval. It is also set when every retrieved chunk lacks text
+> (RAG-3), and when QA-1's Q&A service refuses a question because no chunk
+> reaches the 0.4 floor.
