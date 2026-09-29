@@ -29,17 +29,20 @@ from app.schemas.librarian import (
     TurnRequest,
     TurnResponse,
 )
+from app.schemas.librarian_collections import CollectionAcceptRequest, CollectionDraftRequest
 from app.schemas.librarian_description import (
     DescriptionAcceptRequest,
     DescriptionDraftRequest,
     DescriptionRestoreRequest,
 )
 from app.schemas.librarian_duplicates import DuplicateCompareRequest, DuplicateScanRequest
+from app.services.collection import CollectionService, get_collection_service
 from app.services.librarian import (
     LibrarianConflict,
     LibrarianDraftError,
     LibrarianService,
 )
+from app.services.librarian_collections import accept_collection, collection_provenance, draft_collections
 from app.services.librarian_description import (
     accept_description,
     description_state,
@@ -293,3 +296,54 @@ def librarian_duplicate_compare(
         raise HTTPException(404, detail=str(exc)) from exc
     except LibrarianConflict as exc:
         raise HTTPException(409, detail=str(exc)) from exc
+
+
+@router.post("/collections/draft")
+def librarian_collection_draft(
+    payload: CollectionDraftRequest,
+    current_user: AuthenticatedUser = Depends(require_authenticated_user),
+    db: Session = Depends(get_db),
+    service: LibrarianService = Depends(get_librarian_service),
+) -> dict:
+    _require_human(current_user)
+    project = _load_project(db, current_user, payload.project_id, "read")
+    try:
+        return draft_collections(db, current_user, project, payload.prompt, service)
+    except LibrarianConflict as exc:
+        raise HTTPException(409, detail=str(exc)) from exc
+    except LibrarianDraftError as exc:
+        raise HTTPException(422, detail=str(exc)) from exc
+    except LibrarianUnavailable as exc:
+        raise HTTPException(503, detail=str(exc)) from exc
+    except (RateLimitError, APIError) as exc:
+        raise _provider_error(exc) from exc
+
+
+@router.post("/collections/accept")
+def librarian_collection_accept(
+    payload: CollectionAcceptRequest,
+    current_user: AuthenticatedUser = Depends(require_authenticated_user),
+    db: Session = Depends(get_db),
+    service: CollectionService = Depends(get_collection_service),
+) -> dict:
+    _require_human(current_user)
+    project = _load_project(db, current_user, payload.project_id, "read")
+    try:
+        return accept_collection(db, current_user, project, payload, service)
+    except LibrarianConflict as exc:
+        raise HTTPException(409, detail=str(exc)) from exc
+    except LibrarianDraftError as exc:
+        raise HTTPException(422, detail=str(exc)) from exc
+
+
+@router.get("/collections/{collection_id}")
+def librarian_collection_provenance(
+    collection_id: UUID,
+    current_user: AuthenticatedUser = Depends(require_authenticated_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    _require_human(current_user)
+    try:
+        return collection_provenance(db, current_user, collection_id)
+    except LookupError as exc:
+        raise HTTPException(404, detail=str(exc)) from exc

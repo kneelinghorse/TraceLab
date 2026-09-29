@@ -1,0 +1,77 @@
+........................................................................ [ 69%]
+................................                                         [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/_pytest/config/__init__.py:852
+  <repo>/.venv/lib/python3.11/site-packages/_pytest/config/__init__.py:852: PytestAssertRewriteWarning: Module already imported so cannot be rewritten; cmos_pytest_telemetry_plugin
+    self.import_plugin(import_spec)
+
+app/core/config.py:11
+  <repo>/app/core/config.py:11: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class Settings(BaseSettings):
+
+app/core/database.py:29
+  <repo>/app/core/database.py:29: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+.venv/lib/python3.11/site-packages/passlib/utils/__init__.py:854
+  <repo>/.venv/lib/python3.11/site-packages/passlib/utils/__init__.py:854: DeprecationWarning: 'crypt' is deprecated and slated for removal in Python 3.13
+    from crypt import crypt as _crypt
+
+app/schemas/pagination.py:8
+  <repo>/app/schemas/pagination.py:8: PydanticDeprecatedSince20: `pydantic.generics:GenericModel` has been moved to `pydantic.BaseModel`. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    from pydantic.generics import GenericModel
+
+app/schemas/api_key.py:23
+  <repo>/app/schemas/api_key.py:23: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class APIKeyResponse(BaseModel):
+
+app/schemas/api_key.py:39
+  <repo>/app/schemas/api_key.py:39: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class APIKeyInfo(BaseModel):
+
+app/schemas/saved_searches.py:41
+  <repo>/app/schemas/saved_searches.py:41: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class SavedSearchResponse(SavedSearchBase):
+
+app/schemas/search_history.py:15
+  <repo>/app/schemas/search_history.py:15: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class SearchHistoryEntry(BaseModel):
+
+app/schemas/webhook.py:22
+  <repo>/app/schemas/webhook.py:22: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class ExecutionMetadata(BaseModel):
+
+app/main.py:161
+  <repo>/app/main.py:161: DeprecationWarning:
+          on_event is deprecated, use lifespan event handlers instead.
+
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+
+    @app.on_event("startup")
+
+.venv/lib/python3.11/site-packages/fastapi/applications.py:4599
+.venv/lib/python3.11/site-packages/fastapi/applications.py:4599
+  <repo>/.venv/lib/python3.11/site-packages/fastapi/applications.py:4599: DeprecationWarning:
+          on_event is deprecated, use lifespan event handlers instead.
+
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+
+    return self.router.on_event(event_type)
+
+app/main.py:210
+  <repo>/app/main.py:210: DeprecationWarning:
+          on_event is deprecated, use lifespan event handlers instead.
+
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+
+    @app.on_event("shutdown")
+
+.venv/lib/python3.11/site-packages/_pytest/config/__init__.py:852
+  <repo>/.venv/lib/python3.11/site-packages/_pytest/config/__init__.py:852: PytestAssertRewriteWarning: Module already imported so cannot be rewritten; tests.fixtures.graph_fixtures
+    self.import_plugin(import_spec)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+104 passed, 47 deselected, 15 warnings in 265.74s (0:04:25)

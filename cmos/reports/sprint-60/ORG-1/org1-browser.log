@@ -1,0 +1,21 @@
+
+Running 12 tests using 1 worker
+
+(node:6228) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:6228) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium] › tests/e2e/collection-context.spec.ts:15:7 › collection context, reviewed seed and evidence citations in light at 390 (5.8s)
+  ✓   2 [chromium] › tests/e2e/collection-context.spec.ts:15:7 › collection context, reviewed seed and evidence citations in light at 820 (5.1s)
+  ✓   3 [chromium] › tests/e2e/collection-context.spec.ts:15:7 › collection context, reviewed seed and evidence citations in light at 1440 (5.2s)
+  ✓   4 [chromium] › tests/e2e/collection-context.spec.ts:15:7 › collection context, reviewed seed and evidence citations in dark at 390 (4.4s)
+  ✓   5 [chromium] › tests/e2e/collection-context.spec.ts:15:7 › collection context, reviewed seed and evidence citations in dark at 820 (4.7s)
+  ✓   6 [chromium] › tests/e2e/collection-context.spec.ts:15:7 › collection context, reviewed seed and evidence citations in dark at 1440 (5.1s)
+  ✓   7 [chromium] › tests/e2e/librarian-collections.spec.ts:5:7 › reviewed collections light 390 (1.6s)
+  ✓   8 [chromium] › tests/e2e/librarian-collections.spec.ts:5:7 › reviewed collections light 820 (1.4s)
+  ✓   9 [chromium] › tests/e2e/librarian-collections.spec.ts:5:7 › reviewed collections light 1440 (1.8s)
+  ✓  10 [chromium] › tests/e2e/librarian-collections.spec.ts:5:7 › reviewed collections dark 390 (1.3s)
+  ✓  11 [chromium] › tests/e2e/librarian-collections.spec.ts:5:7 › reviewed collections dark 820 (1.4s)
+  ✓  12 [chromium] › tests/e2e/librarian-collections.spec.ts:5:7 › reviewed collections dark 1440 (1.5s)
+
+  12 passed (42.2s)

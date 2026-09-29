@@ -1,0 +1,13 @@
+
+ RUN  v3.2.4 <repo>/frontend
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ ✓ src/__tests__/librarian-collections.test.tsx (8 tests) 1984ms
+   ✓ generates only on request and preserves review edits without saving on navigation or dismissal  551ms
+   ✓ accepts only the edited group and selected subset with no second model call  373ms
+   ✓ retries a persisted partial result using the same frozen proposal and order  327ms
+
+ Test Files  1 passed (1)
+      Tests  8 passed (8)
+   Start at  18:09:31
+   Duration  9.51s (transform 529ms, setup 716ms, collect 843ms, tests 1.98s, environment 2.89s, prepare 255ms)

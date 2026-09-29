@@ -1,0 +1,22 @@
+{
+  "mutants": [
+    {
+      "mutation": "bypass-caller-binding",
+      "test": "test_wrong_user_and_service_cannot_accept_another_principals_group",
+      "exit_code": 1,
+      "source_restored": true
+    },
+    {
+      "mutation": "bypass-project-scope",
+      "test": "test_privileged_caller_is_still_scoped_before_provider_and_acceptance",
+      "exit_code": 1,
+      "source_restored": true
+    },
+    {
+      "mutation": "bypass-attachment-recheck",
+      "test": "test_source_changed_between_validation_and_attachment_stays_partial",
+      "exit_code": 1,
+      "source_restored": true
+    }
+  ]
+}

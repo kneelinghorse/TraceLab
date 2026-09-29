@@ -16,6 +16,7 @@ import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { parseApiTimestamp } from "@/lib/api/timestamps";
 import { CollectionDocuments } from "@/components/collections/CollectionDocuments";
+import { CollectionOrigin } from "@/components/librarian/CollectionSuggestions";
 import useSWR from "swr";
 
 export default function CollectionDetailPage() {
@@ -242,6 +243,7 @@ export default function CollectionDetailPage() {
             )}
           </div>
 
+          {collection.librarian_generated && <CollectionOrigin userId={user?.user_id ?? ""} collectionId={collection.id} />}
           <CollectionDocuments collectionId={collection.id} onChange={() => mutate()} />
           {/* Collection Items */}
           <div className="bg-surface rounded-lg border border-line p-6">
@@ -271,7 +273,7 @@ export default function CollectionDetailPage() {
                           </code>
                           {item.document_id && (
                             <Link
-                              href={`/documents/${item.document_id}`}
+                              href={`/documents/${item.document_id}?chunk=${item.chunk_id}`}
                               className="text-xs text-accent-text underline underline-offset-4"
                             >
                               View document

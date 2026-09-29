@@ -13,6 +13,7 @@ from sqlalchemy.orm import Query, Session, noload
 from sqlalchemy.sql.elements import ColumnElement
 
 from app.core.database import SessionLocal
+from app.core.security import AuthenticatedUser
 from app.models.chunk import DocumentChunk
 from app.models.collection import Collection, CollectionItem
 from app.models.collection_document import CollectionDocument
@@ -30,6 +31,10 @@ class CollectionChunkNotFoundError(ValueError):
 
 class CollectionChunkForbiddenError(ValueError):
     """Raised when an existing add target is outside the caller's project scope."""
+
+
+class ReviewedCollectionAlreadyCreatedError(ValueError):
+    """A durable receipt prevents replay from recreating a deleted collection."""
 
 
 class CollectionService:
@@ -118,6 +123,8 @@ class CollectionService:
         instructions: str | None = None,
         owner_id: UUID | None = None,
         workspace_id: UUID | None = None,
+        collection_id: UUID | None = None,
+        generation_provenance: dict | None = None,
     ) -> Collection:
         """Create a new collection.
 
@@ -131,12 +138,23 @@ class CollectionService:
 
         session = self.session_factory()
         try:
+            if generation_provenance is not None:
+                from app.onboarding.idempotency import IdempotencyService
+
+                receipt = IdempotencyService(session, method="POST", path="/librarian/collections/accept",
+                                             key=f"librarian-collection:{owner_id}:{collection_id}")
+                payload = {"fingerprint": generation_provenance["fingerprint"]}
+                if receipt.check_replay(payload):
+                    raise ReviewedCollectionAlreadyCreatedError("This proposal already created a collection.")
+                receipt.save_response(request_payload=payload, response_payload={"collection_id": str(collection_id)}, status_code=201)
             entry = Collection(
                 name=name_value,
                 description=self._clean_description(description),
                 instructions=instructions.strip() or None if instructions else None,
                 owner_id=owner_id,
                 workspace_id=workspace_id,
+                **({"id": collection_id} if collection_id is not None else {}),
+                generation_provenance=generation_provenance,
             )
             session.add(entry)
             session.commit()
@@ -215,6 +233,9 @@ class CollectionService:
         notes: str | None = None,
         accessible_project_ids: list[UUID] | None = None,
         document_filter: ColumnElement[bool] | None = None,
+        review_position: int | None = None,
+        reviewed_source: dict | None = None,
+        source_user: AuthenticatedUser | None = None,
     ) -> CollectionItem:
         """Add a live chunk to a collection within the caller's project scope."""
         session = self.session_factory()
@@ -239,6 +260,21 @@ class CollectionService:
                 if accessible_project_ids is None:
                     raise ValueError("Collection not found.")
                 raise CollectionChunkNotFoundError("Collection not found.")
+
+            if reviewed_source is not None:
+                # This service owns its transaction. Validate under its locks,
+                # never while another request session holds the same source locks.
+                from app.services.librarian_description import _fresh_project, _validate_sources
+
+                if source_user is None or collection.owner_id != source_user.user_id:
+                    raise CollectionChunkForbiddenError("This reviewed collection belongs to another user.")
+                project = _fresh_project(session, source_user, UUID(reviewed_source["project_id"]), "read")
+                source = reviewed_source["source"]
+                if source["chunk_id"] != str(chunk_id):
+                    raise CollectionChunkForbiddenError("The excerpt differs from the reviewed source.")
+                _validate_sources(session, source_user, project, f"Reviewed excerpt [{source['marker']}].", [source])
+                accessible_project_ids = [project.id]
+                document_filter = Document.project_id == project.id
 
             if accessible_project_ids is None:
                 chunk = (
@@ -291,6 +327,7 @@ class CollectionService:
                 collection_id=str(collection_id),
                 chunk_id=str(chunk_id),
                 notes=self._clean_description(notes),
+                review_position=review_position,
             )
             session.add(item)
             session.commit()
@@ -386,7 +423,7 @@ class CollectionService:
         session = self.session_factory()
         try:
             if document_filter is not None:
-                return self._items_with_document_policy(session, collection_id, document_filter, accessible_project_ids).order_by(CollectionItem.added_at.desc()).all()
+                return self._items_with_document_policy(session, collection_id, document_filter, accessible_project_ids).order_by(CollectionItem.review_position.asc().nulls_last(), CollectionItem.added_at.desc()).all()
             if accessible_project_ids is not None:
                 return (
                     session.query(CollectionItem)
@@ -400,14 +437,14 @@ class CollectionService:
                         Document.deleted_at.is_(None),
                         Document.project_id.in_(accessible_project_ids),
                     )
-                    .order_by(CollectionItem.added_at.desc())
+                    .order_by(CollectionItem.review_position.asc().nulls_last(), CollectionItem.added_at.desc())
                     .all()
                 )
 
             return (
                 session.query(CollectionItem)
                 .filter(CollectionItem.collection_id == str(collection_id))
-                .order_by(CollectionItem.added_at.desc())
+                .order_by(CollectionItem.review_position.asc().nulls_last(), CollectionItem.added_at.desc())
                 .all()
             )
         finally:
@@ -479,12 +516,12 @@ class CollectionService:
             # Keep the unrestricted query byte-identical. Scoped reads instead
             # resolve each child through its live document and project grant.
             if document_filter is not None:
-                items = self._items_with_document_policy(session, collection_id, document_filter, accessible_project_ids).order_by(CollectionItem.added_at.asc()).all()
+                items = self._items_with_document_policy(session, collection_id, document_filter, accessible_project_ids).order_by(CollectionItem.review_position.asc().nulls_last(), CollectionItem.added_at.asc()).all()
             elif accessible_project_ids is None:
                 items = (
                     session.query(CollectionItem)
                     .filter(CollectionItem.collection_id == str(collection_id))
-                    .order_by(CollectionItem.added_at.asc())
+                    .order_by(CollectionItem.review_position.asc().nulls_last(), CollectionItem.added_at.asc())
                     .all()
                 )
             elif accessible_project_ids == []:
@@ -502,7 +539,7 @@ class CollectionService:
                         Document.deleted_at.is_(None),
                         Document.project_id.in_(accessible_project_ids),
                     )
-                    .order_by(CollectionItem.added_at.asc())
+                    .order_by(CollectionItem.review_position.asc().nulls_last(), CollectionItem.added_at.asc())
                     .all()
                 )
 

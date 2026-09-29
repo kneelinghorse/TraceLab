@@ -1,0 +1,33 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____ test_source_changed_between_validation_and_attachment_stays_partial ______
+
+organisation = (<starlette.testclient.TestClient object at 0x114dff210>, <Mock id='4650605776'>, <app.models.project.Project object a...a550>, <app.models.chunk.DocumentChunk object at 0x115378d90>, <app.models.chunk.DocumentChunk object at 0x115393450>])
+db_session = <sqlalchemy.orm.session.Session object at 0x1144c3750>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x11532a690>
+
+    def test_source_changed_between_validation_and_attachment_stays_partial(organisation, db_session, monkeypatch):
+        from app.core.database import SessionLocal
+
+        client, _, project, _, _ = organisation
+        group = draft(client, project)["groups"][0]
+        original = CollectionService.add_chunk
+        def changed_before_add(self, *args, **kwargs):
+            with SessionLocal() as other:
+                row = other.get(DocumentChunk, kwargs["chunk_id"])
+                row.content = "Edited during attachment"
+                other.commit()
+            return original(self, *args, **kwargs)
+        monkeypatch.setattr(CollectionService, "add_chunk", changed_before_add)
+        result = accept(client, project, group).json()
+        assert result["state"] == "partial"
+>       assert result["completed_member_ids"] == []
+E       AssertionError: assert ['0ce17551-87...6a2fa443b7d1'] == []
+E
+E         Left contains 3 more items, first extra item: '0ce17551-87f8-4a02-b921-6fa830e7e89e'
+E         Use -v to get more diff
+
+tests/test_librarian_collections.py:195: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_librarian_collections.py::test_source_changed_between_validation_and_attachment_stays_partial
+1 failed, 14 warnings in 7.19s
