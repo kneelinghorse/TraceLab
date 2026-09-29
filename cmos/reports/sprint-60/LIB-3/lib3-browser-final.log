@@ -1,0 +1,19 @@
+
+Running 6 tests using 2 workers
+
+(node:54680) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:54681) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:54681) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:54680) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 [chromium] › tests/e2e/librarian-description.spec.ts:5:7 › reviewed project description light 390 (7.4s)
+  ✓  1 [chromium] › tests/e2e/librarian-description.spec.ts:5:7 › reviewed project description light 820 (7.4s)
+  ✓  4 [chromium] › tests/e2e/librarian-description.spec.ts:5:7 › reviewed project description dark 390 (5.7s)
+  ✓  3 [chromium] › tests/e2e/librarian-description.spec.ts:5:7 › reviewed project description light 1440 (6.4s)
+  ✓  5 [chromium] › tests/e2e/librarian-description.spec.ts:5:7 › reviewed project description dark 820 (4.6s)
+  ✓  6 [chromium] › tests/e2e/librarian-description.spec.ts:5:7 › reviewed project description dark 1440 (4.7s)
+
+  6 passed (27.1s)

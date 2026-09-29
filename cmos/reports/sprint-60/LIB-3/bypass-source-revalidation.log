@@ -1,0 +1,37 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________ test_corpus_citations_are_scoped_and_rechecked ________________
+
+description_client = (<starlette.testclient.TestClient object at 0x114bfe550>, <Mock id='4513214416'>)
+project = <app.models.project.Project object at 0x115ac8a50>
+db_session = <sqlalchemy.orm.session.Session object at 0x115ac89d0>
+
+    def test_corpus_citations_are_scoped_and_rechecked(description_client, project, db_session):
+        client, model = description_client
+        doc = Document(name="Interviews", project_id=project.id)
+        other = Project(name="Other")
+        db_session.add_all([doc, other])
+        db_session.flush()
+        unrelated = Document(name="Secret", project_id=other.id)
+        db_session.add(unrelated)
+        db_session.flush()
+        chunk = DocumentChunk(document_id=doc.id, chunk_index=0, content="Onboarding interviews.")
+        db_session.add_all([chunk, DocumentChunk(document_id=unrelated.id, chunk_index=0, content="OTHER PROJECT SECRET")])
+        db_session.commit()
+        model.complete.return_value.content = json.dumps({"description": "Onboarding research [1]."})
+        proposal = draft(client, project)
+        assert proposal["basis"] == "corpus"
+        assert "OTHER PROJECT SECRET" not in str(model.complete.call_args)
+        assert proposal["citations"][0]["chunk_id"] == str(chunk.id)
+        assert accept(client, project, proposal, description="Fabricated [999].").status_code == 422
+        chunk.content = "Edited after generation"
+        db_session.commit()
+>       assert accept(client, project, proposal).status_code == 409
+E       AssertionError: assert 200 == 409
+E        +  where 200 = <Response [200 OK]>.status_code
+E        +    where <Response [200 OK]> = accept(<starlette.testclient.TestClient object at 0x114bfe550>, <app.models.project.Project object at 0x115ac8a50>, {'basis': 'corpus', 'citations': [{'available': True, 'chunk_id': 'd8a98983-2145-408d-934e-faa23de630b8', 'document_id...'chunk_limit': 12, 'eligible_chunks': 1, 'excluded_chunks': 0, ...}, 'current_description': 'Pipeline validation', ...})
+
+tests/test_librarian_descriptions.py:131: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_librarian_descriptions.py::test_corpus_citations_are_scoped_and_rechecked
+1 failed, 14 warnings in 42.78s

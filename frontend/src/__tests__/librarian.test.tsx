@@ -1,4 +1,5 @@
 import "@testing-library/jest-dom/vitest";
+vi.mock("@/components/librarian/ProjectDescription", () => ({ ProjectDescription: () => null }));
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { SWRConfig } from "swr";

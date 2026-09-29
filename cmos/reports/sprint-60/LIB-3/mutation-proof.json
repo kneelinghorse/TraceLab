@@ -1,0 +1,15 @@
+{
+  "mutants": [
+    {
+      "mutation": "bypass-source-revalidation",
+      "test": "test_corpus_citations_are_scoped_and_rechecked",
+      "exit_code": 1
+    },
+    {
+      "mutation": "bypass-caller-binding",
+      "test": "test_human_project_authorization_precedes_model_and_signed_caller_is_required",
+      "exit_code": 1
+    }
+  ],
+  "source_restored": true
+}

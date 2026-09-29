@@ -1899,6 +1899,74 @@
       "classification": "rest-only-by-design",
       "baseline": "personal-2-picker-read",
       "rationale": "Feeds the create-form Space picker (PERSONAL-2, decision #533). An agent names a Space on tracelab_project.create with the workspace_id it reads from tracelab_project.get or .list, and the server holds it to the same membership check, so no list-Spaces action is needed."
+    },
+    {
+      "id": "frontend/src/lib/api/librarian-descriptions.ts#descriptionApi.accept:POST:/librarian/descriptions/accept",
+      "api_file": "frontend/src/lib/api/librarian-descriptions.ts",
+      "operation": "descriptionApi.accept",
+      "source_line": 55,
+      "method": "POST",
+      "path": "/api/v1/librarian/descriptions/accept",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/librarian/ProjectDescription.tsx",
+        "frontend/src/pages/librarian.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "new",
+      "rationale": "LIB-3: human-principal description proposal, explicit review/accept and guarded restore. Decision #553; conversational proposal workflows remain REST-only under S60 decision #551."
+    },
+    {
+      "id": "frontend/src/lib/api/librarian-descriptions.ts#descriptionApi.draft:POST:/librarian/descriptions/draft",
+      "api_file": "frontend/src/lib/api/librarian-descriptions.ts",
+      "operation": "descriptionApi.draft",
+      "source_line": 52,
+      "method": "POST",
+      "path": "/api/v1/librarian/descriptions/draft",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/librarian/ProjectDescription.tsx",
+        "frontend/src/pages/librarian.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "new",
+      "rationale": "LIB-3: human-principal description proposal, explicit review/accept and guarded restore. Decision #553; conversational proposal workflows remain REST-only under S60 decision #551."
+    },
+    {
+      "id": "frontend/src/lib/api/librarian-descriptions.ts#descriptionApi.restore:POST:/librarian/descriptions/restore",
+      "api_file": "frontend/src/lib/api/librarian-descriptions.ts",
+      "operation": "descriptionApi.restore",
+      "source_line": 58,
+      "method": "POST",
+      "path": "/api/v1/librarian/descriptions/restore",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/librarian/ProjectDescription.tsx",
+        "frontend/src/pages/librarian.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "new",
+      "rationale": "LIB-3: human-principal description proposal, explicit review/accept and guarded restore. Decision #553; conversational proposal workflows remain REST-only under S60 decision #551."
+    },
+    {
+      "id": "frontend/src/lib/api/librarian-descriptions.ts#descriptionApi.state:GET:/librarian/descriptions/{projectId}",
+      "api_file": "frontend/src/lib/api/librarian-descriptions.ts",
+      "operation": "descriptionApi.state",
+      "source_line": 49,
+      "method": "GET",
+      "path": "/api/v1/librarian/descriptions/{projectId}",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/librarian/ProjectDescription.tsx",
+        "frontend/src/pages/librarian.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "new",
+      "rationale": "LIB-3: human-principal description proposal, explicit review/accept and guarded restore. Decision #553; conversational proposal workflows remain REST-only under S60 decision #551."
     }
   ]
 }
