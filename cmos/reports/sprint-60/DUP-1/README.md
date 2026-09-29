@@ -1,6 +1,6 @@
 # DUP-1 — explicit document duplicate review
 
-The [comparison contract](../../../contracts/librarian-duplicates.md) implements decision #554 and the [Sprint 60 handoff](../../../planning/sprint-60-HANDOFF.md). CMOS owns mission status. Live acceptance is required before completion.
+The [comparison contract](../../../contracts/librarian-duplicates.md) implements decision #554 and the [Sprint 60 handoff](../../../planning/sprint-60-HANDOFF.md). CMOS owns mission status. The merged application build passed local, CI and deployed acceptance.
 
 The Librarian compares one selected project's live readable extracted text only when asked. Exact normalized text and conservative probable overlap are distinct. Stable source identities, excerpts, method and coverage are visible; fresh comparison rechecks access, project membership and content identity. Keep-both/dismiss affect only the caller's browser review. There is no merge, delete, reparent, archive, graph/collection write, model call, background scan or new index.
 
@@ -17,8 +17,18 @@ The bounded method examines at most 100 documents of at most 20,000 characters a
 
 The initial red test run failed because the new service did not yet exist, before implementation. Existing browser-data age, Python deprecation and test timeout warnings remain in logs. Synthetic test telemetry appended to the historical sprint-04 file was discarded after inspection; this directory retains mission-specific results.
 
+## CI
+
+[PR #393](https://github.com/kneelinghorse/TraceLab/pull/393), merged as `edc0a0b4ea1a8049dbb4ffb74e6af590f554333f`, passed every required check. Backend: **2,931 passed, 3 existing skips, 12 existing quarantined deselections**. PostgreSQL integration: **147 passed, 2 existing skips**. Frontend: **275 passed**; production browser: **70 passed**. `ci-final.json` records the checked head and job URLs.
+
 ## Deployed acceptance
 
-Pending merge and deployment. `deployed_acceptance.mjs` first verifies both exact serving commits, then creates one named synthetic user-feedback project and six documents through existing upload/processing operations. Fixture IDs are recorded for resumability. Its read-only phase requires one exact pair, two edited-overlap pairs, no distinct/disclaimer false positives, current source links, stable repeat results and unchanged document/chunk/tag/relationship/collection snapshots. Fixture ingestion is separate from duplicate analysis, which performs no model calls.
+Both production services served **`edc0a0b4ea1a8049dbb4ffb74e6af590f554333f`** before fixture setup and verification. Railway backend deployment `073e8f41-a165-4117-b653-07c0e24570f6` and frontend `da5b6975-6bd4-4fd5-afdb-8101d3fb38e6` succeeded; [post-deploy wait and smoke](https://github.com/kneelinghorse/TraceLab/actions/runs/36639376583) passed. No migration or environment-variable change was required. See `deploy-wait.json` and `deployed-services.json`.
 
-`deployed_browser.mjs` uses real deployed responses in mobile Light and desktop Dark, verifies no automatic scan, opens every comparison's source links by keyboard, preserves keep-both/dismiss across reload and records any unexpected write request. Credentials are never logged. This is agent verification, not Derek's personal acceptance.
+`deployed_acceptance.mjs` created project **`0d6c5b1d-72eb-4390-a40b-c48c88cdb302`**, “Sprint 60 Librarian acceptance — onboarding feedback,” and six named synthetic documents through existing upload/processing operations. IDs are in `deployed-progress.json` for reuse by ORG-1, LIB-4 and WALK-3. Fixture ingestion is separate from duplicate analysis.
+
+The read-only review examined all six documents and returned exactly **one exact pair and two probable-overlap pairs**. The distinct same-title document and shared-disclaimer notes produced no false positives. Every candidate refreshed successfully, current text and source links matched, repeated scans retained the same candidates, and before/after document/content/graph/collection/project snapshots were identical. `deployed-acceptance.json` records the coverage, evidence, identities and matching hashes. Duplicate review made **zero model calls**.
+
+`deployed_browser.mjs` exercised real responses in **Light at 390px and Dark at 1440px**, opened all **12 source destinations by keyboard**, checked fresh comparison and reload without rescan, and preserved keep-both/dismiss choices. Both cases recorded **zero corpus write requests, page errors or horizontal overflow**. Screenshots were inspected; details are in `deployed-browser.json`. Credentials and proposal tokens are absent from the receipt. This is agent verification, not Derek's personal acceptance.
+
+`reverify.mjs` checks both exact serving identities, repeats fresh comparison against the same candidates and proves no research change. It can be rerun on the final receipt commit or later sprint builds without recreating fixtures or invoking a model. CMOS completion records the final serving commit after this receipt is merged.
