@@ -1,0 +1,14 @@
+{
+  "sha": "4d64190ff1fb126fe0b1a9b3b41b3d8febae1c47",
+  "ok": true,
+  "observed": {
+    "backend": "4d64190ff1fb126fe0b1a9b3b41b3d8febae1c47",
+    "frontend": "4d64190ff1fb126fe0b1a9b3b41b3d8febae1c47"
+  },
+  "seconds_to_serve": {
+    "frontend": 143.3,
+    "backend": 183.8
+  },
+  "budget_seconds": 1200,
+  "elapsed_seconds": 183.8
+}

@@ -1,0 +1,46 @@
+{
+  "verified_at": "2026-09-29T21:26:28.085Z",
+  "serving_commit": "4d64190ff1fb126fe0b1a9b3b41b3d8febae1c47",
+  "results": [
+    {
+      "theme": "light",
+      "width": 390,
+      "project_id": "f254b254-3a3a-45d0-b088-973d1674bc5d",
+      "prior_acceptance_visible": true,
+      "guarded_restore_complete": true,
+      "source_links_opened": 0,
+      "overflow": false
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+      "prior_acceptance_visible": true,
+      "guarded_restore_complete": true,
+      "source_links_opened": 7,
+      "overflow": false
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "project_id": "f254b254-3a3a-45d0-b088-973d1674bc5d",
+      "prior_acceptance_visible": true,
+      "guarded_restore_complete": true,
+      "source_links_opened": 0,
+      "overflow": false
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+      "prior_acceptance_visible": true,
+      "guarded_restore_complete": true,
+      "source_links_opened": 7,
+      "overflow": false
+    }
+  ],
+  "page_errors": 0,
+  "observed_write_requests": [],
+  "mocked_responses": false,
+  "personal_user_acceptance": false
+}

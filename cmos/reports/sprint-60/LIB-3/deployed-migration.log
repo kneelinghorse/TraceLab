@@ -1,0 +1,1 @@
+INFO  [alembic.runtime.migration] Running upgrade 053_report_citations -> 054_description_provenance, Guard reviewed description writes and retain their human acceptance provenance.
