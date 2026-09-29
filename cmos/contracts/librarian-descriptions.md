@@ -1,0 +1,26 @@
+# Reviewed project descriptions (LIB-3)
+
+Decision #553 implements the [Sprint 60 handoff](../planning/sprint-60-HANDOFF.md), using the [architecture template](../foundational-docs/tech_arch_template.md). CMOS owns mission status. This is a description-specific extension of the existing Librarian, not a general proposal system.
+
+All four routes require a human principal. Draft, accept and restore use the same project `update` authorization as `PUT /projects/{id}`; status uses `read`. Project and document liveness apply to privileged callers too. Source comparison never expands beyond the selected project.
+
+| Route under `/api/v1/librarian` | Input | Result |
+| --- | --- | --- |
+| `POST /descriptions/draft` | `project_id`, trimmed `prompt` (1–4000 characters) | Signed `proposal_token`, editable `description`, `current_description`, `basis`, original `prompt`, `model`, scoped `citations`, `coverage`, provider `usage` |
+| `POST /descriptions/accept` | `project_id`, `proposal_token`, reviewed `description` (1–6000 characters) | Current description state; no model call |
+| `POST /descriptions/restore` | `project_id`, accepted `proposal_id` | Current description state; no model call |
+| `GET /descriptions/{project_id}` | Project identity | `project_id`, `description`, `revision`, filtered `provenance`, `can_restore` |
+
+Request schemas forbid extra fields. Clients cannot supply source identities, provenance, accepting-user labels or revisions. The signed envelope uses the existing application secret and a dedicated audience, expires after seven days, and binds the requesting user, project, baseline revision/value hash, exact generated description, brief, model, generation time, and validated source map. It cannot be reused as an authentication token. The token is held only in per-user/project browser storage; logs and receipts must omit it.
+
+Drafting selects at most twelve live readable non-empty chunks of at most 4000 characters each, in stable document/chunk order, with a total 24,000-character cap. Coverage returns readable, eligible, supplied and excluded chunk counts and whether the sample was limited. This is a bounded sample, not a complete corpus summary. All source filtering precedes model construction. The current Librarian model seam receives one JSON request capped at 2500 output tokens; there is no automatic regeneration or repair. Successful, refused, malformed and truncated returned calls are metered through the existing per-user/project usage recorder. Provider failures retain the existing 502/503 handling.
+
+Corpus paragraphs reuse REPORT-1's citation-coverage validator, which delegates to the Librarian provenance validator. Every cited marker must name actual supplied text. Validation proves source identity and paragraph coverage, not semantic entailment. With no usable source text, the proposal is explicitly labeled `planning_brief`: the model is asked to describe stated plans, never to pretend research findings exist. The user can edit a proposal; corpus edits retain valid paragraph citations and are recorded as human edits.
+
+Migration 054 adds `projects.description_revision` (non-null integer, default zero) and nullable `description_provenance` (JSONB/PostgreSQL, JSON/SQLite). Legacy text is unchanged and no generation history is invented. A draft changes no research artifact. Acceptance persists one latest accepted-field receipt: proposal ID, generated/accepted/previous values, model, brief, basis, source map, requesting generation time, accepting user/time, edited flag and applied revision. Status reveals current readable source links only. Later manual description writes increment revision even when the value repeats, so a generated label cannot survive an ABA edit.
+
+Acceptance reloads the caller and project authorization, locks project/source rows on PostgreSQL, validates live source text hashes and project membership, then performs a conditional revision/value update. SQLite uses the same conditional update. Concurrent PostgreSQL retries of the same latest acceptance return the same receipt. A different value, superseded proposal, later manual edit or prior restore produces 409. Invalid/expired/foreign-user signed proposals and invalid edited citations produce 422. Deleted or inaccessible projects retain ordinary 404/403 handling. Source change produces 409 without a project write.
+
+Restore is explicit and succeeds only while the accepted value and applied revision are still current. It restores the exact previous value, retains the receipt with restore user/time/revision, and increments revision. A repeated latest restore returns state without another write. Any later edit blocks restore. The latest receipt is intentionally sufficient for one-level undo; this does not create an unbounded history log.
+
+The browser shows current/proposed values, editable review, scoped source links, input coverage and explicit Accept/Dismiss. It restores a proposal without calling the provider and keys it by user and project; late responses cannot enter a switched account/project panel. Project pages link back to the Librarian's review/history. The four operations remain REST-only by design in the MCP parity manifest; no MCP package surface changes.

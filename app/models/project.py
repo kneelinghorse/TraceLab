@@ -8,7 +8,7 @@ from sqlalchemy.orm import relationship
 
 from app.core.database import Base
 from app.models.mixins import SoftDeleteMixin
-from app.models.types import GUID
+from app.models.types import GUID, CrossDBJSON
 
 
 class Project(Base, SoftDeleteMixin):
@@ -24,6 +24,8 @@ class Project(Base, SoftDeleteMixin):
     id = Column(GUID(), primary_key=True, default=uuid.uuid4)
     name = Column(String, nullable=False)
     description = Column(Text)
+    description_revision = Column(Integer, nullable=False, default=0, server_default="0")
+    description_provenance = Column(CrossDBJSON(), nullable=True)
     user_id = Column(GUID())  # Placeholder for auth
     mission_protocol_id = Column(GUID())  # References missions table
 

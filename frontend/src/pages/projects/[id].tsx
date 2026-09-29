@@ -208,6 +208,9 @@ function ProjectDetail() {
                     {project.description && (
                       <p className="mt-2 break-words text-secondary">{project.description}</p>
                     )}
+                    <Link href={`/librarian?project=${projectId}`} className="mt-2 inline-block text-sm text-accent-text underline">
+                      Review description and its drafting history
+                    </Link>
                     <div className="mt-4 flex flex-wrap gap-4 text-sm text-muted">
                       <StatusBadge status={project.status || "unknown"} />
                       {project.created_at && (

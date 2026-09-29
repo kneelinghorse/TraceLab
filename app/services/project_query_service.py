@@ -133,6 +133,10 @@ class ProjectQueryService:
             return None
 
         update_data = data.model_dump(exclude_unset=True)
+        if "description" in update_data:
+            # Every explicit manual write advances the revision, including ABA edits.
+            # SQL arithmetic serializes correctly against a Librarian acceptance.
+            project.description_revision = Project.description_revision + 1
         for key, value in update_data.items():
             setattr(project, key, value)
 

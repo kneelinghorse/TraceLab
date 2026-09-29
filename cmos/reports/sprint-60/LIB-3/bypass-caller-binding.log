@@ -1,0 +1,41 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_human_project_authorization_precedes_model_and_signed_caller_is_required _
+
+description_client = (<starlette.testclient.TestClient object at 0x1113d9490>, <Mock id='4580178704'>)
+project = <app.models.project.Project object at 0x1119d4450>
+db_session = <sqlalchemy.orm.session.Session object at 0x1119d43d0>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x110806dd0>
+
+    def test_human_project_authorization_precedes_model_and_signed_caller_is_required(description_client, project, db_session, monkeypatch):
+        from app.core.security import AuthenticatedUser, require_authenticated_user
+        from app.models.user import User
+
+        client, model = description_client
+        owner = db_session.query(User).first()
+        project.owner_id = owner.id
+        db_session.commit()
+        proposal = draft(client, project)
+        member = User(email="description-member@example.test", display_name="Description test", password_hash=str(uuid4()), role="member")
+        db_session.add(member)
+        db_session.commit()
+        principal = AuthenticatedUser(user_id=member.id, email=member.email, display_name="Member", role="member")
+        monkeypatch.setattr(settings, "rbac_enabled", True)
+        app.dependency_overrides[require_authenticated_user] = lambda: principal
+        try:
+            response = client.post("/api/v1/librarian/descriptions/draft", json={"project_id": str(project.id), "prompt": "Steal this"})
+            assert response.status_code == 403
+            assert accept(client, project, proposal).status_code == 403
+            assert model.complete.call_count == 1
+            member.role = "admin"
+            db_session.commit()
+            principal = AuthenticatedUser(user_id=member.id, email=member.email, display_name="Admin", role="admin")
+>           assert accept(client, project, proposal).status_code == 422
+E           AssertionError: assert 200 == 422
+E            +  where 200 = <Response [200 OK]>.status_code
+E            +    where <Response [200 OK]> = accept(<starlette.testclient.TestClient object at 0x1113d9490>, <app.models.project.Project object at 0x1119d4450>, {'basis': 'planning_brief', 'citations': [], 'coverage': {'character_limit': 24000, 'chunk_limit': 12, 'eligible_chunks': 0, 'excluded_chunks': 0, ...}, 'current_description': 'Pipeline validation', ...})
+
+tests/test_librarian_descriptions.py:217: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_librarian_descriptions.py::test_human_project_authorization_precedes_model_and_signed_caller_is_required
+1 failed, 14 warnings in 19.96s

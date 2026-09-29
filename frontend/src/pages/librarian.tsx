@@ -8,6 +8,7 @@ import { AuthGate } from "@/components/AuthGate";
 import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 import { SpacePicker } from "@/components/SpacePicker";
 import { ChunkList, type ChunkListRequest } from "@/components/librarian/ChunkList";
+import { ProjectDescription } from "@/components/librarian/ProjectDescription";
 import { useFeedback } from "@/components/ui/useFeedback";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -482,6 +483,8 @@ function LibrarianContent() {
         )}
         {project && <p className="text-sm text-secondary">Missions will be created in <Link href={`/projects/${project.id}`} className="text-accent-text underline">{project.name}</Link>.</p>}
       </section>
+
+      {project && <ProjectDescription key={`${storageUser}:${project.id}`} userId={storageUser} projectId={project.id} projectName={project.name} />}
 
       <section className="panel p-5" aria-label="Conversation with the Librarian">
         {started && (

@@ -30,10 +30,21 @@ from app.schemas.librarian import (
     TurnRequest,
     TurnResponse,
 )
+from app.schemas.librarian_description import (
+    DescriptionAcceptRequest,
+    DescriptionDraftRequest,
+    DescriptionRestoreRequest,
+)
 from app.services.librarian import (
     LibrarianConflict,
     LibrarianDraftError,
     LibrarianService,
+)
+from app.services.librarian_description import (
+    accept_description,
+    description_state,
+    draft_description,
+    restore_description,
 )
 from app.services.librarian_model import (
     APIError,
@@ -192,3 +203,65 @@ def librarian_create_mission(
     if not created:
         response.status_code = http_status.HTTP_200_OK
     return CreatedMissionResponse(mission=_to_response(mission), created=created)
+
+
+@router.get("/descriptions/{project_id}")
+def librarian_description_state(
+    project_id: UUID,
+    current_user: AuthenticatedUser = Depends(require_authenticated_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    _require_human(current_user)
+    project = _load_project(db, current_user, project_id, "read")
+    return description_state(db, current_user, project)
+
+
+@router.post("/descriptions/draft")
+def librarian_description_draft(
+    payload: DescriptionDraftRequest,
+    current_user: AuthenticatedUser = Depends(require_authenticated_user),
+    db: Session = Depends(get_db),
+    service: LibrarianService = Depends(get_librarian_service),
+) -> dict:
+    _require_human(current_user)
+    project = _load_project(db, current_user, payload.project_id, "update")
+    try:
+        return draft_description(db, current_user, project, payload.prompt, service)
+    except LibrarianConflict as exc:
+        raise HTTPException(409, detail=str(exc)) from exc
+    except LibrarianDraftError as exc:
+        raise HTTPException(422, detail=str(exc)) from exc
+    except LibrarianUnavailable as exc:
+        raise HTTPException(503, detail=str(exc)) from exc
+    except (RateLimitError, APIError) as exc:
+        raise _provider_error(exc) from exc
+
+
+@router.post("/descriptions/accept")
+def librarian_description_accept(
+    payload: DescriptionAcceptRequest,
+    current_user: AuthenticatedUser = Depends(require_authenticated_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    _require_human(current_user)
+    project = _load_project(db, current_user, payload.project_id, "update")
+    try:
+        return accept_description(db, current_user, project, payload.proposal_token, payload.description)
+    except LibrarianConflict as exc:
+        raise HTTPException(409, detail=str(exc)) from exc
+    except LibrarianDraftError as exc:
+        raise HTTPException(422, detail=str(exc)) from exc
+
+
+@router.post("/descriptions/restore")
+def librarian_description_restore(
+    payload: DescriptionRestoreRequest,
+    current_user: AuthenticatedUser = Depends(require_authenticated_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    _require_human(current_user)
+    project = _load_project(db, current_user, payload.project_id, "update")
+    try:
+        return restore_description(db, current_user, project, payload.proposal_id)
+    except LibrarianConflict as exc:
+        raise HTTPException(409, detail=str(exc)) from exc

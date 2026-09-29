@@ -1,0 +1,16 @@
+
+> frontend@0.1.0 test:unit
+> vitest --run src/__tests__/librarian-description.test.tsx
+
+
+ RUN  v3.2.4 /Users/systemsystems/portfolio/TraceLab/frontend
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ ✓ src/__tests__/librarian-description.test.tsx (6 tests) 1095ms
+   ✓ drafts only on request, preserves edits across navigation, and dismissal never accepts  422ms
+   ✓ binds acceptance to the reviewed proposal and edits, then shows provenance and guarded restore  414ms
+
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+   Start at  15:49:07
+   Duration  5.82s (transform 273ms, setup 461ms, collect 618ms, tests 1.09s, environment 1.32s, prepare 307ms)
