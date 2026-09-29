@@ -24,6 +24,7 @@ from app.schemas.synthesis import (
 )
 from app.services.document_policy import document_read_policy, resolve_readable_chunks
 from app.services.ownership import default_workspace_id
+from app.services.report_citations import generation_provenance, persistable_citations
 from app.services.synthesis import SynthesisService, get_synthesis_service
 from app.services.synthesis_cache import (
     SynthesisCacheService,
@@ -53,6 +54,10 @@ def _create_report_from_synthesis(
     chunk_ids: list[UUID] | None,
     project_id: UUID | None,
     owner_id: UUID | None,
+    synthesis_result: dict,
+    document_filter=None,
+    project_scope: list[UUID] | None = None,
+    source_user: AuthenticatedUser | None = None,
 ) -> UUID:
     """Create a Report record from synthesis results.
 
@@ -68,6 +73,10 @@ def _create_report_from_synthesis(
 
     session = SessionLocal()
     try:
+        manifest = persistable_citations(
+            session, synthesis_result, document_filter=document_filter,
+            accessible_project_ids=project_scope, source_user=source_user,
+        )
         report = Report(
             project_id=str(project_id) if project_id else None,
             title=title,
@@ -80,6 +89,8 @@ def _create_report_from_synthesis(
             chunk_count=chunk_count,
             owner_id=owner_id,
             workspace_id=default_workspace_id(session),
+            citation_manifest=manifest,
+            generation_provenance=generation_provenance(synthesis_result, owner_id),
         )
         session.add(report)
         session.flush()  # Get report.id
@@ -227,6 +238,7 @@ def synthesize(
     # Map result to response schema
     citations = [
         CitationInfo(
+            marker=c.get("marker"),
             chunk_id=c["chunk_id"],
             document_id=c.get("document_id"),
             excerpt=c.get("excerpt", ""),
@@ -249,13 +261,19 @@ def synthesize(
                 chunk_ids=[
                     chunk_id if isinstance(chunk_id, UUID) else UUID(chunk_id)
                     for chunk_id in result.get(
-                        "effective_chunk_ids", [] if document_scope is not None else request.chunk_ids or []
+                        "effective_chunk_ids", []
                     )
                 ],
                 project_id=request.project_id,
                 owner_id=current_user.user_id,
+                synthesis_result=result,
+                document_filter=document_scope,
+                project_scope=project_scope,
+                source_user=current_user if document_scope is not None else None,
             )
             logger.info(f"Synthesis saved as report {report_id}")
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
         except Exception as exc:
             logger.error(f"Failed to save synthesis as report: {exc}")
             raise HTTPException(

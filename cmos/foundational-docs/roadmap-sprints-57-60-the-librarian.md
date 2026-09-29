@@ -3,6 +3,7 @@
 **Status:** Living document. Authoritative for INTENT; CMOS is authoritative for STATUS.
 **Opened:** 2026-09-17, at Sprint 57 planning.
 **Predecessor:** `roadmap-sprints-50-53-ux-overhaul.md`, which carried Sprints 50–56 and is now closed to new sprint sections.
+**Guiding template:** [roadmap_template.md](roadmap_template.md). Follow-on product work is recorded below the Librarian sprint plan; CMOS holds its acceptance criteria and status.
 
 Revisit this document at **every sprint open and every sprint close**, the same way its predecessor was maintained: at close, rewrite the closing sprint's section as outcome; at open, re-plan the opening sprint's section from the CMOS missions; append a dated line to the Change Log either way. A sprint is not closed while its section here still reads as a plan.
 
@@ -190,20 +191,41 @@ The close's receipt re-verification found stale citations in one receipt: RAG-2'
 
 Every open next-step was carried to a Sprint 60 shell, 23 in all. They include Railway's 2026-12-01 deadline for `railway.json`, where the backend's start command runs the migrations.
 
-### Sprint 60 — Suggestions, and the org case (planned)
+### Sprint 60 — Finish the Librarian: suggestions, organisation and cited reports (opened 2026-09-29)
 
-Since the Sprint 59 close, `sprint-60` has been a Planned shell in CMOS that holds the carried next-steps. It has no missions: they are scoped with Derek, in his words (decision #508).
+**Goal:** Finish the remaining Librarian capabilities and accept the complete journey on the deployed build. Derek asked to detail Sprint 60 for a fresh build session and "wrap up the librarian arc and make sure its all ready to go." He chose **one selected project** for organisation and duplicate suggestions. Decision **#551** records the plan; the [build handoff](../planning/sprint-60-HANDOFF.md) names the implementation seams, validation contract and carried-item dispositions. CMOS holds the full mission criteria.
+
+**REPORT-1 is In Progress**; the five following missions remain **Queued**. Starting REPORT-1 opened the sprint on 2026-09-29. Each mission gets a fresh build session and is merged, deployed and verified before the next begins; the Requires chain records that sequence.
 
 **Simplified 2026-09-18 by decision #515.** Derek ruled out autonomous writes permanently, not as a staging decision:
 
 > "no librarian is always asked and always has a given prompt or context. No ad hoc writes from an auto or chron. auto jobs should only ever be low risk, or suggested, like drafting a mission idea. i would still need to run it or if we did de-duping for instance, it would be presenting those as options as to how to remediate."
 
-So the suggestion queue is the **destination**, not a stepping stone, and the hard problem of making an unattended writer safe does not need solving at all. That collapses the old Sprint 58 into this one:
+The suggestions are requested, reviewed and accepted in the Librarian; a persistent global queue or scheduler is not required. Sprints 57–59 already delivered mission authoring, guest/personal-Space readiness, corpus Q&A and chunk search. The remaining work is:
 
-- Project descriptions drafted for a human to accept — *"eventually all projects have descriptions"*, one acceptance at a time.
-- Duplicate detection that **presents remediation options**, never performs the merge.
-- Organisation suggestions, and report assembly from existing chunks for the org case: *"help researchers pull out user feedback or summarize or create new reports from compilied chunks."*
-- Provenance marking survives, demoted from safety mechanism to useful bookkeeping: knowing a description was Librarian-drafted and human-accepted is worth recording.
+| Order | Mission | Accepted outcome |
+| --- | --- | --- |
+| 1 | **REPORT-1 — Durable report citations** | The exact citation-to-chunk mapping survives saving, reopening and export; legacy gaps stay explicit |
+| 2 | **LIB-3 — Project-description proposals** | Review/edit/accept a description, retain generated/accepted provenance, and safely restore the prior value |
+| 3 | **DUP-1 — Duplicate review** | Compare exact/probable duplicate documents and remediation options without merging or deleting anything |
+| 4 | **ORG-1 — Themed collections** | Review proposed document/chunk groups and explicitly save only the collections the user chooses |
+| 5 | **LIB-4 — Report assembly** | Draft a report from reviewed project material, then save that exact cited draft with no second model call |
+| 6 | **WALK-3 — Deployed arc acceptance** | Verify old and new journeys, source links, human-control boundaries, UI/accessibility and MCP reads; close the arc with receipts |
+
+**Report choice, settled before build:** retain Report as the saved synthesis artifact and keep DeepSearch result Documents and links. Next-step #405 exposed a real prerequisite: report detail currently discards the transient citation list, and the synthesis list loses the original numeric markers. REPORT-1 makes those mappings durable; it does not fabricate support from input-source order or mass-regenerate historical reports. Learning #261 distinguishes claim citations, ReportSource inputs and the related Evidence panel.
+
+**Acceptance boundary:** corpus claims cite actual in-scope sources; proposal generation/dismissal never changes research artifacts; acceptance rechecks permissions, source liveness and stale edits; repeated saves do not duplicate artifacts. New conversational workflows follow the existing REST-only classification while existing MCP report/search contracts stay in parity. The arc is complete only after WALK-3 passes on the deployed build.
+
+**Outside this sprint:** password recovery is Sprint 61; sharing stays deferred, invites remain Derek's, and there is no RBAC redesign or autonomous writing. The 23 carried next-steps are triaged in the handoff rather than promoted wholesale. DeepSearch live-progress message `1621f451` still awaits a response at planning and must not be claimed resolved by this sprint.
+
+### Follow-on backlog — Sprint 61: Account recovery (planned 2026-09-29)
+
+Derek asked for password recovery for himself and other users, admin help resetting a password, and reset instructions or a link sent through the existing Resend capability. He explicitly allowed a follow-on sprint. Sprint 60 retains the Librarian scope; `sprint-61` is Planned with no dates and two queued missions:
+
+- **AUTH-1 — Forgot password: recover access through a Resend reset link.** A signed-out user requests an email, follows an expiring, single-use link and chooses a new password. Recovery is independent of mission-email preferences; successful reset invalidates prior interactive sessions. Existing Settings → Change password remains the path when the current password is known.
+- **AUTH-2 — Admin-assisted recovery: send a password reset link for a user** (*Requires AUTH-1*). Admins and owners trigger that same email for any eligible human account, including themselves. The working default is a link to the account's stored email so the recipient chooses the password; direct temporary-password setting remains an optional preference, not committed scope.
+
+CMOS holds the full criteria, including authorization, token replay/expiry/concurrency, mail failure handling, and deployed email-to-reset-to-login verification. This is backlog capture only; neither mission has started. The separate API-key/device-grant policy is a design question to record before implementation.
 
 ### Running alongside: the guest expansion track
 
@@ -225,7 +247,7 @@ All three of the opening questions were answered in one pass. Kept here with the
 
 Add to this list rather than resolving items silently.
 
-1. **Should project grants be genuinely per-project, or sugar over Space membership?** The agent recommends genuinely per-project, so the Space blast-radius warning is only shown when a Space grant is what the user actually chose, rather than living permanently on the sharing UI. Not yet ruled on. Sharing was deferred past Sprint 58 by decision #526, to be re-sequenced after the rewalk; the rewalk passed on 2026-09-22, so this is put to Derek at Sprint 59 planning.
+1. **Should project grants be genuinely per-project, or sugar over Space membership?** The agent recommends genuinely per-project, so the Space blast-radius warning is only shown when a Space grant is what the user actually chose. Not yet ruled on. **Deferred:** decision #526 moved sharing beyond Sprint 58, and Derek excluded it from Sprint 59 (decision #538: "don't care, no"). Revisit when he wants sharing; it is not an invitation gate or committed Sprint 60 work.
 2. **Does `rag_default_max_tokens` stay a single default or become per-request?** A one-line answer and a full synthesis want different budgets. Sprint 59. **Answered: per request**, in the Sprint 59 plan Derek approved (decision #538), and built by QA-1 on 2026-09-23.
 
 ---
@@ -253,7 +275,7 @@ Add to this list rather than resolving items silently.
 | Auto-writes corrupt a corpus Derek cares about | Ruled out at the source: nothing writes without a human accepting it (decision #515) |
 | A grounded answer that quietly is not grounded | Mutation test: a fabricated citation must fail |
 | Guests hit a path nobody has walked | WALK-1, before invites |
-| A guest cannot share their own work without an admin | Sprint 58 ships before any invitation goes out |
+| A guest cannot share their own work without an admin | Sharing remains deferred; personal Spaces shipped and invitations are Derek's choice (decisions #535, #538) |
 | Guest cost becomes an open tab | METER-0 records now; policy later, with data |
 | Building on unverified retrieval | RAG-1 gates the Q&A sprint, not the arc |
 | The LLM framework space moves under us | LIB-0 runs first and is re-run if the arc extends past Sprint 60 |
@@ -272,6 +294,12 @@ Add to this list rather than resolving items silently.
 ---
 
 ## Change Log
+
+- **2026-09-29 UTC, Sprint 60 opened (REPORT-1).** Build session PS-2026-09-29-003 started the citation foundation in dependency order; identity pointers synchronized. Decision #552 records the additive persistence and scoped-read contract before implementation.
+
+- **2026-09-29 UTC, Sprint 60 planned for build handoff (decision #551).** On Derek's explicit request to finish the Librarian arc, six missions were queued in CMOS: REPORT-1 → LIB-3 → DUP-1 → ORG-1 → LIB-4 → WALK-3. He chose one selected project for organisation and duplicate suggestions. Source inspection found report detail drops citations and synthesis loses marker identity, so durable report citations lead the sprint. Report remains the saved artifact, result Documents remain sources, and historical gaps are not disguised as valid support. The handoff records the carried-item dispositions, deployed acceptance and fresh-session start; no feature was implemented during planning.
+
+- **2026-09-29 UTC, roadmap and inbox review; account recovery backlogged (decision #550).** TraceLab has no pending inbox messages; the request for DeepSearch logs during a run (`1621f451`) still awaits a response. Sprint 60 remains a Planned shell for the four remaining Librarian capabilities, with no missions started. Derek's password-recovery request is captured in Planned Sprint 61 as AUTH-1 (self-service through Resend) and AUTH-2 (admin-triggered reset link, Requires AUTH-1). The existing Settings form requires the current password and does not cover recovery. The roadmap now reflects the later sharing deferral rather than the superseded invitation gate. No runtime changes were made.
 
 - **2026-09-17 UTC, created at Sprint 57 open.** Written from the Sprint 56 review conversation with Derek, which closed the RBAC arc and opened this one. Sprint 57 created in CMOS with five missions (LIB-0, LIB-1 *Requires LIB-0*, WALK-1, METER-0, RAG-1) and zero RBAC missions. The two rules were settled in that conversation: the artifact rule from Derek's "not a backdoor way for someone to have a chat account", and the claim-type boundary after Derek rejected the agent's proposed corpus-only bound on cold-start grounds. The agent's original sequencing — corpus Q&A first, retrieval as the gate for the whole arc — was wrong and was changed: authoring ships first because it works on day one and causes the corpus to exist, and RAG-1 gates the Q&A sprint only. Production baseline recorded above, including three facts that shaped the plan: no one but Derek has ever run a mission, a project lives in exactly one Space, and missions record no cost.
 

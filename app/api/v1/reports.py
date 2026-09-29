@@ -14,6 +14,7 @@ from app.core.authorization import (
     accessible_project_ids,
     authorize_or_403,
 )
+from app.core.config import settings
 from app.core.database import get_db
 from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.models.collection import Collection
@@ -31,6 +32,7 @@ from app.schemas.report import (
 )
 from app.services.document_policy import document_read_policy
 from app.services.ownership import default_workspace_id
+from app.services.report_citations import original_documents, readable_citations, readable_source_records
 from app.services.report_service import ReportService, get_report_service
 
 router = APIRouter()
@@ -50,13 +52,15 @@ def _build_report_response(report, citations: list) -> ReportResponse:
         title=report.title,
         content=report.content,
         citations=[CitationSchema(**c) for c in citations],
+        citation_status="validated" if getattr(report, "citation_manifest", None) is not None else "legacy_unavailable",
+        generation_provenance=getattr(report, "generation_provenance", None),
         tokens_used=report.tokens_used,
         status=report.status,
         created_at=report.created_at,
     )
 
 
-def _build_report_detail(report) -> ReportDetailResponse:
+def _build_report_detail(report, db: Session, user: AuthenticatedUser) -> ReportDetailResponse:
     """Build detailed report response with sources."""
     sources = [
         ReportSourceSchema(
@@ -66,13 +70,16 @@ def _build_report_detail(report) -> ReportDetailResponse:
             source_id=s.source_id,
             added_at=s.added_at,
         )
-        for s in (report.sources or [])
+        for s in readable_source_records(db, user, report)
     ]
     return ReportDetailResponse(
         id=report.id,
         title=report.title,
         content=report.content,
-        citations=[],  # Citations not stored, only at creation time
+        citations=[CitationSchema(**c) for c in readable_citations(db, user, report)],
+        citation_status="validated" if getattr(report, "citation_manifest", None) is not None else "legacy_unavailable",
+        generation_provenance=getattr(report, "generation_provenance", None),
+        original_documents=original_documents(db, user, report),
         tokens_used=report.tokens_used,
         status=report.status,
         created_at=report.created_at,
@@ -160,6 +167,7 @@ def create_report(
         document_scope = document_read_policy(current_user, db)
         if document_scope is not None:
             create_kwargs["document_filter"] = document_scope
+            create_kwargs["source_user"] = current_user
         report, citations = service.create_report(**create_kwargs)
     except ValueError as exc:
         raise HTTPException(
@@ -167,7 +175,7 @@ def create_report(
             detail=str(exc),
         ) from exc
 
-    return _build_report_response(report, citations)
+    return _build_report_response(report, readable_citations(db, current_user, report))
 
 
 @router.get("", response_model=ReportListResponse)
@@ -222,7 +230,7 @@ def get_report(
             detail="Report not found.",
         )
     authorize_or_403(current_user, "read", report, db)
-    return _build_report_detail(report)
+    return _build_report_detail(report, db, current_user)
 
 
 @router.get("/{report_id}/export")
@@ -253,7 +261,7 @@ def export_report(
     safe_title = report.title.replace(" ", "-").replace("/", "-")[:80]
 
     if format == "json":
-        detail = _build_report_detail(report)
+        detail = _build_report_detail(report, db, current_user)
         content = json_lib.dumps(detail.model_dump(mode="json"), indent=2)
         media_type = "application/json"
         filename = f"{safe_title}.json"
@@ -265,6 +273,13 @@ def export_report(
         content = f"# {report.title}\n\n{report.content}"
         media_type = "text/markdown"
         filename = f"{safe_title}.md"
+
+    if format in ("md", "txt") and getattr(report, "citation_manifest", None) is not None:
+        content += "\n\nSource citations\n"
+        for citation in readable_citations(db, current_user, report):
+            content += f"\n[{citation['marker']}] " + (
+                settings.frontend_url.rstrip("/") + citation["href"] if citation["available"] else "Source unavailable"
+            )
 
     # ASCII fallback keeps headers valid; UTF-8 titles retain a standards-based name.
     fallback = "".join(char if 32 <= ord(char) < 127 and char not in '\\"' else "-" for char in filename)
@@ -300,7 +315,7 @@ def update_report(
         )
     # Reload to get sources
     report = service.get_report(report_id)
-    return _build_report_detail(report)
+    return _build_report_detail(report, db, current_user)
 
 
 @router.delete("/{report_id}", response_model=DeleteResponse)

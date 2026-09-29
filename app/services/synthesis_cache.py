@@ -130,6 +130,7 @@ class SynthesisCacheService:
                 "cache_hit": True,
                 "cache_id": str(cached.id),
                 "hit_count": cached.hit_count,
+                "generated_at": cached.created_at.isoformat() if cached.created_at else None,
             }
         except Exception:
             session.rollback()

@@ -12,7 +12,10 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 class CitationSchema(BaseModel):
     """A citation to a source chunk."""
 
-    chunk_id: str
+    marker: int | None = None
+    chunk_id: str | None = None
+    available: bool = True
+    href: str | None = None
     document_id: str | None = None
     excerpt: str = Field(default="", description="Brief excerpt from source")
 
@@ -83,6 +86,9 @@ class ReportResponse(BaseModel):
     title: str
     content: str
     citations: list[CitationSchema] = Field(default_factory=list)
+    citation_status: Literal["validated", "legacy_unavailable"] = "legacy_unavailable"
+    generation_provenance: dict | None = None
+    original_documents: list[dict] = Field(default_factory=list)
     tokens_used: int = 0
     status: str = "draft"
     created_at: datetime

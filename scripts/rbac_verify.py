@@ -1907,19 +1907,26 @@ class RbacVerifier:
             )
             if synthesized_report_id is not None:
                 report_ids.add(synthesized_report_id)
+            # REPORT-1 refuses to persist ungrounded reports. Keep validating
+            # the old empty-result shape for pre-upgrade deployments as well.
+            refused_ungrounded = synthesized.status_code == 400 and self._json_object(synthesized) == {
+                "detail": "A report requires a validated citation mapping."
+            }
             self._record(
-                synthesized.status_code == 200
-                and synthesized_payload is not None
-                and synthesized_payload.get("content") == _SYNTHESIS_EMPTY_CONTENT
-                and synthesized_payload.get("citations") == []
-                and synthesized_payload.get("chunk_count") == 0
-                and synthesized_report_id is not None,
+                refused_ungrounded or (
+                    synthesized.status_code == 200
+                    and synthesized_payload is not None
+                    and synthesized_payload.get("content") == _SYNTHESIS_EMPTY_CONTENT
+                    and synthesized_payload.get("citations") == []
+                    and synthesized_payload.get("chunk_count") == 0
+                    and synthesized_report_id is not None
+                ),
                 Gap(
                     "SYNTHESIS-REPORT-SCOPE-LEAK",
                     role,
                     "post",
                     synthesize_path,
-                    "empty synthesis with a persisted report",
+                    "citation refusal or empty legacy synthesis report",
                     str(synthesized.status_code),
                 ),
             )
@@ -2028,14 +2035,17 @@ class RbacVerifier:
                     and created_payload.get("content") == _SYNTHESIS_EMPTY_CONTENT
                     and created_payload.get("citations") == []
                 )
+                refused_ungrounded = created.status_code == 400 and created_payload == {
+                    "detail": "A report requires a validated citation mapping."
+                }
                 self._record(
-                    clean_created,
+                    refused_ungrounded or clean_created,
                     Gap(
                         "REPORT-SOURCE-SCOPE-LEAK",
                         role,
                         "post",
                         f"{self._prefix}/reports",
-                        f"empty {source_kind} report",
+                        f"citation refusal or empty legacy {source_kind} report",
                         str(created.status_code),
                     ),
                 )

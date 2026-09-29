@@ -16,6 +16,13 @@ from app.models.document import Document
 from app.models.project import Project
 
 
+@pytest.fixture(autouse=True)
+def isolated_synthesis_singletons(monkeypatch):
+    # Each patched provider belongs only to this test, never the previous test.
+    monkeypatch.setattr("app.services.synthesis._synthesis_service", None)
+    monkeypatch.setattr("app.services.synthesis_cache._synthesis_cache_service", None)
+
+
 def _create_test_project(db_session) -> Project:
     """Create a test project."""
     project = Project(
@@ -88,7 +95,7 @@ def _add_chunk_to_collection(
     return item
 
 
-def _mock_openai_response(content: str = "This is a synthesis [1] with citations [2]."):
+def _mock_openai_response(content: str = "This is a synthesis with citations [1]."):
     """Create a mock OpenAI response."""
     mock_choice = MagicMock()
     mock_choice.message.content = content

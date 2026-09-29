@@ -9,7 +9,7 @@ from sqlalchemy import Column, DateTime, ForeignKey, Index, Integer, String, Tex
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base
-from app.models.types import GUID
+from app.models.types import GUID, CrossDBJSON
 
 
 class Report(Base):
@@ -40,6 +40,10 @@ class Report(Base):
     created_by = Column(
         String(100), nullable=True, comment="Agent or user who created this report"
     )
+
+    # Null preserves the honest legacy state; input sources are not claim citations.
+    citation_manifest = Column(CrossDBJSON, nullable=True)
+    generation_provenance = Column(CrossDBJSON, nullable=True)
 
     # Ownership + tenancy (Sprint 43 RBAC foundation; additive, nullable, unread until Sprint C)
     owner_id = Column(GUID(), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)

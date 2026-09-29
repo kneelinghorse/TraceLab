@@ -14,6 +14,7 @@ it is pointed at prod (the live prod run itself is T47.6):
 
 from __future__ import annotations
 
+from unittest.mock import AsyncMock
 from uuid import UUID, uuid4
 
 import pytest
@@ -33,6 +34,7 @@ from app.models.chunk import DocumentChunk
 from app.models.collection import Collection
 from app.models.document import Document
 from app.models.mission import Mission
+from app.models.mission_log import MissionLog  # noqa: F401 - register before the isolated DB is created
 from app.models.project import Project
 from app.models.report import Report
 from app.models.saved_search import SavedSearch
@@ -137,7 +139,10 @@ def _supplied_principals(db, tag="fixture"):
 
 
 @pytest.fixture
-def client():
+def client(monkeypatch):
+    monkeypatch.setattr("app.main.prewarm_qdrant", AsyncMock(return_value=True))
+    monkeypatch.setattr(settings, "qdrant_url", "http://127.0.0.1:9")
+    monkeypatch.setattr(settings, "qdrant_api_key", None)
     with TestClient(app) as test_client:
         yield test_client
 
@@ -2122,5 +2127,3 @@ class TestFixtureProjectLifecycle:
         with pytest.raises(HarnessError) as exc:
             verifier.provision_fixture_project("owner-jwt")
         assert "did not read back as owned" in str(exc.value)
-
-

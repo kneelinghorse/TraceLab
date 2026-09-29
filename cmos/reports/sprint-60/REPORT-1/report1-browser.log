@@ -1,0 +1,19 @@
+
+Running 6 tests using 2 workers
+
+(node:6282) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:6283) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:6282) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:6283) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 [chromium] › tests/e2e/report-citations.spec.ts:5:7 › durable report citations light 820 (4.8s)
+  ✓  1 [chromium] › tests/e2e/report-citations.spec.ts:5:7 › durable report citations light 390 (4.8s)
+  ✓  4 [chromium] › tests/e2e/report-citations.spec.ts:5:7 › durable report citations dark 390 (2.1s)
+  ✓  3 [chromium] › tests/e2e/report-citations.spec.ts:5:7 › durable report citations light 1440 (2.8s)
+  ✓  5 [chromium] › tests/e2e/report-citations.spec.ts:5:7 › durable report citations dark 820 (1.6s)
+  ✓  6 [chromium] › tests/e2e/report-citations.spec.ts:5:7 › durable report citations dark 1440 (1.6s)
+
+  6 passed (11.7s)

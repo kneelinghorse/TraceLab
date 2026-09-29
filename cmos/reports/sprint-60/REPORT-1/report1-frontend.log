@@ -1,0 +1,15 @@
+
+> frontend@0.1.0 test:unit
+> vitest --run src/__tests__/collection-context.test.tsx
+
+
+ RUN  v3.2.4 /Users/systemsystems/portfolio/TraceLab/frontend
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ ✓ src/__tests__/collection-context.test.tsx (7 tests) 1501ms
+   ✓ edits instructions and links to reviewed authoring without creating a mission  729ms
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  13:48:27
+   Duration  21.14s (transform 1.44s, setup 819ms, collect 7.83s, tests 1.50s, environment 5.43s, prepare 636ms)

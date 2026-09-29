@@ -156,20 +156,23 @@ class TestUserFacingCreateVisibility:
         from app.services.report_service import ReportService
 
         member = _make_user(db_session, "report-member@example.com")
-        mock_synth = MagicMock()
-        mock_synth.synthesize.return_value = {
-            "content": "synthesized body [1]",
-            "citations": [],
-            "tokens_used": 1,
-            "chunk_count": 1,
-        }
+        from app.models.chunk import DocumentChunk
+        from tests.test_reports_api import MockSynthesisService
+        project = _make_project(db_session, owner_id=member.id)
+        document = Document(name="Report support", project_id=project.id, owner_id=member.id)
+        db_session.add(document)
+        db_session.flush()
+        chunk = DocumentChunk(document_id=document.id, chunk_index=0, content="Supported research")
+        db_session.add(chunk)
+        db_session.commit()
+        mock_synth = MockSynthesisService()
         app.dependency_overrides[get_report_service_factory] = lambda: (
             lambda: ReportService(synthesis_service=mock_synth)
         )
         try:
             created = client.post(
                 REPORTS_URL,
-                json={"title": "Mine", "chunk_ids": [str(uuid4())]},  # no project_id
+                json={"title": "Mine", "chunk_ids": [str(chunk.id)]},  # no project_id
                 headers=_bearer(member),
             )
             assert created.status_code == 201, created.text

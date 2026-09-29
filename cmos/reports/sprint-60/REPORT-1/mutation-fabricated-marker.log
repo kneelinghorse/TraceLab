@@ -1,0 +1,9 @@
+F..                                                                      [100%]
+=================================== FAILURES ===================================
+_ test_fabricated_or_uncited_claims_cannot_be_grounded[Invented support [99].] _
+tests/test_report_citations.py:28: in test_fabricated_or_uncited_claims_cannot_be_grounded
+    with pytest.raises(ValueError, match="citation"):
+E   Failed: DID NOT RAISE <class 'ValueError'>
+=========================== short test summary info ============================
+FAILED tests/test_report_citations.py::test_fabricated_or_uncited_claims_cannot_be_grounded[Invented support [99].]
+1 failed, 2 passed, 18 deselected in 13.55s

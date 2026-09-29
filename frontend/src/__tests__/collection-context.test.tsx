@@ -72,3 +72,25 @@ it("preserves the report total and resets paging when filters change", async () 
   fireEvent.change(screen.getByLabelText("Project"), { target: { value: "project" } });
   await waitFor(() => expect(mocks.reports).toHaveBeenLastCalledWith(expect.objectContaining({ page: 1, status: "final", project_id: "project" })));
 });
+
+it("keeps sparse numbered report sources separate from Evidence and withholds unavailable links", async () => {
+  mocks.router.query.id = "report";
+  mocks.getReport.mockResolvedValue({ id: "report", title: "Cited report", content: "First [1]. Third [3].", status: "draft", report_type: "summary", tokens_used: 10, chunk_count: 3, sources: [], created_at: "2026-09-29T00:00:00Z", updated_at: "2026-09-29T00:00:00Z", citation_status: "validated", citations: [
+    { marker: 1, available: true, chunk_id: "chunk-one", document_id: "doc", href: "/documents/doc?chunk=chunk-one&index=0", excerpt: "First support" },
+    { marker: 3, available: false, chunk_id: null, document_id: null, href: null, excerpt: "" },
+  ] });
+  await browser(<ReportPage />);
+  expect(await screen.findByRole("link", { name: "[1] Open source excerpt" })).toHaveAttribute("href", "/documents/doc?chunk=chunk-one&index=0");
+  expect(screen.getByText(/\[3\] Source unavailable/)).toBeVisible();
+  expect(screen.queryByRole("link", { name: /\[3\]/ })).not.toBeInTheDocument();
+  expect(screen.queryByRole("link", { name: /\[2\]/ })).not.toBeInTheDocument();
+});
+
+it("explains missing legacy mappings without inventing chunk support", async () => {
+  mocks.router.query.id = "report";
+  mocks.getReport.mockResolvedValue({ id: "report", title: "Old report", content: "Legacy [3]", status: "draft", report_type: "summary", tokens_used: 0, chunk_count: 1, sources: [], citations: [], citation_status: "legacy_unavailable", created_at: "2026-09-29T00:00:00Z", updated_at: "2026-09-29T00:00:00Z", original_documents: [{ document_id: "doc", name: "Original research", href: "/documents/doc" }] });
+  await browser(<ReportPage />);
+  expect(await screen.findByText(/no saved mapping from numbered citations/)).toBeVisible();
+  expect(screen.getByRole("link", { name: "Original research" })).toHaveAttribute("href", "/documents/doc");
+  expect(screen.queryByRole("link", { name: /Open source excerpt/ })).not.toBeInTheDocument();
+});

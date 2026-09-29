@@ -21,6 +21,8 @@ _HASH = "placeholder-not-a-real-hash"
 
 @pytest.fixture
 def context_fixture(db_session, monkeypatch):
+    from unittest.mock import AsyncMock
+    monkeypatch.setattr("app.main.prewarm_qdrant", AsyncMock(return_value=True))
     monkeypatch.setattr(settings, "rbac_enabled", True)
     owner = User(email=f"{uuid4()}@example.test", display_name="Context author", password_hash=_HASH, role="member")
     other = User(email=f"{uuid4()}@example.test", display_name="Other author", password_hash=_HASH, role="member")
@@ -198,7 +200,8 @@ def test_report_creation_resolves_readable_document_subset_before_synthesis(cont
     db_session.add_all([CollectionItem(collection_id=collection.id, chunk_id=chunk.id) for chunk in chunks])
     db_session.commit()
     synthesis = MagicMock()
-    synthesis.synthesize.return_value = {"content": "Readable findings", "citations": [], "effective_chunk_ids": [str(chunk.id) for chunk in chunks[:2]], "chunk_count": 2}
+    from app.services.report_citations import text_hash
+    synthesis.synthesize.return_value = {"content": "Readable findings [1]", "citations": [{"marker": 1, "chunk_id": str(chunks[0].id), "document_id": str(chunks[0].document_id), "content_hash": text_hash(chunks[0].content)}], "effective_chunk_ids": [str(chunk.id) for chunk in chunks[:2]], "chunk_count": 2}
     app.dependency_overrides[get_report_service_factory] = lambda: lambda: ReportService(synthesis_service=synthesis)
     try:
         response = client.post(f"{API}/reports", json={"title": "Scoped collection report", "collection_id": str(collection.id)}, headers=headers)
@@ -228,7 +231,7 @@ def test_report_export_bytes_remain_stable_with_citation_ui(context_fixture, db_
     expected = {
         "md": "# Cafe / findings\n\nA café claim.\n\n[source](https://example.test/primary)\n",
         "txt": "Cafe / findings\n===============\n\nA café claim.\n\n[source](https://example.test/primary)\n",
-        "json": json.dumps({"id": str(report.id), "title": "Cafe / findings", "content": "A café claim.\n\n[source](https://example.test/primary)\n", "citations": [], "tokens_used": 12, "status": "final", "created_at": "2026-09-13T12:00:00", "project_id": None, "report_type": "markdown", "prompt": None, "chunk_count": 1, "sources": [], "updated_at": "2026-09-13T12:00:00"}, indent=2),
+        "json": json.dumps({"id": str(report.id), "title": "Cafe / findings", "content": "A café claim.\n\n[source](https://example.test/primary)\n", "citations": [], "citation_status": "legacy_unavailable", "generation_provenance": None, "original_documents": [], "tokens_used": 12, "status": "final", "created_at": "2026-09-13T12:00:00", "project_id": None, "report_type": "markdown", "prompt": None, "chunk_count": 1, "sources": [], "updated_at": "2026-09-13T12:00:00"}, indent=2),
     }
     response = client.get(f"{API}/reports/{report.id}/export", params={"format": format}, headers=headers)
     assert response.status_code == 200
@@ -259,3 +262,74 @@ def test_collection_context_requires_auth_before_reads_or_mutations(context_fixt
     client, _, _, _, collection, _, _ = context_fixture
     response = client.request(method, f"{API}/collections/{collection.id}{suffix}", json=body)
     assert response.status_code == 401
+
+
+def test_report_reader_rechecks_source_policy_and_original_documents(context_fixture, db_session):
+    """Owning a report or result mission must not reveal a foreign source's identity."""
+    from app.models.mission import Mission
+    from app.models.report import Report, ReportSource
+    from app.services.report_citations import text_hash
+
+    client, owner, other, project, _, headers, _ = context_fixture
+    foreign = Project(name="Now private", owner_id=other.id)
+    db_session.add(foreign)
+    db_session.flush()
+    readable = Document(name="Original result", project_id=project.id, owner_id=owner.id)
+    hidden = Document(name="Secret original", project_id=foreign.id, owner_id=other.id)
+    db_session.add_all([readable, hidden])
+    db_session.flush()
+    chunk = DocumentChunk(document_id=hidden.id, chunk_index=0, content="Revoked support")
+    db_session.add(chunk)
+    db_session.flush()
+    report = Report(title="Still my report", owner_id=owner.id, content="Authored claim [3].", citation_manifest=[{
+        "marker": 3, "chunk_id": str(chunk.id), "document_id": str(hidden.id), "content_hash": text_hash(chunk.content),
+    }])
+    db_session.add(report)
+    db_session.flush()
+    db_session.add(ReportSource(report_id=report.id, source_type="chunk", source_id=chunk.id))
+    db_session.add(Mission(project_id=project.id, owner_id=owner.id, mission_id="REPORT1-ORIGINAL", title="Original mission", objective="Test provenance", success_criteria=["Readable sources only"], result_report_id=report.id, result_document_ids=[str(readable.id), str(hidden.id)]))
+    db_session.commit()
+    response = client.get(f"{API}/reports/{report.id}", headers=headers)
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["content"] == "Authored claim [3]."
+    assert body["citations"][0]["available"] is False
+    assert body["sources"] == []
+    assert [doc["document_id"] for doc in body["original_documents"]] == [str(readable.id)]
+    for secret in (str(hidden.id), str(chunk.id), "Secret original", "Revoked support"):
+        assert secret not in response.text
+
+
+@pytest.mark.parametrize("writer", ["reports", "synthesize"])
+def test_source_access_revoked_while_model_runs_refuses_save(context_fixture, db_session, writer):
+    """Generation cannot carry an old permission snapshot into a report commit."""
+    from app.api.v1.reports import get_report_service_factory
+    from app.api.v1.synthesize import get_synthesis_service_factory
+    from app.models.report import Report
+    from app.services.report_service import ReportService
+    from tests.test_reports_api import MockSynthesisService
+
+    client, _, other, project, _, headers, _ = context_fixture
+    doc = Document(name="Initially shared", project_id=project.id, owner_id=other.id)
+    db_session.add(doc)
+    db_session.flush()
+    chunk = DocumentChunk(document_id=doc.id, chunk_index=0, content="A real finding")
+    db_session.add(chunk)
+    db_session.commit()
+    synthesis = MockSynthesisService().service
+    def revoke_during_generation(*args):
+        project.owner_id = other.id
+        db_session.commit()
+        return "A real finding [1].", {"total_tokens": 10}
+    synthesis._generate_completion.side_effect = revoke_during_generation
+    app.dependency_overrides[get_report_service_factory] = lambda: lambda: ReportService(synthesis_service=synthesis)
+    app.dependency_overrides[get_synthesis_service_factory] = lambda: lambda: synthesis
+    body = {"chunk_ids": [str(chunk.id)]}
+    body.update({"title": "Revoked"} if writer == "reports" else {"save_as_report": True, "report_title": "Revoked"})
+    try:
+        response = client.post(f"{API}/{writer}", json=body, headers=headers)
+        assert response.status_code == 400, response.text
+        assert db_session.query(Report).count() == 0
+    finally:
+        app.dependency_overrides.pop(get_report_service_factory, None)
+        app.dependency_overrides.pop(get_synthesis_service_factory, None)

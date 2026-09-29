@@ -13,9 +13,10 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql.elements import ColumnElement
 
 from app.core.database import SessionLocal
-from app.models.collection import CollectionItem
+from app.core.security import AuthenticatedUser
 from app.models.report import Report, ReportSource
 from app.services.document_policy import resolve_readable_chunks
+from app.services.report_citations import generation_provenance, persistable_citations
 from app.services.synthesis import SynthesisService, get_synthesis_service
 
 logger = logging.getLogger(__name__)
@@ -55,6 +56,7 @@ class ReportService:
         workspace_id: UUID | None = None,
         accessible_project_ids: list[UUID] | None = None,
         document_filter: ColumnElement[bool] | None = None,
+        source_user: AuthenticatedUser | None = None,
     ) -> tuple[Report, list[dict[str, Any]]]:
         """Create a new report by synthesizing content.
 
@@ -124,20 +126,17 @@ class ReportService:
         citations = synthesis_result.get("citations", [])
         tokens_used = synthesis_result.get("tokens_used", 0)
         chunk_count = synthesis_result.get("chunk_count", 0)
-        effective_chunk_ids = (
-            [
-                chunk_id if isinstance(chunk_id, UUID) else UUID(str(chunk_id))
-                for chunk_id in synthesis_result.get("effective_chunk_ids", [])
-            ]
-            if accessible_project_ids is not None or document_filter is not None
-            else None
-        )
+        effective_chunk_ids = [UUID(str(cid)) for cid in synthesis_result.get("effective_chunk_ids", [])]
 
         # Compute content hash for dedup
         content_hash = hashlib.sha256(content.encode("utf-8")).hexdigest()
 
         session = self.session_factory()
         try:
+            manifest = persistable_citations(
+                session, synthesis_result, document_filter=document_filter,
+                accessible_project_ids=accessible_project_ids, source_user=source_user,
+            )
             # Create report
             report = Report(
                 project_id=str(project_id) if project_id else None,
@@ -151,45 +150,16 @@ class ReportService:
                 chunk_count=chunk_count,
                 owner_id=owner_id,
                 workspace_id=workspace_id,
+                citation_manifest=manifest,
+                generation_provenance=generation_provenance(synthesis_result, owner_id),
             )
             session.add(report)
             session.flush()
 
-            # Record sources
             if collection_id:
-                source = ReportSource(
-                    report_id=report.id,
-                    source_type="collection",
-                    source_id=str(collection_id),
-                )
-                session.add(source)
-
-                # Scoped synthesis has already resolved the authoritative subset.
-                # Re-expanding the collection here would reintroduce foreign chunks.
-                collection_chunks = (
-                    self._get_collection_chunk_ids(session, collection_id)
-                    if effective_chunk_ids is None
-                    else effective_chunk_ids
-                )
-                for chunk_id in collection_chunks:
-                    chunk_source = ReportSource(
-                        report_id=report.id,
-                        source_type="chunk",
-                        source_id=str(chunk_id),
-                    )
-                    session.add(chunk_source)
-
-            if chunk_ids:
-                source_chunk_ids = (
-                    chunk_ids if effective_chunk_ids is None else effective_chunk_ids
-                )
-                for chunk_id in source_chunk_ids:
-                    source = ReportSource(
-                        report_id=report.id,
-                        source_type="chunk",
-                        source_id=str(chunk_id),
-                    )
-                    session.add(source)
+                session.add(ReportSource(report_id=report.id, source_type="collection", source_id=collection_id))
+            for chunk_id in effective_chunk_ids:
+                session.add(ReportSource(report_id=report.id, source_type="chunk", source_id=chunk_id))
 
             session.commit()
             session.refresh(report)
@@ -200,17 +170,6 @@ class ReportService:
             raise
         finally:
             session.close()
-
-    def _get_collection_chunk_ids(
-        self, session: Session, collection_id: UUID
-    ) -> list[UUID]:
-        """Get all chunk IDs from a collection."""
-        items = (
-            session.query(CollectionItem)
-            .filter(CollectionItem.collection_id == str(collection_id))
-            .all()
-        )
-        return [UUID(str(item.chunk_id)) for item in items if item.chunk_id]
 
     def get_report(self, report_id: UUID) -> Report | None:
         """Get a report by ID with sources loaded."""

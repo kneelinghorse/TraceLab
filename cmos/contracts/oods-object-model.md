@@ -222,6 +222,9 @@ Source: `app.schemas.report`. Traits: `content/Labelled`, `lifecycle/Stateful`, 
 
 | Field | Pydantic models | Presentation destination |
 |---|---|---|
+| `marker` | `CitationSchema` | Report.citations[].marker; preserve the author's numeric label |
+| `available` | `CitationSchema` | Report.citations[].available; unavailable support has no source identity or excerpt |
+| `href` | `CitationSchema` | Report.citations[].href; exact currently authorized chunk destination |
 | `chunk_id` | `CitationSchema` | Report.citations[].chunk_id |
 | `document_id` | `CitationSchema` | Report.citations[].document_id |
 | `excerpt` | `CitationSchema` | Report.citations[].excerpt |
@@ -240,6 +243,9 @@ Source: `app.schemas.report`. Traits: `content/Labelled`, `lifecycle/Stateful`, 
 | `id` | `ReportResponse`, `ReportDetailResponse`, `ReportListItem` | Report.id |
 | `content` | `ReportResponse`, `ReportDetailResponse` | Report.content |
 | `citations` | `ReportResponse`, `ReportDetailResponse` | Report.citations |
+| `citation_status` | `ReportResponse`, `ReportDetailResponse` | Report.citation_status; explicitly distinguish legacy gaps |
+| `generation_provenance` | `ReportResponse`, `ReportDetailResponse` | Report.generation_provenance; generated origin and review status |
+| `original_documents` | `ReportResponse`, `ReportDetailResponse` | Report.original_documents; authorized result-document links, separate from claim support |
 | `tokens_used` | `ReportResponse`, `ReportDetailResponse`, `ReportListItem` | Report.tokens_used |
 | `created_at` | `ReportResponse`, `ReportDetailResponse`, `ReportListItem` | Report.created_at → Timestampable.created_at |
 | `report_type` | `ReportDetailResponse`, `ReportListItem` | Report.report_type |

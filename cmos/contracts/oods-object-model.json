@@ -2900,7 +2900,7 @@
       "schemas": {
         "CitationSchema": {
           "chunk_id": {
-            "annotation": "<class 'str'>",
+            "annotation": "str | None",
             "mapping": "Report.citations[].chunk_id"
           },
           "document_id": {
@@ -2910,6 +2910,18 @@
           "excerpt": {
             "annotation": "<class 'str'>",
             "mapping": "Report.citations[].excerpt"
+          },
+          "marker": {
+            "annotation": "int | None",
+            "mapping": "Report.citations[].marker"
+          },
+          "available": {
+            "annotation": "<class 'bool'>",
+            "mapping": "Report.citations[].available"
+          },
+          "href": {
+            "annotation": "str | None",
+            "mapping": "Report.citations[].href"
           }
         },
         "ReportSourceSchema": {
@@ -3004,6 +3016,18 @@
           "created_at": {
             "annotation": "<class 'datetime.datetime'>",
             "mapping": "Report.created_at \u2192 Timestampable.created_at"
+          },
+          "citation_status": {
+            "annotation": "typing.Literal['validated', 'legacy_unavailable']",
+            "mapping": "Report.citation_status"
+          },
+          "generation_provenance": {
+            "annotation": "dict | None",
+            "mapping": "Report.generation_provenance"
+          },
+          "original_documents": {
+            "annotation": "list[dict]",
+            "mapping": "Report.original_documents"
           }
         },
         "ReportDetailResponse": {
@@ -3058,6 +3082,18 @@
           "updated_at": {
             "annotation": "<class 'datetime.datetime'>",
             "mapping": "Report.updated_at \u2192 Timestampable.updated_at"
+          },
+          "citation_status": {
+            "annotation": "typing.Literal['validated', 'legacy_unavailable']",
+            "mapping": "Report.citation_status"
+          },
+          "generation_provenance": {
+            "annotation": "dict | None",
+            "mapping": "Report.generation_provenance"
+          },
+          "original_documents": {
+            "annotation": "list[dict]",
+            "mapping": "Report.original_documents"
           }
         },
         "ReportListItem": {

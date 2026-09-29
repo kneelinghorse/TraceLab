@@ -9,7 +9,10 @@ export type ReportStatus = "draft" | "final";
 export type ReportFormat = "summary" | "report" | "bullets" | "markdown";
 
 export type Citation = {
-  chunk_id: string;
+  marker?: number;
+  chunk_id: string | null;
+  available?: boolean;
+  href?: string | null;
   document_id: string | null;
   excerpt: string;
 };
@@ -27,6 +30,9 @@ export type Report = {
   title: string;
   content: string;
   citations: Citation[];
+  citation_status?: "validated" | "legacy_unavailable";
+  generation_provenance?: { origin: string; model: string | null; accepted_by: string | null } | null;
+  original_documents?: { document_id: string; name: string; href: string }[];
   tokens_used: number;
   status: ReportStatus;
   created_at: string;
