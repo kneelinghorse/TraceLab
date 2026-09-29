@@ -146,6 +146,13 @@ class Settings(BaseSettings):
     resend_from_address: str | None = None
     notification_emails_enabled: bool = True
 
+    # Stage1's public support address, stage1@aquex.ai, is forwarded to its owner (Stage1 s97-m02, decision 1105).
+    # Resend Inbound calls /webhooks/resend-inbound; nothing is accepted until all three are set on the deployment.
+    # The inbound key needs full access, because reading received mail is not a sending permission.
+    resend_webhook_secret: str | None = None
+    resend_inbound_api_key: str | None = None
+    support_forward_to: str | None = None
+
     # PEDR cache settings
     pedr_cache_max_size: int = 1000  # Max cached queries
     pedr_cache_ttl_seconds: int = 300  # 5 minutes TTL
