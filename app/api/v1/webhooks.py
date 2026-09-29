@@ -6,18 +6,22 @@ These endpoints use signature-based authentication rather than JWT.
 
 from __future__ import annotations
 
+import json
 import logging
 
+import httpx
 from fastapi import APIRouter, BackgroundTasks, Depends, Header, HTTPException, Request
 from fastapi import status as http_status
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.core.database import get_db
 from app.schemas.webhook import (
     DeepSearchWebhookPayload,
     WebhookErrorResponse,
     WebhookResponse,
 )
+from app.services import support_inbox
 from app.services.mission_service import MissionNotFoundError
 from app.services.notifications import NOTIFY_STATUSES, notify_terminal_status
 from app.services.webhook_handler import (
@@ -142,3 +146,39 @@ async def receive_deepsearch_webhook(
             status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Internal error: {str(exc)[:200]}",
         ) from exc
+
+
+@router.post(
+    "/resend-inbound",
+    summary="Forward mail for Stage1's support address",
+    description="""
+Resend Inbound calls this for every message received on aquex.ai. Messages to stage1@aquex.ai are fetched and
+re-sent to SUPPORT_FORWARD_TO (Stage1 s97-m02); every other event or recipient is acknowledged and ignored.
+
+**Authentication**: Resend's Svix signature (`svix-id`, `svix-timestamp`, `svix-signature`) under
+`RESEND_WEBHOOK_SECRET`. The route fails closed (503) until the secret, `RESEND_INBOUND_API_KEY`,
+`SUPPORT_FORWARD_TO` and `RESEND_FROM_ADDRESS` are all set. A failed forward answers 502, so Resend retries;
+the send's idempotency key makes a retry safe.
+""",
+)
+async def receive_resend_inbound(request: Request) -> dict[str, str]:
+    """Verify Resend's signature, then forward a message addressed to the support address."""
+    if not (settings.resend_webhook_secret and settings.resend_inbound_api_key and settings.support_forward_to and settings.resend_from_address):
+        raise HTTPException(status_code=http_status.HTTP_503_SERVICE_UNAVAILABLE, detail="Support forwarding is not configured")
+    body = await request.body()
+    if not support_inbox.signature_valid(settings.resend_webhook_secret, request.headers, body):
+        logger.warning("Resend inbound webhook signature validation failed")
+        raise HTTPException(status_code=http_status.HTTP_401_UNAUTHORIZED, detail="Invalid signature")
+    event = json.loads(body)
+    data = event.get("data") or {}
+    if event.get("type") != "email.received" or not support_inbox.addressed_to_support(data):
+        return {"status": "ignored"}
+    email_id = str(data.get("email_id", ""))
+    try:
+        message_id = await support_inbox.forward(email_id)
+    except httpx.HTTPError as exc:
+        # The message id only: the body and addresses stay out of the logs.
+        logger.warning("Forwarding received email %s failed: %s", email_id, type(exc).__name__)
+        raise HTTPException(status_code=http_status.HTTP_502_BAD_GATEWAY, detail="Forwarding failed") from exc
+    logger.info("Forwarded received email %s as %s", email_id, message_id)
+    return {"status": "forwarded"}
