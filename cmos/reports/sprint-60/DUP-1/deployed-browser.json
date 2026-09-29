@@ -1,0 +1,31 @@
+{
+  "verified_at": "2026-09-29T22:30:12.071Z",
+  "serving_commit": "edc0a0b4ea1a8049dbb4ffb74e6af590f554333f",
+  "project_id": "0d6c5b1d-72eb-4390-a40b-c48c88cdb302",
+  "results": [
+    {
+      "theme": "light",
+      "width": 390,
+      "scans": 1,
+      "comparisons": 7,
+      "source_links_opened": 6,
+      "keep_both_and_dismiss_persisted": true,
+      "corpus_write_requests": [],
+      "page_errors": [],
+      "overflow": false
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "scans": 1,
+      "comparisons": 7,
+      "source_links_opened": 6,
+      "keep_both_and_dismiss_persisted": true,
+      "corpus_write_requests": [],
+      "page_errors": [],
+      "overflow": false
+    }
+  ],
+  "mocked_responses": false,
+  "personal_user_acceptance": false
+}

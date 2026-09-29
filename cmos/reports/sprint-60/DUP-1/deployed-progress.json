@@ -1,0 +1,29 @@
+{
+  "documents": {
+    "original": {
+      "id": "3f794e93-ea21-420e-91ae-7e7fd57e2f61",
+      "processed": true
+    },
+    "copy": {
+      "id": "46e7213f-6d61-42a5-8f13-0c74f22e9a49",
+      "processed": true
+    },
+    "edited": {
+      "id": "21d34319-77cb-40f0-9e3f-727083670c72",
+      "processed": true
+    },
+    "distinct": {
+      "id": "f142cde9-fcab-49f0-9930-1124601fa169",
+      "processed": true
+    },
+    "boilerplate_a": {
+      "id": "8aea9974-9346-4f16-bf5a-b76656925c95",
+      "processed": true
+    },
+    "boilerplate_b": {
+      "id": "6dd1dd58-53e6-4ffe-8f14-9fe85a1389dd",
+      "processed": true
+    }
+  },
+  "project_id": "0d6c5b1d-72eb-4390-a40b-c48c88cdb302"
+}

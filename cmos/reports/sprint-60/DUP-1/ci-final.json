@@ -1,0 +1,125 @@
+{
+  "headRefOid": "da107c78f7791e2199fdffcebd75a8669710623c",
+  "mergeStateStatus": "CLEAN",
+  "statusCheckRollup": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-09-29T22:16:36Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/kneelinghorse/TraceLab/actions/runs/36638222170/job/109643994385",
+      "name": "backend-integration",
+      "startedAt": "2026-09-29T22:13:01Z",
+      "status": "COMPLETED",
+      "workflowName": "Backend Integration"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-09-29T22:13:28Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/kneelinghorse/TraceLab/actions/runs/36638222854/job/109643997212",
+      "name": "ruff-diff",
+      "startedAt": "2026-09-29T22:13:02Z",
+      "status": "COMPLETED",
+      "workflowName": "Backend Lint"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-09-29T22:23:57Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/kneelinghorse/TraceLab/actions/runs/36638222212/job/109643994542",
+      "name": "backend-suite",
+      "startedAt": "2026-09-29T22:13:01Z",
+      "status": "COMPLETED",
+      "workflowName": "Backend Tests"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-09-29T22:14:28Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/kneelinghorse/TraceLab/actions/runs/36638222266/job/109643994255",
+      "name": "vitest",
+      "startedAt": "2026-09-29T22:13:01Z",
+      "status": "COMPLETED",
+      "workflowName": "Frontend Checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-09-29T22:16:57Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/kneelinghorse/TraceLab/actions/runs/36638222391/job/109643994472",
+      "name": "build-frontend-production",
+      "startedAt": "2026-09-29T22:13:01Z",
+      "status": "COMPLETED",
+      "workflowName": "Frontend Production Build"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-09-29T22:13:54Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/kneelinghorse/TraceLab/actions/runs/36638222126/job/109643994170",
+      "name": "mcp-package",
+      "startedAt": "2026-09-29T22:13:01Z",
+      "status": "COMPLETED",
+      "workflowName": "MCP Package"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-09-29T22:13:36Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/kneelinghorse/TraceLab/actions/runs/36638222257/job/109644002034",
+      "name": "Secret Scan",
+      "startedAt": "2026-09-29T22:13:03Z",
+      "status": "COMPLETED",
+      "workflowName": "Secret Scan"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-09-29T22:13:35Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/kneelinghorse/TraceLab/actions/runs/36638195366/job/109643904729",
+      "name": "Secret Scan",
+      "startedAt": "2026-09-29T22:12:46Z",
+      "status": "COMPLETED",
+      "workflowName": "Secret Scan"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-09-29T22:14:00Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/kneelinghorse/TraceLab/actions/runs/36638222266/job/109643994649",
+      "name": "type-check",
+      "startedAt": "2026-09-29T22:13:01Z",
+      "status": "COMPLETED",
+      "workflowName": "Frontend Checks"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-09-29T22:14:04Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/kneelinghorse/TraceLab/actions/runs/36638222266/job/109643994619",
+      "name": "lint",
+      "startedAt": "2026-09-29T22:13:01Z",
+      "status": "COMPLETED",
+      "workflowName": "Frontend Checks"
+    }
+  ],
+  "url": "https://github.com/kneelinghorse/TraceLab/pull/393",
+  "summary": {
+    "backend": {
+      "passed": 2931,
+      "skipped": 3,
+      "quarantined_deselections": 12
+    },
+    "postgres": {
+      "passed": 147,
+      "skipped": 2
+    },
+    "frontend_unit": {
+      "passed": 275
+    },
+    "built_browser": {
+      "passed": 70
+    }
+  },
+  "merge_commit": "edc0a0b4ea1a8049dbb4ffb74e6af590f554333f"
+}

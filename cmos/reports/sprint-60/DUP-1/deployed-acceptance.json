@@ -1,0 +1,119 @@
+{
+  "verified_at": "2026-09-29T22:29:11.373Z",
+  "serving_commit": "edc0a0b4ea1a8049dbb4ffb74e6af590f554333f",
+  "project_id": "0d6c5b1d-72eb-4390-a40b-c48c88cdb302",
+  "caller_role": "owner",
+  "fixture_setup": "Six named synthetic text uploads processed through the existing ingestion pipeline before the read-only snapshot.",
+  "documents": {
+    "original": "3f794e93-ea21-420e-91ae-7e7fd57e2f61",
+    "copy": "46e7213f-6d61-42a5-8f13-0c74f22e9a49",
+    "edited": "21d34319-77cb-40f0-9e3f-727083670c72",
+    "distinct": "f142cde9-fcab-49f0-9930-1124601fa169",
+    "boilerplate_a": "8aea9974-9346-4f16-bf5a-b76656925c95",
+    "boilerplate_b": "6dd1dd58-53e6-4ffe-8f14-9fe85a1389dd"
+  },
+  "candidates": [
+    {
+      "candidate_id": "dc554118c1f248ce472aae52172f0a6ea1af0fd04bae52471c8e64f4e960072c",
+      "kind": "exact_text",
+      "score": 1,
+      "documents": [
+        {
+          "id": "3f794e93-ea21-420e-91ae-7e7fd57e2f61",
+          "name": "user-feedback.txt",
+          "href": "/documents/3f794e93-ea21-420e-91ae-7e7fd57e2f61"
+        },
+        {
+          "id": "46e7213f-6d61-42a5-8f13-0c74f22e9a49",
+          "name": "user-feedback-copy.txt",
+          "href": "/documents/46e7213f-6d61-42a5-8f13-0c74f22e9a49"
+        }
+      ],
+      "basis": "The complete non-empty extracted texts are equal after Unicode, case and whitespace normalization.",
+      "evidence": [
+        {
+          "left_excerpt": "Researchers described the first onboarding session as confusing because the workspace opened without any explanation of where imported notes would appear. Several participants searched for an upload control in the project header before finding it in the documents area. A visible checklist and a short example project helped them understand the sequence. They wanted to preview the destination before",
+          "right_excerpt": "Researchers described the first onboarding session as confusing because the workspace opened without any explanation of where imported notes would appear. Several participants searched for an upload control in the project header before finding it in the documents area. A visible checklist and a short example project helped them understand the sequence. They wanted to preview the destination before"
+        }
+      ],
+      "recommendation": "Compare source dates, annotations and purpose. Keep both if either adds useful context. If one is redundant, decide which to retain before using its existing document controls. This review changes neither document."
+    },
+    {
+      "candidate_id": "6ee87937834dd148feef1a7e88516e1a2cc83fd3b9ab8ac7db7a76439743b3f1",
+      "kind": "probable_overlap",
+      "score": 0.8985,
+      "documents": [
+        {
+          "id": "21d34319-77cb-40f0-9e3f-727083670c72",
+          "name": "user-feedback-edit.txt",
+          "href": "/documents/21d34319-77cb-40f0-9e3f-727083670c72"
+        },
+        {
+          "id": "3f794e93-ea21-420e-91ae-7e7fd57e2f61",
+          "name": "user-feedback.txt",
+          "href": "/documents/3f794e93-ea21-420e-91ae-7e7fd57e2f61"
+        }
+      ],
+      "basis": "90% five-word phrase overlap, with substantial shared text in at least two distinct passages in each document.",
+      "evidence": [
+        {
+          "left_excerpt": "Researchers described the first onboarding session as unclear because the workspace opened without any explanation of where imported notes would appear. Several participants searched for an upload control in the project header before finding it in the documents area. A visible checklist and a short example project helped them understand the sequence. They wanted to preview the destination before c",
+          "right_excerpt": "Researchers described the first onboarding session as confusing because the workspace opened without any explanation of where imported notes would appear. Several participants searched for an upload control in the project header before finding it in the documents area. A visible checklist and a short example project helped them understand the sequence. They wanted to preview the destination before"
+        },
+        {
+          "left_excerpt": "Participants also struggled to distinguish a collection from a project during their later session. They expected a collection to be a curated reading list that could contain selected excerpts without moving the original documents. The team recommended keeping source links visible beside each excerpt and showing exactly which items would be saved. Clear ownership labels were more useful than a seco",
+          "right_excerpt": "Participants also struggled to distinguish a collection from a project during their second session. They expected a collection to be a curated reading list that could contain selected excerpts without moving the original documents. The team recommended keeping source links visible beside each excerpt and showing exactly which items would be saved. Clear ownership labels were more useful than a sec"
+        }
+      ],
+      "recommendation": "Compare source dates, annotations and purpose. Keep both if either adds useful context. If one is redundant, decide which to retain before using its existing document controls. This review changes neither document."
+    },
+    {
+      "candidate_id": "567a3ae22a615bd9d01979f64930ade772d476a2c76df34e5e0a94879752113d",
+      "kind": "probable_overlap",
+      "score": 0.8985,
+      "documents": [
+        {
+          "id": "21d34319-77cb-40f0-9e3f-727083670c72",
+          "name": "user-feedback-edit.txt",
+          "href": "/documents/21d34319-77cb-40f0-9e3f-727083670c72"
+        },
+        {
+          "id": "46e7213f-6d61-42a5-8f13-0c74f22e9a49",
+          "name": "user-feedback-copy.txt",
+          "href": "/documents/46e7213f-6d61-42a5-8f13-0c74f22e9a49"
+        }
+      ],
+      "basis": "90% five-word phrase overlap, with substantial shared text in at least two distinct passages in each document.",
+      "evidence": [
+        {
+          "left_excerpt": "Researchers described the first onboarding session as unclear because the workspace opened without any explanation of where imported notes would appear. Several participants searched for an upload control in the project header before finding it in the documents area. A visible checklist and a short example project helped them understand the sequence. They wanted to preview the destination before c",
+          "right_excerpt": "Researchers described the first onboarding session as confusing because the workspace opened without any explanation of where imported notes would appear. Several participants searched for an upload control in the project header before finding it in the documents area. A visible checklist and a short example project helped them understand the sequence. They wanted to preview the destination before"
+        },
+        {
+          "left_excerpt": "Participants also struggled to distinguish a collection from a project during their later session. They expected a collection to be a curated reading list that could contain selected excerpts without moving the original documents. The team recommended keeping source links visible beside each excerpt and showing exactly which items would be saved. Clear ownership labels were more useful than a seco",
+          "right_excerpt": "Participants also struggled to distinguish a collection from a project during their second session. They expected a collection to be a curated reading list that could contain selected excerpts without moving the original documents. The team recommended keeping source links visible beside each excerpt and showing exactly which items would be saved. Clear ownership labels were more useful than a sec"
+        }
+      ],
+      "recommendation": "Compare source dates, annotations and purpose. Keep both if either adds useful context. If one is redundant, decide which to retain before using its existing document controls. This review changes neither document."
+    }
+  ],
+  "coverage": {
+    "readable_documents": 6,
+    "scanned_documents": 6,
+    "examined_documents": 6,
+    "empty_documents": 0,
+    "overlong_documents": 0,
+    "exact_only_documents": 0,
+    "limited": false,
+    "document_limit": 100,
+    "character_limit": 20000,
+    "candidate_count": 3,
+    "candidates_limited": false,
+    "pair_limit": 20
+  },
+  "before_sha256": "a4a946c9348ee58e1c11ff043cd4c72b83c5e706d2dc5be42a6e90e4b0ad0c17",
+  "after_sha256": "a4a946c9348ee58e1c11ff043cd4c72b83c5e706d2dc5be42a6e90e4b0ad0c17",
+  "documents_chunks_relationships_collections_unchanged": true,
+  "model_calls_for_duplicate_review": 0,
+  "verification": "Agent acceptance, not Derek personal acceptance"
+}
