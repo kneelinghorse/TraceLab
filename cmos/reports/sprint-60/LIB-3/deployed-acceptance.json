@@ -1,0 +1,109 @@
+{
+  "verified_at": "2026-09-29T21:25:29.024Z",
+  "serving_commit": "4d64190ff1fb126fe0b1a9b3b41b3d8febae1c47",
+  "receipts": [
+    {
+      "basis": "planning_brief",
+      "project_id": "f254b254-3a3a-45d0-b088-973d1674bc5d",
+      "original_sha256": "46969e638aea9c653465a604df30a829d8ae9e9d173c47e6faebd061d3246b9b",
+      "accepted_sha256": "2b54805d283bde9443248ff4f5c877d895eb97db85665a13a535c235de6536ed",
+      "restored_sha256": "46969e638aea9c653465a604df30a829d8ae9e9d173c47e6faebd061d3246b9b",
+      "proposal_id": "82a68143-6ab3-4046-870e-b2bc204b826c",
+      "model": "gpt-5.1",
+      "usage": {
+        "prompt_tokens": 154,
+        "completion_tokens": 102,
+        "total_tokens": 256
+      },
+      "coverage": {
+        "readable_chunks": 0,
+        "eligible_chunks": 0,
+        "used_chunks": 0,
+        "excluded_chunks": 0,
+        "limited": false,
+        "chunk_limit": 12,
+        "character_limit": 24000
+      },
+      "source_links": [],
+      "draft_no_write": true,
+      "accept_replay_no_write": true,
+      "restore_replay_no_write": true,
+      "accepted_revision": 1,
+      "restored_revision": 2
+    },
+    {
+      "basis": "corpus",
+      "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+      "original_sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "accepted_sha256": "7ca1e523663a0c527c991d70b36ca1687e717d2e13687b1244b351027e8d9f25",
+      "restored_sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "proposal_id": "d63cf20c-48a9-47aa-a0f2-031b91040fc5",
+      "model": "gpt-5.1",
+      "usage": {
+        "prompt_tokens": 5091,
+        "completion_tokens": 360,
+        "total_tokens": 5451
+      },
+      "coverage": {
+        "readable_chunks": 360,
+        "eligible_chunks": 352,
+        "used_chunks": 7,
+        "excluded_chunks": 8,
+        "limited": true,
+        "chunk_limit": 12,
+        "character_limit": 24000
+      },
+      "source_links": [
+        {
+          "marker": 1,
+          "document_id": "04ffc800-85cf-4a49-bcec-a856644796a8",
+          "chunk_id": "495844eb-ec3b-42d4-81b8-d2d2005c62f6",
+          "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=495844eb-ec3b-42d4-81b8-d2d2005c62f6&index=0"
+        },
+        {
+          "marker": 2,
+          "document_id": "04ffc800-85cf-4a49-bcec-a856644796a8",
+          "chunk_id": "edd589df-4319-40c6-95a5-8cc5a03f17dd",
+          "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=edd589df-4319-40c6-95a5-8cc5a03f17dd&index=1"
+        },
+        {
+          "marker": 3,
+          "document_id": "04ffc800-85cf-4a49-bcec-a856644796a8",
+          "chunk_id": "6649d184-8e26-4a27-8bc9-7642021c0bb3",
+          "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=6649d184-8e26-4a27-8bc9-7642021c0bb3&index=2"
+        },
+        {
+          "marker": 4,
+          "document_id": "04ffc800-85cf-4a49-bcec-a856644796a8",
+          "chunk_id": "8471a8b8-ace5-476c-aa3e-6323a21e98f3",
+          "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=8471a8b8-ace5-476c-aa3e-6323a21e98f3&index=3"
+        },
+        {
+          "marker": 5,
+          "document_id": "04ffc800-85cf-4a49-bcec-a856644796a8",
+          "chunk_id": "22b1e76a-bfb2-48cd-b006-97fe9fcb1de8",
+          "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=22b1e76a-bfb2-48cd-b006-97fe9fcb1de8&index=4"
+        },
+        {
+          "marker": 6,
+          "document_id": "04ffc800-85cf-4a49-bcec-a856644796a8",
+          "chunk_id": "e9d4c409-16c7-4af1-9ced-23d9d1f05774",
+          "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=e9d4c409-16c7-4af1-9ced-23d9d1f05774&index=5"
+        },
+        {
+          "marker": 7,
+          "document_id": "04ffc800-85cf-4a49-bcec-a856644796a8",
+          "chunk_id": "22dc10c0-b9ea-401c-9e00-aa6de3560a20",
+          "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=22dc10c0-b9ea-401c-9e00-aa6de3560a20&index=6"
+        }
+      ],
+      "draft_no_write": true,
+      "accept_replay_no_write": true,
+      "restore_replay_no_write": true,
+      "accepted_revision": 1,
+      "restored_revision": 2
+    }
+  ],
+  "verification": "Agent acceptance, not Derek personal acceptance",
+  "original_descriptions_restored": true
+}

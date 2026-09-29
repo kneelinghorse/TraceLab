@@ -1,0 +1,20 @@
+{
+  "verified_at": "2026-09-29T21:28:40.795746+00:00",
+  "services": [
+    {
+      "service": "TraceLab",
+      "deployment_id": "9888536f-b6b1-46a6-a3d6-322ab7db729f",
+      "status": "SUCCESS",
+      "commit": "4d64190ff1fb126fe0b1a9b3b41b3d8febae1c47"
+    },
+    {
+      "service": "frontend",
+      "deployment_id": "11164448-fe56-4334-a5bd-4fd469cae1b5",
+      "status": "SUCCESS",
+      "commit": "4d64190ff1fb126fe0b1a9b3b41b3d8febae1c47"
+    }
+  ],
+  "new_environment_variables": [],
+  "post_deploy_smoke": "https://github.com/kneelinghorse/TraceLab/actions/runs/36632588275",
+  "post_deploy_smoke_conclusion": "success"
+}

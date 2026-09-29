@@ -195,7 +195,7 @@ Every open next-step was carried to a Sprint 60 shell, 23 in all. They include R
 
 **Goal:** Finish the remaining Librarian capabilities and accept the complete journey on the deployed build. Derek asked to detail Sprint 60 for a fresh build session and "wrap up the librarian arc and make sure its all ready to go." He chose **one selected project** for organisation and duplicate suggestions. Decision **#551** records the plan; the [build handoff](../planning/sprint-60-HANDOFF.md) names the implementation seams, validation contract and carried-item dispositions. CMOS holds the full mission criteria.
 
-**REPORT-1 is deployed and verified** ([receipt](../reports/sprint-60/REPORT-1/README.md)); the five following missions remain **Queued**. **LIB-3 is next**, in a fresh build session. Starting REPORT-1 opened the sprint on 2026-09-29. Each mission gets a fresh build session and is merged, deployed and verified before the next begins; the Requires chain records that sequence.
+**REPORT-1 and LIB-3 are deployed and verified** ([report receipt](../reports/sprint-60/REPORT-1/README.md), [description receipt](../reports/sprint-60/LIB-3/README.md)); the four following missions remain **Queued**. **DUP-1 is next**, in a fresh build session. Starting REPORT-1 opened the sprint on 2026-09-29. Each mission gets a fresh build session and is merged, deployed and verified before the next begins; the Requires chain records that sequence. CMOS owns closure status.
 
 **Simplified 2026-09-18 by decision #515.** Derek ruled out autonomous writes permanently, not as a staging decision:
 
@@ -294,6 +294,8 @@ Add to this list rather than resolving items silently.
 ---
 
 ## Change Log
+
+- **2026-09-29 UTC, LIB-3 deployed and verified.** [PR #391](https://github.com/kneelinghorse/TraceLab/pull/391), serving commit `4d64190`, adds editable project-description drafts, signed caller/project/source-bound acceptance, retained provenance and guarded one-level restore. PostgreSQL migration/concurrency tests and mutation proofs passed; all required CI gates passed with existing skips disclosed in the [receipt](../reports/sprint-60/LIB-3/README.md). Live empty/populated projects proved draft-no-write, idempotent acceptance and exact restore; Light/mobile and Dark/desktop opened all seven source chunks by keyboard. Original descriptions were restored. This is agent verification, not Derek's personal acceptance. DUP-1 follows in a fresh session; four missions and the arc acceptance remain open.
 
 - **2026-09-29 UTC, REPORT-1 deployed and verified.** [PR #389](https://github.com/kneelinghorse/TraceLab/pull/389), serving commit `93d71fc`, adds durable validated citation maps, scoped reads and export destinations. Both writers, legacy gaps, source revocation/deletion and cache identity are covered by regressions; PostgreSQL and mutation checks passed. Published MCP 2.1.0 created one report, reopened it and preserved all three citations through every export; deployed Light/mobile and Dark/desktop opened every exact chunk. [Receipt](../reports/sprint-60/REPORT-1/README.md) discloses CI skips and quarantine. LIB-3 follows in a fresh session; the arc remains open.
 
