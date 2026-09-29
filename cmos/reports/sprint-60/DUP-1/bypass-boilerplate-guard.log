@@ -1,0 +1,23 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_one_shared_boilerplate_paragraph_is_not_a_near_duplicate _________
+
+duplicate_client = <starlette.testclient.TestClient object at 0x1166fb110>
+project = <app.models.project.Project object at 0x116b37bd0>
+db_session = <sqlalchemy.orm.session.Session object at 0x116b37b50>
+
+    def test_one_shared_boilerplate_paragraph_is_not_a_near_duplicate(duplicate_client, project, db_session):
+        # Most text overlaps: the paragraph-distribution guard, not just threshold,
+        # must prevent a shared disclaimer from turning distinct notes into advice.
+        add_document(db_session, project, TEXT["boilerplate"] + "\n\nResearchers could not find the upload button during onboarding and requested a clearer project header with a visible destination selector.")
+        add_document(db_session, project, TEXT["boilerplate"] + "\n\nMechanics could not locate replacement door seals during inspections and requested an accurate warehouse inventory with regional availability and compatibility information.")
+>       assert scan(duplicate_client, project)["candidates"] == []
+E       AssertionError: assert [{'basis': '8...fect'}], ...}] == []
+E
+E         Left contains one more item: {'basis': '83% five-word phrase overlap, with substantial shared text in at least two distinct passages in each docume...n shortened for readability. Reviewers should consult the original records before making decisions that affect'}], ...}
+E         Use -v to get more diff
+
+tests/test_librarian_duplicates.py:84: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_librarian_duplicates.py::test_one_shared_boilerplate_paragraph_is_not_a_near_duplicate
+1 failed, 14 warnings in 38.96s

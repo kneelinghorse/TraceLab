@@ -1967,6 +1967,40 @@
       "classification": "rest-only-by-design",
       "baseline": "new",
       "rationale": "LIB-3: human-principal description proposal, explicit review/accept and guarded restore. Decision #553; conversational proposal workflows remain REST-only under S60 decision #551."
+    },
+    {
+      "id": "frontend/src/lib/api/librarian-duplicates.ts#duplicateApi.compare:POST:/librarian/duplicates/compare",
+      "api_file": "frontend/src/lib/api/librarian-duplicates.ts",
+      "operation": "duplicateApi.compare",
+      "source_line": 32,
+      "method": "POST",
+      "path": "/api/v1/librarian/duplicates/compare",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/librarian/DuplicateReview.tsx",
+        "frontend/src/pages/librarian.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "new",
+      "rationale": "DUP-1: explicit human-principal selected-project text comparison and review. Deterministic read-only suggestions; no remediation writes. Decisions #551/#554 keep conversational proposal operations REST-only."
+    },
+    {
+      "id": "frontend/src/lib/api/librarian-duplicates.ts#duplicateApi.scan:POST:/librarian/duplicates/scan",
+      "api_file": "frontend/src/lib/api/librarian-duplicates.ts",
+      "operation": "duplicateApi.scan",
+      "source_line": 29,
+      "method": "POST",
+      "path": "/api/v1/librarian/duplicates/scan",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/librarian/DuplicateReview.tsx",
+        "frontend/src/pages/librarian.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "new",
+      "rationale": "DUP-1: explicit human-principal selected-project text comparison and review. Deterministic read-only suggestions; no remediation writes. Decisions #551/#554 keep conversational proposal operations REST-only."
     }
   ]
 }

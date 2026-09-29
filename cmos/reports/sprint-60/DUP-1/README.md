@@ -1,0 +1,24 @@
+# DUP-1 — explicit document duplicate review
+
+The [comparison contract](../../../contracts/librarian-duplicates.md) implements decision #554 and the [Sprint 60 handoff](../../../planning/sprint-60-HANDOFF.md). CMOS owns mission status. Live acceptance is required before completion.
+
+The Librarian compares one selected project's live readable extracted text only when asked. Exact normalized text and conservative probable overlap are distinct. Stable source identities, excerpts, method and coverage are visible; fresh comparison rechecks access, project membership and content identity. Keep-both/dismiss affect only the caller's browser review. There is no merge, delete, reparent, archive, graph/collection write, model call, background scan or new index.
+
+The bounded method examines at most 100 documents of at most 20,000 characters and returns at most 20 pairs. Exact comparison uses complete non-empty Unicode/case/whitespace-normalized text. Probable comparison requires 80% five-word-phrase overlap, similar lengths, 40 shared phrases and substantial support across two distinct paragraphs in each document. Single-passage/short texts are exact-only; paraphrases may be missed. A numeric score measures lexical overlap, not a probability. Empty/overlong inputs, scan limits and candidate truncation remain explicit. No migration, dependency, new environment variable or MCP package changes were needed.
+
+## Local verification
+
+- Backend duplicate, description, Librarian mission/Q&A and provenance regressions: **81 passed**, no skips (`dup1-regressions.log`). New tests prohibit outbound socket connections; existing Librarian cases use scripted model seams. Root fixtures force isolated SQLite; every invocation pins Qdrant to loopback port 9. Python suites ran sequentially.
+- Calibration and scope tests include exact/edited positives, identical-title/different-content and related-topic negatives, a dominant shared disclaimer, short Unicode text, empty and overlong matching prefixes, scan/result limits, deleted/reparented/changed sources, lost member access, forged comparison IDs and unknown write fields. SQL listeners verify no INSERT/UPDATE/DELETE occurs during scan/replay/compare.
+- Mutation proofs: bypassing the paragraph-distribution guard admits the dominant disclaimer; bypassing the selected-project query filter exposes a foreign row before preparation. Each intended test fails; `mutation-proof.json` records source restoration. The disclaimer fixture was strengthened above the overlap threshold so the paragraph guard is what makes the regression pass.
+- Frontend full run: **275 passed**, no skips (`dup1-all-ui.log`). Seven new review tests cover explicit scan, persistence, local dismissal/keep-both, fresh comparison/focus, failed comparisons/scans, and account/project/late-response isolation. A sibling React key collision with the description panel was found and fixed using distinct panel key prefixes.
+- Built browser: **12 passed** across description and duplicate workflows, Light/Dark at 390/820/1440 (`dup1-browser.log`). Final duplicate-only screenshot check: **6 passed** (`dup1-browser-final.log`). Keyboard focus, reload without scanning, fresh comparison, keep-both persistence, no corpus requests, no horizontal overflow or serious/critical axe violations. Mobile Light and desktop Dark captures inspected.
+- Production build, TypeScript, changed-file ESLint/Ruff, foundational-reference validation and parity audit pass. Parity: **109 operations / 9 tools / 50 actions**, including two REST-only-by-design review operations. The six new viewport/theme cases are included in the required production-build CI job.
+
+The initial red test run failed because the new service did not yet exist, before implementation. Existing browser-data age, Python deprecation and test timeout warnings remain in logs. Synthetic test telemetry appended to the historical sprint-04 file was discarded after inspection; this directory retains mission-specific results.
+
+## Deployed acceptance
+
+Pending merge and deployment. `deployed_acceptance.mjs` first verifies both exact serving commits, then creates one named synthetic user-feedback project and six documents through existing upload/processing operations. Fixture IDs are recorded for resumability. Its read-only phase requires one exact pair, two edited-overlap pairs, no distinct/disclaimer false positives, current source links, stable repeat results and unchanged document/chunk/tag/relationship/collection snapshots. Fixture ingestion is separate from duplicate analysis, which performs no model calls.
+
+`deployed_browser.mjs` uses real deployed responses in mobile Light and desktop Dark, verifies no automatic scan, opens every comparison's source links by keyboard, preserves keep-both/dismiss across reload and records any unexpected write request. Credentials are never logged. This is agent verification, not Derek's personal acceptance.

@@ -1,0 +1,20 @@
+Running 12 tests using 1 worker
+
+(node:71547) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:71547) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium] › tests/e2e/librarian-description.spec.ts:5:7 › reviewed project description light 390 (9.2s)
+  ✓   2 [chromium] › tests/e2e/librarian-description.spec.ts:5:7 › reviewed project description light 820 (5.5s)
+  ✓   3 [chromium] › tests/e2e/librarian-description.spec.ts:5:7 › reviewed project description light 1440 (5.1s)
+  ✓   4 [chromium] › tests/e2e/librarian-description.spec.ts:5:7 › reviewed project description dark 390 (9.6s)
+  ✓   5 [chromium] › tests/e2e/librarian-description.spec.ts:5:7 › reviewed project description dark 820 (10.9s)
+  ✓   6 [chromium] › tests/e2e/librarian-description.spec.ts:5:7 › reviewed project description dark 1440 (8.4s)
+  ✓   7 [chromium] › tests/e2e/librarian-duplicates.spec.ts:5:7 › duplicate review light 390 (6.8s)
+  ✓   8 [chromium] › tests/e2e/librarian-duplicates.spec.ts:5:7 › duplicate review light 820 (5.1s)
+  ✓   9 [chromium] › tests/e2e/librarian-duplicates.spec.ts:5:7 › duplicate review light 1440 (4.0s)
+  ✓  10 [chromium] › tests/e2e/librarian-duplicates.spec.ts:5:7 › duplicate review dark 390 (3.0s)
+  ✓  11 [chromium] › tests/e2e/librarian-duplicates.spec.ts:5:7 › duplicate review dark 820 (4.4s)
+  ✓  12 [chromium] › tests/e2e/librarian-duplicates.spec.ts:5:7 › duplicate review dark 1440 (6.5s)
+
+  12 passed (1.8m)
