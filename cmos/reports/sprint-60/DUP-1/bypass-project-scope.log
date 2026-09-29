@@ -1,0 +1,143 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________ test_project_scope_precedes_analysis_even_for_admin ______________
+
+duplicate_client = <starlette.testclient.TestClient object at 0x111c256d0>
+project = <app.models.project.Project object at 0x111db3dd0>
+db_session = <sqlalchemy.orm.session.Session object at 0x111db3d90>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x111d29590>
+
+    def test_project_scope_precedes_analysis_even_for_admin(duplicate_client, project, db_session, monkeypatch):
+        owner = db_session.query(User).first()
+        owner.role = "admin"
+        db_session.commit()
+        other = Project(name="Other")
+        db_session.add(other)
+        db_session.commit()
+        add_document(db_session, project, TEXT["feedback"])
+        secret = add_document(db_session, other, "SECRET OTHER PROJECT")
+        monkeypatch.setattr(settings, "rbac_enabled", True)
+        original = duplicates._prepare
+
+        def bounded(row):
+            assert row.id != secret.id, "Filtering after text analysis leaks the other project"
+            return original(row)
+
+        monkeypatch.setattr(duplicates, "_prepare", bounded)
+>       assert scan(duplicate_client, project)["coverage"]["readable_documents"] == 1
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_librarian_duplicates.py:182:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests/test_librarian_duplicates.py:46: in scan
+    response = client.post("/api/v1/librarian/duplicates/scan", json={"project_id": str(project.id)})
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/starlette/testclient.py:546: in post
+    return super().post(
+.venv/lib/python3.11/site-packages/httpx/_client.py:1144: in post
+    return self.request(
+.venv/lib/python3.11/site-packages/starlette/testclient.py:445: in request
+    return super().request(
+.venv/lib/python3.11/site-packages/httpx/_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/httpx/_client.py:914: in send
+    response = self._send_handling_auth(
+.venv/lib/python3.11/site-packages/httpx/_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+.venv/lib/python3.11/site-packages/httpx/_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/httpx/_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/starlette/testclient.py:348: in handle_request
+    raise exc
+.venv/lib/python3.11/site-packages/starlette/testclient.py:345: in handle_request
+    portal.call(self.app, scope, receive, send)
+.venv/lib/python3.11/site-packages/anyio/from_thread.py:334: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.11.9/lib/python3.11/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.11.9/lib/python3.11/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+.venv/lib/python3.11/site-packages/anyio/from_thread.py:259: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/fastapi/applications.py:1160: in __call__
+    await super().__call__(scope, receive, send)
+.venv/lib/python3.11/site-packages/starlette/applications.py:107: in __call__
+    await self.middleware_stack(scope, receive, send)
+.venv/lib/python3.11/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+.venv/lib/python3.11/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+app/main.py:100: in __call__
+    await self.app(scope, receive, send)
+.venv/lib/python3.11/site-packages/starlette/middleware/cors.py:87: in __call__
+    await self.app(scope, receive, send)
+.venv/lib/python3.11/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+.venv/lib/python3.11/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+.venv/lib/python3.11/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+.venv/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+.venv/lib/python3.11/site-packages/starlette/routing.py:716: in __call__
+    await self.middleware_stack(scope, receive, send)
+.venv/lib/python3.11/site-packages/starlette/routing.py:736: in app
+    await route.handle(scope, receive, send)
+.venv/lib/python3.11/site-packages/starlette/routing.py:290: in handle
+    await self.app(scope, receive, send)
+.venv/lib/python3.11/site-packages/fastapi/routing.py:130: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+.venv/lib/python3.11/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+.venv/lib/python3.11/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+.venv/lib/python3.11/site-packages/fastapi/routing.py:116: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/fastapi/routing.py:670: in app
+    raw_response = await run_endpoint_function(
+.venv/lib/python3.11/site-packages/fastapi/routing.py:326: in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/starlette/concurrency.py:32: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/anyio/to_thread.py:63: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py:2502: in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py:986: in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+app/api/v1/librarian.py:279: in librarian_duplicate_scan
+    return scan_duplicates(db, current_user, project)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/services/librarian_duplicates.py:114: in scan_duplicates
+    prepared = [text for row in rows if (text := _prepare(row)) is not None]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/services/librarian_duplicates.py:114: in <listcomp>
+    prepared = [text for row in rows if (text := _prepare(row)) is not None]
+                                                 ^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+row = (UUID('8b252b34-f865-40ba-8b1c-9321369d4f1f'), 'Interview notes', 20, 'SECRET OTHER PROJECT')
+
+    def bounded(row):
+>       assert row.id != secret.id, "Filtering after text analysis leaks the other project"
+E       AssertionError: Filtering after text analysis leaks the other project
+E       assert UUID('8b252b34-f865-40ba-8b1c-9321369d4f1f') != UUID('8b252b34-f865-40ba-8b1c-9321369d4f1f')
+E        +  where UUID('8b252b34-f865-40ba-8b1c-9321369d4f1f') = (UUID('8b252b34-f865-40ba-8b1c-9321369d4f1f'), 'Interview notes', 20, 'SECRET OTHER PROJECT').id
+E        +  and   UUID('8b252b34-f865-40ba-8b1c-9321369d4f1f') = <app.models.document.Document object at 0x111d3a890>.id
+
+tests/test_librarian_duplicates.py:178: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_librarian_duplicates.py::test_project_scope_precedes_analysis_even_for_admin
+1 failed, 14 warnings in 51.79s

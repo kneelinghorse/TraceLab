@@ -1,9 +1,8 @@
 """The Librarian's HTTP surface (LIB-1).
 
-Three calls, all human-principal only and all authorized against the project
-with the caller's own principal (criterion 7): a conversational turn, a mission
-draft, and the explicit creation of that draft as a pristine mission. A turn in
-answer mode (QA-1) answers a question from the project's documents instead.
+Human-principal conversations, mission drafts, reviewed project descriptions
+and read-only duplicate comparisons, authorized with the caller's own principal.
+A turn in answer mode answers a question from the project's documents instead.
 """
 
 from __future__ import annotations
@@ -35,6 +34,7 @@ from app.schemas.librarian_description import (
     DescriptionDraftRequest,
     DescriptionRestoreRequest,
 )
+from app.schemas.librarian_duplicates import DuplicateCompareRequest, DuplicateScanRequest
 from app.services.librarian import (
     LibrarianConflict,
     LibrarianDraftError,
@@ -46,6 +46,7 @@ from app.services.librarian_description import (
     draft_description,
     restore_description,
 )
+from app.services.librarian_duplicates import compare_duplicates, scan_duplicates
 from app.services.librarian_model import (
     APIError,
     LibrarianUnavailable,
@@ -263,5 +264,32 @@ def librarian_description_restore(
     project = _load_project(db, current_user, payload.project_id, "update")
     try:
         return restore_description(db, current_user, project, payload.proposal_id)
+    except LibrarianConflict as exc:
+        raise HTTPException(409, detail=str(exc)) from exc
+
+
+@router.post("/duplicates/scan")
+def librarian_duplicate_scan(
+    payload: DuplicateScanRequest,
+    current_user: AuthenticatedUser = Depends(require_authenticated_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    _require_human(current_user)
+    project = _load_project(db, current_user, payload.project_id, "read")
+    return scan_duplicates(db, current_user, project)
+
+
+@router.post("/duplicates/compare")
+def librarian_duplicate_compare(
+    payload: DuplicateCompareRequest,
+    current_user: AuthenticatedUser = Depends(require_authenticated_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    _require_human(current_user)
+    project = _load_project(db, current_user, payload.project_id, "read")
+    try:
+        return compare_duplicates(db, current_user, project, payload.document_ids, payload.candidate_id)
+    except LookupError as exc:
+        raise HTTPException(404, detail=str(exc)) from exc
     except LibrarianConflict as exc:
         raise HTTPException(409, detail=str(exc)) from exc

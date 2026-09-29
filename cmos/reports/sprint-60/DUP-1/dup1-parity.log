@@ -1,0 +1,20 @@
+{
+  "totals": {
+    "operations": 109,
+    "live": 104,
+    "dead": 5,
+    "tools": 9,
+    "actions": 50,
+    "classifications": {
+      "covered": 21,
+      "partial": 0,
+      "closed-MCP-1": 17,
+      "closed-MCP-2": 7,
+      "rest-only-by-design": 59,
+      "deferred-MCP-2": 0,
+      "needs-derek": 0,
+      "dead-client-code": 5
+    }
+  },
+  "errors": []
+}

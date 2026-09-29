@@ -1,0 +1,15 @@
+{
+  "mutants": [
+    {
+      "mutation": "bypass-boilerplate-guard",
+      "test": "test_one_shared_boilerplate_paragraph_is_not_a_near_duplicate",
+      "exit_code": 1
+    },
+    {
+      "mutation": "bypass-project-scope",
+      "test": "test_project_scope_precedes_analysis_even_for_admin",
+      "exit_code": 1
+    }
+  ],
+  "source_restored": true
+}

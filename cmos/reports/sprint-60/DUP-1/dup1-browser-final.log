@@ -1,0 +1,14 @@
+Running 6 tests using 1 worker
+
+(node:78517) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:78517) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [chromium] › tests/e2e/librarian-duplicates.spec.ts:5:7 › duplicate review light 390 (3.8s)
+  ✓  2 [chromium] › tests/e2e/librarian-duplicates.spec.ts:5:7 › duplicate review light 820 (2.6s)
+  ✓  3 [chromium] › tests/e2e/librarian-duplicates.spec.ts:5:7 › duplicate review light 1440 (3.3s)
+  ✓  4 [chromium] › tests/e2e/librarian-duplicates.spec.ts:5:7 › duplicate review dark 390 (2.5s)
+  ✓  5 [chromium] › tests/e2e/librarian-duplicates.spec.ts:5:7 › duplicate review dark 820 (2.3s)
+  ✓  6 [chromium] › tests/e2e/librarian-duplicates.spec.ts:5:7 › duplicate review dark 1440 (2.5s)
+
+  6 passed (22.1s)
