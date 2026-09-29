@@ -19,7 +19,7 @@ from app.core.config import settings
 from app.main import app
 from app.services import support_inbox
 
-SECRET = "whsec_" + base64.b64encode(b"s97-m02-synthetic-signing-key").decode()
+SECRET = "whsec_" + base64.b64encode(b"s97-m02-synthetic-signing-key").decode()  # secret-scan: allow -- synthetic signing key fixture
 URL = "/api/v1/webhooks/resend-inbound"
 RECEIVED = f"{support_inbox.RESEND_API}/emails/receiving/rcv-1"
 SEND = f"{support_inbox.RESEND_API}/emails"
