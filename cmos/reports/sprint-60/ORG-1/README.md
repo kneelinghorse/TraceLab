@@ -12,6 +12,8 @@ The Librarian proposes bounded groups of actual saved excerpts from one selected
 - The parity inventory has 112 operations and no errors. Foundational references and changed Python lint pass. Existing warnings are retained in the logs; no formatting sweep was applied.
 - Initial focused tests failed against missing routes. Deliberately removing caller binding, project filtering or the in-transaction attachment recheck fails the corresponding intent assertion; [mutation evidence](mutation-proof.json) records restoration. Source bodies, credentials and signed proposals are excluded from committed test output.
 
+A clean-checkout run of the full backend CI invocation found one missing OODS presentation mapping for the new `librarian_generated` API flag: 2,960 passed, 3 existing skips and 12 quarantine exclusions, one failure. The mapping was added following the existing consumer-only convention; all 18 OODS contract tests then passed. The slow original CI run was canceled after this concrete local failure was found. Its log showed continued progress through 57%, rather than a proven deadlock. Fresh CI on the corrected revision is required.
+
 ## Deployed acceptance
 
 Pending merge and exact-build deployment. Do not mark ORG-1 complete from local tests alone.

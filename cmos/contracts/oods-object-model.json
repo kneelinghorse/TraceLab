@@ -1577,6 +1577,10 @@
           "instructions": {
             "annotation": "str | None",
             "mapping": "Collection context instructions; UX-8 consumer section, no Forge registry mutation."
+          },
+          "librarian_generated": {
+            "annotation": "<class 'bool'>",
+            "mapping": "ORG-1 consumer flag: show the Collection origin panel; its separate endpoint resolves generated provenance and currently readable source links. No Forge registry mutation."
           }
         },
         "CollectionListResponse": {
