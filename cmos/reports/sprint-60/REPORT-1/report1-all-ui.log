@@ -1,0 +1,390 @@
+
+> frontend@0.1.0 test:unit
+> vitest --run
+
+
+ RUN  v3.2.4 /Users/systemsystems/portfolio/TraceLab/frontend
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ ✓ src/__tests__/admin/spaces.test.tsx (18 tests) 3607ms
+   ✓ SpacesAdmin > adds a member  521ms
+   ✓ SpacesAdmin > resets the member picker when switching spaces  601ms
+   ✓ SpacesAdmin > ignores a stale roster response when the space is switched mid-fetch  494ms
+ ✓ src/__tests__/graph.test.tsx (16 tests) 3345ms
+   ✓ relationship accessibility and truthful totals > gives the list every diagram node and every edge, including repeated targets  956ms
+   ✓ the relationship page > finds roots across all six types without sending an unscoped neighborhood request  971ms
+   ✓ the relationship page > loads depth 1 from the URL and pushes root/depth changes into history  401ms
+   ✓ the relationship page > reports root-search failure with retry and its own empty state  311ms
+ ✓ src/__tests__/admin/users.test.tsx (15 tests) 5209ms
+   ✓ UsersAdmin — list + lifecycle > lists users from the API  548ms
+   ✓ UsersAdmin — list + lifecycle > creates a user at a role and reloads the list  679ms
+   ✓ UsersAdmin — list + lifecycle > requires confirmation (with the cascade warning) before deleting  697ms
+   ✓ UsersAdmin — owner-gating > hides the owner role option from an admin caller  421ms
+   ✓ UsersAdmin — error surfacing > blocks submit and shows a field error when the display name is blank  317ms
+   ✓ UsersAdmin — error surfacing > surfaces a 403 from a role change  525ms
+ ✓ src/__tests__/evidence.test.tsx (9 tests) 4870ms
+   ✓ the evidence browser > marks the whole opened group seen once, not once per page (BADGE-1)  1655ms
+   ✓ the evidence browser > preserves Home's mission and session scope through pagination, then clears it when switching projects  586ms
+   ✓ the evidence browser > submits search with all filters and counts results independently of the visible page  715ms
+   ✓ the evidence browser > opens entry provenance and uses accessible source-history totals  688ms
+   ✓ the evidence browser > requires an explicit confirmation before promoting the entire session and permits retry  481ms
+stderr | src/__tests__/librarian.test.tsx > Librarian page, asking the documents > sends the chosen budget and links each citation to the chunk it came from
+An update to LibrarianContent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to LibrarianContent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/librarian.test.tsx > Librarian page, asking the documents > asks for a short answer unless the user chooses a full synthesis
+An update to LibrarianContent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to LibrarianContent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/__tests__/mission-authoring.test.tsx (9 tests) 7901ms
+   ✓ saves and previews inline, preserves authored fields, and submits the same pristine draft  2554ms
+   ✓ retains a saved draft after failed submission and maps lint errors to the field  956ms
+   ✓ normalizes optional empty loop inputs and blocks malformed JSON before saving  1609ms
+   ✓ does not reset a run after an ambiguous submission response  1000ms
+   ✓ seeds collection instructions and document references into a reviewed draft before submission  580ms
+   ✓ shows the collection destination after project options load and retains user changes  552ms
+   ✓ preserves document identity when editing or removing references with duplicate filenames  412ms
+stderr | src/__tests__/librarian.test.tsx > Librarian page, asking the documents > renders a refusal as a note that asserts nothing, and keeps it that way after a reload
+An update to LibrarianContent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to LibrarianContent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+(node:4494) TimeoutNaNWarning: NaN is not a number.
+Timeout duration was set to 1.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/__tests__/librarian.test.tsx (19 tests) 8630ms
+   ✓ Librarian page > renders world knowledge as prose and corpus claims as cited passages  1591ms
+   ✓ Librarian page > shows a withheld notice instead of an unproven claim and keeps talking without a project  931ms
+   ✓ Librarian page > drafts a mission from the transcript, shows the compiled contract, and creates it on confirmation  1165ms
+   ✓ Librarian page > lets a user with no project create one inline and selects it  640ms
+   ✓ Librarian page > keeps the conversation and project when the page is left and reopened, until the user starts over  760ms
+   ✓ Librarian page, asking the documents > renders a refusal as a note that asserts nothing, and keeps it that way after a reload  431ms
+   ✓ Librarian page, listing the chunks > puts the phrase in the URL and never sends it to the Librarian model  354ms
+   ✓ Librarian page, listing the chunks > keeps the list as one collection in rank order, and a retry adds only what is missing  338ms
+   ✓ Librarian page, listing the chunks > saves the phrase as a saved search with its project and list size  325ms
+ ✓ src/__tests__/document-detail.test.tsx (12 tests) 2696ms
+   ✓ opens on the Text tab and shows the full text from the content endpoint, not the preview  727ms
+   ✓ moves stats and metadata to Overview and loads chunks only on the Chunks tab  531ms
+stderr | src/components/CommandPalette.test.tsx > scoped palette data and actions > keeps old lookup results out of a new query and a new account
+An update to Navigation inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to Navigation inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/home.test.tsx > Home's recent activity > marks an item viewed explicitly or by opening it, then refreshes from the server
+Error: Not implemented: navigation (except hash changes)
+    at module.exports (/Users/systemsystems/portfolio/TraceLab/frontend/node_modules/jsdom/lib/jsdom/browser/not-implemented.js:9:17)
+    at navigateFetch (/Users/systemsystems/portfolio/TraceLab/frontend/node_modules/jsdom/lib/jsdom/living/window/navigation.js:77:3)
+    at exports.navigate (/Users/systemsystems/portfolio/TraceLab/frontend/node_modules/jsdom/lib/jsdom/living/window/navigation.js:55:3)
+    at Timeout._onTimeout (/Users/systemsystems/portfolio/TraceLab/frontend/node_modules/jsdom/lib/jsdom/living/nodes/HTMLHyperlinkElementUtils-impl.js:80:7)
+    at listOnTimeout (node:internal/timers:608:17)
+    at processTimers (node:internal/timers:543:7) undefined
+
+ ✓ src/components/CommandPalette.test.tsx (6 tests) 4570ms
+   ✓ scoped palette data and actions > queries names only while open and exposes every server-returned entity link  1495ms
+   ✓ scoped palette data and actions > pages a full scoped group and resets its page for a new name  1102ms
+   ✓ scoped palette data and actions > keeps a quickly reopened palette active when the previous native close event arrives late  535ms
+   ✓ scoped palette data and actions > keeps old lookup results out of a new query and a new account  701ms
+   ✓ scoped palette data and actions > runs a saved search in the Librarian, not the retired /search alias, and exposes useful actions  546ms
+ ✓ src/__tests__/home.test.tsx (5 tests) 2431ms
+   ✓ Home's recent activity > lists what happened newest first with status as a label only, and keeps missing progress unknown  1274ms
+   ✓ Home's recent activity > marks an item viewed explicitly or by opening it, then refreshes from the server  476ms
+   ✓ Home's recent activity > loads more activity on demand and retains stale data when refresh fails  392ms
+stderr | src/components/AppShell.test.tsx > the shared shell > opens focused search from the Home entry point
+An update to Navigation inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to Navigation inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to CommandPalette inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/components/AppShell.test.tsx > the shared shell > provides one main and banner, and marks only the deepest navigation route current
+An update to Navigation inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to Navigation inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/components/AppShell.test.tsx > the shared shell > keeps admin destinations out of both navigation and command search for non-admins
+An update to Navigation inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to Navigation inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to CommandPalette inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/components/AppShell.test.tsx > the shared shell > opens focused keyboard search and submits an encoded research query ({"ctrlKey":true})
+An update to Navigation inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to Navigation inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/components/AppShell.test.tsx > the shared shell > opens focused keyboard search and submits an encoded research query ({"metaKey":true})
+An update to Navigation inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to Navigation inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/__tests__/admin/observability.test.tsx (6 tests) 2344ms
+   ✓ admin observability > renders server totals separately from recent rows and preserves unknown telemetry  1032ms
+   ✓ admin observability > preserves correction actions at the new route and exposes total dead letters without a fake clear action  823ms
+stderr | src/components/AppShell.test.tsx > the shared shell > jumps to a section and restores drawer state on close
+An update to Navigation inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to Navigation inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/components/AppShell.test.tsx (8 tests) 3994ms
+   ✓ the shared shell > opens focused search from the Home entry point  968ms
+   ✓ the shared shell > provides one main and banner, and marks only the deepest navigation route current  313ms
+   ✓ the shared shell > shows new-item counts on the Missions, Evidence and Reports entries in the sidebar and the drawer, hidden at zero  504ms
+   ✓ the shared shell > keeps admin destinations out of both navigation and command search for non-admins  775ms
+   ✓ the shared shell > jumps to a section and restores drawer state on close  936ms
+ ✓ src/__tests__/collection-context.test.tsx (7 tests) 2781ms
+   ✓ edits instructions and links to reviewed authoring without creating a mission  1059ms
+   ✓ pages the full document context and removes only after explicit confirmation  723ms
+   ✓ preserves the report total and resets paging when filters change  338ms
+ ✓ src/contexts/RoleContext.test.tsx (8 tests) 683ms
+ ✓ src/__tests__/hygiene.test.tsx (10 tests) 3666ms
+   ✓ shared feedback and page state > requires explicit acceptance before deletion, preserves failure, and retries through the same confirmation  1523ms
+   ✓ shared feedback and page state > failed documents reads show retry instead of a false empty state  318ms
+   ✓ shared feedback and page state > requests each server collection page without hiding its scoped total  930ms
+ ✓ src/__tests__/missions.test.tsx (13 tests) 6153ms
+   ✓ uses server totals, query filters and recency sorts, and never pins rows by status  748ms
+   ✓ renders draft with actions appropriate to one execution  507ms
+   ✓ renders queued with actions appropriate to one execution  776ms
+   ✓ renders in_progress with actions appropriate to one execution  529ms
+   ✓ renders completed with actions appropriate to one execution  1104ms
+   ✓ renders cancelled with actions appropriate to one execution  589ms
+   ✓ prepares a new run only after confirmation without mutating the old result  489ms
+   ✓ orients a draft reached from the Librarian once, and never a draft opened directly  523ms
+ ✓ src/contexts/ThemeContext.test.tsx (5 tests) 849ms
+   ✓ per-user appearance > offers the accepted shipped palettes and explicitly defers High contrast  461ms
+ ✓ src/components/RequireAdmin.test.tsx (12 tests) 817ms
+   ✓ RequireAdmin — fail-closed denials > denies (fail-closed) but offers a Retry when the /auth/me lookup errored  533ms
+ ✓ src/__tests__/document-upload.test.tsx (4 tests) 1765ms
+   ✓ independent document uploads > keeps a rejected file visible and still uploads the next file  760ms
+   ✓ independent document uploads > retries failed processing on the saved document instead of uploading a duplicate  564ms
+ ✓ src/__tests__/collection-picker.test.tsx (3 tests) 2038ms
+   ✓ adds a document without manufacturing a chunk and pages the complete collection total  1005ms
+   ✓ keeps a created collection when adding its first document fails  567ms
+   ✓ keeps excerpt callers on the existing chunk API and distinguishes collection load failure  462ms
+ ✓ src/__tests__/project-new.test.tsx (3 tests) 1463ms
+   ✓ New project page > shows no Space picker with one Space and sends no workspace_id  825ms
+   ✓ New project page > defaults to My Space, which leaves the placement to the server  534ms
+ ✓ src/lib/api/admin.test.ts (12 tests) 44ms
+ ✓ src/lib/theme.test.ts (7 tests) 35ms
+ ✓ src/__tests__/project-bundles.test.tsx (9 tests) 3254ms
+   ✓ project bundle resources > pages documents using the full server total and current project  1269ms
+   ✓ project bundle resources > gets Collections from its scoped paginated endpoint  352ms
+   ✓ project bundle resources > gets Missions from its scoped paginated endpoint  366ms
+   ✓ personal project shortcuts > waits for the saved server state and keeps a failed pin visibly unpinned  394ms
+ ✓ src/__tests__/document-upload-api.test.ts (3 tests) 28ms
+ ✓ src/lib/route-migrations.test.ts (3 tests) 13ms
+ ✓ src/lib/api/librarian.test.ts (3 tests) 11ms
+ ✓ src/__tests__/mission-run.test.tsx (9 tests) 1725ms
+   ✓ keeps missing observations unknown for draft and never calls empty logs live  552ms
+   ✓ keeps missing observations unknown for blocked and never calls empty logs live  352ms
+   ✓ displays only observed phase and valid steps, with recent event details  375ms
+ ✓ src/contexts/AuthContext.test.tsx (1 test) 184ms
+ ✓ src/lib/route-migration-links.test.ts (2 tests) 11ms
+ ✓ scripts/check-token-colors.test.ts (8 tests) 2922ms
+   ✓ one semantic palette on every surface > rejects a new competing palette utility: dark:bg-surface  309ms
+   ✓ one semantic palette on every surface > rejects a new competing palette utility: dark:prose-invert  505ms
+   ✓ one semantic palette on every surface > accepts token colors that adapt to every theme  481ms
+   ✓ one semantic palette on every surface > rejects CSS apply rules that bypass the shared palette  372ms
+   ✓ one semantic palette on every surface > accepts semantic CSS apply rules  421ms
+ ✓ src/__tests__/document-state.test.ts (6 tests) 27ms
+ ✓ src/components/MarkdownRenderer.test.tsx (2 tests) 735ms
+   ✓ accessible research markdown > announces task status as document content instead of unnamed form controls  646ms
+ ✓ src/lib/api/errors.test.ts (4 tests) 10ms
+ ✓ src/lib/api/timestamps.test.ts (1 test) 3ms
+ ✓ src/__tests__/settings-notifications.test.tsx (3 tests) 557ms
+   ✓ mission email preference on Settings > shows the stored preference and then whatever the server saved  451ms
+ ✓ src/__tests__/mission-timeline.test.tsx (1 test) 207ms
+
+ Test Files  36 passed (36)
+      Tests  262 passed (262)
+   Start at  13:51:24
+   Duration  49.04s (transform 9.42s, setup 25.57s, collect 76.18s, tests 79.58s, environment 82.00s, prepare 16.42s)
+

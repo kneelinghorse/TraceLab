@@ -317,42 +317,33 @@ export default function ReportDetailPage() {
             <MarkdownRenderer content={report.content} />
           </div>
 
-          {/* Citations */}
-          {report.citations && report.citations.length > 0 && (
-            <div className="bg-surface rounded-lg border border-line p-6 mb-6">
-              <h2 className="text-lg font-semibold text-foreground mb-4">
-                Source excerpts ({report.citations.length})
-              </h2>
-              <div className="space-y-3">
-                {report.citations.map((citation, index) => (
-                  <div
-                    key={`${citation.chunk_id}-${index}`}
-                    className="border border-line rounded-lg p-4"
-                  >
-                    <div className="flex items-center gap-2 mb-2">
-                      <code className="text-xs bg-surface px-2 py-0.5 rounded text-secondary">
-                        {citation.chunk_id.slice(0, 8)}...
-                      </code>
-                      {citation.document_id && report.project_id && <Link className="text-xs text-accent-text underline" href={`/evidence?project_id=${report.project_id}&document_id=${citation.document_id}`}>Find evidence</Link>}
-                      {citation.document_id && (
-                        <Link
-                          href={`/documents/${citation.document_id}`}
-                          className="text-xs text-accent-text underline underline-offset-4"
-                        >
-                          View document
-                        </Link>
-                      )}
-                    </div>
-                    {citation.excerpt && (
-                      <p className="text-sm text-secondary italic">
-                        &quot;{citation.excerpt}&quot;
-                      </p>
-                    )}
-                  </div>
+          <section aria-label="Report source citations" className="bg-surface rounded-lg border border-line p-6 mb-6">
+            <h2 className="text-lg font-semibold text-foreground mb-4">Source citations</h2>
+            {report.citation_status !== "validated" ? (
+              <p className="text-sm text-secondary">This report has no saved mapping from numbered citations to source excerpts. Source records and related Evidence do not establish support for individual claims.</p>
+            ) : (
+              <ul className="space-y-3">
+                {report.citations.map((citation) => (
+                  <li key={citation.marker} className="border border-line rounded-lg p-4">
+                    {citation.available && citation.href ? (
+                      <>
+                        <Link href={citation.href} className="text-sm text-accent-text underline underline-offset-4">[{citation.marker}] Open source excerpt</Link>
+                        {citation.excerpt && <p className="mt-2 text-sm text-secondary">{citation.excerpt}</p>}
+                      </>
+                    ) : <p className="text-sm text-secondary">[{citation.marker}] Source unavailable. It may have changed or you may no longer have access.</p>}
+                  </li>
                 ))}
+              </ul>
+            )}
+            {report.generation_provenance && <p className="mt-4 text-xs text-muted">Generated synthesis{report.generation_provenance.model ? ` · ${report.generation_provenance.model}` : ""}{report.generation_provenance.accepted_by ? " · Human accepted" : " · Review not recorded"}</p>}
+            {(report.original_documents ?? []).length > 0 && (
+              <div className="mt-4">
+                <h3 className="font-medium">Original result documents</h3>
+                <p className="text-sm text-secondary">Original research output; these links do not establish numbered claim support.</p>
+                <ul>{report.original_documents?.map((document) => <li key={document.document_id}><Link className="text-accent-text underline" href={document.href}>{document.name}</Link></li>)}</ul>
               </div>
-            </div>
-          )}
+            )}
+          </section>
 
           {/* Sources */}
           {report.sources && report.sources.length > 0 && (

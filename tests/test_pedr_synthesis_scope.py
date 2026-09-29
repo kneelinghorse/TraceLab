@@ -7,6 +7,7 @@ from unittest.mock import MagicMock
 from uuid import UUID, uuid4
 
 import pytest
+from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from sqlalchemy import event, text
 
@@ -168,6 +169,7 @@ def test_privileged_synthesis_resolves_live_documents_before_cache_and_provider(
 ):
     """Privilege cannot send deleted sources to a provider or resurrect them in reports."""
     from app.models.report import ReportSource
+    from app.models.user import User
 
     monkeypatch.setattr(settings, "rbac_enabled", True)
     live = _project(db_session, name="Live")
@@ -186,10 +188,24 @@ def test_privileged_synthesis_resolves_live_documents_before_cache_and_provider(
     cache = _RecordingCache()
     service, client = _service(cache_service=cache)
     factory = MagicMock(return_value=service)
+    principal = _principal(role=role)
+    db_session.add(User(id=principal.user_id, email=principal.email, display_name=role, role=role, password_hash="test"))  # noqa: S106
+    db_session.commit()
     inputs = {"collection_id": collection.id} if input_kind == "collection" else {"chunk_ids": [c.id for c in chunks]}
+    if not has_live_chunk:
+        with pytest.raises(HTTPException) as rejected:
+            synthesize(
+                SynthesizeRequest(**inputs, save_as_report=True, report_title="No support"),
+                current_user=principal, db=db_session, service_factory=factory,
+            )
+        assert rejected.value.status_code == 400
+        factory.assert_not_called()
+        client.chat.completions.create.assert_not_called()
+        assert cache.get_calls == cache.set_calls == []
+        return
     result = synthesize(
         SynthesizeRequest(**inputs, save_as_report=True, report_title="Live sources only"),
-        current_user=_principal(role=role), db=db_session, service_factory=factory,
+        current_user=principal, db=db_session, service_factory=factory,
     )
     expected = [chunks[0].id] if has_live_chunk else []
     sources = db_session.query(ReportSource).filter_by(report_id=result.report_id, source_type="chunk").all()
@@ -204,7 +220,9 @@ def test_privileged_synthesis_resolves_live_documents_before_cache_and_provider(
         assert "Deleted parent secret" not in messages
         assert len(cache.get_calls) == len(cache.set_calls) == 1
         for call in cache.get_calls + cache.set_calls:
-            assert call["chunk_ids"] == SynthesisService._scoped_cache_chunk_ids(expected, [live.id])
+            assert call["chunk_ids"][0] == expected[0]
+            assert call["chunk_ids"][-1] == SynthesisService._scoped_cache_chunk_ids([], [live.id])[0]
+            assert len(call["chunk_ids"]) == 3  # source, ordered-content signature, scope
     else:
         factory.assert_not_called()
         client.chat.completions.create.assert_not_called()
@@ -515,11 +533,11 @@ def test_scope_signature_is_canonical_and_isolates_cache_entries(monkeypatch):
     assert first_ids == second_ids
     assert first_ids != third_ids
     assert first_ids[0] == chunk_id
-    assert len(first_ids) == 2
+    assert len(first_ids) == 3
 
 
-def test_none_scope_keeps_legacy_cache_identity(monkeypatch):
-    """Unrestricted calls pass only the original effective IDs to cache unchanged."""
+def test_none_scope_versions_cache_identity_for_durable_mapping(monkeypatch):
+    """Unrestricted calls add a content signature so old transient maps cannot replay."""
     cache = _RecordingCache()
     service, _client = _service(cache_service=cache)
     chunk_id = uuid4()
@@ -534,6 +552,7 @@ def test_none_scope_keeps_legacy_cache_identity(monkeypatch):
 
     result = service.synthesize(chunk_ids=[chunk_id])
 
-    assert cache.get_calls[0]["chunk_ids"] == [chunk_id]
-    assert cache.set_calls[0]["chunk_ids"] == [chunk_id]
-    assert "effective_chunk_ids" not in result
+    assert cache.get_calls[0]["chunk_ids"][0] == chunk_id
+    assert len(cache.get_calls[0]["chunk_ids"]) == 2
+    assert cache.set_calls[0]["chunk_ids"] == cache.get_calls[0]["chunk_ids"]
+    assert result["effective_chunk_ids"] == [str(chunk_id)]

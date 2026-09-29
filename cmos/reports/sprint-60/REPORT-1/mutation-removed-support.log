@@ -1,0 +1,18 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_____ test_source_removed_during_generation_prevents_report_write[reports] _____
+tests/test_report_citations.py:166: in test_source_removed_during_generation_prevents_report_write
+    assert response.status_code == 400, response.text
+E   AssertionError: {"id":"b26bbf0e-2ddc-4626-9c4f-861dac6c5977","title":"Unsafe","content":"Finding [1].","citations":[{"marker":1,"chunk_id":null,"available":false,"href":null,"document_id":null,"excerpt":""}],"citation_status":"validated","generation_provenance":{"origin":"synthesis","model":"gpt-5.1","requested_by":"be9bae9d-7645-403a-82c6-c788bc6ef05f","generated_at":"2026-09-29T19:05:07.995949+00:00","cache_hit":false,"accepted_by":null,"accepted_at":null},"original_documents":[],"tokens_used":5,"status":"draft","created_at":"2026-09-29T19:05:08.000298"}
+E   assert 201 == 400
+E    +  where 201 = <Response [201 Created]>.status_code
+___ test_source_removed_during_generation_prevents_report_write[synthesize] ____
+tests/test_report_citations.py:166: in test_source_removed_during_generation_prevents_report_write
+    assert response.status_code == 400, response.text
+E   AssertionError: {"content":"Finding [1].","citations":[{"marker":1,"chunk_id":"18ae46a6-b3de-4def-88ba-143124d16a6e","document_id":"3b5459ea-8602-4c48-9b28-9b8dbc9a5250","excerpt":"Finding number 1."}],"tokens_used":5,"truncated":false,"chunk_count":3,"cache_hit":false,"cache_id":"c786f211-127c-4a42-bd6c-a6516ecae396","report_id":"b635662b-aa0a-48be-8bb6-91dd122155b2"}
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+=========================== short test summary info ============================
+FAILED tests/test_report_citations.py::test_source_removed_during_generation_prevents_report_write[reports]
+FAILED tests/test_report_citations.py::test_source_removed_during_generation_prevents_report_write[synthesize]
+2 failed, 19 deselected in 15.20s

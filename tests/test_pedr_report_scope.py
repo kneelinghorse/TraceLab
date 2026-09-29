@@ -94,6 +94,16 @@ class _RecordingSynthesis:
         return self.result
 
 
+def _supported_result(chunk, *, effective=None):
+    from app.services.report_citations import text_hash
+    return {
+        "content": "Authorized finding [1].",
+        "citations": [{"marker": 1, "chunk_id": str(chunk.id), "document_id": str(chunk.document_id), "content_hash": text_hash(chunk.content)}],
+        "effective_chunk_ids": effective or [str(chunk.id)], "chunk_count": len(effective or [chunk.id]),
+        "tokens_used": 3,
+    }
+
+
 class _RecordingCache:
     def __init__(self) -> None:
         self.get_calls: list[dict] = []
@@ -404,18 +414,11 @@ def test_scoped_direct_synthesis_report_persists_only_effective_chunk_ids(
         )
     )
     db_session.commit()
-    allowed_project_id = uuid4()
-    allowed_chunk_id = uuid4()
+    allowed_project_id = _project(db_session, name="Allowed synthesis").id
+    allowed_chunk = _chunk(db_session, project_id=allowed_project_id, content="Authorized finding")
+    allowed_chunk_id = allowed_chunk.id
     foreign_chunk_id = uuid4()
-    synthesis = _RecordingSynthesis(
-        {
-            "content": "Only authorized content",
-            "citations": [],
-            "tokens_used": 3,
-            "chunk_count": 1,
-            "effective_chunk_ids": [str(allowed_chunk_id)],
-        }
-    )
+    synthesis = _RecordingSynthesis(_supported_result(allowed_chunk))
     monkeypatch.setattr(
         synthesize_api,
         "accessible_project_ids",
@@ -445,10 +448,10 @@ def test_scoped_direct_synthesis_report_persists_only_effective_chunk_ids(
     }
 
 
-def test_scoped_collection_synthesis_empty_result_persists_collection_only(
+def test_scoped_collection_synthesis_empty_result_refuses_report(
     monkeypatch, db_session
 ):
-    """A filtered mixed collection remains attributable without leaking child IDs."""
+    """A filtered empty collection cannot become a grounded report."""
     caller = _principal()
     collection = Collection(
         name="Scoped empty collection",
@@ -484,27 +487,21 @@ def test_scoped_collection_synthesis_empty_result_persists_collection_only(
         lambda _user, _db: [allowed_project_id],
     )
 
-    response = synthesize_api.synthesize(
-        SynthesizeRequest(
-            collection_id=collection.id,
-            save_as_report=True,
-            report_title="Scoped collection synthesis",
-        ),
-        current_user=caller,
-        db=db_session,
-        service_factory=lambda: synthesis,
-    )
+    with pytest.raises(HTTPException) as rejected:
+        synthesize_api.synthesize(
+            SynthesizeRequest(
+                collection_id=collection.id,
+                save_as_report=True,
+                report_title="Scoped collection synthesis",
+            ),
+            current_user=caller,
+            db=db_session,
+            service_factory=lambda: synthesis,
+        )
 
-    assert response.report_id is not None
+    assert rejected.value.status_code == 400
     assert synthesis.calls == [], "Empty authorized context must not reach a provider or cache"
-    assert response.content == SynthesisService._empty_result(include_effective_chunk_ids=True)["content"]
-    db_session.expire_all()
-    report = db_session.get(Report, response.report_id)
-    assert report is not None
-    assert report.chunk_count == 0
-    assert {(source.source_type, source.source_id) for source in report.sources} == {
-        ("collection", collection.id)
-    }
+    assert db_session.query(Report).count() == 0
 
 
 def test_scoped_collection_report_snapshots_only_cache_hit_effective_chunks(
@@ -534,16 +531,7 @@ def test_scoped_collection_report_snapshots_only_cache_hit_effective_chunks(
     )
     db_session.commit()
 
-    synthesis = _RecordingSynthesis(
-        {
-            "content": "Cached allowed synthesis",
-            "citations": [],
-            "tokens_used": 2,
-            "chunk_count": 1,
-            "cache_hit": True,
-            "effective_chunk_ids": [str(allowed_chunk.id)],
-        }
-    )
+    synthesis = _RecordingSynthesis({**_supported_result(allowed_chunk), "cache_hit": True})
     service = ReportService(
         session_factory=SessionLocal,
         synthesis_service=synthesis,
@@ -571,17 +559,10 @@ def test_scoped_collection_report_snapshots_only_cache_hit_effective_chunks(
 def test_scoped_direct_report_snapshots_only_effective_chunks(db_session):
     """Foreign requested chunk IDs cannot survive as scoped report sources."""
     allowed_project = _project(db_session, name="Allowed direct")
-    allowed_chunk_id = uuid4()
+    allowed_chunk = _chunk(db_session, project_id=allowed_project.id, content="Allowed direct")
+    allowed_chunk_id = allowed_chunk.id
     foreign_chunk_id = uuid4()
-    synthesis = _RecordingSynthesis(
-        {
-            "content": "Allowed direct synthesis",
-            "citations": [],
-            "tokens_used": 1,
-            "chunk_count": 1,
-            "effective_chunk_ids": [allowed_chunk_id],
-        }
-    )
+    synthesis = _RecordingSynthesis(_supported_result(allowed_chunk))
     service = ReportService(
         session_factory=SessionLocal,
         synthesis_service=synthesis,
@@ -601,34 +582,18 @@ def test_scoped_direct_report_snapshots_only_effective_chunks(db_session):
     assert [str(source.source_id) for source in sources] == [str(allowed_chunk_id)]
 
 
-def test_empty_scope_creates_empty_report_without_synthesis_provider(db_session):
-    """Batch report creation may persist an empty 201 artifact without LLM/cache use."""
+def test_empty_scope_refuses_report_without_synthesis_provider(db_session):
+    """No-evidence input cannot create an apparently successful grounded artifact."""
     synthesis = _RecordingSynthesis({})
-    service = ReportService(
-        session_factory=SessionLocal,
-        synthesis_service=synthesis,
-    )
-
-    report, citations = service.create_report(
-        title="Empty report",
-        chunk_ids=[uuid4()],
-        accessible_project_ids=[],
-    )
-
-    assert report.chunk_count == 0
-    assert report.content.startswith("No content available")
-    assert citations == []
+    service = ReportService(session_factory=SessionLocal, synthesis_service=synthesis)
+    with pytest.raises(ValueError, match="citation"):
+        service.create_report(title="Empty report", chunk_ids=[uuid4()], accessible_project_ids=[])
     assert synthesis.calls == []
-    assert (
-        db_session.query(ReportSource)
-        .filter(ReportSource.report_id == report.id)
-        .count()
-        == 0
-    )
+    assert db_session.query(Report).count() == 0
 
 
 def test_all_foreign_report_skips_provider_and_cache(db_session):
-    """A nonempty scope with no effective inputs also creates an empty report safely."""
+    """A nonempty scope with no effective inputs refuses a report safely."""
     allowed_project = _project(db_session, name="Allowed empty")
     foreign_project = _project(db_session, name="Foreign input")
     foreign_chunk = _chunk(
@@ -649,23 +614,17 @@ def test_all_foreign_report_skips_provider_and_cache(db_session):
         synthesis_service=synthesis,
     )
 
-    report, citations = service.create_report(
-        title="All foreign",
-        chunk_ids=[foreign_chunk.id],
-        accessible_project_ids=[allowed_project.id],
-    )
+    with pytest.raises(ValueError, match="citation"):
+        service.create_report(
+            title="All foreign",
+            chunk_ids=[foreign_chunk.id],
+            accessible_project_ids=[allowed_project.id],
+        )
 
-    assert report.chunk_count == 0
-    assert citations == []
     client.chat.completions.create.assert_not_called()
     assert cache.get_calls == []
     assert cache.set_calls == []
-    assert (
-        db_session.query(ReportSource)
-        .filter(ReportSource.report_id == report.id)
-        .count()
-        == 0
-    )
+    assert db_session.query(Report).count() == 0
 
 
 def test_none_scope_keeps_legacy_collection_snapshot_and_call_shape(db_session):
@@ -683,14 +642,7 @@ def test_none_scope_keeps_legacy_collection_snapshot_and_call_shape(db_session):
         ]
     )
     db_session.commit()
-    synthesis = _RecordingSynthesis(
-        {
-            "content": "Legacy synthesis",
-            "citations": [],
-            "tokens_used": 1,
-            "chunk_count": 2,
-        }
-    )
+    synthesis = _RecordingSynthesis(_supported_result(first, effective=[str(first.id), str(second.id)]))
     service = ReportService(
         session_factory=SessionLocal,
         synthesis_service=synthesis,

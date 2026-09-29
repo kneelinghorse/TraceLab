@@ -49,6 +49,8 @@ def credentials(db, user, credential):
 
 @pytest.fixture
 def source(db_session, tmp_path, monkeypatch):
+    from unittest.mock import AsyncMock
+    monkeypatch.setattr("app.main.prewarm_qdrant", AsyncMock(return_value=True))
     monkeypatch.setattr(settings, "rbac_enabled", True)
     owner, headers = actor(db_session)
     other, _ = actor(db_session)
@@ -150,8 +152,9 @@ def test_reports_and_synthesis_persist_only_readable_sources(source, db_session,
         ("synthesize", {"save_as_report": True, "report_title": "Saved sibling findings"}, 200),
     ):
         response = client.post(f"{API}/{endpoint}", json={**inputs, **extra}, headers=headers)
-        assert response.status_code == (403 if outsider and input_kind == "collection" else success), response.text
-        if response.status_code == 403:
+        expected = 403 if outsider and input_kind == "collection" else (400 if outsider and (endpoint == "reports" or extra.get("save_as_report")) else success)
+        assert response.status_code == expected, response.text
+        if response.status_code >= 400:
             continue
         body = response.json()
         if endpoint == "synthesize":
@@ -204,7 +207,7 @@ def test_alternate_caller_document_read_matrix(source, db_session, monkeypatch, 
         ("document", "GET", f"/documents/{doc.id}", None, 403 if not visible else 200),
         ("documents", "GET", f"/documents?project_id={project.id}", None, 403 if denied else 200),
         ("export", "GET", f"/collections/{collection.id}/export", None, 403 if not visible else 200),
-        ("report", "POST", "/reports", {"title": "Matrix report", "chunk_ids": [str(chunk.id)]}, 403 if denied else 201),
+        ("report", "POST", "/reports", {"title": "Matrix report", "chunk_ids": [str(chunk.id)]}, 403 if denied else (201 if visible else 400)),
         ("synthesize", "POST", "/synthesize", {"chunk_ids": [str(chunk.id)]}, 403 if denied else 200),
         ("jobs", "GET", "/jobs", None, 403 if denied else 200),
     ]

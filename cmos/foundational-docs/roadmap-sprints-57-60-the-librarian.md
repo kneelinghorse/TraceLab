@@ -191,11 +191,11 @@ The close's receipt re-verification found stale citations in one receipt: RAG-2'
 
 Every open next-step was carried to a Sprint 60 shell, 23 in all. They include Railway's 2026-12-01 deadline for `railway.json`, where the backend's start command runs the migrations.
 
-### Sprint 60 — Finish the Librarian: suggestions, organisation and cited reports (planned 2026-09-29)
+### Sprint 60 — Finish the Librarian: suggestions, organisation and cited reports (opened 2026-09-29)
 
 **Goal:** Finish the remaining Librarian capabilities and accept the complete journey on the deployed build. Derek asked to detail Sprint 60 for a fresh build session and "wrap up the librarian arc and make sure its all ready to go." He chose **one selected project** for organisation and duplicate suggestions. Decision **#551** records the plan; the [build handoff](../planning/sprint-60-HANDOFF.md) names the implementation seams, validation contract and carried-item dispositions. CMOS holds the full mission criteria.
 
-All six missions are **Queued** and the sprint remains **Planned**, with no invented dates. The first build mission opens it. Each mission gets a fresh build session and is merged, deployed and verified before the next begins; the Requires chain records that sequence.
+**REPORT-1 is In Progress**; the five following missions remain **Queued**. Starting REPORT-1 opened the sprint on 2026-09-29. Each mission gets a fresh build session and is merged, deployed and verified before the next begins; the Requires chain records that sequence.
 
 **Simplified 2026-09-18 by decision #515.** Derek ruled out autonomous writes permanently, not as a staging decision:
 
@@ -294,6 +294,8 @@ Add to this list rather than resolving items silently.
 ---
 
 ## Change Log
+
+- **2026-09-29 UTC, Sprint 60 opened (REPORT-1).** Build session PS-2026-09-29-003 started the citation foundation in dependency order; identity pointers synchronized. Decision #552 records the additive persistence and scoped-read contract before implementation.
 
 - **2026-09-29 UTC, Sprint 60 planned for build handoff (decision #551).** On Derek's explicit request to finish the Librarian arc, six missions were queued in CMOS: REPORT-1 → LIB-3 → DUP-1 → ORG-1 → LIB-4 → WALK-3. He chose one selected project for organisation and duplicate suggestions. Source inspection found report detail drops citations and synthesis loses marker identity, so durable report citations lead the sprint. Report remains the saved artifact, result Documents remain sources, and historical gaps are not disguised as valid support. The handoff records the carried-item dispositions, deployed acceptance and fresh-session start; no feature was implemented during planning.
 

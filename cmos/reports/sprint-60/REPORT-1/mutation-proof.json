@@ -1,0 +1,10 @@
+[
+  {
+    "mutant": "fabricated-marker",
+    "detected": true
+  },
+  {
+    "mutant": "removed-support",
+    "detected": true
+  }
+]

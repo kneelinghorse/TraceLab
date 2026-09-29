@@ -72,6 +72,7 @@ class SynthesizeRequest(BaseModel):
 class CitationInfo(BaseModel):
     """Citation reference back to source chunk."""
 
+    marker: int | None = None
     chunk_id: UUID = Field(description="UUID of the source chunk")
     document_id: UUID | None = Field(
         default=None,

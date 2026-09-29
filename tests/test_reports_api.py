@@ -82,33 +82,21 @@ def _add_chunk_to_collection(db_session, collection_id: uuid.UUID, chunk_id: uui
     return item
 
 
-def _mock_synthesis_result():
-    """Return a mock synthesis result."""
-    return {
-        "content": "This is a synthesized report about the test content. [1]",
-        "citations": [
-            {
-                "chunk_id": str(uuid.uuid4()),
-                "document_id": str(uuid.uuid4()),
-                "excerpt": "Test excerpt",
-            }
-        ],
-        "tokens_used": 150,
-        "truncated": False,
-        "chunk_count": 2,
-    }
-
-
 class MockSynthesisService:
-    """Mock synthesis service for testing."""
+    """Exercise real source resolution with a deterministic, isolated completion."""
 
-    def __init__(self, result=None):
-        self.result = result or _mock_synthesis_result()
+    def __init__(self):
+        from unittest.mock import Mock
+
+        from app.services.synthesis import SynthesisService
+
+        self.service = SynthesisService(client=Mock(), cost_monitor=Mock(), enable_cache=False)
+        self.service._generate_completion = Mock(return_value=("Synthesized finding [1].", {"total_tokens": 150}))
         self.call_args = []
 
     def synthesize(self, **kwargs):
         self.call_args.append(kwargs)
-        return self.result
+        return self.service.synthesize(**kwargs)
 
 
 class TestReportCreate:
@@ -428,8 +416,10 @@ class TestReportGet:
         """Get report includes its sources."""
         client = TestClient(app)
 
-        chunk_id = uuid.uuid4()
-        collection_id = uuid.uuid4()
+        project = _create_test_project(db_session)
+        document = _create_test_document(db_session, project.id)
+        chunk_id = _create_test_chunk(db_session, document.id).id
+        collection_id = _create_test_collection(db_session).id
 
         report = Report(
             title="Report With Sources",
