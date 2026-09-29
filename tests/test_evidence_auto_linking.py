@@ -26,6 +26,8 @@ CREATE TABLE IF NOT EXISTS projects (
     id CHAR(36) PRIMARY KEY NOT NULL,
     name VARCHAR NOT NULL,
     description TEXT,
+    description_revision INTEGER NOT NULL DEFAULT 0,
+    description_provenance JSON,
     user_id CHAR(36),
     mission_protocol_id CHAR(36),
     research_type VARCHAR,

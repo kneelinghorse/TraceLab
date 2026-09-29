@@ -21,6 +21,8 @@ Migration 054 adds a default-zero description revision and nullable JSON provena
 
 Initial harness failures were corrected: required user display names were missing, and parallel pytest processes shared the root SQLite reset fixture. Database suites subsequently ran sequentially. No production service was contacted by those tests. Existing browser-data age and Python deprecation warnings remain disclosed in the logs.
 
+The full CI backend suite caught the evidence auto-linking fixture's handwritten projects table missing the two new columns. Its DDL now matches the model; all seven auto-linking tests pass (`lib3-fixture-compatibility.log`). No quarantine or skip list was changed.
+
 ## Deployment acceptance
 
 Pending merge and deployment. `deployed_acceptance.mjs` uses the established human credential and REPORT-1's TraceLab Research acceptance project plus one explicitly named empty LIB-3 fixture. It verifies the exact serving commit, draft-no-write, acceptance/replay, fresh state, current in-project source destinations, and guarded restore/replay. Original descriptions are restored even if a post-accept verification fails. It records hashes and identities without credentials or signed proposals. This is agent verification, not Derek's personal acceptance.
