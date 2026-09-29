@@ -1,0 +1,45 @@
+{
+  "verified_at": "2026-09-29T19:50:45.747Z",
+  "serving_commit": "93d71fcf4d8e0818103970b1c3131e6e1323681b",
+  "report_id": "cb0ae24f-b28d-4b1c-839e-9a7172d66154",
+  "checks": [
+    {
+      "theme": "light",
+      "width": 390,
+      "marker": 1,
+      "exact_chunk_opened": true
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "marker": 2,
+      "exact_chunk_opened": true
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "marker": 3,
+      "exact_chunk_opened": true
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "marker": 1,
+      "exact_chunk_opened": true
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "marker": 2,
+      "exact_chunk_opened": true
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "marker": 3,
+      "exact_chunk_opened": true
+    }
+  ],
+  "mocked_responses": false,
+  "personal_user_acceptance": false
+}

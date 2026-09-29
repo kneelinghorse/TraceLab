@@ -12,7 +12,7 @@ Asked whether organisation and duplicate suggestions should span projects, he ch
 
 A researcher can ask the Librarian to describe a project, review possible duplicates, organise research into collections, and assemble a cited report from those materials. They review and accept each change. The saved result retains its provenance and resolving citations. Existing conversation, mission authoring, Q&A and chunk search continue working.
 
-This session performed planning and source inspection only. The sprint is **Planned**, all six missions are **Queued**, and no delivery dates have been invented. Starting REPORT-1 is the build-session sprint open. Password recovery stays in Sprint 61 (AUTH-1, AUTH-2).
+The planning session performed source inspection only. REPORT-1 subsequently opened Sprint 60 and is now deployed and verified through [PR #389](https://github.com/kneelinghorse/TraceLab/pull/389); see the [acceptance receipt](../reports/sprint-60/REPORT-1/README.md). The sprint remains Active, and **LIB-3 is the next build slice**. CMOS is authoritative for closure status. Password recovery stays in Sprint 61 (AUTH-1, AUTH-2).
 
 ## Build order
 
@@ -111,11 +111,11 @@ The 23 carried entries are not 23 additional missions.
 Use the current checkout's absolute project root with every CMOS call (on this machine `/Users/systemsystems/portfolio/TraceLab`); do not copy the stale Linux path in `cmos/agents.md`.
 
 1. Run `cmos_review`, read root `agents.md` and `cmos/agents.md`, check database health and working-tree state. The local v2 MCP-only instruction supersedes the root's old CLI examples.
-2. Read this file, decision #551, learning #261 and `cmos_mission(action="show", missionId="REPORT-1")`. Reconfirm it is the first unfinished mission.
-3. Start the build session and REPORT-1 through CMOS. Starting the first mission activates the sprint. Run the [Sprint-Boundary Identity Sync runbook](../docs/operations-guide.md#sprint-boundary-identity-sync-runbook), including `sprint_tracking.current_sprint` (learning #247). Do not mark the sprint Active during planning merely to make the digest look current.
-4. Record REPORT-1's concrete additive contract before coding, then prove the transient-citation defect with focused tests. No new research mission is necessary; the relevant behavior is in the tree.
+2. Read this file, decisions #551/#552, learnings #261/#263 and `cmos_mission(action="show", missionId="LIB-3")`. Confirm REPORT-1 is complete and LIB-3 is the first unfinished mission in the agreed order; the alphabetical queue suggestion is not that order.
+3. Start a fresh build session and LIB-3 through CMOS. Sprint 60 is already Active and its identity pointers were synchronized at REPORT-1 start. At sprint boundaries use the [identity-sync runbook](../docs/operations-guide.md#sprint-boundary-identity-sync-runbook), including `sprint_tracking.current_sprint` (learning #247).
+4. Read LIB-3's full criteria and existing project/Librarian callers. Record its concrete proposal, acceptance and guarded-restore contract before coding. Reuse the established source validation and provenance conventions; do not imply that generation itself is human acceptance.
 5. Build, test, merge/deploy within the user's standing authorization, run live acceptance, record the receipt and complete only that mission. Hand the next mission to a fresh session. Do not create a new Codex task unless Derek explicitly asks.
 
 Suggested opening prompt:
 
-> Continue TraceLab Sprint 60 from cmos/planning/sprint-60-HANDOFF.md. Run cmos_review(), load both agents files, and read decision #551 and REPORT-1. Build REPORT-1 in this fresh session, verify it locally and on the deployed build, and record its acceptance before handing off LIB-3. Keep organisation and duplicate scope within one selected project; preserve explicit human acceptance and resolving citations. Sprint 61 password recovery is separate.
+> Continue TraceLab Sprint 60 from cmos/planning/sprint-60-HANDOFF.md. Run cmos_review(), load both agents files, and read decisions #551/#552 and LIB-3. Confirm REPORT-1 is complete, then build LIB-3 in this fresh session, verify it locally and on the deployed build, and record its acceptance before handing off DUP-1. Keep organisation and duplicate scope within one selected project; preserve explicit human acceptance and resolving citations. Sprint 61 password recovery is separate.

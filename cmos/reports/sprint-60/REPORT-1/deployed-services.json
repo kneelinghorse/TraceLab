@@ -1,0 +1,19 @@
+{
+  "verified_at": "2026-09-29T19:49:05.168426+00:00",
+  "services": [
+    {
+      "service": "TraceLab",
+      "deployment_id": "94cc363a-544a-4693-9beb-e1fb66845c52",
+      "status": "SUCCESS",
+      "commit": "93d71fcf4d8e0818103970b1c3131e6e1323681b"
+    },
+    {
+      "service": "frontend",
+      "deployment_id": "30410f8e-491b-443a-b30a-399579a20015",
+      "status": "SUCCESS",
+      "commit": "93d71fcf4d8e0818103970b1c3131e6e1323681b"
+    }
+  ],
+  "frontend_url": "https://tracelab.aquex.ai",
+  "new_environment_variables": []
+}

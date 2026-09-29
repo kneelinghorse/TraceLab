@@ -1,0 +1,75 @@
+{
+  "tested_commit": "e19dde0",
+  "merge_commit": "93d71fcf4d8e0818103970b1c3131e6e1323681b",
+  "pull_request": "https://github.com/kneelinghorse/TraceLab/pull/389",
+  "runs": {
+    "backend": {
+      "conclusion": "success",
+      "headSha": "e19dde04f4965fb847017b631682661cac53d411",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/36619482559"
+    },
+    "postgresql": {
+      "conclusion": "success",
+      "headSha": "e19dde04f4965fb847017b631682661cac53d411",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/36619482119"
+    },
+    "production_frontend": {
+      "conclusion": "success",
+      "headSha": "e19dde04f4965fb847017b631682661cac53d411",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/36619482285"
+    },
+    "frontend_checks": {
+      "conclusion": "success",
+      "headSha": "e19dde04f4965fb847017b631682661cac53d411",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/36619482087"
+    },
+    "mcp_package": {
+      "conclusion": "success",
+      "headSha": "e19dde04f4965fb847017b631682661cac53d411",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/36619482189"
+    },
+    "ruff_diff": {
+      "conclusion": "success",
+      "headSha": "e19dde04f4965fb847017b631682661cac53d411",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/36619482179"
+    },
+    "secret_scan": {
+      "conclusion": "success",
+      "headSha": "e19dde04f4965fb847017b631682661cac53d411",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/36619482271"
+    }
+  },
+  "counts": {
+    "backend": {
+      "passed": 2894,
+      "skipped": 3,
+      "quarantined_deselections": 12
+    },
+    "postgresql": {
+      "passed": 145,
+      "skipped": 2
+    },
+    "production_browser": {
+      "passed": 58
+    },
+    "frontend_unit": {
+      "passed": 262
+    },
+    "contract_consumer_followup": {
+      "passed": 81,
+      "skipped": 0
+    }
+  },
+  "integration_skips": [
+    "live RBAC matrix requires RBAC_VERIFY_BASE_URL",
+    "CLI ingestion requires an authenticated running server"
+  ],
+  "quarantine_file": ".github/ci/backend-quarantine.txt (unchanged)"
+}
