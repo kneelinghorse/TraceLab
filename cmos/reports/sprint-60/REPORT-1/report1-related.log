@@ -42,31 +42,31 @@ app/schemas/webhook.py:22
     class ExecutionMetadata(BaseModel):
 
 app/main.py:161
-  /Users/systemsystems/portfolio/TraceLab/app/main.py:161: DeprecationWarning: 
+  /Users/systemsystems/portfolio/TraceLab/app/main.py:161: DeprecationWarning:
           on_event is deprecated, use lifespan event handlers instead.
-  
+
           Read more about it in the
           [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
-          
+
     @app.on_event("startup")
 
 .venv/lib/python3.11/site-packages/fastapi/applications.py:4599
 .venv/lib/python3.11/site-packages/fastapi/applications.py:4599
-  /Users/systemsystems/portfolio/TraceLab/.venv/lib/python3.11/site-packages/fastapi/applications.py:4599: DeprecationWarning: 
+  /Users/systemsystems/portfolio/TraceLab/.venv/lib/python3.11/site-packages/fastapi/applications.py:4599: DeprecationWarning:
           on_event is deprecated, use lifespan event handlers instead.
-  
+
           Read more about it in the
           [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
-          
+
     return self.router.on_event(event_type)
 
 app/main.py:210
-  /Users/systemsystems/portfolio/TraceLab/app/main.py:210: DeprecationWarning: 
+  /Users/systemsystems/portfolio/TraceLab/app/main.py:210: DeprecationWarning:
           on_event is deprecated, use lifespan event handlers instead.
-  
+
           Read more about it in the
           [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
-          
+
     @app.on_event("shutdown")
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
