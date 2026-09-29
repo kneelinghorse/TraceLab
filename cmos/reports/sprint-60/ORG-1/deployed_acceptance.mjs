@@ -146,6 +146,7 @@ if (mode === 'all' || mode === 'browser') {
         await link.focus(); await page.keyboard.press('Enter');
         await page.waitForURL(web + member.href);
         await page.getByRole('heading', { level: 1, name: member.document_name, exact: true }).waitFor();
+        await page.locator(`[data-cited="true"] #chunk-${member.chunk_id}`).waitFor();
         sourceLinks++; await page.goto(librarian);
         await page.getByLabel('Collection name 1', { exact: true }).waitFor();
       }

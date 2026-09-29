@@ -273,7 +273,7 @@ export default function CollectionDetailPage() {
                           </code>
                           {item.document_id && (
                             <Link
-                              href={`/documents/${item.document_id}?chunk=${item.chunk_id}`}
+                              href={`/documents/${item.document_id}`}
                               className="text-xs text-accent-text underline underline-offset-4"
                             >
                               View document
