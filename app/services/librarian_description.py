@@ -63,7 +63,15 @@ def description_state(db: Session, user: AuthenticatedUser, project: Project) ->
             "previous_value", "accepted_by", "accepted_at", "restored_at", "edited",
         )}
         visible["current"] = current
-        visible["citations"] = readable_citations(db, user, SimpleNamespace(citation_manifest=provenance["citations"]))
+        # A privileged reader's broad access must not expand this project's
+        # provenance after a source is reparented to another project.
+        manifest = provenance["citations"]
+        in_project = {str(row.id) for row in db.query(Document.id).filter(
+            Document.id.in_([UUID(c["document_id"]) for c in manifest]), Document.project_id == project.id,
+        ).all()}
+        scoped = [c for c in manifest if c["document_id"] in in_project]
+        readable = {c["marker"]: c for c in readable_citations(db, user, SimpleNamespace(citation_manifest=scoped))}
+        visible["citations"] = [readable.get(c["marker"], {"marker": c["marker"], "available": False}) for c in manifest]
     return {"project_id": str(project.id), "description": project.description,
             "revision": project.description_revision, "provenance": visible, "can_restore": current}
 

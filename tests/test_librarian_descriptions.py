@@ -263,6 +263,26 @@ def test_whitespace_only_chunks_are_not_evidence(description_client, project, db
     assert proposal["coverage"]["excluded_chunks"] == 1
 
 
+def test_history_does_not_expand_project_scope_after_source_move(description_client, project, db_session):
+    client, model = description_client
+    doc = Document(name="Reviewed source", project_id=project.id)
+    other = Project(name="Other project readable by admin")
+    db_session.add_all([doc, other])
+    db_session.flush()
+    chunk = DocumentChunk(document_id=doc.id, chunk_index=0, content="Onboarding findings")
+    db_session.add(chunk)
+    db_session.commit()
+    model.complete.return_value.content = '{"description":"Onboarding research [1]."}'
+    proposal = draft(client, project)
+    assert accept(client, project, proposal).status_code == 200
+    doc.project_id = other.id
+    db_session.commit()
+    state = client.get(f"/api/v1/librarian/descriptions/{project.id}").json()
+    assert state["provenance"]["citations"] == [{"marker": 1, "available": False}]
+    assert str(chunk.id) not in json.dumps(state)
+    assert str(doc.id) not in json.dumps(state)
+
+
 @pytest.mark.parametrize("content,reason", [("Not JSON", None), ('{"description":"Uncited corpus claim"}', None), ('{"description":"Cut off [1]"}', "length")])
 def test_invalid_generation_is_visible_and_metered(description_client, project, db_session, content, reason):
     client, model = description_client

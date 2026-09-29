@@ -52,26 +52,26 @@ for (const [basis, projectId, prompt] of [
   const sources = [];
   let restored;
   try {
-  assert.equal(accepted.description, proposal.description);
-  assert.equal(accepted.provenance.accepted_by, me.user_id);
-  assert.equal(accepted.provenance.previous_value, before.description);
-  assert.equal(accepted.provenance.current, true);
-  assert.deepEqual(await request('/librarian/descriptions/accept', 'POST', payload), accepted);
-  assert.deepEqual(await request(`/librarian/descriptions/${projectId}`), accepted);
-  for (const citation of accepted.provenance.citations) {
-    assert.equal(citation.available, true);
-    const doc = await request(`/documents/${citation.document_id}`);
-    assert.equal(doc.project_id, projectId);
-    assert.equal((await fetch(web + citation.href)).status, 200);
-    sources.push({ marker: citation.marker, document_id: citation.document_id, chunk_id: citation.chunk_id, href: citation.href });
+    assert.equal(accepted.description, proposal.description);
+    assert.equal(accepted.provenance.accepted_by, me.user_id);
+    assert.equal(accepted.provenance.previous_value, before.description);
+    assert.equal(accepted.provenance.current, true);
+    assert.deepEqual(await request('/librarian/descriptions/accept', 'POST', payload), accepted);
+    assert.deepEqual(await request(`/librarian/descriptions/${projectId}`), accepted);
+    for (const citation of accepted.provenance.citations) {
+      assert.equal(citation.available, true);
+      const doc = await request(`/documents/${citation.document_id}`);
+      assert.equal(doc.project_id, projectId);
+      assert.equal((await fetch(web + citation.href)).status, 200);
+      sources.push({ marker: citation.marker, document_id: citation.document_id, chunk_id: citation.chunk_id, href: citation.href });
   }
-  if (basis === 'corpus') assert.ok(sources.length > 0);
+    if (basis === 'corpus') assert.ok(sources.length > 0);
   } finally {
-  const restore = { project_id: projectId, proposal_id: accepted.provenance.proposal_id };
-  restored = await request('/librarian/descriptions/restore', 'POST', restore);
-  assert.equal(restored.description, before.description);
-  assert.equal(restored.can_restore, false);
-  assert.deepEqual(await request('/librarian/descriptions/restore', 'POST', restore), restored);
+    const restore = { project_id: projectId, proposal_id: accepted.provenance.proposal_id };
+    restored = await request('/librarian/descriptions/restore', 'POST', restore);
+    assert.equal(restored.description, before.description);
+    assert.equal(restored.can_restore, false);
+    assert.deepEqual(await request('/librarian/descriptions/restore', 'POST', restore), restored);
   }
   receipts.push({ basis, project_id: projectId, original_sha256: hash(before.description), accepted_sha256: hash(accepted.description), restored_sha256: hash(restored.description), proposal_id: accepted.provenance.proposal_id, model: proposal.model, usage: proposal.usage, coverage: proposal.coverage, source_links: sources, draft_no_write: true, accept_replay_no_write: true, restore_replay_no_write: true, accepted_revision: accepted.revision, restored_revision: restored.revision });
   await fs.writeFile(path.join(out, 'deployed-acceptance.json'), JSON.stringify({ verified_at: new Date().toISOString(), serving_commit: commit, receipts, verification: 'Agent acceptance, not Derek personal acceptance', original_descriptions_restored: true }, null, 2) + '\n');
