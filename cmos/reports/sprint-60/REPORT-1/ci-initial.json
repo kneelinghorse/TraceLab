@@ -1,0 +1,12 @@
+{
+  "run_url": "https://github.com/kneelinghorse/TraceLab/actions/runs/36617040154",
+  "passed": 2892,
+  "failed": 2,
+  "skipped": 3,
+  "deselected": 12,
+  "failures": [
+    "tests/test_rbac_verify_harness.py::test_pedr1c_matrix_is_compatible_with_real_testclient_routes",
+    "tests/unit/test_oods_object_contract.py::test_every_api_model_field_requires_an_explicit_presentation_mapping[Report]"
+  ],
+  "resolution": "Explicit no-citation refusal recognized by RBAC verification; additive report fields reviewed in the OODS mapping. No quarantine edits."
+}

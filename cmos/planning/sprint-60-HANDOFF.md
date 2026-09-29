@@ -72,7 +72,7 @@ Read immediate callers, ports/adapters and relevant tests before changing these 
 
 New conversational proposal/review/accept endpoints follow LIB-1's **REST-only-by-design** classification. Record new UI operations in `cmos/contracts/mcp-parity-manifest.json`; do not manufacture a new MCP cluster for the assistant.
 
-Existing `tracelab_report` create/get and `tracelab_search` synthesize/ask must retain parity. The TypeScript create/get handlers currently forward `result.citations`, so verify actual propagation before assuming a package edit is needed. A changed MCP response contract requires the deployed-client regression in the root playbook even when a direct REST test passes. If package source changes, build before local tests and satisfy the clean published-artifact smoke gate; a tarball dry run alone is not proof of what npm serves.
+Existing `tracelab_report` create/get and `tracelab_collection` synthesize and `tracelab_search` ask must retain parity. The TypeScript create/get handlers currently forward `result.citations`, so verify actual propagation before assuming a package edit is needed. A changed MCP response contract requires the deployed-client regression in the root playbook even when a direct REST test passes. If package source changes, build before local tests and satisfy the clean published-artifact smoke gate; a tarball dry run alone is not proof of what npm serves.
 
 Record paid draft/repair calls against the requesting user and selected project using the existing usage infrastructure. Saving, dismissing, restoring and reading a cached result do not represent fresh provider usage. Use the configured Librarian model seam; no model comparison or migration is part of S60.
 
