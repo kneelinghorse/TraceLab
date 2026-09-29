@@ -1,0 +1,58 @@
+{
+  "verified_at": "2026-09-29T19:49:04.202Z",
+  "serving_commit": "93d71fcf4d8e0818103970b1c3131e6e1323681b",
+  "package_version": "2.1.0",
+  "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+  "document_id": "04ffc800-85cf-4a49-bcec-a856644796a8",
+  "collection_id": "a60a5eab-01d1-4c59-bfab-fbdbd307a143",
+  "report_id": "cb0ae24f-b28d-4b1c-839e-9a7172d66154",
+  "report_url": "https://tracelab.aquex.ai/reports/cb0ae24f-b28d-4b1c-839e-9a7172d66154",
+  "citations": [
+    {
+      "marker": 1,
+      "chunk_id": "495844eb-ec3b-42d4-81b8-d2d2005c62f6",
+      "available": true,
+      "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=495844eb-ec3b-42d4-81b8-d2d2005c62f6&index=0",
+      "document_id": "04ffc800-85cf-4a49-bcec-a856644796a8"
+    },
+    {
+      "marker": 2,
+      "chunk_id": "6649d184-8e26-4a27-8bc9-7642021c0bb3",
+      "available": true,
+      "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=6649d184-8e26-4a27-8bc9-7642021c0bb3&index=2",
+      "document_id": "04ffc800-85cf-4a49-bcec-a856644796a8"
+    },
+    {
+      "marker": 3,
+      "chunk_id": "edd589df-4319-40c6-95a5-8cc5a03f17dd",
+      "available": true,
+      "href": "/documents/04ffc800-85cf-4a49-bcec-a856644796a8?chunk=edd589df-4319-40c6-95a5-8cc5a03f17dd&index=1",
+      "document_id": "04ffc800-85cf-4a49-bcec-a856644796a8"
+    }
+  ],
+  "exports": {
+    "md": {
+      "bytes": 2442,
+      "sha256": "782f26c854052da51c89c2cc9c9f3361480f9363737efb45c1b4c9864b8e07a7"
+    },
+    "json": {
+      "bytes": 5220,
+      "sha256": "877c8792f23c41313d037328dfbff3dd9ecef50cf10cd9c147e23d5e9053b85b"
+    },
+    "txt": {
+      "bytes": 2487,
+      "sha256": "90d0d7fad108c3e0236b9ac8b921475504e57d698346ab020d169253e240fccb"
+    }
+  },
+  "checks": [
+    "published MCP create/get preserve mapping",
+    "fresh REST read agrees",
+    "published MCP collection synthesize replays the same text and identities",
+    "source identities are live and supplied",
+    "source destinations resolve",
+    "published MCP exports equal REST bytes"
+  ],
+  "created_this_run": true,
+  "no_package_source_change": true,
+  "personal_user_acceptance": false
+}

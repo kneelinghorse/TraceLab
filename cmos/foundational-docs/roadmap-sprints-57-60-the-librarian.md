@@ -195,7 +195,7 @@ Every open next-step was carried to a Sprint 60 shell, 23 in all. They include R
 
 **Goal:** Finish the remaining Librarian capabilities and accept the complete journey on the deployed build. Derek asked to detail Sprint 60 for a fresh build session and "wrap up the librarian arc and make sure its all ready to go." He chose **one selected project** for organisation and duplicate suggestions. Decision **#551** records the plan; the [build handoff](../planning/sprint-60-HANDOFF.md) names the implementation seams, validation contract and carried-item dispositions. CMOS holds the full mission criteria.
 
-**REPORT-1 is In Progress**; the five following missions remain **Queued**. Starting REPORT-1 opened the sprint on 2026-09-29. Each mission gets a fresh build session and is merged, deployed and verified before the next begins; the Requires chain records that sequence.
+**REPORT-1 is deployed and verified** ([receipt](../reports/sprint-60/REPORT-1/README.md)); the five following missions remain **Queued**. **LIB-3 is next**, in a fresh build session. Starting REPORT-1 opened the sprint on 2026-09-29. Each mission gets a fresh build session and is merged, deployed and verified before the next begins; the Requires chain records that sequence.
 
 **Simplified 2026-09-18 by decision #515.** Derek ruled out autonomous writes permanently, not as a staging decision:
 
@@ -212,7 +212,7 @@ The suggestions are requested, reviewed and accepted in the Librarian; a persist
 | 5 | **LIB-4 — Report assembly** | Draft a report from reviewed project material, then save that exact cited draft with no second model call |
 | 6 | **WALK-3 — Deployed arc acceptance** | Verify old and new journeys, source links, human-control boundaries, UI/accessibility and MCP reads; close the arc with receipts |
 
-**Report choice, settled before build:** retain Report as the saved synthesis artifact and keep DeepSearch result Documents and links. Next-step #405 exposed a real prerequisite: report detail currently discards the transient citation list, and the synthesis list loses the original numeric markers. REPORT-1 makes those mappings durable; it does not fabricate support from input-source order or mass-regenerate historical reports. Learning #261 distinguishes claim citations, ReportSource inputs and the related Evidence panel.
+**Report choice, settled before build:** retain Report as the saved synthesis artifact and keep DeepSearch result Documents and links. Next-step #405 exposed a real prerequisite: report detail discarded the transient citation list, and the synthesis list lost the original numeric markers. REPORT-1 now makes those mappings durable; it does not fabricate support from input-source order or mass-regenerate historical reports. Learning #261 distinguishes claim citations, ReportSource inputs and the related Evidence panel.
 
 **Acceptance boundary:** corpus claims cite actual in-scope sources; proposal generation/dismissal never changes research artifacts; acceptance rechecks permissions, source liveness and stale edits; repeated saves do not duplicate artifacts. New conversational workflows follow the existing REST-only classification while existing MCP report/search contracts stay in parity. The arc is complete only after WALK-3 passes on the deployed build.
 
@@ -294,6 +294,8 @@ Add to this list rather than resolving items silently.
 ---
 
 ## Change Log
+
+- **2026-09-29 UTC, REPORT-1 deployed and verified.** [PR #389](https://github.com/kneelinghorse/TraceLab/pull/389), serving commit `93d71fc`, adds durable validated citation maps, scoped reads and export destinations. Both writers, legacy gaps, source revocation/deletion and cache identity are covered by regressions; PostgreSQL and mutation checks passed. Published MCP 2.1.0 created one report, reopened it and preserved all three citations through every export; deployed Light/mobile and Dark/desktop opened every exact chunk. [Receipt](../reports/sprint-60/REPORT-1/README.md) discloses CI skips and quarantine. LIB-3 follows in a fresh session; the arc remains open.
 
 - **2026-09-29 UTC, Sprint 60 opened (REPORT-1).** Build session PS-2026-09-29-003 started the citation foundation in dependency order; identity pointers synchronized. Decision #552 records the additive persistence and scoped-read contract before implementation.
 

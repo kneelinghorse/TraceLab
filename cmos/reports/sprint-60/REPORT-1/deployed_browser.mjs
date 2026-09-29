@@ -39,6 +39,7 @@ try {
     await page.goto(receipt.report_url);
     await expect(page.getByRole('heading', { name: 'REPORT-1 acceptance — durable source citations' })).toBeVisible();
     await expect(page.getByText('Review not recorded', { exact: false })).toBeVisible();
+    await expect(page.getByText('No accessible evidence is linked to this report.')).toBeVisible();
     for (const citation of receipt.citations) await expect(page.getByRole('link', { name: `[${citation.marker}] Open source excerpt` })).toHaveAttribute('href', citation.href);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
     await page.screenshot({ path: path.join(out, `deployed-report-${theme}-${width}.png`), fullPage: true, mask: [page.getByText(me.email, { exact: true })] });
