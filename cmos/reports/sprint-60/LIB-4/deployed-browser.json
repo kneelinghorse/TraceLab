@@ -1,0 +1,35 @@
+{
+  "serving_commit": "9801c4f1e25acd93570564acbd76f67248a8a723",
+  "checks": [
+    {
+      "theme": "light",
+      "width": 390,
+      "explicit_accepts": 1,
+      "model_calls": 0,
+      "exact_source_visits": 4,
+      "navigation_and_reload_preserved_preview": true,
+      "report_id": "69ac7bc1-2319-4de5-bce6-763cb7f3c3de",
+      "expected_report_viewed_updates": 4,
+      "viewed_updates_only_saved_report": true,
+      "unrelated_writes": [],
+      "page_errors": [],
+      "overflow": false
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "explicit_accepts": 1,
+      "model_calls": 0,
+      "exact_source_visits": 4,
+      "navigation_and_reload_preserved_preview": true,
+      "report_id": "69ac7bc1-2319-4de5-bce6-763cb7f3c3de",
+      "expected_report_viewed_updates": 4,
+      "viewed_updates_only_saved_report": true,
+      "unrelated_writes": [],
+      "page_errors": [],
+      "overflow": false
+    }
+  ],
+  "source": "Real privately cached server proposal; live acceptance and reads; no mocked API responses",
+  "agent_acceptance": true
+}

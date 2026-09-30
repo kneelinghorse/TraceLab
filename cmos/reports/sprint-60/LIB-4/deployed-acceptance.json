@@ -1,0 +1,44 @@
+{
+  "verified_at": "2026-09-30T01:53:27.147Z",
+  "serving_commit": "9801c4f1e25acd93570564acbd76f67248a8a723",
+  "project_id": "0d6c5b1d-72eb-4390-a40b-c48c88cdb302",
+  "collection_id": "cf1dd7ec-25f1-4141-9210-4a805e311137",
+  "report_id": "69ac7bc1-2319-4de5-bce6-763cb7f3c3de",
+  "reviewed_content_sha256": "8f27a0fdb8dcd0ec9f7444f99ffb9241b222137461deb655d52fcc0376086f5e",
+  "citations": [
+    {
+      "marker": 1,
+      "available": true,
+      "chunk_id": "27a6eb7e-581c-43cd-bad9-3f7c3a5332ee",
+      "document_id": "228e2feb-9701-4a2d-855c-4c676a2218ea",
+      "excerpt": "Synthetic acceptance interview A. The researcher entered a new project and expected an obvious place",
+      "href": "/documents/228e2feb-9701-4a2d-855c-4c676a2218ea?chunk=27a6eb7e-581c-43cd-bad9-3f7c3a5332ee&index=0"
+    },
+    {
+      "marker": 2,
+      "available": true,
+      "chunk_id": "5382d30e-4343-4f3e-bca2-08b0cb1ff792",
+      "document_id": "c355fc82-a73b-4a8b-96d0-ddd53f83464a",
+      "excerpt": "Synthetic acceptance interview C. The researcher had interview notes ready to upload but could not q",
+      "href": "/documents/c355fc82-a73b-4a8b-96d0-ddd53f83464a?chunk=5382d30e-4343-4f3e-bca2-08b0cb1ff792&index=0"
+    }
+  ],
+  "input_chunk_ids": [
+    "27a6eb7e-581c-43cd-bad9-3f7c3a5332ee",
+    "5382d30e-4343-4f3e-bca2-08b0cb1ff792"
+  ],
+  "model": "gpt-5.1",
+  "caller_role": "owner",
+  "single_report": true,
+  "sources_collection_project_unchanged": true,
+  "snapshot_sha256": "4bea10f7c9ce8434d3e4ea4f58e64a926e0dc0f7b880c7f8d98ef9266c23fcce",
+  "exports_sha256": {
+    "md": "c6366ebf9ddd65beac538b5c29d5024898f32f1bbb443662226fc2e988510382",
+    "json": "42c8f9181b23c11ffc6b387b28ff697c3d61c47450c95c94056e73c1a5008965",
+    "txt": "255429f321ea7b4e722ba2ae9795cfe205f3b9bbbad59d20031687bd57e2c615"
+  },
+  "published_mcp_version": "2.1.0",
+  "exact_preview_content_and_citations_reopened_exported_and_mcp": true,
+  "verification": "Agent acceptance, not Derek personal acceptance",
+  "read_only": false
+}
