@@ -20,6 +20,7 @@ from app.services.activity import ActivityService
 from app.services.admin_stats import AdminStatsService
 from app.services.collection_context import CollectionContextService
 from app.services.home import HomeService
+from app.services.mission_logs import MissionLogService
 from app.services.password_recovery import PasswordRecoveryService
 
 logger = logging.getLogger(__name__)
@@ -124,3 +125,10 @@ def get_admin_stats_service() -> AdminStatsService:
     from app.adapters.repositories.sqlalchemy_admin_stats_repo import SQLAlchemyAdminStatsRepository
 
     return AdminStatsService(SQLAlchemyAdminStatsRepository(), HTTPWorkerProbe())
+
+
+def get_mission_log_service() -> MissionLogService:
+    """Wire log ownership/replay semantics to the transactional SQL repository."""
+    from app.adapters.repositories.sqlalchemy_mission_log_repo import SQLAlchemyMissionLogRepository
+
+    return MissionLogService(SQLAlchemyMissionLogRepository())

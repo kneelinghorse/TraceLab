@@ -1,0 +1,227 @@
+{
+  "mission": "AUTH-2",
+  "session": "PS-2026-09-30-007",
+  "recorded_at": "2026-09-30T18:56:20.027172+00:00",
+  "status": "accepted_and_candidate_disabled",
+  "pull_request": "https://github.com/kneelinghorse/TraceLab/pull/403",
+  "review_head": "fa9e9e1a2550d0de9e5780eeeccb187b7b3a1172",
+  "merge_commit": "db153f89321439a9404833234589b1b80db12e70",
+  "source_hashes_match_local_receipt": true,
+  "required_ci": {
+    "result": "all nine required contexts passed",
+    "backend_suite": {
+      "passed": 3032,
+      "skipped": 3,
+      "deselected_existing_quarantine": 12,
+      "warnings": 49,
+      "duration_seconds": 691.55,
+      "run": "https://github.com/kneelinghorse/TraceLab/actions/runs/36755686626"
+    },
+    "local_validation": "local-validation.json"
+  },
+  "deployment": {
+    "sha": "db153f89321439a9404833234589b1b80db12e70",
+    "ok": true,
+    "observed": {
+      "backend": "db153f89321439a9404833234589b1b80db12e70",
+      "frontend": "db153f89321439a9404833234589b1b80db12e70"
+    },
+    "seconds_to_serve": {
+      "backend": 162.9,
+      "frontend": 223.6
+    },
+    "budget_seconds": 900,
+    "elapsed_seconds": 223.6
+  },
+  "configuration": {
+    "observed_at": "2026-09-30T18:09:47.684958+00:00",
+    "resend_api_key_present": true,
+    "resend_sender_present": true,
+    "frontend_url_expected": true,
+    "debug": "false"
+  },
+  "preflight": {
+    "observed_at": "2026-09-30T18:19:35.162100+00:00",
+    "schema": "057_password_recovery_audit",
+    "candidate": {
+      "revision": 1,
+      "role": "member",
+      "active": false,
+      "keys": 0,
+      "grants": 0
+    },
+    "recovery": null,
+    "audits": []
+  },
+  "authorization": {
+    "observed_at": "2026-09-30T18:19:37.260099+00:00",
+    "anonymous_status": 401,
+    "service_status": 403,
+    "recipient_override_status": 422
+  },
+  "disabled_target_refusal": {
+    "operation": "disabled_refusal",
+    "status": 400,
+    "candidate_id": "44ea6fc4-7460-4ddb-b357-52bc1a0c1da7",
+    "observed_at": "2026-09-30T18:19:36.819770+00:00"
+  },
+  "candidate_setup": {
+    "operation": "enable",
+    "status": 200,
+    "candidate_id": "44ea6fc4-7460-4ddb-b357-52bc1a0c1da7",
+    "active": true,
+    "observed_at": "2026-09-30T18:20:11.447418+00:00"
+  },
+  "candidate_authorization": "Same dedicated, user-created candidate with explicitly controlled mailbox as AUTH-1; re-enabled explicitly as test setup. No unrelated account reset or email.",
+  "admin_request": {
+    "operation": "admin_password_reset",
+    "status": 200,
+    "candidate_id": "44ea6fc4-7460-4ddb-b357-52bc1a0c1da7",
+    "actor_id": "007c8cb6-7d70-48fc-bcb4-3a0e46bc0519",
+    "provider_status": "accepted",
+    "cache_control": "no-store",
+    "observed_at": "2026-09-30T18:20:53.944953+00:00"
+  },
+  "after_send": {
+    "observed_at": "2026-09-30T18:21:30.945665+00:00",
+    "schema": "057_password_recovery_audit",
+    "candidate": {
+      "revision": 1,
+      "role": "member",
+      "active": true,
+      "keys": 0,
+      "grants": 0
+    },
+    "recovery": [
+      "2026-09-30 18:20:53.741426",
+      "2026-09-30 18:50:53.741426",
+      "accepted",
+      1,
+      true
+    ],
+    "audits": [
+      {
+        "id": "2417c737-012b-4427-a75d-0e82d1071bf4",
+        "actor_user_id": "007c8cb6-7d70-48fc-bcb4-3a0e46bc0519",
+        "target_user_id": "44ea6fc4-7460-4ddb-b357-52bc1a0c1da7",
+        "requested_at": "2026-09-30 18:19:36.802839",
+        "completed_at": "2026-09-30 18:19:36.802839",
+        "outcome": "ineligible"
+      },
+      {
+        "id": "df9fc08a-7815-412c-8681-c74164561739",
+        "actor_user_id": "007c8cb6-7d70-48fc-bcb4-3a0e46bc0519",
+        "target_user_id": "44ea6fc4-7460-4ddb-b357-52bc1a0c1da7",
+        "requested_at": "2026-09-30 18:20:53.741426",
+        "completed_at": "2026-09-30 18:20:53.925317",
+        "outcome": "accepted"
+      }
+    ],
+    "candidate_password_changed": false,
+    "candidate_credentials_unchanged": true,
+    "candidate_revision_before": 1,
+    "other_accounts_unchanged": true,
+    "other_accounts_compared": 7,
+    "service_accounts_compared": 1,
+    "service_credentials_unchanged": true
+  },
+  "delivery_distinction": "Provider acceptance is recorded separately from the user-confirmed recipient flow. Password changed, revision advanced 1 to 2, and recovery token was removed; then the candidate was disabled.",
+  "browser_coverage": "Admin confirmation/pending/error/retry/keyboard/axe and Light/Dark 390/820/1440 were tested against the production build with controlled API fixtures. Deployed request used the real owner-authenticated API, not a live authenticated admin browser.",
+  "privacy": "No password, password hash, raw token, reset URL, API key, signing secret, provider error body or mailbox address in this receipt. Database inspections were read-only over TLS. Seven other account credential fingerprints, including the service principal, remained unchanged through reset and cleanup.",
+  "observed_probe_limitations": [
+    "One early read-only preflight ran before migration 057 and returned UndefinedTable; after the serving hash changed, migration 057 and the audit table were verified.",
+    "An initial local send probe refused to proceed while its read-only baseline was still running. After baseline completion, a read-only check proved no recovery row and only the prior ineligible audit. Exactly one subsequent admin request was accepted."
+  ],
+  "must_pass_open": [],
+  "closing_session": "PS-2026-09-30-008",
+  "after_reset": {
+    "observed_at": "2026-09-30T18:55:08.412103+00:00",
+    "schema": "057_password_recovery_audit",
+    "candidate": {
+      "revision": 2,
+      "role": "member",
+      "active": true,
+      "keys": 0,
+      "grants": 0
+    },
+    "recovery": null,
+    "audits": [
+      {
+        "id": "2417c737-012b-4427-a75d-0e82d1071bf4",
+        "actor_user_id": "007c8cb6-7d70-48fc-bcb4-3a0e46bc0519",
+        "target_user_id": "44ea6fc4-7460-4ddb-b357-52bc1a0c1da7",
+        "requested_at": "2026-09-30 18:19:36.802839",
+        "completed_at": "2026-09-30 18:19:36.802839",
+        "outcome": "ineligible"
+      },
+      {
+        "id": "df9fc08a-7815-412c-8681-c74164561739",
+        "actor_user_id": "007c8cb6-7d70-48fc-bcb4-3a0e46bc0519",
+        "target_user_id": "44ea6fc4-7460-4ddb-b357-52bc1a0c1da7",
+        "requested_at": "2026-09-30 18:20:53.741426",
+        "completed_at": "2026-09-30 18:20:53.925317",
+        "outcome": "accepted"
+      }
+    ],
+    "candidate_password_changed": true,
+    "candidate_credentials_unchanged": false,
+    "candidate_revision_before": 1,
+    "other_accounts_unchanged": true,
+    "other_accounts_compared": 7,
+    "service_accounts_compared": 1,
+    "service_credentials_unchanged": true
+  },
+  "cleanup": {
+    "operation": "disable",
+    "status": 200,
+    "candidate_id": "44ea6fc4-7460-4ddb-b357-52bc1a0c1da7",
+    "active": false,
+    "observed_at": "2026-09-30T18:55:21.194762+00:00"
+  },
+  "after_cleanup": {
+    "observed_at": "2026-09-30T18:55:56.819012+00:00",
+    "schema": "057_password_recovery_audit",
+    "candidate": {
+      "revision": 2,
+      "role": "member",
+      "active": false,
+      "keys": 0,
+      "grants": 0
+    },
+    "recovery": null,
+    "audits": [
+      {
+        "id": "2417c737-012b-4427-a75d-0e82d1071bf4",
+        "actor_user_id": "007c8cb6-7d70-48fc-bcb4-3a0e46bc0519",
+        "target_user_id": "44ea6fc4-7460-4ddb-b357-52bc1a0c1da7",
+        "requested_at": "2026-09-30 18:19:36.802839",
+        "completed_at": "2026-09-30 18:19:36.802839",
+        "outcome": "ineligible"
+      },
+      {
+        "id": "df9fc08a-7815-412c-8681-c74164561739",
+        "actor_user_id": "007c8cb6-7d70-48fc-bcb4-3a0e46bc0519",
+        "target_user_id": "44ea6fc4-7460-4ddb-b357-52bc1a0c1da7",
+        "requested_at": "2026-09-30 18:20:53.741426",
+        "completed_at": "2026-09-30 18:20:53.925317",
+        "outcome": "accepted"
+      }
+    ],
+    "candidate_password_changed": true,
+    "candidate_credentials_unchanged": false,
+    "candidate_revision_before": 1,
+    "other_accounts_unchanged": true,
+    "other_accounts_compared": 7,
+    "service_accounts_compared": 1,
+    "service_credentials_unchanged": true
+  },
+  "recipient_confirmation": {
+    "source": "User confirmation in this build session: confirmed, looks good",
+    "interpretation": "Confirmation of the requested admin reset acceptance, corroborated by a later read-only password/revision/consumed-token check. Password entry and inbox remained with the user.",
+    "ordering_note": "An initial post-confirmation read still showed the reset unused; completion was held until the later read proved the reset had completed."
+  },
+  "remaining_sprint_acceptance": [
+    "WALK-4 owns the expanded live credential matrix and final sprint review.",
+    "LOG-1 is In Progress; LOG-2 live worker delivery is still pending."
+  ]
+}

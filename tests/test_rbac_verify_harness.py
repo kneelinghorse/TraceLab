@@ -269,12 +269,17 @@ def test_matrix_flags_leak_when_unenforced(client, db_session, owner_principal, 
     assert leaks, "harness FAILED to flag a 2xx BOLA leak when RBAC was off"
 
 
-def test_service_log_matrix_flags_leak_when_gate_off(client, db_session, owner_principal, monkeypatch):
-    """With RBAC OFF the service gate is a no-op, so a non-service human reaches the
-    log-write (201). The new service_log_write_matrix MUST flag that as a DENY-LEAK —
-    proving the check can go RED (a harness check that can't fail is worthless, the
-    T47.2 review lesson). With the flag ON the full run (above) proves it stays green."""
+def test_service_log_matrix_flags_leak_when_gate_bypassed(client, db_session, owner_principal, monkeypatch):
+    """Inject a real role-gate bypass; the harness must catch successful human writes.
+
+    RBAC-off no longer bypasses this gate. A terminal local fixture lets the
+    legacy write reach insertion, so the mutation proves more than a 409 mismatch.
+    """
+    from app.api.v1 import missions as mission_routes
+    from app.models.mission import Mission
+
     monkeypatch.setattr(settings, "rbac_enabled", False)
+    monkeypatch.setattr(mission_routes, "authorize_service_or_403", lambda *args, **kwargs: None)
     verifier = RbacVerifier(client)
     owner_token = verifier.login(OWNER_EMAIL, OWNER_PW)
     owner_key, _ = verifier.mint_api_key(owner_token)
@@ -287,10 +292,16 @@ def test_service_log_matrix_flags_leak_when_gate_off(client, db_session, owner_p
     mid = verifier.seed(owner_key, mission_spec, {"project": proj_id})
     assert mid is not None, "mission seeding failed"
 
+    mission = db_session.get(Mission, UUID(mid))
+    mission.status = "completed"
+    mission.deepsearch_result_key = "controlled-terminal-result"
+    db_session.commit()
     verifier.service_log_write_matrix(mid, {"member": member_jwt})
 
     leaks = [g for g in verifier.gaps if g.kind == "DENY-LEAK-2xx"]
-    assert leaks, "harness FAILED to flag the log-write leak when the service gate was off"
+    assert any(g.method == "post" and g.path.endswith("/logs") for g in leaks), (
+        "harness FAILED to flag the successful human log-write with a bypassed service gate"
+    )
 
 
 def test_service_log_matrix_flags_missing_service_principal(client, db_session, owner_principal, monkeypatch):

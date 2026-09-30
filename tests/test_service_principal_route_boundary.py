@@ -93,6 +93,7 @@ def _completed_mission_owned_by(db, service: User) -> tuple[Project, Mission]:
         success_criteria=["Only explicit machine routes accept the credential."],
         status="completed",
         deepsearch_job_id="ds-service-boundary-v1",
+        deepsearch_result_key=uuid4().hex,
         result_markdown=claim,
         result_protocol={
             "sources_collected": [
@@ -236,5 +237,6 @@ def test_raw_principal_dependency_is_limited_to_reviewed_carve_outs():
     assert call_sites == {
         "api/v1/auth.py": 1,
         "api/v1/mission_events.py": 1,
-        "api/v1/missions.py": 2,
+        # Legacy log write, v2 negotiation/write, and evidence delivery.
+        "api/v1/missions.py": 4,
     }
