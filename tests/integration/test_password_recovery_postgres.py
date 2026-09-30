@@ -134,6 +134,32 @@ def test_api_key_authentication_racing_reset_cannot_borrow_new_revision(pg_recov
             assert future.result(timeout=10) is None
 
 
+def test_slow_key_hash_does_not_hold_the_user_lock_but_rechecks_revocation(pg_recovery, monkeypatch):
+    from app.core import security
+
+    factory, service, principal, token = pg_recovery
+    monkeypatch.setattr(security, "SessionLocal", factory)
+    with factory() as db:
+        key = create_api_key(APIKeyCreate(name="slow verification"), principal, db).key
+    hashing, resume = Event(), Event()
+    verify = security.verify_api_key
+    def slow_verify(plain, hashed):
+        hashing.set()
+        assert resume.wait(10)
+        return verify(plain, hashed)
+    monkeypatch.setattr(security, "verify_api_key", slow_verify)
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        future = pool.submit(security._validate_api_key, key)
+        assert hashing.wait(5)
+        try:
+            with factory() as db:
+                db.execute(text("SET LOCAL lock_timeout = '2s'"))
+                service.confirm(db, token, "replacement-password")
+        finally:
+            resume.set()
+        assert future.result(timeout=10) is None
+
+
 def test_reset_deletes_device_children_before_keys_and_preserves_pending(pg_recovery):
     factory, service, principal, token = pg_recovery
     with factory.begin() as db:

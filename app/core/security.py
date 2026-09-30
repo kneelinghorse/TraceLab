@@ -254,11 +254,16 @@ def _validate_api_key(api_key: str) -> AuthenticatedUser | None:
     try:
         candidates = db.query(APIKey).filter(APIKey.key_prefix == key_prefix).all()
         for candidate in candidates:
+            verified_hash = candidate.key_hash
+            if not verify_api_key(api_key, verified_hash):
+                continue
             # Match reset's user -> key lock order. Re-read after acquiring the
             # user lock: a key checked before reset must not acquire its new revision.
+            # Bcrypt stays outside that lock so machine requests are not serialized
+            # for the duration of password hashing; compare the verified hash again.
             db_user = db.query(User).filter(User.id == candidate.user_id).with_for_update().first()
             current = db.query(APIKey).populate_existing().filter(APIKey.id == candidate.id).first()
-            if db_user and current and verify_api_key(api_key, current.key_hash):
+            if db_user and current and current.key_hash == verified_hash:
                 if current.expires_at and current.expires_at < datetime.utcnow():
                     return None
                 principal = _to_authenticated_user(db_user, api_key_id=current.id)
