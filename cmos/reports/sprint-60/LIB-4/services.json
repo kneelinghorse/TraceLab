@@ -1,0 +1,12 @@
+{
+  "api": {
+    "id": "fa6a52a5-ba44-4b0d-8c11-2b96106b8146",
+    "status": "SUCCESS",
+    "commit": "9801c4f1e25acd93570564acbd76f67248a8a723"
+  },
+  "frontend": {
+    "id": "bcdfcf07-87ba-4576-b1ed-7b2d1fe4f126",
+    "status": "SUCCESS",
+    "commit": "9801c4f1e25acd93570564acbd76f67248a8a723"
+  }
+}

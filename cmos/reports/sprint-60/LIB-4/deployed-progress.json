@@ -1,0 +1,57 @@
+{
+  "project_id": "0d6c5b1d-72eb-4390-a40b-c48c88cdb302",
+  "collection_id": "cf1dd7ec-25f1-4141-9210-4a805e311137",
+  "draft_started": "2026-09-30T01:50:20.584Z",
+  "refused_attempts": [
+    {
+      "requested_at": "2026-09-30T01:48:31.191Z",
+      "http_status": 422,
+      "detail": "Original harness retained status only; exact provider/validation reason unavailable.",
+      "after_inspection": {
+        "provider_usage_records": 4,
+        "project_reports": 0
+      },
+      "retry_reason": "Explicitly request supported Markdown heading/citation formatting after inspecting the source texts and shared validator; no automatic repair or retry."
+    }
+  ],
+  "preview": {
+    "report_id": "69ac7bc1-2319-4de5-bce6-763cb7f3c3de",
+    "title": "LIB-4 reviewed synthetic onboarding report",
+    "model": "gpt-5.1",
+    "content_hash": "8f27a0fdb8dcd0ec9f7444f99ffb9241b222137461deb655d52fcc0376086f5e",
+    "citations": [
+      {
+        "marker": 1,
+        "available": true,
+        "chunk_id": "27a6eb7e-581c-43cd-bad9-3f7c3a5332ee",
+        "document_id": "228e2feb-9701-4a2d-855c-4c676a2218ea",
+        "excerpt": "Synthetic acceptance interview A. The researcher entered a new project and expected an obvious place",
+        "href": "/documents/228e2feb-9701-4a2d-855c-4c676a2218ea?chunk=27a6eb7e-581c-43cd-bad9-3f7c3a5332ee&index=0"
+      },
+      {
+        "marker": 2,
+        "available": true,
+        "chunk_id": "5382d30e-4343-4f3e-bca2-08b0cb1ff792",
+        "document_id": "c355fc82-a73b-4a8b-96d0-ddd53f83464a",
+        "excerpt": "Synthetic acceptance interview C. The researcher had interview notes ready to upload but could not q",
+        "href": "/documents/c355fc82-a73b-4a8b-96d0-ddd53f83464a?chunk=5382d30e-4343-4f3e-bca2-08b0cb1ff792&index=0"
+      }
+    ],
+    "input_chunk_ids": [
+      "27a6eb7e-581c-43cd-bad9-3f7c3a5332ee",
+      "5382d30e-4343-4f3e-bca2-08b0cb1ff792"
+    ],
+    "input_characters": 5133,
+    "snapshot_hash": "4bea10f7c9ce8434d3e4ea4f58e64a926e0dc0f7b880c7f8d98ef9266c23fcce",
+    "reports_before": [],
+    "draft_created_no_reports": true,
+    "caller_role": "owner",
+    "usage_before": 4,
+    "usage_after_draft": 5
+  },
+  "saved": {
+    "report_id": "69ac7bc1-2319-4de5-bce6-763cb7f3c3de",
+    "title": "LIB-4 reviewed synthetic onboarding report",
+    "href": "/reports/69ac7bc1-2319-4de5-bce6-763cb7f3c3de"
+  }
+}

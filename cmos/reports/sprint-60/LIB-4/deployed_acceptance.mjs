@@ -28,7 +28,12 @@ async function jsonFile(filename, fallback) {
 async function request(route, method = 'GET', body, asText = false) {
   const response = await fetch(api + '/api/v1' + route, { method,
     headers: { 'X-API-Key': credentials.key, 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
-  assert.ok(response.ok, `${method} ${route.split('?')[0]}: ${response.status}`);
+  if (!response.ok) {
+    const failure = await response.json().catch(() => ({}));
+    // Pydantic errors may echo signed inputs. Retain only a plain application detail.
+    const detail = typeof failure.detail === 'string' ? failure.detail : 'Request validation failed';
+    throw new Error(`${method} ${route.split('?')[0]}: ${response.status}: ${detail}`);
+  }
   return asText ? response.text() : response.json();
 }
 for (const endpoint of [api + '/api/v1/health', web + '/api/version']) {
@@ -57,7 +62,8 @@ async function usage() {
 }
 if (mode === 'prepare') {
   if (!review) {
-    assert.ok(!progress.draft_started, 'A prior draft was requested; inspect before another paid call');
+    assert.ok(!progress.draft_started || process.env.LIB4_RETRY_REFUSED === progress.draft_started,
+      'A prior draft was requested; inspect and explicitly identify that attempt before another paid call');
     const before = await snapshot();
     const reports = await request(`/reports?project_id=${projectId}&page_size=100`);
     assert.ok(reports.total <= 100);
@@ -68,7 +74,7 @@ if (mode === 'prepare') {
     progress.draft_started = new Date().toISOString(); await saveProgress();
     const preview = await request('/librarian/reports/draft', 'POST', { project_id: projectId, source_token: sources.source_token,
       chunk_ids: expectedChunks, reviewed_sources: true, title: 'LIB-4 reviewed synthetic onboarding report', format: 'report',
-      prompt: 'Summarise the onboarding navigation pain points in these two explicitly synthetic interview fixtures. Cite each supplied excerpt. Keep observed fixture statements separate from recommendations and do not claim real participant findings. Give a short report grounded only in these excerpts.' });
+      prompt: 'Summarise the onboarding navigation pain points in these two explicitly synthetic interview fixtures. Cite each supplied excerpt. Keep observed fixture statements separate from recommendations and do not claim real participant findings. Give a short report grounded only in these excerpts. Use markdown # headings and three short paragraphs; every paragraph, including any synthetic-data caveat or recommendation, must end with its supporting markers as separate [1] [2] citations. Do not use standalone bold labels.' });
     review = { user_id: me.user_id, sources, preview };
     await fs.writeFile(privateFile, JSON.stringify(review), { mode: 0o600 });
     assert.deepEqual(preview.citations.map(citation => citation.chunk_id), expectedChunks);
@@ -107,13 +113,14 @@ if (mode === 'browser') {
           reviewed: true, preview, saved: null }));
       }, { user: me, theme, sources: review.sources, preview: review.preview });
       const page = await context.newPage();
-      const errors = [], writes = []; let drafts = 0, accepts = 0, sourceVisits = 0;
+      const errors = [], writes = [], viewed = []; let drafts = 0, accepts = 0, sourceVisits = 0;
       page.on('pageerror', error => errors.push(error.message));
       page.on('request', req => {
         if (!req.url().startsWith(api + '/') || ['GET', 'HEAD', 'OPTIONS'].includes(req.method())) return;
         const pathname = new URL(req.url()).pathname;
         if (pathname.endsWith('/librarian/reports/draft')) drafts++;
         else if (pathname.endsWith('/librarian/reports/accept')) accepts++;
+        else if (pathname === '/api/v1/activity/viewed' && req.method() === 'PUT') viewed.push(req.postDataJSON());
         else writes.push({ method: req.method(), path: pathname });
       });
       const librarian = web + '/librarian?project=' + projectId;
@@ -136,21 +143,23 @@ if (mode === 'browser') {
         await expect(page.locator('[data-cited="true"] button[aria-expanded="true"]')).toBeVisible();
         sourceVisits++; await page.goto(librarian); await preview.waitFor();
       }
-      assert.equal(drafts, 0); assert.equal(accepts, 0);
+      assert.equal(drafts, 0); assert.equal(accepts, 0); assert.deepEqual(viewed, []);
       const saving = page.waitForResponse(r => r.url().endsWith('/librarian/reports/accept') && r.request().method() === 'POST');
       await preview.getByRole('button', { name: 'Save reviewed report' }).focus(); await page.keyboard.press('Enter');
       const response = await saving; assert.equal(response.status(), 200);
       const saved = await response.json(); assert.equal(saved.report_id, review.preview.report_id);
       progress.saved = saved; await saveProgress();
       await preview.getByRole('link', { name: saved.title, exact: true }).waitFor();
-      await page.evaluate(() => document.activeElement?.blur());
-      await panel.screenshot({ path: path.join(out, `deployed-preview-${theme}-${width}.png`) });
+      await page.evaluate(() => { document.activeElement?.blur(); window.scrollTo(0, 0); });
+      await page.screenshot({ path: path.join(out, `deployed-preview-${theme}-${width}.png`), fullPage: true,
+        mask: [page.getByText(me.email, { exact: true })] });
       await preview.getByRole('link', { name: saved.title, exact: true }).click();
       await page.getByRole('heading', { level: 1, name: saved.title, exact: true }).waitFor();
       await expect(page.getByText('Librarian drafted', { exact: false })).toContainText('Human accepted');
       await page.reload();
       const citations = page.getByRole('region', { name: 'Report source citations', exact: true });
       await citations.waitFor();
+      await expect(page.getByText('No accessible evidence is linked to this report.', { exact: true })).toBeVisible();
       await page.evaluate(() => { document.activeElement?.blur(); window.scrollTo(0, 0); });
       await page.screenshot({ path: path.join(out, `deployed-report-${theme}-${width}.png`), fullPage: true, mask: [page.getByText(me.email, { exact: true })] });
       for (const citation of review.preview.citations) {
@@ -161,9 +170,15 @@ if (mode === 'browser') {
         sourceVisits++; await page.goto(web + saved.href); await citations.waitFor();
       }
       assert.equal(drafts, 0); assert.equal(accepts, 1); assert.deepEqual(writes, []); assert.deepEqual(errors, []);
+      assert.ok(viewed.length >= 2);
+      for (const body of viewed) {
+        assert.equal(body.items.length, 1); assert.equal(body.items[0].type, 'report');
+        assert.equal(body.items[0].id, saved.report_id); assert.ok(body.items[0].occurred_at);
+      }
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
       checks.push({ theme, width, explicit_accepts: accepts, model_calls: drafts, exact_source_visits: sourceVisits,
-        navigation_and_reload_preserved_preview: true, report_id: saved.report_id, unrelated_writes: writes, page_errors: errors, overflow: false });
+        navigation_and_reload_preserved_preview: true, report_id: saved.report_id, expected_report_viewed_updates: viewed.length,
+        viewed_updates_only_saved_report: true, unrelated_writes: writes, page_errors: errors, overflow: false });
       await context.close();
     }
   } finally { await browser.close(); }
