@@ -38,7 +38,7 @@ export function LoginPanel({ onSwitchToRegister }: LoginPanelProps) {
         <p className="text-xs uppercase tracking-[0.4em] text-muted">TraceLab</p>
         <h1 className="text-3xl text-foreground font-semibold mt-2">Sign in</h1>
         <p className="text-sm text-secondary mt-3">
-          Enter your credentials to access Mission Protocol.
+          Enter your email and password to sign in.
         </p>
       </div>
 

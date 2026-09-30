@@ -220,7 +220,7 @@ The suggestions are requested, reviewed and accepted in the Librarian; a persist
 
 ### Follow-on — Sprint 61: Account recovery and live run logs (opened 2026-09-30)
 
-Derek asked to detail both password recovery and the outstanding DeepSearch live-log issue for a fresh build handoff. Decision **#563**, learnings **#274–275**, and the [Sprint 61 handoff](../planning/sprint-61-HANDOFF.md) record the source investigation, proposed policies, validation gates and cross-repository boundary. The existing sprint shell opened when AUTH-1 started in build session PS-2026-09-30-005 on 2026-09-30. AUTH-1 is In Progress; the other four missions remain Queued. Decision #564 records the recovery transaction and privacy contract before code.
+Derek asked to detail both password recovery and the outstanding DeepSearch live-log issue for a fresh build handoff. Decision **#563**, learnings **#274–275**, and the [Sprint 61 handoff](../planning/sprint-61-HANDOFF.md) record the source investigation, proposed policies, validation gates and cross-repository boundary. The existing sprint shell opened when AUTH-1 started in build session PS-2026-09-30-005 on 2026-09-30. AUTH-1 self-service recovery is accepted on deployed commit `68f607c` (PR #401): Derek received the real email, reset the dedicated candidate, observed sign-out, signed in with the new password and confirmed rejection of the old password. The token was consumed, unrelated human/service credentials stayed valid and the candidate was disabled afterward. The [deployed receipt](../reports/sprint-61/AUTH-1/deployed-acceptance.json) separates these observations from broader local revocation coverage and remaining WALK-4 live checks. Decisions #564–566 record the recovery transaction, privacy and race contracts. CMOS remains authoritative for the other mission states.
 
 | Mission | Planned outcome | Requires |
 | --- | --- | --- |
@@ -234,7 +234,7 @@ Recovery is independent of mission-email preferences and keeps Settings' known-p
 
 Local DeepSearch source intentionally sets `auto_delivery=False` to avoid writes from lost leases and flushes only after terminal persistence. TraceLab's receiver currently appends without deduplication. Therefore live delivery requires a safe receiving contract before worker enablement, not just switching on a timer. Existing five-second UI polling stays; no speculative progress percentages or replacement stream infrastructure. The old pending request `1621f451` is not evidence that the worker work is scheduled. LOG-2 owns the authorized live run; WALK-4 reuses its receipt. DeepSearch's current model-evaluation sprint is untouched, and its deployment/dispatch authorization remains a later concrete build gate.
 
-CMOS holds the full acceptance criteria. The build session starts with AUTH-1 and synchronized the sprint identity on opening. Production recovery still requires an agreed controlled mailbox/account and exact-build email-to-login acceptance. #412 stays unresolved until multiple batches are observed before completion; #416 and unrelated maintenance remain explicit carryovers.
+CMOS holds the full acceptance criteria. The build session synchronized sprint identity on opening. Public recovery has passed actual mailbox-to-login acceptance; admin-triggered recovery and the broader WALK-4 credential matrix still need their own live checks. #412 stays unresolved until multiple batches are observed before completion; #416 and unrelated maintenance remain explicit carryovers.
 
 ### Running alongside: the guest expansion track
 
