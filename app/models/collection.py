@@ -10,6 +10,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Index,
+    Integer,
     String,
     Text,
     UniqueConstraint,
@@ -17,7 +18,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base
-from app.models.types import GUID
+from app.models.types import GUID, CrossDBJSON
 
 
 class Collection(Base):
@@ -29,6 +30,7 @@ class Collection(Base):
     name = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
     instructions = Column(Text, nullable=True)
+    generation_provenance = Column(CrossDBJSON(), nullable=True)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(
         DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
@@ -66,6 +68,7 @@ class CollectionItem(Base):
         GUID(), ForeignKey("document_chunks.id", ondelete="CASCADE"), nullable=False
     )
     notes = Column(Text, nullable=True)
+    review_position = Column(Integer, nullable=True)
     added_at = Column(DateTime, nullable=False, default=datetime.utcnow)
 
     # Relationships

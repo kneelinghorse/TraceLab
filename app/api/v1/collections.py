@@ -200,6 +200,7 @@ def get_collection(
         updated_at=entry.updated_at,
         item_count=len(item_responses),
         items=item_responses,
+        librarian_generated=bool(getattr(entry, "generation_provenance", None)),
     )
 
 

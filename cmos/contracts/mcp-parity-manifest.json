@@ -2001,6 +2001,57 @@
       "classification": "rest-only-by-design",
       "baseline": "new",
       "rationale": "DUP-1: explicit human-principal selected-project text comparison and review. Deterministic read-only suggestions; no remediation writes. Decisions #551/#554 keep conversational proposal operations REST-only."
+    },
+    {
+      "id": "frontend/src/lib/api/librarian-collections.ts#organisationApi.draft:POST:/librarian/collections/draft",
+      "api_file": "frontend/src/lib/api/librarian-collections.ts",
+      "operation": "organisationApi.draft",
+      "source_line": 22,
+      "method": "POST",
+      "path": "/api/v1/librarian/collections/draft",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/librarian/CollectionSuggestions.tsx",
+        "frontend/src/pages/librarian.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "new",
+      "rationale": "ORG-1: human-reviewed selected-project collection proposals, explicit per-group acceptance and scoped provenance. Decisions #551/#555/#556 preserve existing MCP collection operations; conversational workflows remain REST-only."
+    },
+    {
+      "id": "frontend/src/lib/api/librarian-collections.ts#organisationApi.accept:POST:/librarian/collections/accept",
+      "api_file": "frontend/src/lib/api/librarian-collections.ts",
+      "operation": "organisationApi.accept",
+      "source_line": 25,
+      "method": "POST",
+      "path": "/api/v1/librarian/collections/accept",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/librarian/CollectionSuggestions.tsx",
+        "frontend/src/pages/librarian.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "new",
+      "rationale": "ORG-1: human-reviewed selected-project collection proposals, explicit per-group acceptance and scoped provenance. Decisions #551/#555/#556 preserve existing MCP collection operations; conversational workflows remain REST-only."
+    },
+    {
+      "id": "frontend/src/lib/api/librarian-collections.ts#organisationApi.provenance:GET:/librarian/collections/{collectionId}",
+      "api_file": "frontend/src/lib/api/librarian-collections.ts",
+      "operation": "organisationApi.provenance",
+      "source_line": 28,
+      "method": "GET",
+      "path": "/api/v1/librarian/collections/{collectionId}",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/librarian/CollectionSuggestions.tsx",
+        "frontend/src/pages/collections/[id].tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "new",
+      "rationale": "ORG-1: human-reviewed selected-project collection proposals, explicit per-group acceptance and scoped provenance. Decisions #551/#555/#556 preserve existing MCP collection operations; conversational workflows remain REST-only."
     }
   ]
 }

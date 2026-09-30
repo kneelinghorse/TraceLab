@@ -1,0 +1,25 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______ test_wrong_user_and_service_cannot_accept_another_principals_group ______
+
+organisation = (<starlette.testclient.TestClient object at 0x114a0b110>, <Mock id='4648801936'>, <app.models.project.Project object a...bf10>, <app.models.chunk.DocumentChunk object at 0x11530b210>, <app.models.chunk.DocumentChunk object at 0x11530b710>])
+db_session = <sqlalchemy.orm.session.Session object at 0x1152f0b10>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1151709d0>
+
+    def test_wrong_user_and_service_cannot_accept_another_principals_group(organisation, db_session, monkeypatch):
+        from app.core.security import AuthenticatedUser, require_authenticated_user
+
+        client, model, project, _, _ = organisation
+        group = draft(client, project)["groups"][0]
+        for role, expected in (("member", 422), ("service", 403)):
+            principal = AuthenticatedUser(user_id=uuid4(), email="fixture@example.test", display_name="Fixture", role=role)
+            monkeypatch.setitem(app.dependency_overrides, require_authenticated_user, lambda principal=principal: principal)
+>           assert accept(client, project, group).status_code == expected
+E           AssertionError: assert 409 == 422
+E            +  where 409 = <Response [409 Conflict]>.status_code
+E            +    where <Response [409 Conflict]> = accept(<starlette.testclient.TestClient object at 0x114a0b110>, <app.models.project.Project object at 0x1152f1f10>, {'description': 'Feedback about finding sources', 'group_id': '878d827c-ea4c-4156-9503-877dbf5b9d61', 'members': [{'av... 'document_id': '6f32b216-fee7-47d5-8c0b-e6b56349131c', 'document_name': 'Interview', ...}], 'name': 'Navigation', ...})
+
+tests/test_librarian_collections.py:294: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_librarian_collections.py::test_wrong_user_and_service_cannot_accept_another_principals_group
+1 failed, 14 warnings in 5.67s

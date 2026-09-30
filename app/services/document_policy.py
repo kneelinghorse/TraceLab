@@ -54,7 +54,7 @@ def resolve_readable_chunks(
     if collection_id is not None:
         query = query.join(CollectionItem, CollectionItem.chunk_id == DocumentChunk.id).filter(
             CollectionItem.collection_id == collection_id
-        ).order_by(CollectionItem.added_at, DocumentChunk.id)
+        ).order_by(CollectionItem.review_position.asc().nulls_last(), CollectionItem.added_at, DocumentChunk.id)
     else:
         query = query.filter(DocumentChunk.id.in_(chunk_ids or [])).order_by(DocumentChunk.id)
     return [(row.id, row.project_id) for row in query.all()]

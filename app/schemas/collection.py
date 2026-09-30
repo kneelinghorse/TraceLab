@@ -73,6 +73,7 @@ class CollectionDetailResponse(CollectionResponse):
     """Collection with full list of items for detail view."""
 
     items: list[CollectionItemResponse] = Field(default_factory=list)
+    librarian_generated: bool = False
 
 
 class CollectionListResponse(BaseModel):

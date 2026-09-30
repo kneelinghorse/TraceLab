@@ -339,7 +339,7 @@ class SynthesisService:
                         Document.deleted_at.is_(None),
                         Document.project_id.in_(accessible_project_ids),
                     )
-                    .order_by(CollectionItem.added_at.asc())
+                    .order_by(CollectionItem.review_position.asc().nulls_last(), CollectionItem.added_at.asc())
                     .limit(MAX_CHUNKS_PER_REQUEST + 1)
                     .all()
                 )
@@ -362,7 +362,7 @@ class SynthesisService:
             items = (
                 session.query(CollectionItem)
                 .filter(CollectionItem.collection_id == str(collection_id))
-                .order_by(CollectionItem.added_at.asc())
+                .order_by(CollectionItem.review_position.asc().nulls_last(), CollectionItem.added_at.asc())
                 .all()
             )
 

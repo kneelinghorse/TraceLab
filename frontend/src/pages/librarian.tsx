@@ -10,6 +10,7 @@ import { SpacePicker } from "@/components/SpacePicker";
 import { ChunkList, type ChunkListRequest } from "@/components/librarian/ChunkList";
 import { ProjectDescription } from "@/components/librarian/ProjectDescription";
 import { DuplicateReview } from "@/components/librarian/DuplicateReview";
+import { CollectionSuggestions } from "@/components/librarian/CollectionSuggestions";
 import { useFeedback } from "@/components/ui/useFeedback";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -487,6 +488,7 @@ function LibrarianContent() {
 
       {project && <ProjectDescription key={`description:${storageUser}:${project.id}`} userId={storageUser} projectId={project.id} projectName={project.name} />}
       {project && <DuplicateReview key={`duplicates:${storageUser}:${project.id}`} userId={storageUser} projectId={project.id} projectName={project.name} />}
+      {project && <CollectionSuggestions key={`collections:${storageUser}:${project.id}`} userId={storageUser} projectId={project.id} projectName={project.name} />}
 
       <section className="panel p-5" aria-label="Conversation with the Librarian">
         {started && (

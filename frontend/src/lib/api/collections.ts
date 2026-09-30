@@ -27,6 +27,7 @@ export type CollectionItem = {
 
 export type CollectionDetail = Collection & {
   items: CollectionItem[];
+  librarian_generated?: boolean;
 };
 
 export type CollectionListResponse = {
