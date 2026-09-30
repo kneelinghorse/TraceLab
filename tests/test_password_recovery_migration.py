@@ -10,7 +10,7 @@ from alembic.operations import Operations
 
 
 def test_recovery_sqlite_upgrade_downgrade(monkeypatch):
-    source = Path(__file__).resolve().parents[2] / "alembic/versions/056_password_recovery.py"
+    source = Path(__file__).resolve().parents[1] / "alembic/versions/056_password_recovery.py"
     spec = importlib.util.spec_from_file_location("recovery_migration", source)
     migration = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(migration)

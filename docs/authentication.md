@@ -126,7 +126,7 @@ CLI automation isolated from the service account used elsewhere.
      -H "Authorization: Bearer ${TOKEN}"
    ```
 
-All failures return structured 401 responses (`missing token`, `invalid username or password`, or `token subject is not recognized`). When developing against the frontend, ensure the browser origin matches the configured CORS list to avoid pre-flight rejections.
+Invalid or missing credentials return 401; disabled accounts return 403 and exhausted authentication budgets return 429 with Retry-After. Recovery response codes are described above. When developing against the frontend, ensure the browser origin matches the configured CORS list to avoid pre-flight rejections.
 
 ## CLI & Script Examples
 

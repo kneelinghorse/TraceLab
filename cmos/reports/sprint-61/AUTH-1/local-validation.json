@@ -37,7 +37,7 @@
     "tests/test_auth_me_role_contract.py": "ed9c5788c3b3e5f505068a520314a345f182f5052ede456715d114bd52c9b7db",
     "tests/test_password_recovery.py": "b9d5031b3091ff8777a7bbe3b1d3a8198e694fbb22ea66df66e36a38a6f66dfe",
     "tests/test_recovery_routes.py": "0fa546aed40480512823790b3af90bc051d590447c450c808c6ba1a59b6f5144",
-    "tests/unit/test_password_recovery_migration.py": "cd57f2925e9d9d90445ae3940590e069f978779295ecd9c33cd5d359daf64adc"
+    "tests/test_password_recovery_migration.py": "53f011baf506b1f9bf16cd6e4fb5ebc3d20e3a55b7234b14e7f2eb9899877fa0"
   },
   "validation": [
     {
@@ -162,5 +162,7 @@
     "The full backend and full PostgreSQL suites have not been run locally; targeted checks are recorded here.",
     "The existing 12-node backend quarantine is unchanged.",
     "No AUTH-2, LOG-1, LOG-2 or WALK-4 completion is claimed."
-  ]
+  ],
+  "review_url": "https://github.com/kneelinghorse/TraceLab/pull/401",
+  "runtime_source_commit": "b21fb3b7dd2a41d1b71b0e5882f3e961408b3d4a"
 }
