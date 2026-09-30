@@ -1,0 +1,275 @@
+{
+  "mission": "LOG-1",
+  "session": "PS-2026-09-30-008",
+  "recorded_at": "2026-09-30T19:44:06.332319+00:00",
+  "status": "receiver_accepted_live_worker_delivery_still_pending",
+  "pull_request": "https://github.com/kneelinghorse/TraceLab/pull/404",
+  "tested_head": "1bf93a1407838e1bbc5151786977b01f6d828cc3",
+  "serving_commit": "55b5da6a7cc2334350aa40a251d0c479a3c96914",
+  "source_hashes_match_local_receipt": true,
+  "local_validation": "local-validation.json",
+  "decisions": [
+    568,
+    569
+  ],
+  "required_ci": [
+    {
+      "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36764850896/job/110056325405",
+      "name": "backend-integration",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36764851016/job/110056325087",
+      "name": "vitest",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36764850995/job/110056324830",
+      "name": "Secret Scan",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36764851016/job/110056325335",
+      "name": "type-check",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36764851016/job/110056325433",
+      "name": "lint",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36764851050/job/110056324773",
+      "name": "ruff-diff",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36764850898/job/110056325652",
+      "name": "backend-suite",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36764851058/job/110056324365",
+      "name": "build-frontend-production",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36764851062/job/110056324509",
+      "name": "mcp-package",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36764841909/job/110056291247",
+      "name": "Secret Scan",
+      "state": "SUCCESS"
+    }
+  ],
+  "final_ci": {
+    "backend": {
+      "passed": 3074,
+      "skipped": 3,
+      "deselected_existing_quarantine": 12,
+      "warnings": 49,
+      "duration_seconds": 839.21,
+      "run": "https://github.com/kneelinghorse/TraceLab/actions/runs/36764850898"
+    },
+    "postgres": {
+      "passed": 169,
+      "skipped": 2,
+      "skip_reasons": [
+        "Optional live RBAC matrix has no deployed target configured.",
+        "CLI subprocess requires a running authenticated server unavailable in this test environment."
+      ],
+      "warnings": 17,
+      "duration_seconds": 132.55,
+      "run": "https://github.com/kneelinghorse/TraceLab/actions/runs/36764850896"
+    },
+    "production_browser": {
+      "passed": 82,
+      "run": "https://github.com/kneelinghorse/TraceLab/actions/runs/36764851058"
+    }
+  },
+  "deployment": {
+    "sha": "55b5da6a7cc2334350aa40a251d0c479a3c96914",
+    "ok": true,
+    "observed": {
+      "backend": "55b5da6a7cc2334350aa40a251d0c479a3c96914",
+      "frontend": "55b5da6a7cc2334350aa40a251d0c479a3c96914"
+    },
+    "seconds_to_serve": {
+      "frontend": 141.8,
+      "backend": 161.9
+    },
+    "budget_seconds": 900,
+    "elapsed_seconds": 161.9
+  },
+  "fixture_setup": {
+    "mission_id": "70d5c2c5-49f9-4ea4-a1dc-4f535f4eff4b",
+    "project_id": "ef0d0c3c-a169-44de-bd2a-460532a96a52",
+    "attempt_count": 2147483647,
+    "serving_sha": "55b5da6a7cc2334350aa40a251d0c479a3c96914",
+    "created_at": "2026-09-30T19:39:42.221662+00:00"
+  },
+  "no_dispatch_fence": "New dedicated project/draft created through real owner API; guarded SQLAlchemy fixture transition used attempt_count=2147483647, above the deployed worker policy maximum and impossible to increment in PostgreSQL int32. Never queued. Only this synthetic row was altered. No provider invoked, worker deployed, or worker config changed.",
+  "deployed_http_proof": {
+    "observed_at": "2026-09-30T19:40:12.096084+00:00",
+    "serving_sha": "55b5da6a7cc2334350aa40a251d0c479a3c96914",
+    "mission_id": "70d5c2c5-49f9-4ea4-a1dc-4f535f4eff4b",
+    "project_id": "ef0d0c3c-a169-44de-bd2a-460532a96a52",
+    "fixture_attempt": 2147483647,
+    "capabilities": {
+      "contract_version": "tracelab-mission-logs-v2",
+      "max_batch_entries": 200,
+      "max_message_chars": 2048,
+      "final_flush": "terminal_result_key",
+      "legacy": "terminal_only_until_LOG-2_cutover"
+    },
+    "checks": [
+      {
+        "check": "first_insert",
+        "status": 201,
+        "counts": [
+          1,
+          0
+        ]
+      },
+      {
+        "check": "exact_replay",
+        "status": 200,
+        "counts": [
+          0,
+          1
+        ]
+      },
+      {
+        "check": "mixed_new_conflict_atomic_refusal",
+        "status": 409,
+        "counts": null
+      },
+      {
+        "check": "prior_attempt_refusal",
+        "status": 409,
+        "counts": null
+      },
+      {
+        "check": "forged_proof_refusal",
+        "status": 409,
+        "counts": null
+      },
+      {
+        "check": "final_flush_after_token_cleared",
+        "status": 201,
+        "counts": [
+          1,
+          0
+        ]
+      },
+      {
+        "check": "final_flush_replay",
+        "status": 200,
+        "counts": [
+          0,
+          1
+        ]
+      }
+    ],
+    "active_mission_unchanged": true,
+    "terminal_mission_unchanged": true,
+    "rows": [
+      {
+        "id": "fa4b643f-5ba2-4286-943d-66b7bab49119",
+        "level": "INFO",
+        "message": "Controlled LOG-1 receiver observation; no research executed.",
+        "source": "deepsearch:running",
+        "logged_at": "2026-09-30T19:40:12.095316",
+        "created_at": "2026-09-30T19:40:12.442463",
+        "attempt_count": 2147483647,
+        "event_id": "0891ab3a-ae46-40b4-8229-397d85b90b15",
+        "sequence": 1
+      },
+      {
+        "id": "61dabd2d-9496-4301-bb11-129f5e0d0bf4",
+        "level": "INFO",
+        "message": "Controlled final flush after synthetic terminal transition; no research executed.",
+        "source": "deepsearch:running",
+        "logged_at": "2026-09-30T19:40:15.032958",
+        "created_at": "2026-09-30T19:40:15.274950",
+        "attempt_count": 2147483647,
+        "event_id": "0a9f8513-479f-45b8-b8c7-e38b3b466e51",
+        "sequence": 2
+      }
+    ],
+    "authorization": {
+      "human_write": 403,
+      "service_read": 403,
+      "anonymous_write": 401
+    },
+    "no_provider": true
+  },
+  "deployed_mcp": {
+    "observed_at": "2026-09-30T19:42:08.642Z",
+    "package": "@aquex/tracelab-mcp@2.1.0",
+    "server": {
+      "name": "tracelab-mcp",
+      "version": "2.1.0"
+    },
+    "install": "clean temporary npm install of published artifact, lifecycle scripts disabled",
+    "api_origin": "https://api.tracelab.aquex.ai",
+    "mission_id": "70d5c2c5-49f9-4ea4-a1dc-4f535f4eff4b",
+    "action": "tracelab_mission_execution.logs",
+    "count": 2,
+    "attempt_and_event_fields_preserved": true,
+    "rows_match_deployed_http_read": true,
+    "raw_proof_absent": true,
+    "connector_limitation": "Connected Aquex tool returned Transport closed; this successful call uses the actual published MCP server over SDK stdio against deployed TraceLab.",
+    "response": {
+      "logs": [
+        {
+          "id": "fa4b643f-5ba2-4286-943d-66b7bab49119",
+          "level": "INFO",
+          "message": "Controlled LOG-1 receiver observation; no research executed.",
+          "source": "deepsearch:running",
+          "logged_at": "2026-09-30T19:40:12.095316",
+          "created_at": "2026-09-30T19:40:12.442463",
+          "attempt_count": 2147483647,
+          "event_id": "0891ab3a-ae46-40b4-8229-397d85b90b15",
+          "sequence": 1,
+          "url": "https://tracelab.aquex.ai/missions/70d5c2c5-49f9-4ea4-a1dc-4f535f4eff4b"
+        },
+        {
+          "id": "61dabd2d-9496-4301-bb11-129f5e0d0bf4",
+          "level": "INFO",
+          "message": "Controlled final flush after synthetic terminal transition; no research executed.",
+          "source": "deepsearch:running",
+          "logged_at": "2026-09-30T19:40:15.032958",
+          "created_at": "2026-09-30T19:40:15.274950",
+          "attempt_count": 2147483647,
+          "event_id": "0a9f8513-479f-45b8-b8c7-e38b3b466e51",
+          "sequence": 2,
+          "url": "https://tracelab.aquex.ai/missions/70d5c2c5-49f9-4ea4-a1dc-4f535f4eff4b"
+        }
+      ],
+      "url": "https://tracelab.aquex.ai/missions/70d5c2c5-49f9-4ea4-a1dc-4f535f4eff4b",
+      "empty": false,
+      "message": "Recorded log lines; live streaming is dormant."
+    }
+  },
+  "npm_integrity": "sha512-/pLsANVNUZtY82vg1NNT95wWWqb+QGRS3/+9vpqBrL6p/h7YPzZ5Nb3Xoq5sOfgecFqPjMyDerphvIpHjg6skw==",
+  "cleanup": {
+    "observed_at": "2026-09-30T19:42:31.024336+00:00",
+    "mission_id": "70d5c2c5-49f9-4ea4-a1dc-4f535f4eff4b",
+    "project_id": "ef0d0c3c-a169-44de-bd2a-460532a96a52",
+    "mission_deleted": true,
+    "logs_cascade_deleted": true,
+    "project_soft_deleted": true,
+    "serving_sha": "55b5da6a7cc2334350aa40a251d0c479a3c96914"
+  },
+  "privacy": "No credentials, raw lease proof, derived terminal key, passwords or signed URLs retained. Fixture private state stayed local with mode0600. Mission/logs removed; project soft-deleted through owner API. MCP URLs identify the intentionally removed fixture.",
+  "limitations": [
+    "This is synthetic receiver acceptance, not pre-terminal delivery from a real research worker; #412 remains open for LOG-2/WALK-4.",
+    "Connected Aquex MCP transport was closed. A clean install of the actual published @aquex/tracelab-mcp2.1.0 was successfully called via MCP SDK stdio against the deployed API instead.",
+    "Legacy terminal-only compatibility remains non-idempotent and must be retired in LOG-2 after coordinated worker acceptance.",
+    "Worker build identity remains separately unverified at runtime; its next authorized required live run must record it.",
+    "Original CI failures and local harness defects are preserved in local-validation.json. No quarantine or skips changed."
+  ]
+}
