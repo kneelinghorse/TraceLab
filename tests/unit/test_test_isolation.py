@@ -105,6 +105,7 @@ print("isolated settings, singleton, enabled cache recreate/write/read, RAG and 
         QDRANT_API_KEY="test-sentinel-not-a-secret",
         QDRANT_COLLECTION_NAME="production_chunks",
         SEMANTIC_CACHE_COLLECTION_NAME="production_cache",
+        SEMANTIC_CACHE_ENABLED="false",
         OPENAI_API_KEY="test-sentinel-not-a-secret",
         LIBRARIAN_API_KEY="test-sentinel-not-a-secret",
         RESEND_API_KEY="test-sentinel-not-a-secret",
@@ -119,7 +120,7 @@ print("isolated settings, singleton, enabled cache recreate/write/read, RAG and 
     (tmp_path / ".env").write_text(
         'QDRANT_URL=https://dotenv-sentinel.invalid\n'
         'QDRANT_API_KEY=test-dotenv-not-a-secret\n'
-        'SEMANTIC_CACHE_ENABLED=true\n'
+        'SEMANTIC_CACHE_ENABLED=false\n'
     )
     (tmp_path / "tests").mkdir()
     completed = subprocess.run(  # noqa: S603 - fixed local probe, no user input

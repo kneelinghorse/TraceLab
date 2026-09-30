@@ -57,12 +57,42 @@
         "legacy headings expected in cmos/agents.md"
       ],
       "disposition": "Unchanged historical harness assumptions; not runtime isolation failures. Preserved in integration-framework.json."
+    },
+    {
+      "selection": "full serialized backend, 638a931 plus equivalent cache-on default",
+      "passed": 3076,
+      "failed": 1,
+      "skipped": 4,
+      "deselected": 12,
+      "duration_seconds": 500.14,
+      "failure": "tests/performance/test_qdrant_performance.py::test_parameter_sweep_finds_configuration_with_latency_headroom",
+      "observed": "Sleeping stub p99 for ef128=4.497792ms, ef96=9.585083ms; latency ordering assertion failed. No real Qdrant transport in that test; no threshold or quarantine modification."
+    },
+    {
+      "selection": "final source: sentinel environment/dotenv, late import, parameter sweep, disposable Qdrant and PostgreSQL locking",
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0,
+      "deselected": 0,
+      "duration_seconds": 49.32
+    },
+    {
+      "selection": "GitHub initial source638a931",
+      "passed_contexts": [
+        "backend-integration",
+        "vitest",
+        "type-check",
+        "ruff-diff",
+        "build-frontend-production",
+        "Secret Scan",
+        "lint",
+        "mcp-package"
+      ],
+      "backend_suite": "in progress"
     }
   ],
   "pending": [
-    "Full serialized backend with original 12 quarantined nodes",
-    "Final PostgreSQL integration and exact-source checks",
-    "GitHub required checks"
+    "Required GitHub checks for final source"
   ],
   "external_calls": "Sentinel probes intercepted sockets; no production vector, mail or model calls. Container proof used newly created local Docker Qdrant and PostgreSQL.",
   "scope_limits": [
@@ -70,5 +100,12 @@
     "No quarantine changes",
     "No production deployment required for this test-only mission"
   ],
-  "dependency_audit_observation": "npm ci reported existing lockfile advisories: frontend21 (2 critical), MCP13 (1 critical). No dependencies changed; remediation outside the locked isolation mission."
+  "dependency_audit_observation": "npm ci reported existing lockfile advisories: frontend21 (2 critical), MCP13 (1 critical). No dependencies changed; remediation outside the locked isolation mission.",
+  "source_files_sha256": {
+    "scripts/pytest_isolation.py": "1d6fab180d96bcbc7ba4e2a7f3dcb23f51a3b54cdd4eb939dd49f3898f07524b",
+    "tests/conftest.py": "b25d9a7bc8dd8c289ad010df0384a55f7a6a91f25bd1a5de375e73fcfe75739c",
+    "tests/integration/conftest.py": "8fb011f4d1e21a0072695782834919169fc61bc51ec3a4855fbff1bd8d1d205f",
+    "tests/unit/test_test_isolation.py": "9dba5cea81c0d0d1b1f0a68f87ee2569fe48109d97fafd59960c7fd762e0bcfb",
+    "tests/integration/test_qdrant_isolation.py": "7bea7d7fe6d273b32b43adbb13aa0118b76463abd7d5007b1b42ca6f147e6f56"
+  }
 }

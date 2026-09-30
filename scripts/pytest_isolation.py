@@ -36,6 +36,7 @@ def install() -> None:
         QDRANT_API_KEY="",
         QDRANT_PREFER_GRPC="false",
         QDRANT_COLLECTION_NAME=f"{prefix}_chunks",
+        SEMANTIC_CACHE_ENABLED="true",
         SEMANTIC_CACHE_COLLECTION_NAME=f"{prefix}_cache",
         OPENAI_API_KEY="test",
         OPENAI_BASE_URL="https://pytest-provider.invalid/v1",
