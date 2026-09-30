@@ -28,3 +28,23 @@ def test_recovery_sqlite_upgrade_downgrade(monkeypatch):
         migration.downgrade()
         assert "password_recoveries" not in inspect(connection).get_table_names()
         assert "credential_version" not in {c["name"] for c in inspect(connection).get_columns("users")}
+
+
+def test_admin_recovery_audit_survives_account_cleanup(monkeypatch):
+    source = Path(__file__).resolve().parents[1] / "alembic/versions/057_password_recovery_audit.py"
+    spec = importlib.util.spec_from_file_location("recovery_audit_migration", source)
+    migration = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(migration)
+    engine = create_engine("sqlite://")
+    with engine.begin() as connection:
+        connection.execute(text("PRAGMA foreign_keys=ON"))
+        connection.execute(text("CREATE TABLE users (id CHAR(36) PRIMARY KEY)"))
+        monkeypatch.setattr(migration, "op", Operations(MigrationContext.configure(connection)))
+        migration.upgrade()
+        connection.execute(text("INSERT INTO users VALUES ('actor'), ('target')"))
+        connection.execute(text("INSERT INTO password_recovery_audits VALUES ('audit','actor','target',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,'accepted')"))
+        connection.execute(text("DELETE FROM users"))
+        assert tuple(connection.execute(text("SELECT actor_user_id,target_user_id,outcome FROM password_recovery_audits")).one()) == ("actor", "target", "accepted")
+        assert {c["name"] for c in inspect(connection).get_columns("password_recovery_audits")} == {"id", "actor_user_id", "target_user_id", "requested_at", "completed_at", "outcome"}
+        migration.downgrade()
+        assert "password_recovery_audits" not in inspect(connection).get_table_names()

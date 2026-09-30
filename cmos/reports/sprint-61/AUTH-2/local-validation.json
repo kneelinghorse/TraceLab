@@ -1,0 +1,104 @@
+{
+  "mission": "AUTH-2",
+  "session": "PS-2026-09-30-007",
+  "decision": 567,
+  "recorded_at": "2026-09-30T18:01:42.182603+00:00",
+  "status": "local_validation_passed_deployed_acceptance_pending",
+  "source_base": "7d1fe317e06696cab4b0781b733fba079e41f741",
+  "source_sha256": {
+    "app/api/v1/admin_users.py": "56954dab211697bc414dd0b7ae284e93a9fa3916f72d50153f3516bb68f3bac7",
+    "app/models/__init__.py": "a773ff95ca2455d205768c8079f0961bfb2502293f8f5cb1077f689c340d1d69",
+    "app/models/password_recovery.py": "e89cb590b569c5bdc237b5ff8e49af94536485b4c60377c8cd7e7d51d18e4441",
+    "app/schemas/auth.py": "0eaa0e8c23e5ccb95bfee9148a25aa0b53e97f5a9dd856893c480974452893f2",
+    "app/services/password_recovery.py": "ab1c28a3b23e29f344a4af120daf414e1265490682d819c2ca7f255a8ea0d430",
+    "frontend/src/__tests__/admin/users.test.tsx": "e2d58154a460f97ec442cd2291270151d3015123cf6652b1fcfd543509bedeef",
+    "frontend/src/lib/api/admin.ts": "db51662582ab0bd168efeb98df417351c3ad4ba89a013b123b523fbe718b5d48",
+    "frontend/src/pages/admin/users.tsx": "ff75e136375fabad487d94c86150f428e63516f84d107063d10d9fd47ae1fded",
+    "tests/integration/test_password_recovery_postgres.py": "2c0c6dcfcfa0bb3b17fdf17362b31dd3d0aac97048452cd43935e899a8f9e81a",
+    "tests/test_password_recovery.py": "0a1ef8c1432f3c7ee651497ef076bccba7565455c941401a7f4f4f9d3a0d873e",
+    "tests/test_password_recovery_migration.py": "ded24101ec477d9d063e5e663ad3572d89bc23e149d27b90460692c97968c8a7",
+    "alembic/versions/057_password_recovery_audit.py": "58721312eb71eb0c1cf612d3b2250059758b434d7a4249c4a0be4b7c9d45a180",
+    "frontend/tests/e2e/admin-password-recovery.spec.ts": "3f1923524c91f1dd2331e04675ea1eeafec72066d1d7e237e13c57ad36d14ce4",
+    "tests/test_admin_password_recovery.py": "ebdd335416dfa6225e5d7013eb9dcf90021da66d4a77d01397260b65d8745daf"
+  },
+  "validation": [
+    {
+      "scope": "admin/public recovery, existing admin user controls, SQLite DDL and real PostgreSQL migration/concurrent request/credential fences",
+      "passed": 88,
+      "skipped": 0,
+      "log_local": "/tmp/auth2-boundaries.log"
+    },
+    {
+      "scope": "final provider exception secrecy, API-key, device auth, notifications and OODS consumers",
+      "passed": 77,
+      "skipped": 0,
+      "overlaps_other_runs": true,
+      "log_local": "/tmp/auth2-consumers.log"
+    },
+    {
+      "scope": "all frontend units, serial execution",
+      "passed": 306,
+      "skipped": 0,
+      "log_local": "/tmp/auth2-all-frontend.log"
+    },
+    {
+      "scope": "final built Chromium admin dialog Light/Dark 390/820/1440; stored target, keyboard, focus, axe serious/critical, no page overflow, failure/retry, retained account activity",
+      "passed": 6,
+      "skipped": 0,
+      "api": "intercepted fixtures; no actual email",
+      "log_local": "/tmp/auth2-browser-recheck.log"
+    },
+    {
+      "scope": "public recovery built browser regression in mixed run",
+      "passed": 6,
+      "skipped": 0,
+      "log_local": "/tmp/auth2-browser-final.log",
+      "note": "Same run had two failing admin mobile overflow checks, fixed and reverified separately."
+    },
+    {
+      "scope": "frontend types/build/changed-file ESLint, changed Python Ruff, credential scan, MCP parity and foundational references",
+      "result": "passed"
+    }
+  ],
+  "failures_preserved": [
+    {
+      "run": "initial TDD",
+      "reason": "PasswordRecoveryAudit was not implemented yet",
+      "resolution": "implemented and boundary tests pass",
+      "log_local": "/tmp/auth2-tdd.log"
+    },
+    {
+      "run": "initial parity",
+      "reason": "new admin REST operation not yet classified",
+      "resolution": "recorded REST-only admin authentication classification; 9 tools / 50 actions unchanged"
+    },
+    {
+      "run": "visual and mobile overflow review",
+      "reason": "First screenshot revealed squeezed table text; initial scrollable-table correction exposed absolute status accessibility text outside scroll containment",
+      "resolution": "readable minimum table width and positioned keyboard-focusable scroll region; final six cases pass",
+      "log_local": "/tmp/auth2-browser-final.log"
+    },
+    {
+      "run": "diagnostic harness attempts",
+      "reason": "temporary extra closing parenthesis and wrong working directory for local axe asset",
+      "resolution": "corrected diagnostic test and ran from frontend; final six cases pass",
+      "logs_local": [
+        "/tmp/auth2-mobile-diagnostic.log",
+        "/tmp/auth2-mobile-diagnostic2.log",
+        "/tmp/auth2-mobile-diagnostic3.log"
+      ]
+    }
+  ],
+  "must_pass_open": [
+    "Required final-head CI and review/deployment of the exact source.",
+    "Observe schema 057 and unchanged Resend/HTTPS configuration in production.",
+    "Real admin send to the agreed controlled candidate, provider/audit acceptance, actual inbox receipt, recipient reset and new-password login.",
+    "Disable/revoke temporary fixture after acceptance and record exact serving builds."
+  ],
+  "limits": [
+    "No AUTH-2 production email or password change has occurred yet.",
+    "Candidate from AUTH-1 is currently disabled. Re-enable it explicitly as test setup before the next acceptance; the recovery endpoint itself never enables accounts.",
+    "Existing 12-node backend quarantine is unchanged; full CI may have its established skips. All local executed cases listed above have zero skips.",
+    "This does not complete LOG-1, LOG-2, WALK-4 or the expanded live credential matrix."
+  ]
+}

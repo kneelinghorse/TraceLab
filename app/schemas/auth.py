@@ -70,6 +70,15 @@ class PasswordResetResponse(BaseModel):
     message: str
 
 
+class AdminPasswordResetRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+
+class AdminPasswordResetResponse(BaseModel):
+    delivery_status: Literal["accepted"]
+    message: str
+
+
 class ProfileUpdate(BaseModel):
     """Payload for updating the authenticated user's profile."""
 

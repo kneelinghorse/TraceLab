@@ -45,6 +45,10 @@ export function UsersAdmin() {
   const [actionError, setActionError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<AdminUser | null>(null);
+  const [pendingRecovery, setPendingRecovery] = useState<AdminUser | null>(null);
+  const [recoveryError, setRecoveryError] = useState<string | null>(null);
+  const [recoveryNotice, setRecoveryNotice] = useState<string | null>(null);
+  const recoverySending = useRef(false);
   const cancelDeleteRef = useRef<HTMLButtonElement>(null);
 
   // Move focus into the destructive-action dialog when it opens (a11y).
@@ -116,6 +120,25 @@ export function UsersAdmin() {
     }
   };
 
+  const confirmRecovery = async () => {
+    if (!pendingRecovery || recoverySending.current) return;
+    const target = pendingRecovery;
+    recoverySending.current = true;
+    setBusyId(target.id);
+    setRecoveryError(null);
+    setRecoveryNotice(null);
+    try {
+      const result = await adminUsersApi.sendPasswordReset(target.id);
+      setRecoveryNotice(`${target.email}: ${result.message}`);
+      setPendingRecovery(null);
+    } catch (err) {
+      setRecoveryError(apiErrorMessage(err, "The reset email could not be sent. Please try again later."));
+    } finally {
+      recoverySending.current = false;
+      setBusyId(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
@@ -125,6 +148,8 @@ export function UsersAdmin() {
 
         <section className="rounded-lg bg-surface border border-line p-6">
           <h2 className="text-lg font-semibold text-foreground mb-4">Users</h2>
+
+          {recoveryNotice && <p role="status" className="mb-4 rounded-lg border border-line bg-background px-4 py-3 text-sm text-secondary">{recoveryNotice}</p>}
 
           {actionError && (
             <p className="mb-4 rounded-lg bg-danger-surface border border-danger-line px-4 py-3 text-sm text-danger">
@@ -142,8 +167,8 @@ export function UsersAdmin() {
           ) : users.length === 0 ? (
             <p className="text-sm text-muted">No users.</p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+            <div className="relative overflow-x-auto" role="region" aria-label="User accounts" tabIndex={0}>
+              <table className="w-full min-w-[52rem] text-sm">
                 <thead>
                   <tr className="text-left text-xs uppercase tracking-wide text-muted border-b border-line">
                     <th className="py-2 pr-4 font-medium">Email</th>
@@ -183,7 +208,16 @@ export function UsersAdmin() {
                           <StatusBadge status={u.is_active} label={u.is_active ? "Active" : "Disabled"} />
                         </td>
                         <td className="py-3 pr-4">
-                          <div className="flex items-center gap-3">
+                          <div className="flex min-w-48 flex-wrap items-center gap-3">
+                            <button
+                              type="button"
+                              onClick={() => { setRecoveryError(null); setRecoveryNotice(null); setPendingRecovery(u); }}
+                              disabled={rowBusy || !u.is_active || u.role === "service"}
+                              title={!u.is_active ? "Disabled accounts cannot recover access" : u.role === "service" ? "Service accounts cannot use password recovery" : undefined}
+                              className="text-accent-text hover:underline disabled:opacity-40"
+                            >
+                              Send password reset link
+                            </button>
                             <button
                               type="button"
                               onClick={() => toggleActive(u)}
@@ -212,6 +246,22 @@ export function UsersAdmin() {
           )}
         </section>
       </div>
+
+        <Dialog open={Boolean(pendingRecovery)} title="Send password reset link?" onClose={() => { if (!recoverySending.current) setPendingRecovery(null); }}>
+          <p className="text-sm text-secondary break-words">
+            Send a password reset email to <strong>{pendingRecovery?.display_name}</strong> at <strong>{pendingRecovery?.email}</strong>?
+          </p>
+          <p className="mt-3 text-sm text-secondary">
+            The recipient chooses their password. Their current password, sessions and integration keys stay unchanged until they complete the reset. Only the newest link works, and it expires after 30 minutes.
+          </p>
+          {recoveryError && <p role="alert" className="mt-3 text-sm text-danger">{recoveryError}</p>}
+          <div className="mt-5 flex flex-wrap justify-end gap-3">
+            <button type="button" autoFocus disabled={Boolean(pendingRecovery && busyId === pendingRecovery.id)} onClick={() => setPendingRecovery(null)} className="px-4 py-2 text-sm font-medium text-secondary hover:text-foreground disabled:opacity-50">Cancel</button>
+            <button type="button" disabled={!pendingRecovery || busyId === pendingRecovery.id} onClick={confirmRecovery} className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-on-accent disabled:opacity-50">
+              {pendingRecovery && busyId === pendingRecovery.id ? "Sending…" : "Send reset email"}
+            </button>
+          </div>
+        </Dialog>
 
         <Dialog open={Boolean(pendingDelete)} title={pendingDelete ? `Delete ${pendingDelete.email}?` : "Delete user"} onClose={() => { if (busyId !== pendingDelete?.id) setPendingDelete(null); }}>
             <p className="mt-2 text-sm text-secondary">

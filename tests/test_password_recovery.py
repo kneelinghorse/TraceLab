@@ -361,7 +361,7 @@ def test_link_waits_for_provider_acceptance_and_late_failure_cannot_revoke_repla
     import hashlib
 
     client, service, _, user_id = recovery
-    digest, message = service._prepare("recover@controlled.org")
+    digest, message, _ = service._prepare("recover@controlled.org")
     token = message.text.split("#token=", 1)[1].split()[0]
     # A crash between issuing and finishing a send leaves an unusable pending slot.
     assert confirm(client, token).status_code == 400

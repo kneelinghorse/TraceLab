@@ -167,7 +167,25 @@
     },
     "changed_frontend_eslint": "passed",
     "foundational_references": "passed",
-    "production_copy_deployment": "pending follow-up PR",
+    "production_copy_deployment": {
+      "status": "passed",
+      "pull_request": "https://github.com/kneelinghorse/TraceLab/pull/402",
+      "build": {
+        "sha": "7d1fe317e06696cab4b0781b733fba079e41f741",
+        "ok": true,
+        "observed": {
+          "backend": "7d1fe317e06696cab4b0781b733fba079e41f741",
+          "frontend": "7d1fe317e06696cab4b0781b733fba079e41f741"
+        },
+        "seconds_to_serve": {
+          "backend": 122.6,
+          "frontend": 183.2
+        },
+        "budget_seconds": 900,
+        "elapsed_seconds": 183.2
+      },
+      "browser": "Confirmed the deployed signed-out /missions page renders Enter your email and password to sign in."
+    },
     "frontend_production_build": "passed",
     "built_browser": "Verified signed-out /missions renders Enter your email and password to sign in."
   }

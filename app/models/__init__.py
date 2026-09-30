@@ -20,7 +20,7 @@ from app.models.ingestion_job import IngestionJob
 from app.models.insight import Insight, InsightSource
 from app.models.invite_code import InviteCode
 from app.models.mission import Mission
-from app.models.password_recovery import PasswordRecovery
+from app.models.password_recovery import PasswordRecovery, PasswordRecoveryAudit
 from app.models.processing_status import DocumentProcessingStatus
 from app.models.project import Project
 from app.models.project_tag import ProjectTag
@@ -40,6 +40,7 @@ from app.models.workspace import Workspace
 
 __all__ = [
     "PasswordRecovery",
+    "PasswordRecoveryAudit",
     "Base",
     "Project",
     "Document",

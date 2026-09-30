@@ -13,6 +13,7 @@ const mocks = vi.hoisted(() => ({
     create: vi.fn(),
     setRole: vi.fn(),
     setActive: vi.fn(),
+    sendPasswordReset: vi.fn(),
     remove: vi.fn(),
   },
 }));
@@ -85,6 +86,7 @@ beforeEach(() => {
   });
   mocks.api.setRole.mockReset().mockResolvedValue({});
   mocks.api.setActive.mockReset().mockResolvedValue({});
+  mocks.api.sendPasswordReset.mockReset().mockResolvedValue({ delivery_status: "accepted", message: "The email provider accepted the reset email. Ask the recipient to check their inbox and spam folder." });
   mocks.api.remove.mockReset().mockResolvedValue({ success: true, id: "u2", message: "deleted" });
 });
 
@@ -188,6 +190,56 @@ describe("UsersAdmin — owner-gating", () => {
     mocks.role = { role: "owner", status: "ready", isAdmin: true };
     await renderLoaded();
     expect(optionValues(screen.getByLabelText("New user role"))).toContain("owner");
+  });
+});
+
+describe("UsersAdmin — recovery assistance", () => {
+  it.each(["me@x.com", "bob@x.com", "olivia@x.com"])("confirms the stored target %s, including self and owner", async (email) => {
+    await renderLoaded();
+    const target = sampleUsers().find(user => user.email === email)!;
+    const row = screen.getByText(email).closest("tr") as HTMLElement;
+    fireEvent.click(within(row).getByRole("button", { name: "Send password reset link" }));
+    const dialog = screen.getByRole("dialog", { name: "Send password reset link?" });
+    expect(within(dialog).getByText(target.display_name)).toBeTruthy();
+    expect(within(dialog).getByText(email)).toBeTruthy();
+    expect(within(dialog).getByText(/stay unchanged until/i)).toBeTruthy();
+    expect(mocks.api.sendPasswordReset).not.toHaveBeenCalled();
+    fireEvent.click(within(dialog).getByRole("button", { name: "Send reset email" }));
+    await waitFor(() => expect(mocks.api.sendPasswordReset).toHaveBeenCalledWith(target.id));
+    expect((await screen.findByRole("status")).textContent).toContain("provider accepted");
+    expect(mocks.api.setActive).not.toHaveBeenCalled();
+  });
+
+  it("cancels without sending and keeps disabled and service accounts unavailable", async () => {
+    mocks.api.list.mockResolvedValue([...sampleUsers(), { ...sampleUsers()[1], id: "service", email: "worker@x.com", role: "service" }]);
+    await renderLoaded();
+    for (const email of ["carol@x.com", "worker@x.com"]) {
+      const row = screen.getByText(email).closest("tr") as HTMLElement;
+      expect((within(row).getByRole("button", { name: "Send password reset link" }) as HTMLButtonElement).disabled).toBe(true);
+    }
+    const row = screen.getByText("bob@x.com").closest("tr") as HTMLElement;
+    fireEvent.click(within(row).getByRole("button", { name: "Send password reset link" }));
+    fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Cancel" }));
+    expect(mocks.api.sendPasswordReset).not.toHaveBeenCalled();
+  });
+
+  it("prevents duplicate sends while pending and allows explicit retry after failure", async () => {
+    let rejectSend!: (error: Error) => void;
+    mocks.api.sendPasswordReset.mockImplementationOnce(() => new Promise((_, reject) => { rejectSend = reject; }));
+    await renderLoaded();
+    const row = screen.getByText("bob@x.com").closest("tr") as HTMLElement;
+    fireEvent.click(within(row).getByRole("button", { name: "Send password reset link" }));
+    const dialog = screen.getByRole("dialog");
+    const send = within(dialog).getByRole("button", { name: "Send reset email" });
+    fireEvent.click(send);
+    fireEvent.click(send);
+    expect(mocks.api.sendPasswordReset).toHaveBeenCalledTimes(1);
+    expect((within(dialog).getByRole("button", { name: "Sending…" }) as HTMLButtonElement).disabled).toBe(true);
+    rejectSend(new Error('{"detail":"A reset email was recently requested. Wait a minute before retrying."}'));
+    expect((await screen.findByRole("alert")).textContent).toContain("Wait a minute");
+    fireEvent.click(within(dialog).getByRole("button", { name: "Send reset email" }));
+    await waitFor(() => expect(mocks.api.sendPasswordReset).toHaveBeenCalledTimes(2));
+    expect((await screen.findByRole("status")).textContent).toContain("provider accepted");
   });
 });
 

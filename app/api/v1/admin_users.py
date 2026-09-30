@@ -12,11 +12,12 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from fastapi import APIRouter, Body, Depends, HTTPException, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Request, Response, status
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.core.rate_limit import recovery_request_limiter
 from app.core.security import (
     ROLE_ADMIN,
     ROLE_MEMBER,
@@ -27,13 +28,20 @@ from app.core.security import (
     hash_password,
     require_admin,
 )
+from app.dependencies import get_password_recovery_service
 from app.models.api_key import APIKey
 from app.models.device_authorization import DeviceAuthorizationGrant
 from app.models.invite_code import InviteCode
 from app.models.password_recovery import PasswordRecovery
 from app.models.user import User
-from app.schemas.auth import AdminUserCreate, AdminUserResponse
+from app.schemas.auth import (
+    AdminPasswordResetRequest,
+    AdminPasswordResetResponse,
+    AdminUserCreate,
+    AdminUserResponse,
+)
 from app.services.ownership import LastOwnerError, assert_not_last_owner, ensure_personal_space
+from app.services.password_recovery import PasswordRecoveryService, ensure_recovery_configured
 
 router = APIRouter(tags=["admin-users"])
 
@@ -55,6 +63,28 @@ def _get_user_or_404(db: Session, user_id: UUID) -> User:
 def list_users(db: Session = Depends(get_db)) -> list[User]:
     """List all users (admin only)."""
     return db.query(User).order_by(User.created_at.asc()).all()
+
+
+@router.post("/{user_id}/password-reset", response_model=AdminPasswordResetResponse)
+async def send_password_reset(
+    user_id: UUID,
+    payload: AdminPasswordResetRequest,
+    request: Request,
+    response: Response,
+    caller: AuthenticatedUser = Depends(require_admin),
+    service: PasswordRecoveryService = Depends(get_password_recovery_service),
+) -> AdminPasswordResetResponse:
+    """Send to the stored mailbox; admins never receive a token or set a password."""
+    response.headers["Cache-Control"] = "no-store"
+    recovery_request_limiter.check(request)
+    ensure_recovery_configured()
+    accepted = await service.request(None, target_user_id=user_id, actor_user_id=caller.user_id)
+    if not accepted:
+        raise HTTPException(503, detail="The reset email could not be sent. Please try again later.")
+    return AdminPasswordResetResponse(
+        delivery_status="accepted",
+        message="The email provider accepted the reset email. Ask the recipient to check their inbox and spam folder. Only the newest link works.",
+    )
 
 
 @router.post("", response_model=AdminUserResponse, status_code=status.HTTP_201_CREATED)

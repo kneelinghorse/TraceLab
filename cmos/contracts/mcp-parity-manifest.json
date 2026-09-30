@@ -355,6 +355,22 @@
       "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
     },
     {
+      "id": "frontend/src/lib/api/admin.ts#adminUsersApi.sendPasswordReset:POST:/admin/users/{userId}/password-reset",
+      "api_file": "frontend/src/lib/api/admin.ts",
+      "operation": "adminUsersApi.sendPasswordReset",
+      "source_line": 53,
+      "method": "POST",
+      "path": "/api/v1/admin/users/{userId}/password-reset",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/admin/users.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Admin recovery sends to the stored mailbox after UI confirmation; credential management stays REST/UI-only (AUTH-2, decision 567)."
+    },
+    {
       "id": "frontend/src/lib/api/admin.ts#adminUsersApi.setActive:PATCH:/admin/users/{userId}/active",
       "api_file": "frontend/src/lib/api/admin.ts",
       "operation": "adminUsersApi.setActive",
