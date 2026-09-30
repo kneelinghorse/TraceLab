@@ -1,0 +1,231 @@
+{
+  "mission": "LOG-2",
+  "session": "PS-2026-09-30-010",
+  "recorded_at": "2026-09-30T21:03:41.236997+00:00",
+  "status": "worker_ui_live_acceptance_passed_retirement_pending",
+  "authorization": {
+    "dispatch_count": 1,
+    "mission_uuid": "3f5c2641-7a47-45ed-a092-feebe9143ed1",
+    "mission_id": "S61-LOG2-ACCEPT-01",
+    "project_id": "5229e75e-8ad3-4ac5-94de-093a177562c6",
+    "planning_allowance_usd": 5,
+    "enforced_dollar_cap": false,
+    "no_second_paid_run": true
+  },
+  "builds": {
+    "tracelab_serving": "56aae00673dda2c500edf41ab4aef3296d24a784",
+    "deepsearch_deployed": "5a75502727b889aa4a65a6373df4b74aa36da23b",
+    "runtime_identity": {
+      "model": "deepseek-flash",
+      "llm_backend": "deepseek",
+      "build_hash": "fa31cba8cf6f88fe4c32980ecd1c2dee6b704b0ee8e5e3747823b7c935c04bcc",
+      "build_source": "source_tree_hash",
+      "git_dirty": false,
+      "execution_path": "tracelab",
+      "python_version": "3.11.9"
+    },
+    "source_tree_hash_matches": true,
+    "worker_deployment": "17053355-f5a5-43b2-90d3-bbb4a75850e0"
+  },
+  "run": {
+    "status": "completed",
+    "started_at": "2026-09-30T20:54:29.868999",
+    "completed_at": "2026-09-30T20:56:48.640270",
+    "attempt_count": 1,
+    "final_log_count": 12,
+    "final_outcome": {
+      "outcome": "complete",
+      "completed_at": "2026-09-30T20:56:48.640270",
+      "routing_reason": "",
+      "delivery_quality": "usable_with_warning",
+      "quality_gate_failures": [
+        "critique_assessment_partial",
+        "retrieval_failures_2_source_fetch"
+      ],
+      "coverage_gate_failures": [],
+      "structural_validation_failures": []
+    },
+    "result_materialization": {
+      "status": "ready",
+      "attempted_at": "2026-09-30T20:56:50.408963+00:00",
+      "attempt_count": 1,
+      "error_categories": []
+    }
+  },
+  "live_delivery": {
+    "preterminal_distinct_receipt_times": [
+      "2026-09-30T20:54:30.560567",
+      "2026-09-30T20:54:31.009883"
+    ],
+    "preterminal_snapshots_counts": [
+      3,
+      4
+    ],
+    "browser_first_four_observed_at": "2026-09-30T20:54:40.502Z",
+    "oldest_emission_in_first_four": "2026-09-30T20:54:29.875000",
+    "maximum_initial_emission_to_observed_display_seconds": 10.627,
+    "target_seconds": 15,
+    "measurement": "Upper bound from actual browser observation, not inferred first-paint timing. UTC browser/worker clocks assumed synchronized; no per-frame instrumentation.",
+    "terminal_12_observed_at": "2026-09-30T20:57:09.057Z",
+    "attempt_history": "Attempt 1 visible. Reclaim/multiple-attempt separation covered by deterministic fixtures, not a second paid attempt.",
+    "replay_proof": "Lost-ack replay covered by real sender/HTTP test plus LOG-1 deployed synthetic receipt. This paid run was reread without writing/replaying its credential proof."
+  },
+  "artifacts": {
+    "mission_result_chars": 15440,
+    "mission_result_sha256": "7a9ebff50a2f7c2dae7e8ce72480f1b06236980e8fab6ff979c544c6a96c2255",
+    "report_id": "78b5bda7-6358-45db-8a00-800d60af68f5",
+    "report_status": "draft",
+    "report_content_chars": 529,
+    "report_source_count": 5,
+    "report_citation_status": "legacy_unavailable",
+    "report_note": "Existing DeepSearch materializer generates a 529-character protocol summary; full research text is retained on the mission and promoted document. No durable report citations asserted.",
+    "document_id": "87bcd621-5a73-4b5f-8cc6-d83912ed8d4a",
+    "document_name": "S61-LOG2-ACCEPT-01_report.md",
+    "document_source_mission_id": "3f5c2641-7a47-45ed-a092-feebe9143ed1",
+    "document_chunk_count": 5,
+    "document_processed": true,
+    "document_embedded": true,
+    "ledger_count": 24,
+    "ledger_dispositions": {
+      "supporting": 4,
+      "background": 20
+    },
+    "ledger_ids": [
+      "ad3125e7-0205-49d6-8d18-2ce05ead88c7",
+      "faba3fd9-9470-45d9-8298-d882574abe9d",
+      "e25c5a21-05be-49d3-8912-35ae6aeda0b5",
+      "95c8d3db-173f-4b3f-87ba-7e6323053c81",
+      "a3d83b46-957f-4baa-be0d-af0601fb1e46",
+      "2977b9ad-1ab8-42b3-b216-419cb95e9c27",
+      "dbbf9ba1-3b05-462b-8a1f-33a2a483f010",
+      "207d6b7f-15f0-487e-8bf3-97e760ff8de3",
+      "4ceba287-7c74-4fa3-bed6-f19999e4f43f",
+      "9e89f0f3-70ce-4db2-8656-d6d36cd033e9",
+      "b0144c0a-082a-4129-b0b4-b95dab6e0296",
+      "de1c5d67-3155-44d4-bdfb-ea7cce8a27a7",
+      "de72f228-13e0-4775-b4fa-8d336cd1bcda",
+      "414cd331-f020-4b7b-b14b-010612201860",
+      "1b747869-a5bd-464e-9b8c-c8b72771a25e",
+      "31f53272-d274-4ba8-bd60-4b0fa15ad991",
+      "dbd740e0-2156-4b42-94a6-3c713f81a515",
+      "1c4bf05b-69f0-4d10-b6b6-12c1eba81b6e",
+      "17157f8b-760b-4ee9-acf8-e32faad77bce",
+      "5bce5213-effd-421d-aa17-36df07bd56eb",
+      "f1ac2d63-ed92-4595-95af-c708be1d1be9",
+      "de02c7eb-9a65-49a6-846d-d5fa57abd94e",
+      "75217321-2c68-4a2c-add1-caa813b2dd46",
+      "9bf5ae6e-65a0-4814-96b9-db74611fe7f6"
+    ]
+  },
+  "usage": {
+    "legacy_synthesis_and_critique_tokens": 513840,
+    "observed_model_accounting": {
+      "observed": {
+        "input": 492325,
+        "total": 519007,
+        "output": 26682
+      },
+      "requests": 24,
+      "usage_complete": true,
+      "duplicate_records": 0,
+      "compiler_observation": "observed",
+      "observation_coverage": "complete",
+      "reconciliation_delta": 0,
+      "compiler_observed_total": 5167,
+      "legacy_synthesis_critique_total": 513840,
+      "requests_with_missing_or_inconsistent_usage": 0
+    },
+    "observed_tool_calls": [
+      {
+        "web_search": {
+          "ok": 2,
+          "calls": 2,
+          "error": 0,
+          "by_category": {},
+          "circuit_open": 0,
+          "results_total": 20
+        },
+        "source_fetch": {
+          "ok": 13,
+          "calls": 15,
+          "error": 2,
+          "by_category": {
+            "missing_stored_body": 2
+          },
+          "circuit_open": 0,
+          "results_total": 441613
+        },
+        "url_liveness": {
+          "ok": 4,
+          "calls": 4,
+          "error": 0,
+          "by_category": {},
+          "circuit_open": 0,
+          "results_total": 0
+        },
+        "scratchpad_write": {
+          "ok": 6,
+          "calls": 6,
+          "error": 0,
+          "by_category": {},
+          "circuit_open": 0,
+          "results_total": 0
+        },
+        "completeness_check": {
+          "ok": 2,
+          "calls": 2,
+          "error": 0,
+          "by_category": {},
+          "circuit_open": 0,
+          "results_total": 0
+        }
+      }
+    ],
+    "provider_fees_observed": false,
+    "actual_billed_total_usd": null,
+    "note": "Actual billed dollars and account-specific pricing unavailable; do not present the planning allowance or rate arithmetic as charged cost."
+  },
+  "validation": {
+    "retirement_rebase_local": {
+      "passed": 107,
+      "skipped": 0,
+      "warnings": 16,
+      "duration_seconds": 40.51,
+      "includes_real_cross_service": true
+    },
+    "prior_ci": "rollout-progress.json",
+    "prior_local": "local-validation.json",
+    "published_mcp": "published-mcp-read.json",
+    "retirement_final_boundaries": {
+      "passed": 190,
+      "skipped": 0,
+      "warnings": 16,
+      "duration_seconds": 57.99,
+      "includes_real_cross_service": true,
+      "suites": [
+        "tests/test_mission_log_delivery.py",
+        "tests/test_rbac_route_enforcement_api.py",
+        "tests/test_service_principal_route_boundary.py",
+        "tests/test_rbac_verify_harness.py",
+        "tests/test_rbac_verify_mutation_proof.py",
+        "tests/test_live_log_cross_service.py"
+      ]
+    },
+    "initial_retirement_ci_failure": {
+      "run": "https://github.com/kneelinghorse/TraceLab/actions/runs/36777223468",
+      "failed": 8,
+      "passed": 3066,
+      "skipped": 4,
+      "deselected_unchanged_quarantine": 12,
+      "warnings": 49,
+      "duration_seconds": 617.19,
+      "cause": "Two existing route-boundary suites still expected legacy writes201; update to426, assert no insertion, retain machine capability200 and human403. No production code or authorization relaxation."
+    }
+  },
+  "limitations": [
+    "Healthy run proves production delivery and result retention; transport-failure isolation is proven in controlled local/HTTP tests, not by sabotaging production.",
+    "Research scope drift: complete rendered result has 2285 whitespace-separated words (worker report_word_count 2240), above authored 300\u2013500. It cites two official pages but collected 22 sources across seven domains and performed two web searches; prose claiming no third source consulted overstates the telemetry. Preserve output and investigate compiler/output scope separately; no rerun.",
+    "Final outcome usable_with_warning: critique_assessment_partial and retrieval_failures_2_source_fetch. No coverage/structural failure reported.",
+    "WALK-4 expanded live credential matrix remains outstanding; Sprint 61 is not closed."
+  ]
+}

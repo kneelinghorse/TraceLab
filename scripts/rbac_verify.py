@@ -3058,7 +3058,7 @@ class RbacVerifier:
         """Prove service negotiation and human denial without fabricating a lease.
 
         The harness owns a draft fixture. Service reads of capabilities must
-        succeed, but both writes must reject this unowned draft with 409. Exact
+        succeed; v2 rejects an unowned draft with 409 and retired legacy with 426. Exact
         human 403s distinguish the role gate from downstream ownership checks.
         Successful owned writes are covered by the receiver acceptance suite.
         """
@@ -3095,7 +3095,7 @@ class RbacVerifier:
             service_token = principals.get("service")
             if service_token:
                 resp = self._call(method, route, token=service_token, json=payload)
-                expected = 200 if method == "get" else 409
+                expected = 200 if method == "get" else 409 if route.endswith("/v2") else 426
                 self._record(
                     resp.status_code == expected,
                     Gap("service-log-boundary", "service", method, route,

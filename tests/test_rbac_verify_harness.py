@@ -270,11 +270,7 @@ def test_matrix_flags_leak_when_unenforced(client, db_session, owner_principal, 
 
 
 def test_service_log_matrix_flags_leak_when_gate_bypassed(client, db_session, owner_principal, monkeypatch):
-    """Inject a real role-gate bypass; the harness must catch successful human writes.
-
-    RBAC-off no longer bypasses this gate. A terminal local fixture lets the
-    legacy write reach insertion, so the mutation proves more than a 409 mismatch.
-    """
+    """A role-gate bypass must be detected even on the retired append route."""
     from app.api.v1 import missions as mission_routes
     from app.models.mission import Mission
 
@@ -298,9 +294,9 @@ def test_service_log_matrix_flags_leak_when_gate_bypassed(client, db_session, ow
     db_session.commit()
     verifier.service_log_write_matrix(mid, {"member": member_jwt})
 
-    leaks = [g for g in verifier.gaps if g.kind == "DENY-LEAK-2xx"]
-    assert any(g.method == "post" and g.path.endswith("/logs") for g in leaks), (
-        "harness FAILED to flag the successful human log-write with a bypassed service gate"
+    leaks = [g for g in verifier.gaps if g.kind == "SERVICE-LOG-AUTHZ-STATUS"]
+    assert any(g.method == "post" and g.path.endswith("/logs") and g.actual == "426" for g in leaks), (
+        "harness FAILED to flag the human reaching the retired route with a bypassed service gate"
     )
 
 

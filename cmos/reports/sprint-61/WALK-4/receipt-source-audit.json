@@ -1,0 +1,247 @@
+{
+  "AUTH-1": {
+    "receipt_exists": true,
+    "matching_files": [
+      "alembic/versions/056_password_recovery.py",
+      "app/api/v1/auth.py",
+      "app/api/v1/auth_device.py",
+      "app/api/v1/mission_events.py",
+      "app/core/rate_limit.py",
+      "app/core/security.py",
+      "app/models/user.py",
+      "app/ports/email.py",
+      "app/services/device_credentials.py",
+      "app/services/notifications.py",
+      "frontend/next.config.ts",
+      "frontend/src/components/AppShell.test.tsx",
+      "frontend/src/components/AppShell.tsx",
+      "frontend/src/components/PasswordRecovery.test.tsx",
+      "frontend/src/components/PasswordRecovery.tsx",
+      "frontend/src/lib/api/auth.ts",
+      "frontend/src/lib/auth/recovery.ts",
+      "frontend/src/pages/_document.tsx",
+      "frontend/src/pages/forgot-password.tsx",
+      "frontend/src/pages/reset-password.tsx",
+      "tests/conftest.py",
+      "tests/test_auth_me_role_contract.py",
+      "tests/test_recovery_routes.py"
+    ],
+    "changed_files": [
+      "app/api/v1/admin_users.py",
+      "app/dependencies.py",
+      "app/models/__init__.py",
+      "app/models/password_recovery.py",
+      "app/schemas/auth.py",
+      "app/services/password_recovery.py",
+      "frontend/src/components/LoginPanel.tsx",
+      "tests/integration/test_password_recovery_postgres.py",
+      "tests/test_password_recovery.py",
+      "tests/test_password_recovery_migration.py"
+    ],
+    "missing_files": [],
+    "hash_fields": [
+      "mission",
+      "session",
+      "recorded_at",
+      "status",
+      "source_base",
+      "source_sha256",
+      "validation",
+      "failures_preserved",
+      "production_read_only_preflight",
+      "branch_protection_observed",
+      "must_pass_open",
+      "limitations",
+      "review_url",
+      "runtime_source_commit"
+    ],
+    "file_history": {
+      "app/api/v1/admin_users.py": [
+        "db153f8 AUTH-2: let admins send audited password recovery links (#403)",
+        "68f607c AUTH-1: recover access by email and revoke prior credentials (#401)",
+        "fec1893 PERSONAL-1: every user gets a personal Space, and new projects land there (#363)"
+      ],
+      "app/dependencies.py": [
+        "55b5da6 LOG-1: receive owned mission logs with replay-safe acknowledgements (#404)",
+        "68f607c AUTH-1: recover access by email and revoke prior credentials (#401)",
+        "814caed ACT-1 + MISS-2: recent activity replaces the inbox, attention, reviews and saved views; missions card grid (#318)"
+      ],
+      "app/models/__init__.py": [
+        "db153f8 AUTH-2: let admins send audited password recovery links (#403)",
+        "68f607c AUTH-1: recover access by email and revoke prior credentials (#401)",
+        "329de9b METER-0: record what a mission costs, so metering is possible later (#353)"
+      ],
+      "app/models/password_recovery.py": [
+        "db153f8 AUTH-2: let admins send audited password recovery links (#403)",
+        "68f607c AUTH-1: recover access by email and revoke prior credentials (#401)"
+      ],
+      "app/schemas/auth.py": [
+        "db153f8 AUTH-2: let admins send audited password recovery links (#403)",
+        "68f607c AUTH-1: recover access by email and revoke prior credentials (#401)",
+        "617333a DOCV-1 + NOTIFY-1: document reader and Resend notifications land on main (#321)"
+      ],
+      "app/services/password_recovery.py": [
+        "db153f8 AUTH-2: let admins send audited password recovery links (#403)",
+        "68f607c AUTH-1: recover access by email and revoke prior credentials (#401)"
+      ],
+      "frontend/src/components/LoginPanel.tsx": [
+        "7d1fe31 AUTH-1: record live recovery acceptance and simplify sign-in copy (#402)",
+        "68f607c AUTH-1: recover access by email and revoke prior credentials (#401)",
+        "346bfc6 UX-0 unify shell, OODS themes, navigation and accessibility"
+      ],
+      "tests/integration/test_password_recovery_postgres.py": [
+        "db153f8 AUTH-2: let admins send audited password recovery links (#403)",
+        "68f607c AUTH-1: recover access by email and revoke prior credentials (#401)"
+      ],
+      "tests/test_password_recovery.py": [
+        "db153f8 AUTH-2: let admins send audited password recovery links (#403)",
+        "68f607c AUTH-1: recover access by email and revoke prior credentials (#401)"
+      ],
+      "tests/test_password_recovery_migration.py": [
+        "db153f8 AUTH-2: let admins send audited password recovery links (#403)",
+        "68f607c AUTH-1: recover access by email and revoke prior credentials (#401)"
+      ]
+    }
+  },
+  "AUTH-2": {
+    "receipt_exists": true,
+    "matching_files": [
+      "app/api/v1/admin_users.py",
+      "app/models/__init__.py",
+      "app/models/password_recovery.py",
+      "app/schemas/auth.py",
+      "app/services/password_recovery.py",
+      "frontend/src/__tests__/admin/users.test.tsx",
+      "frontend/src/lib/api/admin.ts",
+      "frontend/src/pages/admin/users.tsx",
+      "tests/integration/test_password_recovery_postgres.py",
+      "tests/test_password_recovery.py",
+      "tests/test_password_recovery_migration.py",
+      "alembic/versions/057_password_recovery_audit.py",
+      "frontend/tests/e2e/admin-password-recovery.spec.ts",
+      "tests/test_admin_password_recovery.py"
+    ],
+    "changed_files": [],
+    "missing_files": [],
+    "hash_fields": [
+      "mission",
+      "session",
+      "decision",
+      "recorded_at",
+      "status",
+      "source_base",
+      "source_sha256",
+      "validation",
+      "failures_preserved",
+      "must_pass_open",
+      "limits"
+    ],
+    "file_history": {}
+  },
+  "LOG-1": {
+    "receipt_exists": true,
+    "matching_files": [
+      "app/dependencies.py",
+      "app/models/mission_log.py",
+      "app/schemas/mission_logs.py",
+      "app/ports/mission_logs.py",
+      "app/adapters/repositories/sqlalchemy_mission_log_repo.py",
+      "app/services/mission_logs.py",
+      "alembic/versions/058_mission_log_attempts.py",
+      "tests/test_mission_log_migration.py",
+      "tests/integration/test_mission_log_delivery_postgres.py",
+      "tests/fixtures/mission-logs-v2/batch.json",
+      "tests/test_service_principal_route_boundary.py",
+      "tests/test_rbac_flip_regression.py",
+      "tests/test_rbac_route_enforcement_api.py"
+    ],
+    "changed_files": [
+      "app/api/v1/missions.py",
+      "tests/test_mission_log_delivery.py",
+      "cmos/contracts/mission-log-delivery-contract.md",
+      "scripts/rbac_verify.py",
+      "tests/test_rbac_verify_harness.py"
+    ],
+    "missing_files": [],
+    "hash_fields": [
+      "mission",
+      "session",
+      "recorded_at",
+      "base_commit",
+      "decisions",
+      "source_sha256",
+      "validation",
+      "failures_preserved",
+      "limits",
+      "deployment_probe_design"
+    ],
+    "file_history": {
+      "app/api/v1/missions.py": [
+        "623f036 LOG-2: retire legacy log appends after worker acceptance",
+        "55b5da6 LOG-1: receive owned mission logs with replay-safe acknowledgements (#404)",
+        "329de9b METER-0: record what a mission costs, so metering is possible later (#353)"
+      ],
+      "tests/test_mission_log_delivery.py": [
+        "623f036 LOG-2: retire legacy log appends after worker acceptance",
+        "55b5da6 LOG-1: receive owned mission logs with replay-safe acknowledgements (#404)"
+      ],
+      "cmos/contracts/mission-log-delivery-contract.md": [
+        "47ddd07 LOG-2: preserve live acceptance and open legacy retirement gate",
+        "623f036 LOG-2: retire legacy log appends after worker acceptance",
+        "56aae00 LOG-2: show live mission observations and receipt freshness (#405)"
+      ],
+      "scripts/rbac_verify.py": [
+        "623f036 LOG-2: retire legacy log appends after worker acceptance",
+        "55b5da6 LOG-1: receive owned mission logs with replay-safe acknowledgements (#404)",
+        "93d71fc REPORT-1: preserve report citations through saving, reopening and export (#389)"
+      ],
+      "tests/test_rbac_verify_harness.py": [
+        "623f036 LOG-2: retire legacy log appends after worker acceptance",
+        "55b5da6 LOG-1: receive owned mission logs with replay-safe acknowledgements (#404)",
+        "93d71fc REPORT-1: preserve report citations through saving, reopening and export (#389)"
+      ]
+    }
+  },
+  "LOG-2": {
+    "receipt_exists": true,
+    "matching_files": [
+      "TraceLab/cmos/contracts/mcp-parity-manifest.json",
+      "TraceLab/frontend/src/__tests__/mission-run.test.tsx",
+      "TraceLab/frontend/src/components/missions/MissionRunActivity.tsx",
+      "TraceLab/frontend/tests/e2e/mission-live-logs.spec.ts",
+      "TraceLab/frontend/tests/e2e/mission-protocol.spec.ts",
+      "TraceLab/tests/test_live_log_cross_service.py",
+      "DeepSearch/deepsearch/tracelab/log_handler.py",
+      "DeepSearch/deepsearch/tracelab/log_projection.py",
+      "DeepSearch/deepsearch/worker/execution.py",
+      "DeepSearch/deepsearch/worker/main.py",
+      "DeepSearch/docs/mission_log_delivery.md",
+      "DeepSearch/tests/fixtures/mission-logs-v2/batch.json",
+      "DeepSearch/tests/unit/test_live_log_contract.py",
+      "DeepSearch/tests/unit/test_s91_m05_log_transport.py",
+      "DeepSearch/tests/unit/test_worker_main.py",
+      "TraceLab-retirement/app/api/v1/missions.py",
+      "TraceLab-retirement/scripts/rbac_verify.py",
+      "TraceLab-retirement/tests/test_mission_log_delivery.py",
+      "TraceLab-retirement/tests/test_rbac_verify_harness.py"
+    ],
+    "changed_files": [
+      "TraceLab/cmos/contracts/mission-log-delivery-contract.md",
+      "TraceLab-retirement/cmos/contracts/mission-log-delivery-contract.md"
+    ],
+    "missing_files": [],
+    "hash_fields": [
+      "observed_at",
+      "status",
+      "source",
+      "validation",
+      "failures_resolved",
+      "limits",
+      "paid_run",
+      "external_evidence_ids",
+      "source_file_sha256",
+      "screenshots"
+    ],
+    "file_history": {}
+  }
+}

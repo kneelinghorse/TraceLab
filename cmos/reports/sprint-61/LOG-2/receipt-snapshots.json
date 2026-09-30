@@ -1,0 +1,520 @@
+{
+  "source": "Authenticated deployed HTTP sampler; status reads bracket each logs read. UTC timestamps without offset are server UTC.",
+  "samples": [
+    {
+      "observed_at": "2026-09-30T20:53:19.096214+00:00",
+      "status_before": "draft",
+      "status_after": "draft",
+      "started_at": null,
+      "completed_at": null,
+      "logs": []
+    },
+    {
+      "observed_at": "2026-09-30T20:54:31.264905+00:00",
+      "status_before": "in_progress",
+      "status_after": "in_progress",
+      "started_at": "2026-09-30T20:54:29.868999",
+      "completed_at": null,
+      "logs": [
+        {
+          "id": "d2532abd-947b-4c84-ae80-c485570f6c73",
+          "level": "INFO",
+          "message": "{\"category\":\"info\",\"event\":\"phase_started\",\"phase\":\"loading\"}",
+          "source": "deepsearch:loading",
+          "logged_at": "2026-09-30T20:54:29.875000",
+          "created_at": "2026-09-30T20:54:30.560567",
+          "attempt_count": 1,
+          "event_id": "74d763c0-927a-4cb2-aa36-22dfaa10bbce",
+          "sequence": 1
+        },
+        {
+          "id": "c74c8db8-1534-4abe-8993-7f7525f202af",
+          "level": "INFO",
+          "message": "{\"category\":\"info\",\"event\":\"mission_progress\",\"phase\":\"loading\"}",
+          "source": "deepsearch:loading",
+          "logged_at": "2026-09-30T20:54:29.875000",
+          "created_at": "2026-09-30T20:54:30.560567",
+          "attempt_count": 1,
+          "event_id": "637978b6-9fa6-49fe-a40a-ed9d8da867ac",
+          "sequence": 2
+        },
+        {
+          "id": "04c8aa15-ed1e-4906-ba80-a6560d3fa770",
+          "level": "INFO",
+          "message": "{\"category\":\"info\",\"event\":\"phase_completed\",\"phase\":\"compiled\"}",
+          "source": "deepsearch:compiled",
+          "logged_at": "2026-09-30T20:54:29.875000",
+          "created_at": "2026-09-30T20:54:30.560567",
+          "attempt_count": 1,
+          "event_id": "1170ab08-838e-4e25-b049-6b4a227e12e2",
+          "sequence": 3
+        }
+      ]
+    },
+    {
+      "observed_at": "2026-09-30T20:54:33.994268+00:00",
+      "status_before": "in_progress",
+      "status_after": "in_progress",
+      "started_at": "2026-09-30T20:54:29.868999",
+      "completed_at": null,
+      "logs": [
+        {
+          "id": "d2532abd-947b-4c84-ae80-c485570f6c73",
+          "level": "INFO",
+          "message": "{\"category\":\"info\",\"event\":\"phase_started\",\"phase\":\"loading\"}",
+          "source": "deepsearch:loading",
+          "logged_at": "2026-09-30T20:54:29.875000",
+          "created_at": "2026-09-30T20:54:30.560567",
+          "attempt_count": 1,
+          "event_id": "74d763c0-927a-4cb2-aa36-22dfaa10bbce",
+          "sequence": 1
+        },
+        {
+          "id": "c74c8db8-1534-4abe-8993-7f7525f202af",
+          "level": "INFO",
+          "message": "{\"category\":\"info\",\"event\":\"mission_progress\",\"phase\":\"loading\"}",
+          "source": "deepsearch:loading",
+          "logged_at": "2026-09-30T20:54:29.875000",
+          "created_at": "2026-09-30T20:54:30.560567",
+          "attempt_count": 1,
+          "event_id": "637978b6-9fa6-49fe-a40a-ed9d8da867ac",
+          "sequence": 2
+        },
+        {
+          "id": "04c8aa15-ed1e-4906-ba80-a6560d3fa770",
+          "level": "INFO",
+          "message": "{\"category\":\"info\",\"event\":\"phase_completed\",\"phase\":\"compiled\"}",
+          "source": "deepsearch:compiled",
+          "logged_at": "2026-09-30T20:54:29.875000",
+          "created_at": "2026-09-30T20:54:30.560567",
+          "attempt_count": 1,
+          "event_id": "1170ab08-838e-4e25-b049-6b4a227e12e2",
+          "sequence": 3
+        },
+        {
+          "id": "b3f45cca-402d-4603-a3d7-2adeafdea439",
+          "level": "INFO",
+          "message": "{\"category\":\"info\",\"event\":\"phase_started\",\"phase\":\"running\"}",
+          "source": "deepsearch:running",
+          "logged_at": "2026-09-30T20:54:30.111000",
+          "created_at": "2026-09-30T20:54:31.009883",
+          "attempt_count": 1,
+          "event_id": "d81309df-8169-4548-8a80-29b91c77b2d7",
+          "sequence": 4
+        }
+      ]
+    },
+    {
+      "observed_at": "2026-09-30T20:56:51.879208+00:00",
+      "status_before": "completed",
+      "status_after": "completed",
+      "started_at": "2026-09-30T20:54:29.868999",
+      "completed_at": "2026-09-30T20:56:48.640270",
+      "logs": [
+        {
+          "id": "d2532abd-947b-4c84-ae80-c485570f6c73",
+          "level": "INFO",
+          "message": "{\"category\":\"info\",\"event\":\"phase_started\",\"phase\":\"loading\"}",
+          "source": "deepsearch:loading",
+          "logged_at": "2026-09-30T20:54:29.875000",
+          "created_at": "2026-09-30T20:54:30.560567",
+          "attempt_count": 1,
+          "event_id": "74d763c0-927a-4cb2-aa36-22dfaa10bbce",
+          "sequence": 1
+        },
+        {
+          "id": "c74c8db8-1534-4abe-8993-7f7525f202af",
+          "level": "INFO",
+          "message": "{\"category\":\"info\",\"event\":\"mission_progress\",\"phase\":\"loading\"}",
+          "source": "deepsearch:loading",
+          "logged_at": "2026-09-30T20:54:29.875000",
+          "created_at": "2026-09-30T20:54:30.560567",
+          "attempt_count": 1,
+          "event_id": "637978b6-9fa6-49fe-a40a-ed9d8da867ac",
+          "sequence": 2
+        },
+        {
+          "id": "04c8aa15-ed1e-4906-ba80-a6560d3fa770",
+          "level": "INFO",
+          "message": "{\"category\":\"info\",\"event\":\"phase_completed\",\"phase\":\"compiled\"}",
+          "source": "deepsearch:compiled",
+          "logged_at": "2026-09-30T20:54:29.875000",
+          "created_at": "2026-09-30T20:54:30.560567",
+          "attempt_count": 1,
+          "event_id": "1170ab08-838e-4e25-b049-6b4a227e12e2",
+          "sequence": 3
+        },
+        {
+          "id": "b3f45cca-402d-4603-a3d7-2adeafdea439",
+          "level": "INFO",
+          "message": "{\"category\":\"info\",\"event\":\"phase_started\",\"phase\":\"running\"}",
+          "source": "deepsearch:running",
+          "logged_at": "2026-09-30T20:54:30.111000",
+          "created_at": "2026-09-30T20:54:31.009883",
+          "attempt_count": 1,
+          "event_id": "d81309df-8169-4548-8a80-29b91c77b2d7",
+          "sequence": 4
+        },
+        {
+          "id": "8bc34447-546e-4102-bff4-1409d940d131",
+          "level": "INFO",
+          "message": "{\"category\":\"info\",\"event\":\"mission_progress\",\"phase\":\"running\"}",
+          "source": "deepsearch:running",
+          "logged_at": "2026-09-30T20:56:48.640000",
+          "created_at": "2026-09-30T20:56:51.172501",
+          "attempt_count": 1,
+          "event_id": "578b3d63-3896-431d-a27d-1ec2b6113267",
+          "sequence": 5
+        },
+        {
+          "id": "d45024a5-74a4-4b57-89d5-46134e63d145",
+          "level": "INFO",
+          "message": "{\"category\":\"info\",\"event\":\"mission_progress\",\"phase\":\"running\"}",
+          "source": "deepsearch:running",
+          "logged_at": "2026-09-30T20:56:48.640000",
+          "created_at": "2026-09-30T20:56:51.172501",
+          "attempt_count": 1,
+          "event_id": "1b554b70-0886-4dbf-ab49-893b7052d146",
+          "sequence": 6
+        },
+        {
+          "id": "57208063-918a-4297-9f0c-2ae510496029",
+          "level": "INFO",
+          "message": "{\"category\":\"info\",\"event\":\"mission_progress\",\"phase\":\"running\"}",
+          "source": "deepsearch:running",
+          "logged_at": "2026-09-30T20:56:48.641000",
+          "created_at": "2026-09-30T20:56:51.172501",
+          "attempt_count": 1,
+          "event_id": "2e5751bd-33e8-4f2f-90da-055ce649c01c",
+          "sequence": 7
+        },
+        {
+          "id": "15c0c752-f0ed-4bf4-8561-3f0ea55e4bff",
+          "level": "INFO",
+          "message": "{\"category\":\"info\",\"event\":\"mission_progress\",\"phase\":\"running\"}",
+          "source": "deepsearch:running",
+          "logged_at": "2026-09-30T20:56:48.646000",
+          "created_at": "2026-09-30T20:56:51.172501",
+          "attempt_count": 1,
+          "event_id": "f6230716-d23f-44b6-8f2f-98962b330a72",
+          "sequence": 8
+        },
+        {
+          "id": "6e635eef-b76c-4f19-8814-f77de2e34803",
+          "level": "INFO",
+          "message": "{\"category\":\"info\",\"event\":\"mission_progress\",\"phase\":\"upload\"}",
+          "source": "deepsearch:upload",
+          "logged_at": "2026-09-30T20:56:48.656000",
+          "created_at": "2026-09-30T20:56:51.172501",
+          "attempt_count": 1,
+          "event_id": "537d0138-7d40-4aef-9000-d7aae4769e6a",
+          "sequence": 9
+        },
+        {
+          "id": "9f12d891-a047-42ea-829c-3921f8357f40",
+          "level": "INFO",
+          "message": "{\"category\":\"info\",\"event\":\"mission_progress\",\"phase\":\"upload\"}",
+          "source": "deepsearch:upload",
+          "logged_at": "2026-09-30T20:56:48.657000",
+          "created_at": "2026-09-30T20:56:51.172501",
+          "attempt_count": 1,
+          "event_id": "19fdf175-293f-4509-85ad-4a3dfec2c5d7",
+          "sequence": 10
+        },
+        {
+          "id": "7ebe1ec9-6063-4607-b479-5e2a0eb3a528",
+          "level": "INFO",
+          "message": "{\"category\":\"info\",\"event\":\"mission_progress\",\"phase\":\"upload\"}",
+          "source": "deepsearch:upload",
+          "logged_at": "2026-09-30T20:56:48.693000",
+          "created_at": "2026-09-30T20:56:51.172501",
+          "attempt_count": 1,
+          "event_id": "0181d672-55d2-4960-9fd8-85e5ef8b5403",
+          "sequence": 11
+        }
+      ]
+    },
+    {
+      "observed_at": "2026-09-30T20:56:54.734619+00:00",
+      "status_before": "completed",
+      "status_after": "completed",
+      "started_at": "2026-09-30T20:54:29.868999",
+      "completed_at": "2026-09-30T20:56:48.640270",
+      "logs": [
+        {
+          "id": "d2532abd-947b-4c84-ae80-c485570f6c73",
+          "level": "INFO",
+          "message": "{\"category\":\"info\",\"event\":\"phase_started\",\"phase\":\"loading\"}",
+          "source": "deepsearch:loading",
+          "logged_at": "2026-09-30T20:54:29.875000",
+          "created_at": "2026-09-30T20:54:30.560567",
+          "attempt_count": 1,
+          "event_id": "74d763c0-927a-4cb2-aa36-22dfaa10bbce",
+          "sequence": 1
+        },
+        {
+          "id": "c74c8db8-1534-4abe-8993-7f7525f202af",
+          "level": "INFO",
+          "message": "{\"category\":\"info\",\"event\":\"mission_progress\",\"phase\":\"loading\"}",
+          "source": "deepsearch:loading",
+          "logged_at": "2026-09-30T20:54:29.875000",
+          "created_at": "2026-09-30T20:54:30.560567",
+          "attempt_count": 1,
+          "event_id": "637978b6-9fa6-49fe-a40a-ed9d8da867ac",
+          "sequence": 2
+        },
+        {
+          "id": "04c8aa15-ed1e-4906-ba80-a6560d3fa770",
+          "level": "INFO",
+          "message": "{\"category\":\"info\",\"event\":\"phase_completed\",\"phase\":\"compiled\"}",
+          "source": "deepsearch:compiled",
+          "logged_at": "2026-09-30T20:54:29.875000",
+          "created_at": "2026-09-30T20:54:30.560567",
+          "attempt_count": 1,
+          "event_id": "1170ab08-838e-4e25-b049-6b4a227e12e2",
+          "sequence": 3
+        },
+        {
+          "id": "b3f45cca-402d-4603-a3d7-2adeafdea439",
+          "level": "INFO",
+          "message": "{\"category\":\"info\",\"event\":\"phase_started\",\"phase\":\"running\"}",
+          "source": "deepsearch:running",
+          "logged_at": "2026-09-30T20:54:30.111000",
+          "created_at": "2026-09-30T20:54:31.009883",
+          "attempt_count": 1,
+          "event_id": "d81309df-8169-4548-8a80-29b91c77b2d7",
+          "sequence": 4
+        },
+        {
+          "id": "8bc34447-546e-4102-bff4-1409d940d131",
+          "level": "INFO",
+          "message": "{\"category\":\"info\",\"event\":\"mission_progress\",\"phase\":\"running\"}",
+          "source": "deepsearch:running",
+          "logged_at": "2026-09-30T20:56:48.640000",
+          "created_at": "2026-09-30T20:56:51.172501",
+          "attempt_count": 1,
+          "event_id": "578b3d63-3896-431d-a27d-1ec2b6113267",
+          "sequence": 5
+        },
+        {
+          "id": "d45024a5-74a4-4b57-89d5-46134e63d145",
+          "level": "INFO",
+          "message": "{\"category\":\"info\",\"event\":\"mission_progress\",\"phase\":\"running\"}",
+          "source": "deepsearch:running",
+          "logged_at": "2026-09-30T20:56:48.640000",
+          "created_at": "2026-09-30T20:56:51.172501",
+          "attempt_count": 1,
+          "event_id": "1b554b70-0886-4dbf-ab49-893b7052d146",
+          "sequence": 6
+        },
+        {
+          "id": "57208063-918a-4297-9f0c-2ae510496029",
+          "level": "INFO",
+          "message": "{\"category\":\"info\",\"event\":\"mission_progress\",\"phase\":\"running\"}",
+          "source": "deepsearch:running",
+          "logged_at": "2026-09-30T20:56:48.641000",
+          "created_at": "2026-09-30T20:56:51.172501",
+          "attempt_count": 1,
+          "event_id": "2e5751bd-33e8-4f2f-90da-055ce649c01c",
+          "sequence": 7
+        },
+        {
+          "id": "15c0c752-f0ed-4bf4-8561-3f0ea55e4bff",
+          "level": "INFO",
+          "message": "{\"category\":\"info\",\"event\":\"mission_progress\",\"phase\":\"running\"}",
+          "source": "deepsearch:running",
+          "logged_at": "2026-09-30T20:56:48.646000",
+          "created_at": "2026-09-30T20:56:51.172501",
+          "attempt_count": 1,
+          "event_id": "f6230716-d23f-44b6-8f2f-98962b330a72",
+          "sequence": 8
+        },
+        {
+          "id": "6e635eef-b76c-4f19-8814-f77de2e34803",
+          "level": "INFO",
+          "message": "{\"category\":\"info\",\"event\":\"mission_progress\",\"phase\":\"upload\"}",
+          "source": "deepsearch:upload",
+          "logged_at": "2026-09-30T20:56:48.656000",
+          "created_at": "2026-09-30T20:56:51.172501",
+          "attempt_count": 1,
+          "event_id": "537d0138-7d40-4aef-9000-d7aae4769e6a",
+          "sequence": 9
+        },
+        {
+          "id": "9f12d891-a047-42ea-829c-3921f8357f40",
+          "level": "INFO",
+          "message": "{\"category\":\"info\",\"event\":\"mission_progress\",\"phase\":\"upload\"}",
+          "source": "deepsearch:upload",
+          "logged_at": "2026-09-30T20:56:48.657000",
+          "created_at": "2026-09-30T20:56:51.172501",
+          "attempt_count": 1,
+          "event_id": "19fdf175-293f-4509-85ad-4a3dfec2c5d7",
+          "sequence": 10
+        },
+        {
+          "id": "7ebe1ec9-6063-4607-b479-5e2a0eb3a528",
+          "level": "INFO",
+          "message": "{\"category\":\"info\",\"event\":\"mission_progress\",\"phase\":\"upload\"}",
+          "source": "deepsearch:upload",
+          "logged_at": "2026-09-30T20:56:48.693000",
+          "created_at": "2026-09-30T20:56:51.172501",
+          "attempt_count": 1,
+          "event_id": "0181d672-55d2-4960-9fd8-85e5ef8b5403",
+          "sequence": 11
+        },
+        {
+          "id": "243818f1-03e1-46d0-b5c6-8bb773b93366",
+          "level": "INFO",
+          "message": "{\"category\":\"info\",\"event\":\"mission_progress\",\"phase\":\"upload\"}",
+          "source": "deepsearch:upload",
+          "logged_at": "2026-09-30T20:56:50.443000",
+          "created_at": "2026-09-30T20:56:51.858436",
+          "attempt_count": 1,
+          "event_id": "2f40c328-896a-4418-8a19-62911930642c",
+          "sequence": 12
+        }
+      ]
+    }
+  ],
+  "final_stable_sample": {
+    "observed_at": "2026-09-30T20:57:53.008013+00:00",
+    "status_before": "completed",
+    "status_after": "completed",
+    "started_at": "2026-09-30T20:54:29.868999",
+    "completed_at": "2026-09-30T20:56:48.640270",
+    "logs": [
+      {
+        "id": "d2532abd-947b-4c84-ae80-c485570f6c73",
+        "level": "INFO",
+        "message": "{\"category\":\"info\",\"event\":\"phase_started\",\"phase\":\"loading\"}",
+        "source": "deepsearch:loading",
+        "logged_at": "2026-09-30T20:54:29.875000",
+        "created_at": "2026-09-30T20:54:30.560567",
+        "attempt_count": 1,
+        "event_id": "74d763c0-927a-4cb2-aa36-22dfaa10bbce",
+        "sequence": 1
+      },
+      {
+        "id": "c74c8db8-1534-4abe-8993-7f7525f202af",
+        "level": "INFO",
+        "message": "{\"category\":\"info\",\"event\":\"mission_progress\",\"phase\":\"loading\"}",
+        "source": "deepsearch:loading",
+        "logged_at": "2026-09-30T20:54:29.875000",
+        "created_at": "2026-09-30T20:54:30.560567",
+        "attempt_count": 1,
+        "event_id": "637978b6-9fa6-49fe-a40a-ed9d8da867ac",
+        "sequence": 2
+      },
+      {
+        "id": "04c8aa15-ed1e-4906-ba80-a6560d3fa770",
+        "level": "INFO",
+        "message": "{\"category\":\"info\",\"event\":\"phase_completed\",\"phase\":\"compiled\"}",
+        "source": "deepsearch:compiled",
+        "logged_at": "2026-09-30T20:54:29.875000",
+        "created_at": "2026-09-30T20:54:30.560567",
+        "attempt_count": 1,
+        "event_id": "1170ab08-838e-4e25-b049-6b4a227e12e2",
+        "sequence": 3
+      },
+      {
+        "id": "b3f45cca-402d-4603-a3d7-2adeafdea439",
+        "level": "INFO",
+        "message": "{\"category\":\"info\",\"event\":\"phase_started\",\"phase\":\"running\"}",
+        "source": "deepsearch:running",
+        "logged_at": "2026-09-30T20:54:30.111000",
+        "created_at": "2026-09-30T20:54:31.009883",
+        "attempt_count": 1,
+        "event_id": "d81309df-8169-4548-8a80-29b91c77b2d7",
+        "sequence": 4
+      },
+      {
+        "id": "8bc34447-546e-4102-bff4-1409d940d131",
+        "level": "INFO",
+        "message": "{\"category\":\"info\",\"event\":\"mission_progress\",\"phase\":\"running\"}",
+        "source": "deepsearch:running",
+        "logged_at": "2026-09-30T20:56:48.640000",
+        "created_at": "2026-09-30T20:56:51.172501",
+        "attempt_count": 1,
+        "event_id": "578b3d63-3896-431d-a27d-1ec2b6113267",
+        "sequence": 5
+      },
+      {
+        "id": "d45024a5-74a4-4b57-89d5-46134e63d145",
+        "level": "INFO",
+        "message": "{\"category\":\"info\",\"event\":\"mission_progress\",\"phase\":\"running\"}",
+        "source": "deepsearch:running",
+        "logged_at": "2026-09-30T20:56:48.640000",
+        "created_at": "2026-09-30T20:56:51.172501",
+        "attempt_count": 1,
+        "event_id": "1b554b70-0886-4dbf-ab49-893b7052d146",
+        "sequence": 6
+      },
+      {
+        "id": "57208063-918a-4297-9f0c-2ae510496029",
+        "level": "INFO",
+        "message": "{\"category\":\"info\",\"event\":\"mission_progress\",\"phase\":\"running\"}",
+        "source": "deepsearch:running",
+        "logged_at": "2026-09-30T20:56:48.641000",
+        "created_at": "2026-09-30T20:56:51.172501",
+        "attempt_count": 1,
+        "event_id": "2e5751bd-33e8-4f2f-90da-055ce649c01c",
+        "sequence": 7
+      },
+      {
+        "id": "15c0c752-f0ed-4bf4-8561-3f0ea55e4bff",
+        "level": "INFO",
+        "message": "{\"category\":\"info\",\"event\":\"mission_progress\",\"phase\":\"running\"}",
+        "source": "deepsearch:running",
+        "logged_at": "2026-09-30T20:56:48.646000",
+        "created_at": "2026-09-30T20:56:51.172501",
+        "attempt_count": 1,
+        "event_id": "f6230716-d23f-44b6-8f2f-98962b330a72",
+        "sequence": 8
+      },
+      {
+        "id": "6e635eef-b76c-4f19-8814-f77de2e34803",
+        "level": "INFO",
+        "message": "{\"category\":\"info\",\"event\":\"mission_progress\",\"phase\":\"upload\"}",
+        "source": "deepsearch:upload",
+        "logged_at": "2026-09-30T20:56:48.656000",
+        "created_at": "2026-09-30T20:56:51.172501",
+        "attempt_count": 1,
+        "event_id": "537d0138-7d40-4aef-9000-d7aae4769e6a",
+        "sequence": 9
+      },
+      {
+        "id": "9f12d891-a047-42ea-829c-3921f8357f40",
+        "level": "INFO",
+        "message": "{\"category\":\"info\",\"event\":\"mission_progress\",\"phase\":\"upload\"}",
+        "source": "deepsearch:upload",
+        "logged_at": "2026-09-30T20:56:48.657000",
+        "created_at": "2026-09-30T20:56:51.172501",
+        "attempt_count": 1,
+        "event_id": "19fdf175-293f-4509-85ad-4a3dfec2c5d7",
+        "sequence": 10
+      },
+      {
+        "id": "7ebe1ec9-6063-4607-b479-5e2a0eb3a528",
+        "level": "INFO",
+        "message": "{\"category\":\"info\",\"event\":\"mission_progress\",\"phase\":\"upload\"}",
+        "source": "deepsearch:upload",
+        "logged_at": "2026-09-30T20:56:48.693000",
+        "created_at": "2026-09-30T20:56:51.172501",
+        "attempt_count": 1,
+        "event_id": "0181d672-55d2-4960-9fd8-85e5ef8b5403",
+        "sequence": 11
+      },
+      {
+        "id": "243818f1-03e1-46d0-b5c6-8bb773b93366",
+        "level": "INFO",
+        "message": "{\"category\":\"info\",\"event\":\"mission_progress\",\"phase\":\"upload\"}",
+        "source": "deepsearch:upload",
+        "logged_at": "2026-09-30T20:56:50.443000",
+        "created_at": "2026-09-30T20:56:51.858436",
+        "attempt_count": 1,
+        "event_id": "2f40c328-896a-4418-8a19-62911930642c",
+        "sequence": 12
+      }
+    ]
+  }
+}

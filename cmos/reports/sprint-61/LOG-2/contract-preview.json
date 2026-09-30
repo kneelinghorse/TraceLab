@@ -1,0 +1,138 @@
+{
+  "mission_id": "S61-LOG2-ACCEPT-01",
+  "mission_uuid": "3f5c2641-7a47-45ed-a092-feebe9143ed1",
+  "project_id": "5229e75e-8ad3-4ac5-94de-093a177562c6",
+  "contract_version": "1.0",
+  "compiler_revision": "24e88100624e6221e5fa957508ab77c4b0f519f9",
+  "fidelity": "structural_only",
+  "named_entities": [],
+  "objectives": [
+    {
+      "id": "objective-0",
+      "text": "Explain which PostgreSQL timestamp observation should validate a lease after a row-lock wait, using only the official PostgreSQL documentation.",
+      "source": "objective",
+      "required": false
+    },
+    {
+      "id": "objective-1",
+      "text": "Explain in one worked timeline why a lease check after a row-lock wait needs an actual current-time observation; cite the official explicit-locking documentation.",
+      "source": "success_criteria",
+      "required": true
+    }
+  ],
+  "evidence_slots": [
+    {
+      "id": "slot-objective-1",
+      "kind": "objective_coverage",
+      "description": "Gather evidence that directly addresses: Explain in one worked timeline why a lease check after a row-lock wait needs an actual current-time observation; cite the official explicit-locking documentation.",
+      "source": "success_criteria",
+      "target": {
+        "objective_id": "objective-1"
+      },
+      "required": true
+    },
+    {
+      "id": "slot-deliverable-schema-1",
+      "kind": "deliverable_schema",
+      "description": "Satisfy structural deliverable 'Comparison Table'.",
+      "source": "deliverables",
+      "target": {
+        "schema_id": "deliverable-schema-1",
+        "format": "table"
+      },
+      "required": true
+    },
+    {
+      "id": "slot-deliverable-schema-2",
+      "kind": "deliverable_schema",
+      "description": "Satisfy structural deliverable 'Required Table'.",
+      "source": "deliverables",
+      "target": {
+        "schema_id": "deliverable-schema-2",
+        "format": "table"
+      },
+      "required": true
+    }
+  ],
+  "acceptance_checks": [
+    {
+      "id": "check-objective-1",
+      "kind": "objective_coverage",
+      "description": "Objective must be substantively addressed: Explain in one worked timeline why a lease check after a row-lock wait needs an actual current-time observation; cite the official explicit-locking documentation.",
+      "target": {
+        "objective_id": "objective-1"
+      },
+      "required": true
+    },
+    {
+      "id": "check-deliverable-schema-1",
+      "kind": "structural_output",
+      "description": "Output must satisfy the 'Comparison Table' structural contract.",
+      "target": {
+        "schema_id": "deliverable-schema-1",
+        "format": "table"
+      },
+      "required": true
+    },
+    {
+      "id": "check-deliverable-schema-2",
+      "kind": "structural_output",
+      "description": "Output must satisfy the 'Required Table' structural contract.",
+      "target": {
+        "schema_id": "deliverable-schema-2",
+        "format": "table"
+      },
+      "required": true
+    }
+  ],
+  "deliverable_schemas": [
+    {
+      "id": "deliverable-schema-1",
+      "kind": "table",
+      "title": "Comparison Table",
+      "format": "table",
+      "source_text": "One concise Markdown comparison note with the requested table and worked timeline.",
+      "min_items": null,
+      "minimum_citation_count": null,
+      "columns": [],
+      "allowed_values": [],
+      "required_sections": [],
+      "entity_extraction_required": false,
+      "entity_types": [],
+      "row_identifier_column": null,
+      "recommendation_required": false,
+      "evidence_gaps_section_required": false,
+      "corpus_reference_required": false,
+      "claim_to_evidence_mapping_required": false,
+      "limitations_section_required": false,
+      "notes": [
+        "Satisfy the required table structure explicitly; do not narrate it away."
+      ]
+    },
+    {
+      "id": "deliverable-schema-2",
+      "kind": "table",
+      "title": "Required Table",
+      "format": "table",
+      "source_text": "Compare CURRENT_TIMESTAMP/transaction_timestamp(), statement_timestamp(), and clock_timestamp() in one concise table, citing the official PostgreSQL date/time functions documentation.",
+      "min_items": null,
+      "minimum_citation_count": null,
+      "columns": [],
+      "allowed_values": [],
+      "required_sections": [],
+      "entity_extraction_required": false,
+      "entity_types": [],
+      "row_identifier_column": null,
+      "recommendation_required": false,
+      "evidence_gaps_section_required": false,
+      "corpus_reference_required": false,
+      "claim_to_evidence_mapping_required": false,
+      "limitations_section_required": false,
+      "notes": [
+        "Satisfy the required table structure explicitly; do not narrate it away."
+      ]
+    }
+  ],
+  "coverage_thresholds": {},
+  "validation_thresholds": {}
+}

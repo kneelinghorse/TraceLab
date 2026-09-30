@@ -528,7 +528,7 @@ class TestServiceRoleLogIngest:
     #260(3): with the flag ON, a human-auth token — any role, including owner —
     can no longer append/spoof logs on an arbitrary mission; only the service
     principal can. LOG-1 makes this boundary unconditional in both policy modes.
-    Legacy delivery is restricted to terminal results during worker cutover."""
+    LOG-2 retires legacy delivery; authorized services receive an upgrade refusal."""
 
     def test_log_ingest_requires_authentication(self, client):
         # Anon -> 401 regardless of the flag (router-level authn, flag-independent).
@@ -557,14 +557,15 @@ class TestServiceRoleLogIngest:
         )
         assert resp.status_code == 403, resp.text
 
-    def test_log_ingest_service_principal_ok(self, client, db_session, rbac_on):
+    def test_log_ingest_service_principal_must_upgrade(self, client, db_session, rbac_on):
         service = _make_user(db_session, "svc-runner@x.io", role=ROLE_SERVICE)
         mission = _make_terminal_log_mission(db_session, owner_id=uuid4(), project_id=None)
         resp = client.post(
             f"{API}/missions/{mission.id}/logs", json=_LOG_BODY, headers=_bearer(service)
         )
-        assert resp.status_code == 201, resp.text
-        assert resp.json()["accepted"] == 1
+        assert resp.status_code == 426, resp.text
+        assert "/logs/v2" in resp.json()["detail"]
+        assert db_session.query(MissionLog).filter_by(mission_id=mission.id).count() == 0
 
     @pytest.mark.parametrize(
         ("role", "expected_status"),
@@ -573,7 +574,7 @@ class TestServiceRoleLogIngest:
             (ROLE_MEMBER, 403),
             (ROLE_ADMIN, 403),
             (ROLE_OWNER, 403),
-            (ROLE_SERVICE, 201),
+            (ROLE_SERVICE, 426),
         ],
         ids=("viewer", "member", "admin", "owner", "service"),
     )
@@ -592,8 +593,7 @@ class TestServiceRoleLogIngest:
         )
 
         assert resp.status_code == expected_status, resp.text
-        if role == ROLE_SERVICE:
-            assert resp.json()["accepted"] == 1
+        assert db_session.query(MissionLog).filter_by(mission_id=mission.id).count() == 0
 
     def test_log_ingest_invalid_api_key_rejected(self, client, rbac_on):
         resp = client.post(
@@ -605,10 +605,9 @@ class TestServiceRoleLogIngest:
         assert resp.status_code == 401, resp.text
 
     @pytest.mark.parametrize(
-        ("payload", "expected_logged_at", "expected_source"),
+        "payload",
         [
-            (
-                {
+            {
                     "logs": [
                         {
                             "level": "INFO",
@@ -617,12 +616,8 @@ class TestServiceRoleLogIngest:
                             "logged_at": "2026-08-14T12:34:56Z",
                         }
                     ]
-                },
-                datetime(2026, 8, 14, 12, 34, 56),
-                "deepsearch:running",
-            ),
-            (
-                {
+            },
+            {
                     "entries": [
                         {
                             "level": "WARNING",
@@ -631,23 +626,18 @@ class TestServiceRoleLogIngest:
                             "ts": "2026-08-14T12:35:57Z",
                         }
                     ]
-                },
-                datetime(2026, 8, 14, 12, 35, 57),
-                "critique",
-            ),
+            },
         ],
         ids=("canonical", "deepsearch-transitional"),
     )
-    def test_log_ingest_normalizes_supported_wire_shapes(
+    def test_log_ingest_retires_both_legacy_wire_shapes_without_inserting(
         self,
         client,
         db_session,
         rbac_on,
         payload,
-        expected_logged_at,
-        expected_source,
     ):
-        """The receiver accepts the canonical contract during runner migration."""
+        """Neither old alias can bypass retirement and insert unattributed logs."""
         service = _make_user(db_session, f"svc-shape-{uuid4().hex[:8]}@x.io", role=ROLE_SERVICE)
         mission = _make_terminal_log_mission(db_session, owner_id=uuid4(), project_id=None)
 
@@ -657,14 +647,8 @@ class TestServiceRoleLogIngest:
             headers=_bearer(service),
         )
 
-        assert resp.status_code == 201, resp.text
-        stored = (
-            db_session.query(MissionLog)
-            .filter(MissionLog.mission_id == mission.id)
-            .one()
-        )
-        assert stored.logged_at == expected_logged_at
-        assert stored.source == expected_source
+        assert resp.status_code == 426, resp.text
+        assert db_session.query(MissionLog).filter_by(mission_id=mission.id).count() == 0
 
     def test_log_ingest_human_forbidden_when_flag_off(self, client, db_session):
         # LOG-1: disabling human RBAC must never enable machine log spoofing.
