@@ -1,0 +1,397 @@
+{
+  "verified_head": "295028c8f8b7e7fa0b160be49321f53099b1951a",
+  "receipt_paths": [
+    {
+      "receipt": "cmos/reports/sprint-60/DUP-1/README.md",
+      "path": "cmos/contracts/librarian-duplicates.md"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/DUP-1/README.md",
+      "path": "cmos/planning/sprint-60-HANDOFF.md"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-3/README.md",
+      "path": "cmos/contracts/librarian-descriptions.md"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-3/README.md",
+      "path": "cmos/planning/sprint-60-HANDOFF.md"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/README.md",
+      "path": "cmos/contracts/librarian-reports.md"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/README.md",
+      "path": "cmos/planning/sprint-60-HANDOFF.md"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/README.md",
+      "path": "cmos/reports/sprint-60/LIB-4/backend-related.log"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/README.md",
+      "path": "cmos/reports/sprint-60/LIB-4/initial-red.log"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/README.md",
+      "path": "cmos/reports/sprint-60/LIB-4/postgres-concurrency.log"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/README.md",
+      "path": "cmos/reports/sprint-60/LIB-4/postgres-full.log"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/README.md",
+      "path": "cmos/reports/sprint-60/LIB-4/frontend-unit.log"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/README.md",
+      "path": "cmos/reports/sprint-60/LIB-4/frontend-types.log"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/README.md",
+      "path": "cmos/reports/sprint-60/LIB-4/frontend-lint.log"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/README.md",
+      "path": "cmos/reports/sprint-60/LIB-4/production-build.log"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/README.md",
+      "path": "cmos/reports/sprint-60/LIB-4/built-browser.log"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/README.md",
+      "path": "cmos/reports/sprint-60/LIB-4/built-report-light-390.png"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/README.md",
+      "path": "cmos/reports/sprint-60/LIB-4/built-report-dark-1440.png"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/README.md",
+      "path": "cmos/reports/sprint-60/LIB-4/mutation-proof.json"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/README.md",
+      "path": "cmos/reports/sprint-60/LIB-4/mcp-parity.json"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/README.md",
+      "path": "cmos/reports/sprint-60/LIB-4/ci-code.json"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/README.md",
+      "path": "cmos/reports/sprint-60/LIB-4/ci-results.json"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/README.md",
+      "path": "cmos/reports/sprint-60/LIB-4/deploy-wait.json"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/README.md",
+      "path": "cmos/reports/sprint-60/LIB-4/services.json"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/README.md",
+      "path": "cmos/reports/sprint-60/LIB-4/ci-main.json"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/README.md",
+      "path": "cmos/reports/sprint-60/LIB-4/post-deploy-check.json"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/README.md",
+      "path": "cmos/reports/sprint-60/LIB-4/deployed_acceptance.mjs"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/README.md",
+      "path": "cmos/reports/sprint-60/LIB-4/deployed-acceptance.json"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/README.md",
+      "path": "cmos/reports/sprint-60/LIB-4/reviewed-preview.json"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/README.md",
+      "path": "cmos/reports/sprint-60/LIB-4/deployed-progress.json"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/README.md",
+      "path": "cmos/reports/sprint-60/LIB-4/deployed-browser.json"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/README.md",
+      "path": "cmos/reports/sprint-60/LIB-4/first-browser-activity-check.log"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/README.md",
+      "path": "cmos/reports/sprint-60/LIB-4/deployed-report-light-390.png"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/README.md",
+      "path": "cmos/reports/sprint-60/LIB-4/deployed-preview-dark-1440.png"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/ORG-1/README.md",
+      "path": "cmos/contracts/librarian-collections.md"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/ORG-1/README.md",
+      "path": "cmos/foundational-docs/roadmap_template.md"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/ORG-1/README.md",
+      "path": "cmos/foundational-docs/tech_arch_template.md"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/ORG-1/README.md",
+      "path": "cmos/reports/sprint-60/ORG-1/mutation-proof.json"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/ORG-1/README.md",
+      "path": "cmos/reports/sprint-60/ORG-1/ci-code.json"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/ORG-1/README.md",
+      "path": "cmos/reports/sprint-60/ORG-1/ci-results.json"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/ORG-1/README.md",
+      "path": "cmos/reports/sprint-60/ORG-1/deployed-migration.log"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/ORG-1/README.md",
+      "path": "cmos/reports/sprint-60/ORG-1/deployed-services.json"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/ORG-1/README.md",
+      "path": "cmos/reports/sprint-60/ORG-1/deploy-wait.json"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/ORG-1/README.md",
+      "path": "cmos/reports/sprint-60/ORG-1/deploy-wait-first-timeout.json"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/ORG-1/README.md",
+      "path": "cmos/reports/sprint-60/ORG-1/post-deploy-code.json"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/ORG-1/README.md",
+      "path": "cmos/reports/sprint-60/ORG-1/deployed-acceptance.json"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/ORG-1/README.md",
+      "path": "cmos/reports/sprint-60/ORG-1/deployed-browser.json"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/ORG-1/README.md",
+      "path": "cmos/reports/sprint-60/ORG-1/deployed-readonly.json"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/ORG-1/README.md",
+      "path": "cmos/reports/sprint-60/ORG-1/duplicate-regression.json"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/ORG-1/README.md",
+      "path": "cmos/reports/sprint-60/ORG-1/deployed-collection-light-390.png"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/ORG-1/README.md",
+      "path": "cmos/reports/sprint-60/ORG-1/deployed-review-dark-1440.png"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/ORG-1/README.md",
+      "path": "cmos/reports/sprint-60/ORG-1/deployed_acceptance.mjs"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/REPORT-1/README.md",
+      "path": "cmos/planning/sprint-60-HANDOFF.md"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/REPORT-1/README.md",
+      "path": "cmos/contracts/collection-context-and-reports.md"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/REPORT-1/ci-initial.json",
+      "path": "tests/test_rbac_verify_harness.py"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/REPORT-1/ci-initial.json",
+      "path": "tests/unit/test_oods_object_contract.py"
+    }
+  ],
+  "test_symbols": [
+    {
+      "receipt": "cmos/reports/sprint-60/DUP-1/mutation-proof.json",
+      "symbol": "test_one_shared_boilerplate_paragraph_is_not_a_near_duplicate",
+      "definitions": [
+        "tests/test_librarian_duplicates.py"
+      ]
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/DUP-1/mutation-proof.json",
+      "symbol": "test_project_scope_precedes_analysis_even_for_admin",
+      "definitions": [
+        "tests/test_librarian_duplicates.py"
+      ]
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-3/mutation-proof.json",
+      "symbol": "test_corpus_citations_are_scoped_and_rechecked",
+      "definitions": [
+        "tests/test_librarian_descriptions.py"
+      ]
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-3/mutation-proof.json",
+      "symbol": "test_human_project_authorization_precedes_model_and_signed_caller_is_required",
+      "definitions": [
+        "tests/test_librarian_descriptions.py"
+      ]
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/mutation-proof.json",
+      "symbol": "test_all_effective_inputs_are_rechecked_at_save",
+      "definitions": [
+        "tests/test_librarian_reports.py"
+      ]
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/mutation-proof.json",
+      "symbol": "test_preview_then_exact_save_and_retry_never_generate_again",
+      "definitions": [
+        "tests/test_librarian_reports.py"
+      ]
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/LIB-4/mutation-proof.json",
+      "symbol": "test_unsigned_or_wrong_principal_acceptance_cannot_write",
+      "definitions": [
+        "tests/test_librarian_reports.py"
+      ]
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/ORG-1/mutation-proof.json",
+      "symbol": "test_privileged_caller_is_still_scoped_before_provider_and_acceptance",
+      "definitions": [
+        "tests/test_librarian_collections.py"
+      ]
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/ORG-1/mutation-proof.json",
+      "symbol": "test_source_changed_between_validation_and_attachment_stays_partial",
+      "definitions": [
+        "tests/test_librarian_collections.py"
+      ]
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/ORG-1/mutation-proof.json",
+      "symbol": "test_wrong_user_and_service_cannot_accept_another_principals_group",
+      "definitions": [
+        "tests/test_librarian_collections.py"
+      ]
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/REPORT-1/ci-initial.json",
+      "symbol": "test_every_api_model_field_requires_an_explicit_presentation_mapping",
+      "definitions": [
+        "tests/unit/test_oods_object_contract.py"
+      ]
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/REPORT-1/ci-initial.json",
+      "symbol": "test_oods_object_contract",
+      "definitions": [],
+      "module_path": "tests/unit/test_oods_object_contract.py"
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/REPORT-1/ci-initial.json",
+      "symbol": "test_pedr1c_matrix_is_compatible_with_real_testclient_routes",
+      "definitions": [
+        "tests/test_rbac_verify_harness.py"
+      ]
+    },
+    {
+      "receipt": "cmos/reports/sprint-60/REPORT-1/ci-initial.json",
+      "symbol": "test_rbac_verify_harness",
+      "definitions": [],
+      "module_path": "tests/test_rbac_verify_harness.py"
+    }
+  ],
+  "unresolved": [],
+  "classification_note": "Two test_* names in initial CI failure paths identify existing modules rather than functions. Historical counts remain labeled by their original commit; WALK-3 records freshly measured current counts.",
+  "decision_mechanisms": [
+    {
+      "decisions": [
+        551,
+        552
+      ],
+      "files": [
+        "app/services/report_citations.py",
+        "app/services/synthesis.py",
+        "app/api/v1/reports.py"
+      ],
+      "verified_mechanism": "Marker/hash persistence, scoped reads/exports, legacy unavailable mapping, source locks; later synthesis ordering now honors review_position."
+    },
+    {
+      "decisions": [
+        553
+      ],
+      "files": [
+        "app/services/librarian_description.py"
+      ],
+      "verified_mechanism": "Audience/caller/project binding; revision and prior hash; live source checks; compare-and-swap accept/restore."
+    },
+    {
+      "decisions": [
+        554
+      ],
+      "files": [
+        "app/services/librarian_duplicates.py"
+      ],
+      "verified_mechanism": "100 documents, 20000 chars, 20 pairs; normalization, two-paragraph probable guard and fresh scoped comparison; no mutation."
+    },
+    {
+      "decisions": [
+        555,
+        556
+      ],
+      "files": [
+        "app/services/librarian_collections.py",
+        "app/services/collection.py",
+        "app/onboarding/idempotency.py"
+      ],
+      "verified_mechanism": "Bounded proposals; existing default Space; ordered subset; per-attachment/final source recheck; transactional durable retry receipt."
+    },
+    {
+      "decisions": [
+        557,
+        558
+      ],
+      "files": [
+        "app/services/librarian_reports.py"
+      ],
+      "verified_mechanism": "100 candidates, 12 selected, 4000 chars each, 24000 total; signed reviewed source and preview; current access/source/collection checks; atomic Report/sources/receipt and current-value replay. First LIB-4 refusal cause remains unknown."
+    },
+    {
+      "decisions": [
+        559
+      ],
+      "files": [
+        "cmos/reports/sprint-60/WALK-3/deployed_acceptance.mjs"
+      ],
+      "verified_mechanism": "Controlled member; real UI/API/published MCP; no DeepSearch submission; completion is gated on all live modes and cleanup."
+    },
+    {
+      "decisions": [
+        560
+      ],
+      "files": [
+        "cmos/planning/sprint-60-HANDOFF.md"
+      ],
+      "verified_mechanism": "Bounded #405 closure; remaining maintenance stays carried without expanding password-recovery scope."
+    }
+  ]
+}

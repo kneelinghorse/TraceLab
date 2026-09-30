@@ -1,0 +1,21 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
++ actual - expected
+
++ 'cbaf222933f0ee20512ad9a68035c3f04b3f146dfc0c07764501a5d4acb9f5af'
+- '04f4431effd5ac5c7dc239bf9ed59d7072b8ad5b1342582987b7c526ca5a7719'
+
+    at file:///Users/systemsystems/portfolio/TraceLab/cmos/reports/sprint-60/WALK-3/deployed_acceptance.mjs:359:73
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: 'cbaf222933f0ee20512ad9a68035c3f04b3f146dfc0c07764501a5d4acb9f5af',
+  expected: '04f4431effd5ac5c7dc239bf9ed59d7072b8ad5b1342582987b7c526ca5a7719',
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.6.0

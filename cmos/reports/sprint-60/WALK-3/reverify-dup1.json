@@ -1,0 +1,9 @@
+{
+  "verified_at": "2026-09-30T02:38:05.462Z",
+  "serving_commit": "295028c8f8b7e7fa0b160be49321f53099b1951a",
+  "baseline_commit": "edc0a0b4ea1a8049dbb4ffb74e6af590f554333f",
+  "candidates": 3,
+  "unchanged_snapshot_sha256": "77e482fcb6d91c6156b932d3ebd78c6415e425cbb4527d4762e96c0d87fb840d",
+  "mutations": 0,
+  "model_calls": 0
+}
