@@ -255,8 +255,8 @@ shared human-route authentication dependency everywhere else, regardless of
 `RBAC_ENABLED`, resource ownership, or Space membership. It can therefore do
 nothing but the explicit service writes below plus `GET /api/v1/auth/me`, which
 is intentionally available for startup role verification. Legacy log ingest
-retains the feature-flag no-op for flip-back compatibility. The evidence
-projection passes `enforce_when_disabled=True`, so its service-role boundary is
+retains a feature-flag no-op by default. Log writes/capabilities and evidence
+projection pass `enforce_when_disabled=True`, so their service-role boundary is
 unconditional even when `RBAC_ENABLED` is off.
 
 **Service / trusted-origin surfaces (the carve-out — kept explicit so it cannot
@@ -265,7 +265,8 @@ silently widen; guarded by `tests/test_rbac_flip_regression.py::TestServiceCarve
 | Surface | Auth mechanism | Notes |
 | --- | --- | --- |
 | `GET /api/v1/auth/me` (startup role verification) | Any authenticated principal | Read-only exception: returns the caller's live database role so a worker can fail closed unless it resolves to `service`. |
-| `POST /missions/{id}/logs` (runner log ingest) | **service principal** (`role=service`) when `RBAC_ENABLED` on; authn-only when off | Accepts only canonical/transitional runner log batches. |
+| `POST /missions/{id}/logs` (legacy log ingest) | **service principal** in every feature-flag state | Bounded, terminal-only, unattributed compatibility until LOG-2 cutover; no v2 downgrade. |
+| `GET /missions/{id}/logs/capabilities` and `POST /missions/{id}/logs/v2` | **service principal** in every feature-flag state | Explicit contract negotiation, atomic lease ownership and stable-event replay. [Delivery contract](../cmos/contracts/mission-log-delivery-contract.md), decision #568. GET log history remains scoped to humans; no proof is exposed. |
 | `POST /missions/events/cmos` (CMOS event bridge) | **service principal** when `RBAC_ENABLED` on; authn-only when off | Emits operational CMOS transition events. |
 | `POST /missions/{id}/evidence` (DeepSearch ledger projection) | **service principal** (`role=service`) in every feature-flag state | Triggers idempotent projection of the exact persisted terminal mission/job result; every human role is denied and the request cannot supply evidence, project, session, or origin fields. |
 | `POST /api/v1/webhooks/deepsearch` | HMAC-SHA256 shared secret (env `DEEPSEARCH_TRACELAB_SERVICE_SECRET`, legacy fallback `DEEPSEARCH_WEBHOOK_SECRET`) | Never user-authed; structural carve-out (never calls `authorize()`). ⚠️ If neither is set, HMAC validation is **skipped** (dev-only mode) — must be set in prod. |
@@ -274,7 +275,7 @@ silently widen; guarded by `tests/test_rbac_flip_regression.py::TestServiceCarve
 
 **⚠️ Rollout dependency:** the DeepSearch runner must use a dedicated
 `role=service` principal before invoking `POST /missions/{id}/evidence`, and
-before `RBAC_ENABLED` is flipped on for `POST /missions/{id}/logs`. Provision
+before using either log-write version (independently of `RBAC_ENABLED`). Provision
 the service account and give the runner a revocable API key first:
 
 ```bash

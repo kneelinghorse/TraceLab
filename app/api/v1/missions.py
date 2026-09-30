@@ -15,7 +15,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from fastapi import status as http_status
-from pydantic import AliasChoices, BaseModel, Field
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.core.authorization import (
@@ -31,6 +31,7 @@ from app.core.security import (
     require_authenticated_principal,
     require_authenticated_user,
 )
+from app.dependencies import get_mission_log_service
 from app.models.project import Project
 from app.schemas.evidence_ledger import (
     DeepSearchEvidenceRequest,
@@ -46,6 +47,14 @@ from app.schemas.mission import (
     MissionSubmitResponse,
     MissionUpdate,
     ReportPromotionResponse,
+)
+from app.schemas.mission_logs import (
+    LOG_CONTRACT_VERSION,
+    MAX_LOG_BATCH,
+    MAX_LOG_MESSAGE,
+    AttemptLogBatch,
+    LogBatchAcknowledgement,
+    LogBatchRequest,
 )
 from app.schemas.pagination import PaginatedResponse
 from app.services.auto_ingest import is_document_search_ready
@@ -63,6 +72,7 @@ from app.services.evidence_ledger import (
     get_evidence_ledger_service,
 )
 from app.services.mission_linter import lint_mission_for_submit
+from app.services.mission_logs import MissionLogService
 from app.services.mission_service import (
     MissionNotFoundError,
     MissionService,
@@ -1113,25 +1123,6 @@ def promote_mission_report(
 # Mission log ingestion + retrieval (T39.3)
 # ---------------------------------------------------------------------------
 
-class LogEntry(BaseModel):
-    level: str = "INFO"
-    message: str
-    source: str | None = Field(
-        default=None,
-        validation_alias=AliasChoices("source", "phase"),
-    )
-    logged_at: datetime | None = Field(
-        default=None,
-        validation_alias=AliasChoices("logged_at", "ts"),
-    )
-
-
-class LogBatchRequest(BaseModel):
-    logs: list[LogEntry] = Field(
-        validation_alias=AliasChoices("logs", "entries"),
-    )
-
-
 class LogEntryResponse(BaseModel):
     id: str
     level: str
@@ -1139,6 +1130,9 @@ class LogEntryResponse(BaseModel):
     source: str | None
     logged_at: datetime
     created_at: datetime
+    attempt_count: int | None = None
+    event_id: UUID | None = None
+    sequence: int | None = None
 
 
 @service_router.post(
@@ -1151,43 +1145,47 @@ def ingest_mission_logs(
     payload: LogBatchRequest,
     db: Session = Depends(get_db),
     user: AuthenticatedUser = Depends(require_authenticated_principal),
+    service: MissionLogService = Depends(get_mission_log_service),
 ) -> dict:
-    """Accept a batch of log lines from the DeepSearch runner.
+    """Bounded terminal-only compatibility until the LOG-2 worker cutover."""
+    authorize_service_or_403(user, enforce_when_disabled=True)
+    return {"accepted": service.ingest_legacy(db, mission_id, payload)}
 
-    Called by TracelabLogHandler in the DeepSearch service. This is a
-    service-to-service WRITE, so it is gated to a SERVICE PRINCIPAL (role 'service')
-    via ``authorize_service_or_403`` (T47.4) instead of the per-user ``authorize()``
-    used on the human-facing routes. This closes decision #260(3): a human-auth
-    token (any role, including owner/admin) can no longer append/spoof log records
-    on an arbitrary mission by id — only the runner's service principal can. The
-    gate is a no-op while ``rbac_enabled`` is False, so flip-back stays byte-
-    identical and the deployed runner is unaffected until its account is
-    provisioned as a service principal ahead of the flip (T47.6 runbook). The
-    human-facing READ side (GET .../logs) IS authorize()-gated below.
-    """
-    authorize_service_or_403(user)
 
-    from app.models.mission_log import MissionLog
+@service_router.get("/{mission_id}/logs/capabilities")
+def mission_log_capabilities(
+    mission_id: UUID,
+    user: AuthenticatedUser = Depends(require_authenticated_principal),
+) -> dict:
+    """Explicit capability proof; old append-only endpoints cannot impersonate v2."""
+    authorize_service_or_403(user, enforce_when_disabled=True)
+    return {"contract_version": LOG_CONTRACT_VERSION, "max_batch_entries": MAX_LOG_BATCH,
+            "max_message_chars": MAX_LOG_MESSAGE, "final_flush": "terminal_result_key",
+            "legacy": "terminal_only_until_LOG-2_cutover"}
 
-    mission = _service.get_mission(db, mission_id)
 
-    now = datetime.utcnow()
-    records = [
-        MissionLog(
-            mission_id=mission.id,
-            level=(entry.level or "INFO").upper()[:20],
-            message=entry.message,
-            source=entry.source,
-            logged_at=entry.logged_at or now,
-            created_at=now,
-        )
-        for entry in payload.logs
-    ]
-
-    db.add_all(records)
-    db.commit()
-
-    return {"accepted": len(records)}
+@service_router.post(
+    "/{mission_id}/logs/v2",
+    response_model=LogBatchAcknowledgement,
+    responses={
+        200: {"description": "All events are exact replays."},
+        201: {"model": LogBatchAcknowledgement, "description": "At least one new event was recorded."},
+        409: {"description": "Ownership or event identity conflicts; no events inserted."},
+    },
+)
+def ingest_mission_logs_v2(
+    mission_id: UUID,
+    payload: AttemptLogBatch,
+    response: Response,
+    db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_principal),
+    service: MissionLogService = Depends(get_mission_log_service),
+) -> LogBatchAcknowledgement:
+    authorize_service_or_403(user, enforce_when_disabled=True)
+    result = service.ingest(db, mission_id, payload)
+    response.status_code = 201 if result.accepted else 200
+    response.headers["Cache-Control"] = "no-store"
+    return result
 
 
 @service_router.post(
@@ -1281,7 +1279,7 @@ def get_mission_logs(
     logs = (
         db.query(MissionLog)
         .filter(MissionLog.mission_id == mission.id)
-        .order_by(MissionLog.logged_at.desc())
+        .order_by(MissionLog.logged_at.desc(), MissionLog.attempt_count.desc().nullslast(), MissionLog.sequence.desc().nullslast(), MissionLog.id.desc())
         .limit(limit)
         .all()
     )
@@ -1295,6 +1293,9 @@ def get_mission_logs(
             source=log.source,
             logged_at=log.logged_at,
             created_at=log.created_at,
+            attempt_count=log.attempt_count,
+            event_id=log.event_id,
+            sequence=log.sequence,
         )
         for log in logs
     ]

@@ -1,0 +1,84 @@
+{
+  "mission": "LOG-1",
+  "session": "PS-2026-09-30-008",
+  "recorded_at": "2026-09-30T19:00:47.547971+00:00",
+  "base_commit": "db153f89321439a9404833234589b1b80db12e70",
+  "decisions": [
+    568,
+    569
+  ],
+  "source_sha256": {
+    "app/api/v1/missions.py": "19caaa52a82364488faa12eef546da3785860f7c8d3c3e1903b620357acc572a",
+    "app/dependencies.py": "4f916f540584db959e813d7878bc84b2e37f41715fe2418d162e36523e0e89c0",
+    "app/models/mission_log.py": "0d5bfd2aed63bb5e82af0d098b907fa42d105636981ac471cb13aabbc58c3b6e",
+    "app/schemas/mission_logs.py": "113c7a4007d79b06305a4b9b227c83f34c600babe056e37e693fc940fbb519ac",
+    "app/ports/mission_logs.py": "58eadec709e2a70d05a1db8a53b82fdb9fafd0c9d5561915049b8f3ea73a9b7a",
+    "app/adapters/repositories/sqlalchemy_mission_log_repo.py": "085d2835df45c7b6479b5605f682595cf4d843a7f2b59ec615b23ad9543d80df",
+    "app/services/mission_logs.py": "921354fa481df7fcd985e3c17814e3552e40b5d49723b7c26095f9769a3c333b",
+    "alembic/versions/058_mission_log_attempts.py": "1b163eb2617bfbb9394c2f0e45bb6e7749c2c0c25101d612226bf736cb734ac0",
+    "tests/test_mission_log_delivery.py": "ea88a5b1ab1bc0f2f5ab1de61541e4ee79595d731f02d8a21d93822bf8707bf6",
+    "tests/test_mission_log_migration.py": "677c482153baf0a7d111b4a0c0a81b3e69059d9191f7e807f66fafc0ced8f2fd",
+    "tests/integration/test_mission_log_delivery_postgres.py": "368082435f1c02aa82f925ea9e53f5dd1df83ed689047d9e98aeffd6e8f7be1b",
+    "tests/fixtures/mission-logs-v2/batch.json": "7e698ce50c7d3a26e884261ec7c3278b28d91a94024a74b6df3f383d791cf423",
+    "cmos/contracts/mission-log-delivery-contract.md": "4cc11a71affbb53e5975d87253bf201f18b748ec73b457754289333ab7e7af27",
+    "tests/test_service_principal_route_boundary.py": "b7b727d10674a69ff2df0c5207d9f7949f81f452a89a87bfada1a959064cfd2c",
+    "tests/test_rbac_flip_regression.py": "d46f2384ae282e577f8e2a2024d2afdc926489e47157e33154448396e77dc270",
+    "tests/test_rbac_route_enforcement_api.py": "8cfa5f3e73baec2491e327810a4d92f132911803e24e87b0636e22d07427e286"
+  },
+  "validation": {
+    "boundary_final": {
+      "passed": 68,
+      "skipped": 0,
+      "warnings": 14,
+      "duration_seconds": 73.21,
+      "files": [
+        "tests/test_mission_log_delivery.py",
+        "tests/test_mission_log_migration.py",
+        "tests/test_service_principal_route_boundary.py",
+        "tests/test_rbac_flip_regression.py",
+        "tests/integration/test_mission_log_delivery_postgres.py"
+      ],
+      "coverage": "Real SQLite HTTP concurrent JWT-authenticated retries; PostgreSQL actual lock waits, writer-first requeue/reclaim/terminal/expiry, insert-first reclaim, concurrent idempotency/conflict, migration upgrade/downgrade preserving history; strict bounded inputs and proof privacy; scoped reads and service writes with RBAC on/off."
+    },
+    "broader_consumers": {
+      "passed": 237,
+      "failed": 1,
+      "skipped": 0,
+      "warnings": 39,
+      "duration_seconds": 128.18,
+      "failure": "Reviewed service-principal call-site inventory expected two instead of four. Corrected explicitly; entire affected file passed in boundary_final. Other mission API/model and RBAC tests passed.",
+      "files": [
+        "tests/test_mission_log_delivery.py",
+        "tests/test_mission_log_migration.py",
+        "tests/test_rbac_route_enforcement_api.py",
+        "tests/test_service_principal_route_boundary.py",
+        "tests/test_rbac_flip_regression.py",
+        "tests/test_missions_api.py",
+        "tests/test_mission_model.py"
+      ]
+    },
+    "frontend_consumer": {
+      "file": "mission-run.test.tsx",
+      "passed": 9,
+      "skipped": 0
+    },
+    "ruff_changed_files": "passed",
+    "diff_check": "passed",
+    "foundational_references": "passed",
+    "mcp_parity": "passed: 118 classified operations, 113 live, 5 dead; 9 tools / 50 actions"
+  },
+  "failures_preserved": [
+    "Initial fixture omitted required success_criteria; corrected before expected route-404 TDD failure.",
+    "SQLite concurrency first used the suite StaticPool single physical connection; BEGIN IMMEDIATE failed. Independent NullPool request sessions corrected this. A later broad run exposed auth SessionLocal sharing that same StaticPool and crashed the interpreter; the fixture now also gives real JWT authentication independent connections. Learning #278.",
+    "Real PostgreSQL rejected bare ORM FOR UPDATE with Mission.result_report eager outer join. Receiver now selects only seven fence columns and locks OF missions; actual PostgreSQL races passed. Learning #277.",
+    "Broader consumer inventory mismatch corrected as described above."
+  ],
+  "limits": [
+    "Receiver-only change; no actual worker live-delivery claim and no closure of #412.",
+    "CI, exact deployed build, controlled no-provider proof and actual deployed MCP log read still pending.",
+    "Legacy terminal-only compatibility is explicitly temporary and not idempotent; LOG-2 retires it after coordinated worker cutover.",
+    "No MCP package source change or package publish; deployed pass-through response must still be exercised.",
+    "No provider, model, Qdrant, worker deployment or paid dispatch used. Existing quarantine unchanged."
+  ],
+  "deployment_probe_design": "Decision #569: API-created draft in its own project; guarded synthetic lease uses max int32 attempt, excluded from worker claim. Test ingestion/replay/conflict/stale/terminal proof; actual MCP read; delete mission/logs and soft-delete project. No queued state or provider calls."
+}

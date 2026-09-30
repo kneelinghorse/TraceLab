@@ -514,13 +514,21 @@ class TestFlagOffNoOp:
 _LOG_BODY = {"logs": [{"level": "INFO", "message": "service-gate test"}]}
 
 
+def _make_terminal_log_mission(db, **kwargs):
+    mission = _make_mission(db, **kwargs)
+    mission.status = "completed"
+    mission.deepsearch_result_key = uuid4().hex
+    db.commit()
+    return mission
+
+
 class TestServiceRoleLogIngest:
     """The runner log-ingest write (POST /missions/{id}/logs) is gated to a SERVICE
     principal (role 'service'), NOT per-user authorize(). This closes decision
     #260(3): with the flag ON, a human-auth token — any role, including owner —
     can no longer append/spoof logs on an arbitrary mission; only the service
-    principal can. The gate respects rbac_enabled (no-op OFF) so the deployed
-    runner is unaffected until the flip. Authentication is unconditional (401 anon)."""
+    principal can. LOG-1 makes this boundary unconditional in both policy modes.
+    Legacy delivery is restricted to terminal results during worker cutover."""
 
     def test_log_ingest_requires_authentication(self, client):
         # Anon -> 401 regardless of the flag (router-level authn, flag-independent).
@@ -532,7 +540,7 @@ class TestServiceRoleLogIngest:
         self, client, db_session, rbac_on, role
     ):
         human = _make_user(db_session, f"svc-{role}@x.io", role=role)
-        mission = _make_mission(db_session, owner_id=uuid4(), project_id=None)
+        mission = _make_terminal_log_mission(db_session, owner_id=uuid4(), project_id=None)
         resp = client.post(
             f"{API}/missions/{mission.id}/logs", json=_LOG_BODY, headers=_bearer(human)
         )
@@ -543,7 +551,7 @@ class TestServiceRoleLogIngest:
         # would pass authorize via the privileged tier) is denied here — proving the
         # gate keys on "is a service principal", not "is privileged".
         owner = _make_user(db_session, "svc-owner@x.io", role=ROLE_OWNER)
-        mission = _make_mission(db_session, owner_id=owner.id, project_id=None)
+        mission = _make_terminal_log_mission(db_session, owner_id=owner.id, project_id=None)
         resp = client.post(
             f"{API}/missions/{mission.id}/logs", json=_LOG_BODY, headers=_bearer(owner)
         )
@@ -551,7 +559,7 @@ class TestServiceRoleLogIngest:
 
     def test_log_ingest_service_principal_ok(self, client, db_session, rbac_on):
         service = _make_user(db_session, "svc-runner@x.io", role=ROLE_SERVICE)
-        mission = _make_mission(db_session, owner_id=uuid4(), project_id=None)
+        mission = _make_terminal_log_mission(db_session, owner_id=uuid4(), project_id=None)
         resp = client.post(
             f"{API}/missions/{mission.id}/logs", json=_LOG_BODY, headers=_bearer(service)
         )
@@ -575,7 +583,7 @@ class TestServiceRoleLogIngest:
         """X-API-Key preserves the strict service-only route boundary."""
         principal = _make_user(db_session, f"api-key-{role}@x.io", role=role)
         api_key = _api_key(db_session, principal)
-        mission = _make_mission(db_session, owner_id=uuid4(), project_id=None)
+        mission = _make_terminal_log_mission(db_session, owner_id=uuid4(), project_id=None)
 
         resp = client.post(
             f"{API}/missions/{mission.id}/logs",
@@ -641,7 +649,7 @@ class TestServiceRoleLogIngest:
     ):
         """The receiver accepts the canonical contract during runner migration."""
         service = _make_user(db_session, f"svc-shape-{uuid4().hex[:8]}@x.io", role=ROLE_SERVICE)
-        mission = _make_mission(db_session, owner_id=uuid4(), project_id=None)
+        mission = _make_terminal_log_mission(db_session, owner_id=uuid4(), project_id=None)
 
         resp = client.post(
             f"{API}/missions/{mission.id}/logs",
@@ -658,13 +666,12 @@ class TestServiceRoleLogIngest:
         assert stored.logged_at == expected_logged_at
         assert stored.source == expected_source
 
-    def test_log_ingest_open_when_flag_off(self, client, db_session):
-        # Flip-back invariant: with the flag OFF a non-service human still succeeds,
-        # so deploying this gate does NOT break the live runner before the flip.
+    def test_log_ingest_human_forbidden_when_flag_off(self, client, db_session):
+        # LOG-1: disabling human RBAC must never enable machine log spoofing.
         assert settings.rbac_enabled is False
         member = _make_user(db_session, "svc-off@x.io", role=ROLE_MEMBER)
-        mission = _make_mission(db_session, owner_id=uuid4(), project_id=None)
+        mission = _make_terminal_log_mission(db_session, owner_id=uuid4(), project_id=None)
         resp = client.post(
             f"{API}/missions/{mission.id}/logs", json=_LOG_BODY, headers=_bearer(member)
         )
-        assert resp.status_code == 201, resp.text
+        assert resp.status_code == 403, resp.text

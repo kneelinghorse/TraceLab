@@ -174,7 +174,7 @@
       "mcp": "tracelab_mission_execution.logs",
       "classification": "closed-MCP-1",
       "baseline": "read-gap",
-      "rationale": "Bounded snapshot of persisted logs; an empty result is explicit and does not imply a live stream."
+      "rationale": "LOG-1 (#568): existing authorized GET snapshot adds nullable attempt_count/event_id/sequence through the unchanged MCP pass-through. Service-only capability negotiation and v2 ingestion are internal REST worker operations, not human UI/MCP tools. Receiver readiness alone does not prove live worker delivery; LOG-2 owns that acceptance."
     },
     {
       "id": "frontend/src/components/missions/MissionRunActivity.tsx#MissionRunActivity:GET:/missions/events/recent",

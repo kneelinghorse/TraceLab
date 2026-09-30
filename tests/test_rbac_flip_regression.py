@@ -201,16 +201,17 @@ class TestServiceCarveOutBoundary:
         )
 
     def test_known_service_writes_are_explicitly_gated(self):
-        # Positive: both named handlers invoke the gate. Counting calls keeps a
-        # third service write in the same file from bypassing the file allowlist.
+        # Every reviewed machine handler invokes the gate. Counting calls keeps
+        # an additional carve-out from bypassing the file allowlist.
         missions = (self._APP_DIR / "api" / "v1" / "missions.py").read_text()
-        assert missions.count("authorize_service_or_403(") == 2
-        assert "authorize_service_or_403(user)" in missions
+        assert missions.count("authorize_service_or_403(") == 4
         assert (
             "authorize_service_or_403(user, enforce_when_disabled=True)"
             in missions
         )
         assert '"/{mission_id}/logs"' in missions
+        assert '"/{mission_id}/logs/v2"' in missions
+        assert '"/{mission_id}/logs/capabilities"' in missions
         assert '"/{mission_id}/evidence"' in missions
 
         events = (self._APP_DIR / "api" / "v1" / "mission_events.py").read_text()
