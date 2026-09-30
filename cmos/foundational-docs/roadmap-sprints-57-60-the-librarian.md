@@ -266,6 +266,48 @@ deadline. DeepSearch's model evaluation, provider configuration and other paid w
 were not changed. Sprint identity, decision ownership and CMOS parity are checked
 at close; the historical receipts now identify resolved operator instructions.
 
+### Follow-on — Sprint 62: Reliable operations and guided mission creation (Planned, locked 2026-09-30)
+
+Derek approved the reliability and mission-entry recommendation and asked for a
+fresh-session build handoff. Decision **#576** and the
+[Sprint 62 handoff](../planning/sprint-62-HANDOFF.md) lock nine missions; CMOS
+holds their complete acceptance criteria and dependencies. No build has started.
+
+The primary Home, Missions and command-palette action becomes **Plan a mission**,
+opening a focused Librarian view. A new user can describe research before choosing
+or creating a project inline, then review and refine the generated draft, save it,
+and explicitly submit from the mission page. Manual authoring, seeded/repeat runs
+and the general Librarian remain available. This fixes the zero-project dead end
+without a full Librarian redesign or automatic project/mission/run creation.
+
+| Priority order | Mission | Planned outcome |
+| --- | --- | --- |
+| 1 | **S62-ISO** | Prevent inherited production Qdrant access during tests; preserve disposable integrations |
+| 2 | **S62-CI** | Controlled timeout diagnostics, exact Evidence smoke handling and current required-check guidance |
+| 3 | **S62-MAIL** | Forward hello@aquex.ai alongside Stage1 with one per-email retry identity and real inbox acceptance |
+| 4 | **S62-SCOPE** | Diagnose saved S61 research scope divergence and specify the owning correction, without a paid rerun |
+| 5 | **S62-ENTRY** | Focused guided mission entry, inline project creation and retained advanced paths |
+| 6 | **S62-OBS** | Restore useful cache and legacy metrics failure diagnostics |
+| 7 | **S62-UX** | Exit disabled sessions correctly and make overflowing code keyboard accessible |
+| 8 | **S62-DEPLOY** | Migrate both TraceLab services to supported Railway configuration with behavior parity |
+| 9 | **S62-WALK** | Verify deployed outcomes, final-source receipts and accurate carryover closure |
+
+Isolation precedes CI tooling; CI precedes the feature/operations changes. Scope
+diagnosis requires isolation, and final acceptance requires all eight preceding
+missions. These are recorded dependencies, not automatic execution enforcement.
+
+Railway's [official Config as Code documentation](https://docs.railway.com/config-as-code)
+was checked on 2026-09-30 and confirms the **2026-12-01** cutoff. #451 is therefore
+promoted into the sprint, with effective-config readback and backend Alembic startup
+proof. S62-UX verifies existing table focus behavior and fixes the remaining code
+block gap. S62-OBS distinguishes the old metrics endpoint from the current admin UI.
+
+Ten next-steps (#397, #426, #444, #445, #446, #447, #451, #464, #476, #478) are
+carried to their named missions and remain unresolved until acceptance. Thirteen
+other carryovers stay outside scope. Full redesign, sharing, unrelated cleanup,
+model/provider changes and worker implementation are not part of this plan.
+Aquex owns its site contact change; no email or cross-project reply has been sent.
+
 ### Running alongside: the guest expansion track
 
 > "tracelab has a few friends i've given access to but i think i want to expand that, so it will be for other software design pros to try it out."
@@ -333,6 +375,8 @@ Add to this list rather than resolving items silently.
 ---
 
 ## Change Log
+
+- **2026-09-30 UTC, Sprint 62 locked for fresh build (decision #576).** Nine Queued missions cover test isolation, CI diagnostics, hello forwarding, saved-run scope diagnosis, guided mission entry, cache observability, two narrow UX defects, supported Railway configuration and final acceptance. Ten existing follow-ups promoted; thirteen remain outside scope. Official Railway cutoff corroborated in Evidence Ledger; no runtime/deploy/mail/paid-run action. [Build handoff](../planning/sprint-62-HANDOFF.md).
 
 - **2026-09-30 UTC, Sprint 61 detailed for a fresh build (decision #563).** Refined AUTH-1/AUTH-2 and added LOG-1, LOG-2 and WALK-4 in CMOS. Source inspection found missing session revocation/public-route/mail-secrecy work for recovery and intentional terminal-only delivery plus an unfenced append receiver for logs. The handoff preserves lease safety, replay semantics, independent recovery delivery, real mailbox/pre-terminal acceptance and the DeepSearch deployment boundary. Sprint remains Planned; no runtime or production actions performed.
 
