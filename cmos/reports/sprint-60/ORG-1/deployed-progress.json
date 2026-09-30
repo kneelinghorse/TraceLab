@@ -1,0 +1,84 @@
+{
+  "project_id": "0d6c5b1d-72eb-4390-a40b-c48c88cdb302",
+  "documents": {
+    "onboarding-interview-a.txt": {
+      "id": "228e2feb-9701-4a2d-855c-4c676a2218ea",
+      "processed": true,
+      "chunk_ids": [
+        "27a6eb7e-581c-43cd-bad9-3f7c3a5332ee"
+      ]
+    },
+    "onboarding-interview-b.txt": {
+      "id": "1cd8e74f-f779-43b3-9a55-4d87f9c4dddc",
+      "processed": true,
+      "chunk_ids": [
+        "a7e09605-ecdf-4f72-be6d-34c6c9fe4c0d"
+      ]
+    },
+    "onboarding-interview-c.txt": {
+      "id": "c355fc82-a73b-4a8b-96d0-ddd53f83464a",
+      "processed": true,
+      "chunk_ids": [
+        "5382d30e-4343-4f3e-bca2-08b0cb1ff792"
+      ]
+    }
+  },
+  "draft_started": "2026-09-30T00:35:35.147Z",
+  "proposal": {
+    "model": "gpt-5.1",
+    "coverage": {
+      "readable_documents": 9,
+      "documents_with_eligible_chunks": 3,
+      "used_documents": 3,
+      "readable_chunks": 3,
+      "eligible_chunks": 3,
+      "used_chunks": 3,
+      "excluded_chunks": 0,
+      "limited": false,
+      "chunk_limit": 20,
+      "character_limit": 24000
+    },
+    "group_ids": [
+      "cf1dd7ec-25f1-4141-9210-4a805e311137",
+      "bc43fdad-4217-4aa6-88b3-b6072a6dce4d"
+    ],
+    "corpus_hash": "1393114b9498302614e619f5c57202626ac6739e9c29455b291cacc1eb7cbead",
+    "project_hash": "5d3e1984c855c21ea2cb49493a430a434076ff50ed88aae6b13e6e1dc65c15bc",
+    "draft_created_no_collections": true,
+    "caller_role": "owner"
+  },
+  "accepted": {
+    "collection_id": "cf1dd7ec-25f1-4141-9210-4a805e311137",
+    "name": "ORG-1 reviewed onboarding feedback",
+    "description": "Human-reviewed synthetic onboarding excerpts for the Sprint 60 report workflow.",
+    "member_ids": [
+      "27a6eb7e-581c-43cd-bad9-3f7c3a5332ee",
+      "5382d30e-4343-4f3e-bca2-08b0cb1ff792"
+    ],
+    "destination": {
+      "owner_id": "007c8cb6-7d70-48fc-bcb4-3a0e46bc0519",
+      "space_name": "Default Workspace",
+      "workspace_id": "00000000-0000-0000-0000-000000000001"
+    },
+    "source_members": [
+      {
+        "marker": 2,
+        "available": true,
+        "chunk_id": "27a6eb7e-581c-43cd-bad9-3f7c3a5332ee",
+        "document_id": "228e2feb-9701-4a2d-855c-4c676a2218ea",
+        "excerpt": "Synthetic acceptance interview A. The researcher entered a new project and expected an obvious place to import interview notes. The first screen did not explain whether a project was an empty folder or a running research job. The researcher looked at the mission controls before finding the document area, then asked whether importing a file would start a paid run. A short explanation of what an upl",
+        "href": "/documents/228e2feb-9701-4a2d-855c-4c676a2218ea?chunk=27a6eb7e-581c-43cd-bad9-3f7c3a5332ee&index=0",
+        "document_name": "onboarding-interview-a.txt"
+      },
+      {
+        "marker": 3,
+        "available": true,
+        "chunk_id": "5382d30e-4343-4f3e-bca2-08b0cb1ff792",
+        "document_id": "c355fc82-a73b-4a8b-96d0-ddd53f83464a",
+        "excerpt": "Synthetic acceptance interview C. The researcher had interview notes ready to upload but could not quickly tell which project would receive them. They moved between the project page and the document list looking for an import control. A destination label beside the action would have reduced that uncertainty. They wanted the resulting message to confirm the document name and project instead of show",
+        "href": "/documents/c355fc82-a73b-4a8b-96d0-ddd53f83464a?chunk=5382d30e-4343-4f3e-bca2-08b0cb1ff792&index=0",
+        "document_name": "onboarding-interview-c.txt"
+      }
+    ]
+  }
+}

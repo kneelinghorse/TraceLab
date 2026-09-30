@@ -74,13 +74,16 @@ if (mode === 'all' || mode === 'prepare') {
   if (!review) {
     assert.ok(!progress.draft_started, 'Proposal cache missing after a prior request; inspect before making another paid call');
     const before = await corpus();
+    const projectBefore = await request('/projects/' + projectId);
     const collections = await request(`/collections?project_id=${projectId}&page_size=100`);
     progress.draft_started = new Date().toISOString(); await saveProgress();
     const proposal = await request('/librarian/collections/draft', 'POST', { project_id: projectId,
       prompt: 'Group this synthetic onboarding feedback by pain point. Propose two useful themed collections, each drawing on all three available interview excerpts. Keep exact excerpt membership visible. Describe these as controlled fixtures, not real participant findings.' });
-    review = { user_id: me.user_id, proposal, corpus_hash: hash(before), collections_before: collections };
+    review = { user_id: me.user_id, proposal, corpus_hash: hash(before), collections_before: collections,
+      project_hash: hash(projectBefore) };
     await fs.writeFile(privateFile, JSON.stringify(review), { mode: 0o600 });
     assert.deepEqual(await corpus(), before, 'Draft changed research sources');
+    assert.deepEqual(await request('/projects/' + projectId), projectBefore, 'Draft changed the selected project');
     assert.deepEqual(await request(`/collections?project_id=${projectId}&page_size=100`), collections);
   }
   assert.equal(review.user_id, me.user_id);
@@ -89,7 +92,7 @@ if (mode === 'all' || mode === 'prepare') {
   assert.equal(review.proposal.coverage.readable_documents, 9);
   assert.ok(review.proposal.groups.length >= 2 && review.proposal.groups[0].members.length >= 2, 'Need an editable multi-member group and an independent dismissible group');
   progress.proposal = { model: review.proposal.model, coverage: review.proposal.coverage,
-    group_ids: review.proposal.groups.map(g => g.group_id), corpus_hash: review.corpus_hash,
+    group_ids: review.proposal.groups.map(g => g.group_id), corpus_hash: review.corpus_hash, project_hash: review.project_hash,
     draft_created_no_collections: true, caller_role: me.role };
   await saveProgress();
   console.log(JSON.stringify({ stage: 'prepared', chunks: review.proposal.coverage.used_chunks, groups: review.proposal.groups.length }));
@@ -150,7 +153,7 @@ if (mode === 'all' || mode === 'browser') {
         sourceLinks++; await page.goto(librarian);
         await page.getByLabel('Collection name 1', { exact: true }).waitFor();
       }
-      assert.equal(drafts, 0); assert.deepEqual(accepts, []);
+      assert.equal(drafts, 0); assert.equal(accepts.length, 0);
       const saving = page.waitForResponse(response => response.url().endsWith('/librarian/collections/accept') && response.request().method() === 'POST');
       await first.getByRole('button', { name: 'Accept this collection', exact: true }).focus(); await page.keyboard.press('Enter');
       const response = await saving;
@@ -163,7 +166,7 @@ if (mode === 'all' || mode === 'browser') {
       await saveProgress();
       await page.getByText('Reviewed collection saved.', { exact: true }).waitFor();
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
-      await page.getByRole('region', { name: 'Organise research', exact: true }).scrollIntoViewIfNeeded();
+      await page.evaluate(() => { document.activeElement?.blur(); window.scrollTo(0, 0); });
       await page.screenshot({ path: path.join(out, `deployed-review-${theme}-${width}.png`), fullPage: true, mask: [page.getByText(me.email, { exact: true })] });
       await first.getByRole('link', { name, exact: true }).click();
       const origin = page.getByRole('region', { name: 'Collection origin', exact: true });
@@ -171,6 +174,7 @@ if (mode === 'all' || mode === 'browser') {
       await origin.getByText('Originally accepted sources', { exact: true }).click();
       assert.equal(await origin.locator('a').count(), selected.length);
       await page.reload(); await origin.waitFor();
+      await page.evaluate(() => { document.activeElement?.blur(); window.scrollTo(0, 0); });
       await page.screenshot({ path: path.join(out, `deployed-collection-${theme}-${width}.png`), fullPage: true, mask: [page.getByText(me.email, { exact: true })] });
       assert.equal(accepts.length, 1);
       assert.deepEqual(accepts[0].member_ids, selected);
@@ -206,6 +210,7 @@ if (mode === 'all' || mode === 'verify' || mode === 'read-only') {
   const createdGroups = collections.data.filter(c => progress.proposal.group_ids.includes(c.id));
   assert.deepEqual(createdGroups.map(c => c.id), [accepted.collection_id]);
   assert.equal(hash(await corpus()), progress.proposal.corpus_hash, 'Acceptance changed original source records');
+  assert.equal(hash(await request('/projects/' + projectId)), progress.proposal.project_hash, 'Acceptance changed the selected project');
   const markdown = await request(`/collections/${accepted.collection_id}/export`, 'GET', undefined, true);
   let previous = -1;
   for (const item of detail.items) {
@@ -233,7 +238,8 @@ if (mode === 'all' || mode === 'verify' || mode === 'read-only') {
   const receipt = { verified_at: new Date().toISOString(), serving_commit: commit, project_id: projectId,
     collection_id: accepted.collection_id, reviewed_member_ids: accepted.member_ids, model: origin.model,
     coverage: progress.proposal.coverage, destination: accepted.destination, published_mcp_version: mcpVersion,
-    original_source_sha256: progress.proposal.corpus_hash, sources_unchanged: true, saved_group_count: 1,
+    original_source_sha256: progress.proposal.corpus_hash, project_sha256: progress.proposal.project_hash,
+    sources_and_project_unchanged: true, saved_group_count: 1,
     dismissed_group_ids: progress.proposal.group_ids.filter(id => id !== accepted.collection_id),
     exact_membership_order_reopen_export_and_mcp: true, resolving_sources: origin.members.length,
     verification: 'Agent acceptance, not Derek personal acceptance', read_only: mode === 'read-only' };

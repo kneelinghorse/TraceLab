@@ -1,0 +1,14 @@
+[
+  {
+    "service": "TraceLab",
+    "deployment_id": "07eb63d0-4e18-4831-8c18-0bdc8a125b49",
+    "status": "SUCCESS",
+    "commit": "25e3acdbc6a755a6ddf9de927433a9c9b1531656"
+  },
+  {
+    "service": "frontend",
+    "deployment_id": "33dbe5c8-4379-4384-9723-aa7827f6464f",
+    "status": "SUCCESS",
+    "commit": "25e3acdbc6a755a6ddf9de927433a9c9b1531656"
+  }
+]
