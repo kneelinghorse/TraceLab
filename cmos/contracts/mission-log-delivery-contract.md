@@ -59,3 +59,33 @@ The window ends in LOG-2's coordinated cutover after its worker has passed v2 ne
 ## Required proof
 
 SQLite and real PostgreSQL tests cover additive migration/rollback preserving old rows, row/sequence uniqueness, canonical replay, changed-content conflicts, whole-batch rollback, service-only writes in both RBAC modes, human scoped reads, malformed/oversized/private-proof errors, concurrent insertion, lease change/expiry after lock waits, requeue/reclaim and terminal flush races. Use the shared wire fixture through the actual HTTP client. A deployed controlled no-provider mission proves negotiation, ingest, replay, stale refusal and authorized MCP reads on exact serving commits. This does not close live worker delivery or carryover #412.
+
+## LOG-2 sender and reader
+
+The worker captures an immutable `LeaseAttempt`, allocates each UUID and sequence
+before enqueue, and starts delivery only after confirming current ownership,
+starting the heartbeat watch, and negotiating this contract. Five-second timers
+and the existing threshold share one serialized background transport. Queue
+capacity remains 2,000, batches at most 200, and attempts at most three with
+interruptible exponential backoff. Full acknowledgement identity/count/order and
+HTTP 200/201 semantics must match before dequeue. A 409 stops this attempt;
+there is no unversioned fallback. Stop/discard quiesces in-flight writes before
+release or requeue. Terminal retries keep the original proof and IDs.
+
+Child and parent use one enum/numeric allowlist for structured observations.
+Neither raw log formatting nor arbitrary extras become the persisted message.
+Accepted history remains attributable after ownership loss.
+
+The UI polls every five seconds while queued/running. Server `created_at` is
+receipt freshness; `logged_at` labels emission. Thirty seconds without a new
+receipt is a quiet gap, not proof of failure. Transient errors retain rows;
+401/403/404 hide them. User+mission isolate both SWR keys and local timers. A
+terminal transition revalidates immediately and for 45 seconds to catch the
+post-commit final flush, with manual refresh thereafter. Known enums have readable
+labels; unknown text remains visible. No percentage is inferred.
+
+The opt-in `tests/test_live_log_cross_service.py` imports a real independent
+DeepSearch checkout via `DEEPSEARCH_SOURCE_ROOT` and uses actual HTTP against a
+loopback receiver. Without that explicit checkout it reports a named skip;
+release readiness requires executing it with no skip. LOG-2's readiness receipt
+records the exact sender/receiver source identities and production gate.
