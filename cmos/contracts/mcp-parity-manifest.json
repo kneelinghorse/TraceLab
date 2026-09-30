@@ -572,6 +572,7 @@
       "ui_consumers": [
         "frontend/src/components/AddToCollection.tsx",
         "frontend/src/components/librarian/ChunkList.tsx",
+        "frontend/src/components/librarian/ReportDraft.tsx",
         "frontend/src/components/projects/ProjectResources.tsx",
         "frontend/src/pages/collections/index.tsx",
         "frontend/src/pages/documents/[id].tsx",
@@ -2052,6 +2053,57 @@
       "classification": "rest-only-by-design",
       "baseline": "new",
       "rationale": "ORG-1: human-reviewed selected-project collection proposals, explicit per-group acceptance and scoped provenance. Decisions #551/#555/#556 preserve existing MCP collection operations; conversational workflows remain REST-only."
+    },
+    {
+      "id": "frontend/src/lib/api/librarian-reports.ts#librarianReportsApi.sources:GET:/librarian/reports/sources",
+      "api_file": "frontend/src/lib/api/librarian-reports.ts",
+      "operation": "librarianReportsApi.sources",
+      "source_line": 18,
+      "method": "GET",
+      "path": "/api/v1/librarian/reports/sources",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/librarian/ReportDraft.tsx",
+        "frontend/src/pages/librarian.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "new",
+      "rationale": "LIB-4: explicit source review, cited preview and signed exact-content acceptance. Decisions #551/#557 retain existing MCP Report retrieval; conversational review stays REST-only."
+    },
+    {
+      "id": "frontend/src/lib/api/librarian-reports.ts#librarianReportsApi.draft:POST:/librarian/reports/draft",
+      "api_file": "frontend/src/lib/api/librarian-reports.ts",
+      "operation": "librarianReportsApi.draft",
+      "source_line": 21,
+      "method": "POST",
+      "path": "/api/v1/librarian/reports/draft",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/librarian/ReportDraft.tsx",
+        "frontend/src/pages/librarian.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "new",
+      "rationale": "LIB-4: explicit source review, cited preview and signed exact-content acceptance. Decisions #551/#557 retain existing MCP Report retrieval; conversational review stays REST-only."
+    },
+    {
+      "id": "frontend/src/lib/api/librarian-reports.ts#librarianReportsApi.accept:POST:/librarian/reports/accept",
+      "api_file": "frontend/src/lib/api/librarian-reports.ts",
+      "operation": "librarianReportsApi.accept",
+      "source_line": 24,
+      "method": "POST",
+      "path": "/api/v1/librarian/reports/accept",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/librarian/ReportDraft.tsx",
+        "frontend/src/pages/librarian.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "new",
+      "rationale": "LIB-4: explicit source review, cited preview and signed exact-content acceptance. Decisions #551/#557 retain existing MCP Report retrieval; conversational review stays REST-only."
     }
   ]
 }

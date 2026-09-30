@@ -31,3 +31,7 @@ Generation provenance records origin, model, requesting user, generation time an
 ## Explicit collection acceptance (ORG-1, Sprint 60)
 
 The [reviewed-collection contract](librarian-collections.md), decisions #555/#556, adds nullable generation provenance and per-item reviewed positions in migration 055. Position precedes the existing time ordering for collection detail, export and synthesis/report inputs; legacy null positions preserve their prior ordering. A signed caller/project proposal creates only its explicitly accepted group through CollectionService, with current source checks, immutable accepted membership and durable idempotency across partial retry or later deletion. The detail response's `librarian_generated` flag enables a separate scoped origin view; existing MCP fields are unchanged. No project foreign key, automatic source move, tag rewrite or Space grant is added.
+
+## Reviewed Report acceptance (LIB-4, Sprint 60)
+
+The [reviewed-report contract](librarian-reports.md), decision #557, adds explicit source selection, a signed cited preview and atomic acceptance of that exact content without a second generation. It uses the existing Report/citation/provenance fields and scoped reads/exports. Source lists visibly filter a collection to one selected project and never expand whole-document membership. All effective sources are checked again before save. Stable proposal identity and a durable receipt prevent duplicate creation or resurrection after deletion. No new MCP action or migration is required.
