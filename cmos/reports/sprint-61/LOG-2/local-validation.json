@@ -1,0 +1,162 @@
+{
+  "observed_at": "2026-09-30T20:20:32.388504+00:00",
+  "status": "local_readiness_only_awaiting_explicit_authorization",
+  "source": {
+    "tracelab_runtime_commit": "18ec1a017e9c053a607339c4bc834b63374d2f59",
+    "worker_commit": "849389e56bdce593b90de720e68f9cbbe557a2e2",
+    "worker_source_tree_hash": "fa31cba8cf6f88fe4c32980ecd1c2dee6b704b0ee8e5e3747823b7c935c04bcc",
+    "retirement_commit_held": "dc9787dffa5ca4389ee5c4bd7c13261d70ec94ff",
+    "worker_baseline_commit": "8465fab0564a9847ded70593e7b9f59e99a1e29e"
+  },
+  "validation": {
+    "worker": {
+      "passed": 161,
+      "failed": 2,
+      "skipped": 0,
+      "deselected": 0,
+      "seconds": 23.26,
+      "known_baseline_failures": [
+        "tests/unit/test_s87_m06_readiness.py::test_pending_worksheet_pins_contract_source_hash_and_five_rows",
+        "tests/unit/test_s87_m06_readiness.py::test_readiness_runbook_pins_all_hashes_and_authorization_gates"
+      ],
+      "baseline_passed": 108,
+      "baseline_failed": 2,
+      "baseline_source_hash": "6adab231174a3d7c20fce2aa3f31ea627a7a6070f980bae638e81b8ce6e603dd"
+    },
+    "receiver_and_real_cross_service": {
+      "passed": 42,
+      "failed": 0,
+      "skipped": 0,
+      "warnings": 16,
+      "seconds": 27.0,
+      "transport": "Real DeepSearch httpx client and service API key -> loopback uvicorn -> TraceLab SQLite with independent auth/request connections",
+      "observed": [
+        "five-second sparse delivery",
+        "503 before commit",
+        "timeout after committed first batch",
+        "identical-ID exact replay acknowledgement",
+        "two distinct batches while in_progress",
+        "owner GET sees both before terminal",
+        "matching terminal-proof final flush",
+        "stale successor attempt rejects409",
+        "bounded successor overflow retains sequence2/3 and accepted prior-attempt history"
+      ]
+    },
+    "frontend_unit": {
+      "files": 41,
+      "passed": 313,
+      "failed": 0,
+      "skipped": 0
+    },
+    "frontend_production_browser": {
+      "passed": 14,
+      "failed": 0,
+      "skipped": 0,
+      "seconds": 14.3,
+      "details": "six Light/Dark390/820/1440 live-log cases including keyboard, overflow, serious/critical axe, quiet gaps, transient retention and revoked access; eight mission navigation/authoring cases against next build/start"
+    },
+    "retirement_held": {
+      "receiver_and_rbac_passed": 106,
+      "real_cross_service_passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "details": "Real v2 sender negotiates legacy=retired; role-gate mutation detects human426; legacy appends forbidden even for matching terminal proof"
+    },
+    "other": [
+      "production frontend build passed",
+      "frontend lint and typecheck passed",
+      "MCP parity113live/118total,9tools/50actions passed",
+      "both repositories foundational references passed",
+      "credential scanner passed changed files",
+      "git diff --check passed",
+      "changed worker files lint clean except four baseline N806 names in unchanged portions of test_worker_main.py; same four verified from8465fab"
+    ]
+  },
+  "failures_resolved": [
+    "TDD constructor lacked lease initially",
+    "worker ownership/watch order now explicitly starts heartbeat before negotiation",
+    "shared real-auth fixture replaced cached JWT lacking required login configuration with actual local API key",
+    "frontend tests initially invoked from wrong directory, then corrected",
+    "Turbopack refused external node_modules symlink; isolated npm ci kept lockfile unchanged",
+    "browser clock moved before SWR initialization to avoid mixing real/fake timers",
+    "parity manifest updated to renamed inner RunActivity consumer",
+    "held retirement RBAC mutation expectation updated from legacy201 to exact human426 deviation"
+  ],
+  "limits": [
+    "No live worker deployment or paid dispatch performed; #412 and #416 remain open",
+    "No new required remote CI has run for these unpushed commits; run all required checks after authorized publishing",
+    "Cross-service test explicitly skips without DEEPSEARCH_SOURCE_ROOT in a single-repository checkout; release proof above executed it with no skip",
+    "No PostgreSQL schema/receiver v2 logic change in this slice; accepted LOG-1 PostgreSQL proof remains applicable",
+    "WALK-4 broader live credential matrix and final serving-version audit remain pending"
+  ],
+  "paid_run": {
+    "project": "TraceLab Engineering",
+    "project_id": "5229e75e-8ad3-4ac5-94de-093a177562c6",
+    "payload_sha256": "310a0cdb38196e1ae1fc8e9ec0cee7eaef3206a98d0b51a8f176ef5927c05784",
+    "model": "deepseek-flash",
+    "backend": "deepseek",
+    "runtime_budget": "unchanged: default40CodeAgentsteps,32768outputtokens/request; existing same-memory recovery and zero-usage transient requeue rules",
+    "proposed_allowance_usd": 5,
+    "illustrative_envelope": {
+      "cache_miss_input_tokens": 10000000,
+      "output_tokens": 1000000,
+      "standard_search_requests": 100,
+      "peak_rate_estimate_usd": 4.8
+    },
+    "hard_dollar_limit_enforced": false,
+    "instruction": "One explicit submit after approval; no agent-initiated rerun to repair acceptance evidence. Do not claim max_loops or authored source/word limits enforce a dollar cap. Before dispatch, user must accept the planning allowance limitation or authorize a separate effective spend control."
+  },
+  "external_evidence_ids": [
+    "553501d7-bf17-4305-86b6-c5989cca4a6d",
+    "b9d5b317-c9af-40f5-8bc5-a791c7cdeb1f"
+  ],
+  "source_file_sha256": {
+    "TraceLab/cmos/contracts/mcp-parity-manifest.json": "289f5cf63e748c2598354fbdd5c385fc94b73e107e96aadd6563496c7b73053b",
+    "TraceLab/cmos/contracts/mission-log-delivery-contract.md": "793f3276fdbdf90ebdaba233fa6e0cbc87a0e2c28cca5cb50affb32f42062cc4",
+    "TraceLab/frontend/src/__tests__/mission-run.test.tsx": "ad60059f8e2ac3d7d4d702a2429edac2089255a99c4e9c99840231d53f408417",
+    "TraceLab/frontend/src/components/missions/MissionRunActivity.tsx": "ff0634b4fb81a3cb7e4a4eeb54ca09a01f4ba865fbc2875bc906d3fdbe1f1bcc",
+    "TraceLab/frontend/tests/e2e/mission-live-logs.spec.ts": "3c4901fcf634175c28f6b2d5d2bf9f185eaedaf96d326a6bdf3606d4f4447616",
+    "TraceLab/frontend/tests/e2e/mission-protocol.spec.ts": "d89d2ac817f039f81b75576d4dee2737d78c76f67cd60324dcb8fe5ecbff7400",
+    "TraceLab/tests/test_live_log_cross_service.py": "ba46550746771630a692d9cab94cb4743b353af1d227a3c1946c7eca7402b1de",
+    "DeepSearch/deepsearch/tracelab/log_handler.py": "30b6198405f8d28a82720a01bb858d757f516ba99a064770c1f45cc4a087d6e0",
+    "DeepSearch/deepsearch/tracelab/log_projection.py": "7741615e85cf3c6fe684f4eae44ba3932b75057f841daa15e48777b09f7c9430",
+    "DeepSearch/deepsearch/worker/execution.py": "5dafe4a3c36dfe1f2b4f993ebfa061555333c96caded7b028cd0b89c337c2064",
+    "DeepSearch/deepsearch/worker/main.py": "4c9e49f4fea4fa1d618f980b3b635ee701c1958a79b10249b794414484698af4",
+    "DeepSearch/docs/mission_log_delivery.md": "4426b59e1fa717aa0d0882cd7385eb022a0e2ba9a87178bae3ed0aa7ab155ba8",
+    "DeepSearch/tests/fixtures/mission-logs-v2/batch.json": "7e698ce50c7d3a26e884261ec7c3278b28d91a94024a74b6df3f383d791cf423",
+    "DeepSearch/tests/unit/test_live_log_contract.py": "834b3a72172ebeb654e1c788dbe769758dfa3c4a45b9d2b16ff8f639948bdf80",
+    "DeepSearch/tests/unit/test_s91_m05_log_transport.py": "3f889b8bd14aaed11295a5ac0d6e839995a9cb6d4e59065ebeaa988bba8c163d",
+    "DeepSearch/tests/unit/test_worker_main.py": "8cf770a9a94f5d51eee58a7d1da3138187e13f05cf1100e6b2bedceb8b5c7a43",
+    "TraceLab-retirement/app/api/v1/missions.py": "648270e01cf47e21bc28323f78b344a29d796f93a286cd0582ab2d41cf46dc4d",
+    "TraceLab-retirement/cmos/contracts/mission-log-delivery-contract.md": "ec83b4593c85954fa72bf9aa775367ce45ad9d9056da0ec5ffbd3fc0951713ff",
+    "TraceLab-retirement/scripts/rbac_verify.py": "10a955651465e398e59321b8060a47c8a5901d9752d2af3285f759f84d7909f8",
+    "TraceLab-retirement/tests/test_mission_log_delivery.py": "ce11516426b59a05e910a1f8c7d28140e8c2afaf9805e222e721682d15bc429a",
+    "TraceLab-retirement/tests/test_rbac_verify_harness.py": "5c623bb5b0cc45840c7698f21958e2b02c0a23f97da92ebd3b1342c83df29065"
+  },
+  "screenshots": [
+    {
+      "path": "screenshots/live-logs-dark-1440.png",
+      "sha256": "5809d6d75503739f41c673274d42be35a926fc77a4f9cc59284299bed7e2de5f"
+    },
+    {
+      "path": "screenshots/live-logs-dark-390.png",
+      "sha256": "578fe0baf4feebce850fce538a60461cfa60f34384bec57ce08d643e3815b959"
+    },
+    {
+      "path": "screenshots/live-logs-dark-820.png",
+      "sha256": "9897dbb457c0e88127cb213947dad5b66abee35a261677c15da6f2ec4cb92a92"
+    },
+    {
+      "path": "screenshots/live-logs-light-1440.png",
+      "sha256": "8a43e639fc294bc5a7bcdbd356a3de281f1872b151004d67c3a81f8227a4b88c"
+    },
+    {
+      "path": "screenshots/live-logs-light-390.png",
+      "sha256": "abe1a23600fdefdabd558350f6f8fa8b01e0af1c9a5a9e240661d9d79b403e83"
+    },
+    {
+      "path": "screenshots/live-logs-light-820.png",
+      "sha256": "653efb0d6281c11a417bd0c019450daa8377e87783fb68a80408b1307ea2fb78"
+    }
+  ]
+}

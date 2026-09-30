@@ -61,7 +61,7 @@ for (const theme of ["light", "dark"] as const) for (const width of [390, 820, 1
     await page.screenshot({ path: info.outputPath("authoring.png"), fullPage: true });
     await page.getByRole("button", { name: "Submit to DeepSearch", exact: true }).click();
     await expect(page).toHaveURL(/\/missions\/run-1$/);
-    await expect(page.getByText(/Logs unavailable/)).toBeVisible();
+    await expect(page.getByText(/Waiting for the first runner observation/)).toBeVisible();
     await expect(page.getByText("Step progress unknown")).toBeVisible();
     state.status = "in_progress"; state.started_at = state.updated_at;
     state.execution_metadata = { current_phase: "synthesis", current_step: 2, total_steps: 3, progress_percent: 65 };

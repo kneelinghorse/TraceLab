@@ -160,10 +160,10 @@
   },
   "operations": [
     {
-      "id": "frontend/src/components/missions/MissionRunActivity.tsx#MissionRunActivity:GET:/missions/{mission.id}/logs",
+      "id": "frontend/src/components/missions/MissionRunActivity.tsx#RunActivity:GET:/missions/{mission.id}/logs",
       "api_file": "frontend/src/components/missions/MissionRunActivity.tsx",
-      "operation": "MissionRunActivity",
-      "source_line": 23,
+      "operation": "RunActivity",
+      "source_line": 57,
       "method": "GET",
       "path": "/api/v1/missions/{mission.id}/logs",
       "live": true,
@@ -177,10 +177,10 @@
       "rationale": "LOG-1 (#568): existing authorized GET snapshot adds nullable attempt_count/event_id/sequence through the unchanged MCP pass-through. Service-only capability negotiation and v2 ingestion are internal REST worker operations, not human UI/MCP tools. Receiver readiness alone does not prove live worker delivery; LOG-2 owns that acceptance."
     },
     {
-      "id": "frontend/src/components/missions/MissionRunActivity.tsx#MissionRunActivity:GET:/missions/events/recent",
+      "id": "frontend/src/components/missions/MissionRunActivity.tsx#RunActivity:GET:/missions/events/recent",
       "api_file": "frontend/src/components/missions/MissionRunActivity.tsx",
-      "operation": "MissionRunActivity",
-      "source_line": 21,
+      "operation": "RunActivity",
+      "source_line": 55,
       "method": "GET",
       "path": "/api/v1/missions/events/recent",
       "live": true,
