@@ -218,14 +218,23 @@ The suggestions are requested, reviewed and accepted in the Librarian; a persist
 
 **Outside this sprint:** password recovery is Sprint 61; sharing stays deferred, invites remain Derek's, and there is no RBAC redesign or autonomous writing. Twenty-one existing maintenance entries plus CI-documentation follow-up #464 were carried to the next backlog without expanding AUTH-1/AUTH-2. Next-step #405 is closed for the artifact choice and durable citation foundation only; historical gaps remain explicit. DeepSearch live-progress/runtime-identity follow-ups (#412/#416, message `1621f451`) were not resolved by this acceptance. Railway configuration follow-up #451 retains its recorded 2026-12-01 deadline.
 
-### Follow-on backlog — Sprint 61: Account recovery (planned 2026-09-29)
+### Follow-on — Sprint 61: Account recovery and live run logs (planned 2026-09-30)
 
-Derek asked for password recovery for himself and other users, admin help resetting a password, and reset instructions or a link sent through the existing Resend capability. He explicitly allowed a follow-on sprint. Sprint 60 retains the Librarian scope; `sprint-61` is Planned with no dates and two queued missions:
+Derek asked to detail both password recovery and the outstanding DeepSearch live-log issue for a fresh build handoff. Decision **#563**, learnings **#274–275**, and the [Sprint 61 handoff](../planning/sprint-61-HANDOFF.md) record the source investigation, proposed policies, validation gates and cross-repository boundary. The existing sprint shell is reused: Planned, no dates, five queued missions.
 
-- **AUTH-1 — Forgot password: recover access through a Resend reset link.** A signed-out user requests an email, follows an expiring, single-use link and chooses a new password. Recovery is independent of mission-email preferences; successful reset invalidates prior interactive sessions. Existing Settings → Change password remains the path when the current password is known.
-- **AUTH-2 — Admin-assisted recovery: send a password reset link for a user** (*Requires AUTH-1*). Admins and owners trigger that same email for any eligible human account, including themselves. The working default is a link to the account's stored email so the recipient chooses the password; direct temporary-password setting remains an optional preference, not committed scope.
+| Mission | Planned outcome | Requires |
+| --- | --- | --- |
+| **AUTH-1** | Signed-out Resend recovery; expiring single-use token; prior credentials invalidated; usable public reset route | — |
+| **AUTH-2** | Admin/owner sends the same link to an eligible user's stored mailbox, with target confirmation and audit | AUTH-1 |
+| **LOG-1** | TraceLab receives attempt-scoped logs with atomic ownership checks and replay-safe event identity | — |
+| **LOG-2** | DeepSearch delivers during owned runs; TraceLab shows actual freshness and final lines | LOG-1 and coordinated worker work |
+| **WALK-4** | Real email-to-reset-to-login acceptance and verified pre-terminal log evidence on deployed builds | AUTH-2, LOG-2 |
 
-CMOS holds the full criteria, including authorization, token replay/expiry/concurrency, mail failure handling, and deployed email-to-reset-to-login verification. This is backlog capture only; neither mission has started. The separate API-key/device-grant policy is a design question to record before implementation.
+Recovery is independent of mission-email preferences and keeps Settings' known-password flow. Agent working defaults are email-only admin help, a 30-minute newest-link token, and revocation of the recovering human's browser sessions and API/device keys; the separate DeepSearch service principal is unaffected. These are labeled recommendations pending any different user answer, not invented user selections. Builders record the exact transaction, credential race, mail-failure and privacy contracts before code.
+
+Local DeepSearch source intentionally sets `auto_delivery=False` to avoid writes from lost leases and flushes only after terminal persistence. TraceLab's receiver currently appends without deduplication. Therefore live delivery requires a safe receiving contract before worker enablement, not just switching on a timer. Existing five-second UI polling stays; no speculative progress percentages or replacement stream infrastructure. The old pending request `1621f451` is not evidence that the worker work is scheduled. LOG-2 owns the authorized live run; WALK-4 reuses its receipt. DeepSearch's current model-evaluation sprint is untouched, and its deployment/dispatch authorization remains a later concrete build gate.
+
+CMOS holds the full acceptance criteria. This session performs no implementation, credential change, email send, external message, deployment or paid run. #412 stays unresolved until multiple batches are observed before completion; #416 and unrelated maintenance remain explicit carryovers. A fresh build session starts **AUTH-1** and synchronizes sprint identity only when work actually opens the sprint.
 
 ### Running alongside: the guest expansion track
 
@@ -294,6 +303,8 @@ Add to this list rather than resolving items silently.
 ---
 
 ## Change Log
+
+- **2026-09-30 UTC, Sprint 61 detailed for a fresh build (decision #563).** Refined AUTH-1/AUTH-2 and added LOG-1, LOG-2 and WALK-4 in CMOS. Source inspection found missing session revocation/public-route/mail-secrecy work for recovery and intentional terminal-only delivery plus an unfenced append receiver for logs. The handoff preserves lease safety, replay semantics, independent recovery delivery, real mailbox/pre-terminal acceptance and the DeepSearch deployment boundary. Sprint remains Planned; no runtime or production actions performed.
 
 - **2026-09-30 UTC, Sprint 60 closed six of six; the Librarian arc accepted.** WALK-3 used a dedicated temporary member for real planning, draft creation, descriptions/undo, duplicate review, edited collection save, cited report review/save/export, Q&A/refusal and chunk search. Published MCP 2.1.0, 30 deployed theme/viewport pages, scope/stale/revoked-source negatives and exact artifact retries passed. The account/key were disabled/revoked. All current required CI and exact serving-version checks passed; the receipt distinguishes initial harness failures, unchanged skips/quarantine and agent acceptance from Derek personally walking. Five earlier receipts and decision mechanisms were reverified; #405 closed within REPORT-1's boundary. Twenty-one existing maintenance entries and new CI-documentation follow-up #464 carried without starting Sprint 61. CMOS identity and its approved master-context mirror were synchronized. [Acceptance receipt](../reports/sprint-60/WALK-3/README.md).
 
