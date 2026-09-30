@@ -11,6 +11,7 @@ import secrets
 from collections.abc import Callable
 from datetime import datetime, timedelta
 from urllib.parse import urlsplit
+from uuid import UUID
 
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
@@ -20,7 +21,7 @@ from app.core.rate_limit import recovery_recipient_limiter
 from app.core.security import hash_password
 from app.models.api_key import APIKey
 from app.models.device_authorization import DeviceAuthorizationGrant
-from app.models.password_recovery import PasswordRecovery
+from app.models.password_recovery import PasswordRecovery, PasswordRecoveryAudit
 from app.models.user import User
 from app.ports.email import EmailSender
 from app.services.device_credentials import forget_device_credentials
@@ -58,15 +59,44 @@ class PasswordRecoveryService:
         self.session_factory = session_factory
         self.sender = sender
 
-    def _prepare(self, email: str) -> tuple[str, Email] | None:
+    def _prepare(
+        self, email: str | None, *, target_user_id: UUID | None = None,
+        actor_user_id: UUID | None = None,
+    ) -> tuple[str, Email, UUID | None] | None:
         with self.session_factory() as db:
-            user = db.query(User).filter(User.email == email).with_for_update().first()
-            if not user or not user.is_active or user.role not in HUMAN_ROLES or not deliverable_address(user.email):
-                return None
+            query = db.query(User)
+            query = query.filter(User.id == target_user_id) if target_user_id else query.filter(User.email == email)
+            user = query.with_for_update().first()
             now = datetime.utcnow()
+            audit = None
+            if actor_user_id is not None and target_user_id is not None:
+                audit = PasswordRecoveryAudit(actor_user_id=actor_user_id, target_user_id=target_user_id,
+                                              requested_at=now, outcome="pending")
+                db.add(audit)
+
+            def refuse(outcome: str, message: str, status_code: int = 400) -> None:
+                if audit is not None:
+                    audit.outcome = outcome
+                    audit.completed_at = now
+                    db.commit()
+                    raise HTTPException(status_code, detail=message,
+                                        headers={"Retry-After": "60"} if status_code == 429 else None)
+
+            if user is None:
+                return refuse("not_found", "User not found", 404)
+            if not user.is_active:
+                return refuse("ineligible", "This account is disabled. No reset email was sent.")
+            if user.role not in HUMAN_ROLES:
+                return refuse("ineligible", "Service accounts cannot use password recovery.")
+            if not deliverable_address(user.email):
+                return refuse("ineligible", "This account does not have a deliverable email address.")
+            # Public requests spend this same budget before account lookup to
+            # avoid enumeration; admin requests resolve the stored address here.
+            if audit is not None and not recipient_budget(user.email.strip().lower()):
+                return refuse("rate_limited", "Too many reset requests for this account. Try again later.", 429)
             recovery = db.get(PasswordRecovery, user.id)
             if recovery and recovery.requested_at > now - SEND_COOLDOWN:
-                return None
+                return refuse("rate_limited", "A reset email was recently requested. Wait a minute before retrying.", 429)
             token = secrets.token_urlsafe(32)
             digest = hashlib.sha256(token.encode()).hexdigest()
             if recovery is None:
@@ -86,35 +116,48 @@ class PasswordRecoveryService:
             message = Email(to=user.email, subject="Reset your TraceLab password", text=text,
                             html=f'<p>A password reset was requested for your TraceLab account.</p><p><a href="{html.escape(link)}">Choose a new password</a></p><p>This link expires in 30 minutes. Only the newest link works. Your sessions and integration keys are revoked only when you submit a new password. If you did not request this, ignore this email.</p>')
             db.commit()
-            return digest, message
+            return digest, message, audit.id if audit is not None else None
 
-    def _finish(self, digest: str, accepted: bool) -> None:
+    def _finish(self, digest: str, accepted: bool, audit_id: UUID | None = None) -> None:
         with self.session_factory() as db:
             # An old send finishing late must never change the replacement token.
             values = {"delivery_status": "accepted" if accepted else "failed"}
             if not accepted:
                 values["token_hash"] = None
             db.query(PasswordRecovery).filter(PasswordRecovery.token_hash == digest).update(values)
+            if audit_id is not None:
+                db.query(PasswordRecoveryAudit).filter(PasswordRecoveryAudit.id == audit_id).update({
+                    "outcome": "accepted" if accepted else "failed", "completed_at": datetime.utcnow(),
+                })
             db.commit()
 
-    async def request(self, email: str) -> None:
-        """Run after the public response; no provider or account-dependent latency."""
+    async def request(
+        self, email: str | None, *, target_user_id: UUID | None = None,
+        actor_user_id: UUID | None = None,
+    ) -> bool:
+        """Public callers enqueue this; admins await the same provider outcome."""
         digest = None
+        audit_id = None
         try:
-            prepared = await asyncio.to_thread(self._prepare, email)
+            prepared = await asyncio.to_thread(self._prepare, email, target_user_id=target_user_id,
+                                              actor_user_id=actor_user_id)
             if prepared is None:
-                return
-            digest, message = prepared
+                return False
+            digest, message, audit_id = prepared
             accepted = bool(await self.sender.send(message))
-            await asyncio.to_thread(self._finish, digest, accepted)
+            await asyncio.to_thread(self._finish, digest, accepted, audit_id)
             logger.info("password_recovery delivery=%s", "provider_accepted" if accepted else "failed")
-        except Exception:  # noqa: BLE001 - never echo email/provider exceptions or token-bearing locals
+            return accepted
+        except Exception as exc:  # noqa: BLE001 - never echo email/provider exceptions or token-bearing locals
+            if digest is None and isinstance(exc, HTTPException):
+                raise  # Explicit admin target/cooldown refusal before sending.
             logger.error("password_recovery delivery=failed")
             if digest:
                 try:
-                    await asyncio.to_thread(self._finish, digest, False)
+                    await asyncio.to_thread(self._finish, digest, False, audit_id)
                 except Exception:  # noqa: BLE001 - database failures must not expose task arguments
                     logger.error("password_recovery cleanup=failed")
+            return False
 
     def confirm(self, db: Session, token: str, password: str) -> None:
         digest = hashlib.sha256(token.encode()).hexdigest()

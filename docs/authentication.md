@@ -72,6 +72,30 @@ receipt, reset, new login and revoked credentials on the exact deployed build. A
 acknowledgement or local mock is insufficient. Keep acceptance receipts free of links and
 credentials, and disable/revoke the temporary fixture afterward.
 
+### Admin-assisted recovery
+
+Admins and owners can choose **Send password reset link** in User management,
+confirm the named account and its stored mailbox, and await provider acceptance.
+`POST /api/v1/admin/users/{user_id}/password-reset` takes an empty JSON object;
+recipient, redirect and password overrides are rejected. Members, viewers,
+service principals and anonymous callers are denied. Disabled, service and
+non-deliverable targets receive explicit refusals and are never reactivated.
+
+This uses the same recovery service, recipient budget, database cooldown and
+newest-link policy as public recovery. A provider failure invalidates that
+issuance; retry explicitly after the cooldown. Sending changes no credentials.
+The recipient still chooses the password through the public link. Provider
+acceptance is not proof that the mailbox received the email.
+
+`password_recovery_audits` records historical actor/target UUIDs, request and
+completion times and a fixed outcome (`pending`, `accepted`, `failed`,
+`ineligible`, `not_found`, `rate_limited`). It contains no address, token, link,
+password/hash or provider response. Identity snapshots intentionally have no
+user foreign keys, so purging an account retains the audit. An interrupted send
+can leave a `pending` audit and unusable pending token; never relabel it as
+accepted without a provider acknowledgement. Global configuration/IP denials
+happen before preparing a target request and do not create an audit row.
+
 ## Environment Configuration
 
 | Variable | Purpose | Example |

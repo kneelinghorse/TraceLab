@@ -49,6 +49,9 @@ export const adminUsersApi = {
   setActive(userId: string, isActive: boolean): Promise<AdminUser> {
     return httpClient.patch(`${USERS_PATH}/${userId}/active`, { is_active: isActive });
   },
+  sendPasswordReset(userId: string): Promise<{ delivery_status: "accepted"; message: string }> {
+    return httpClient.post(`${USERS_PATH}/${userId}/password-reset`, {});
+  },
   remove(userId: string): Promise<DeleteUserResult> {
     return httpClient.delete(`${USERS_PATH}/${userId}`);
   },

@@ -175,3 +175,47 @@ def test_reset_deletes_device_children_before_keys_and_preserves_pending(pg_reco
         service.confirm(db, token, "replacement-password")
         assert db.get(DeviceAuthorizationGrant, approved_id) is None
         assert db.get(DeviceAuthorizationGrant, pending_id).status == "pending"
+
+
+def test_admin_and_public_request_share_the_database_cooldown(pg_recovery):
+    from app.models.password_recovery import PasswordRecoveryAudit
+
+    factory, service, principal, _ = pg_recovery
+    with factory.begin() as db:
+        db.get(PasswordRecovery, principal.user_id).requested_at = datetime.utcnow() - timedelta(minutes=2)
+    service.sender.reset_mock()
+
+    def request(admin):
+        try:
+            return asyncio.run(service.request(None, target_user_id=principal.user_id, actor_user_id=principal.user_id)) if admin else asyncio.run(service.request(principal.email))
+        except HTTPException as exc:
+            assert exc.status_code == 429
+            return False
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        assert sorted(pool.map(request, [True, False])) == [False, True]
+    assert service.sender.send.call_count == 1
+    with factory() as db:
+        audit = db.query(PasswordRecoveryAudit).filter_by(target_user_id=principal.user_id).one()
+        assert audit.outcome in {"accepted", "rate_limited"}
+        assert db.get(User, principal.user_id).credential_version == 0
+        assert db.get(PasswordRecovery, principal.user_id).delivery_status == "accepted"
+
+
+def test_admin_audit_migration_keeps_history_after_deletion(alembic_cfg, migration_db_url):
+    command.upgrade(alembic_cfg, "056_password_recovery")
+    engine = create_engine(migration_db_url)
+    actor, target, audit = uuid4(), uuid4(), uuid4()
+    with engine.begin() as conn:
+        for user_id in (actor, target):
+            conn.execute(text("INSERT INTO users (id,email,display_name,password_hash,role,is_active) VALUES (:id,:email,'Audit fixture','unused','member',true)"), {"id":user_id,"email":f"{user_id}@controlled.org"})
+    command.upgrade(alembic_cfg, "057_password_recovery_audit")
+    with engine.begin() as conn:
+        conn.execute(text("INSERT INTO password_recovery_audits VALUES (:id,:actor,:target,now(),now(),'accepted')"), {"id":audit,"actor":actor,"target":target})
+        conn.execute(text("DELETE FROM users WHERE id IN (:actor,:target)"), {"actor":actor,"target":target})
+        assert tuple(conn.execute(text("SELECT actor_user_id,target_user_id,outcome FROM password_recovery_audits WHERE id=:id"), {"id":audit}).one()) == (actor, target, "accepted")
+    command.downgrade(alembic_cfg, "056_password_recovery")
+    assert "password_recovery_audits" not in inspect(engine).get_table_names()
+    assert "password_recoveries" in inspect(engine).get_table_names()
+    command.upgrade(alembic_cfg, "head")
+    engine.dispose()
