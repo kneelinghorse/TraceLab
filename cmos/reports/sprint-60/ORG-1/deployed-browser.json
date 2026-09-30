@@ -1,0 +1,35 @@
+{
+  "verified_at": "2026-09-30T00:36:57.188Z",
+  "serving_commit": "25e3acdbc6a755a6ddf9de927433a9c9b1531656",
+  "results": [
+    {
+      "theme": "light",
+      "width": 390,
+      "accepted_collection_id": "cf1dd7ec-25f1-4141-9210-4a805e311137",
+      "source_links_opened": 3,
+      "edited_subset_persisted_after_navigation": true,
+      "dismissed_groups": 1,
+      "accepts": 1,
+      "automatic_model_requests": 0,
+      "other_writes": [],
+      "page_errors": [],
+      "overflow": false
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "accepted_collection_id": "cf1dd7ec-25f1-4141-9210-4a805e311137",
+      "source_links_opened": 3,
+      "edited_subset_persisted_after_navigation": true,
+      "dismissed_groups": 1,
+      "accepts": 1,
+      "automatic_model_requests": 0,
+      "other_writes": [],
+      "page_errors": [],
+      "overflow": false
+    }
+  ],
+  "mocked_responses": false,
+  "proposal_source": "Real API-generated proposal restored from private browser draft state; both themes accept the same signed group.",
+  "personal_user_acceptance": false
+}

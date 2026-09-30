@@ -1,0 +1,13 @@
+{
+  "sha": "25e3acdbc6a755a6ddf9de927433a9c9b1531656",
+  "ok": false,
+  "observed": {
+    "backend": "25e3acdbc6a755a6ddf9de927433a9c9b1531656",
+    "frontend": "024d437b6113ad689b229b27f3a5800def3a38bf"
+  },
+  "seconds_to_serve": {
+    "backend": 121.8
+  },
+  "budget_seconds": 1200,
+  "elapsed_seconds": 1200.2
+}

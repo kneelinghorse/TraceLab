@@ -1,0 +1,13 @@
+{
+  "merged_commit": "25e3acdbc6a755a6ddf9de927433a9c9b1531656",
+  "ci_head": "6552678564c7673b725d68ef64a4c8296fe0cbb5",
+  "results": {
+    "backend": "backend-suite\tRun serialized backend suite\t2026-09-30T00:09:32.0652117Z === 2961 passed, 3 skipped, 12 deselected, 49 warnings in 616.34s (0:10:16) ====",
+    "postgres": "backend-integration\tRun integration tests with testcontainers\t2026-09-30T00:01:08.9322037Z =========== 149 passed, 2 skipped, 17 warnings in 110.88s (0:01:50) ============",
+    "browser": "build-frontend-production\tVerify shell behavior against the production artifact\t2026-09-30T00:02:03.6484984Z ##[notice]  76 passed (2.3m)"
+  },
+  "prior_ci_attempt": {
+    "run": 36645309801,
+    "result": "Canceled after a clean local full-suite reproduction found the missing OODS mapping; the job log showed slow ongoing progress through57%. No deadlock established."
+  }
+}
