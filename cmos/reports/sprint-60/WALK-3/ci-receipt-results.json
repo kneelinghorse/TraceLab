@@ -1,0 +1,9 @@
+{
+  "tested_head": "bec91850f0cfb266fa3bcbb36443b5822f684448",
+  "merged_commit": "58269adb6c4409c73e3a84a58aefbbe7d4466ff5",
+  "results": {
+    "backend": "backend-suite\tRun serialized backend suite\t2026-09-30T03:00:23.6188514Z === 2988 passed, 3 skipped, 12 deselected, 49 warnings in 645.39s (0:10:45) ====",
+    "postgres": "backend-integration\tRun integration tests with testcontainers\t2026-09-30T02:51:39.6095472Z =========== 150 passed, 2 skipped, 17 warnings in 111.96s (0:01:51) ============",
+    "browser": "build-frontend-production\tVerify shell behavior against the production artifact\t2026-09-30T02:53:01.2894300Z ##[notice]  82 passed (2.8m)"
+  }
+}

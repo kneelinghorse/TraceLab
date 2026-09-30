@@ -1,0 +1,52 @@
+{
+  "closed_at": "2026-09-30T03:14:04.913Z",
+  "status": "Completed",
+  "sprint_id": "sprint-60",
+  "total_missions": 6,
+  "completed_missions": 6,
+  "missions": [
+    {
+      "id": "DUP-1",
+      "status": "Completed"
+    },
+    {
+      "id": "LIB-3",
+      "status": "Completed"
+    },
+    {
+      "id": "LIB-4",
+      "status": "Completed"
+    },
+    {
+      "id": "ORG-1",
+      "status": "Completed"
+    },
+    {
+      "id": "REPORT-1",
+      "status": "Completed"
+    },
+    {
+      "id": "WALK-3",
+      "status": "Completed"
+    }
+  ],
+  "session_id": "PS-2026-09-30-002",
+  "mission_completed_at": "2026-09-30T03:13:41.204Z",
+  "sprint_completed_at": "2026-09-30T03:14:04.913Z",
+  "identity_status": "sprint-60-complete",
+  "master_current_sprint": "sprint-60",
+  "master_sprint_status": "Completed",
+  "sprint_tracking_current": null,
+  "last_completed_sprint": "sprint-60",
+  "broker_reconciled_rows": 1715,
+  "existing_maintenance_carried": 21,
+  "new_ci_documentation_followup": 464,
+  "next_sprint": "sprint-61",
+  "next_sprint_status": "Planned",
+  "next_missions_unstarted": [
+    "AUTH-1",
+    "AUTH-2"
+  ],
+  "approved_mirror": "cmos/context/MASTER_CONTEXT.json",
+  "mirror_source": "Exact cmos_context(view, master_context).content response"
+}

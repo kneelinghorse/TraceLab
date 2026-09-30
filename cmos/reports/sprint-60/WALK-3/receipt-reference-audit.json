@@ -393,5 +393,7 @@
       ],
       "verified_mechanism": "Bounded #405 closure; remaining maintenance stays carried without expanding password-recovery scope."
     }
-  ]
+  ],
+  "final_reverified_head": "58269adb6c4409c73e3a84a58aefbbe7d4466ff5",
+  "runtime_trees_unchanged_from_accepted_head": true
 }
