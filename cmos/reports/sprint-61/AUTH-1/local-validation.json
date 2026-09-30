@@ -1,0 +1,180 @@
+{
+  "mission": "AUTH-1",
+  "session": "PS-2026-09-30-005",
+  "recorded_at": "2026-09-30",
+  "status": "local_validation_passed_live_acceptance_pending",
+  "source_base": "cc0c194696f12967666b60db4a7ea1310261f9b2",
+  "source_sha256": {
+    "alembic/versions/056_password_recovery.py": "6a3b0a327cb3e692a8c196d199867bbf852a27b7bb31dec05a03b3d62ded90c7",
+    "app/api/v1/admin_users.py": "9ab692942b6f9ee51e8bd1e82e91440e2ee032db8812143a8a814fb143e0cae6",
+    "app/api/v1/auth.py": "99f008e64360f69303efba4594634fa9cea255e80e6d6830d39bd4032774c448",
+    "app/api/v1/auth_device.py": "6f62055aef8d568e07ec71daf8b9ade658377dbfb13976508f6142df44e3023e",
+    "app/api/v1/mission_events.py": "6b37c06c0d71250e72f36f33eedc7af67153bd60110aca64ad838a0cb8a37d9a",
+    "app/core/rate_limit.py": "b69376514295e0eb687e1bcb4187d87477427411d31e288fbc26e3075236bfaa",
+    "app/core/security.py": "1b6750c57b72882c9db9c27031e13e835bdbcd601ca566fe5bddc38e4e425d3c",
+    "app/dependencies.py": "3d333cf2c5462b7e0e4d5d2d8d46a80c72fc4a83985497c64cc62765af278b5f",
+    "app/models/__init__.py": "8d7cccc12b35dd1ccd8d91cb23b251fa1a0af73d139c1a0a268c00b12beaabb4",
+    "app/models/password_recovery.py": "621401e962309a6aa95b2eb64f45d38caff7dcd56d92bbb993b1792137697d73",
+    "app/models/user.py": "b1d6a755e65e3eb6f5d38639174af51e1350e624e13a37fe99a35c4dac3a6c03",
+    "app/ports/email.py": "c68dc3ba24a0a1249adbe0f3bd4e42041da18114ba7f26645fe014bc9e0bc3c3",
+    "app/schemas/auth.py": "b3cc5ea39f370fc9a8a258d7c1d70470eae5649fa21cb188984885d9252715d5",
+    "app/services/device_credentials.py": "f803ce8253467900fd9c2748ee2f0b3fc84e858481975e726600c6d6b1694092",
+    "app/services/notifications.py": "f8c9907efb0f6d82364ef561db128bbdb3e942d19eeb15fdf33b0b351cd334f8",
+    "app/services/password_recovery.py": "79da88448666983a1ba825e11376133e14ca9a63d0a892b8620ba1d553b052a7",
+    "frontend/next.config.ts": "2aec233e85a3bd4b9f9b66d704bbf280d15bd1f34b148b5580a42188595c7ec5",
+    "frontend/src/components/AppShell.test.tsx": "2a3c63e2f549cbe03c32d93f7a95b699e5ce034217bb19c815c4c294f79d6135",
+    "frontend/src/components/AppShell.tsx": "5cc5d0ff31a390da3ec4411929b1a1036d528d7de3c08252dda1fc1699275324",
+    "frontend/src/components/LoginPanel.tsx": "7c62ced6594ec6d77be668c1237a0a5cc23ad9b6cd8c6028b2f93946d44ea387",
+    "frontend/src/components/PasswordRecovery.test.tsx": "28fc9fdf0957c9b3661aac99840230979a9a49458a7fabf3921385dfb812920a",
+    "frontend/src/components/PasswordRecovery.tsx": "31c009df7004ed375577d318c8f4277af8182684456d2054891d1fad241ceb5f",
+    "frontend/src/lib/api/auth.ts": "8102acf0ca0615c656f43135d47145bc73c620e253308596dcb41d4a97427a38",
+    "frontend/src/lib/auth/recovery.ts": "6bead150b2b67c949ac0f3fb5f1d3602735fb25c9317d7e501ca53752ee26f0a",
+    "frontend/src/pages/_document.tsx": "c524d6e7904789bbabd6a77707620640f06dde0aff78eb63145a98ea54a91d58",
+    "frontend/src/pages/forgot-password.tsx": "4ff639b2e96d21ac1e0a525226b8783b37b670fc47997ff6d2dc5894edb89294",
+    "frontend/src/pages/reset-password.tsx": "df6bde15faf60f462d034f470d5b8a17fae743189cd125967dc7c4b19df88a30",
+    "tests/conftest.py": "5d19a403160ebb38ab2a963cb8c2c23901a4c2f1da5950cb860f4725d38c2806",
+    "tests/integration/test_password_recovery_postgres.py": "a620539f17578c0f9d3beeda3faa5668c57cfd567f58ff22eb6741ed70983088",
+    "tests/test_auth_me_role_contract.py": "ed9c5788c3b3e5f505068a520314a345f182f5052ede456715d114bd52c9b7db",
+    "tests/test_password_recovery.py": "b9d5031b3091ff8777a7bbe3b1d3a8198e694fbb22ea66df66e36a38a6f66dfe",
+    "tests/test_recovery_routes.py": "0fa546aed40480512823790b3af90bc051d590447c450c808c6ba1a59b6f5144",
+    "tests/test_password_recovery_migration.py": "53f011baf506b1f9bf16cd6e4fb5ebc3d20e3a55b7234b14e7f2eb9899877fa0"
+  },
+  "validation": [
+    {
+      "scope": "auth/recovery/device/API-key/notification/RBAC/stream/OODS backend",
+      "passed": 213,
+      "skipped": 0,
+      "log_local": "/tmp/auth1-final-backend.log"
+    },
+    {
+      "scope": "SQLite recovery migration, real PostgreSQL migration/redemption/issuance/key-auth races, recovery API",
+      "passed": 27,
+      "skipped": 0,
+      "log_local": "/tmp/auth1-final-recovery-recheck.log"
+    },
+    {
+      "scope": "pending-provider activation and late failure against replacement",
+      "passed": 1,
+      "skipped": 0,
+      "log_local": "/tmp/auth1-mail-acceptance.log"
+    },
+    {
+      "scope": "PostgreSQL full Alembic model coverage included in boundary pass",
+      "passed": 61,
+      "skipped": 0,
+      "overlaps_other_runs": true,
+      "log_local": "/tmp/auth1-boundaries.log"
+    },
+    {
+      "scope": "all frontend units, serial run",
+      "passed": 301,
+      "skipped": 0,
+      "log_local": "/tmp/auth1-all-frontend-tests-serial.log"
+    },
+    {
+      "scope": "built Chromium recovery, Light/Dark at 390/820/1440, keyboard, focus, axe serious/critical and no horizontal overflow",
+      "passed": 6,
+      "skipped": 0,
+      "api": "mocked; no actual email",
+      "log_local": "/tmp/auth1-browser.log"
+    },
+    {
+      "scope": "frontend production build, types, lint, changed Python Ruff, MCP parity, foundational references, credential scan",
+      "result": "passed"
+    },
+    {
+      "scope": "final recovery/device/API-key and PostgreSQL races, including bcrypt outside the user lock with post-hash revocation check",
+      "passed": 65,
+      "skipped": 0,
+      "log_local": "/tmp/auth1-final-key-lock.log"
+    },
+    {
+      "scope": "SQLite migration proof in root DB test suite (moved out of mock-only unit directory)",
+      "passed": 1,
+      "skipped": 0,
+      "log_local": "/tmp/auth1-sqlite-migration-final.log"
+    }
+  ],
+  "failures_preserved": [
+    {
+      "run": "initial TDD collection",
+      "reason": "recovery service did not exist yet",
+      "resolution": "implemented"
+    },
+    {
+      "run": "first recovery assertions",
+      "reason": "test password substring overlapped string_too_short error code; event fixture omitted required timestamp",
+      "resolution": "fixtures corrected, reruns pass"
+    },
+    {
+      "run": "early auth consumers",
+      "reason": "JWT exact-claim assertion omitted new credential_version",
+      "resolution": "allow revocation claim while retaining no-role assertion"
+    },
+    {
+      "run": "new frontend unit assertions",
+      "reason": "jest-dom matchers not imported in new test",
+      "resolution": "explicit vitest matcher import"
+    },
+    {
+      "run": "frontend full parallel",
+      "result": "300 passed / 1 failed",
+      "reason": "unchanged librarian duplicate comparison focus assertion",
+      "resolution": "no source or quarantine change; serial full run 301 passed",
+      "log_local": "/tmp/auth1-all-frontend-tests.log"
+    },
+    {
+      "run": "first browser matrix",
+      "result": "5 passed / 1 failed",
+      "reason": "harness filled login Email before navigation finished",
+      "resolution": "wait for recovery heading; all six pass",
+      "log_local": "/tmp/auth1-browser-first.log"
+    },
+    {
+      "run": "SQLite migration harness",
+      "reason": "import used installed alembic package instead of local revision path",
+      "resolution": "load revision by file path; passes"
+    },
+    {
+      "run": "combined migrations before recovery secrecy assertion",
+      "reason": "Alembic fileConfig disabled imported application logger",
+      "resolution": "secrecy test explicitly enables its logger; combined rerun passes"
+    }
+  ],
+  "production_read_only_preflight": {
+    "serving_backend_commit": "e02fbcf9e8ee611c8fa8000311884e5555a8fa94",
+    "serving_frontend_commit": "e02fbcf9e8ee611c8fa8000311884e5555a8fa94",
+    "resend_api_key_present": true,
+    "resend_sender_present": true,
+    "frontend_url": "https://tracelab.aquex.ai",
+    "debug": false,
+    "new_env_vars": [],
+    "emails_sent": 0,
+    "passwords_reset": 0
+  },
+  "branch_protection_observed": [
+    "backend-suite",
+    "vitest",
+    "type-check",
+    "ruff-diff",
+    "build-frontend-production",
+    "Secret Scan",
+    "backend-integration",
+    "lint",
+    "mcp-package"
+  ],
+  "must_pass_open": [
+    "Review/CI and deployment of this exact AUTH-1 source",
+    "Agree dedicated controlled mailbox/account and access to received link",
+    "Actual delivered email -> reset -> new login, with old credential rejection and unrelated-user/service retention",
+    "Disable/revoke temporary fixture and record exact serving build"
+  ],
+  "limitations": [
+    "Local browser API calls are intercepted fixtures; they do not prove real mailbox delivery.",
+    "The full backend and full PostgreSQL suites have not been run locally; targeted checks are recorded here.",
+    "The existing 12-node backend quarantine is unchanged.",
+    "No AUTH-2, LOG-1, LOG-2 or WALK-4 completion is claimed."
+  ],
+  "review_url": "https://github.com/kneelinghorse/TraceLab/pull/401",
+  "runtime_source_commit": "21a3e3c023b8dd0862e3186b6eb6224a3c254e18"
+}

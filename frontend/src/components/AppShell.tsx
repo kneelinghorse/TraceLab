@@ -51,12 +51,13 @@ export function AppShell({ children }: { children: ReactNode }) {
   // trees identical while the theme bootstrap already paints the right colors.
   if (!hydrated) return <main id="main-content" className="app-auth-main min-h-screen"><p role="status">Loading workspace…</p></main>;
 
-  if (!isAuthenticated) {
+  const isRecoveryPage = router.pathname === "/forgot-password" || router.pathname === "/reset-password";
+  if (!isAuthenticated || isRecoveryPage) {
     const isErrorPage = router.pathname === "/404" || router.pathname === "/_error";
     return <div className="app-auth-layout">
       <a href="#main-content" className="skip-link">Skip to content</a>
       <header className="flex flex-wrap items-center justify-between gap-4 px-6 py-5"><Brand /><ThemeSelect /></header>
-      <main id="main-content" tabIndex={-1} className="app-auth-main">{isErrorPage ? children : <AuthGate>{children}</AuthGate>}</main>
+      <main id="main-content" tabIndex={-1} className="app-auth-main">{isErrorPage || isRecoveryPage ? children : <AuthGate>{children}</AuthGate>}</main>
     </div>;
   }
 

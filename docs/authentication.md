@@ -4,21 +4,86 @@ Comprehensive instructions for configuring TraceLab's JWT authentication, obtain
 
 ## Overview
 
-TraceLab secures every API route except `/api/v1/health` with bearer tokens. The FastAPI backend issues JSON Web Tokens (JWT) from the `/api/v1/auth/login` endpoint using credentials stored in environment variables. Tokens expire after `ACCESS_TOKEN_EXPIRE_MINUTES` (default: 60) and can be refreshed via `/api/v1/auth/refresh` without re-sending credentials. Frontend and CLI clients must attach `Authorization: Bearer <token>` to call protected endpoints.
+TraceLab authenticates users from the `users` table by normalized email and password at
+`POST /api/v1/auth/login`. Protected endpoints accept a bearer JWT or a user-owned
+`X-API-Key`; health, registration, device initiation/polling and password recovery have
+explicit public routes. Human routes deny service principals. Roles and active state
+are resolved from the database for each request, never cached in a JWT.
+
+JWTs contain `sub`, `exp` and `credential_version`. A legacy token without the revision
+means zero and works only while the user's stored revision is still zero. Recovery
+increments that revision; header authentication, refresh, SSE query authentication,
+and already-open mission event streams reject the invalidated session. Login, refresh,
+API-key creation and device approval serialize against recovery on the user row, so an
+old in-flight credential cannot mint a session or key at the new revision.
+
+## Forgotten-password recovery (AUTH-1)
+
+The sign-in screen links to `/forgot-password`; delivered mail links to
+`/reset-password#token=…`. Only those two recovery pages bypass the login shell, even
+when another account is signed in. Opening a link never changes credentials. The
+bootstrap script captures its fragment in memory and immediately strips the URL before
+Next routing. Recovery pages set `Referrer-Policy: no-referrer`; no token goes into
+persistent browser storage. Reloading a consumed in-memory page requires reopening the
+email or requesting a fresh link. Submit the new password twice (8 characters minimum,
+72 UTF-8 bytes maximum). Completion signs out the current browser and returns to ordinary
+login, without automatic sign-in.
+
+- `POST /api/v1/auth/password-reset/request` accepts only `email`, normalized as login.
+  Eligible and ineligible accounts get the same 202 message. Background dispatch starts
+  after the response, including the database lookup: 202 is not mailbox delivery proof.
+  Missing Resend configuration or an unsafe destination returns the same 503 for all.
+- `POST /api/v1/auth/password-reset/confirm` accepts `token`, `new_password` and
+  `confirm_password`. Invalid, expired, replayed, disabled and superseded links share a
+  400 response. Validation never reflects submitted values. There is no GET redemption.
+- The token is 32 random bytes (43 URL-safe characters); only its SHA-256 digest is stored.
+  Migration `056_password_recovery` adds one replaceable recovery row per user and the
+  credential revision. Expiry is 30 minutes. A new issuance supersedes the previous link;
+  a failed or uncertain send invalidates the new link as well. A pending link cannot
+  redeem until provider acceptance has been persisted. The user can request again
+  after the cooldown. A process crash can lose an in-flight email; no plaintext durable
+  queue is introduced. The bounded row is replaced on retry and deleted on reset, a
+  Settings password change, or account deletion. Expired rows cannot redeem.
+- A successful reset atomically consumes the link, changes the hash and revision, deletes
+  the recovering human's approved device grants before their API keys, and clears local
+  pending-key delivery. Other users, the DeepSearch service principal and unowned pending
+  device codes remain unchanged. New device approval requires a valid post-reset session.
+  The existing Settings flow still requires the current password and invalidates recovery
+  links without signing out sessions or revoking keys.
+
+Recovery uses the existing `RESEND_API_KEY`, `RESEND_FROM_ADDRESS` and an HTTPS
+`FRONTEND_URL` (no caller-supplied destination), independently of mission email switches
+and per-user notification preferences. No new environment variable is introduced.
+Provider errors are logged by outcome/status only: never provider bodies, reset links,
+passwords or token-bearing exceptions. Internal delivery status means provider acceptance,
+not confirmed inbox receipt. Debug SQL logging should remain disabled on deployments.
+
+Limits: independent request IP budget 5/minute, confirmation IP budget 10/minute, and
+HMAC-normalized recipient budget 3/15 minutes. IPs use the existing trusted-proxy policy.
+Each in-process limiter stores at most 4,096 keys and refuses new keys at capacity after
+pruning expired entries. IP/recipient budgets reset on restart and multiply with replicas;
+a database-backed 60-second per-user send cooldown additionally serializes sends across
+replicas. Recipient throttling uses the generic 202, so it reveals no account existence.
+Requests never lock normal password login. This is the current single-instance deployment
+contract; multi-replica abuse limits would require a shared limiter.
+
+Before release acceptance, use an agreed dedicated mailbox/account to prove actual email
+receipt, reset, new login and revoked credentials on the exact deployed build. A provider
+acknowledgement or local mock is insufficient. Keep acceptance receipts free of links and
+credentials, and disable/revoke the temporary fixture afterward.
 
 ## Environment Configuration
 
 | Variable | Purpose | Example |
 | --- | --- | --- |
-| `AUTH_USERNAME` | Service account username issued to clients | `tracelab-admin` |
-| `AUTH_PASSWORD` | Plain-text password hashed at startup (development only) | `changeme` |
-| `AUTH_PASSWORD_HASH` | Pre-computed hash for production deployments | `$2b$12$...` |
+| `AUTH_USERNAME` | Explicit full email for bootstrap owner provisioning; not a runtime login override | `owner@example.com` |
+| `AUTH_PASSWORD` / `AUTH_PASSWORD_HASH` | Initial bootstrap credential; changing it does not reset an existing user | Set privately |
 | `SECRET_KEY` | Signing key for JWTs (must be at least 32 bytes) | `super-secret-change-me` |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | Token lifetime in minutes | `60` |
 | `JWT_ALGORITHM` | Signing algorithm | `HS256` |
 | `CORS_ALLOWED_ORIGINS_DEV` / `CORS_ALLOWED_ORIGINS_PROD` | Origins permitted to call the API | `["http://localhost:3000"]` |
 
-**Local defaults:** Copy `.env.example` to `.env` and edit the values above as needed. Development stacks automatically hash `AUTH_PASSWORD`, so you only need the plain text secret. For production, prefer supplying `AUTH_PASSWORD_HASH` plus a strong `SECRET_KEY`.
+**Local setup:** Copy `.env.example` to `.env` and configure bootstrap identity and the signing secret. Runtime login checks the database password hash. Use Settings with the current password, or recovery below, to change an existing account. Never rotate the shared signing secret to reset one person.
 
 ### Ingestion CLI Credentials
 
@@ -38,7 +103,7 @@ CLI automation isolated from the service account used elsewhere.
    ```bash
    curl -X POST http://localhost:8000/api/v1/auth/login \
      -H "Content-Type: application/json" \
-     -d '{"username":"tracelab-admin","password":"changeme"}'
+     -d '{"email":"owner@example.com","password":"<your-password>"}'
    ```
    Response:
    ```json
@@ -46,7 +111,7 @@ CLI automation isolated from the service account used elsewhere.
      "access_token": "<access-token>",
      "token_type": "bearer",
      "expires_in": 3600,
-     "user": {"username": "tracelab-admin"}
+     "user": {"user_id": "<uuid>", "email": "owner@example.com", "display_name": "Owner", "username": "Owner"}
    }
    ```
 2. **Call protected APIs**
@@ -61,7 +126,7 @@ CLI automation isolated from the service account used elsewhere.
      -H "Authorization: Bearer ${TOKEN}"
    ```
 
-All failures return structured 401 responses (`missing token`, `invalid username or password`, or `token subject is not recognized`). When developing against the frontend, ensure the browser origin matches the configured CORS list to avoid pre-flight rejections.
+Invalid or missing credentials return 401; disabled accounts return 403 and exhausted authentication budgets return 429 with Retry-After. Recovery response codes are described above. When developing against the frontend, ensure the browser origin matches the configured CORS list to avoid pre-flight rejections.
 
 ## CLI & Script Examples
 

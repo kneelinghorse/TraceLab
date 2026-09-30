@@ -2,6 +2,12 @@ import type { NextConfig } from "next";
 import migrations from "./src/lib/route-migrations.json";
 
 const nextConfig: NextConfig = {
+  async headers() {
+    return ["/forgot-password", "/reset-password"].map(source => ({ source, headers: [
+      { key: "Referrer-Policy", value: "no-referrer" },
+      { key: "Cache-Control", value: "no-store" },
+    ] }));
+  },
   async redirects() {
     return migrations.filter(row => row.kind === "redirect").map(({ source, destination }) => ({ source, destination, permanent: true }));
   },

@@ -30,6 +30,7 @@ from app.core.security import (
 from app.models.api_key import APIKey
 from app.models.device_authorization import DeviceAuthorizationGrant
 from app.models.invite_code import InviteCode
+from app.models.password_recovery import PasswordRecovery
 from app.models.user import User
 from app.schemas.auth import AdminUserCreate, AdminUserResponse
 from app.services.ownership import LastOwnerError, assert_not_last_owner, ensure_personal_space
@@ -136,6 +137,7 @@ def delete_user(
         synchronize_session=False
     )
     db.query(APIKey).filter(APIKey.user_id == user_id).delete(synchronize_session=False)
+    db.query(PasswordRecovery).filter(PasswordRecovery.user_id == user_id).delete(synchronize_session=False)
     db.query(InviteCode).filter(or_(InviteCode.created_by == user_id, InviteCode.used_by == user_id)).delete(
         synchronize_session=False
     )

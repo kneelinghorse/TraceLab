@@ -8,15 +8,20 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from functools import lru_cache
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 from fastapi import Depends, Header, HTTPException, Query, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
+from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.database import SessionLocal
+
+if TYPE_CHECKING:
+    from app.models.user import User
 
 # passlib 1.7.x probes bcrypt.__about__.__version__, which bcrypt>=4 removed, and
 # logs a noisy (harmless) "(trapped) error reading bcrypt version" WARNING when the
@@ -83,6 +88,8 @@ class AuthenticatedUser:
     email: str
     display_name: str
     role: str
+    credential_version: int = 0
+    api_key_id: UUID | None = None
 
     @property
     def username(self) -> str:
@@ -116,7 +123,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return _pwd_context.verify(plain_password, hashed_password)
 
 
-def create_access_token(*, subject: str, expires_delta: timedelta | None = None) -> str:
+def create_access_token(*, subject: str, expires_delta: timedelta | None = None, credential_version: int = 0) -> str:
     """Create a signed JWT for the given subject (user UUID as string)."""
     if not settings.secret_key:
         raise RuntimeError("SECRET_KEY must be configured to issue JWTs.")
@@ -124,12 +131,12 @@ def create_access_token(*, subject: str, expires_delta: timedelta | None = None)
     expire = datetime.now(UTC) + (
         expires_delta or timedelta(minutes=settings.access_token_expire_minutes)
     )
-    payload = {"sub": subject, "exp": expire}
+    payload = {"sub": subject, "exp": expire, "credential_version": credential_version}
     return jwt.encode(payload, settings.secret_key, algorithm=settings.jwt_algorithm)
 
 
-def _decode_access_token(token: str) -> str:
-    """Validate and decode a JWT, returning the subject."""
+def _decode_access_token(token: str) -> tuple[str, int]:
+    """Validate the subject and credential revision (legacy tokens mean zero)."""
     if not settings.secret_key:
         raise RuntimeError("SECRET_KEY must be configured to validate JWTs.")
     try:
@@ -146,7 +153,10 @@ def _decode_access_token(token: str) -> str:
         raise HTTPException(
             status.HTTP_401_UNAUTHORIZED, detail="Token subject missing"
         )
-    return subject
+    revision = payload.get("credential_version", 0)
+    if type(revision) is not int or revision < 0:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid token revision")
+    return subject, revision
 
 
 def issue_token_response(user, *, expires_in_seconds: int | None = None) -> dict:
@@ -157,7 +167,7 @@ def issue_token_response(user, *, expires_in_seconds: int | None = None) -> dict
     from app.models.user import User
 
     if isinstance(user, User):
-        access_token = create_access_token(subject=str(user.id))
+        access_token = create_access_token(subject=str(user.id), credential_version=user.credential_version or 0)
         expires = expires_in_seconds or settings.access_token_expire_minutes * 60
         return {
             "access_token": access_token,
@@ -209,7 +219,7 @@ def get_key_prefix(key: str) -> str:
     return key[:12]
 
 
-def _to_authenticated_user(db_user) -> AuthenticatedUser:
+def _to_authenticated_user(db_user, *, api_key_id: UUID | None = None) -> AuthenticatedUser:
     """Build the request principal from a users row, enforcing the is_active gate.
 
     Sprint C (T46.3): a soft-disabled user (is_active=False) is rejected at EVERY
@@ -225,6 +235,8 @@ def _to_authenticated_user(db_user) -> AuthenticatedUser:
         email=db_user.email,
         display_name=db_user.display_name,
         role=db_user.role,
+        credential_version=db_user.credential_version,
+        api_key_id=api_key_id,
     )
 
 
@@ -241,32 +253,31 @@ def _validate_api_key(api_key: str) -> AuthenticatedUser | None:
     db = SessionLocal()
     try:
         candidates = db.query(APIKey).filter(APIKey.key_prefix == key_prefix).all()
-
         for candidate in candidates:
-            if verify_api_key(api_key, candidate.key_hash):
-                if candidate.expires_at and candidate.expires_at < datetime.utcnow():
+            verified_hash = candidate.key_hash
+            if not verify_api_key(api_key, verified_hash):
+                continue
+            # Match reset's user -> key lock order. Re-read after acquiring the
+            # user lock: a key checked before reset must not acquire its new revision.
+            # Bcrypt stays outside that lock so machine requests are not serialized
+            # for the duration of password hashing; compare the verified hash again.
+            db_user = db.query(User).filter(User.id == candidate.user_id).with_for_update().first()
+            current = db.query(APIKey).populate_existing().filter(APIKey.id == candidate.id).first()
+            if db_user and current and current.key_hash == verified_hash:
+                if current.expires_at and current.expires_at < datetime.utcnow():
                     return None
-
-                # Update last_used_at (debounced)
-                if (
-                    candidate.last_used_at is None
-                    or (datetime.utcnow() - candidate.last_used_at).total_seconds() > 60
-                ):
-                    candidate.last_used_at = datetime.utcnow()
-                    db.commit()
-
-                # Look up user from UUID
-                db_user = db.query(User).filter(User.id == candidate.user_id).first()
-                if db_user:
-                    return _to_authenticated_user(db_user)
-                return None
+                principal = _to_authenticated_user(db_user, api_key_id=current.id)
+                if current.last_used_at is None or (datetime.utcnow() - current.last_used_at).total_seconds() > 60:
+                    current.last_used_at = datetime.utcnow()
+                db.commit()
+                return principal
 
         return None
     finally:
         db.close()
 
 
-def _resolve_user_from_jwt(subject: str) -> AuthenticatedUser:
+def _resolve_user_from_jwt(subject: str, credential_version: int = 0) -> AuthenticatedUser:
     """Resolve a JWT subject to an AuthenticatedUser.
 
     Tries UUID lookup first (new flow), falls back to display_name lookup (migration).
@@ -280,6 +291,7 @@ def _resolve_user_from_jwt(subject: str) -> AuthenticatedUser:
             user_uuid = UUID(subject)
             db_user = db.query(User).filter(User.id == user_uuid).first()
             if db_user:
+                _check_revision(db_user, credential_version)
                 return _to_authenticated_user(db_user)
         except (ValueError, AttributeError):
             pass
@@ -287,6 +299,7 @@ def _resolve_user_from_jwt(subject: str) -> AuthenticatedUser:
         # Fallback: subject is a username/display_name (legacy tokens)
         db_user = db.query(User).filter(User.display_name == subject).first()
         if db_user:
+            _check_revision(db_user, credential_version)
             return _to_authenticated_user(db_user)
 
         raise HTTPException(
@@ -294,6 +307,32 @@ def _resolve_user_from_jwt(subject: str) -> AuthenticatedUser:
         )
     finally:
         db.close()
+
+
+def _check_revision(db_user: User, credential_version: int) -> None:
+    if db_user.credential_version != credential_version:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Session expired; sign in again")
+
+
+def current_principal(db: Session, user: AuthenticatedUser, *, lock: bool = False) -> User:
+    """Reauthorize a retained principal at a stream or credential-write boundary.
+
+    Credential writers hold this user lock until commit, as recovery does.
+    """
+    from app.models.api_key import APIKey
+    from app.models.user import User
+
+    query = db.query(User).populate_existing().filter(User.id == user.user_id)
+    db_user = (query.with_for_update() if lock else query).first()
+    if db_user is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="User not found")
+    _check_revision(db_user, user.credential_version)
+    if user.api_key_id is not None:
+        key = db.query(APIKey).filter(APIKey.id == user.api_key_id, APIKey.user_id == user.user_id).first()
+        if key is None or (key.expires_at and key.expires_at <= datetime.utcnow()):
+            raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired API key")
+    _require_human_principal(_to_authenticated_user(db_user))
+    return db_user
 
 
 async def require_authenticated_principal(
@@ -327,8 +366,8 @@ async def require_authenticated_principal(
             detail="Missing Authorization bearer token or X-API-Key header",
         )
 
-    subject = _decode_access_token(credentials.credentials)
-    return _resolve_user_from_jwt(subject)
+    subject, revision = _decode_access_token(credentials.credentials)
+    return _resolve_user_from_jwt(subject, revision)
 
 
 def _require_human_principal(user: AuthenticatedUser) -> AuthenticatedUser:
@@ -371,8 +410,8 @@ async def require_authenticated_user_sse(
     """
     # Check query param token first (SSE / EventSource)
     if token:
-        subject = _decode_access_token(token)
-        return _require_human_principal(_resolve_user_from_jwt(subject))
+        subject, revision = _decode_access_token(token)
+        return _require_human_principal(_resolve_user_from_jwt(subject, revision))
 
     # Fall through to standard auth
     return await require_authenticated_user(

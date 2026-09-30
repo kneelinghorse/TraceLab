@@ -28,6 +28,7 @@ beforeEach(() => {
   mocks.role.isAdmin = false;
   mocks.activity.mission = 0; mocks.activity.evidence = 0; mocks.activity.report = 0;
   mocks.router.push.mockReset();
+  mocks.router.pathname = "/missions/[id]";
   vi.stubGlobal("matchMedia", vi.fn(() => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
   HTMLDialogElement.prototype.showModal = function () { this.setAttribute("open", ""); };
   HTMLDialogElement.prototype.close = function () { this.removeAttribute("open"); this.dispatchEvent(new Event("close")); };
@@ -36,6 +37,15 @@ const fresh = { provider: () => new Map(), dedupingInterval: 0, shouldRetryOnErr
 function shell() { return render(<SWRConfig value={fresh}><ThemeProvider><AppShell><h1>Queue work</h1></AppShell></ThemeProvider></SWRConfig>); }
 
 describe("the shared shell", () => {
+  it.each([true, false])("recovery pages are reachable when authenticated=%s without exposing workspace navigation", authenticated => {
+    mocks.auth.isAuthenticated = authenticated;
+    mocks.router.pathname = "/reset-password";
+    shell();
+    expect(screen.getByRole("heading", { name: "Queue work" })).toBeTruthy();
+    expect(screen.queryByText("Sign in form")).toBeNull();
+    expect(screen.queryByRole("navigation", { name: "Main navigation" })).toBeNull();
+  });
+
   it("opens focused search from the Home entry point", () => {
     shell();
     act(openCommandPalette);

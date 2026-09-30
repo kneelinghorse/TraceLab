@@ -120,7 +120,8 @@ def test_jwt_carries_no_role_claim(db_session):
     token = create_access_token(subject=str(user.id))
     claims = jwt.get_unverified_claims(token)
     assert "role" not in claims
-    assert set(claims) <= {"sub", "exp"}
+    assert set(claims) <= {"sub", "exp", "credential_version"}
+    assert claims["credential_version"] == 0  # Revocation boundary, never a cached role.
 
 
 def test_non_admin_still_403s_on_admin_api(client, db_session):

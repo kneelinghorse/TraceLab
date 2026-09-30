@@ -1,11 +1,13 @@
 import { Html, Head, Main, NextScript } from "next/document";
 
 import { themeBootstrapScript } from "@/lib/theme";
+import { recoveryBootstrapScript } from "@/lib/auth/recovery";
 
 export default function Document() {
   return (
     <Html lang="en" data-brand="A" suppressHydrationWarning>
       <Head>
+        <script dangerouslySetInnerHTML={{ __html: recoveryBootstrapScript }} />
         <link rel="icon" href="/favicon.ico" sizes="48x48" />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />

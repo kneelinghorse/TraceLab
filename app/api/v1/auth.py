@@ -5,14 +5,21 @@ import re
 from datetime import datetime, timedelta
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, Response, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.core.rate_limit import auth_rate_limiter, client_ip, register_rate_limiter
+from app.core.rate_limit import (
+    auth_rate_limiter,
+    client_ip,
+    recovery_confirm_limiter,
+    recovery_request_limiter,
+    register_rate_limiter,
+)
 from app.core.security import (
     ROLE_MEMBER,
     AuthenticatedUser,
+    current_principal,
     generate_api_key,
     get_key_prefix,
     hash_api_key,
@@ -23,8 +30,10 @@ from app.core.security import (
     require_authenticated_user,
     verify_password,
 )
+from app.dependencies import get_password_recovery_service
 from app.models.api_key import APIKey
 from app.models.invite_code import InviteCode, generate_invite_code
+from app.models.password_recovery import PasswordRecovery
 from app.models.user import User
 from app.schemas.api_key import (
     APIKeyCreate,
@@ -33,8 +42,23 @@ from app.schemas.api_key import (
     APIKeyList,
     APIKeyResponse,
 )
-from app.schemas.auth import LoginRequest, ProfileResponse, ProfileUpdate, RegisterRequest, TokenResponse
+from app.schemas.auth import (
+    LoginRequest,
+    PasswordResetConfirm,
+    PasswordResetRequest,
+    PasswordResetResponse,
+    ProfileResponse,
+    ProfileUpdate,
+    RegisterRequest,
+    TokenResponse,
+)
 from app.services.ownership import ensure_personal_space
+from app.services.password_recovery import (
+    REQUEST_MESSAGE,
+    PasswordRecoveryService,
+    ensure_recovery_configured,
+    recipient_budget,
+)
 
 router = APIRouter(tags=["auth"])
 
@@ -63,7 +87,7 @@ def login(
     # or verifying a password — counts every attempt, success or failure (429 + Retry-After).
     auth_rate_limiter.check(request)
 
-    db_user = db.query(User).filter(User.email == payload.email).first()
+    db_user = db.query(User).filter(User.email == payload.email).with_for_update().first()
 
     if not db_user or not verify_password(payload.password, db_user.password_hash):
         # T47.5: audit failed logins (no reason-leak between "no such user" and
@@ -90,9 +114,8 @@ def login(
 
     # Update last_login_at
     db_user.last_login_at = datetime.utcnow()
-    db.commit()
-
     response_payload = issue_token_response(db_user)
+    db.commit()
     return TokenResponse(**response_payload)
 
 
@@ -160,10 +183,8 @@ def register(
     invite.used_by = new_user.id
     invite.used_at = datetime.utcnow()
 
-    db.commit()
-    db.refresh(new_user)
-
     response_payload = issue_token_response(new_user)
+    db.commit()
     return TokenResponse(**response_payload)
 
 
@@ -173,10 +194,9 @@ def refresh_token(
     db: Session = Depends(get_db),
 ) -> TokenResponse:
     """Refresh the caller's JWT."""
-    db_user = db.query(User).filter(User.id == user.user_id).first()
-    if not db_user:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="User not found")
+    db_user = current_principal(db, user, lock=True)
     response_payload = issue_token_response(db_user)
+    db.commit()
     return TokenResponse(**response_payload)
 
 
@@ -208,9 +228,7 @@ def update_me(
     db: Session = Depends(get_db),
 ) -> ProfileResponse:
     """Update the authenticated user's display name and/or password."""
-    db_user = db.query(User).filter(User.id == user.user_id).first()
-    if not db_user:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="User not found")
+    db_user = current_principal(db, user, lock=True)
 
     if payload.display_name is not None:
         db_user.display_name = payload.display_name
@@ -227,6 +245,7 @@ def update_me(
         if not verify_password(payload.current_password, db_user.password_hash):
             raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Current password is incorrect")
         db_user.password_hash = hash_password(payload.new_password)
+        db.query(PasswordRecovery).filter(PasswordRecovery.user_id == user.user_id).delete(synchronize_session=False)
 
     db.commit()
     db.refresh(db_user)
@@ -251,6 +270,7 @@ def create_api_key(
     db: Session = Depends(get_db),
 ) -> APIKeyResponse:
     """Create a new API key. The full key is only returned once at creation time."""
+    current_principal(db, user, lock=True)
     # Check rate limit (max 10 keys per user)
     existing_count = db.query(APIKey).filter(APIKey.user_id == user.user_id).count()
     if existing_count >= MAX_API_KEYS_PER_USER:
@@ -437,3 +457,29 @@ def delete_invite_code(
     db.commit()
 
     return {"success": True, "message": "Invite code deleted"}
+
+
+@router.post("/password-reset/request", response_model=PasswordResetResponse, status_code=202)
+def request_password_reset(
+    payload: PasswordResetRequest, request: Request, response: Response,
+    background: BackgroundTasks,
+    service: PasswordRecoveryService = Depends(get_password_recovery_service),
+) -> PasswordResetResponse:
+    recovery_request_limiter.check(request)
+    ensure_recovery_configured()
+    response.headers["Cache-Control"] = "no-store"
+    if recipient_budget(payload.email):
+        background.add_task(service.request, payload.email)
+    return PasswordResetResponse(message=REQUEST_MESSAGE)
+
+
+@router.post("/password-reset/confirm", response_model=PasswordResetResponse)
+def confirm_password_reset(
+    payload: PasswordResetConfirm, request: Request, response: Response,
+    db: Session = Depends(get_db),
+    service: PasswordRecoveryService = Depends(get_password_recovery_service),
+) -> PasswordResetResponse:
+    recovery_confirm_limiter.check(request)
+    service.confirm(db, payload.token, payload.new_password)
+    response.headers["Cache-Control"] = "no-store"
+    return PasswordResetResponse(message="Password changed. Sign in with your new password and reconnect your integrations.")
