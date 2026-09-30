@@ -62,7 +62,7 @@ research dispatch was performed by these probes.
   Six Light/Dark 390/820/1440 cases include keyboard/scroll, no overflow, no serious
   or critical axe findings, quiet gaps, retained refresh errors and revoked access.
   [Screenshots](screenshots/) are local fixture evidence.
-- Rebased retirement: **107 receiver/RBAC/real cross-service tests** pass, zero skips, 16 warnings (40.51 seconds).
+- Final retirement: **190 receiver/RBAC/real cross-service tests** pass, zero skips, 16 warnings (57.99 seconds). Initial full CI exposed eight stale legacy201 expectations outside the first107-test selection; these now assert426/no insertion while preserving role-boundary checks.
   The worker negotiates `legacy=retired`; legacy POST returns 426 after authorization.
 - Production build, frontend lint/types, changed-file credential checks, foundational
   references and MCP parity pass. All nine required TraceLab contexts passed

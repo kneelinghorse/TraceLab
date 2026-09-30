@@ -195,7 +195,32 @@
     },
     "prior_ci": "rollout-progress.json",
     "prior_local": "local-validation.json",
-    "published_mcp": "published-mcp-read.json"
+    "published_mcp": "published-mcp-read.json",
+    "retirement_final_boundaries": {
+      "passed": 190,
+      "skipped": 0,
+      "warnings": 16,
+      "duration_seconds": 57.99,
+      "includes_real_cross_service": true,
+      "suites": [
+        "tests/test_mission_log_delivery.py",
+        "tests/test_rbac_route_enforcement_api.py",
+        "tests/test_service_principal_route_boundary.py",
+        "tests/test_rbac_verify_harness.py",
+        "tests/test_rbac_verify_mutation_proof.py",
+        "tests/test_live_log_cross_service.py"
+      ]
+    },
+    "initial_retirement_ci_failure": {
+      "run": "https://github.com/kneelinghorse/TraceLab/actions/runs/36777223468",
+      "failed": 8,
+      "passed": 3066,
+      "skipped": 4,
+      "deselected_unchanged_quarantine": 12,
+      "warnings": 49,
+      "duration_seconds": 617.19,
+      "cause": "Two existing route-boundary suites still expected legacy writes201; update to426, assert no insertion, retain machine capability200 and human403. No production code or authorization relaxation."
+    }
   },
   "limitations": [
     "Healthy run proves production delivery and result retention; transport-failure isolation is proven in controlled local/HTTP tests, not by sabotaging production.",

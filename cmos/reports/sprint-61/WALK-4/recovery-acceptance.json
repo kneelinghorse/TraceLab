@@ -1,0 +1,160 @@
+{
+  "mission": "WALK-4",
+  "session": "PS-2026-09-30-010",
+  "status": "recovery_live_matrix_verified_final_retirement_deploy_pending",
+  "recorded_at": "2026-09-30T21:20:38.110728+00:00",
+  "candidate": {
+    "id": "44ea6fc4-7460-4ddb-b357-52bc1a0c1da7",
+    "purpose": "Same dedicated mailbox/account created by the user for Sprint 61 acceptance. Mailbox address omitted.",
+    "final_active": true,
+    "final_revision": 3,
+    "final_keys": 0,
+    "final_approved_grants": 0,
+    "cleanup": "Reset itself deleted all three disposable keys and both approved grants. Leave the user-created candidate enabled; no more account mutations after the operator reported confusion.",
+    "user_confirmation": "After the third reset the user reported being logged in under the candidate account. Earlier AUTH-1 receipt explicitly confirms new-password login, old-password rejection and automatic logout."
+  },
+  "builds": {
+    "recovery_backend_and_frontend": "56aae00673dda2c500edf41ab4aef3296d24a784",
+    "recovery_source_unchanged_by_retirement": true,
+    "live_log_receipt": "../LOG-2/deployed-acceptance.json"
+  },
+  "request": {
+    "operation": "admin_password_reset",
+    "status": 200,
+    "candidate_id": "44ea6fc4-7460-4ddb-b357-52bc1a0c1da7",
+    "actor_id": "007c8cb6-7d70-48fc-bcb4-3a0e46bc0519",
+    "provider_status": "accepted",
+    "cache_control": "no-store",
+    "observed_at": "2026-09-30T21:10:54.159859+00:00"
+  },
+  "fixtures": {
+    "observed_at": "2026-09-30T21:09:35.141361+00:00",
+    "candidate_id": "44ea6fc4-7460-4ddb-b357-52bc1a0c1da7",
+    "candidate_role": "member",
+    "jwt_me": 200,
+    "ordinary_key_me": 200,
+    "collected_device_key_me": 200,
+    "legacy_no_revision_fixture": 401,
+    "uncollected_approved": false,
+    "fixture_key_ids": [
+      "4265395d-dbf4-4ed2-8684-af174b040b8b",
+      "bbd10bb7-4688-4386-8894-96f5737a8092"
+    ],
+    "legacy_note": "No-revision signed token correctly fails at already-recovered revision2 before this reset; initial legacy0 acceptance/reset covered by isolated regression."
+  },
+  "approved_uncollected": {
+    "observed_at": "2026-09-30T21:13:37.107461+00:00",
+    "approved": true,
+    "collected": false,
+    "candidate_id": "44ea6fc4-7460-4ddb-b357-52bc1a0c1da7",
+    "key_id": "1b55efed-0aff-4b80-b9cb-4c8162199b81"
+  },
+  "request_and_open": {
+    "observed_at": "2026-09-30T21:13:36.470356+00:00",
+    "user_confirmed_reset_form_open": true,
+    "credentials_after_request_and_open": {
+      "jwt": 200,
+      "api_key": 200,
+      "device_key": 200
+    }
+  },
+  "open_stream": {
+    "started_at": "2026-09-30T21:13:43.013089+00:00",
+    "stream_status": 200,
+    "heartbeats_before_reset": 2,
+    "events_after_rejection": 0,
+    "stream_closed_at": "2026-09-30T21:14:28.130869+00:00",
+    "first_auth_rejected_at": "2026-09-30T21:14:28.807456+00:00"
+  },
+  "revocation": {
+    "observed_at": "2026-09-30T21:14:45.809978+00:00",
+    "candidate_id": "44ea6fc4-7460-4ddb-b357-52bc1a0c1da7",
+    "checks": {
+      "old_jwt": 401,
+      "old_api_key": 401,
+      "old_collected_device_key": 401,
+      "legacy_fixture": 401,
+      "old_refresh": 401,
+      "old_query_token": 401,
+      "uncollected_device_status": 400,
+      "uncollected_device_error": "expired_token",
+      "other_owner_me": 200,
+      "service_me": 200
+    }
+  },
+  "after_reset": {
+    "observed_at": "2026-09-30T21:14:47.157612+00:00",
+    "candidate": {
+      "revision": 3,
+      "role": "member",
+      "active": true,
+      "keys": 0,
+      "grants": 0
+    },
+    "recovery": null,
+    "other_accounts_unchanged": true,
+    "service_credentials_unchanged": true,
+    "other_accounts_compared": 7,
+    "candidate_password_changed": true,
+    "revision_before": 2
+  },
+  "invalid_token": {
+    "observed_at": "2026-09-30T21:08:35.799130+00:00",
+    "status": 400,
+    "secret_echo": false,
+    "fixture": "random nonexistent token; no real account mutation"
+  },
+  "prior_receipts": [
+    "../AUTH-1/deployed-acceptance.json",
+    "../AUTH-2/deployed-acceptance.json",
+    "../LOG-1/deployed-acceptance.json",
+    "../LOG-2/deployed-acceptance.json"
+  ],
+  "evidence_scope": {
+    "actual_production": [
+      "Public and admin mailbox-to-reset flows (AUTH-1/AUTH-2); user-confirmed new login and old password rejection.",
+      "Normal device approval by candidate, collected device key, ordinary API key and refreshed JWT. All were live before reset.",
+      "Request and user-confirmed open form left all three credentials valid.",
+      "Live query-token stream produced two heartbeats, then ended normally at reset; next JWT/refresh/query-token/key requests reject. No deployment occurred during stream observation.",
+      "Approved uncollected device grant was removed before its ten-minute expiry; token retrieval fails.",
+      "Signed legacy no-revision candidate fixture rejected before/after the third reset at revisions2/3. This does not claim revision0 acceptance in production.",
+      "All seven other accounts have unchanged credential fingerprints, including owner and service; authenticated reads still return200.",
+      "Random invalid reset token returns400 without secret echo. Disabled target, service-principal caller and recipient-override refusals are recorded in AUTH-2."
+    ],
+    "controlled_local_and_postgres": [
+      "Legacy revision0 token works before initial reset and fails afterward.",
+      "Expired/replayed links and retained Settings behavior are regression-tested in isolation; no additional production password change for these negative cases.",
+      "Non-deliverable/service target denial, timing/rate/privacy and issuance/auth/reset races; source receipt files name suites.",
+      "Transport failure, lost acknowledgement, overflow/reclaim/cancellation races and result retention under log failure.",
+      "Light/Dark 390/820/1440 with keyboard/focus/axe and navigation against production frontend build."
+    ],
+    "not_claimed": [
+      "Personal user walk of every screen or visual breakpoint.",
+      "A second paid run, a forced production log failure, or historical runtime identity repair.",
+      "Measured billed dollars; provider accounting unavailable."
+    ]
+  },
+  "mcp_integration_verification": {
+    "observed_after_candidate_reset": true,
+    "aquex_hub": {
+      "success": true,
+      "projects": 65
+    },
+    "direct_tracelab": {
+      "success": true,
+      "projects": 65
+    },
+    "published_2_1_0": {
+      "success": true,
+      "mission_logs": 12,
+      "matches_http": true
+    },
+    "separate_aquex_connector": {
+      "success": false,
+      "error": "MCP SSE probe returned 404 from aquex.ai",
+      "scope": "Endpoint routing failure, not a revoked-key response. No routing/config/credential change performed for this connector."
+    }
+  },
+  "source_receipt_audit": "receipt-source-audit.json",
+  "remaining_gate": "Required CI and legacy retirement serving verification; then CMOS closure."
+}

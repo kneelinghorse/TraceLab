@@ -26,6 +26,7 @@ from app.core.security import (
 from app.main import app
 from app.models.api_key import APIKey
 from app.models.mission import Mission
+from app.models.mission_log import MissionLog
 from app.models.project import Project
 from app.models.user import User
 from app.models.workspace import Workspace
@@ -192,8 +193,11 @@ def test_service_credential_is_machine_only_in_every_rbac_state(
         headers=headers,
         json={"logs": [{"level": "INFO", "message": "trusted runner log"}]},
     )
-    assert logs.status_code == 201, logs.text
-    assert logs.json() == {"accepted": 1}
+    assert logs.status_code == 426, logs.text
+    assert db_session.query(MissionLog).filter_by(mission_id=mission.id).count() == 0
+    capabilities = client.get(f"{API}/missions/{mission.id}/logs/capabilities", headers=headers)
+    assert capabilities.status_code == 200, capabilities.text
+    assert capabilities.json()["legacy"] == "retired"
 
     evidence = client.post(
         f"{API}/missions/{mission.id}/evidence",
