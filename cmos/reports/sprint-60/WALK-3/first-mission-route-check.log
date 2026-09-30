@@ -1,0 +1,14 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+page.waitForURL: Timeout 20000ms exceeded.
+=========================== logs ===========================
+waiting for navigation to "https://tracelab.aquex.ai/missions/9bd0493f-cdd2-443e-b8c3-4ee9161642a1" until "load"
+  navigated to "https://tracelab.aquex.ai/missions/9bd0493f-cdd2-443e-b8c3-4ee9161642a1?from=librarian"
+============================================================
+    at /Users/systemsystems/portfolio/TraceLab/cmos/reports/sprint-60/WALK-3/deployed_acceptance.mjs:202:18 {
+  name: 'TimeoutError'
+}
+
+Node.js v24.6.0

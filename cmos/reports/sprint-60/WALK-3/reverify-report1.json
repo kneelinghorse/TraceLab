@@ -1,0 +1,9 @@
+{
+  "verified_at": "2026-09-30T02:37:53.874Z",
+  "serving_commit": "295028c8f8b7e7fa0b160be49321f53099b1951a",
+  "baseline_commit": "93d71fcf4d8e0818103970b1c3131e6e1323681b",
+  "report_id": "cb0ae24f-b28d-4b1c-839e-9a7172d66154",
+  "citations": 3,
+  "all_export_hashes_unchanged": true,
+  "mutations": 0
+}

@@ -1,0 +1,2032 @@
+{
+  "checks": {
+    "planning": {
+      "no_artifact_writes": true,
+      "empty_project": true,
+      "chat": {
+        "segments": [
+          {
+            "kind": "prose",
+            "text": "Below is a self-contained planning outline you can use to run a small desk-research study without actually starting a TraceLab mission.\n\n## 1. Clarify the focus\nYou’re studying **how research tools communicate where uploaded data will go** (the “upload destination”). Focus on:\n- What the user is told before they choose a file\n- What the UI suggests about *where* the file goes (local, private workspace, shared project, public index, model training, etc.)\n- How risks and guarantees are framed (retention, access, reuse)\n\n## 2. Pick three public examples\nFor a quick but meaningful contrast, choose tools that are:\n- **Different archetypes** (chat assistant, reference manager, notebook or cloud storage)\n- **Publicly accessible** without sign-up, or with free-tier screenshots/docs\n\nExample trio you could use (adjust as you like):\n1. A **general AI chat tool with file upload** (e.g., ChatGPT, Perplexity, Claude, Gemini)\n2. A **reference / PDF tool** (e.g., Zotero web, Mendeley web, Semantic Scholar’s PDF upload, Paperpile)\n3. A **cloud or notebook tool** (e.g., Google Drive, Dropbox, Notion, Overleaf, Jupyter/Colab)\n\n## 3. Observation template (per tool)\nCreate a short, repeatable note template, e.g. a 1-page table:\n\n**Context**\n- Tool name & URL\n- Page / feature where upload occurs\n\n**Visual cues**\n- Label near upload control (button text, helper text)\n- Icons / placement suggesting destination (folder, project name, “My workspace”)\n\n**Copy about destination & use**\n- Where does it say **where the file is stored**?\n- Does it say **who can access** it (only me, team, org, public)?\n- Does it mention **secondary use** (e.g., used to improve the product / train models)?\n- Any **links** to policies (privacy, data usage, retention) directly in the flow?\n\n**Timing & clarity**\n- When is this explained: before upload, after upload, or only in help/policies?\n- Is there an **explicit statement** like “Your file will be stored in X and visible to Y”?\n- Are there **defaults vs. choices** (checkboxes, toggles, scopes)?\n\n**Risk & reassurance**\n- Mentions of: encryption, deletion, offline/local-only, not used for training, etc.\n- Any **warnings** about sensitive or personal data?\n\n**Overall impression**\n- 1–2 sentences on how confidently you, as a new user, understand where the file goes and who can see/use it.\n\n## 4. Concise comparison structure\nWhen you’ve taken notes for all three tools, synthesize them into a small matrix plus 3–5 bullets of commentary.\n\n**Comparison table (example headings)**\n\n| Tool | Where destination is stated | Who can access (as stated) | Model/training use messaging | Placement in flow | Clarity (1–5) |\n|------|----------------------------|-----------------------------|------------------------------|-------------------|---------------|\n| Tool A | … | … | … | … | … |\n| Tool B | … | … | … | … | … |\n| Tool C | … | … | … | … | … |\n\nThen add a short narrative (aim for ~200–300 words total) that:\n- Highlights **one standout strength** of each tool\n- Notes **one confusion or risk** pattern that appears in more than one tool\n\n## 5. Three actionable design questions\nUse your comparison to drive design discussion rather than just description. Frame questions that a product team could directly use in a design review. For example:\n\n1. **Destination explicitness**  \n   *“At the moment a user selects a file, could we show a short, plain-language line that answers: ‘This file will be stored in **[location]** and will be visible to **[audience]**’—without requiring them to open a policy document?”*\n\n2. **Secondary use & retention transparency**  \n   *“If our system uses uploaded content for things beyond the immediate task (e.g., analytics, model improvement), how might we surface a one-sentence summary and a clear opt-out or scope control right in the upload UI?”*\n\n3. **Contextual warnings and reassurance**  \n   *“For users unsure whether it’s safe to upload sensitive material, what lightweight, context-aware cues (e.g., short warnings, icons, examples) can we add so they understand both what **not** to upload and what **protections** they get if they proceed?”*\n\nYou can refine these questions after you see the real patterns in your three examples. They should map directly onto specific UI points where your comparison shows confusion or hidden implications.\n\nIf you tell me which three concrete tools you plan to use, I can help you tighten the observation template or adapt the design questions to match those ecosystems (e.g., enterprise vs. consumer).",
+            "citations": []
+          }
+        ],
+        "suggested_action": "draft_mission",
+        "evidence": [],
+        "chunks": [],
+        "no_evidence": false,
+        "withheld_count": 0,
+        "usage": {},
+        "model": "gpt-5.1"
+      },
+      "draft": {
+        "draft": {
+          "mission_id": "WALK-3",
+          "title": "Upload Destination Clarity in Research Tools",
+          "objective": "Investigate how three public research-related tools communicate upload destinations, access, and secondary data use in their UIs, to inform safer and clearer upload flows in our product.",
+          "success_criteria": [
+            "Select three publicly accessible tools from distinct categories (chat AI, reference/PDF, cloud/notebook).",
+            "Capture structured observations for each tool using a consistent note/template format.",
+            "Document how each tool states storage location, access scope, and secondary/model-training use.",
+            "Assess timing and prominence of destination and risk messaging in each upload flow.",
+            "Produce a concise comparison matrix covering all three tools with clarity ratings.",
+            "Write a 200–300 word narrative synthesis highlighting strengths and recurring risks.",
+            "Derive three actionable design questions grounded in the observed patterns."
+          ],
+          "background": "The user is planning a small desk-research study for an empty synthetic acceptance project, focusing on how research tools communicate where uploaded data goes, who can access it, and how it may be reused.",
+          "focus": "UI and copy around upload controls in research-related tools: how upload destinations, access scopes, retention, and secondary/model-training uses are conveyed to end users at or near the moment of upload.",
+          "required_entities": null,
+          "excluded_entities": null,
+          "constraints": [
+            "Use only publicly accessible UIs or documentation (no private or NDA-limited tools).",
+            "Do not perform an actual TraceLab research run; this is a planning-only exercise."
+          ],
+          "deliverable_format": "Concise written report with one comparison table plus brief narrative and design questions.",
+          "deliverables": [
+            "Completed observation notes for each of the three selected tools using the shared template.",
+            "A comparison table summarizing destination clarity, access scope messaging, model/secondary use messaging, placement in flow, and a 1–5 clarity rating for each tool.",
+            "A 200–300 word narrative synthesis contrasting strengths and recurring confusion or risk patterns across tools.",
+            "Three actionable design questions that a product team can use directly in design reviews to improve upload destination clarity."
+          ],
+          "tags": [
+            "UX",
+            "data privacy",
+            "upload flows",
+            "comparative analysis",
+            "desk research"
+          ]
+        },
+        "preview": {
+          "contract_version": "1.0",
+          "compiler_revision": "24e88100624e6221e5fa957508ab77c4b0f519f9",
+          "fidelity": "structural_only",
+          "named_entities": [
+            "secondary data use",
+            "to inform safer",
+            "clearer upload flows",
+            "focusing",
+            "who can access it",
+            "PDF",
+            "access scope",
+            "model-training use",
+            "destination",
+            "risk messaging",
+            "timing",
+            "prominence"
+          ],
+          "objectives": [
+            {
+              "id": "objective-0",
+              "text": "Investigate how three public research-related tools communicate upload destinations, access, and secondary data use in their UIs, to inform safer and clearer upload flows in our product.",
+              "source": "objective",
+              "required": false
+            },
+            {
+              "id": "objective-1",
+              "text": "Select three publicly accessible tools from distinct categories (chat AI, reference/PDF, cloud/notebook).",
+              "source": "success_criteria",
+              "required": true
+            },
+            {
+              "id": "objective-2",
+              "text": "Capture structured observations for each tool using a consistent note/template format.",
+              "source": "success_criteria",
+              "required": true
+            },
+            {
+              "id": "objective-3",
+              "text": "Document how each tool states storage location, access scope, and secondary/model-training use.",
+              "source": "success_criteria",
+              "required": true
+            },
+            {
+              "id": "objective-4",
+              "text": "Assess timing and prominence of destination and risk messaging in each upload flow.",
+              "source": "success_criteria",
+              "required": true
+            },
+            {
+              "id": "objective-5",
+              "text": "Write a 200–300 word narrative synthesis highlighting strengths and recurring risks.",
+              "source": "success_criteria",
+              "required": true
+            },
+            {
+              "id": "objective-6",
+              "text": "Derive three actionable design questions grounded in the observed patterns.",
+              "source": "success_criteria",
+              "required": true
+            }
+          ],
+          "evidence_slots": [
+            {
+              "id": "slot-objective-1",
+              "kind": "objective_coverage",
+              "description": "Gather evidence that directly addresses: Select three publicly accessible tools from distinct categories (chat AI, reference/PDF, cloud/notebook).",
+              "source": "success_criteria",
+              "target": {
+                "objective_id": "objective-1"
+              },
+              "required": true
+            },
+            {
+              "id": "slot-objective-2",
+              "kind": "objective_coverage",
+              "description": "Gather evidence that directly addresses: Capture structured observations for each tool using a consistent note/template format.",
+              "source": "success_criteria",
+              "target": {
+                "objective_id": "objective-2"
+              },
+              "required": true
+            },
+            {
+              "id": "slot-objective-3",
+              "kind": "objective_coverage",
+              "description": "Gather evidence that directly addresses: Document how each tool states storage location, access scope, and secondary/model-training use.",
+              "source": "success_criteria",
+              "target": {
+                "objective_id": "objective-3"
+              },
+              "required": true
+            },
+            {
+              "id": "slot-objective-4",
+              "kind": "objective_coverage",
+              "description": "Gather evidence that directly addresses: Assess timing and prominence of destination and risk messaging in each upload flow.",
+              "source": "success_criteria",
+              "target": {
+                "objective_id": "objective-4"
+              },
+              "required": true
+            },
+            {
+              "id": "slot-objective-5",
+              "kind": "objective_coverage",
+              "description": "Gather evidence that directly addresses: Write a 200–300 word narrative synthesis highlighting strengths and recurring risks.",
+              "source": "success_criteria",
+              "target": {
+                "objective_id": "objective-5"
+              },
+              "required": true
+            },
+            {
+              "id": "slot-objective-6",
+              "kind": "objective_coverage",
+              "description": "Gather evidence that directly addresses: Derive three actionable design questions grounded in the observed patterns.",
+              "source": "success_criteria",
+              "target": {
+                "objective_id": "objective-6"
+              },
+              "required": true
+            },
+            {
+              "id": "slot-entity-secondary-data-use",
+              "kind": "named_entity",
+              "description": "Cover named entity 'secondary data use' with source-grounded evidence.",
+              "source": "named_entities",
+              "target": {
+                "entity": "secondary data use",
+                "entity_name": "secondary data use"
+              },
+              "required": true
+            },
+            {
+              "id": "slot-entity-to-inform-safer",
+              "kind": "named_entity",
+              "description": "Cover named entity 'to inform safer' with source-grounded evidence.",
+              "source": "named_entities",
+              "target": {
+                "entity": "to inform safer",
+                "entity_name": "to inform safer"
+              },
+              "required": true
+            },
+            {
+              "id": "slot-entity-clearer-upload-flows",
+              "kind": "named_entity",
+              "description": "Cover named entity 'clearer upload flows' with source-grounded evidence.",
+              "source": "named_entities",
+              "target": {
+                "entity": "clearer upload flows",
+                "entity_name": "clearer upload flows"
+              },
+              "required": true
+            },
+            {
+              "id": "slot-entity-focusing",
+              "kind": "named_entity",
+              "description": "Cover named entity 'focusing' with source-grounded evidence.",
+              "source": "named_entities",
+              "target": {
+                "entity": "focusing",
+                "entity_name": "focusing"
+              },
+              "required": true
+            },
+            {
+              "id": "slot-entity-who-can-access-it",
+              "kind": "named_entity",
+              "description": "Cover named entity 'who can access it' with source-grounded evidence.",
+              "source": "named_entities",
+              "target": {
+                "entity": "who can access it",
+                "entity_name": "who can access it"
+              },
+              "required": true
+            },
+            {
+              "id": "slot-entity-pdf",
+              "kind": "named_entity",
+              "description": "Cover named entity 'PDF' with source-grounded evidence.",
+              "source": "named_entities",
+              "target": {
+                "entity": "PDF",
+                "entity_name": "PDF",
+                "objective_ids": [
+                  "objective-1"
+                ]
+              },
+              "required": true
+            },
+            {
+              "id": "slot-entity-access-scope",
+              "kind": "named_entity",
+              "description": "Cover named entity 'access scope' with source-grounded evidence.",
+              "source": "named_entities",
+              "target": {
+                "entity": "access scope",
+                "entity_name": "access scope",
+                "objective_ids": [
+                  "objective-3"
+                ]
+              },
+              "required": true
+            },
+            {
+              "id": "slot-entity-model-training-use",
+              "kind": "named_entity",
+              "description": "Cover named entity 'model-training use' with source-grounded evidence.",
+              "source": "named_entities",
+              "target": {
+                "entity": "model-training use",
+                "entity_name": "model-training use",
+                "objective_ids": [
+                  "objective-3"
+                ]
+              },
+              "required": true
+            },
+            {
+              "id": "slot-entity-destination",
+              "kind": "named_entity",
+              "description": "Cover named entity 'destination' with source-grounded evidence.",
+              "source": "named_entities",
+              "target": {
+                "entity": "destination",
+                "entity_name": "destination",
+                "objective_ids": [
+                  "objective-4"
+                ]
+              },
+              "required": true
+            },
+            {
+              "id": "slot-entity-risk-messaging",
+              "kind": "named_entity",
+              "description": "Cover named entity 'risk messaging' with source-grounded evidence.",
+              "source": "named_entities",
+              "target": {
+                "entity": "risk messaging",
+                "entity_name": "risk messaging",
+                "objective_ids": [
+                  "objective-4"
+                ]
+              },
+              "required": true
+            },
+            {
+              "id": "slot-entity-timing",
+              "kind": "named_entity",
+              "description": "Cover named entity 'timing' with source-grounded evidence.",
+              "source": "named_entities",
+              "target": {
+                "entity": "timing",
+                "entity_name": "timing",
+                "objective_ids": [
+                  "objective-4"
+                ]
+              },
+              "required": true
+            },
+            {
+              "id": "slot-entity-prominence",
+              "kind": "named_entity",
+              "description": "Cover named entity 'prominence' with source-grounded evidence.",
+              "source": "named_entities",
+              "target": {
+                "entity": "prominence",
+                "entity_name": "prominence",
+                "objective_ids": [
+                  "objective-4"
+                ]
+              },
+              "required": true
+            },
+            {
+              "id": "slot-deliverable-schema-1",
+              "kind": "deliverable_schema",
+              "description": "Satisfy structural deliverable 'Comparison Table'.",
+              "source": "deliverables",
+              "target": {
+                "schema_id": "deliverable-schema-1",
+                "format": "table"
+              },
+              "required": true
+            },
+            {
+              "id": "slot-deliverable-schema-2",
+              "kind": "deliverable_schema",
+              "description": "Satisfy structural deliverable 'Classification Matrix'.",
+              "source": "deliverables",
+              "target": {
+                "schema_id": "deliverable-schema-2",
+                "format": "table",
+                "columns": [
+                  "Technique",
+                  "Classification",
+                  "Evidence"
+                ],
+                "row_identifier_column": "Technique"
+              },
+              "required": true
+            }
+          ],
+          "acceptance_checks": [
+            {
+              "id": "check-objective-1",
+              "kind": "objective_coverage",
+              "description": "Objective must be substantively addressed: Select three publicly accessible tools from distinct categories (chat AI, reference/PDF, cloud/notebook).",
+              "target": {
+                "objective_id": "objective-1"
+              },
+              "required": true
+            },
+            {
+              "id": "check-objective-2",
+              "kind": "objective_coverage",
+              "description": "Objective must be substantively addressed: Capture structured observations for each tool using a consistent note/template format.",
+              "target": {
+                "objective_id": "objective-2"
+              },
+              "required": true
+            },
+            {
+              "id": "check-objective-3",
+              "kind": "objective_coverage",
+              "description": "Objective must be substantively addressed: Document how each tool states storage location, access scope, and secondary/model-training use.",
+              "target": {
+                "objective_id": "objective-3"
+              },
+              "required": true
+            },
+            {
+              "id": "check-objective-4",
+              "kind": "objective_coverage",
+              "description": "Objective must be substantively addressed: Assess timing and prominence of destination and risk messaging in each upload flow.",
+              "target": {
+                "objective_id": "objective-4"
+              },
+              "required": true
+            },
+            {
+              "id": "check-objective-5",
+              "kind": "objective_coverage",
+              "description": "Objective must be substantively addressed: Write a 200–300 word narrative synthesis highlighting strengths and recurring risks.",
+              "target": {
+                "objective_id": "objective-5"
+              },
+              "required": true
+            },
+            {
+              "id": "check-objective-6",
+              "kind": "objective_coverage",
+              "description": "Objective must be substantively addressed: Derive three actionable design questions grounded in the observed patterns.",
+              "target": {
+                "objective_id": "objective-6"
+              },
+              "required": true
+            },
+            {
+              "id": "check-entity-secondary-data-use",
+              "kind": "named_entity_coverage",
+              "description": "Named entity 'secondary data use' must appear in grounded evidence or synthesis.",
+              "target": {
+                "entity": "secondary data use"
+              },
+              "required": true
+            },
+            {
+              "id": "check-entity-to-inform-safer",
+              "kind": "named_entity_coverage",
+              "description": "Named entity 'to inform safer' must appear in grounded evidence or synthesis.",
+              "target": {
+                "entity": "to inform safer"
+              },
+              "required": true
+            },
+            {
+              "id": "check-entity-clearer-upload-flows",
+              "kind": "named_entity_coverage",
+              "description": "Named entity 'clearer upload flows' must appear in grounded evidence or synthesis.",
+              "target": {
+                "entity": "clearer upload flows"
+              },
+              "required": true
+            },
+            {
+              "id": "check-entity-focusing",
+              "kind": "named_entity_coverage",
+              "description": "Named entity 'focusing' must appear in grounded evidence or synthesis.",
+              "target": {
+                "entity": "focusing"
+              },
+              "required": true
+            },
+            {
+              "id": "check-entity-who-can-access-it",
+              "kind": "named_entity_coverage",
+              "description": "Named entity 'who can access it' must appear in grounded evidence or synthesis.",
+              "target": {
+                "entity": "who can access it"
+              },
+              "required": true
+            },
+            {
+              "id": "check-entity-pdf",
+              "kind": "named_entity_coverage",
+              "description": "Named entity 'PDF' must appear in grounded evidence or synthesis.",
+              "target": {
+                "entity": "PDF"
+              },
+              "required": true
+            },
+            {
+              "id": "check-entity-access-scope",
+              "kind": "named_entity_coverage",
+              "description": "Named entity 'access scope' must appear in grounded evidence or synthesis.",
+              "target": {
+                "entity": "access scope"
+              },
+              "required": true
+            },
+            {
+              "id": "check-entity-model-training-use",
+              "kind": "named_entity_coverage",
+              "description": "Named entity 'model-training use' must appear in grounded evidence or synthesis.",
+              "target": {
+                "entity": "model-training use"
+              },
+              "required": true
+            },
+            {
+              "id": "check-entity-destination",
+              "kind": "named_entity_coverage",
+              "description": "Named entity 'destination' must appear in grounded evidence or synthesis.",
+              "target": {
+                "entity": "destination"
+              },
+              "required": true
+            },
+            {
+              "id": "check-entity-risk-messaging",
+              "kind": "named_entity_coverage",
+              "description": "Named entity 'risk messaging' must appear in grounded evidence or synthesis.",
+              "target": {
+                "entity": "risk messaging"
+              },
+              "required": true
+            },
+            {
+              "id": "check-entity-timing",
+              "kind": "named_entity_coverage",
+              "description": "Named entity 'timing' must appear in grounded evidence or synthesis.",
+              "target": {
+                "entity": "timing"
+              },
+              "required": true
+            },
+            {
+              "id": "check-entity-prominence",
+              "kind": "named_entity_coverage",
+              "description": "Named entity 'prominence' must appear in grounded evidence or synthesis.",
+              "target": {
+                "entity": "prominence"
+              },
+              "required": true
+            },
+            {
+              "id": "check-deliverable-schema-1",
+              "kind": "structural_output",
+              "description": "Output must satisfy the 'Comparison Table' structural contract.",
+              "target": {
+                "schema_id": "deliverable-schema-1",
+                "format": "table"
+              },
+              "required": true
+            },
+            {
+              "id": "check-deliverable-schema-2",
+              "kind": "structural_output",
+              "description": "Output must satisfy the 'Classification Matrix' structural contract.",
+              "target": {
+                "schema_id": "deliverable-schema-2",
+                "format": "table",
+                "columns": [
+                  "Technique",
+                  "Classification",
+                  "Evidence"
+                ],
+                "row_identifier_column": "Technique"
+              },
+              "required": true
+            }
+          ],
+          "deliverable_schemas": [
+            {
+              "id": "deliverable-schema-1",
+              "kind": "table",
+              "title": "Comparison Table",
+              "format": "table",
+              "source_text": "A comparison table summarizing destination clarity, access scope messaging, model/secondary use messaging, placement in flow, and a 1–5 clarity rating for each tool.",
+              "min_items": null,
+              "minimum_citation_count": null,
+              "columns": [],
+              "allowed_values": [],
+              "required_sections": [],
+              "entity_extraction_required": false,
+              "entity_types": [],
+              "row_identifier_column": null,
+              "recommendation_required": false,
+              "evidence_gaps_section_required": false,
+              "corpus_reference_required": false,
+              "claim_to_evidence_mapping_required": false,
+              "limitations_section_required": false,
+              "notes": [
+                "Satisfy the required table structure explicitly; do not narrate it away."
+              ]
+            },
+            {
+              "id": "deliverable-schema-2",
+              "kind": "classification_matrix",
+              "title": "Classification Matrix",
+              "format": "table",
+              "source_text": "Produce a concise comparison matrix covering all three tools with clarity ratings.",
+              "min_items": null,
+              "minimum_citation_count": null,
+              "columns": [
+                "Technique",
+                "Classification",
+                "Evidence"
+              ],
+              "allowed_values": [],
+              "required_sections": [],
+              "entity_extraction_required": false,
+              "entity_types": [],
+              "row_identifier_column": "Technique",
+              "recommendation_required": false,
+              "evidence_gaps_section_required": false,
+              "corpus_reference_required": false,
+              "claim_to_evidence_mapping_required": false,
+              "limitations_section_required": false,
+              "notes": [
+                "Include one row per named technique or method discussed in the findings.",
+                "Classification values must be explicit, not implied in prose."
+              ]
+            }
+          ],
+          "coverage_thresholds": {},
+          "validation_thresholds": {}
+        },
+        "preview_error": null,
+        "lint_errors": [],
+        "lint_warnings": [],
+        "notes": [
+          "2 success criteria compiled as deliverable schemas rather than research objectives; DeepSearch would format a table instead of gathering evidence for them. Shorten or split those criteria before running.",
+          "No required_entities were named; DeepSearch anchors coverage on named entities."
+        ],
+        "usage": {},
+        "model": "gpt-5.1"
+      }
+    },
+    "mission": {
+      "mission_id": "9bd0493f-cdd2-443e-b8c3-4ee9161642a1",
+      "status": "draft",
+      "separate_submission_enabled": true,
+      "submission_not_sent": true,
+      "retry_same_mission": true
+    },
+    "descriptions": [
+      {
+        "project_id": "957ab254-9cae-4d87-801c-7501726a1298",
+        "basis": "planning_brief",
+        "description": "This planned synthetic desk-research study will explore how clearly various digital platforms communicate upload destinations to users—for example, whether a file, post, or dataset will be stored privately, shared with specific groups, or made public. It will systematically review publicly available interface designs, help documentation, and policy texts from a range of platforms to identify common patterns, ambiguities, and gaps in how upload destinations are labeled and explained. The project will also compare different wording, iconography, and workflow steps used to signal where uploads go, with the aim of developing a preliminary framework for evaluating destination clarity and generating hypotheses for future user testing and empirical research.",
+        "citations": [],
+        "no_artifact_writes": true
+      },
+      {
+        "project_id": "78980844-9425-401e-8562-ce558fe10675",
+        "basis": "corpus",
+        "description": "These synthetic onboarding interview fixtures describe imagined researchers entering a new project, struggling to understand where uploaded interview notes will go, and wanting clearer destination labels, confirmations that name both document and project, and short explanations of what an upload changes without starting unintended paid work [1][2][3]. They repeatedly encounter confusion between projects, collections, and Spaces, and the scripted behavior emphasizes previews that show collection name, destination Space, source document, and exact excerpts, with persistent source links so other researchers can reopen surrounding context [1][2][3]. The fixtures stage preferences for manually choosing small, well‑defined groups of related passages rather than automatically organizing all documents, including the ability to edit membership, keep order, remove irrelevant passages, and avoid unintended moves, renames, or background organization across Spaces [1][2][3]. They also script a workflow where suggested summaries and reports are thoroughly checked against sources, with stable previews that do not change on save, explicit retention of the original question or prompt, indicators of user edits, and exportable citations that match the reviewed preview [1][2][3]. Finally, the fixtures cover expectations around interrupted saves and retries, such as preserving proposed collection names and members across navigation, distinguishing already-added from missing excerpts, linking back to any partially created collection, clarifying whether analysis used all available excerpts or only a subset, and explicitly not including features like autonomous background work, deletion, retagging, document moves, or broader sharing permissions, while noting that all these notes are controlled synthetic scenarios rather than findings from actual participants [1][2][3].",
+        "citations": [
+          {
+            "marker": 1,
+            "available": true,
+            "chunk_id": "9bccfe96-07ed-4201-9837-1097b968b979",
+            "document_id": "1147f25b-7891-4942-9a27-183785674140",
+            "excerpt": "Synthetic acceptance interview A. The researcher entered a new project and expected an obvious place",
+            "href": "/documents/1147f25b-7891-4942-9a27-183785674140?chunk=9bccfe96-07ed-4201-9837-1097b968b979&index=0"
+          },
+          {
+            "marker": 2,
+            "available": true,
+            "chunk_id": "c5f00d11-1926-4e09-907b-316cb298c5ad",
+            "document_id": "189bfbe5-494e-4511-ba47-52527a2dc25c",
+            "excerpt": "Synthetic acceptance interview A. The researcher entered a new project and expected an obvious place",
+            "href": "/documents/189bfbe5-494e-4511-ba47-52527a2dc25c?chunk=c5f00d11-1926-4e09-907b-316cb298c5ad&index=0"
+          },
+          {
+            "marker": 3,
+            "available": true,
+            "chunk_id": "7f8ab11f-463d-427d-8b49-970dc66e20e7",
+            "document_id": "a0ddafd3-3c46-400a-b07b-35bcedd71b53",
+            "excerpt": "Synthetic acceptance interview C. The researcher had interview notes ready to upload but could not q",
+            "href": "/documents/a0ddafd3-3c46-400a-b07b-35bcedd71b53?chunk=7f8ab11f-463d-427d-8b49-970dc66e20e7&index=0"
+          }
+        ],
+        "no_artifact_writes": true
+      }
+    ],
+    "description-accept": [
+      {
+        "project_id": "957ab254-9cae-4d87-801c-7501726a1298",
+        "accepted": "6e967f53500e33af5b0cd623bfa368e5c312f22ef35acf846ad606b56239e2ef",
+        "restored": "18f1a655934c190fb4966085def31ecd17b27c37634f15ccb6df771d167e9e3b",
+        "previous": "18f1a655934c190fb4966085def31ecd17b27c37634f15ccb6df771d167e9e3b",
+        "provenance": {
+          "proposal_id": "0e3e5782-7c9d-47f1-8ef8-f9c00b64c58e",
+          "origin": "librarian",
+          "model": "gpt-5.1",
+          "prompt": "Describe this planned synthetic desk-research study of upload destination clarity in one short paragraph. There are no findings or documents yet.",
+          "basis": "planning_brief",
+          "generated_value": "This planned synthetic desk-research study will explore how clearly various digital platforms communicate upload destinations to users—for example, whether a file, post, or dataset will be stored privately, shared with specific groups, or made public. It will systematically review publicly available interface designs, help documentation, and policy texts from a range of platforms to identify common patterns, ambiguities, and gaps in how upload destinations are labeled and explained. The project will also compare different wording, iconography, and workflow steps used to signal where uploads go, with the aim of developing a preliminary framework for evaluating destination clarity and generating hypotheses for future user testing and empirical research.",
+          "accepted_value": "This planned synthetic desk-research study will explore how clearly various digital platforms communicate upload destinations to users—for example, whether a file, post, or dataset will be stored privately, shared with specific groups, or made public. It will systematically review publicly available interface designs, help documentation, and policy texts from a range of platforms to identify common patterns, ambiguities, and gaps in how upload destinations are labeled and explained. The project will also compare different wording, iconography, and workflow steps used to signal where uploads go, with the aim of developing a preliminary framework for evaluating destination clarity and generating hypotheses for future user testing and empirical research.",
+          "previous_value": "Controlled WALK-3 synthetic acceptance fixture; not real participant research.",
+          "accepted_by": "e02bf562-ffca-449e-925c-096ff69d5309",
+          "accepted_at": "2026-09-30T02:28:04.183676+00:00",
+          "restored_at": null,
+          "edited": false,
+          "current": true,
+          "citations": []
+        }
+      },
+      {
+        "project_id": "78980844-9425-401e-8562-ce558fe10675",
+        "accepted": "7541e488fa319bf8e9df8d5689766a98b4d0591d1afcc9a18ecdd476354b9ec8",
+        "restored": "18f1a655934c190fb4966085def31ecd17b27c37634f15ccb6df771d167e9e3b",
+        "previous": "18f1a655934c190fb4966085def31ecd17b27c37634f15ccb6df771d167e9e3b",
+        "provenance": {
+          "proposal_id": "a8c184d8-1194-41b5-abbb-5681fa9527e8",
+          "origin": "librarian",
+          "model": "gpt-5.1",
+          "prompt": "Describe the supplied synthetic onboarding interview fixtures in one short paragraph. Cite every assertion with supplied numeric markers, use only these excerpts, and never claim actual participant findings.",
+          "basis": "corpus",
+          "generated_value": "These synthetic onboarding interview fixtures describe imagined researchers entering a new project, struggling to understand where uploaded interview notes will go, and wanting clearer destination labels, confirmations that name both document and project, and short explanations of what an upload changes without starting unintended paid work [1][2][3]. They repeatedly encounter confusion between projects, collections, and Spaces, and the scripted behavior emphasizes previews that show collection name, destination Space, source document, and exact excerpts, with persistent source links so other researchers can reopen surrounding context [1][2][3]. The fixtures stage preferences for manually choosing small, well‑defined groups of related passages rather than automatically organizing all documents, including the ability to edit membership, keep order, remove irrelevant passages, and avoid unintended moves, renames, or background organization across Spaces [1][2][3]. They also script a workflow where suggested summaries and reports are thoroughly checked against sources, with stable previews that do not change on save, explicit retention of the original question or prompt, indicators of user edits, and exportable citations that match the reviewed preview [1][2][3]. Finally, the fixtures cover expectations around interrupted saves and retries, such as preserving proposed collection names and members across navigation, distinguishing already-added from missing excerpts, linking back to any partially created collection, clarifying whether analysis used all available excerpts or only a subset, and explicitly not including features like autonomous background work, deletion, retagging, document moves, or broader sharing permissions, while noting that all these notes are controlled synthetic scenarios rather than findings from actual participants [1][2][3].",
+          "accepted_value": "These synthetic onboarding interview fixtures describe imagined researchers entering a new project, struggling to understand where uploaded interview notes will go, and wanting clearer destination labels, confirmations that name both document and project, and short explanations of what an upload changes without starting unintended paid work [1][2][3]. They repeatedly encounter confusion between projects, collections, and Spaces, and the scripted behavior emphasizes previews that show collection name, destination Space, source document, and exact excerpts, with persistent source links so other researchers can reopen surrounding context [1][2][3]. The fixtures stage preferences for manually choosing small, well‑defined groups of related passages rather than automatically organizing all documents, including the ability to edit membership, keep order, remove irrelevant passages, and avoid unintended moves, renames, or background organization across Spaces [1][2][3]. They also script a workflow where suggested summaries and reports are thoroughly checked against sources, with stable previews that do not change on save, explicit retention of the original question or prompt, indicators of user edits, and exportable citations that match the reviewed preview [1][2][3]. Finally, the fixtures cover expectations around interrupted saves and retries, such as preserving proposed collection names and members across navigation, distinguishing already-added from missing excerpts, linking back to any partially created collection, clarifying whether analysis used all available excerpts or only a subset, and explicitly not including features like autonomous background work, deletion, retagging, document moves, or broader sharing permissions, while noting that all these notes are controlled synthetic scenarios rather than findings from actual participants [1][2][3].",
+          "previous_value": "Controlled WALK-3 synthetic acceptance fixture; not real participant research.",
+          "accepted_by": "e02bf562-ffca-449e-925c-096ff69d5309",
+          "accepted_at": "2026-09-30T02:28:07.421621+00:00",
+          "restored_at": null,
+          "edited": false,
+          "current": true,
+          "citations": [
+            {
+              "marker": 1,
+              "available": true,
+              "chunk_id": "9bccfe96-07ed-4201-9837-1097b968b979",
+              "document_id": "1147f25b-7891-4942-9a27-183785674140",
+              "excerpt": "Synthetic acceptance interview A. The researcher entered a new project and expected an obvious place",
+              "href": "/documents/1147f25b-7891-4942-9a27-183785674140?chunk=9bccfe96-07ed-4201-9837-1097b968b979&index=0"
+            },
+            {
+              "marker": 2,
+              "available": true,
+              "chunk_id": "c5f00d11-1926-4e09-907b-316cb298c5ad",
+              "document_id": "189bfbe5-494e-4511-ba47-52527a2dc25c",
+              "excerpt": "Synthetic acceptance interview A. The researcher entered a new project and expected an obvious place",
+              "href": "/documents/189bfbe5-494e-4511-ba47-52527a2dc25c?chunk=c5f00d11-1926-4e09-907b-316cb298c5ad&index=0"
+            },
+            {
+              "marker": 3,
+              "available": true,
+              "chunk_id": "7f8ab11f-463d-427d-8b49-970dc66e20e7",
+              "document_id": "a0ddafd3-3c46-400a-b07b-35bcedd71b53",
+              "excerpt": "Synthetic acceptance interview C. The researcher had interview notes ready to upload but could not q",
+              "href": "/documents/a0ddafd3-3c46-400a-b07b-35bcedd71b53?chunk=7f8ab11f-463d-427d-8b49-970dc66e20e7&index=0"
+            }
+          ]
+        }
+      }
+    ],
+    "duplicates": {
+      "exact_pairs": 1,
+      "compared_and_dismissed": true,
+      "persisted": true,
+      "artifacts_unchanged": true,
+      "scan": {
+        "project_id": "78980844-9425-401e-8562-ce558fe10675",
+        "scanned_at": "2026-09-30T02:34:42.096783+00:00",
+        "method": "normalized-text-five-word-phrases-v1",
+        "candidates": [
+          {
+            "candidate_id": "3cf371eebbd34ba90cc1eddc593946f2788229ee0427dc9febf380eda7f892f5",
+            "kind": "exact_text",
+            "score": 1,
+            "documents": [
+              {
+                "id": "1147f25b-7891-4942-9a27-183785674140",
+                "name": "onboarding-interview-a.txt",
+                "href": "/documents/1147f25b-7891-4942-9a27-183785674140"
+              },
+              {
+                "id": "189bfbe5-494e-4511-ba47-52527a2dc25c",
+                "name": "onboarding-interview-a-copy.txt",
+                "href": "/documents/189bfbe5-494e-4511-ba47-52527a2dc25c"
+              }
+            ],
+            "basis": "The complete non-empty extracted texts are equal after Unicode, case and whitespace normalization.",
+            "evidence": [
+              {
+                "left_excerpt": "Synthetic acceptance interview A. The researcher entered a new project and expected an obvious place to import interview notes. The first screen did not explain whether a project was an empty folder or a running research job. The researcher looked at the mission controls before finding the document area, then asked whether importing a file would start a paid run. A short explanation of what an upl",
+                "right_excerpt": "Synthetic acceptance interview A. The researcher entered a new project and expected an obvious place to import interview notes. The first screen did not explain whether a project was an empty folder or a running research job. The researcher looked at the mission controls before finding the document area, then asked whether importing a file would start a paid run. A short explanation of what an upl"
+              }
+            ],
+            "recommendation": "Compare source dates, annotations and purpose. Keep both if either adds useful context. If one is redundant, decide which to retain before using its existing document controls. This review changes neither document."
+          }
+        ],
+        "coverage": {
+          "readable_documents": 3,
+          "scanned_documents": 3,
+          "examined_documents": 3,
+          "empty_documents": 0,
+          "overlong_documents": 0,
+          "exact_only_documents": 0,
+          "limited": false,
+          "document_limit": 100,
+          "character_limit": 20000,
+          "candidate_count": 1,
+          "candidates_limited": false,
+          "pair_limit": 20
+        }
+      }
+    },
+    "organisation": {
+      "no_artifact_writes": true,
+      "proposal": {
+        "project_id": "78980844-9425-401e-8562-ce558fe10675",
+        "prompt": "Propose two themed collections from these explicitly synthetic onboarding interviews. Include all three supplied excerpts in each group so I can review and remove the duplicate. Cite rationale statements with the supplied numeric markers. Do not claim real participant research.",
+        "model": "gpt-5.1",
+        "destination": {
+          "owner_id": "e02bf562-ffca-449e-925c-096ff69d5309",
+          "workspace_id": "00000000-0000-0000-0000-000000000001",
+          "space_name": "Default Workspace"
+        },
+        "groups": [
+          {
+            "group_id": "812075e7-a8bc-4654-86fc-d27e13d164a0",
+            "name": "Synthetic onboarding: project & upload clarity",
+            "description": "A collection focused on how synthetic onboarding participants interpret projects, destinations, and upload actions, highlighting expectations around project labels, destination confirmations, paid run concerns, and visible upload effects during the first-use experience.",
+            "rationale": "These synthetic excerpts all describe uncertainty about where uploads go and what a project or mission means in the workflow, making them useful to review together for destination and upload clarity in onboarding [1][2][3]. They each mention the need for clearer labels or confirmations around upload actions and project destinations, such as showing the current project name beside upload controls and confirming the receiving project, which can be compared across the texts to refine how destinations are communicated [1][2][3]. The notes also provide parallel, explicitly synthetic accounts of confusion about whether starting a project is creating an active research job or just an organisational container, allowing side-by-side review to harmonise terminology around projects, missions, and libraries [1][2][3].",
+            "members": [
+              {
+                "marker": 1,
+                "available": true,
+                "chunk_id": "9bccfe96-07ed-4201-9837-1097b968b979",
+                "document_id": "1147f25b-7891-4942-9a27-183785674140",
+                "excerpt": "Synthetic acceptance interview A. The researcher entered a new project and expected an obvious place to import interview notes. The first screen did not explain whether a project was an empty folder or a running research job. The researcher looked at the mission controls before finding the document area, then asked whether importing a file would start a paid run. A short explanation of what an upl",
+                "href": "/documents/1147f25b-7891-4942-9a27-183785674140?chunk=9bccfe96-07ed-4201-9837-1097b968b979&index=0",
+                "document_name": "onboarding-interview-a.txt"
+              },
+              {
+                "marker": 2,
+                "available": true,
+                "chunk_id": "c5f00d11-1926-4e09-907b-316cb298c5ad",
+                "document_id": "189bfbe5-494e-4511-ba47-52527a2dc25c",
+                "excerpt": "Synthetic acceptance interview A. The researcher entered a new project and expected an obvious place to import interview notes. The first screen did not explain whether a project was an empty folder or a running research job. The researcher looked at the mission controls before finding the document area, then asked whether importing a file would start a paid run. A short explanation of what an upl",
+                "href": "/documents/189bfbe5-494e-4511-ba47-52527a2dc25c?chunk=c5f00d11-1926-4e09-907b-316cb298c5ad&index=0",
+                "document_name": "onboarding-interview-a-copy.txt"
+              },
+              {
+                "marker": 3,
+                "available": true,
+                "chunk_id": "7f8ab11f-463d-427d-8b49-970dc66e20e7",
+                "document_id": "a0ddafd3-3c46-400a-b07b-35bcedd71b53",
+                "excerpt": "Synthetic acceptance interview C. The researcher had interview notes ready to upload but could not quickly tell which project would receive them. They moved between the project page and the document list looking for an import control. A destination label beside the action would have reduced that uncertainty. They wanted the resulting message to confirm the document name and project instead of show",
+                "href": "/documents/a0ddafd3-3c46-400a-b07b-35bcedd71b53?chunk=7f8ab11f-463d-427d-8b49-970dc66e20e7&index=0",
+                "document_name": "onboarding-interview-c.txt"
+              }
+            ]
+          },
+          {
+            "group_id": "f3922726-e3f4-4ad0-8d08-39c434d09b22",
+            "name": "Synthetic onboarding: collections, excerpts & reports",
+            "description": "A collection centered on how synthetic participants want collections, excerpts, and reports to behave, including expectations for membership previews, stable report previews, citation transparency, and navigation resilience when working with grouped passages.",
+            "rationale": "All three synthetic excerpts describe how users conceptualise collections versus projects and how they want excerpt grouping and membership control to work, making them suitable for joint review around the design of collections and saved groups [1][2][3]. Each text discusses expectations for previews and stability of generated reports—such as preserving the reviewed draft, keeping citations inspectable, and ensuring the saved artifact matches the inspected preview—which can be compared across these controlled fixtures [1][2][3]. The interviews also highlight navigation and retry behaviours for collections, including keeping proposed names and members across navigation, surfacing links back to partially created collections, and showing which excerpts are missing after interrupted saves, providing a coherent theme around resilient collection and reporting workflows without making claims about real participant research [1][2][3].",
+            "members": [
+              {
+                "marker": 1,
+                "available": true,
+                "chunk_id": "9bccfe96-07ed-4201-9837-1097b968b979",
+                "document_id": "1147f25b-7891-4942-9a27-183785674140",
+                "excerpt": "Synthetic acceptance interview A. The researcher entered a new project and expected an obvious place to import interview notes. The first screen did not explain whether a project was an empty folder or a running research job. The researcher looked at the mission controls before finding the document area, then asked whether importing a file would start a paid run. A short explanation of what an upl",
+                "href": "/documents/1147f25b-7891-4942-9a27-183785674140?chunk=9bccfe96-07ed-4201-9837-1097b968b979&index=0",
+                "document_name": "onboarding-interview-a.txt"
+              },
+              {
+                "marker": 2,
+                "available": true,
+                "chunk_id": "c5f00d11-1926-4e09-907b-316cb298c5ad",
+                "document_id": "189bfbe5-494e-4511-ba47-52527a2dc25c",
+                "excerpt": "Synthetic acceptance interview A. The researcher entered a new project and expected an obvious place to import interview notes. The first screen did not explain whether a project was an empty folder or a running research job. The researcher looked at the mission controls before finding the document area, then asked whether importing a file would start a paid run. A short explanation of what an upl",
+                "href": "/documents/189bfbe5-494e-4511-ba47-52527a2dc25c?chunk=c5f00d11-1926-4e09-907b-316cb298c5ad&index=0",
+                "document_name": "onboarding-interview-a-copy.txt"
+              },
+              {
+                "marker": 3,
+                "available": true,
+                "chunk_id": "7f8ab11f-463d-427d-8b49-970dc66e20e7",
+                "document_id": "a0ddafd3-3c46-400a-b07b-35bcedd71b53",
+                "excerpt": "Synthetic acceptance interview C. The researcher had interview notes ready to upload but could not quickly tell which project would receive them. They moved between the project page and the document list looking for an import control. A destination label beside the action would have reduced that uncertainty. They wanted the resulting message to confirm the document name and project instead of show",
+                "href": "/documents/a0ddafd3-3c46-400a-b07b-35bcedd71b53?chunk=7f8ab11f-463d-427d-8b49-970dc66e20e7&index=0",
+                "document_name": "onboarding-interview-c.txt"
+              }
+            ]
+          }
+        ],
+        "usage": {},
+        "coverage": {
+          "readable_documents": 3,
+          "documents_with_eligible_chunks": 3,
+          "used_documents": 3,
+          "readable_chunks": 3,
+          "eligible_chunks": 3,
+          "used_chunks": 3,
+          "excluded_chunks": 0,
+          "limited": false,
+          "chunk_limit": 20,
+          "character_limit": 24000
+        }
+      }
+    },
+    "collection": {
+      "collection_id": "812075e7-a8bc-4654-86fc-d27e13d164a0",
+      "members": [
+        "9bccfe96-07ed-4201-9837-1097b968b979",
+        "7f8ab11f-463d-427d-8b49-970dc66e20e7"
+      ],
+      "dismissed_groups": [
+        "f3922726-e3f4-4ad0-8d08-39c434d09b22"
+      ],
+      "edited_subset": true,
+      "retry_same_collection": true,
+      "no_model_on_save": true
+    },
+    "report": {
+      "no_artifact_writes": true,
+      "reviewed_inputs": [
+        {
+          "chunk_id": "9bccfe96-07ed-4201-9837-1097b968b979",
+          "characters": 2516
+        },
+        {
+          "chunk_id": "7f8ab11f-463d-427d-8b49-970dc66e20e7",
+          "characters": 2617
+        }
+      ],
+      "preview": {
+        "report_id": "18545204-bdc7-43ec-8799-c3b6726c9d35",
+        "title": "WALK-3 reviewed synthetic onboarding report",
+        "prompt": "Summarise the upload destination and collection navigation concerns in these synthetic interview fixtures. Use markdown # headings and three short paragraphs. Distinguish fixture observations from recommendations and real participant findings. Every paragraph, including the synthetic-data caveat and recommendations, must cite its supplied numeric source markers separately, such as [1] [2]. Do not use standalone bold labels. Cite both supplied excerpts.",
+        "format": "report",
+        "content": "# Synthetic-data caveat\n\nThese observations about upload destinations and collection navigation come from controlled synthetic interview fixtures rather than real researcher behavior, and they are used only to exercise and verify aspects of the onboarding workflow rather than to report empirical findings from actual participants.[1] [2]\n\n# Fixture observations on upload destination clarity\n\nIn both fixtures, researchers struggled to see which project would receive uploaded notes and whether uploading would trigger additional actions such as starting a paid run, moving documents, or renaming existing workspaces.[1] [2] Interview A describes uncertainty about whether a project is an empty folder or an active research job, with the researcher hunting across mission controls and document areas before upload, while Interview C shows repeated navigation between the project page and document list trying to locate and confirm the import destination.[1] [2] Across both, the fixture researchers expected destination labels and confirmations that clearly name the project and document involved, and they explicitly did not seek autonomous behaviors such as background reorganization, document moves, or broader sharing changes tied to upload.[1] [2]\n\n# Fixture observations on collection navigation and membership\n\nThe synthetic researchers in both fixtures had trouble understanding how collections relate to projects and Spaces, worrying that saving excerpts might move originals, rename existing collections, or relocate documents across Spaces without consent.[1] [2] In response, they emphasized clear previews and stable navigation: showing collection names, destination Spaces, source documents, exact excerpts, and whether all excerpts or only a subset are included, as well as preserving proposed names and selected members when returning from source views or after interrupted saves.[1] [2] They consistently preferred precise, curated membership over automatic grouping, wanted collections to act as reference sets while originals stay put, and expected reliable links back to context, unchanging report previews upon save, and explicit retry paths that surface any already-created collections and missing excerpts.[1] [2]\n\n# Recommendations (from synthetic fixtures, not real findings)\n\nBased on these synthetic fixtures, the onboarding flow could reduce confusion by making upload destinations explicit next to import controls, confirming both project and document names after upload, and avoiding implicit side effects such as starting paid runs or moving files without clear consent.[1] [2] Collection workflows could foreground previews that show collection name, destination Space, source documents, exact excerpts, and inclusion scope, while ensuring that names, membership choices, and proposal states persist across navigation and retries.[1] [2] Finally, treating collections as stable reference groupings—with durable contextual links, frozen report previews at save time, preserved prompts and source projects, and visible handling of incomplete or ineligible material—would more closely match the expectations expressed in these synthetic acceptance interviews rather than implying any validated real-user preference.[1] [2]",
+        "model": "gpt-5.1",
+        "generated_at": "2026-09-30T02:37:40.442592+00:00",
+        "project_id": "78980844-9425-401e-8562-ce558fe10675",
+        "citations": [
+          {
+            "marker": 1,
+            "available": true,
+            "chunk_id": "9bccfe96-07ed-4201-9837-1097b968b979",
+            "document_id": "1147f25b-7891-4942-9a27-183785674140",
+            "excerpt": "Synthetic acceptance interview A. The researcher entered a new project and expected an obvious place",
+            "href": "/documents/1147f25b-7891-4942-9a27-183785674140?chunk=9bccfe96-07ed-4201-9837-1097b968b979&index=0"
+          },
+          {
+            "marker": 2,
+            "available": true,
+            "chunk_id": "7f8ab11f-463d-427d-8b49-970dc66e20e7",
+            "document_id": "a0ddafd3-3c46-400a-b07b-35bcedd71b53",
+            "excerpt": "Synthetic acceptance interview C. The researcher had interview notes ready to upload but could not q",
+            "href": "/documents/a0ddafd3-3c46-400a-b07b-35bcedd71b53?chunk=7f8ab11f-463d-427d-8b49-970dc66e20e7&index=0"
+          }
+        ],
+        "input_chunk_ids": [
+          "9bccfe96-07ed-4201-9837-1097b968b979",
+          "7f8ab11f-463d-427d-8b49-970dc66e20e7"
+        ],
+        "input_characters": 5133,
+        "usage": {}
+      }
+    },
+    "report-save": {
+      "report_id": "18545204-bdc7-43ec-8799-c3b6726c9d35",
+      "exact_content": "837af004149f4f67591b3b2737bffd27850f4e76cd3a2b9fa907faa0416e8287",
+      "citations": [
+        {
+          "marker": 1,
+          "available": true,
+          "chunk_id": "9bccfe96-07ed-4201-9837-1097b968b979",
+          "document_id": "1147f25b-7891-4942-9a27-183785674140",
+          "excerpt": "Synthetic acceptance interview A. The researcher entered a new project and expected an obvious place",
+          "href": "/documents/1147f25b-7891-4942-9a27-183785674140?chunk=9bccfe96-07ed-4201-9837-1097b968b979&index=0"
+        },
+        {
+          "marker": 2,
+          "available": true,
+          "chunk_id": "7f8ab11f-463d-427d-8b49-970dc66e20e7",
+          "document_id": "a0ddafd3-3c46-400a-b07b-35bcedd71b53",
+          "excerpt": "Synthetic acceptance interview C. The researcher had interview notes ready to upload but could not q",
+          "href": "/documents/a0ddafd3-3c46-400a-b07b-35bcedd71b53?chunk=7f8ab11f-463d-427d-8b49-970dc66e20e7&index=0"
+        }
+      ],
+      "exports": {
+        "md": "0ec50fda9592c9497372bb1c9b47be70bc9094dbd5c22ac04297f6b88f41b531",
+        "json": "264699e2ec36cde2855d986bb735d8335a9c9a2c1d334cf1c69e9dda60ff49cb",
+        "txt": "424b9ad6dc08059342e1b866784706b88492de4555d6b7d79674646101c59d4b"
+      },
+      "reloaded": true,
+      "keyboard_source_visits": 4,
+      "single_report": true,
+      "no_model_on_save_or_navigation": true
+    },
+    "questions": {
+      "question": "In the synthetic onboarding interviews, what did researchers want beside the upload action to clarify which project receives their notes?",
+      "answer": {
+        "segments": [
+          {
+            "kind": "corpus_claim",
+            "text": "In the synthetic onboarding interviews, researchers wanted the current project name or a destination label shown beside the upload action so it was clear which project would receive their notes.",
+            "citations": [
+              "9bccfe96-07ed-4201-9837-1097b968b979",
+              "7f8ab11f-463d-427d-8b49-970dc66e20e7"
+            ]
+          }
+        ],
+        "suggested_action": null,
+        "evidence": [],
+        "chunks": [
+          {
+            "id": "9bccfe96-07ed-4201-9837-1097b968b979",
+            "document_id": "1147f25b-7891-4942-9a27-183785674140",
+            "document_name": "onboarding-interview-a.txt",
+            "chunk_index": 0,
+            "snippet": "Synthetic acceptance interview A. The researcher entered a new project and expected an obvious place to import interview notes. The first screen did not explain whether a project was an empty folder or a running research job. The researcher looked at the mission controls before f",
+            "href": "/documents/1147f25b-7891-4942-9a27-183785674140?chunk=9bccfe96-07ed-4201-9837-1097b968b979&index=0"
+          },
+          {
+            "id": "7f8ab11f-463d-427d-8b49-970dc66e20e7",
+            "document_id": "a0ddafd3-3c46-400a-b07b-35bcedd71b53",
+            "document_name": "onboarding-interview-c.txt",
+            "chunk_index": 0,
+            "snippet": "Synthetic acceptance interview C. The researcher had interview notes ready to upload but could not quickly tell which project would receive them. They moved between the project page and the document list looking for an import control. A destination label beside the action would h",
+            "href": "/documents/a0ddafd3-3c46-400a-b07b-35bcedd71b53?chunk=7f8ab11f-463d-427d-8b49-970dc66e20e7&index=0"
+          }
+        ],
+        "no_evidence": false,
+        "withheld_count": 0,
+        "usage": {},
+        "model": "gpt-5.1"
+      },
+      "refused": {
+        "segments": [
+          {
+            "kind": "prose",
+            "text": "Nothing in this project answers that question.",
+            "citations": []
+          }
+        ],
+        "suggested_action": null,
+        "evidence": [],
+        "chunks": [],
+        "no_evidence": true,
+        "withheld_count": 0,
+        "usage": null,
+        "model": "gpt-5.1"
+      },
+      "no_artifact_writes_before_explicit_list_save": true,
+      "ranked_chunk_ids": [
+        "7f8ab11f-463d-427d-8b49-970dc66e20e7",
+        "9bccfe96-07ed-4201-9837-1097b968b979",
+        "c5f00d11-1926-4e09-907b-316cb298c5ad"
+      ],
+      "list_collection_id": "98e1d368-0d6d-4947-96ec-9c70ecd0ccc4"
+    },
+    "matrix": {
+      "serving_commit": "295028c8f8b7e7fa0b160be49321f53099b1951a",
+      "results": [
+        {
+          "route": "/librarian?project=78980844-9425-401e-8562-ce558fe10675",
+          "theme": "light",
+          "width": 390,
+          "overflow": false,
+          "violations": [],
+          "screenshot": "deployed-librarian-light-390.png"
+        },
+        {
+          "route": "/librarian?q=upload%20destination%20project%20name%20onboarding&project=78980844-9425-401e-8562-ce558fe10675",
+          "theme": "light",
+          "width": 390,
+          "overflow": false,
+          "violations": [],
+          "screenshot": "deployed-chunks-light-390.png"
+        },
+        {
+          "route": "/collections/812075e7-a8bc-4654-86fc-d27e13d164a0",
+          "theme": "light",
+          "width": 390,
+          "overflow": false,
+          "violations": [],
+          "screenshot": "deployed-collection-light-390.png"
+        },
+        {
+          "route": "/reports/18545204-bdc7-43ec-8799-c3b6726c9d35",
+          "theme": "light",
+          "width": 390,
+          "overflow": false,
+          "violations": [],
+          "screenshot": "deployed-report-light-390.png"
+        },
+        {
+          "route": "/missions/9bd0493f-cdd2-443e-b8c3-4ee9161642a1?from=librarian",
+          "theme": "light",
+          "width": 390,
+          "overflow": false,
+          "violations": [],
+          "screenshot": "deployed-mission-light-390.png"
+        },
+        {
+          "route": "/librarian?project=78980844-9425-401e-8562-ce558fe10675",
+          "theme": "light",
+          "width": 820,
+          "overflow": false,
+          "violations": [],
+          "screenshot": "deployed-librarian-light-820.png"
+        },
+        {
+          "route": "/librarian?q=upload%20destination%20project%20name%20onboarding&project=78980844-9425-401e-8562-ce558fe10675",
+          "theme": "light",
+          "width": 820,
+          "overflow": false,
+          "violations": [],
+          "screenshot": "deployed-chunks-light-820.png"
+        },
+        {
+          "route": "/collections/812075e7-a8bc-4654-86fc-d27e13d164a0",
+          "theme": "light",
+          "width": 820,
+          "overflow": false,
+          "violations": [],
+          "screenshot": "deployed-collection-light-820.png"
+        },
+        {
+          "route": "/reports/18545204-bdc7-43ec-8799-c3b6726c9d35",
+          "theme": "light",
+          "width": 820,
+          "overflow": false,
+          "violations": [],
+          "screenshot": "deployed-report-light-820.png"
+        },
+        {
+          "route": "/missions/9bd0493f-cdd2-443e-b8c3-4ee9161642a1?from=librarian",
+          "theme": "light",
+          "width": 820,
+          "overflow": false,
+          "violations": [],
+          "screenshot": "deployed-mission-light-820.png"
+        },
+        {
+          "route": "/librarian?project=78980844-9425-401e-8562-ce558fe10675",
+          "theme": "light",
+          "width": 1440,
+          "overflow": false,
+          "violations": [],
+          "screenshot": "deployed-librarian-light-1440.png"
+        },
+        {
+          "route": "/librarian?q=upload%20destination%20project%20name%20onboarding&project=78980844-9425-401e-8562-ce558fe10675",
+          "theme": "light",
+          "width": 1440,
+          "overflow": false,
+          "violations": [],
+          "screenshot": "deployed-chunks-light-1440.png"
+        },
+        {
+          "route": "/collections/812075e7-a8bc-4654-86fc-d27e13d164a0",
+          "theme": "light",
+          "width": 1440,
+          "overflow": false,
+          "violations": [],
+          "screenshot": "deployed-collection-light-1440.png"
+        },
+        {
+          "route": "/reports/18545204-bdc7-43ec-8799-c3b6726c9d35",
+          "theme": "light",
+          "width": 1440,
+          "overflow": false,
+          "violations": [],
+          "screenshot": "deployed-report-light-1440.png"
+        },
+        {
+          "route": "/missions/9bd0493f-cdd2-443e-b8c3-4ee9161642a1?from=librarian",
+          "theme": "light",
+          "width": 1440,
+          "overflow": false,
+          "violations": [],
+          "screenshot": "deployed-mission-light-1440.png"
+        },
+        {
+          "route": "/librarian?project=78980844-9425-401e-8562-ce558fe10675",
+          "theme": "dark",
+          "width": 390,
+          "overflow": false,
+          "violations": [],
+          "screenshot": "deployed-librarian-dark-390.png"
+        },
+        {
+          "route": "/librarian?q=upload%20destination%20project%20name%20onboarding&project=78980844-9425-401e-8562-ce558fe10675",
+          "theme": "dark",
+          "width": 390,
+          "overflow": false,
+          "violations": [],
+          "screenshot": "deployed-chunks-dark-390.png"
+        },
+        {
+          "route": "/collections/812075e7-a8bc-4654-86fc-d27e13d164a0",
+          "theme": "dark",
+          "width": 390,
+          "overflow": false,
+          "violations": [],
+          "screenshot": "deployed-collection-dark-390.png"
+        },
+        {
+          "route": "/reports/18545204-bdc7-43ec-8799-c3b6726c9d35",
+          "theme": "dark",
+          "width": 390,
+          "overflow": false,
+          "violations": [],
+          "screenshot": "deployed-report-dark-390.png"
+        },
+        {
+          "route": "/missions/9bd0493f-cdd2-443e-b8c3-4ee9161642a1?from=librarian",
+          "theme": "dark",
+          "width": 390,
+          "overflow": false,
+          "violations": [],
+          "screenshot": "deployed-mission-dark-390.png"
+        },
+        {
+          "route": "/librarian?project=78980844-9425-401e-8562-ce558fe10675",
+          "theme": "dark",
+          "width": 820,
+          "overflow": false,
+          "violations": [],
+          "screenshot": "deployed-librarian-dark-820.png"
+        },
+        {
+          "route": "/librarian?q=upload%20destination%20project%20name%20onboarding&project=78980844-9425-401e-8562-ce558fe10675",
+          "theme": "dark",
+          "width": 820,
+          "overflow": false,
+          "violations": [],
+          "screenshot": "deployed-chunks-dark-820.png"
+        },
+        {
+          "route": "/collections/812075e7-a8bc-4654-86fc-d27e13d164a0",
+          "theme": "dark",
+          "width": 820,
+          "overflow": false,
+          "violations": [],
+          "screenshot": "deployed-collection-dark-820.png"
+        },
+        {
+          "route": "/reports/18545204-bdc7-43ec-8799-c3b6726c9d35",
+          "theme": "dark",
+          "width": 820,
+          "overflow": false,
+          "violations": [],
+          "screenshot": "deployed-report-dark-820.png"
+        },
+        {
+          "route": "/missions/9bd0493f-cdd2-443e-b8c3-4ee9161642a1?from=librarian",
+          "theme": "dark",
+          "width": 820,
+          "overflow": false,
+          "violations": [],
+          "screenshot": "deployed-mission-dark-820.png"
+        },
+        {
+          "route": "/librarian?project=78980844-9425-401e-8562-ce558fe10675",
+          "theme": "dark",
+          "width": 1440,
+          "overflow": false,
+          "violations": [],
+          "screenshot": "deployed-librarian-dark-1440.png"
+        },
+        {
+          "route": "/librarian?q=upload%20destination%20project%20name%20onboarding&project=78980844-9425-401e-8562-ce558fe10675",
+          "theme": "dark",
+          "width": 1440,
+          "overflow": false,
+          "violations": [],
+          "screenshot": "deployed-chunks-dark-1440.png"
+        },
+        {
+          "route": "/collections/812075e7-a8bc-4654-86fc-d27e13d164a0",
+          "theme": "dark",
+          "width": 1440,
+          "overflow": false,
+          "violations": [],
+          "screenshot": "deployed-collection-dark-1440.png"
+        },
+        {
+          "route": "/reports/18545204-bdc7-43ec-8799-c3b6726c9d35",
+          "theme": "dark",
+          "width": 1440,
+          "overflow": false,
+          "violations": [],
+          "screenshot": "deployed-report-dark-1440.png"
+        },
+        {
+          "route": "/missions/9bd0493f-cdd2-443e-b8c3-4ee9161642a1?from=librarian",
+          "theme": "dark",
+          "width": 1440,
+          "overflow": false,
+          "violations": [],
+          "screenshot": "deployed-mission-dark-1440.png"
+        }
+      ],
+      "no_automatic_model_calls": true,
+      "no_artifact_writes": true,
+      "activity_updates_only_fixture_report_and_mission": true,
+      "account_and_project_state_isolated": true,
+      "keyboard_report_source_visits": 12,
+      "navigation_reload_and_focus_preserved": true
+    },
+    "mcp": {
+      "serving_commit": "295028c8f8b7e7fa0b160be49321f53099b1951a",
+      "published_version": "2.1.0",
+      "empty_working_directory": true,
+      "caller_role": "member",
+      "tools": 9,
+      "actions": 50,
+      "artifacts_unchanged": true,
+      "checks": {
+        "report": {
+          "id": "18545204-bdc7-43ec-8799-c3b6726c9d35",
+          "exact_content": "837af004149f4f67591b3b2737bffd27850f4e76cd3a2b9fa907faa0416e8287",
+          "exact_citations": "cbaf222933f0ee20512ad9a68035c3f04b3f146dfc0c07764501a5d4acb9f5af"
+        },
+        "collection": {
+          "id": "812075e7-a8bc-4654-86fc-d27e13d164a0",
+          "members": [
+            "9bccfe96-07ed-4201-9837-1097b968b979",
+            "7f8ab11f-463d-427d-8b49-970dc66e20e7"
+          ]
+        },
+        "list": {
+          "query": "upload destination project name onboarding",
+          "total_results": 3,
+          "results": [
+            {
+              "rank": 1,
+              "chunk_id": "9bccfe96-07ed-4201-9837-1097b968b979",
+              "score": "0.387",
+              "content_preview": "Synthetic acceptance interview A. The researcher entered a new project and expected an obvious place to import interview notes. The first screen did not explain whether a project was an empty folder or a running research job. The researcher looked at the mission controls before finding the document area, then asked whether importing a file would start a paid run. A short explanation of what an upload changes would have made that choice easier. The participant wanted the current project name besi...",
+              "document_id": "1147f25b-7891-4942-9a27-183785674140",
+              "document_url": "https://tracelab.aquex.ai/documents/1147f25b-7891-4942-9a27-183785674140",
+              "source_type": "interview",
+              "tags": []
+            },
+            {
+              "rank": 2,
+              "chunk_id": "c5f00d11-1926-4e09-907b-316cb298c5ad",
+              "score": "0.387",
+              "content_preview": "Synthetic acceptance interview A. The researcher entered a new project and expected an obvious place to import interview notes. The first screen did not explain whether a project was an empty folder or a running research job. The researcher looked at the mission controls before finding the document area, then asked whether importing a file would start a paid run. A short explanation of what an upload changes would have made that choice easier. The participant wanted the current project name besi...",
+              "document_id": "189bfbe5-494e-4511-ba47-52527a2dc25c",
+              "document_url": "https://tracelab.aquex.ai/documents/189bfbe5-494e-4511-ba47-52527a2dc25c",
+              "source_type": "interview",
+              "tags": []
+            },
+            {
+              "rank": 3,
+              "chunk_id": "7f8ab11f-463d-427d-8b49-970dc66e20e7",
+              "score": "0.315",
+              "content_preview": "Synthetic acceptance interview C. The researcher had interview notes ready to upload but could not quickly tell which project would receive them. They moved between the project page and the document list looking for an import control. A destination label beside the action would have reduced that uncertainty. They wanted the resulting message to confirm the document name and project instead of showing only a generic success state. The researcher also asked for help understanding the difference be...",
+              "document_id": "a0ddafd3-3c46-400a-b07b-35bcedd71b53",
+              "document_url": "https://tracelab.aquex.ai/documents/a0ddafd3-3c46-400a-b07b-35bcedd71b53",
+              "source_type": "interview",
+              "tags": []
+            }
+          ]
+        },
+        "answer": {
+          "answer": "In the synthetic onboarding interviews, researchers wanted the current project name or a destination label shown beside the upload action so it was clear which project would receive their notes.",
+          "passages": [
+            {
+              "text": "In the synthetic onboarding interviews, researchers wanted the current project name or a destination label shown beside the upload action so it was clear which project would receive their notes.",
+              "citations": [
+                "9bccfe96-07ed-4201-9837-1097b968b979",
+                "7f8ab11f-463d-427d-8b49-970dc66e20e7"
+              ]
+            }
+          ],
+          "citations": [
+            {
+              "chunk_id": "9bccfe96-07ed-4201-9837-1097b968b979",
+              "document_id": "1147f25b-7891-4942-9a27-183785674140",
+              "document_name": "onboarding-interview-a.txt",
+              "chunk_index": 0,
+              "snippet": "Synthetic acceptance interview A. The researcher entered a new project and expected an obvious place to import interview notes. The first screen did not explain whether a project was an empty folder or a running research job. The researcher looked at the mission controls before f",
+              "href": "/documents/1147f25b-7891-4942-9a27-183785674140?chunk=9bccfe96-07ed-4201-9837-1097b968b979&index=0",
+              "url": "https://tracelab.aquex.ai/documents/1147f25b-7891-4942-9a27-183785674140?chunk=9bccfe96-07ed-4201-9837-1097b968b979&index=0"
+            },
+            {
+              "chunk_id": "7f8ab11f-463d-427d-8b49-970dc66e20e7",
+              "document_id": "a0ddafd3-3c46-400a-b07b-35bcedd71b53",
+              "document_name": "onboarding-interview-c.txt",
+              "chunk_index": 0,
+              "snippet": "Synthetic acceptance interview C. The researcher had interview notes ready to upload but could not quickly tell which project would receive them. They moved between the project page and the document list looking for an import control. A destination label beside the action would h",
+              "href": "/documents/a0ddafd3-3c46-400a-b07b-35bcedd71b53?chunk=7f8ab11f-463d-427d-8b49-970dc66e20e7&index=0",
+              "url": "https://tracelab.aquex.ai/documents/a0ddafd3-3c46-400a-b07b-35bcedd71b53?chunk=7f8ab11f-463d-427d-8b49-970dc66e20e7&index=0"
+            }
+          ],
+          "no_evidence": false,
+          "model": "gpt-5.1",
+          "project_url": "https://tracelab.aquex.ai/projects/78980844-9425-401e-8562-ce558fe10675"
+        },
+        "refusal": {
+          "answer": "Nothing in this project answers that question.",
+          "passages": [
+            {
+              "text": "Nothing in this project answers that question.",
+              "citations": []
+            }
+          ],
+          "citations": [],
+          "no_evidence": true,
+          "model": "gpt-5.1",
+          "project_url": "https://tracelab.aquex.ai/projects/78980844-9425-401e-8562-ce558fe10675"
+        },
+        "foreign_project_denied": true
+      }
+    },
+    "negatives": {
+      "serving_commit": "295028c8f8b7e7fa0b160be49321f53099b1951a",
+      "checks": [
+        {
+          "route": "/projects/0d6c5b1d-72eb-4390-a40b-c48c88cdb302",
+          "status": 403,
+          "detail": "You do not have access to this resource."
+        },
+        {
+          "route": "/librarian/descriptions/draft",
+          "status": 403,
+          "detail": "You do not have access to this resource."
+        },
+        {
+          "route": "/librarian/duplicates/scan",
+          "status": 403,
+          "detail": "You do not have access to this resource."
+        },
+        {
+          "route": "/librarian/collections/draft",
+          "status": 403,
+          "detail": "You do not have access to this resource."
+        },
+        {
+          "route": "/librarian/reports/sources",
+          "status": 403,
+          "detail": "You do not have access to this resource."
+        },
+        {
+          "route": "/librarian/reports/accept",
+          "status": 422,
+          "detail": "This review is invalid or expired. Load sources and draft again."
+        },
+        {
+          "route": "/librarian/reports/accept",
+          "status": 422,
+          "detail": "This review is invalid or expired. Load sources and draft again."
+        },
+        {
+          "wrong_source_denied": true,
+          "wrong_caller_denied": true
+        },
+        {
+          "deleted_source_denied": true,
+          "status": 409,
+          "detail": "The reviewed sources changed or are no longer available. Draft again."
+        },
+        {
+          "revoked_source_denied": true,
+          "owner_independent_membership_revoked": true
+        },
+        {
+          "stale_description_denied": true,
+          "current_manual_edit_preserved": true,
+          "original_fixture_description_restored": true
+        },
+        {
+          "retry_preserves_manual_report_title": true,
+          "single_report": true,
+          "no_model_calls": true
+        }
+      ],
+      "controlled_mutations": "Soft-deleted/restored duplicate fixture only; revoked only dedicated fixture Space membership; temporarily edited/restored fixture description and Report title."
+    },
+    "cleanup": {
+      "at": "2026-09-30T02:44:28.316Z",
+      "caller_id": "e02bf562-ffca-449e-925c-096ff69d5309",
+      "account_disabled": true,
+      "temporary_key_revoked": true,
+      "key_status": 401,
+      "login_status": 403,
+      "fixtures_retained": true,
+      "shared_fixture_membership_revoked": true,
+      "existing_guest_untouched": true
+    }
+  },
+  "setup": {
+    "serving_commit": "295028c8f8b7e7fa0b160be49321f53099b1951a",
+    "caller_role": "member",
+    "caller_id": "e02bf562-ffca-449e-925c-096ff69d5309",
+    "agent_selected_temporary_member": true,
+    "empty_project": "957ab254-9cae-4d87-801c-7501726a1298",
+    "populated_project": "78980844-9425-401e-8562-ce558fe10675",
+    "revocable_project": "21f8c1c3-71fb-4bfe-b63d-b86f30e01adb",
+    "revocable_space": "4df092bf-159b-45bc-a567-2de7f6b991fa",
+    "documents": {
+      "a": {
+        "id": "1147f25b-7891-4942-9a27-183785674140",
+        "project_id": "78980844-9425-401e-8562-ce558fe10675",
+        "name": "onboarding-interview-a.txt",
+        "chunks": [
+          "9bccfe96-07ed-4201-9837-1097b968b979"
+        ],
+        "processed": true
+      },
+      "c": {
+        "id": "a0ddafd3-3c46-400a-b07b-35bcedd71b53",
+        "project_id": "78980844-9425-401e-8562-ce558fe10675",
+        "name": "onboarding-interview-c.txt",
+        "chunks": [
+          "7f8ab11f-463d-427d-8b49-970dc66e20e7"
+        ],
+        "processed": true
+      },
+      "copy": {
+        "id": "189bfbe5-494e-4511-ba47-52527a2dc25c",
+        "project_id": "78980844-9425-401e-8562-ce558fe10675",
+        "name": "onboarding-interview-a-copy.txt",
+        "chunks": [
+          "c5f00d11-1926-4e09-907b-316cb298c5ad"
+        ],
+        "processed": true
+      },
+      "revocable": {
+        "id": "64ad4239-fcfa-430f-a7b4-6e3b2a59d908",
+        "project_id": "21f8c1c3-71fb-4bfe-b63d-b86f30e01adb",
+        "name": "revocable-synthetic-interview.txt",
+        "chunks": [
+          "2bca8616-f8f3-4676-9970-9a3c3951a469"
+        ],
+        "processed": true
+      }
+    },
+    "personal_space": "2e9bd027-a75a-4610-bd16-b57c3ab2439e",
+    "admin_denied": true,
+    "no_email_sent": true,
+    "existing_guest_untouched": true,
+    "agent_acceptance_not_personal_Derek_walk": true
+  },
+  "browser_stages": {
+    "planning": {
+      "completed_at": "2026-09-30T02:23:17.648Z",
+      "serving_commit": "295028c8f8b7e7fa0b160be49321f53099b1951a",
+      "errors": [],
+      "requests": [
+        {
+          "method": "POST",
+          "path": "/api/v1/librarian/turns"
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/librarian/drafts"
+        }
+      ]
+    },
+    "mission": {
+      "completed_at": "2026-09-30T02:26:47.899Z",
+      "serving_commit": "295028c8f8b7e7fa0b160be49321f53099b1951a",
+      "errors": [],
+      "requests": [
+        {
+          "method": "PUT",
+          "path": "/api/v1/activity/viewed",
+          "body": {
+            "items": [
+              {
+                "type": "mission",
+                "id": "9bd0493f-cdd2-443e-b8c3-4ee9161642a1",
+                "occurred_at": "2026-09-30T02:25:43.097552"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "descriptions": {
+      "completed_at": "2026-09-30T02:27:24.561Z",
+      "serving_commit": "295028c8f8b7e7fa0b160be49321f53099b1951a",
+      "errors": [],
+      "requests": [
+        {
+          "method": "POST",
+          "path": "/api/v1/librarian/descriptions/draft"
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/librarian/descriptions/draft"
+        }
+      ]
+    },
+    "description-accept": {
+      "completed_at": "2026-09-30T02:28:07.823Z",
+      "serving_commit": "295028c8f8b7e7fa0b160be49321f53099b1951a",
+      "errors": [],
+      "requests": [
+        {
+          "method": "POST",
+          "path": "/api/v1/librarian/descriptions/accept"
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/librarian/descriptions/restore"
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/librarian/descriptions/accept"
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/librarian/descriptions/restore"
+        }
+      ]
+    },
+    "duplicates": {
+      "completed_at": "2026-09-30T02:34:47.697Z",
+      "serving_commit": "295028c8f8b7e7fa0b160be49321f53099b1951a",
+      "errors": [],
+      "requests": [
+        {
+          "method": "POST",
+          "path": "/api/v1/librarian/duplicates/scan"
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/librarian/duplicates/compare"
+        }
+      ]
+    },
+    "organisation": {
+      "completed_at": "2026-09-30T02:35:39.486Z",
+      "serving_commit": "295028c8f8b7e7fa0b160be49321f53099b1951a",
+      "errors": [],
+      "requests": [
+        {
+          "method": "POST",
+          "path": "/api/v1/librarian/collections/draft"
+        }
+      ]
+    },
+    "collection": {
+      "completed_at": "2026-09-30T02:37:12.169Z",
+      "serving_commit": "295028c8f8b7e7fa0b160be49321f53099b1951a",
+      "errors": [],
+      "requests": [
+        {
+          "method": "POST",
+          "path": "/api/v1/librarian/collections/accept"
+        }
+      ]
+    },
+    "report": {
+      "completed_at": "2026-09-30T02:37:43.806Z",
+      "serving_commit": "295028c8f8b7e7fa0b160be49321f53099b1951a",
+      "errors": [],
+      "requests": [
+        {
+          "method": "POST",
+          "path": "/api/v1/librarian/reports/draft"
+        }
+      ]
+    },
+    "report-save": {
+      "completed_at": "2026-09-30T02:39:44.952Z",
+      "serving_commit": "295028c8f8b7e7fa0b160be49321f53099b1951a",
+      "errors": [],
+      "requests": [
+        {
+          "method": "PUT",
+          "path": "/api/v1/activity/viewed",
+          "body": {
+            "items": [
+              {
+                "type": "report",
+                "id": "18545204-bdc7-43ec-8799-c3b6726c9d35",
+                "occurred_at": "2026-09-30T02:38:34.047645"
+              }
+            ]
+          }
+        },
+        {
+          "method": "PUT",
+          "path": "/api/v1/activity/viewed",
+          "body": {
+            "items": [
+              {
+                "type": "report",
+                "id": "18545204-bdc7-43ec-8799-c3b6726c9d35",
+                "occurred_at": "2026-09-30T02:38:34.047645"
+              }
+            ]
+          }
+        },
+        {
+          "method": "PUT",
+          "path": "/api/v1/activity/viewed",
+          "body": {
+            "items": [
+              {
+                "type": "report",
+                "id": "18545204-bdc7-43ec-8799-c3b6726c9d35",
+                "occurred_at": "2026-09-30T02:38:34.047645"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "questions": {
+      "completed_at": "2026-09-30T02:40:14.395Z",
+      "serving_commit": "295028c8f8b7e7fa0b160be49321f53099b1951a",
+      "errors": [],
+      "requests": [
+        {
+          "method": "POST",
+          "path": "/api/v1/librarian/turns"
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/librarian/turns"
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/pedr/search"
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/collections"
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/collections/98e1d368-0d6d-4947-96ec-9c70ecd0ccc4/chunks"
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/collections/98e1d368-0d6d-4947-96ec-9c70ecd0ccc4/chunks"
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/collections/98e1d368-0d6d-4947-96ec-9c70ecd0ccc4/chunks"
+        }
+      ]
+    }
+  },
+  "failed_stages": [
+    {
+      "stage": "report-save",
+      "at": "2026-09-30T02:38:40.352Z",
+      "message": "Expected values to be strictly equal:\n+ actual - expected\n\n+ 'cbaf222933f0ee20512ad9a68035c3f04b3f146dfc0c07764501a5d4acb9f5af'\n- '04f4431effd5ac5c7dc239bf9ed59d7072b8ad5b1342582987b7c526ca5a7719'\n",
+      "requests": [
+        {
+          "method": "POST",
+          "path": "/api/v1/librarian/reports/accept"
+        },
+        {
+          "method": "PUT",
+          "path": "/api/v1/activity/viewed",
+          "body": {
+            "items": [
+              {
+                "type": "report",
+                "id": "18545204-bdc7-43ec-8799-c3b6726c9d35",
+                "occurred_at": "2026-09-30T02:38:34.047645"
+              }
+            ]
+          }
+        },
+        {
+          "method": "PUT",
+          "path": "/api/v1/activity/viewed",
+          "body": {
+            "items": [
+              {
+                "type": "report",
+                "id": "18545204-bdc7-43ec-8799-c3b6726c9d35",
+                "occurred_at": "2026-09-30T02:38:34.047645"
+              }
+            ]
+          }
+        },
+        {
+          "method": "PUT",
+          "path": "/api/v1/activity/viewed",
+          "body": {
+            "items": [
+              {
+                "type": "report",
+                "id": "18545204-bdc7-43ec-8799-c3b6726c9d35",
+                "occurred_at": "2026-09-30T02:38:34.047645"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "matrix_progress": {
+    "layouts_completed": 6,
+    "results": [
+      {
+        "route": "/librarian?project=78980844-9425-401e-8562-ce558fe10675",
+        "theme": "light",
+        "width": 390,
+        "overflow": false,
+        "violations": [],
+        "screenshot": "deployed-librarian-light-390.png"
+      },
+      {
+        "route": "/librarian?q=upload%20destination%20project%20name%20onboarding&project=78980844-9425-401e-8562-ce558fe10675",
+        "theme": "light",
+        "width": 390,
+        "overflow": false,
+        "violations": [],
+        "screenshot": "deployed-chunks-light-390.png"
+      },
+      {
+        "route": "/collections/812075e7-a8bc-4654-86fc-d27e13d164a0",
+        "theme": "light",
+        "width": 390,
+        "overflow": false,
+        "violations": [],
+        "screenshot": "deployed-collection-light-390.png"
+      },
+      {
+        "route": "/reports/18545204-bdc7-43ec-8799-c3b6726c9d35",
+        "theme": "light",
+        "width": 390,
+        "overflow": false,
+        "violations": [],
+        "screenshot": "deployed-report-light-390.png"
+      },
+      {
+        "route": "/missions/9bd0493f-cdd2-443e-b8c3-4ee9161642a1?from=librarian",
+        "theme": "light",
+        "width": 390,
+        "overflow": false,
+        "violations": [],
+        "screenshot": "deployed-mission-light-390.png"
+      },
+      {
+        "route": "/librarian?project=78980844-9425-401e-8562-ce558fe10675",
+        "theme": "light",
+        "width": 820,
+        "overflow": false,
+        "violations": [],
+        "screenshot": "deployed-librarian-light-820.png"
+      },
+      {
+        "route": "/librarian?q=upload%20destination%20project%20name%20onboarding&project=78980844-9425-401e-8562-ce558fe10675",
+        "theme": "light",
+        "width": 820,
+        "overflow": false,
+        "violations": [],
+        "screenshot": "deployed-chunks-light-820.png"
+      },
+      {
+        "route": "/collections/812075e7-a8bc-4654-86fc-d27e13d164a0",
+        "theme": "light",
+        "width": 820,
+        "overflow": false,
+        "violations": [],
+        "screenshot": "deployed-collection-light-820.png"
+      },
+      {
+        "route": "/reports/18545204-bdc7-43ec-8799-c3b6726c9d35",
+        "theme": "light",
+        "width": 820,
+        "overflow": false,
+        "violations": [],
+        "screenshot": "deployed-report-light-820.png"
+      },
+      {
+        "route": "/missions/9bd0493f-cdd2-443e-b8c3-4ee9161642a1?from=librarian",
+        "theme": "light",
+        "width": 820,
+        "overflow": false,
+        "violations": [],
+        "screenshot": "deployed-mission-light-820.png"
+      },
+      {
+        "route": "/librarian?project=78980844-9425-401e-8562-ce558fe10675",
+        "theme": "light",
+        "width": 1440,
+        "overflow": false,
+        "violations": [],
+        "screenshot": "deployed-librarian-light-1440.png"
+      },
+      {
+        "route": "/librarian?q=upload%20destination%20project%20name%20onboarding&project=78980844-9425-401e-8562-ce558fe10675",
+        "theme": "light",
+        "width": 1440,
+        "overflow": false,
+        "violations": [],
+        "screenshot": "deployed-chunks-light-1440.png"
+      },
+      {
+        "route": "/collections/812075e7-a8bc-4654-86fc-d27e13d164a0",
+        "theme": "light",
+        "width": 1440,
+        "overflow": false,
+        "violations": [],
+        "screenshot": "deployed-collection-light-1440.png"
+      },
+      {
+        "route": "/reports/18545204-bdc7-43ec-8799-c3b6726c9d35",
+        "theme": "light",
+        "width": 1440,
+        "overflow": false,
+        "violations": [],
+        "screenshot": "deployed-report-light-1440.png"
+      },
+      {
+        "route": "/missions/9bd0493f-cdd2-443e-b8c3-4ee9161642a1?from=librarian",
+        "theme": "light",
+        "width": 1440,
+        "overflow": false,
+        "violations": [],
+        "screenshot": "deployed-mission-light-1440.png"
+      },
+      {
+        "route": "/librarian?project=78980844-9425-401e-8562-ce558fe10675",
+        "theme": "dark",
+        "width": 390,
+        "overflow": false,
+        "violations": [],
+        "screenshot": "deployed-librarian-dark-390.png"
+      },
+      {
+        "route": "/librarian?q=upload%20destination%20project%20name%20onboarding&project=78980844-9425-401e-8562-ce558fe10675",
+        "theme": "dark",
+        "width": 390,
+        "overflow": false,
+        "violations": [],
+        "screenshot": "deployed-chunks-dark-390.png"
+      },
+      {
+        "route": "/collections/812075e7-a8bc-4654-86fc-d27e13d164a0",
+        "theme": "dark",
+        "width": 390,
+        "overflow": false,
+        "violations": [],
+        "screenshot": "deployed-collection-dark-390.png"
+      },
+      {
+        "route": "/reports/18545204-bdc7-43ec-8799-c3b6726c9d35",
+        "theme": "dark",
+        "width": 390,
+        "overflow": false,
+        "violations": [],
+        "screenshot": "deployed-report-dark-390.png"
+      },
+      {
+        "route": "/missions/9bd0493f-cdd2-443e-b8c3-4ee9161642a1?from=librarian",
+        "theme": "dark",
+        "width": 390,
+        "overflow": false,
+        "violations": [],
+        "screenshot": "deployed-mission-dark-390.png"
+      },
+      {
+        "route": "/librarian?project=78980844-9425-401e-8562-ce558fe10675",
+        "theme": "dark",
+        "width": 820,
+        "overflow": false,
+        "violations": [],
+        "screenshot": "deployed-librarian-dark-820.png"
+      },
+      {
+        "route": "/librarian?q=upload%20destination%20project%20name%20onboarding&project=78980844-9425-401e-8562-ce558fe10675",
+        "theme": "dark",
+        "width": 820,
+        "overflow": false,
+        "violations": [],
+        "screenshot": "deployed-chunks-dark-820.png"
+      },
+      {
+        "route": "/collections/812075e7-a8bc-4654-86fc-d27e13d164a0",
+        "theme": "dark",
+        "width": 820,
+        "overflow": false,
+        "violations": [],
+        "screenshot": "deployed-collection-dark-820.png"
+      },
+      {
+        "route": "/reports/18545204-bdc7-43ec-8799-c3b6726c9d35",
+        "theme": "dark",
+        "width": 820,
+        "overflow": false,
+        "violations": [],
+        "screenshot": "deployed-report-dark-820.png"
+      },
+      {
+        "route": "/missions/9bd0493f-cdd2-443e-b8c3-4ee9161642a1?from=librarian",
+        "theme": "dark",
+        "width": 820,
+        "overflow": false,
+        "violations": [],
+        "screenshot": "deployed-mission-dark-820.png"
+      },
+      {
+        "route": "/librarian?project=78980844-9425-401e-8562-ce558fe10675",
+        "theme": "dark",
+        "width": 1440,
+        "overflow": false,
+        "violations": [],
+        "screenshot": "deployed-librarian-dark-1440.png"
+      },
+      {
+        "route": "/librarian?q=upload%20destination%20project%20name%20onboarding&project=78980844-9425-401e-8562-ce558fe10675",
+        "theme": "dark",
+        "width": 1440,
+        "overflow": false,
+        "violations": [],
+        "screenshot": "deployed-chunks-dark-1440.png"
+      },
+      {
+        "route": "/collections/812075e7-a8bc-4654-86fc-d27e13d164a0",
+        "theme": "dark",
+        "width": 1440,
+        "overflow": false,
+        "violations": [],
+        "screenshot": "deployed-collection-dark-1440.png"
+      },
+      {
+        "route": "/reports/18545204-bdc7-43ec-8799-c3b6726c9d35",
+        "theme": "dark",
+        "width": 1440,
+        "overflow": false,
+        "violations": [],
+        "screenshot": "deployed-report-dark-1440.png"
+      },
+      {
+        "route": "/missions/9bd0493f-cdd2-443e-b8c3-4ee9161642a1?from=librarian",
+        "theme": "dark",
+        "width": 1440,
+        "overflow": false,
+        "violations": [],
+        "screenshot": "deployed-mission-dark-1440.png"
+      }
+    ]
+  }
+}

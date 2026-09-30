@@ -1,0 +1,8 @@
+{
+  "head": "295028c8f8b7e7fa0b160be49321f53099b1951a",
+  "results": {
+    "backend": "backend-suite\tRun serialized backend suite\t2026-09-30T02:23:02.1451572Z === 2988 passed, 3 skipped, 12 deselected, 49 warnings in 604.45s (0:10:04) ====",
+    "postgres": "backend-integration\tRun integration tests with testcontainers\t2026-09-30T02:14:29.2916362Z ============ 150 passed, 2 skipped, 17 warnings in 95.20s (0:01:35) ============",
+    "browser": "build-frontend-production\tVerify shell behavior against the production artifact\t2026-09-30T02:16:32.7488076Z ##[notice]  82 passed (2.9m)"
+  }
+}

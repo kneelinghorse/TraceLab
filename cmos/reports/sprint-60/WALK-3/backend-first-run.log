@@ -1,0 +1,504 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.11.9, pytest-9.0.2, pluggy-1.6.0
+benchmark: 5.2.3 (defaults: timer=time.perf_counter disable_gc=False min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=10 warmup=False warmup_iterations=100000)
+rootdir: /Users/systemsystems/portfolio/TraceLab
+configfile: pytest.ini (WARNING: ignoring pytest config in pyproject.toml!)
+testpaths: tests
+plugins: anyio-4.12.1, benchmark-5.2.3, Faker-19.12.0, asyncio-1.3.0, httpx-0.36.2, cov-7.0.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 3003 items / 12 deselected / 2991 selected
+
+tests/mcp_tools/test_mcp_missions_unit.py .............................. [  1%]
+...........                                                              [  1%]
+tests/performance/test_concurrent_queries.py .                           [  1%]
+tests/performance/test_db_query_optimizations.py ..                      [  1%]
+tests/performance/test_qdrant_performance.py .                           [  1%]
+tests/sprint_03/test_progress_tracking.py .                              [  1%]
+tests/sprint_03/test_yaml_roundtrip.py .                                 [  1%]
+tests/test_accessible_filter.py ...................                      [  2%]
+tests/test_activity_api.py .......                                       [  2%]
+tests/test_admin_dashboard.py ...                                        [  2%]
+tests/test_admin_endpoints.py .......                                    [  2%]
+tests/test_admin_stats.py .........                                      [  3%]
+tests/test_admin_user_management.py ..................................   [  4%]
+tests/test_api_documentation.py ..                                       [  4%]
+tests/test_api_key_auth.py ................                              [  4%]
+tests/test_auth_api.py ......                                            [  5%]
+tests/test_auth_device.py .....................                          [  5%]
+tests/test_auth_flow.py ......                                           [  5%]
+tests/test_auth_hardening.py ......................................      [  7%]
+tests/test_auth_me_role_contract.py ..........                           [  7%]
+tests/test_authz.py .................                                    [  8%]
+tests/test_auto_ingest.py ...............s......                         [  8%]
+tests/test_auto_report.py ...............................                [  9%]
+tests/test_bias_detection.py .                                           [  9%]
+tests/test_caching.py ......                                             [ 10%]
+tests/test_cmos_mission_bridge.py ....................                   [ 10%]
+tests/test_collection_context.py ..................                      [ 11%]
+tests/test_collections.py ...........                                    [ 11%]
+tests/test_content_hash_dedup.py ..............                          [ 12%]
+tests/test_context_compression.py ....                                   [ 12%]
+tests/test_corpus_qa.py ............                                     [ 12%]
+tests/test_correction_loop.py ......................                     [ 13%]
+tests/test_cost_monitor.py ..                                            [ 13%]
+tests/test_create_ownership_parity.py ............                       [ 13%]
+tests/test_decision_insight_linking.py ................................. [ 15%]
+.......                                                                  [ 15%]
+tests/test_deepsearch_client.py ..............................           [ 16%]
+tests/test_deepsearch_evidence_projection.py ........................... [ 17%]
+........................................................................ [ 19%]
+..........                                                               [ 19%]
+tests/test_deepsearch_hmac_signer.py ..............                      [ 20%]
+tests/test_deepsearch_ingestion.py ...                                   [ 20%]
+tests/test_delete_endpoint_security.py .............                     [ 20%]
+tests/test_document_chunks_api.py .....                                  [ 21%]
+tests/test_document_content_api.py .........                             [ 21%]
+tests/test_document_download_api.py ......                               [ 21%]
+tests/test_document_embedding_integration.py ...                         [ 21%]
+tests/test_document_ingestion.py ......                                  [ 21%]
+tests/test_e2e_smoke.py .............                                    [ 22%]
+tests/test_edge_materialization.py ...                                   [ 22%]
+tests/test_embedding_generation.py ..                                    [ 22%]
+tests/test_evidence_auto_linking.py .......                              [ 22%]
+tests/test_evidence_ledger_api.py ...................................... [ 24%]
+..                                                                       [ 24%]
+tests/test_faceted_search.py ..                                          [ 24%]
+tests/test_facets_scope.py ........                                      [ 24%]
+tests/test_format_parsers.py ..........................                  [ 25%]
+tests/test_graph_e2e_validation.py .........                             [ 25%]
+tests/test_graph_layer.py ...........................                    [ 26%]
+tests/test_graph_neighborhood_api.py ................................... [ 27%]
+....                                                                     [ 27%]
+tests/test_graph_quality_validation.py .................                 [ 28%]
+tests/test_graph_rag.py ...........                                      [ 28%]
+tests/test_health.py ....                                                [ 28%]
+tests/test_home_api.py .....                                             [ 29%]
+tests/test_hybrid_search.py ....                                         [ 29%]
+tests/test_ingestion_edge_materialization.py .........                   [ 29%]
+tests/test_is_active_enforcement.py .........                            [ 29%]
+tests/test_librarian_api.py ..........................                   [ 30%]
+tests/test_librarian_collections.py ..............................       [ 31%]
+tests/test_librarian_descriptions.py .................                   [ 32%]
+tests/test_librarian_duplicates.py ....................                  [ 32%]
+tests/test_librarian_reports.py ...........................              [ 33%]
+tests/test_list_row_filtering_api.py ............                        [ 34%]
+tests/test_mcp_install_contract.py .                                     [ 34%]
+tests/test_methodology_rigor.py .                                        [ 34%]
+tests/test_mission_contract_preview.py .............                     [ 34%]
+tests/test_mission_events.py .................                           [ 35%]
+tests/test_mission_linter.py ...................................         [ 36%]
+tests/test_mission_model.py ........................                     [ 37%]
+tests/test_mission_protocol_advanced.py ....                             [ 37%]
+tests/test_mission_protocol_service.py ......                            [ 37%]
+tests/test_mission_protocol_validation.py ....                           [ 37%]
+tests/test_mission_validation.py ....................................... [ 38%]
+........................................                                 [ 40%]
+tests/test_mission_views.py ....                                         [ 40%]
+tests/test_missions_api.py ............................................. [ 41%]
+.................................                                        [ 43%]
+tests/test_monitoring_api.py ....                                        [ 43%]
+tests/test_navigation_search_api.py .....................                [ 43%]
+tests/test_notifications.py ....................                         [ 44%]
+tests/test_onboarding_api.py ..                                          [ 44%]
+tests/test_onboarding_register_authz.py ................................ [ 45%]
+............                                                             [ 46%]
+tests/test_owner_grant_policy.py .....                                   [ 46%]
+tests/test_owner_read_path.py .........                                  [ 46%]
+tests/test_ownership.py ..........                                       [ 46%]
+tests/test_pedr_collection_scope.py ....                                 [ 47%]
+tests/test_pedr_delta_sync.py ......................                     [ 47%]
+tests/test_pedr_enhancements.py .......................                  [ 48%]
+tests/test_pedr_error_handling.py ....                                   [ 48%]
+tests/test_pedr_manifest_transformer.py ....                             [ 48%]
+tests/test_pedr_pragmatic.py ........................................... [ 50%]
+.........................................                                [ 51%]
+tests/test_pedr_preflight.py ...................                         [ 52%]
+tests/test_pedr_ranking_validation.py .........                          [ 52%]
+tests/test_pedr_related_preflight_scope.py ..............                [ 53%]
+tests/test_pedr_related_soft_delete_scope.py .......                     [ 53%]
+tests/test_pedr_relational.py .......................                    [ 54%]
+tests/test_pedr_report_scope.py ..................                       [ 54%]
+tests/test_pedr_scope_core.py ..............                             [ 55%]
+tests/test_pedr_search_api.py ......                                     [ 55%]
+tests/test_pedr_search_scope.py .....................                    [ 56%]
+tests/test_pedr_semantic_protocol.py ................................... [ 57%]
+....................................                                     [ 58%]
+tests/test_pedr_syntactic.py ........................................... [ 59%]
+...........                                                              [ 60%]
+tests/test_pedr_synthesis_scope.py ...................                   [ 60%]
+tests/test_pedr_unified_search.py .....................................s [ 62%]
+s...                                                                     [ 62%]
+tests/test_personal_spaces.py ...........                                [ 62%]
+tests/test_pre_flip_gates.py ............                                [ 62%]
+tests/test_preflight_validation.py ..................................... [ 64%]
+......                                                                   [ 64%]
+tests/test_presidio_advanced.py ..                                       [ 64%]
+tests/test_presidio_redaction.py ...                                     [ 64%]
+tests/test_project_document_read_api.py ..                               [ 64%]
+tests/test_project_hub.py .....                                          [ 64%]
+tests/test_project_management_api.py .....................               [ 65%]
+tests/test_project_owner_document_read.py .............................. [ 66%]
+.....                                                                    [ 66%]
+tests/test_proxy_headers_middleware.py .....                             [ 66%]
+tests/test_qdrant_prewarm.py F....................                       [ 67%]
+tests/test_quality_aware_search.py ...............                       [ 68%]
+tests/test_quality_gates.py ....                                         [ 68%]
+tests/test_rag_service.py ..................                             [ 68%]
+tests/test_rag_service_scope.py ........                                 [ 69%]
+tests/test_rbac_flip_regression.py ............                          [ 69%]
+tests/test_rbac_observability_api.py .....                               [ 69%]
+tests/test_rbac_route_enforcement_api.py ............................... [ 70%]
+..............................................                           [ 72%]
+tests/test_rbac_verify_harness.py ...................................... [ 73%]
+.........................                                                [ 74%]
+tests/test_rbac_verify_mutation_proof.py ..                              [ 74%]
+tests/test_reconcile_mission_results_cli.py ...                          [ 74%]
+tests/test_reconciler_scheduler.py ...........                           [ 74%]
+tests/test_recovery_routes.py ..................                         [ 75%]
+tests/test_relationship_api.py ...                                       [ 75%]
+tests/test_relationship_scope.py ....                                    [ 75%]
+tests/test_report_citations.py .....................                     [ 76%]
+tests/test_report_export.py ...                                          [ 76%]
+tests/test_report_promotion.py .................                         [ 77%]
+tests/test_reports_api.py .............................                  [ 78%]
+tests/test_reprocess_embeddings.py ..................                    [ 78%]
+tests/test_result_materialization.py ................................... [ 79%]
+..........                                                               [ 80%]
+tests/test_retrieval_service.py ...                                      [ 80%]
+tests/test_route_registration.py ...                                     [ 80%]
+tests/test_saved_searches.py ................                            [ 80%]
+tests/test_search_ask.py ..........                                      [ 81%]
+tests/test_search_history.py ..........                                  [ 81%]
+tests/test_semantic_edge_e2e_validation.py ......                        [ 81%]
+tests/test_semantic_edge_types.py ..............                         [ 82%]
+tests/test_service_principal_route_boundary.py ......                    [ 82%]
+tests/test_shared_space_create.py .........                              [ 82%]
+tests/test_soft_delete.py ..................................             [ 83%]
+tests/test_space_management_api.py ..........................            [ 84%]
+tests/test_support_inbox.py ........                                     [ 84%]
+tests/test_synthesis_analyzer.py .                                       [ 85%]
+tests/test_synthesis_cache.py ......................                     [ 85%]
+tests/test_synthesize.py .....................                           [ 86%]
+tests/test_synthesize_report_integration.py ...............              [ 86%]
+tests/test_t30_3_pedr_e2e_validation.py ................................ [ 88%]
+.                                                                        [ 88%]
+tests/test_t30_4_hnsw_3072d_tuning.py .....................              [ 88%]
+tests/test_telemetry_migration_completion.py .......                     [ 89%]
+tests/test_telemetry_standardization.py ................................ [ 90%]
+...                                                                      [ 90%]
+tests/test_traceability_validator.py .                                   [ 90%]
+tests/test_usage_records.py ..............                               [ 90%]
+tests/test_validation_error_sanitization.py ...                          [ 90%]
+tests/test_wait_for_deploy.py .....                                      [ 90%]
+tests/test_webhook_handler.py ....................................       [ 92%]
+tests/unit/test_authorization.py .........................               [ 92%]
+tests/unit/test_benchmark_corpus.py ..                                   [ 93%]
+tests/unit/test_embedding_collection_benchmark.py ...                    [ 93%]
+tests/unit/test_evidence_ledger_note_upsert.py ..                        [ 93%]
+tests/unit/test_format_only_guard.py .......                             [ 93%]
+tests/unit/test_generate_mission_map.py ..                               [ 93%]
+tests/unit/test_gpt5_model_migration.py ....                             [ 93%]
+tests/unit/test_librarian_provenance.py ..................               [ 94%]
+tests/unit/test_missions_agent_ux.py ....                                [ 94%]
+tests/unit/test_no_credential_literals.py ...................            [ 95%]
+tests/unit/test_oods_object_contract.py ..................               [ 95%]
+tests/unit/test_pedr_benchmark_regression.py ..                          [ 95%]
+tests/unit/test_pedr_cache.py ...                                        [ 95%]
+tests/unit/test_pedr_cache_standalone.py .....................           [ 96%]
+tests/unit/test_pedr_graph_tuning_baseline.py ....                       [ 96%]
+tests/unit/test_pedr_hybrid_rerank.py ..                                 [ 96%]
+tests/unit/test_pedr_hybrid_rerank_standalone.py ..................      [ 97%]
+tests/unit/test_pedr_validation_benchmark.py ....                        [ 97%]
+tests/unit/test_qdrant_delete.py .                                       [ 97%]
+tests/unit/test_rag_baseline_benchmark.py ...                            [ 97%]
+tests/unit/test_recovery_database_engine.py ....                         [ 97%]
+tests/unit/test_recovery_evidence_telemetry.py ..                        [ 97%]
+tests/unit/test_recovery_search_diagnostics.py ..................        [ 98%]
+tests/unit/test_recovery_telemetry_writers.py ..................         [ 98%]
+tests/unit/test_space_membership.py ................                     [ 99%]
+tests/unit/test_usage_extraction.py ......                               [ 99%]
+tests/unit/test_validate_foundational_refs.py .........                  [100%]
+
+=================================== FAILURES ===================================
+_______ TestQdrantClientModule.test_get_qdrant_client_returns_singleton ________
+
+self = <test_qdrant_prewarm.TestQdrantClientModule object at 0x1146d2b90>
+
+    def test_get_qdrant_client_returns_singleton(self):
+        """Test that get_qdrant_client returns the same instance on repeated calls."""
+        # Reset singleton state first
+        from app.core import qdrant_client as qc_module
+
+        qc_module.reset_client()
+
+        with patch.object(qc_module, "QdrantClient") as mock_client_class:
+            mock_instance = MagicMock()
+            mock_client_class.return_value = mock_instance
+
+            # First call creates client
+>           client1 = qc_module.get_qdrant_client()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_qdrant_prewarm.py:27:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def get_qdrant_client() -> QdrantClient:
+        """Get or create the singleton Qdrant client instance.
+
+        Returns:
+            The shared QdrantClient instance configured from settings.
+
+        Raises:
+            RuntimeError: If qdrant-client package is not installed.
+            ValueError: If QDRANT_URL is not configured.
+        """
+        global _client
+
+        if _qdrant_import_error is not None:
+            raise RuntimeError(
+                "The qdrant-client package is required for vector storage interactions. "
+                "Install dependencies from requirements.txt."
+            ) from _qdrant_import_error
+
+        if _client is None:
+            if not settings.qdrant_url:
+                raise ValueError("QDRANT_URL must be configured before using Qdrant client")
+
+            # Validate HTTPS when API key is set
+            if settings.qdrant_api_key and settings.qdrant_url.startswith("http://"):
+>               raise ValueError(
+                    "QDRANT_URL must use HTTPS when QDRANT_API_KEY is set. "
+                    "See docs/qdrant-railway-setup.md for configuration guidance."
+                )
+E               ValueError: QDRANT_URL must use HTTPS when QDRANT_API_KEY is set. See docs/qdrant-railway-setup.md for configuration guidance.
+
+app/core/qdrant_client.py:62: ValueError
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/_pytest/config/__init__.py:852
+  /Users/systemsystems/portfolio/TraceLab/.venv/lib/python3.11/site-packages/_pytest/config/__init__.py:852: PytestAssertRewriteWarning: Module already imported so cannot be rewritten; cmos_pytest_telemetry_plugin
+    self.import_plugin(import_spec)
+
+app/core/config.py:11
+  /Users/systemsystems/portfolio/TraceLab/app/core/config.py:11: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class Settings(BaseSettings):
+
+app/core/database.py:29
+tests/unit/test_recovery_database_engine.py::test_sqlite_pool_override_is_limited_to_test_sqlite[test-sqlite+pysqlite:///:memory:-True]
+tests/unit/test_recovery_database_engine.py::test_sqlite_pool_override_is_limited_to_test_sqlite[production-sqlite:///:memory:-False]
+tests/unit/test_recovery_database_engine.py::test_sqlite_pool_override_is_limited_to_test_sqlite[test-postgresql://unused.invalid/tracelab-False]
+  /Users/systemsystems/portfolio/TraceLab/app/core/database.py:29: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+.venv/lib/python3.11/site-packages/passlib/utils/__init__.py:854
+  /Users/systemsystems/portfolio/TraceLab/.venv/lib/python3.11/site-packages/passlib/utils/__init__.py:854: DeprecationWarning: 'crypt' is deprecated and slated for removal in Python 3.13
+    from crypt import crypt as _crypt
+
+app/schemas/pagination.py:8
+  /Users/systemsystems/portfolio/TraceLab/app/schemas/pagination.py:8: PydanticDeprecatedSince20: `pydantic.generics:GenericModel` has been moved to `pydantic.BaseModel`. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    from pydantic.generics import GenericModel
+
+app/schemas/api_key.py:23
+  /Users/systemsystems/portfolio/TraceLab/app/schemas/api_key.py:23: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class APIKeyResponse(BaseModel):
+
+app/schemas/api_key.py:39
+  /Users/systemsystems/portfolio/TraceLab/app/schemas/api_key.py:39: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class APIKeyInfo(BaseModel):
+
+app/schemas/saved_searches.py:41
+  /Users/systemsystems/portfolio/TraceLab/app/schemas/saved_searches.py:41: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class SavedSearchResponse(SavedSearchBase):
+
+app/schemas/search_history.py:15
+  /Users/systemsystems/portfolio/TraceLab/app/schemas/search_history.py:15: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class SearchHistoryEntry(BaseModel):
+
+app/schemas/webhook.py:22
+  /Users/systemsystems/portfolio/TraceLab/app/schemas/webhook.py:22: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class ExecutionMetadata(BaseModel):
+
+app/main.py:161
+  /Users/systemsystems/portfolio/TraceLab/app/main.py:161: DeprecationWarning:
+          on_event is deprecated, use lifespan event handlers instead.
+
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+
+    @app.on_event("startup")
+
+.venv/lib/python3.11/site-packages/fastapi/applications.py:4599
+.venv/lib/python3.11/site-packages/fastapi/applications.py:4599
+  /Users/systemsystems/portfolio/TraceLab/.venv/lib/python3.11/site-packages/fastapi/applications.py:4599: DeprecationWarning:
+          on_event is deprecated, use lifespan event handlers instead.
+
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+
+    return self.router.on_event(event_type)
+
+app/main.py:210
+  /Users/systemsystems/portfolio/TraceLab/app/main.py:210: DeprecationWarning:
+          on_event is deprecated, use lifespan event handlers instead.
+
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+
+    @app.on_event("shutdown")
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionStatuses::test_all_statuses_defined without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionInstantiation::test_create_mission_minimal without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionInstantiation::test_create_mission_full without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionMethods::test_to_dict without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionMethods::test_to_dict_with_none_values without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionMethods::test_to_mission_protocol without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionMethods::test_from_mission_protocol_minimal without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionMethods::test_from_mission_protocol_full without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionResultFields::test_execution_lifecycle_fields without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionResultFields::test_result_protocol_storage without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionResultFields::test_error_handling_fields without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionTableDefinition::test_table_name without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionTableDefinition::test_required_columns_exist without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionTableDefinition::test_indexes_defined without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionTableDefinition::test_lease_timestamps_are_timezone_aware without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionTableDefinition::test_opaque_lease_fields_are_not_public_dict_fields without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionTableDefinition::test_constraints_defined without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionAuthoringFields::test_instantiation_with_all_authoring_fields without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionAuthoringFields::test_to_dict_includes_authoring_fields without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionAuthoringFields::test_to_mission_protocol_includes_authoring_fields without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionAuthoringFields::test_from_mission_protocol_round_trip without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionAuthoringFields::test_constraints_fallback_to_context without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionAuthoringFields::test_constraints_column_wins_over_context without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionAuthoringFields::test_authoring_fields_optional without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_evidence_auto_linking.py::test_auto_linking_respects_threshold_and_counts_skips
+  /Users/systemsystems/portfolio/TraceLab/.venv/lib/python3.11/site-packages/pydantic/main.py:464: UserWarning: Pydantic serializer warnings:
+    PydanticSerializationUnexpectedValue(Expected `Evidence` - serialized value may not be as expected [field_name='evidence', input_value={'evidence_id': 'EV-alrea...ry', 'chunk_id': '1234'}, input_type=dict])
+    return self.__pydantic_serializer__.to_python(
+
+tests/test_evidence_ledger_api.py::TestWorkingNotes::test_dot_segment_note_keys_are_rejected[dot]
+tests/test_evidence_ledger_api.py::TestWorkingNotes::test_dot_segment_note_keys_are_rejected[dot-dot]
+tests/test_librarian_api.py::TestDraft::test_unrecoverable_draft_is_422
+tests/test_usage_records.py::TestSummary::test_admin_endpoint_returns_the_summary_and_members_are_refused
+  /Users/systemsystems/portfolio/TraceLab/.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py:986: DeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    result = context.run(func, *args)
+
+tests/test_evidence_ledger_api.py::TestEvidenceBrowser::test_filters_count_all_matching_rows_and_keep_exact_tags
+  /Users/systemsystems/portfolio/TraceLab/app/api/v1/evidence.py:105: DeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    return _normalize_required_filter(value, label)
+
+tests/test_mission_linter.py::TestSubmitEndpointLintIntegration::test_hard_fail_returns_422_with_errors
+tests/test_mission_linter.py::TestSubmitEndpointLintIntegration::test_hard_fail_preserves_draft_status
+  /Users/systemsystems/portfolio/TraceLab/app/api/v1/missions.py:899: DeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    return _submit_existing_mission(db=db, mission=mission, submitted_by=user.user_id)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+
+----------------------------------------------------- benchmark 'rag_concurrency': 1 tests ----------------------------------------------------
+Name (time in ms)                                        Min       Max     Mean   StdDev  Median     IQR  Outliers      OPS  Rounds  Iterations
+-----------------------------------------------------------------------------------------------------------------------------------------------
+test_concurrent_queries_reaches_target_throughput     6.7583  167.7303  11.6350  18.3684  8.2631  2.2036      2;10  85.9473      99           1
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+Legend:
+  Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
+  OPS: Operations Per Second, computed as 1 / Mean
+============================= slowest 25 durations =============================
+5.92s call     tests/test_rbac_verify_harness.py::test_harness_passes_against_enforced_app
+5.65s call     tests/test_onboarding_register_authz.py::test_alternate_callers_cannot_use_replay_to_gain_access[project_owner-api_key-True]
+4.92s call     tests/test_service_principal_route_boundary.py::test_service_credential_is_machine_only_in_every_rbac_state[api-key-rbac-off]
+4.75s call     tests/test_service_principal_route_boundary.py::test_service_credential_is_machine_only_in_every_rbac_state[api-key-rbac-on]
+4.56s call     tests/test_onboarding_register_authz.py::test_alternate_callers_cannot_use_replay_to_gain_access[project_owner-api_key-False]
+3.65s call     tests/test_graph_neighborhood_api.py::test_all_root_statuses_match_canonical_details_and_service_is_denied[resource_owner-api_key-True]
+3.46s call     tests/test_project_owner_document_read.py::test_alternate_caller_document_read_matrix[project_owner-api_key-False]
+3.39s call     tests/test_onboarding_register_authz.py::test_alternate_callers_cannot_use_replay_to_gain_access[viewer-api_key-False]
+3.37s call     tests/test_graph_neighborhood_api.py::test_all_root_statuses_match_canonical_details_and_service_is_denied[admin-api_key-True]
+3.17s call     tests/test_rbac_verify_harness.py::test_run_never_creates_or_deletes_a_user
+3.12s call     tests/test_graph_neighborhood_api.py::test_all_root_statuses_match_canonical_details_and_service_is_denied[non_member-api_key-True]
+3.11s call     tests/test_graph_neighborhood_api.py::test_all_root_statuses_match_canonical_details_and_service_is_denied[admin-api_key-False]
+3.10s call     tests/test_graph_neighborhood_api.py::test_all_root_statuses_match_canonical_details_and_service_is_denied[space_member-api_key-False]
+3.07s call     tests/test_graph_neighborhood_api.py::test_all_root_statuses_match_canonical_details_and_service_is_denied[non_member-api_key-False]
+3.07s call     tests/test_graph_neighborhood_api.py::test_all_root_statuses_match_canonical_details_and_service_is_denied[service-api_key-True]
+3.06s call     tests/test_graph_neighborhood_api.py::test_all_root_statuses_match_canonical_details_and_service_is_denied[resource_owner-api_key-False]
+3.04s call     tests/test_project_owner_document_read.py::test_alternate_caller_document_read_matrix[member-api_key-True]
+3.04s call     tests/test_correction_loop.py::TestWebhookClient::test_dead_letter_queue
+3.04s call     tests/test_correction_loop.py::TestWebhookClient::test_retry_on_failure
+3.02s call     tests/test_graph_neighborhood_api.py::test_all_root_statuses_match_canonical_details_and_service_is_denied[space_member-api_key-True]
+2.95s call     tests/test_graph_neighborhood_api.py::test_all_root_statuses_match_canonical_details_and_service_is_denied[service-api_key-False]
+2.88s call     tests/test_search_ask.py::TestAnswer::test_request_rules
+2.84s call     tests/test_onboarding_register_authz.py::test_alternate_callers_cannot_use_replay_to_gain_access[member-api_key-True]
+2.83s call     tests/test_onboarding_register_authz.py::test_alternate_callers_cannot_use_replay_to_gain_access[viewer-api_key-True]
+2.79s call     tests/test_wait_for_deploy.py::test_anything_short_of_both_services_serving_the_sha_fails[frontend-stale]
+=========================== short test summary info ============================
+FAILED tests/test_qdrant_prewarm.py::TestQdrantClientModule::test_get_qdrant_client_returns_singleton
+= 1 failed, 2987 passed, 3 skipped, 12 deselected, 49 warnings in 691.02s (0:11:31) =
