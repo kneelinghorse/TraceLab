@@ -30,6 +30,7 @@ class RateLimitConfig:
 
     max_requests: int = 5
     window_seconds: int = 60
+    max_keys: int = 4096
 
 
 def client_ip(request: Request) -> str:
@@ -92,11 +93,19 @@ class RateLimiter:
 
     def check(self, request: Request) -> None:
         """Check rate limit for the request. Raises HTTP 429 if exceeded."""
-        ip = self._get_client_ip(request)
+        self.check_key(self._get_client_ip(request))
+
+    def check_key(self, ip: str) -> None:
+        """Consume an opaque key's budget, bounding storage even under unique-key spam."""
         now = time.monotonic()
 
         with self._lock:
             self._prune(ip, now)
+            if ip not in self._requests and len(self._requests) >= self.config.max_keys:
+                for key in list(self._requests):
+                    self._prune(key, now)
+                if len(self._requests) >= self.config.max_keys:
+                    raise HTTPException(429, detail="Too many requests; try again later", headers={"Retry-After": str(self.config.window_seconds)})
             if len(self._requests[ip]) >= self.config.max_requests:
                 retry_after = int(self.config.window_seconds)
                 raise HTTPException(
@@ -118,6 +127,9 @@ auth_rate_limiter = RateLimiter(RateLimitConfig(max_requests=5, window_seconds=6
 register_rate_limiter = RateLimiter(
     RateLimitConfig(max_requests=5, window_seconds=60)
 )
+recovery_request_limiter = RateLimiter(RateLimitConfig(max_requests=5, window_seconds=60))
+recovery_confirm_limiter = RateLimiter(RateLimitConfig(max_requests=10, window_seconds=60))
+recovery_recipient_limiter = RateLimiter(RateLimitConfig(max_requests=3, window_seconds=900))
 
 
 __all__ = [

@@ -116,8 +116,17 @@ def _reset_auth_rate_limiters():
     unrelated suites. Resetting per test isolates them; each rate-limit test's own
     intra-test loop is unaffected because it runs after setup.
     """
-    from app.core.rate_limit import auth_rate_limiter, register_rate_limiter
+    from app.core.rate_limit import (
+        auth_rate_limiter,
+        recovery_confirm_limiter,
+        recovery_recipient_limiter,
+        recovery_request_limiter,
+        register_rate_limiter,
+    )
 
+    recovery_request_limiter.reset()
+    recovery_confirm_limiter.reset()
+    recovery_recipient_limiter.reset()
     auth_rate_limiter.reset()
     register_rate_limiter.reset()
     yield

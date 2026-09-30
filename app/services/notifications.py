@@ -88,11 +88,12 @@ class ResendClient:
                     response = await client.post(RESEND_ENDPOINT, json=payload, headers=headers)
                 if response.status_code < 300:
                     return str(response.json().get("id", ""))
-                logger.warning("Resend rejected an email (attempt %s): %s %s", attempt, response.status_code, response.text[:200])
+                # Provider bodies can echo the entire email, including recovery links.
+                logger.warning("Resend rejected an email (attempt %s): status=%s", attempt, response.status_code)
                 if response.status_code < 500:
                     return None
-            except httpx.HTTPError as exc:
-                logger.warning("Resend transport failure (attempt %s): %s", attempt, exc)
+            except (httpx.HTTPError, ValueError):
+                logger.warning("Resend transport failure (attempt %s)", attempt)
             if attempt == 1:
                 await asyncio.sleep(1.0)
         return None

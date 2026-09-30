@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
 class TokenUser(BaseModel):
@@ -37,6 +37,37 @@ class LoginRequest(BaseModel):
     @classmethod
     def normalize_email(cls, v: str) -> str:
         return v.strip().lower()
+
+
+class PasswordResetRequest(BaseModel):
+    """Only the normalized address is accepted; no redirect or recipient override."""
+
+    model_config = ConfigDict(extra="forbid")
+    email: str = Field(min_length=3, max_length=255)
+
+    @field_validator("email")
+    @classmethod
+    def normalize_email(cls, v: str) -> str:
+        return v.strip().lower()
+
+
+class PasswordResetConfirm(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    token: str = Field(min_length=43, max_length=43, pattern=r"^[A-Za-z0-9_-]+$")
+    new_password: str = Field(min_length=8, max_length=72)
+    confirm_password: str = Field(min_length=8, max_length=72)
+
+    @model_validator(mode="after")
+    def passwords_match(self) -> PasswordResetConfirm:
+        if self.new_password != self.confirm_password:
+            raise ValueError("Passwords must match")
+        if len(self.new_password.encode("utf-8")) > 72:
+            raise ValueError("Password must be at most 72 bytes")
+        return self
+
+
+class PasswordResetResponse(BaseModel):
+    message: str
 
 
 class ProfileUpdate(BaseModel):

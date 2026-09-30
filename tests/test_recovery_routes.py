@@ -25,13 +25,17 @@ def client():
 
 
 @pytest.fixture
-def caller(monkeypatch):
+def caller(monkeypatch, db_session):
     user = AuthenticatedUser(
         user_id=uuid4(),
         email="member@example.test",
         display_name="member",
         role="member",
     )
+    # Stream delivery reauthorizes the retained principal against the live user.
+    db_session.add(User(id=user.user_id, email=user.email, display_name=user.display_name,
+                        role=user.role, password_hash=str(uuid4())))
+    db_session.commit()
     monkeypatch.setitem(
         app.dependency_overrides, require_authenticated_user, lambda: user
     )

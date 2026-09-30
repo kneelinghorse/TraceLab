@@ -3,7 +3,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, Column, DateTime, Index, String
+from sqlalchemy import Boolean, Column, DateTime, Index, Integer, String
 
 from app.core.database import Base
 from app.models.types import GUID
@@ -18,6 +18,7 @@ class User(Base):
     email = Column(String(255), unique=True, nullable=False)
     display_name = Column(String(255), nullable=False)
     password_hash = Column(String(255), nullable=False)
+    credential_version = Column(Integer, nullable=False, default=0, server_default="0")
     email_notifications_enabled = Column(Boolean, nullable=False, default=True, server_default="1")
     # Least-privilege default (Sprint 47 T47.1). Was "admin", which silently minted
     # an admin for every User() without an explicit role — every invite registration

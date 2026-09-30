@@ -30,6 +30,7 @@ from app.core.config import settings
 from app.core.database import get_db
 from app.core.security import (
     AuthenticatedUser,
+    current_principal,
     generate_api_key,
     get_key_prefix,
     hash_api_key,
@@ -48,6 +49,7 @@ from app.schemas.device_auth import (
     DeviceTokenRequest,
     DeviceTokenSuccess,
 )
+from app.services.device_credentials import PENDING_PLAINTEXT
 
 router = APIRouter(tags=["auth-device"])
 
@@ -261,7 +263,7 @@ def poll_device_token(
 # with TTL == DEVICE_CODE_TTL_SECONDS. For Railway-single-instance today
 # this is enough.
 
-_PENDING_PLAINTEXT: dict[UUID, str] = {}
+_PENDING_PLAINTEXT = PENDING_PLAINTEXT
 
 
 def _stash_pending_plaintext(grant_id: UUID, plaintext: str) -> None:
@@ -289,6 +291,8 @@ def _resolve_pending_grant_or_404(
     grant = (
         db.query(DeviceAuthorizationGrant)
         .filter(DeviceAuthorizationGrant.user_code == normalized)
+        .populate_existing()
+        .with_for_update()
         .first()
     )
     if grant is None:
@@ -333,6 +337,7 @@ def approve_device_grant(
     poll. The MCP client persists the key locally and uses it for subsequent
     requests.
     """
+    current_principal(db, user, lock=True)
     grant = _resolve_pending_grant_or_404(db, payload.user_code)
 
     if grant.status == "approved":
@@ -376,10 +381,14 @@ def approve_device_grant(
     grant.user_id = user.user_id
     grant.api_key_id = api_key.id
     grant.approved_at = datetime.utcnow()
-    db.commit()
-    db.refresh(grant)
-
+    # Cache before releasing the user lock so reset cannot purge then race a stash.
     _stash_pending_plaintext(grant.id, plaintext)
+    try:
+        db.commit()
+    except Exception:
+        _PENDING_PLAINTEXT.pop(grant.id, None)
+        raise
+    db.refresh(grant)
 
     return DeviceApproveResponse(
         user_code=grant.user_code,

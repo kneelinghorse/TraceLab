@@ -2104,6 +2104,42 @@
       "classification": "rest-only-by-design",
       "baseline": "new",
       "rationale": "LIB-4: explicit source review, cited preview and signed exact-content acceptance. Decisions #551/#557 retain existing MCP Report retrieval; conversational review stays REST-only."
+    },
+    {
+      "id": "frontend/src/lib/api/auth.ts#confirmPasswordReset:POST:/auth/password-reset/confirm",
+      "api_file": "frontend/src/lib/api/auth.ts",
+      "operation": "confirmPasswordReset",
+      "source_line": 35,
+      "method": "POST",
+      "path": "/api/v1/auth/password-reset/confirm",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/PasswordRecovery.tsx",
+        "frontend/src/pages/forgot-password.tsx",
+        "frontend/src/pages/reset-password.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "AUTH-1: public credential recovery is REST/UI-only; tokens and password-setting actions are never MCP tools."
+    },
+    {
+      "id": "frontend/src/lib/api/auth.ts#requestPasswordReset:POST:/auth/password-reset/request",
+      "api_file": "frontend/src/lib/api/auth.ts",
+      "operation": "requestPasswordReset",
+      "source_line": 29,
+      "method": "POST",
+      "path": "/api/v1/auth/password-reset/request",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/PasswordRecovery.tsx",
+        "frontend/src/pages/forgot-password.tsx",
+        "frontend/src/pages/reset-password.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "AUTH-1: public credential recovery is REST/UI-only; tokens and password-setting actions are never MCP tools."
     }
   ]
 }

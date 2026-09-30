@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import Link from "next/link";
 
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -67,6 +68,8 @@ export function LoginPanel({ onSwitchToRegister }: LoginPanelProps) {
       </label>
 
       {error && <p className="text-sm text-danger">{error}</p>}
+
+      <p className="text-sm"><Link href="/forgot-password" className="text-accent-text underline">Forgot password?</Link></p>
 
       <button
         type="submit"

@@ -218,9 +218,9 @@ The suggestions are requested, reviewed and accepted in the Librarian; a persist
 
 **Outside this sprint:** password recovery is Sprint 61; sharing stays deferred, invites remain Derek's, and there is no RBAC redesign or autonomous writing. Twenty-one existing maintenance entries plus CI-documentation follow-up #464 were carried to the next backlog without expanding AUTH-1/AUTH-2. Next-step #405 is closed for the artifact choice and durable citation foundation only; historical gaps remain explicit. DeepSearch live-progress/runtime-identity follow-ups (#412/#416, message `1621f451`) were not resolved by this acceptance. Railway configuration follow-up #451 retains its recorded 2026-12-01 deadline.
 
-### Follow-on — Sprint 61: Account recovery and live run logs (planned 2026-09-30)
+### Follow-on — Sprint 61: Account recovery and live run logs (opened 2026-09-30)
 
-Derek asked to detail both password recovery and the outstanding DeepSearch live-log issue for a fresh build handoff. Decision **#563**, learnings **#274–275**, and the [Sprint 61 handoff](../planning/sprint-61-HANDOFF.md) record the source investigation, proposed policies, validation gates and cross-repository boundary. The existing sprint shell is reused: Planned, no dates, five queued missions.
+Derek asked to detail both password recovery and the outstanding DeepSearch live-log issue for a fresh build handoff. Decision **#563**, learnings **#274–275**, and the [Sprint 61 handoff](../planning/sprint-61-HANDOFF.md) record the source investigation, proposed policies, validation gates and cross-repository boundary. The existing sprint shell opened when AUTH-1 started in build session PS-2026-09-30-005 on 2026-09-30. AUTH-1 is In Progress; the other four missions remain Queued. Decision #564 records the recovery transaction and privacy contract before code.
 
 | Mission | Planned outcome | Requires |
 | --- | --- | --- |
@@ -234,7 +234,7 @@ Recovery is independent of mission-email preferences and keeps Settings' known-p
 
 Local DeepSearch source intentionally sets `auto_delivery=False` to avoid writes from lost leases and flushes only after terminal persistence. TraceLab's receiver currently appends without deduplication. Therefore live delivery requires a safe receiving contract before worker enablement, not just switching on a timer. Existing five-second UI polling stays; no speculative progress percentages or replacement stream infrastructure. The old pending request `1621f451` is not evidence that the worker work is scheduled. LOG-2 owns the authorized live run; WALK-4 reuses its receipt. DeepSearch's current model-evaluation sprint is untouched, and its deployment/dispatch authorization remains a later concrete build gate.
 
-CMOS holds the full acceptance criteria. This session performs no implementation, credential change, email send, external message, deployment or paid run. #412 stays unresolved until multiple batches are observed before completion; #416 and unrelated maintenance remain explicit carryovers. A fresh build session starts **AUTH-1** and synchronizes sprint identity only when work actually opens the sprint.
+CMOS holds the full acceptance criteria. The build session starts with AUTH-1 and synchronized the sprint identity on opening. Production recovery still requires an agreed controlled mailbox/account and exact-build email-to-login acceptance. #412 stays unresolved until multiple batches are observed before completion; #416 and unrelated maintenance remain explicit carryovers.
 
 ### Running alongside: the guest expansion track
 
@@ -350,3 +350,5 @@ _Truth in data, evidence as the connective tissue, one system._
   - **CMOS:** the project identity reads `sprint-59-complete`, `cmos/context/MASTER_CONTEXT.json` is regenerated, and a Sprint 60 shell holds the 23 carried next-steps. Its missions are Derek's to scope.
   - **The master context** is 78 KB of its 100 KB limit. Most of it is a rolling window of the last 40 session notes, so its size is bounded, and the manual prune planned for this close was not needed.
   - **The CMOS database** is 81 MB, all of it live data (65 MB is context snapshots), growing 1–2 MB a working day. The backfill upload fails above 100 MB, so pruning old snapshots after a backup, which cannot be undone, is Derek's call.
+
+- **2026-09-30: Sprint 61 opened in build session PS-2026-09-30-005.** AUTH-1 started; decision #564 freezes recovery endpoints, migration 056, token replacement/failure rules and credential invalidation. Deployed acceptance remains a separate required gate.

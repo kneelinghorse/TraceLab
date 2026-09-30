@@ -20,8 +20,17 @@ from app.services.activity import ActivityService
 from app.services.admin_stats import AdminStatsService
 from app.services.collection_context import CollectionContextService
 from app.services.home import HomeService
+from app.services.password_recovery import PasswordRecoveryService
 
 logger = logging.getLogger(__name__)
+
+
+def get_password_recovery_service() -> PasswordRecoveryService:
+    """Wire isolated background sessions and transactional email transport."""
+    from app.core.database import SessionLocal
+    from app.services.notifications import ResendClient
+
+    return PasswordRecoveryService(SessionLocal, ResendClient())
 
 
 def get_document_repository() -> DocumentRepository:

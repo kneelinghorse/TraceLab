@@ -35,6 +35,8 @@ from app.core.mission_events import (
 )
 from app.core.security import (
     AuthenticatedUser,
+    _to_authenticated_user,
+    current_principal,
     require_authenticated_principal,
     require_authenticated_user,
     require_authenticated_user_sse,
@@ -80,18 +82,22 @@ async def stream_mission_events(
             with SessionLocal() as db:
                 return _visible_events(events, _user, db)[-limit:]
 
-        async with aclosing(
-            bus.subscribe(
-                include_history=True,
-                heartbeat_seconds=15,
-                history_filter=filter_history,
-            )
-        ) as events:
-            async for event in events:
-                with SessionLocal() as db:
-                    visible = _visible_events([event], _user, db)
-                if visible:
-                    yield event.to_sse()
+        try:
+            async with aclosing(
+                bus.subscribe(
+                    include_history=True,
+                    heartbeat_seconds=15,
+                    history_filter=filter_history,
+                )
+            ) as events:
+                async for event in events:
+                    with SessionLocal() as db:
+                        visible = _visible_events([event], _user, db)
+                    if visible:
+                        yield event.to_sse()
+        except HTTPException:
+            # Revoked sessions must stop already-open streams, not just reconnects.
+            return
 
     return StreamingResponse(
         event_generator(),
@@ -184,6 +190,7 @@ def _visible_events(
     events: list[MissionEvent], user: AuthenticatedUser, db: Session
 ) -> list[MissionEvent]:
     """Scope mission events; global CMOS/PEDR activity has no tenant grants."""
+    user = _to_authenticated_user(current_principal(db, user))
     if authorize(user, "read", None, db):
         return events
     mission_ids = set()

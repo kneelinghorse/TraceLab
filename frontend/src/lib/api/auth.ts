@@ -24,3 +24,15 @@ export async function refresh(): Promise<TokenResponse> {
     method: "POST",
   });
 }
+
+export async function requestPasswordReset(email: string): Promise<{ message: string }> {
+  return apiRequest(`${AUTH_PATH}/password-reset/request`, {
+    method: "POST", body: JSON.stringify({ email }), skipAuth: true,
+  });
+}
+
+export async function confirmPasswordReset(token: string, new_password: string, confirm_password: string): Promise<{ message: string }> {
+  return apiRequest(`${AUTH_PATH}/password-reset/confirm`, {
+    method: "POST", body: JSON.stringify({ token, new_password, confirm_password }), skipAuth: true,
+  });
+}
