@@ -16,7 +16,7 @@ test.describe("Production smoke", () => {
 
   test("missions route responds at the public domain", async ({ page }) => {
     await page.goto("/missions", { waitUntil: "domcontentloaded" });
-    await expect(page.locator("main")).toContainText(/Verifying session|Mission Protocol/i);
+    await expect(page.getByRole("heading", { name: "Sign in", exact: true })).toBeVisible();
   });
 
   for (const route of ["/admin/users", "/admin/spaces"]) {

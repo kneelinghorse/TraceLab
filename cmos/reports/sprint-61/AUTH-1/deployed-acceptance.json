@@ -1,0 +1,174 @@
+{
+  "mission": "AUTH-1",
+  "session": "PS-2026-09-30-007",
+  "status": "self_service_recovery_accepted",
+  "recorded_at": "2026-09-30T17:26:51Z",
+  "pull_request": "https://github.com/kneelinghorse/TraceLab/pull/401",
+  "merge_commit": "68f607c52d6590d93289b616d5c3d8c45c1bcf40",
+  "review_head": "7a4901b70196a67d58ff8ce30b596e92024066e3",
+  "required_checks": "all required final-head checks passed before merge",
+  "deployment": {
+    "sha": "68f607c52d6590d93289b616d5c3d8c45c1bcf40",
+    "ok": true,
+    "observed": {
+      "backend": "68f607c52d6590d93289b616d5c3d8c45c1bcf40",
+      "frontend": "68f607c52d6590d93289b616d5c3d8c45c1bcf40"
+    },
+    "seconds_to_serve": {
+      "backend": 81.1,
+      "frontend": 141.9
+    },
+    "budget_seconds": 900,
+    "elapsed_seconds": 141.9
+  },
+  "schema_revision": "056_password_recovery",
+  "configuration": {
+    "resend_api_key_present": true,
+    "resend_sender_present": true,
+    "frontend_url": "https://tracelab.aquex.ai",
+    "debug": false,
+    "new_environment_variables": []
+  },
+  "public_pages": [
+    {
+      "path": "/forgot-password",
+      "status": 200,
+      "referrer_policy": "no-referrer",
+      "cache_control": "no-store"
+    },
+    {
+      "path": "/reset-password",
+      "status": 200,
+      "referrer_policy": "no-referrer",
+      "cache_control": "no-store"
+    }
+  ],
+  "candidate": {
+    "user_id": "44ea6fc4-7460-4ddb-b357-52bc1a0c1da7",
+    "authorization": "User created a dedicated candidate and explicitly confirmed control of its mailbox. Address omitted from this public receipt.",
+    "role": "member",
+    "active": true,
+    "credential_revision_before": 0,
+    "keys_before": 0,
+    "approved_device_grants_before": 0
+  },
+  "email_request": {
+    "surface": "deployed signed-out Forgot password browser form",
+    "requested_at": "2026-09-30T17:25:39.722444Z",
+    "expires_at": "2026-09-30T17:55:39.722444Z",
+    "ui_generic_success_observed": true,
+    "provider_accepted": true,
+    "acceptance_evidence": "Read-only password_recoveries.delivery_status=accepted after sender acknowledgement; this does not prove inbox delivery.",
+    "observed_at": "2026-09-30T17:25:51.182880Z",
+    "password_changed": false,
+    "credential_revision_after_request": 0,
+    "other_accounts_unchanged": true,
+    "other_accounts_compared": 7,
+    "service_accounts_compared": 1,
+    "service_credentials_unchanged": true,
+    "http_receipt": {
+      "timestamp": "2026-09-30T17:25:39.719119753Z",
+      "status": 202,
+      "method": "POST",
+      "path": "/api/v1/auth/password-reset/request",
+      "deployment_id": "4aafa464-c0c4-4aa5-be34-6e9e300220fb",
+      "total_duration_ms": 98
+    }
+  },
+  "privacy": "No password, token, reset URL, password hash, API key, or signing secret is included. Database queries were read-only over TLS. No other account credentials were changed.",
+  "notes": [
+    "Recovery acceptance exercised exact deployed PR #401 source at 68f607c; local-validation.json records its comprehensive checks and known skips/quarantine.",
+    "The sole follow-up UI change removes Mission Protocol from the login helper text. The production smoke assertion now waits for the Sign in heading instead of accepting the transient loading message.",
+    "No other user was reset. Candidate cleanup disables all of its access; no keys or approved grants remain."
+  ],
+  "recipient_observation": {
+    "evidence": "User reports opening delivered email, successfully completing the change, and automatic logout. Database independently proves this was a password change.",
+    "actual_mail_received": true,
+    "password_reset_completed": true,
+    "automatic_logout_observed": true,
+    "new_password_login": true,
+    "old_password_denied": true,
+    "reported_on": "2026-09-30",
+    "login_evidence": "User explicitly confirmed: yes new password works old password rejected."
+  },
+  "reset_http_receipts": [
+    {
+      "timestamp": "2026-09-30T17:26:19.763119741Z",
+      "httpStatus": 200,
+      "method": "POST",
+      "path": "/api/v1/auth/password-reset/confirm",
+      "deploymentId": "4aafa464-c0c4-4aa5-be34-6e9e300220fb",
+      "totalDuration": 249
+    }
+  ],
+  "post_reset": {
+    "observed_at": "2026-09-30T17:28:42.383882+00:00",
+    "schema": "056_password_recovery",
+    "candidate": {
+      "revision": 1,
+      "role": "member",
+      "active": true,
+      "keys": 0,
+      "grants": 0
+    },
+    "recovery": null,
+    "candidate_password_changed": true,
+    "candidate_revision_before": 0,
+    "other_accounts_unchanged": true,
+    "other_accounts_compared": 7,
+    "service_accounts_compared": 1,
+    "service_credentials_unchanged": true
+  },
+  "unrelated_owner_auth": {
+    "status": 200,
+    "role": "owner",
+    "credential_source": "Existing TraceLab MCP device credential, used privately through the documented API. No secret copied into this receipt."
+  },
+  "updated_at": "2026-09-30T17:39:25.502004+00:00",
+  "service_auth": {
+    "status": 200,
+    "role": "service",
+    "credential_source": "Existing DeepSearch worker TraceLab credential, used privately for GET /auth/me; no worker mutation, deployment, or dispatch."
+  },
+  "cleanup": {
+    "operation": "Admin PATCH active=false for the agreed candidate only",
+    "http_status": 200,
+    "post_cleanup": {
+      "observed_at": "2026-09-30T17:38:20.316761+00:00",
+      "schema": "056_password_recovery",
+      "candidate": {
+        "revision": 1,
+        "role": "member",
+        "active": false,
+        "keys": 0,
+        "grants": 0
+      },
+      "recovery": null,
+      "candidate_password_changed": true,
+      "candidate_revision_before": 0,
+      "other_accounts_unchanged": true,
+      "other_accounts_compared": 7,
+      "service_accounts_compared": 1,
+      "service_credentials_unchanged": true
+    }
+  },
+  "walk_4_followups": [
+    "Live JWT/refresh/query-token/open-stream/API-key/device fixture checks remain in WALK-4. The controlled candidate had no keys or approved grants in this first pass; local PostgreSQL and SQLite revocation/concurrency coverage is recorded separately.",
+    "Admin-assisted recovery is AUTH-2 and requires its own delivered-email acceptance; logs remain LOG-1/LOG-2."
+  ],
+  "copy_followup_validation": {
+    "frontend_recovery_and_shell_units": {
+      "passed": 18,
+      "skipped": 0
+    },
+    "recovery_route_pytest": {
+      "passed": 18,
+      "skipped": 0
+    },
+    "changed_frontend_eslint": "passed",
+    "foundational_references": "passed",
+    "production_copy_deployment": "pending follow-up PR",
+    "frontend_production_build": "passed",
+    "built_browser": "Verified signed-out /missions renders Enter your email and password to sign in."
+  }
+}
