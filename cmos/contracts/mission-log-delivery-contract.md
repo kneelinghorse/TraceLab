@@ -4,7 +4,7 @@ LOG-1, Sprint 61. Guiding templates: [architecture](../foundational-docs/tech_ar
 
 ## Negotiation and authorization
 
-A service principal first calls `GET /api/v1/missions/{mission_uuid}/logs/capabilities`. The response must contain `contract_version: "tracelab-mission-logs-v2"`, `max_batch_entries: 200`, `max_message_chars: 2048`, `final_flush: "terminal_result_key"`, and `legacy: "terminal_only_until_LOG-2_cutover"`. A 404, missing marker or different contract is **not ready**. No timer delivery starts until this proof and lease ownership are available.
+A service principal first calls `GET /api/v1/missions/{mission_uuid}/logs/capabilities`. The response must contain `contract_version: "tracelab-mission-logs-v2"`, `max_batch_entries: 200`, `max_message_chars: 2048`, `final_flush: "terminal_result_key"`, and `legacy: "retired"` (or the transitional `"terminal_only_until_LOG-2_cutover"` marker before cutover). A 404, missing marker or different contract is **not ready**. No timer delivery starts until this proof and lease ownership are available.
 
 Use `POST /api/v1/missions/{mission_uuid}/logs/v2`. Both capability and write routes require a service principal even with RBAC disabled; human admins/owners are denied. GET of saved logs retains existing human resource authorization. Raw ownership proof belongs only in the authenticated HTTPS request body. Never put it in URLs, log messages, telemetry, errors, GET/MCP responses or receipts. The receiver rejects entries whose message/source contains the submitted raw lease token. Validation errors omit submitted values. No response echoes the request body.
 
@@ -89,3 +89,12 @@ DeepSearch checkout via `DEEPSEARCH_SOURCE_ROOT` and uses actual HTTP against a
 loopback receiver. Without that explicit checkout it reports a named skip;
 release readiness requires executing it with no skip. LOG-2's readiness receipt
 records the exact sender/receiver source identities and production gate.
+
+## Retirement release gate
+
+This change is prepared on `codex/sprint-61-retire-legacy-logs` and must remain
+unpublished until the authorized LOG-2 worker acceptance receipt exists.
+After that cutover, service POST `/logs` returns 426 even with valid terminal
+proof; capability `legacy` is `retired`. Human/anonymous denials remain 403/401,
+and existing legacy history remains readable. Deploying this before worker
+acceptance would disable the old worker's terminal transport.

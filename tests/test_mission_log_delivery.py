@@ -202,19 +202,19 @@ def test_simultaneous_sqlite_http_retries_do_not_duplicate_the_observation(log_c
         engine.dispose()
 
 
-def test_legacy_window_is_bounded_terminal_only_and_cannot_downgrade_versioned_history(log_case):
+def test_retired_legacy_route_never_appends_even_with_terminal_proof(log_case):
     _, db, mission, body, _ = log_case
     legacy = {'entries':[{'level':'INFO','message':'old runner','phase':'complete','ts':'2026-09-30T12:00:00Z'}]}
-    assert post(log_case,legacy,versioned=False).status_code == 409
+    assert post(log_case,legacy,versioned=False).status_code == 426
     assert post(log_case,body,versioned=False).status_code == 422
     mission.status = 'completed'
     mission.deepsearch_lease_token = mission.deepsearch_lease_expires_at = None
     mission.deepsearch_result_key = hashlib.sha256(f"tracelab-missions-lease-v2:{mission.id}:1:{body['lease_token']}".encode()).hexdigest()
     db.commit()
-    assert post(log_case,legacy,versioned=False).status_code == 201
+    assert post(log_case,legacy,versioned=False).status_code == 426
     assert post(log_case).status_code == 201
-    assert post(log_case,legacy,versioned=False).status_code == 409
-    assert db.query(MissionLog).filter_by(mission_id=mission.id,attempt_count=None).count() == 1
+    assert post(log_case,legacy,versioned=False).status_code == 426
+    assert db.query(MissionLog).filter_by(mission_id=mission.id,attempt_count=None).count() == 0
 
 
 def test_outsider_and_service_cannot_read_even_valid_owned_observations(log_case):

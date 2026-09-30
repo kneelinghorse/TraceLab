@@ -1143,13 +1143,14 @@ class LogEntryResponse(BaseModel):
 def ingest_mission_logs(
     mission_id: UUID,
     payload: LogBatchRequest,
-    db: Session = Depends(get_db),
     user: AuthenticatedUser = Depends(require_authenticated_principal),
-    service: MissionLogService = Depends(get_mission_log_service),
 ) -> dict:
-    """Bounded terminal-only compatibility until the LOG-2 worker cutover."""
+    """Retired after the coordinated LOG-2 worker acceptance."""
     authorize_service_or_403(user, enforce_when_disabled=True)
-    return {"accepted": service.ingest_legacy(db, mission_id, payload)}
+    raise HTTPException(
+        status_code=http_status.HTTP_426_UPGRADE_REQUIRED,
+        detail="Unversioned mission logs are retired. Use the negotiated /logs/v2 contract.",
+    )
 
 
 @service_router.get("/{mission_id}/logs/capabilities")
@@ -1161,7 +1162,7 @@ def mission_log_capabilities(
     authorize_service_or_403(user, enforce_when_disabled=True)
     return {"contract_version": LOG_CONTRACT_VERSION, "max_batch_entries": MAX_LOG_BATCH,
             "max_message_chars": MAX_LOG_MESSAGE, "final_flush": "terminal_result_key",
-            "legacy": "terminal_only_until_LOG-2_cutover"}
+            "legacy": "retired"}
 
 
 @service_router.post(
