@@ -24,6 +24,68 @@ from app.main import app  # noqa: E402
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
+def pytest_addoption(parser):
+    parser.addoption(
+        "--disposable-qdrant", action="store_true",
+        help="Run Qdrant integration tests in a new local disposable container",
+    )
+
+
+@pytest.fixture
+def disposable_qdrant(request, monkeypatch):
+    """Own the endpoint, unique collection and teardown; never accept a user URL."""
+    if not request.config.getoption("--disposable-qdrant"):
+        pytest.skip("Requires --disposable-qdrant and local Docker")
+    import time
+    from urllib.parse import urlparse
+    from uuid import uuid4
+
+    from qdrant_client import QdrantClient
+    from testcontainers.core.container import DockerContainer
+    from testcontainers.core.docker_client import get_docker_host
+
+    from app.core.config import settings
+    from scripts.pytest_isolation import _container_origins
+
+    docker_host = get_docker_host()
+    if docker_host:
+        parsed = urlparse(docker_host)
+        if parsed.scheme != "unix" and parsed.hostname not in {
+            "localhost", "127.0.0.1", "::1"
+        }:
+            pytest.fail("Disposable Qdrant requires a local Docker host")
+
+    with DockerContainer("qdrant/qdrant:v1.12.4").with_exposed_ports(6333) as container:
+        host = container.get_container_host_ip()
+        if host not in {"localhost", "127.0.0.1", "::1"}:
+            pytest.fail("Disposable Qdrant requires a local Docker host")
+        url = f"http://{host}:{container.get_exposed_port(6333)}"
+        collection = f"test_{uuid4().hex}_cache"
+        _container_origins.add(url)
+        client = None
+        try:
+            client = QdrantClient(url=url, timeout=2)
+            deadline = time.monotonic() + 30
+            while True:
+                try:
+                    client.get_collections()
+                    break
+                except Exception:
+                    if time.monotonic() >= deadline:
+                        raise
+                    time.sleep(0.1)
+            monkeypatch.setattr(settings, "semantic_cache_collection_name", collection)
+            yield client
+        finally:
+            try:
+                if client is not None and client.collection_exists(collection):
+                    client.delete_collection(collection)
+            finally:
+                _container_origins.discard(url)
+                if client is not None:
+                    client.close()
+
+
 @pytest.fixture(scope="session")
 def pg_container():
     """Spin up a PostgreSQL container for the test session."""

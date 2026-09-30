@@ -1,0 +1,74 @@
+{
+  "mission": "S62-ISO",
+  "status": "verification-in-progress",
+  "source_base": "2d353e6",
+  "branch": "codex/sprint-62-build",
+  "implementation": "Pre-import test-only environment and SDK/HTTPX transport boundary; in-memory Qdrant with enabled cache behavior; fixture-owned local disposable Qdrant option.",
+  "validation": [
+    {
+      "selection": "sentinel before implementation",
+      "failed": 1,
+      "reason": "production-like Qdrant key inherited into settings; socket guard installed; no real production call"
+    },
+    {
+      "selection": "first targeted backend",
+      "passed": 74,
+      "failed": 1,
+      "reason": "RAG API test inherited user table from prior suites; fixed shared fixture to initialize its own auth database"
+    },
+    {
+      "selection": "unit + RAG/prewarm/cache/synthesis-cache/mail/password recovery",
+      "passed": 332,
+      "failed": 0,
+      "skipped": 0,
+      "deselected": 0
+    },
+    {
+      "selection": "disposable Qdrant roundtrip + PostgreSQL row locking",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "selection": "frontend",
+      "passed": 313,
+      "lint": "passed",
+      "types": "passed",
+      "production_build": "passed"
+    },
+    {
+      "selection": "MCP",
+      "unit_passed": 160,
+      "clean_installed_tarball_checks": 63,
+      "parity_intent_tests": 11,
+      "parity_audits": "passed"
+    },
+    {
+      "selection": "foundational references and changed-file Ruff",
+      "result": "passed"
+    },
+    {
+      "selection": "CMOS legacy JS integration runner",
+      "passed": 13,
+      "failed": 2,
+      "baseline_reproduced_at": "2d353e6",
+      "failures": [
+        "missing cmos/runtime/boomerang",
+        "legacy headings expected in cmos/agents.md"
+      ],
+      "disposition": "Unchanged historical harness assumptions; not runtime isolation failures. Preserved in integration-framework.json."
+    }
+  ],
+  "pending": [
+    "Full serialized backend with original 12 quarantined nodes",
+    "Final PostgreSQL integration and exact-source checks",
+    "GitHub required checks"
+  ],
+  "external_calls": "Sentinel probes intercepted sockets; no production vector, mail or model calls. Container proof used newly created local Docker Qdrant and PostgreSQL.",
+  "scope_limits": [
+    "No application feature or server variable change",
+    "No quarantine changes",
+    "No production deployment required for this test-only mission"
+  ],
+  "dependency_audit_observation": "npm ci reported existing lockfile advisories: frontend21 (2 critical), MCP13 (1 critical). No dependencies changed; remediation outside the locked isolation mission."
+}

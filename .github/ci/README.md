@@ -4,6 +4,39 @@ This directory records the measured baseline behind CI-1. The introducing pull
 request must reproduce the blocking results below; this file is evidence, not a
 substitute for green GitHub checks.
 
+## Safe test providers (S62-ISO)
+
+Run application tests through `pytest` from the repository root. Root
+`tests/conftest.py` installs `scripts/pytest_isolation.py` **before** settings and
+cached clients load. Shell and `.env` Qdrant endpoints, credentials and collection
+names cannot survive this boundary. The SDK uses in-memory Qdrant by default;
+semantic cache remains enabled and real payload serialization stays exercised.
+Direct remote clients (including gRPC) are rejected. Real HTTPX transports are
+blocked; injected SDK doubles, MockTransport and in-process API clients still work.
+OpenAI/Librarian receive dummy credentials; mail and worker credentials are empty.
+Tests which need configured credentials must provide their own non-secret fixtures.
+
+```bash
+pytest tests/unit/test_test_isolation.py tests/test_rag_service.py tests/test_caching.py
+pytest tests/integration/test_qdrant_isolation.py --disposable-qdrant
+pytest tests/integration/test_collection_locking_postgres.py
+```
+
+`--disposable-qdrant` opts into a **new local Docker container**, never a supplied
+endpoint. Its fixture registers only the allocated HTTP origin, uses a unique
+`test_*` collection, deletes that collection and destroys the container on exit.
+Arbitrary endpoint/key environment variables cannot opt out of isolation. Without
+the flag the container test is explicitly skipped. PostgreSQL's existing
+testcontainer fixture remains unchanged. Do not load production credentials into
+pytest; use separately authorized live verification scripts for deployed checks.
+
+Entrypoint inventory: all `tests/{unit,integration,e2e,mcp_tools}` conftests inherit
+the root boundary, as do both backend GitHub workflows. The only application SDK
+constructor is `app/core/qdrant_client.py`; semantic cache, vector storage, retrieval
+and startup prewarming share it. SDK class references imported earlier are guarded
+at construction too. Loading app settings before this boundary fails explicitly.
+The CMOS JS integration runner validates the planning workspace, not app providers.
+
 ## 2026-08-21 post-PEDR-1C baseline
 
 | Lane | Command | Result |

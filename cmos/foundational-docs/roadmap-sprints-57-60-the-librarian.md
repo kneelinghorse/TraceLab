@@ -266,12 +266,14 @@ deadline. DeepSearch's model evaluation, provider configuration and other paid w
 were not changed. Sprint identity, decision ownership and CMOS parity are checked
 at close; the historical receipts now identify resolved operator instructions.
 
-### Follow-on — Sprint 62: Reliable operations and guided mission creation (Planned, locked 2026-09-30)
+### Follow-on — Sprint 62: Reliable operations and guided mission creation (Active, opened 2026-09-30)
 
 Derek approved the reliability and mission-entry recommendation and asked for a
 fresh-session build handoff. Decision **#576** and the
 [Sprint 62 handoff](../planning/sprint-62-HANDOFF.md) lock nine missions; CMOS
-holds their complete acceptance criteria and dependencies. No build has started.
+holds their complete acceptance criteria and dependencies. Build session
+PS-2026-09-30-013 started S62-ISO first from the accepted planning branch;
+the remaining mission order and acceptance boundaries below are unchanged.
 
 The primary Home, Missions and command-palette action becomes **Plan a mission**,
 opening a focused Librarian view. A new user can describe research before choosing
@@ -376,6 +378,7 @@ Add to this list rather than resolving items silently.
 
 ## Change Log
 
+- **2026-09-30 UTC, Sprint 62 opened.** S62-ISO started in an isolated build worktree from `2d353e6`; CMOS identity and sprint pointers synchronized. Mandatory delivery and deployed acceptance gates remain open.
 - **2026-09-30 UTC, Sprint 62 locked for fresh build (decision #576).** Nine Queued missions cover test isolation, CI diagnostics, hello forwarding, saved-run scope diagnosis, guided mission entry, cache observability, two narrow UX defects, supported Railway configuration and final acceptance. Ten existing follow-ups promoted; thirteen remain outside scope. Official Railway cutoff corroborated in Evidence Ledger; no runtime/deploy/mail/paid-run action. [Build handoff](../planning/sprint-62-HANDOFF.md).
 
 - **2026-09-30 UTC, Sprint 61 detailed for a fresh build (decision #563).** Refined AUTH-1/AUTH-2 and added LOG-1, LOG-2 and WALK-4 in CMOS. Source inspection found missing session revocation/public-route/mail-secrecy work for recovery and intentional terminal-only delivery plus an unfenced append receiver for logs. The handoff preserves lease safety, replay semantics, independent recovery delivery, real mailbox/pre-terminal acceptance and the DeepSearch deployment boundary. Sprint remains Planned; no runtime or production actions performed.
