@@ -1,0 +1,23 @@
+{
+  "restored": true,
+  "results": [
+    {
+      "mutation": "wrong-caller",
+      "test": "test_unsigned_or_wrong_principal_acceptance_cannot_write[user]",
+      "exit_code": 1,
+      "killed": true
+    },
+    {
+      "mutation": "uncited-input-not-rechecked",
+      "test": "test_all_effective_inputs_are_rechecked_at_save[uncited_text]",
+      "exit_code": 1,
+      "killed": true
+    },
+    {
+      "mutation": "persisted-prose-diverges",
+      "test": "test_preview_then_exact_save_and_retry_never_generate_again",
+      "exit_code": 1,
+      "killed": true
+    }
+  ]
+}

@@ -335,7 +335,7 @@ export default function ReportDetailPage() {
                 ))}
               </ul>
             )}
-            {report.generation_provenance && <p className="mt-4 text-xs text-muted">Generated synthesis{report.generation_provenance.model ? ` · ${report.generation_provenance.model}` : ""}{report.generation_provenance.accepted_by ? " · Human accepted" : " · Review not recorded"}</p>}
+            {report.generation_provenance && <p className="mt-4 text-xs text-muted">{report.generation_provenance.origin === "librarian" ? "Librarian drafted" : "Generated synthesis"}{report.generation_provenance.model ? ` · ${report.generation_provenance.model}` : ""}{report.generation_provenance.accepted_by ? " · Human accepted" : " · Review not recorded"}</p>}
             {(report.original_documents ?? []).length > 0 && (
               <div className="mt-4">
                 <h3 className="font-medium">Original result documents</h3>

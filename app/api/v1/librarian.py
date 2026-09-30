@@ -36,6 +36,7 @@ from app.schemas.librarian_description import (
     DescriptionRestoreRequest,
 )
 from app.schemas.librarian_duplicates import DuplicateCompareRequest, DuplicateScanRequest
+from app.schemas.librarian_reports import ReportAcceptRequest, ReportDraftRequest
 from app.services.collection import CollectionService, get_collection_service
 from app.services.librarian import (
     LibrarianConflict,
@@ -56,6 +57,7 @@ from app.services.librarian_model import (
     RateLimitError,
     get_librarian_model,
 )
+from app.services.librarian_reports import accept_report, draft_report, report_sources
 from app.services.mission_service import MissionValidationError
 
 logger = logging.getLogger(__name__)
@@ -347,3 +349,55 @@ def librarian_collection_provenance(
         return collection_provenance(db, current_user, collection_id)
     except LookupError as exc:
         raise HTTPException(404, detail=str(exc)) from exc
+
+
+@router.get("/reports/sources")
+def librarian_report_sources(
+    project_id: UUID,
+    collection_id: UUID | None = None,
+    current_user: AuthenticatedUser = Depends(require_authenticated_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    _require_human(current_user)
+    project = _load_project(db, current_user, project_id, "read")
+    try:
+        return report_sources(db, current_user, project, collection_id)
+    except LibrarianConflict as exc:
+        raise HTTPException(409, detail=str(exc)) from exc
+
+
+@router.post("/reports/draft")
+def librarian_report_draft(
+    payload: ReportDraftRequest,
+    current_user: AuthenticatedUser = Depends(require_authenticated_user),
+    db: Session = Depends(get_db),
+    service: LibrarianService = Depends(get_librarian_service),
+) -> dict:
+    _require_human(current_user)
+    project = _load_project(db, current_user, payload.project_id, "read")
+    try:
+        return draft_report(db, current_user, project, payload, service)
+    except LibrarianConflict as exc:
+        raise HTTPException(409, detail=str(exc)) from exc
+    except LibrarianDraftError as exc:
+        raise HTTPException(422, detail=str(exc)) from exc
+    except LibrarianUnavailable as exc:
+        raise HTTPException(503, detail=str(exc)) from exc
+    except (RateLimitError, APIError) as exc:
+        raise _provider_error(exc) from exc
+
+
+@router.post("/reports/accept")
+def librarian_report_accept(
+    payload: ReportAcceptRequest,
+    current_user: AuthenticatedUser = Depends(require_authenticated_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    _require_human(current_user)
+    project = _load_project(db, current_user, payload.project_id, "create")
+    try:
+        return accept_report(db, current_user, project, payload)
+    except LibrarianConflict as exc:
+        raise HTTPException(409, detail=str(exc)) from exc
+    except LibrarianDraftError as exc:
+        raise HTTPException(422, detail=str(exc)) from exc

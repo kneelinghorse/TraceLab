@@ -35,7 +35,7 @@ it("scans only on request, preserves review after navigation, and dismisses with
   fireEvent.focus(window); fireEvent(window, new Event("online"));
   expect(duplicateApi.scan).not.toHaveBeenCalled();
   await scan();
-  expect(screen.getByRole("region", { name: "Duplicate results" })).toHaveFocus();
+  await waitFor(() => expect(screen.getByRole("region", { name: "Duplicate results" })).toHaveFocus());
   fireEvent.click(screen.getByRole("button", { name: "Dismiss pair" }));
   expect(screen.queryByRole("button", { name: "Compare sources" })).toBeNull();
   first.unmount(); render(panel());
