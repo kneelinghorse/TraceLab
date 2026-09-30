@@ -174,8 +174,8 @@ class TestTrustedOriginPathsUnaffected:
 
 class TestServiceCarveOutBoundary:
     """T47.4 — the service-write carve-out must stay EXPLICIT and cannot silently
-    widen. POST /missions/{id}/logs and POST /missions/{id}/evidence are the two
-    known service-gated writes; any addition or relocation must be a conscious,
+    widen. Legacy/v2 log writes, log capabilities and evidence delivery are the
+    reviewed service surfaces; any addition or relocation must be a conscious,
     reviewed change recorded here and in docs/authentication.md. This is the
     "future cross-resource service write" guard, plus coverage of the published
     npm MCP client (the real production MCP surface — the in-repo app/mcp_server

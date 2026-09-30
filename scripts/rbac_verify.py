@@ -3055,79 +3055,70 @@ class RbacVerifier:
             )
 
     def service_log_write_matrix(self, mission_id: str, principals: dict[str, str]) -> None:
-        """The mission-log INGEST path (POST /missions/{id}/logs) is a service-to-
-        service write gated to a SERVICE principal (T47.4), NOT per-user authorize().
-        Prove the triad on a real seeded mission:
+        """Prove service negotiation and human denial without fabricating a lease.
 
-          * anon (no creds)        -> 401  (router-level authn still applies, flag-free)
-          * a non-service human    -> 403  (a human-auth token can't spoof logs)  CRITICAL
-          * the service principal  -> 2xx  (the legitimate runner is not over-blocked)
-
-        A non-service human receiving 2xx here is the exact BOLA leak this mission
-        closes, so it is reported as a DENY-LEAK-2xx (the harness's critical class).
-        Owner/admin humans are INTENTIONALLY tested as denied too — the service gate
-        is stricter than authorize(), which would allow them. A VALID log body is
-        sent so the SERVICE GATE (not Pydantic body validation) decides the outcome;
-        an empty body would 422 before the gate and prove nothing. The 2xx write is
-        safe to leave: mission_logs FK is ON DELETE CASCADE, so mission teardown
-        reaps it.
+        The harness owns a draft fixture. Service reads of capabilities must
+        succeed, but both writes must reject this unowned draft with 409. Exact
+        human 403s distinguish the role gate from downstream ownership checks.
+        Successful owned writes are covered by the receiver acceptance suite.
         """
         path = f"{self._prefix}/missions/{mission_id}/logs"
         body = {"logs": [{"level": "INFO", "message": "rbac-verify service-gate probe"}]}
-
-        # anon -> 401 (authentication is router-level and independent of the flag)
-        resp = self._call("post", path, json=body)
-        self._record(
-            resp.status_code == 401,
-            Gap("anon-401", "anon", "post", path, "401", str(resp.status_code)),
-        )
-
-        # non-service humans (incl. owner) -> 403. A 2xx is the critical BOLA leak.
-        human_checked = []
-        for role in ("member", "viewer", "owner", "second_owner"):
-            token = principals.get(role)
-            if not token:
-                continue
-            human_checked.append(role)
-            resp = self._call("post", path, token=token, json=body)
-            self._record_exact_deny(
-                resp,
-                role=role,
-                method="post",
-                path=path,
-                expected=403,
-                kind="SERVICE-LOG-AUTHZ-STATUS",
+        versioned = {
+            "contract_version": "tracelab-mission-logs-v2",
+            "mission_id": mission_id,
+            "attempt_count": 1,
+            "lease_owner": "rbac-verifier-unowned",
+            "lease_token": "rbac-verifier-unowned-proof",  # Deliberately invalid fixture proof.
+            "logs": [{
+                "event_id": str(uuid.uuid4()), "sequence": 1, "level": "INFO",
+                "message": "rbac-verify service-gate probe", "source": "rbac-verifier",
+                "logged_at": "2026-09-30T00:00:00Z",
+            }],
+        }
+        routes = [("post", path, body), ("post", path + "/v2", versioned),
+                  ("get", path + "/capabilities", None)]
+        human_roles = [role for role in ("member", "viewer", "owner", "second_owner")
+                       if principals.get(role)]
+        for method, route, payload in routes:
+            resp = self._call(method, route, json=payload)
+            self._record(
+                resp.status_code == 401,
+                Gap("anon-401", "anon", method, route, "401", str(resp.status_code)),
             )
-        if not human_checked:
-            # No human principal -> the deny half proves nothing. Loud, not silent.
+            for role in human_roles:
+                resp = self._call(method, route, token=principals[role], json=payload)
+                self._record_exact_deny(
+                    resp, role=role, method=method, path=route, expected=403,
+                    kind="SERVICE-LOG-AUTHZ-STATUS",
+                )
+            service_token = principals.get("service")
+            if service_token:
+                resp = self._call(method, route, token=service_token, json=payload)
+                expected = 200 if method == "get" else 409
+                self._record(
+                    resp.status_code == expected,
+                    Gap("service-log-boundary", "service", method, route,
+                        str(expected), str(resp.status_code)),
+                )
+                if method == "get" and resp.status_code == 200:
+                    negotiated = resp.json().get("contract_version")
+                    self._record(
+                        negotiated == versioned["contract_version"],
+                        Gap("service-log-version", "service", method, route,
+                            versioned["contract_version"], str(negotiated)),
+                    )
+        if not human_roles:
             self.gaps.append(
                 Gap("NO-DENY-PRINCIPAL", "service-gate", "post", path,
                     "a human principal to prove denial",
                     "none authenticated — no human principal was supplied to run()")
             )
-
-        # the service principal -> 2xx (over-blocking guard: the runner must still work)
-        service_token = principals.get("service")
-        if service_token:
-            resp = self._call("post", path, token=service_token, json=body)
-            self._record(
-                200 <= resp.status_code < 300,
-                Gap("service-overblock", "service", "post", path, "2xx", str(resp.status_code)),
-            )
-        else:
-            # Mirror NO-DENY-PRINCIPAL: the service-ALLOW probe IS the over-block
-            # guard that proves the legitimate runner is not denied — the go/no-go
-            # signal for the rbac_enabled flip (a missing service account is exactly
-            # the "log ingestion 403s at flip time" failure the rollout runbook
-            # exists to prevent). This method is only reached against an rbac-ON
-            # target (precheck aborts when OFF), so an un-provisionable service
-            # principal must be a LOUD gap, never a silent green PASS.
+        if not principals.get("service"):
             self.gaps.append(
-                Gap(
-                    "NO-SERVICE-PRINCIPAL", "service-gate", "post", path,
+                Gap("NO-SERVICE-PRINCIPAL", "service-gate", "get", path + "/capabilities",
                     "a service principal to prove the runner is not over-blocked",
-                    "none authenticated — no service principal was supplied to run()",
-                )
+                    "none authenticated — no service principal was supplied to run()")
             )
 
     # -- teardown -----------------------------------------------------------------
@@ -3531,7 +3522,7 @@ class RbacVerifier:
                 self.pedr1c_scope_matrix(principals, self._principal_ids)
 
                 if "mission" in ctx:
-                    self._log("service-role log-ingest gate (POST .../logs)...")
+                    self._log("service log negotiation and owned-write boundary...")
                     self.service_log_write_matrix(ctx["mission"], principals)
 
                 self.notes.append(

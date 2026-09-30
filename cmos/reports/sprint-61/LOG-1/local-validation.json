@@ -1,7 +1,7 @@
 {
   "mission": "LOG-1",
   "session": "PS-2026-09-30-008",
-  "recorded_at": "2026-09-30T19:00:47.547971+00:00",
+  "recorded_at": "2026-09-30T19:19:12.647539+00:00",
   "base_commit": "db153f89321439a9404833234589b1b80db12e70",
   "decisions": [
     568,
@@ -22,8 +22,10 @@
     "tests/fixtures/mission-logs-v2/batch.json": "7e698ce50c7d3a26e884261ec7c3278b28d91a94024a74b6df3f383d791cf423",
     "cmos/contracts/mission-log-delivery-contract.md": "4cc11a71affbb53e5975d87253bf201f18b748ec73b457754289333ab7e7af27",
     "tests/test_service_principal_route_boundary.py": "b7b727d10674a69ff2df0c5207d9f7949f81f452a89a87bfada1a959064cfd2c",
-    "tests/test_rbac_flip_regression.py": "d46f2384ae282e577f8e2a2024d2afdc926489e47157e33154448396e77dc270",
-    "tests/test_rbac_route_enforcement_api.py": "8cfa5f3e73baec2491e327810a4d92f132911803e24e87b0636e22d07427e286"
+    "tests/test_rbac_flip_regression.py": "8639baf2d9a6f61bb05ca21dd243c18ec2e2392b66a244e0b60500eba3d59c27",
+    "tests/test_rbac_route_enforcement_api.py": "8cfa5f3e73baec2491e327810a4d92f132911803e24e87b0636e22d07427e286",
+    "scripts/rbac_verify.py": "38cc265c635373e0e742952db3ec7c350b8247aacaf5d2ba8d3918a0fc0111be",
+    "tests/test_rbac_verify_harness.py": "df3b7389c5de8d56e78cfa90b5df5ed3c55c328ed5ea9a07257217936797f754"
   },
   "validation": {
     "boundary_final": {
@@ -65,13 +67,48 @@
     "ruff_changed_files": "passed",
     "diff_check": "passed",
     "foundational_references": "passed",
-    "mcp_parity": "passed: 118 classified operations, 113 live, 5 dead; 9 tools / 50 actions"
+    "mcp_parity": "passed: 118 classified operations, 113 live, 5 dead; 9 tools / 50 actions",
+    "rbac_verifier_and_mutation_proof": {
+      "passed": 65,
+      "skipped": 0,
+      "warnings": 14,
+      "duration_seconds": 138.79,
+      "files": [
+        "tests/test_rbac_verify_harness.py",
+        "tests/test_rbac_verify_mutation_proof.py"
+      ],
+      "intent": "Service capabilities prove positive access; unowned draft writes must return409. Human/anonymous exact denials cover legacy, v2 and capabilities. An injected role-gate bypass against a terminal local fixture must be caught as a real human write leak."
+    },
+    "first_ci": {
+      "head": "ad2e4bd058255cd47558305040c82bace578c366",
+      "backend_suite": {
+        "passed": 3072,
+        "failed": 2,
+        "skipped": 3,
+        "deselected_existing_quarantine": 12,
+        "warnings": 49,
+        "duration_seconds": 614.47,
+        "run": "https://github.com/kneelinghorse/TraceLab/actions/runs/36762730499"
+      },
+      "integration": {
+        "passed": 169,
+        "skipped": 2,
+        "warnings": 17,
+        "duration_seconds": 124.99,
+        "run": "https://github.com/kneelinghorse/TraceLab/actions/runs/36762730453"
+      },
+      "production_browser": {
+        "passed": 82,
+        "run": "https://github.com/kneelinghorse/TraceLab/actions/runs/36762730458"
+      }
+    }
   },
   "failures_preserved": [
     "Initial fixture omitted required success_criteria; corrected before expected route-404 TDD failure.",
     "SQLite concurrency first used the suite StaticPool single physical connection; BEGIN IMMEDIATE failed. Independent NullPool request sessions corrected this. A later broad run exposed auth SessionLocal sharing that same StaticPool and crashed the interpreter; the fixture now also gives real JWT authentication independent connections. Learning #278.",
     "Real PostgreSQL rejected bare ORM FOR UPDATE with Mission.result_report eager outer join. Receiver now selects only seven fence columns and locks OF missions; actual PostgreSQL races passed. Learning #277.",
-    "Broader consumer inventory mismatch corrected as described above."
+    "Broader consumer inventory mismatch corrected as described above.",
+    "First full backend CI caught two RBAC-verifier assumptions: service writes to unowned drafts were expected201, and RBAC-off was assumed to disable the service role gate. The verifier now checks service capability/version success, 409 for unowned writes, exact401/403s, and an injected actual bypass. Its full65-test harness/mutation suite passed; runtime ownership was not weakened. Learning #279."
   ],
   "limits": [
     "Receiver-only change; no actual worker live-delivery claim and no closure of #412.",
