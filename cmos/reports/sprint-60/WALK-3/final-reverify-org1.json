@@ -1,0 +1,40 @@
+{
+  "verified_at": "2026-09-30T03:05:26.638Z",
+  "serving_commit": "58269adb6c4409c73e3a84a58aefbbe7d4466ff5",
+  "project_id": "0d6c5b1d-72eb-4390-a40b-c48c88cdb302",
+  "collection_id": "cf1dd7ec-25f1-4141-9210-4a805e311137",
+  "reviewed_member_ids": [
+    "27a6eb7e-581c-43cd-bad9-3f7c3a5332ee",
+    "5382d30e-4343-4f3e-bca2-08b0cb1ff792"
+  ],
+  "model": "gpt-5.1",
+  "coverage": {
+    "readable_documents": 9,
+    "documents_with_eligible_chunks": 3,
+    "used_documents": 3,
+    "readable_chunks": 3,
+    "eligible_chunks": 3,
+    "used_chunks": 3,
+    "excluded_chunks": 0,
+    "limited": false,
+    "chunk_limit": 20,
+    "character_limit": 24000
+  },
+  "destination": {
+    "owner_id": "007c8cb6-7d70-48fc-bcb4-3a0e46bc0519",
+    "space_name": "Default Workspace",
+    "workspace_id": "00000000-0000-0000-0000-000000000001"
+  },
+  "published_mcp_version": "2.1.0",
+  "original_source_sha256": "1393114b9498302614e619f5c57202626ac6739e9c29455b291cacc1eb7cbead",
+  "project_sha256": "5d3e1984c855c21ea2cb49493a430a434076ff50ed88aae6b13e6e1dc65c15bc",
+  "sources_and_project_unchanged": true,
+  "saved_group_count": 1,
+  "dismissed_group_ids": [
+    "bc43fdad-4217-4aa6-88b3-b6072a6dce4d"
+  ],
+  "exact_membership_order_reopen_export_and_mcp": true,
+  "resolving_sources": 2,
+  "verification": "Agent acceptance, not Derek personal acceptance",
+  "read_only": true
+}

@@ -1,0 +1,15 @@
+{
+  "verified_at": "2026-09-30T03:05:09.535Z",
+  "serving_commit": "58269adb6c4409c73e3a84a58aefbbe7d4466ff5",
+  "read_only": true,
+  "member_account_disabled": true,
+  "revoked_key_denied": true,
+  "exact_report_content": "837af004149f4f67591b3b2737bffd27850f4e76cd3a2b9fa907faa0416e8287",
+  "report_id": "18545204-bdc7-43ec-8799-c3b6726c9d35",
+  "collection_id": "812075e7-a8bc-4654-86fc-d27e13d164a0",
+  "exact_members": [
+    "9bccfe96-07ed-4201-9837-1097b968b979",
+    "7f8ab11f-463d-427d-8b49-970dc66e20e7"
+  ],
+  "citations_and_json_export_verified": true
+}
