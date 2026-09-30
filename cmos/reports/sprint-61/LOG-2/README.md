@@ -1,30 +1,39 @@
-# LOG-2 readiness and rollout checkpoint
+# LOG-2 live acceptance and retirement
 
-LOG-2 is **not complete**. The user authorized publishing, deployment and the one
-paid acceptance run on 2026-09-30, including the disclosed $5 planning allowance
-without an enforced dollar cap. Both PRs are merged. The worker rollout was
-canceled before replacing the old worker because unrelated paid research began
-during its build. Resume only in an idle window and with an authenticated browser
-ready to capture live evidence. WALK-4, #412 (live delivery), and #416 (observed
-runtime identity) remain open. [rollout-progress.json](rollout-progress.json)
-records the exact checkpoint. This package follows the [Sprint 61 handoff](../../../planning/sprint-61-HANDOFF.md)
+The authorized worker/UI acceptance **passed** on 2026-09-30. Exactly one paid
+mission completed on attempt 1: `S61-LOG2-ACCEPT-01`, UUID
+`3f5c2641-7a47-45ed-a092-feebe9143ed1`. Two independently received batches were
+observed while status reads before and after each log read were `in_progress`.
+The browser displayed the first four observations within **10.627 seconds** of
+their earliest emission, then correctly showed a quiet interval and all **12**
+terminal lines without manual log refresh. The worker's reported source-tree hash
+exactly matched the tested source. The [deployed receipt](deployed-acceptance.json),
+[HTTP snapshots](receipt-snapshots.json), and [browser observations](browser-observations.json)
+record the evidence and its limits. Legacy retirement is in this follow-on change;
+its final deployment verification remains required before LOG-2 closure.
+
+This package follows the [Sprint 61 handoff](../../../planning/sprint-61-HANDOFF.md)
 and [mission log contract](../../../contracts/mission-log-delivery-contract.md).
+The [rollout checkpoint](rollout-progress.json) preserves the earlier safe hold:
+unrelated paid work began during the first worker build, so that deployment was
+canceled before replacing the worker. After that work completed and the user
+signed in, deployment `17053355-f5a5-43b2-90d3-bbb4a75850e0` succeeded with all
+12 preflight checks passing and unchanged effective configuration.
 
 ## Exact changes
 
 | Slice | Branch / commit | State |
 | --- | --- | --- |
 | Accepted receiver | TraceLab `55b5da6a7cc2334350aa40a251d0c479a3c96914` | Receiver preserved in serving `56aae006`; schema 058 |
-| Worker | DeepSearch PR [179](https://github.com/kneelinghorse/DeepSearch.alpha/pull/179), merge `5a75502727b889aa4a65a6373df4b74aa36da23b` | Identical tree to tested `849389e`; deployment held |
+| Worker | DeepSearch PR [179](https://github.com/kneelinghorse/DeepSearch.alpha/pull/179), merge `5a75502727b889aa4a65a6373df4b74aa36da23b` | Identical tree to tested `849389e`; deployed and accepted |
 | UI and real HTTP proof | TraceLab PR [405](https://github.com/kneelinghorse/TraceLab/pull/405), merge `56aae00673dda2c500edf41ab4aef3296d24a784` | All required CI passed; serving verification in rollout receipt |
-| Legacy append retirement | TraceLab `codex/sprint-61-retire-legacy-logs`, `dc9787dffa5ca4389ee5c4bd7c13261d70ec94ff` | Separate local commit; hold until worker acceptance |
+| Legacy append retirement | TraceLab `codex/sprint-61-retire-legacy-logs`, `623f036` | Rebased onto accepted UI; worker gate passed; this follow-on retires legacy appends |
 
-Expected worker source-tree hash:
+Observed worker source-tree hash (exact match):
 `fa31cba8cf6f88fe4c32980ecd1c2dee6b704b0ee8e5e3747823b7c935c04bcc`.
-This is a local fingerprint, **not a newly observed deployed runtime identity**.
-The current reported production worker commit is `8465fab0564a9847ded70593e7b9f59e99a1e29e`;
-its computed source hash is `6adab231174a3d7c20fce2aa3f31ea627a7a6070f980bae638e81b8ce6e603dd`.
-Do not count a Railway success label as runtime hash verification.
+It was read from the paid mission's `runtime_identity`, with
+`build_source=source_tree_hash`, `git_dirty=false`, and `model=deepseek-flash`.
+This verifies #416 for this run; it does not repair historical telemetry.
 
 The worker now negotiates v2 after ownership confirmation and heartbeat startup,
 uses stable event identity and complete acknowledgements, and quiesces delivery
@@ -53,7 +62,7 @@ research dispatch was performed by these probes.
   Six Light/Dark 390/820/1440 cases include keyboard/scroll, no overflow, no serious
   or critical axe findings, quiet gaps, retained refresh errors and revoked access.
   [Screenshots](screenshots/) are local fixture evidence.
-- Held retirement: **106 receiver/RBAC tests + 1 real cross-service test** pass.
+- Rebased retirement: **107 receiver/RBAC/real cross-service tests** pass, zero skips, 16 warnings (40.51 seconds).
   The worker negotiates `legacy=retired`; legacy POST returns 426 after authorization.
 - Production build, frontend lint/types, changed-file credential checks, foundational
   references and MCP parity pass. All nine required TraceLab contexts passed
@@ -71,13 +80,12 @@ DEEPSEARCH_SOURCE_ROOT=/path/to/DeepSearch.alpha python -m pytest tests/test_liv
 ```
 
 No MCP request/response surface changed in LOG-2. The accepted LOG-1 receipt already
-covers the actual published MCP client against production; rerun its authorized
-logs read during the required live mission to verify the final observations.
+covers the actual published MCP client against production; the actual published `@aquex/tracelab-mcp@2.1.0` read matched all 12 deployed rows, preserving attempt/event fields and excluding proof fields ([receipt](published-mcp-read.json)).
 
-## Proposed one-run scope and cost
+## One-run scope and cost
 
 [proposed-mission.json](proposed-mission.json) is schema-validated and was created
-once as draft UUID `3f5c2641-7a47-45ed-a092-feebe9143ed1`. It is **not submitted**.
+once as draft UUID `3f5c2641-7a47-45ed-a092-feebe9143ed1`, submitted exactly once, and completed.
 Both the deployed structural preview and the current worker's no-provider
 structural compiler were inspected. It selects existing **TraceLab Engineering** project
 `5229e75e-8ad3-4ac5-94de-093a177562c6`: a 300–500 word comparison of PostgreSQL
@@ -107,35 +115,37 @@ the authorization to proceed. Public prices were rechecked before the rollout;
 account-specific discounts and the eventual billed total remain unverified.
 No new budget mechanism is included in this logging change.
 
-## Authorized rollout and live receipt
+## Observed outcome and remaining gates
 
-1. With explicit approval, publish the UI/worker branches, create reviewed PRs and
-   pass current required CI. Do not publish the retirement branch yet. Confirm no
-   unrelated active paid run will be interrupted before deploying the worker.
-2. Merge/deploy UI and worker while keeping the already accepted v2 receiver and
-   transitional terminal-only legacy route. Confirm TraceLab serving commits and
-   worker deployment source, unchanged effective config, healthy preflight and
-   fresh heartbeat. No new server environment variable is required.
-3. After the paid-run allowance is approved, create exactly the proposed draft,
-   inspect its compiled contract, then submit once. Record the assigned UUID and
-   actual selected config. Start API receipt sampling and the real browser view
-   before submission so initial batches cannot be missed.
-4. Save at least two distinct receiver snapshots while status is `in_progress`,
-   with event IDs, attempts, emitted `logged_at`, received `created_at`, observation
-   capture time and browser evidence. Measure emitted-event-to-display delay
-   against the proposed healthy-path 15-second target. Quiet intervals are not
-   delivery lag. Retained terminal-only history cannot satisfy this gate.
-5. On the same run, record terminal final-flush visibility, stable history on
-   re-read/replay, result/report/ledger preservation, actual usage/cost, and
-   `runtime_identity.build_hash` plus its source. Require the exact expected
-   source-tree hash when source-tree hashing is reported; handle other identity
-   mechanisms explicitly. This piggybacks #416 verification on the required run.
-6. Only after that receipt passes, publish/rebase the held legacy-retirement
-   commit, resolve the additive contract-doc overlap, run required CI, deploy and
-   verify capability `legacy=retired`, service legacy426 and human403/anonymous401.
-   Use an unowned/controlled fixture for refusal; do not rerun paid research.
-7. Complete LOG-2 and perform WALK-4's remaining credential and final serving-build
-   audit. Reuse this paid receipt. Do not close Sprint 61 or #412 before acceptance.
+Full research Markdown (15,440 characters) and the five-chunk processed/embedded
+document remain available. The existing materializer also produced a 529-character
+protocol summary report with five sources and `citation_status=legacy_unavailable`;
+this is not a claim of durable report citations. The Ledger retained 24 entries
+(four supporting, 20 background). The published MCP log read matches the HTTP rows.
+
+Model accounting observes 519,007 tokens across 24 requests including contract
+compilation (492,325 input / 26,682 output); the legacy synthesis/critique total is
+513,840. Two web searches and 15 source-fetch calls are recorded. **Actual billed
+dollars are unavailable**; the $5 allowance remains a planning allowance, not a
+measured charge or hard limit.
+
+The research output exceeded its authored scope: 2,285 whitespace-separated words
+(worker count 2,240), 22 collected sources across seven domains, and warnings
+`critique_assessment_partial` / `retrieval_failures_2_source_fetch`. Its final
+references are the two requested official pages, but prose claiming no third
+source was consulted overstates the collection telemetry. Preserve these artifacts
+and investigate compiler/output scope separately. No second paid run is authorized
+or needed for logging evidence.
+
+The healthy production run demonstrates live delivery and retained artifacts.
+Lost-ack replay, failures, stale ownership and multiple-attempt separation are
+covered by the real cross-service tests and LOG-1 deployed synthetic proof; this
+run was not deliberately disrupted. The terminal read stayed at 12 rows.
+
+Publish/deploy this legacy retirement only after the above acceptance, then verify
+capability `legacy=retired`, service legacy426, human403, anonymous401 and unchanged
+v2 history. WALK-4 retains the expanded live credential matrix and final serving
+build audit. Sprint 61 remains open until its must-pass gates are satisfied.
 
 ## Rollback
 
@@ -154,5 +164,5 @@ DeepSearch [agents.md](../../../../../../sprint-61-worker-logs/DeepSearch.alpha/
 requires: “build sessions land code; deploys + dispatches require explicit user
 authorization” and forbids pushing commits without explicit user OK. The user's
 2026-09-30 “authorized, proceed” satisfied this gate for the prepared package.
-That authorization persists; the current hold is an occupied worker and missing
-browser session. No S93 evaluation approval or prior paid result is reused.
+That authorization persists and the worker/browser hold was resolved. No S93
+evaluation approval or prior paid result was reused.

@@ -1,0 +1,172 @@
+{
+  "observed_at": "2026-09-30T20:53:48.818173+00:00",
+  "body": {
+    "status": "healthy",
+    "uptime_seconds": 9.93,
+    "missions_processed": 0,
+    "missions_completed": 0,
+    "missions_failed": 0,
+    "terminal_rows_persisted": 0,
+    "completed_rows_persisted": 0,
+    "completion_receipts_acknowledged": 0,
+    "completion_receipts_failed": 0,
+    "completion_receipt_backlog_overflowed": 0,
+    "last_completion_receipt": null,
+    "pending_completion_receipts": 0,
+    "log_delivery_failures": 0,
+    "log_backlog_overflowed_handlers": 0,
+    "log_backlog_overflowed_entries": 0,
+    "last_log_delivery": null,
+    "pending_log_batches": 0,
+    "evidence_ledger_delivery": {
+      "claimed": 0,
+      "acknowledged": 0,
+      "retry_scheduled": 0,
+      "dead_lettered": 0,
+      "exhausted_swept": 0,
+      "lease_conflicts": 0,
+      "dispatch_errors": 0,
+      "last_delivery": null,
+      "pending": 0,
+      "leased": 0,
+      "acked": 27,
+      "dead_letter": 1,
+      "invalid_exhausted_pending": 0,
+      "overflowed": 0,
+      "discarded": 0,
+      "running": true
+    },
+    "processing": false,
+    "poll_interval": 5.0,
+    "ready": true,
+    "preflight": {
+      "version": 5,
+      "lease_contract_version": "tracelab-missions-lease-v2",
+      "execution_fence_version": "deepsearch-execution-fence-v1",
+      "ready": true,
+      "checked_at": "2026-09-30T20:53:39.288355+00:00",
+      "checks": {
+        "tracelab_transport_security": {
+          "ok": true,
+          "detail": "TraceLab transport uses HTTPS or an explicit loopback host"
+        },
+        "effective_model": {
+          "ok": true,
+          "detail": "Effective model configuration valid (no inference probe)",
+          "data": {
+            "provider": "deepseek",
+            "requested_model": "deepseek-flash",
+            "base_url": "https://api.deepseek.com",
+            "credential_source": "DEEPSEEK_API_KEY",
+            "max_output_tokens": 32768,
+            "context_window": 1000000,
+            "reasoning_effort": "high",
+            "temperature": "omitted",
+            "request_timeout_seconds": 300.0,
+            "stage_overrides": {}
+          }
+        },
+        "linkup_credentials": {
+          "ok": true,
+          "detail": "LINKUP_API_KEY configured"
+        },
+        "tracelab_service_auth": {
+          "ok": true,
+          "detail": "TraceLab service principal verified through /auth/me"
+        },
+        "completion_receipt": {
+          "ok": true,
+          "detail": "TraceLab receipt destination and HMAC secret configured"
+        },
+        "database_configuration": {
+          "ok": true,
+          "detail": "DATABASE_URL structurally valid"
+        },
+        "lease_policy": {
+          "ok": true,
+          "detail": "lease timing and attempt policy valid",
+          "data": {
+            "lease_seconds": 120,
+            "heartbeat_seconds": 30,
+            "max_attempts": 3,
+            "reclaim_grace_seconds": 30
+          }
+        },
+        "lease_overlap_safety": {
+          "ok": true,
+          "detail": "spawned execution terminates before reclaim eligibility",
+          "data": {
+            "version": "deepsearch-execution-fence-v1",
+            "revision": 1,
+            "equation": "H + D + U + M < L + G",
+            "isolation_mode": "spawn-process-v1",
+            "lease_seconds": 120,
+            "heartbeat_seconds": 30,
+            "heartbeat_timeout_seconds": 10.0,
+            "cancellation_grace_seconds": 2.0,
+            "terminate_grace_seconds": 3.0,
+            "kill_grace_seconds": 3.0,
+            "shutdown_bound_seconds": 8.0,
+            "safety_margin_seconds": 10.0,
+            "reclaim_grace_seconds": 30,
+            "required_seconds": 58.0,
+            "available_seconds": 150.0,
+            "slack_seconds": 92.0,
+            "provider_limits": {
+              "contract": {
+                "backend": "deepseek",
+                "request_timeout_seconds": 300.0,
+                "client_max_retries": 0,
+                "configured_max_retries": 3,
+                "wrapper_max_retries": 2,
+                "wrapper_attempts": 3,
+                "hard_bound_mode": "spawn-process-v1"
+              },
+              "codeagent": {
+                "backend": "deepseek-openai-compatible",
+                "request_timeout_seconds": 300.0,
+                "client_max_retries": 0,
+                "smolagents_rate_limit_retry": false,
+                "synthesis_attempts": 3,
+                "max_step_fallback_attempts": 1,
+                "recovery_passes": 1,
+                "hard_bound_mode": "spawn-process-v1"
+              },
+              "tools": {
+                "configured_request_timeout_seconds": 60.0,
+                "configured_max_retries": 3,
+                "linkup_request_timeout_seconds": 60.0,
+                "linkup_max_retries": 3,
+                "source_fetch_request_timeout_seconds": 15.0,
+                "source_fetch_max_redirects": 5,
+                "url_liveness_request_timeout_seconds": 5.0,
+                "url_liveness_max_requests": 3,
+                "scholar_backend_request_timeout_seconds": 20.0,
+                "scholar_max_backends": 2,
+                "hard_bound_mode": "spawn-process-v1"
+              }
+            },
+            "safe": true,
+            "violations": []
+          }
+        },
+        "database": {
+          "ok": true,
+          "detail": "database health query succeeded"
+        },
+        "schema_capabilities": {
+          "ok": true,
+          "detail": "missions authoring, tracelab-missions-lease-v2 constraints, and global non-orphan association available"
+        },
+        "lease_indexes": {
+          "ok": true,
+          "detail": "migration-039 indexes support exact global non-orphan claim order"
+        },
+        "evidence_ledger_delivery": {
+          "ok": true,
+          "detail": "service API-key transport and migration-043 durable outbox ready"
+        }
+      }
+    }
+  }
+}

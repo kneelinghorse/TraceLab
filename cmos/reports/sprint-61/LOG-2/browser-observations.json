@@ -1,0 +1,63 @@
+{
+  "capture": "CUA in-app browser tab4; excerpts transcribed from saved in-session AX/DOM observations, not a recreated or synthetic replay. Screenshots were visually inspected in the task; no deployed screenshot file is claimed.",
+  "url": "https://tracelab.aquex.ai/missions/3f5c2641-7a47-45ed-a092-feebe9143ed1",
+  "local_timezone": "America/Chicago",
+  "manual_log_refresh_used": false,
+  "observations": [
+    {
+      "observed_at": "2026-09-30T20:54:30.203Z",
+      "kind": "accessibility excerpt",
+      "status": "In progress",
+      "text": [
+        "Waiting for the first runner observation.",
+        "Refreshes every 5 seconds while queued or running."
+      ]
+    },
+    {
+      "observed_at": "2026-09-30T20:54:40.502Z",
+      "kind": "accessibility excerpt; status unchanged from prior observation",
+      "status": "In progress",
+      "phase": "Researching",
+      "text": [
+        "Receiving runner observations.",
+        "Last received  9/30/2026, 3:54:31 PM",
+        "Last  4  recorded lines. Timestamps on lines show when observations were emitted.",
+        "Attempt 1",
+        "Loading mission \u00b7 Started",
+        "Loading mission \u00b7 Observation",
+        "Mission prepared \u00b7 Finished",
+        "Researching \u00b7 Started"
+      ]
+    },
+    {
+      "observed_at": "2026-09-30T20:54:59.631Z",
+      "kind": "full DOM snapshot excerpt",
+      "status": "In progress",
+      "text": [
+        "Receiving runner observations.",
+        "Last 4 recorded lines. Timestamps on lines show when observations were emitted.",
+        "Attempt 1"
+      ]
+    },
+    {
+      "observed_at": "2026-09-30T20:55:21.990Z",
+      "kind": "accessibility diff excerpt",
+      "text": [
+        "No new observations for at least 30 seconds. The runner may be working quietly."
+      ]
+    },
+    {
+      "observed_at": "2026-09-30T20:57:09.057Z",
+      "kind": "full DOM snapshot excerpt",
+      "status": "Completed",
+      "phase": "Saving results",
+      "text": [
+        "Retained observations from this run.",
+        "Last received",
+        "9/30/2026, 3:56:51 PM",
+        "Last 12 recorded lines. Timestamps on lines show when observations were emitted.",
+        "Attempt 1"
+      ]
+    }
+  ]
+}

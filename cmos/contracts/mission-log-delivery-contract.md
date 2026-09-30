@@ -92,9 +92,11 @@ records the exact sender/receiver source identities and production gate.
 
 ## Retirement release gate
 
-This change is prepared on `codex/sprint-61-retire-legacy-logs` and must remain
-unpublished until the authorized LOG-2 worker acceptance receipt exists.
-After that cutover, service POST `/logs` returns 426 even with valid terminal
+The authorized LOG-2 worker acceptance passed on 2026-09-30: two pre-terminal
+batches, browser visibility within 10.627 seconds, 12 retained final observations
+and an exact runtime source hash. See
+[the acceptance receipt](../reports/sprint-61/LOG-2/deployed-acceptance.json).
+The follow-on retirement is now eligible for publication. After that cutover, service POST `/logs` returns 426 even with valid terminal
 proof; capability `legacy` is `retired`. Human/anonymous denials remain 403/401,
 and existing legacy history remains readable. Deploying this before worker
 acceptance would disable the old worker's terminal transport.
