@@ -1,0 +1,50 @@
+{
+  "observed_at": "2026-09-30T20:47:41.526737+00:00",
+  "worker_config": {
+    "LLM_BACKEND": "deepseek",
+    "DEEPSEEK_MODEL": "deepseek-flash",
+    "DEEPSEEK_MAX_TOKENS": "<default>",
+    "LLM_REASONING_EFFORT": "<default>",
+    "LLM_REQUEST_TIMEOUT_SECONDS": "<default>"
+  },
+  "backend": {
+    "status_code": 200,
+    "body": {
+      "status": "healthy",
+      "commit": "56aae00673dda2c500edf41ab4aef3296d24a784",
+      "rbac_enabled": true,
+      "deepsearch_receipt_receiver_configured": true,
+      "reconciler": {
+        "enabled": true,
+        "interval_seconds": 900,
+        "last_run_at": "2026-09-30T20:45:32.972745+00:00",
+        "last_status": "ok",
+        "last_counts": {
+          "scanned": 0,
+          "eligible": 0,
+          "repaired": 0,
+          "failed": 0,
+          "skipped_soft_deleted": 0,
+          "usage_recorded": 0
+        },
+        "runs": 1
+      }
+    }
+  },
+  "frontend": {
+    "status_code": 200,
+    "body": {
+      "commit": "56aae00673dda2c500edf41ab4aef3296d24a784"
+    }
+  },
+  "capabilities": {
+    "status_code": 200,
+    "body": {
+      "contract_version": "tracelab-mission-logs-v2",
+      "max_batch_entries": 200,
+      "max_message_chars": 2048,
+      "final_flush": "terminal_result_key",
+      "legacy": "terminal_only_until_LOG-2_cutover"
+    }
+  }
+}

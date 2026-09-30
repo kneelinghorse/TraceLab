@@ -1,18 +1,22 @@
-# LOG-2 local readiness and authorization package
+# LOG-2 readiness and rollout checkpoint
 
-LOG-2 is **not complete**. The worker and UI are implemented and locally verified;
-worker publishing/deployment and the one required paid acceptance run remain
-unauthorized. WALK-4, #412 (live delivery), and #416 (observed runtime identity)
-remain open. This package follows the [Sprint 61 handoff](../../../planning/sprint-61-HANDOFF.md)
+LOG-2 is **not complete**. The user authorized publishing, deployment and the one
+paid acceptance run on 2026-09-30, including the disclosed $5 planning allowance
+without an enforced dollar cap. Both PRs are merged. The worker rollout was
+canceled before replacing the old worker because unrelated paid research began
+during its build. Resume only in an idle window and with an authenticated browser
+ready to capture live evidence. WALK-4, #412 (live delivery), and #416 (observed
+runtime identity) remain open. [rollout-progress.json](rollout-progress.json)
+records the exact checkpoint. This package follows the [Sprint 61 handoff](../../../planning/sprint-61-HANDOFF.md)
 and [mission log contract](../../../contracts/mission-log-delivery-contract.md).
 
 ## Exact changes
 
 | Slice | Branch / commit | State |
 | --- | --- | --- |
-| Accepted receiver | TraceLab main `55b5da6a7cc2334350aa40a251d0c479a3c96914` | Serving production; schema 058 |
-| Worker | DeepSearch `codex/sprint-61-live-logs`, `849389e56bdce593b90de720e68f9cbbe557a2e2` | Local, unpushed |
-| UI and real HTTP proof | TraceLab `codex/sprint-61-live-log-ui`, `18ec1a017e9c053a607339c4bc834b63374d2f59` | Local, unpushed |
+| Accepted receiver | TraceLab `55b5da6a7cc2334350aa40a251d0c479a3c96914` | Receiver preserved in serving `56aae006`; schema 058 |
+| Worker | DeepSearch PR [179](https://github.com/kneelinghorse/DeepSearch.alpha/pull/179), merge `5a75502727b889aa4a65a6373df4b74aa36da23b` | Identical tree to tested `849389e`; deployment held |
+| UI and real HTTP proof | TraceLab PR [405](https://github.com/kneelinghorse/TraceLab/pull/405), merge `56aae00673dda2c500edf41ab4aef3296d24a784` | All required CI passed; serving verification in rollout receipt |
 | Legacy append retirement | TraceLab `codex/sprint-61-retire-legacy-logs`, `dc9787dffa5ca4389ee5c4bd7c13261d70ec94ff` | Separate local commit; hold until worker acceptance |
 
 Expected worker source-tree hash:
@@ -52,8 +56,12 @@ research dispatch was performed by these probes.
 - Held retirement: **106 receiver/RBAC tests + 1 real cross-service test** pass.
   The worker negotiates `legacy=retired`; legacy POST returns 426 after authorization.
 - Production build, frontend lint/types, changed-file credential checks, foundational
-  references and MCP parity pass. No new remote required CI has run for these
-  unpushed branches. All required checks must pass before merging.
+  references and MCP parity pass. All nine required TraceLab contexts passed
+  before PR405 merged: backend 3,074 passed / four skips / 12 unchanged quarantined
+  deselections; PostgreSQL 169 passed / two skips; production browser 82 passed.
+  The external-checkout cross-service test accounts for the additional CI skip.
+  DeepSearch has no remote checks configured; its local results above are retained
+  explicitly, including the two baseline failures.
 
 The external-checkout cross-service test explicitly skips without
 `DEEPSEARCH_SOURCE_ROOT`; release verification must execute it with that variable:
@@ -68,8 +76,10 @@ logs read during the required live mission to verify the final observations.
 
 ## Proposed one-run scope and cost
 
-[proposed-mission.json](proposed-mission.json) is schema-validated and **not created
-or submitted**. It selects existing **TraceLab Engineering** project
+[proposed-mission.json](proposed-mission.json) is schema-validated and was created
+once as draft UUID `3f5c2641-7a47-45ed-a092-feebe9143ed1`. It is **not submitted**.
+Both the deployed structural preview and the current worker's no-provider
+structural compiler were inspected. It selects existing **TraceLab Engineering** project
 `5229e75e-8ad3-4ac5-94de-093a177562c6`: a 300–500 word comparison of PostgreSQL
 transaction/statement/wall-clock timestamps, using two official documentation
 pages and one worked lease-lock timeline. One explicit submit only; preserve
@@ -81,7 +91,7 @@ CodeAgent steps and 32,768 output tokens per request, with existing bounded
 same-memory recovery and zero-usage transient requeue rules. `max_loops` is inert
 on this path and is deliberately not presented as a spend control.
 
-Proposed planning allowance: **$5**. An illustrative conservative usage envelope
+Authorized planning allowance: **$5**. An illustrative conservative usage envelope
 of 10 million uncached input tokens, 1 million output tokens, and 100 standard
 search requests costs **$4.80** using peak Flash rates and assuming $0.006/search.
 This is arithmetic for review, not a prediction or enforced ceiling. Flash peak
@@ -92,10 +102,10 @@ $0.005–$0.006/request. Recheck account pricing before dispatch. Sources:
 project Evidence Ledger (IDs in the JSON receipt).
 
 **The production worker has no hard dollar limiter.** Authored word/source limits
-are task scope, not enforced billing limits. Approval must explicitly accept a
-$5 planning allowance without a guaranteed cap, or a separate approved spend
-control is required before dispatch. No new budget mechanism is slipped into this
-logging change.
+are task scope, not enforced billing limits. The user accepted this limitation in
+the authorization to proceed. Public prices were rechecked before the rollout;
+account-specific discounts and the eventual billed total remain unverified.
+No new budget mechanism is included in this logging change.
 
 ## Authorized rollout and live receipt
 
@@ -142,6 +152,7 @@ back schema058 or delete accepted observations to make old appends succeed.
 
 DeepSearch [agents.md](../../../../../../sprint-61-worker-logs/DeepSearch.alpha/agents.md)
 requires: “build sessions land code; deploys + dispatches require explicit user
-authorization” and forbids pushing commits without explicit user OK. The gate is
-project policy, not a failure of local implementation. No S93 evaluation approval
-or prior paid result is reused as authorization.
+authorization” and forbids pushing commits without explicit user OK. The user's
+2026-09-30 “authorized, proceed” satisfied this gate for the prepared package.
+That authorization persists; the current hold is an occupied worker and missing
+browser session. No S93 evaluation approval or prior paid result is reused.

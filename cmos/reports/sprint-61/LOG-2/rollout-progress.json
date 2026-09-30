@@ -1,0 +1,164 @@
+{
+  "mission": "LOG-2",
+  "session": "PS-2026-09-30-009",
+  "observed_at": "2026-09-30T20:47:42.233079+00:00",
+  "status": "ui_deployed_worker_held_acceptance_not_submitted",
+  "authorization": {
+    "user_text": "authorized, proceed",
+    "scope": "Prepared worker/UI publishing and deployment, exactly one proposed paid acceptance mission with $5 planning allowance explicitly not an enforced cap, then gated legacy retirement. Authorization persists.",
+    "additional_paid_run_authorized": false
+  },
+  "tracelab": {
+    "pr": "https://github.com/kneelinghorse/TraceLab/pull/405",
+    "review_head": "c32a42629be91bac931f41e38a137c0c5dffdaa8",
+    "merge_commit": "56aae00673dda2c500edf41ab4aef3296d24a784",
+    "deployment": {
+      "sha": "56aae00673dda2c500edf41ab4aef3296d24a784",
+      "ok": true,
+      "observed": {
+        "backend": "56aae00673dda2c500edf41ab4aef3296d24a784",
+        "frontend": "56aae00673dda2c500edf41ab4aef3296d24a784"
+      },
+      "seconds_to_serve": {
+        "backend": 141.7,
+        "frontend": 202.2
+      },
+      "budget_seconds": 900,
+      "elapsed_seconds": 202.2
+    },
+    "checks": [
+      {
+        "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36773035291/job/110083953320",
+        "name": "build-frontend-production",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36773035387/job/110083954491",
+        "name": "mcp-package",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36773035323/job/110083953664",
+        "name": "Secret Scan",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36773035432/job/110083954938",
+        "name": "type-check",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36773035432/job/110083954674",
+        "name": "lint",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36773035393/job/110083955640",
+        "name": "backend-integration",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36773035308/job/110083954392",
+        "name": "ruff-diff",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36773035449/job/110083954488",
+        "name": "backend-suite",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36773035432/job/110083954867",
+        "name": "vitest",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36772976621/job/110083758018",
+        "name": "Secret Scan",
+        "state": "SUCCESS"
+      }
+    ],
+    "validation": {
+      "backend": {
+        "passed": 3074,
+        "skipped": 4,
+        "existing_quarantine_deselected": 12,
+        "warnings": 49,
+        "seconds": 622.47
+      },
+      "postgres": {
+        "passed": 169,
+        "skipped": 2,
+        "warnings": 17
+      },
+      "built_browser": {
+        "passed": 82
+      },
+      "skip_note": "One added explicit cross-service skip when DEEPSEARCH_SOURCE_ROOT absent; release local test used actual worker checkout and passed without skip. Other skips/quarantine unchanged."
+    }
+  },
+  "worker": {
+    "pr": "https://github.com/kneelinghorse/DeepSearch.alpha/pull/179",
+    "review_head": "849389e56bdce593b90de720e68f9cbbe557a2e2",
+    "merge_commit": "5a75502727b889aa4a65a6373df4b74aa36da23b",
+    "trees_identical": true,
+    "expected_source_tree_hash": "fa31cba8cf6f88fe4c32980ecd1c2dee6b704b0ee8e5e3747823b7c935c04bcc",
+    "observed_new_runtime_hash": null,
+    "remote_checks_configured": false,
+    "local_validation": "local-validation.json",
+    "rollout": {
+      "canceled_deployment": {
+        "id": "91f5b80c-86e8-48f5-82b1-d37fb7f43911",
+        "status": "REMOVED",
+        "createdAt": "2026-09-30T20:30:50.597Z"
+      },
+      "retained_deployment": {
+        "id": "ae01bc02-675b-4fb8-9096-1b71de9a84d2",
+        "status": "SUCCESS",
+        "commit": "8465fab0564a9847ded70593e7b9f59e99a1e29e"
+      }
+    },
+    "retained_health": {
+      "observed_at": "2026-09-30T20:38:47.192305+00:00",
+      "status": "healthy",
+      "uptime_seconds": 937516.37,
+      "ready": true,
+      "preflight_checked_at": "2026-09-20T00:13:31.261738+00:00",
+      "missions_processed": 5
+    },
+    "reason": "No active/queued research at predeploy check. Unrelated LEGAL-01 started during build; cancel targeted only pending deployment, preserving old healthy worker. LEGAL-01 subsequently completed on attempt1 with ready materialization; REL-02 then occupied the worker. No cancellation or manual redispatch of either research mission."
+  },
+  "acceptance": {
+    "id": "3f5c2641-7a47-45ed-a092-feebe9143ed1",
+    "mission_id": "S61-LOG2-ACCEPT-01",
+    "created_observed_at": "2026-09-30T20:32:05.121666+00:00",
+    "status": "draft",
+    "submit_calls": 0,
+    "browser": "Sign-in required; user asked to authenticate before any paid submission. CUA tab4 preserved for handoff.",
+    "previews": [
+      "contract-preview.json",
+      "worker-structural-contract.json"
+    ],
+    "preview_limit": "Structural only; no provider enrichment, no paid execution. Two table schemas refer to the same authored comparison. Legacy execution-budget fields do not override the CodeAgent budget."
+  },
+  "held_retirement": {
+    "commit": "dc9787dffa5ca4389ee5c4bd7c13261d70ec94ff",
+    "branch": "codex/sprint-61-retire-legacy-logs",
+    "published": false,
+    "gate": "Actual accepted worker run with preterminal browser/receipt evidence."
+  },
+  "resume": [
+    "Check production in_progress and queued work immediately before the worker switch; preserve unrelated paid work. Redeploy merged5a75502 only in an idle window, then verify fresh healthy preflight and unchanged configuration.",
+    "Authenticate the browser, open draft3f5c2641-7a47-45ed-a092-feebe9143ed1 Run view on deployed UI. Start /tmp/log2_acceptance.py watch before the single guarded submit.",
+    "Capture two distinct preterminal batches, browser observation and emitted-to-display lag; verify terminal artifacts, Ledger, published MCP read and actual runtime source hash. Do not create a replacement mission or blindly resubmit.",
+    "After acceptance publish the held legacy-retirement change, verify service426/human403/anonymous401, complete LOG-2, then WALK-4 expanded credential matrix and final audit."
+  ],
+  "open_gates": [
+    "idle worker deployment window",
+    "authenticated browser",
+    "single paid live acceptance and observed runtime identity",
+    "legacy retirement",
+    "WALK-4 remaining credential acceptance"
+  ],
+  "privacy": "No passwords, raw recovery tokens, lease proofs, API keys, signing secrets, or reset URLs included."
+}
