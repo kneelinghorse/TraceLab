@@ -218,25 +218,53 @@ The suggestions are requested, reviewed and accepted in the Librarian; a persist
 
 **Outside this sprint:** password recovery is Sprint 61; sharing stays deferred, invites remain Derek's, and there is no RBAC redesign or autonomous writing. Twenty-one existing maintenance entries plus CI-documentation follow-up #464 were carried to the next backlog without expanding AUTH-1/AUTH-2. Next-step #405 is closed for the artifact choice and durable citation foundation only; historical gaps remain explicit. DeepSearch live-progress/runtime-identity follow-ups (#412/#416, message `1621f451`) were not resolved by this acceptance. Railway configuration follow-up #451 retains its recorded 2026-12-01 deadline.
 
-### Follow-on — Sprint 61: Account recovery and live run logs (opened 2026-09-30)
+### Follow-on — Sprint 61: Account recovery and live run logs (completed 2026-09-30)
 
-Derek asked to detail both password recovery and the outstanding DeepSearch live-log issue for a fresh build handoff. Decision **#563**, learnings **#274–275**, and the [Sprint 61 handoff](../planning/sprint-61-HANDOFF.md) record the source investigation, proposed policies, validation gates and cross-repository boundary. The existing sprint shell opened when AUTH-1 started in build session PS-2026-09-30-005 on 2026-09-30. AUTH-1 self-service recovery is accepted on deployed commit `68f607c` (PR #401): Derek received the real email, reset the dedicated candidate, observed sign-out, signed in with the new password and confirmed rejection of the old password. The token was consumed, unrelated human/service credentials stayed valid and the candidate was disabled afterward. The [deployed receipt](../reports/sprint-61/AUTH-1/deployed-acceptance.json) separates these observations from broader local revocation coverage and remaining WALK-4 live checks. Decisions #564–566 record the recovery transaction, privacy and race contracts. CMOS remains authoritative for the other mission states.
+All five missions shipped and passed their scoped deployed acceptance. The
+[handoff](../planning/sprint-61-HANDOFF.md) preserves the approved plan;
+the [WALK-4 receipt](../reports/sprint-61/WALK-4/README.md) records the final outcome.
+CMOS is authoritative for status. Final TraceLab runtime merge is `4495119551c67a39b393b40f0e0d176ea84128ba`
+(PR #406), and DeepSearch is `5a75502727b889aa4a65a6373df4b74aa36da23b`.
 
-AUTH-2 admin-triggered recovery is also accepted on `db153f8` (PR #403): the recipient confirmation is corroborated by the second password/revision change and consumed token, and the candidate is disabled with unrelated/service credentials unchanged ([receipt](../reports/sprint-61/AUTH-2/deployed-acceptance.json)). LOG-1 is accepted on `55b5da6` (PR #404): migration 058 and the versioned receiver passed real PostgreSQL race/replay coverage plus controlled no-provider production ingestion, rejection, terminal flush, and published MCP retrieval. Its [receipt](../reports/sprint-61/LOG-1/deployed-acceptance.json) records fixture cleanup and existing CI skips. This receiver proof does not close live worker delivery or #412; LOG-2 and WALK-4 remain required, with the newly authorized DeepSearch deployment/paid dispatch still subject to live acceptance.
+| Mission | Shipped outcome |
+| --- | --- |
+| **AUTH-1** | Public Resend recovery, single-use hashed token and account-scoped credential revocation; real email, reset, new login and old-password rejection accepted; sign-in copy corrected |
+| **AUTH-2** | Admin/owner sends the same link to the stored mailbox with explicit target confirmation and secret-free audit; real delivered-link acceptance |
+| **LOG-1** | Attempt-scoped v2 ingestion with ownership locks, stable identity, atomic replay and proof-free reads; PostgreSQL races, deployed synthetic proof and published MCP verified |
+| **LOG-2** | Owned worker delivery during research, receipt freshness, retained errors and terminal refresh; actual preterminal browser acceptance followed by deployed legacy426 retirement |
+| **WALK-4** | Expanded live credential revocation, unaffected main/service MCP, final serving build and receipt audit; closure and explicit maintenance carryovers |
 
-| Mission | Planned outcome | Requires |
-| --- | --- | --- |
-| **AUTH-1** | Signed-out Resend recovery; expiring single-use token; prior credentials invalidated; usable public reset route | — |
-| **AUTH-2** | Admin/owner sends the same link to an eligible user's stored mailbox, with target confirmation and audit | AUTH-1 |
-| **LOG-1** | TraceLab receives attempt-scoped logs with atomic ownership checks and replay-safe event identity | — |
-| **LOG-2** | DeepSearch delivers during owned runs; TraceLab shows actual freshness and final lines | LOG-1 and coordinated worker work |
-| **WALK-4** | Real email-to-reset-to-login acceptance and verified pre-terminal log evidence on deployed builds | AUTH-2, LOG-2 |
+The dedicated candidate completed the public and admin flows. Opening/requesting
+the final link kept its JWT and ordinary/device keys valid; submitting the reset
+revoked old JWT, refresh, query token, open stream, API/device keys and an approved
+uncollected grant. The user confirmed a fresh login. The candidate remains active
+as the user left it, with no temporary keys/grants. All seven other accounts retained
+credentials; direct TraceLab and Aquex hub MCP both listed 65 projects. A separate
+older Aquex connector's SSE404 is tracked independently. No main MCP credential changed.
+Expiry/replay, legacy revision0 lifecycle, target denials and Settings behavior
+are isolated regressions, distinguished from these production observations.
 
-Recovery is independent of mission-email preferences and keeps Settings' known-password flow. Agent working defaults are email-only admin help, a 30-minute newest-link token, and revocation of the recovering human's browser sessions and API/device keys; the separate DeepSearch service principal is unaffected. These are labeled recommendations pending any different user answer, not invented user selections. Builders record the exact transaction, credential race, mail-failure and privacy contracts before code.
+Exactly one authorized `S61-LOG2-ACCEPT-01` run produced two separately received
+batches while in progress, a 10.627-second browser visibility upper bound and 12
+retained final observations. Runtime hash `fa31cba8cf6f…` exactly matched the worker.
+Research text, processed document, protocol-summary report and 24 Ledger entries
+remain available. Controlled replay/transport-failure tests are not mislabeled
+as production faults. #412 closes for this live evidence; #416 is accepted for
+forward model/build identity only, with no historical repair.
 
-LOG-2 worker/UI live acceptance passed on 2026-09-30. TraceLab `56aae006` and DeepSearch `5a75502` (tested tree `849389e`) completed the single authorized `S61-LOG2-ACCEPT-01` mission. Two batches arrived during `in_progress`; the real browser showed four observations within 10.627 seconds and all 12 final lines. Runtime source hash `fa31cba8cf6f…` exactly matched the prepared build. Research text, the processed document, protocol-summary report and 24 Ledger entries were retained. The [deployed receipt](../reports/sprint-61/LOG-2/deployed-acceptance.json) separates live proof from controlled replay/failure tests, records scope drift and quality warnings, and leaves actual billed dollars unverified. The authorized $5 was a planning allowance, not a hard cap. Legacy-retirement publication is now eligible; its final serving verification remains required. No second paid run. WALK-4 retains the broader live credential matrix. DeepSearch's model-evaluation sprint is untouched.
+All nine required CI checks passed: backend 3,074 passed / four skipped / 12
+unchanged quarantined deselections; PostgreSQL 169 passed / two skipped; browser82
+passed. The 190-test local retirement/cross-service run had no skips. The worker's
+two known S87 baseline failures remain disclosed. Both themes at 390/820/1440,
+keyboard/focus/axe, MCP parity and foundational checks passed their scoped tests.
 
-CMOS holds the full acceptance criteria. The build session synchronized sprint identity on opening. Public and admin-triggered recovery have passed actual mailbox-to-login acceptance; the broader WALK-4 live credential matrix remains pending. #412 now has actual pre-terminal evidence, and #416 has observed runtime identity for this run only; neither implies historical repair. Record their dispositions at LOG-2 close. Unrelated maintenance remains carried.
+The $5 allowance was planning guidance, not an enforced hard cap or billed amount.
+Actual billed dollars are unavailable. Oversized research output, broad collection
+and quality warnings are preserved for a separate follow-up; no paid rerun.
+Twenty unrelated maintenance entries remain carried, including #451's 2026-12-01
+deadline. DeepSearch's model evaluation, provider configuration and other paid work
+were not changed. Sprint identity, decision ownership and CMOS parity are checked
+at close; the historical receipts now identify resolved operator instructions.
 
 ### Running alongside: the guest expansion track
 
@@ -354,3 +382,5 @@ _Truth in data, evidence as the connective tissue, one system._
   - **The CMOS database** is 81 MB, all of it live data (65 MB is context snapshots), growing 1–2 MB a working day. The backfill upload fails above 100 MB, so pruning old snapshots after a backup, which cannot be undone, is Derek's call.
 
 - **2026-09-30: Sprint 61 opened in build session PS-2026-09-30-005.** AUTH-1 started; decision #564 freezes recovery endpoints, migration 056, token replacement/failure rules and credential invalidation. Deployed acceptance remains a separate required gate.
+
+- **2026-09-30: Sprint 61 completed, five of five.** Public/admin recovery and live log delivery accepted; final legacy retirement serves4495119. WALK-4 records candidate-only revocation, unaffected MCP, exact CI/serving evidence, #412/#416 dispositions and explicit carryovers. One paid run only; scope/quality warnings and unknown billed dollars retained.

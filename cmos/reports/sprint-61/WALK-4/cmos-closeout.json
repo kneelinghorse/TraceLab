@@ -1,0 +1,115 @@
+{
+  "sprint": "sprint-61",
+  "session": "PS-2026-09-30-010",
+  "completed_at": "2026-09-30T21:39:57.440Z",
+  "status": "Completed",
+  "missions": [
+    {
+      "id": "AUTH-1",
+      "status": "Completed"
+    },
+    {
+      "id": "AUTH-2",
+      "status": "Completed"
+    },
+    {
+      "id": "LOG-1",
+      "status": "Completed"
+    },
+    {
+      "id": "LOG-2",
+      "status": "Completed"
+    },
+    {
+      "id": "WALK-4",
+      "status": "Completed"
+    }
+  ],
+  "identity": {
+    "layer0": "sprint-61-complete",
+    "master": "sprint-61-complete",
+    "metadata_sprint": "sprint-61",
+    "metadata_status": "Completed",
+    "current_sprint_status": "Completed",
+    "tracking_current": null,
+    "tracking_last_completed": "sprint-61"
+  },
+  "closed_next_steps": [
+    412,
+    416,
+    474,
+    475
+  ],
+  "carried_next_steps": [
+    397,
+    400,
+    403,
+    406,
+    407,
+    415,
+    422,
+    426,
+    431,
+    444,
+    445,
+    446,
+    447,
+    448,
+    449,
+    450,
+    451,
+    452,
+    454,
+    464,
+    476,
+    477
+  ],
+  "carryovers": {
+    "existing": 20,
+    "new": 2,
+    "deadline": "Next-step451 remains due before2026-12-01",
+    "target_sprint": null
+  },
+  "decisions_archived": [
+    550,
+    563,
+    564,
+    565,
+    566,
+    567,
+    568,
+    569,
+    570,
+    571,
+    572
+  ],
+  "learnings_archived": [
+    274,
+    275,
+    276,
+    277,
+    278,
+    279
+  ],
+  "evergreen_active": [
+    280
+  ],
+  "decision_ownership_audit": "All11 archived decisions explicitly belong to sprint61. No next-sprint decision affected. Evergreen280 remains active.",
+  "dashboard_sync": {
+    "records_synced": 3531,
+    "failed": 0,
+    "six_table_counts_match": true,
+    "last_sync_at": "2026-09-30T21:41:16.321Z"
+  },
+  "snapshot": {
+    "id": "snapshot-20260930T214133750Z-3a2b",
+    "created_at": "2026-09-30T21:41:33.983Z",
+    "size_bytes": 84156416
+  },
+  "paid_runs": 1,
+  "additional_paid_dispatches": 0,
+  "account_changes_after_final_reset": 0,
+  "final_runtime": "4495119551c67a39b393b40f0e0d176ea84128ba",
+  "readout": "Runtime accepted and deployed; this closeout commit contains documentation and receipts only.",
+  "unresolved_scope": "Twenty maintenance follow-ups plus research scope/quality476 and older Aquex connector SSE404477; no main MCP credential rotation or further user-assisted reset."
+}

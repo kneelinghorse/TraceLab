@@ -1,7 +1,7 @@
 {
   "mission": "WALK-4",
   "session": "PS-2026-09-30-010",
-  "status": "recovery_live_matrix_verified_final_retirement_deploy_pending",
+  "status": "recovery_and_live_log_acceptance_verified",
   "recorded_at": "2026-09-30T21:20:38.110728+00:00",
   "candidate": {
     "id": "44ea6fc4-7460-4ddb-b357-52bc1a0c1da7",
@@ -156,5 +156,7 @@
     }
   },
   "source_receipt_audit": "receipt-source-audit.json",
-  "remaining_gate": "Required CI and legacy retirement serving verification; then CMOS closure."
+  "remaining_gate": null,
+  "final_serving_verification": "../LOG-2/retirement-deployed.json",
+  "final_validation": "final-validation.json"
 }

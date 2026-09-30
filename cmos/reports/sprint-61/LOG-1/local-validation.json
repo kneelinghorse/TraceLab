@@ -110,12 +110,35 @@
     "Broader consumer inventory mismatch corrected as described above.",
     "First full backend CI caught two RBAC-verifier assumptions: service writes to unowned drafts were expected201, and RBAC-off was assumed to disable the service role gate. The verifier now checks service capability/version success, 409 for unowned writes, exact401/403s, and an injected actual bypass. Its full65-test harness/mutation suite passed; runtime ownership was not weakened. Learning #279."
   ],
-  "limits": [
-    "Receiver-only change; no actual worker live-delivery claim and no closure of #412.",
-    "CI, exact deployed build, controlled no-provider proof and actual deployed MCP log read still pending.",
-    "Legacy terminal-only compatibility is explicitly temporary and not idempotent; LOG-2 retires it after coordinated worker cutover.",
-    "No MCP package source change or package publish; deployed pass-through response must still be exercised.",
-    "No provider, model, Qdrant, worker deployment or paid dispatch used. Existing quarantine unchanged."
-  ],
-  "deployment_probe_design": "Decision #569: API-created draft in its own project; guarded synthetic lease uses max int32 attempt, excluded from worker claim. Test ingestion/replay/conflict/stale/terminal proof; actual MCP read; delete mission/logs and soft-delete project. No queued state or provider calls."
+  "deployment_probe_design": "Decision #569: API-created draft in its own project; guarded synthetic lease uses max int32 attempt, excluded from worker claim. Test ingestion/replay/conflict/stale/terminal proof; actual MCP read; delete mission/logs and soft-delete project. No queued state or provider calls.",
+  "original_claim": {
+    "limits": [
+      "Receiver-only change; no actual worker live-delivery claim and no closure of #412.",
+      "CI, exact deployed build, controlled no-provider proof and actual deployed MCP log read still pending.",
+      "Legacy terminal-only compatibility is explicitly temporary and not idempotent; LOG-2 retires it after coordinated worker cutover.",
+      "No MCP package source change or package publish; deployed pass-through response must still be exercised.",
+      "No provider, model, Qdrant, worker deployment or paid dispatch used. Existing quarantine unchanged."
+    ]
+  },
+  "corrected_at_sprint_close": {
+    "date": "2026-09-30T21:39:00.469991+00:00",
+    "session": "PS-2026-09-30-010",
+    "reason": "Historical rollout gates are resolved; these are not current operator instructions. Original observations, counts and limitations remain scoped to their recorded builds.",
+    "current_receipts": [
+      "cmos/reports/sprint-61/LOG-2/deployed-acceptance.json",
+      "cmos/reports/sprint-61/WALK-4/recovery-acceptance.json",
+      "cmos/reports/sprint-61/WALK-4/final-validation.json"
+    ],
+    "commits": {
+      "AUTH-1": "68f607c",
+      "sign_in_copy": "7d1fe31",
+      "AUTH-2": "db153f8",
+      "LOG-1": "55b5da6",
+      "LOG-2_UI": "56aae006",
+      "LOG-2_retirement": "4495119551c67a39b393b40f0e0d176ea84128ba",
+      "DeepSearch": "5a75502727b889aa4a65a6373df4b74aa36da23b"
+    },
+    "account_state": "The candidate is active as the user left it after final login. The reset revoked every temporary key/grant; private fixture bearer files were removed. No main MCP credentials were changed.",
+    "operator_action_required": false
+  }
 }

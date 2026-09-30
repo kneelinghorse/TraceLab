@@ -3,6 +3,8 @@
 Planned 2026-09-30 in CMOS session **PS-2026-09-30-004**, decision **#563**. CMOS is authoritative for mission criteria, dependencies and status; this document explains the implementation boundaries and handoff.
 Guiding templates: [roadmap](../foundational-docs/roadmap_template.md) and [technical architecture](../foundational-docs/tech_arch_template.md). Intent: [living roadmap](../foundational-docs/roadmap-sprints-57-60-the-librarian.md).
 
+> Completed 2026-09-30. This document preserves the planning-time investigation and gates. Current outcome: [WALK-4](../reports/sprint-61/WALK-4/README.md); no further reset, email, authorization or paid acceptance run is requested.
+
 ## Outcome and authorization
 
 Derek asked: “open a planning session and look at what we need to do for s61 for the password reset workflow and I believe we still have deepsearch live log issue hanging out there. Lets get into those details and see what's possible for s61, then we can create the sprint and missions needed to do the work and we'll hand that off to a fresh session to go build.”

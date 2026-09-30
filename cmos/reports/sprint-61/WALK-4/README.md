@@ -1,7 +1,8 @@
 # WALK-4 acceptance
 
-The recovery matrix and the single paid live-log run are verified. Final legacy
-retirement CI/deployment remains required before mission or sprint closure.
+The recovery matrix, single paid live-log run and final legacy retirement are
+verified. TraceLab backend/frontend serve `4495119551c67a39b393b40f0e0d176ea84128ba`;
+DeepSearch serves `5a75502727b889aa4a65a6373df4b74aa36da23b`.
 The [recovery receipt](recovery-acceptance.json) separates production observations,
 user actions and controlled regression tests. It follows the
 [Sprint 61 handoff](../../../planning/sprint-61-HANDOFF.md) and the
@@ -37,3 +38,23 @@ The interaction asked the operator for too many fragmented steps and caused
 confusion about the account. Learning 280 records the corrected practice. Interactive
 testing is finished. The candidate stays enabled as the user left it; all temporary
 test keys and grants were revoked by the reset. No further account changes are planned.
+
+The [final validation receipt](final-validation.json) records all nine required CI
+contexts and their actual final-head counts: 3,074 backend passed, four skipped,
+12 unchanged quarantined deselections; 169 PostgreSQL passed, two skipped;
+82 browser passed. The 190-test local retirement/cross-service selection passed
+without skips. Two pre-existing DeepSearch S87 readiness pins remain failing;
+they also failed on the clean baseline. No remote DeepSearch CI is configured.
+
+The [source audit](receipt-source-audit.json) found no missing cited source files.
+Later AUTH-2 and legacy-retirement changes are attributed to their commits;
+historical pending operator instructions are preserved under `original_claim`
+and explicitly resolved. The current log/recovery mechanisms still match their
+decisions. Receipt test counts remain historical; current CI is measured separately.
+
+Next-step #412 closes for actual preterminal delivery. #416 closes only for
+forward runtime model/build observation on this accepted run; historical missing
+identities were not repaired. Twenty unrelated maintenance entries remain carried
+(including #451's 2026-12-01 Railway deadline). Research scope drift and the older
+Aquex connector's SSE404 are separate follow-ups. Neither requires a paid rerun
+or replacement of the working saved MCP credential.
