@@ -1,0 +1,69 @@
+{
+  "checks_passed": true,
+  "network_or_provider_calls": 0,
+  "persisted_fields_equal_proposed": [
+    "objective",
+    "success_criteria",
+    "constraints",
+    "references",
+    "deliverables",
+    "deliverable_format"
+  ],
+  "local_preview_equals_saved": true,
+  "exact_reference_url_change_preserves_contract_id": true,
+  "word_and_source_instruction_preserved_as_prose": true,
+  "word_and_source_instruction_compiled_to_required_acceptance_check": false,
+  "worker_structural_preview_id": "106cb8668a3efdb8",
+  "executed_contract_id": "bae1333274533285",
+  "executed_contract_body_available": false,
+  "rendered_result_sha256": "7a9ebff50a2f7c2dae7e8ce72480f1b06236980e8fab6ff979c544c6a96c2255",
+  "word_counts": {
+    "rendered_whitespace": 2285,
+    "worker_telemetry": 2240,
+    "delta": 45,
+    "worker_counter_algorithm_observed": false,
+    "both_exceed_authored_maximum": true
+  },
+  "collection": {
+    "sources": 22,
+    "domains": {
+      "paquier.xyz": 1,
+      "postgrespro.com": 1,
+      "pythonexamples.org": 1,
+      "typeerror.org": 5,
+      "www.postgresql.org": 11,
+      "www.sqliz.com": 2,
+      "www.w3resource.com": 1
+    },
+    "final_reference_urls": 2,
+    "ledger_entries": 24,
+    "ledger_dispositions": {
+      "supporting": 4,
+      "background": 20
+    }
+  },
+  "non_official_critique_support": [
+    {
+      "verdict": "supported",
+      "url": "https://postgrespro.com/docs/postgresql/current/functions-datetime",
+      "evidence_id": "E4.1"
+    }
+  ],
+  "usage_tokens_not_billed_dollars": {
+    "input": 492325,
+    "total": 519007,
+    "output": 26682
+  },
+  "quality": {
+    "outcome": "complete",
+    "completed_at": "2026-09-30T20:56:48.640270",
+    "routing_reason": "",
+    "delivery_quality": "usable_with_warning",
+    "quality_gate_failures": [
+      "critique_assessment_partial",
+      "retrieval_failures_2_source_fetch"
+    ],
+    "coverage_gate_failures": [],
+    "structural_validation_failures": []
+  }
+}

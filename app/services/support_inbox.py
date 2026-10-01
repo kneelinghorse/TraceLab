@@ -1,7 +1,7 @@
-"""Forward mail for Stage1's support address to its owner (Stage1 s97-m02, decision 1105).
+"""Forward mail for the fixed Stage1 and Aquex support addresses to their owner.
 
 Resend Inbound receives every message for aquex.ai and calls the webhook with metadata only. A message addressed
-to stage1@aquex.ai is fetched and re-sent to SUPPORT_FORWARD_TO, with the original sender as reply-to, so a reply
+to stage1@aquex.ai or hello@aquex.ai is fetched and re-sent to SUPPORT_FORWARD_TO, with the original sender as reply-to, so a reply
 reaches the person who wrote in. Bodies and addresses are never logged. The received message id is the send's
 idempotency key, so a Resend retry cannot deliver the same message twice.
 """
@@ -14,12 +14,13 @@ import hmac
 import html
 import time
 from collections.abc import Mapping
+from email.utils import getaddresses
 
 import httpx
 
 from app.core.config import settings
 
-SUPPORT_ADDRESS = "stage1@aquex.ai"
+SUPPORT_ADDRESSES = ("stage1@aquex.ai", "hello@aquex.ai")
 RESEND_API = "https://api.resend.com"
 SIGNATURE_TOLERANCE_SECONDS = 300
 
@@ -40,13 +41,20 @@ def signature_valid(secret: str, headers: Mapping[str, str], body: bytes, now: f
     return any(hmac.compare_digest(expected, part[3:]) for part in signatures.split() if part.startswith("v1,"))
 
 
-def addressed_to_support(data: Mapping[str, object]) -> bool:
-    """True when the support address is among the message's recipients, as it is also for a cc or bcc."""
-    recipients = [*(data.get("to") or []), *(data.get("cc") or []), *(data.get("bcc") or [])]
-    return any(SUPPORT_ADDRESS in str(address).lower() for address in recipients)
+def matched_support_addresses(data: Mapping[str, object]) -> tuple[str, ...]:
+    """Parse signed envelope mailboxes, returning unique matches in configured order."""
+    recipients = []
+    for field in ("to", "cc", "bcc"):
+        value = data.get(field)
+        if isinstance(value, str):
+            recipients.append(value)
+        elif isinstance(value, list):
+            recipients.extend(address for address in value if isinstance(address, str))
+    mailboxes = {address.casefold() for _, address in getaddresses(recipients)}
+    return tuple(address for address in SUPPORT_ADDRESSES if address in mailboxes)
 
 
-async def forward(email_id: str) -> str:
+async def forward(email_id: str, matched_addresses: tuple[str, ...]) -> str:
     """Fetch a received message and re-send it to the owner; return the provider id.
 
     Raises httpx.HTTPError when Resend refuses a call, so the webhook answers 5xx and Resend retries.
@@ -63,12 +71,14 @@ async def forward(email_id: str) -> str:
             response.raise_for_status()
             attachments = [{"filename": item["filename"], "path": item["download_url"]} for item in response.json().get("data", [])]
         sender = received.get("from") or "an unknown sender"
-        intro = f"Forwarded from {SUPPORT_ADDRESS}. From: {sender}. Received: {received.get('created_at')}."
+        # Use the verified envelope: fetched content may omit bcc recipients.
+        labels = ", ".join(matched_addresses)
+        intro = f"Forwarded from {labels}. From: {sender}. Received: {received.get('created_at')}."
         payload = {
             "from": settings.resend_from_address,
             "to": [settings.support_forward_to],
             "reply_to": received.get("reply_to") or [sender],
-            "subject": f"[{SUPPORT_ADDRESS}] {received.get('subject') or '(no subject)'}",
+            "subject": f"[{labels}] {received.get('subject') or '(no subject)'}",
             "text": f"{intro}\n\n{received.get('text') or ''}",
         }
         if received.get("html"):

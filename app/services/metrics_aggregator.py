@@ -143,23 +143,34 @@ class MetricsAggregator:
         }
 
     def _cache_performance(self) -> dict[str, Any]:
-        snapshot = self.cache_manager.snapshot()
+        # A telemetry dependency can be down while the other observations remain useful.
+        ttl_status = semantic_status = "available"
+        try:
+            snapshot = self.cache_manager.snapshot()
+        except Exception:
+            snapshot = {}
+            ttl_status = "unavailable"
         ttl_caches = [info for _, info in sorted(snapshot.items())]
-        semantic = self.semantic_cache_metrics.snapshot()
+        try:
+            semantic = self.semantic_cache_metrics.snapshot()
+        except Exception:
+            semantic = {"hit_rate": None, "evictions": None}
+            semantic_status = "unavailable"
         ttl_hit_rates = [
             cache.get("hit_rate")
             for cache in ttl_caches
-            if isinstance(cache.get("hit_rate"), (int, float))
+            if isinstance(cache.get("hit_rate"), int | float)
         ]
         aggregate = {
-            "ttl_cache_count": len(ttl_caches),
-            "ttl_average_hit_rate": round(mean(ttl_hit_rates), 3)
-            if ttl_hit_rates
-            else 0.0,
-            "semantic_hit_rate": round(float(semantic.get("hit_rate", 0.0)), 3),
-            "semantic_evictions": semantic.get("evictions", 0.0),
+            "ttl_cache_count": len(ttl_caches) if ttl_status == "available" else None,
+            "ttl_average_hit_rate": (round(mean(ttl_hit_rates), 3) if ttl_hit_rates else 0.0) if ttl_status == "available" else None,
+            "semantic_hit_rate": round(float(semantic["hit_rate"]), 3) if semantic_status == "available" else None,
+            "semantic_evictions": semantic.get("evictions"),
         }
         return {
+            "scope": "process_local_since_start",
+            "ttl_status": ttl_status,
+            "semantic_status": semantic_status,
             "ttl_caches": ttl_caches,
             "semantic_cache": semantic,
             "aggregate": aggregate,
@@ -171,7 +182,7 @@ class MetricsAggregator:
         latencies = [
             float(event.get("latency_ms"))
             for event in events
-            if isinstance(event.get("latency_ms"), (int, float))
+            if isinstance(event.get("latency_ms"), int | float)
         ]
         now = datetime.now(UTC)
         last_hour = sum(
@@ -182,20 +193,21 @@ class MetricsAggregator:
         slow_queries = [
             self._simplify_event(event)
             for event in sorted(
-                events, key=lambda e: float(e.get("latency_ms", 0.0)), reverse=True
+                (event for event in events if isinstance(event.get("latency_ms"), int | float)),
+                key=lambda e: float(e["latency_ms"]), reverse=True
             )
             if event.get("latency_ms")
         ]
-        semantic_hit = float(cache.get("semantic_cache", {}).get("hit_rate", 0.0))
-        ttl_avg = float(cache.get("aggregate", {}).get("ttl_average_hit_rate", 0.0))
+        semantic_hit = cache["aggregate"]["semantic_hit_rate"]
+        ttl_avg = cache["aggregate"]["ttl_average_hit_rate"]
         return {
             "p50_latency_ms": _percentile(latencies, 50),
             "p95_latency_ms": _percentile(latencies, 95),
             "p99_latency_ms": _percentile(latencies, 99),
             "average_latency_ms": round(mean(latencies), 3) if latencies else 0.0,
             "requests_last_hour": last_hour,
-            "semantic_cache_hit_rate": round(semantic_hit, 3),
-            "application_cache_hit_rate": round(ttl_avg, 3),
+            "semantic_cache_hit_rate": semantic_hit,
+            "application_cache_hit_rate": ttl_avg,
             "slow_queries": slow_queries[:10],
             "trend": self._daily_latency_trend(events, days=7),
         }
@@ -212,6 +224,9 @@ class MetricsAggregator:
             "database": self._database_health(),
             "qdrant": self._qdrant_health(),
             "cache": {
+                "scope": cache["scope"],
+                "ttl_status": cache["ttl_status"],
+                "semantic_status": cache["semantic_status"],
                 "ttl_cache_count": cache.get("aggregate", {}).get("ttl_cache_count", 0),
                 "semantic_cache_hit_rate": cache.get("semantic_cache", {}).get(
                     "hit_rate", 0.0
@@ -257,7 +272,7 @@ class MetricsAggregator:
             if threshold and event["_ts"] < threshold:
                 continue
             cost = event.get("cost_usd")
-            if isinstance(cost, (int, float)):
+            if isinstance(cost, int | float):
                 total += float(cost)
         return round(total, 6)
 
@@ -276,7 +291,7 @@ class MetricsAggregator:
         for event in events:
             value = event.get(key) or "unknown"
             cost = event.get("cost_usd")
-            if isinstance(cost, (int, float)):
+            if isinstance(cost, int | float):
                 buckets[str(value)] += float(cost)
         top = sorted(buckets.items(), key=lambda item: item[1], reverse=True)
         return [
@@ -300,7 +315,7 @@ class MetricsAggregator:
                 continue
             label = event["_ts"].date().isoformat()
             cost = event.get("cost_usd")
-            if isinstance(cost, (int, float)):
+            if isinstance(cost, int | float):
                 buckets[label] += float(cost)
         ordered = sorted(buckets.items())
         return [
@@ -318,7 +333,7 @@ class MetricsAggregator:
             if event["_ts"] < start:
                 continue
             latency = event.get("latency_ms")
-            if isinstance(latency, (int, float)):
+            if isinstance(latency, int | float):
                 buckets[event["_ts"].date().isoformat()].append(float(latency))
         ordered = sorted(buckets.items())
         return [

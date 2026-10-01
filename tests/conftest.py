@@ -13,6 +13,10 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from scripts.pytest_isolation import install as _install_isolation  # noqa: E402
+
+_install_isolation()
+
 # CRITICAL: Force test database to prevent accidental production wipes
 # setdefault doesn't override .env values, so we MUST force this
 _TEST_DB_URL = "sqlite:///./tests/test_ingestion.db"
@@ -21,7 +25,7 @@ _current_db = os.environ.get("DATABASE_URL", "")
 # Safety check: refuse to run tests against production databases
 if "postgresql" in _current_db.lower() or "rlwy.net" in _current_db.lower():
     raise RuntimeError(
-        f"REFUSING TO RUN TESTS: DATABASE_URL points to PostgreSQL ({_current_db[:50]}...).\n"
+        "REFUSING TO RUN TESTS: DATABASE_URL points to PostgreSQL.\n"
         "Tests would wipe the database! Unset DATABASE_URL or use SQLite for tests."
     )
 
@@ -162,7 +166,10 @@ def reset_database_and_reports(request):
         "test_graph_rag",
         "test_evidence_auto_linking",
     ]
-    if any(pattern in test_path for pattern in skip_patterns):
+    # The RAG unit module also contains an authenticated API test. It needs its
+    # own user table, even when no earlier suite happened to create one.
+    needs_auth_database = request.node.name == "test_rag_search_endpoint"
+    if not needs_auth_database and any(pattern in test_path for pattern in skip_patterns):
         yield
         return
 

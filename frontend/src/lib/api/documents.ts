@@ -4,8 +4,8 @@
 
 import type { Document, DocumentChunk, DocumentContent, DocumentProcessResult, DocumentUploadResponse } from "@/types/document";
 import type { PaginatedResponse } from "@/types/pagination";
-import { AUTH_EXPIRED_EVENT, buildApiUrl, HttpError, httpClient } from "./http";
-import { clearStoredAuth, getStoredAuth } from "@/lib/auth/storage";
+import { buildApiUrl, expireRejectedSession, HttpError, httpClient } from "./http";
+import { getStoredAuth } from "@/lib/auth/storage";
 
 export type ListDocumentsParams = {
   projectId?: string;
@@ -63,15 +63,15 @@ export const documentsApi = {
       request.onerror = () => reject(new Error("Upload connection failed. Check the document list before retrying."));
       request.onabort = () => reject(new Error("Upload interrupted."));
       request.onload = () => {
-        if (request.status === 401) {
-          clearStoredAuth();
-          window.dispatchEvent(new Event(AUTH_EXPIRED_EVENT));
-        }
         let body;
-        try { body = JSON.parse(request.responseText); } catch { reject(new HttpError("Upload returned an unreadable response.", request.status)); return; }
+        try { body = JSON.parse(request.responseText); } catch {
+          expireRejectedSession(request.status, undefined, token);
+          reject(new HttpError("Upload returned an unreadable response.", request.status)); return;
+        }
+        expireRejectedSession(request.status, body, token);
         if (request.status < 200 || request.status >= 300) {
-          reject(new HttpError(typeof body.detail === "string" ? body.detail : "Upload failed.", request.status));
-        } else if (!body.id) {
+          reject(new HttpError(typeof body?.detail === "string" ? body.detail : "Upload failed.", request.status));
+        } else if (!body?.id) {
           reject(new Error("Upload did not return a document ID. Check the document list before retrying."));
         } else { resolve(body); }
       };
@@ -109,7 +109,8 @@ export const documentsApi = {
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({ detail: "Download failed" }));
-      throw new Error(error.detail || "Download failed");
+      expireRejectedSession(response.status, error, token);
+      throw new Error(error?.detail || "Download failed");
     }
 
     return response.blob();

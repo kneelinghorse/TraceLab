@@ -1,0 +1,70 @@
+{
+  "mission": "S62-UX",
+  "checked_at": "2026-10-01T01:18:39.190585+00:00",
+  "status": "completed_local_production_build_acceptance",
+  "behavior": [
+    "Exact disabled403 and401 clear stored and in-memory auth across JSON/upload/download",
+    "Ordinary403, malformed403, network and unrelated server errors preserve session",
+    "Captured-token comparison protects a newer login from a late rejection",
+    "Focusable labeled code regions scroll with Tab/ArrowRight; existing tables and copied Markdown unchanged"
+  ],
+  "validation": {
+    "frontend_unit": {
+      "passed": 368,
+      "files": 43,
+      "skipped": 0
+    },
+    "backend_rbac": {
+      "passed": 12,
+      "skipped": 0
+    },
+    "browser": {
+      "total": 12,
+      "expected": 12,
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0,
+      "interrupted": 0,
+      "durationSeconds": 10.204,
+      "retries": 0
+    },
+    "lint": "passed",
+    "typescript": "passed",
+    "production_build": "passed",
+    "foundational_refs": "passed"
+  },
+  "browser_scope": {
+    "transports": [
+      "json",
+      "download"
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "widths": [
+      390,
+      820,
+      1440
+    ],
+    "serious_critical_axe_violations": 0,
+    "document_overflow": false,
+    "logout_reload_and_password_recovery": "passed",
+    "data": "dedicated mocked account and report; no real account mutation",
+    "build_id": "tahW8C0lMhAO8bOHEeX6w"
+  },
+  "iterations": [
+    "Intent regressions initially failed before implementation",
+    "Browser harness corrected Export button accessible name and scoped alert selector to exclude Next route announcer; final12/12 passed without retries"
+  ],
+  "source_sha256": {
+    "frontend/src/lib/api/http.ts": "2089fe06f6c528d8a719dcf250bcae57295e630fd932a531f4e4fb44df44a579",
+    "frontend/src/lib/api/documents.ts": "091623bec87ed3ea79337ea3abf799137854435520ba3ea612fa2920478a0cde",
+    "frontend/src/lib/api/reports.ts": "f0261a82c7f2dbe210ab9ed39f167cff007fa7d490e097d08839d6588de81eff",
+    "frontend/src/lib/api/collections.ts": "c25a6fe5084afe08ab42ffb4f38b69238a65038277b18cda9707d86184a4b9f7",
+    "frontend/src/components/MarkdownRenderer.tsx": "a1836ffa1a95750b30b615a51c538631317bb4270d59aba4e2bfcaec42a91c8b"
+  },
+  "limits": [
+    "Deployed sprint acceptance remains S62-WALK; these browser checks use the local production build with controlled API responses."
+  ]
+}

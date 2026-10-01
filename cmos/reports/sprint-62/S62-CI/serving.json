@@ -1,0 +1,18 @@
+{
+  "observed_at": "2026-10-01T00:12:26.434509+00:00",
+  "backend": {
+    "url": "https://api.tracelab.aquex.ai/api/v1/health",
+    "commit": "4495119551c67a39b393b40f0e0d176ea84128ba",
+    "error": null
+  },
+  "frontend": {
+    "url": "https://tracelab.aquex.ai/api/version",
+    "commit": "4495119551c67a39b393b40f0e0d176ea84128ba",
+    "error": null
+  },
+  "local_frontend": {
+    "url": "http://localhost:3100/api/version",
+    "commit": "3fa0c31da040215783865841e1e29946c3b70cdb",
+    "error": null
+  }
+}

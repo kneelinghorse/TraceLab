@@ -1,0 +1,26 @@
+{
+  "checked_at": "2026-10-01T00:18:13.277926+00:00",
+  "project": "4e3adf39-f05e-48f8-8c7c-f2f27621b484",
+  "environment": "4fb80245-6762-4438-ab94-6993c3568a92",
+  "service": "bb03daef-7b08-4ef9-b0db-b7b5d49c0721",
+  "required_config_present": [
+    {
+      "name": "RESEND_WEBHOOK_SECRET",
+      "present": true
+    },
+    {
+      "name": "RESEND_INBOUND_API_KEY",
+      "present": true
+    },
+    {
+      "name": "SUPPORT_FORWARD_TO",
+      "present": true
+    },
+    {
+      "name": "RESEND_FROM_ADDRESS",
+      "present": true
+    }
+  ],
+  "values_retained": false,
+  "new_variables": []
+}

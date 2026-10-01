@@ -1,0 +1,82 @@
+{
+  "mission": "S62-ENTRY",
+  "checked_at": "2026-10-01T00:53:40.108543+00:00",
+  "decision": 581,
+  "source_base": "f4962e50c5abbf0d43285723c4a54dd1db3bdda0",
+  "source_sha256": {
+    "frontend/src/pages/librarian.tsx": "711930b5667da00db8553d98cf0ccbe928dede1db462fba2ea3cf7466e4c4c13",
+    "frontend/src/pages/index.tsx": "138eaf20a2cc87420d6af603359a54ed69a3b882144fc789a82ed6cd2fafb14f",
+    "frontend/src/pages/missions/index.tsx": "c5d27cb82f2280b075420d3529f094e4c3d033841626ca6b4be3c0d00b6af392",
+    "frontend/src/components/CommandPalette.tsx": "e4259c81ea2c227b3f701fa028f57277777bbeb193b5612d06945eeb2d20ef48",
+    "frontend/src/components/missions/MissionForm.tsx": "f8c8387c71f1bfb2874c2bf68b3e9877f926d3dfe96d61052ab2bbdde94b27e1",
+    "frontend/src/lib/librarian/storage.ts": "4a7a6b1e9d5656270641aa10540787322f9807cf561e982ab9507ab7437fa9d0"
+  },
+  "production_build": {
+    "command": "cd frontend && npm run build",
+    "passed": true,
+    "build_id": "c3fTXWImg-KIzuqFgVQTl",
+    "deployed": false
+  },
+  "validation": {
+    "frontend_unit": {
+      "passed": 347,
+      "skipped": 0
+    },
+    "backend_librarian_personal_spaces": {
+      "passed": 37,
+      "skipped": 0
+    },
+    "backend_review_then_revocation": {
+      "passed": 1,
+      "skipped": 0
+    },
+    "built_manual_repeat_collection_search_palette": {
+      "passed": 29,
+      "skipped": 0
+    },
+    "real_member_browser": {
+      "cases": 12,
+      "passed": 12,
+      "rbac_enabled": true,
+      "model_only_scripted": true,
+      "actual_registration_auth_project_preview_save": true,
+      "initial_visible_projects_per_user": 0,
+      "database_assertions": "12 personal projects, 12 Librarian-authored draft missions, no queued/started timestamps",
+      "double_click_writes_per_mission": 1,
+      "no_execution": true,
+      "axe_serious_critical": 0,
+      "overflow": 0,
+      "draft_focus": true,
+      "screenshots": "/tmp/s62-entry-browser",
+      "pytest_seconds": 40.63
+    },
+    "lint": "passed",
+    "types": "passed",
+    "ruff_changed_python": "passed",
+    "foundational_refs": "passed",
+    "mcp_operations": 118,
+    "mcp_argument_gaps": 0,
+    "argument_regressions": 7
+  },
+  "coverage": [
+    "per-user persisted conversation/project/draft, in-place user change and stale async response rejection",
+    "revoked/changed destination and rejected save require reselect/create; draft invalidated, transcript retained",
+    "loading and failed project load retry; failed project create retry without duplicate successful writes",
+    "conversational refinement/regeneration, failed save retry to same idempotent draft",
+    "explicit q and saved override mission intent; normal QA/citations/refusal preserved",
+    "personal default and explicit shared destination; no visit auto-creation",
+    "manual zero-project escape, repeat/collection seed, edit/preview retained"
+  ],
+  "validation_history": [
+    "One full frontend run found the new retry test asserting selection before the successful cache mutation completed; fixed the test to await selection, full final 347 passed.",
+    "Browser harness initial close raced an in-flight read; waiting for navigation network-idle and safe context cleanup resolved it. A cleanup wait was interrupted after stalling; no product failure was hidden.",
+    "Initial 12-case fixture lacked explicit RBAC enablement and is not acceptance evidence. Final fixture enables RBAC and checks each member sees zero projects at their own entry; all 12 pass.",
+    "A stricter intermediate browser run reported an activity-viewed request cancellation during navigation; awaiting initial network-idle yielded final pass with zero transport failures.",
+    "One mistyped argument-audit filename failed; corrected to scripts/mcp_argument_parity.mjs and seven regressions passed."
+  ],
+  "limits": [
+    "This is local production-build acceptance against an isolated real API with scripted model, not a deployed-provider test; final deployed acceptance belongs to S62-WALK.",
+    "Known baseline dependency and React test warnings retained; no dependency changes.",
+    "Previously documented CMOS legacy integration-runner two baseline failures and 12 backend quarantine entries unchanged."
+  ]
+}

@@ -1,7 +1,7 @@
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent, type RefObject } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent, type RefObject } from "react";
 import useSWR from "swr";
 
 import { AuthGate } from "@/components/AuthGate";
@@ -25,6 +25,7 @@ import {
   type TranscriptMessage,
 } from "@/lib/api/librarian";
 import { projectsApi } from "@/lib/api/projects";
+import { HttpError } from "@/lib/api/http";
 import { LibrarianSteps } from "@/components/librarian/LibrarianSteps";
 import {
   clearLibrarianState,
@@ -118,12 +119,14 @@ function SegmentView({ segment, chunks }: { segment: ReplySegment; chunks: Map<s
 function DraftPanel({
   draft,
   creating,
+  disabled,
   onCreate,
   onDismiss,
   panelRef,
 }: {
   draft: DraftResponse;
   creating: boolean;
+  disabled: boolean;
   onCreate: () => void;
   onDismiss: () => void;
   panelRef: RefObject<HTMLElement | null>;
@@ -226,12 +229,12 @@ function DraftPanel({
         <button
           type="button"
           onClick={onCreate}
-          disabled={creating}
+          disabled={creating || disabled}
           className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-on-accent hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-60"
         >
           {creating ? "Creating…" : "Create draft mission"}
         </button>
-        <button type="button" onClick={onDismiss} className="rounded-lg border border-line-strong px-4 py-2 text-sm">
+        <button type="button" onClick={onDismiss} disabled={creating} className="rounded-lg border border-line-strong px-4 py-2 text-sm">
           Keep refining
         </button>
       </div>
@@ -248,6 +251,8 @@ function LibrarianContent() {
   const queryProject = typeof router.query.project === "string" ? router.query.project : "";
   const queryText = typeof router.query.q === "string" ? router.query.q.trim() : "";
   const savedId = typeof router.query.saved === "string" ? router.query.saved.trim() : "";
+  // An explicit search wins over planning intent, including saved-search links.
+  const focusedPlanning = router.query.intent === "mission" && !queryText && !savedId;
   const listRequest: ChunkListRequest | null = savedId
     ? { kind: "saved", savedId }
     : queryText
@@ -267,6 +272,7 @@ function LibrarianContent() {
   const [creating, setCreating] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [orientationHidden, setOrientationHidden] = useState(false);
+  const [projectUnavailable, setProjectUnavailable] = useState(false);
   // Which user's stored conversation has been restored; persistence waits for it so a
   // fresh mount never overwrites a saved conversation with an empty one.
   const [restoredFor, setRestoredFor] = useState<string | null>(null);
@@ -274,10 +280,31 @@ function LibrarianContent() {
   const draftPanelRef = useRef<HTMLElement>(null);
   const focusDraftRef = useRef(false);
   const storageUser = user?.user_id ?? "guest";
+  const requestScope = useRef(0);
+
+  const changeProject = useCallback((id: string) => {
+    requestScope.current += 1;
+    setProjectId(id);
+    setDraft(null);
+    setDrafting(false);
+    setSending(false);
+    setCreating(false);
+    setProjectUnavailable(false);
+  }, []);
+
+  function handleProjectError(error: unknown) {
+    notify(error);
+    if (error instanceof HttpError && [403, 404].includes(error.status)) {
+      changeProject("");
+      setProjectUnavailable(true);
+      void projects.mutate().catch(() => {});
+    }
+  }
 
   useEffect(() => {
-    if (queryProject) setProjectId(queryProject);
-  }, [queryProject]);
+    if (queryProject) changeProject(queryProject);
+  }, [queryProject, changeProject]);
+  useEffect(() => () => { requestScope.current += 1; }, []);
   useEffect(() => {
     // A list named in the URL (a link, a saved search, the /search redirect) opens in list mode.
     if (!queryText && !savedId) return;
@@ -287,7 +314,7 @@ function LibrarianContent() {
   useEffect(() => {
     const stored = readLibrarianState(storageUser);
     setTurns(stored?.turns ?? []);
-    setDraft(stored?.draft ?? null);
+    setDraft(queryProject && queryProject !== stored?.projectId ? null : stored?.draft ?? null);
     if (!queryProject) setProjectId(stored?.projectId ?? "");
     setOrientationHidden(readOrientationDismissed(storageUser));
     setRestoredFor(storageUser);
@@ -310,17 +337,25 @@ function LibrarianContent() {
   }, [turns.length, sending]);
 
   const project = useMemo(() => projects.data?.find((item) => item.id === projectId) ?? null, [projects.data, projectId]);
+  const projectReady = Boolean(project) && !projects.isLoading && !projects.error;
+  useEffect(() => {
+    if (projectId && projects.data && !projects.error && !project) {
+      changeProject("");
+      setProjectUnavailable(true);
+    }
+  }, [projectId, projects.data, projects.error, project, changeProject]);
   // Asking needs a project: an answer comes from one project's documents.
-  const answering = mode === "answer" && Boolean(projectId);
-  const listing = mode === "list";
+  const answering = !focusedPlanning && mode === "answer" && projectReady;
+  const listing = !focusedPlanning && mode === "list";
   const lastAssistant = [...turns].reverse().find((turn) => turn.role === "assistant");
   const suggested = lastAssistant?.role === "assistant" && lastAssistant.suggested;
-  const canDraft = turns.some((turn) => turn.role === "user") && Boolean(projectId) && !sending;
+  const canDraft = turns.some((turn) => turn.role === "user") && projectReady && !sending;
   const started = turns.length > 0;
   const primaryButton = "rounded-xl bg-accent px-5 py-3 font-semibold text-on-accent hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-60";
   const secondaryButton = "rounded-xl border border-line-strong px-5 py-3 font-semibold text-foreground disabled:cursor-not-allowed disabled:opacity-60";
 
   function startOver() {
+    changeProject("");
     setTurns([]);
     setDraft(null);
     setInput("");
@@ -334,13 +369,14 @@ function LibrarianContent() {
 
   async function send(text: string) {
     const trimmed = text.trim();
-    if (!trimmed || sending) return;
+    if (!trimmed || sending || drafting || creating || creatingProject) return;
     if (listing) {
       // The list lives in the URL, so a reload or a shared link shows the same one.
       void router.push({ pathname: "/librarian", query: { q: trimmed, ...(projectId ? { project: projectId } : {}) } }, undefined, { shallow: true });
       return;
     }
     const next: Turn[] = [...turns, { role: "user", text: trimmed }];
+    const scope = requestScope.current;
     setTurns(next);
     setInput("");
     setSending(true);
@@ -348,6 +384,8 @@ function LibrarianContent() {
       const reply = answering
         ? await librarianApi.turn(toTranscript(next), projectId, { maxTokens: ANSWER_BUDGETS[budget] })
         : await librarianApi.turn(toTranscript(next), projectId || null);
+      if (scope !== requestScope.current) return;
+      setDraft(null);
       setTurns([
         ...next,
         {
@@ -359,40 +397,46 @@ function LibrarianContent() {
         },
       ]);
     } catch (err) {
-      notify(err);
+      if (scope !== requestScope.current) return;
+      handleProjectError(err);
       setTurns(turns);
       setInput(trimmed);
     } finally {
-      setSending(false);
+      if (scope === requestScope.current) setSending(false);
     }
   }
 
   async function draftMission() {
-    if (!projectId || drafting) return;
+    if (!canDraft || drafting || creating || creatingProject) return;
+    const scope = requestScope.current;
     setDrafting(true);
     try {
       const result = await librarianApi.draft(toTranscript(turns), projectId);
+      if (scope !== requestScope.current) return;
       focusDraftRef.current = true;
       setDraft(result);
       notify("Your draft is ready below. Review it, then create it.", "success");
     } catch (err) {
-      notify(err);
+      if (scope === requestScope.current) handleProjectError(err);
     } finally {
-      setDrafting(false);
+      if (scope === requestScope.current) setDrafting(false);
     }
   }
 
   async function createMission() {
-    if (!draft || !projectId || creating) return;
+    if (!draft || !projectReady || creating || sending || drafting) return;
+    const scope = requestScope.current;
     setCreating(true);
     try {
       const result = await librarianApi.createMission(draft.draft, projectId);
+      if (scope !== requestScope.current) return;
       notify(result.created ? "Draft mission created. Review and submit it from the mission page." : "This draft already exists; opening it.", "success");
       // The draft is now a mission; the conversation stays for the next one.
       writeLibrarianState(storageUser, { projectId, turns, draft: null });
       await router.push(`/missions/${result.mission.id}?from=librarian`);
     } catch (err) {
-      notify(err);
+      if (scope !== requestScope.current) return;
+      handleProjectError(err);
       setCreating(false);
     }
   }
@@ -400,19 +444,24 @@ function LibrarianContent() {
   async function createProject(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const name = newProjectName.trim();
-    if (!name || creatingProject) return;
+    if (!name || creatingProject || creating) return;
+    const scope = requestScope.current;
     setCreatingProject(true);
     try {
       const created = await projectsApi.createProject(
         newProjectSpace ? { name, workspace_id: newProjectSpace } : { name },
       );
-      await projects.mutate();
-      setProjectId(created.id);
+      if (scope !== requestScope.current) return;
+      // Cache the successful creation directly: a failed follow-up list must
+      // not make the user create a duplicate project to recover.
+      await projects.mutate(current => [...(current ?? []).filter(item => item.id !== created.id), created], { revalidate: false });
+      if (scope !== requestScope.current) return;
+      changeProject(created.id);
       setNewProjectName("");
       setNewProjectSpace("");
       notify(`Project "${created.name}" created. The Librarian's missions will land there.`, "success");
     } catch (err) {
-      notify(err);
+      if (scope === requestScope.current) notify(err);
     } finally {
       setCreatingProject(false);
     }
@@ -425,23 +474,7 @@ function LibrarianContent() {
     }
   }
 
-  return (
-    <div className={`mx-auto space-y-6 px-4 py-8 sm:px-6 ${started ? "max-w-6xl" : "max-w-4xl"}`}>
-      <Head>
-        <title>Librarian · TraceLab</title>
-      </Head>
-      <header className="space-y-2">
-        <h1 className="text-2xl font-semibold text-foreground">Librarian</h1>
-        <p className="text-secondary">
-          Describe what you want to learn. The Librarian helps shape it into a research question, then drafts a DeepSearch mission you review and run. Or ask a question about a project&apos;s documents and get an answer that cites them, or list the chunks that match a phrase.
-        </p>
-        <p className="text-sm text-muted">
-          Plain text is the Librarian speaking from general knowledge. A highlighted passage is a claim about this project&apos;s documents or evidence and links to what it cites.
-        </p>
-      </header>
-
-      {!orientationHidden && <LibrarianSteps current={draft ? 2 : 1} onDismiss={dismissOrientation} />}
-
+  const projectPanel = (
       <section className="panel space-y-3 p-5" aria-label="Project">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
           <div className="flex-1">
@@ -450,8 +483,8 @@ function LibrarianContent() {
               id="librarian-project"
               className="form-input"
               value={projectId}
-              onChange={(event) => { setProjectId(event.target.value); setDraft(null); }}
-              disabled={projects.isLoading}
+              onChange={(event) => changeProject(event.target.value)}
+              disabled={projects.isLoading || creating || creatingProject}
             >
               <option value="">No project yet (planning only)</option>
               {(projects.data ?? []).map((item) => (
@@ -471,13 +504,14 @@ function LibrarianContent() {
                   placeholder="Name a project to hold the mission"
                 />
               </div>
-              <button type="submit" disabled={creatingProject || !newProjectName.trim()} className="rounded-lg border border-line-strong px-3 py-2 text-sm disabled:opacity-60">
+              <button type="submit" disabled={creating || creatingProject || !newProjectName.trim()} className="rounded-lg border border-line-strong px-3 py-2 text-sm disabled:opacity-60">
                 {creatingProject ? "Creating…" : "Create"}
               </button>
             </div>
             <SpacePicker value={newProjectSpace} onChange={setNewProjectSpace} />
           </form>
         </div>
+        {projectUnavailable && <p role="alert" className="text-sm text-warning">The selected project is no longer available. Choose or create a project to continue; your conversation is still here.</p>}
         {projects.error && <p role="alert" className="text-sm text-danger">Projects could not load. <button type="button" className="underline" onClick={() => void projects.mutate()}>Retry</button></p>}
         {!projectId && !projects.isLoading && (
           <p className="text-sm text-secondary">
@@ -486,11 +520,32 @@ function LibrarianContent() {
         )}
         {project && <p className="text-sm text-secondary">Missions will be created in <Link href={`/projects/${project.id}`} className="text-accent-text underline">{project.name}</Link>.</p>}
       </section>
+  );
 
-      {project && <ProjectDescription key={`description:${storageUser}:${project.id}`} userId={storageUser} projectId={project.id} projectName={project.name} />}
-      {project && <DuplicateReview key={`duplicates:${storageUser}:${project.id}`} userId={storageUser} projectId={project.id} projectName={project.name} />}
-      {project && <CollectionSuggestions key={`collections:${storageUser}:${project.id}`} userId={storageUser} projectId={project.id} projectName={project.name} />}
-      {project && <ReportDraft key={`reports:${storageUser}:${project.id}`} userId={storageUser} projectId={project.id} projectName={project.name} />}
+  return (
+    <div className={`mx-auto space-y-6 px-4 py-8 sm:px-6 ${started ? "max-w-6xl" : "max-w-4xl"}`}>
+      <Head>
+        <title>{focusedPlanning ? "Plan a mission" : "Librarian"} · TraceLab</title>
+      </Head>
+      <header className="space-y-2">
+        <h1 className="text-2xl font-semibold text-foreground">{focusedPlanning ? "Plan a mission" : "Librarian"}</h1>
+        <p className="text-secondary">
+          {focusedPlanning ? "Describe your question, choose or create a project, then review the proposed mission. It stays a draft until you submit it to run." : <>Describe what you want to learn. The Librarian helps shape it into a research question, then drafts a DeepSearch mission you review and run. Or ask a question about a project&apos;s documents and get an answer that cites them, or list the chunks that match a phrase.</>}
+        </p>
+        <p className="text-sm text-muted">
+          Plain text is the Librarian speaking from general knowledge. A highlighted passage is a claim about this project&apos;s documents or evidence and links to what it cites.
+        </p>
+        {focusedPlanning && <p className="flex flex-wrap gap-4 text-sm"><Link href="/missions/new" className="text-accent-text underline">Create manually</Link><Link href="/librarian" className="text-accent-text underline">All Librarian tools</Link></p>}
+      </header>
+
+      {!orientationHidden && <LibrarianSteps current={draft ? 2 : 1} onDismiss={dismissOrientation} />}
+
+      {!focusedPlanning && projectPanel}
+
+      {!focusedPlanning && project && <ProjectDescription key={`description:${storageUser}:${project.id}`} userId={storageUser} projectId={project.id} projectName={project.name} />}
+      {!focusedPlanning && project && <DuplicateReview key={`duplicates:${storageUser}:${project.id}`} userId={storageUser} projectId={project.id} projectName={project.name} />}
+      {!focusedPlanning && project && <CollectionSuggestions key={`collections:${storageUser}:${project.id}`} userId={storageUser} projectId={project.id} projectName={project.name} />}
+      {!focusedPlanning && project && <ReportDraft key={`reports:${storageUser}:${project.id}`} userId={storageUser} projectId={project.id} projectName={project.name} />}
 
       <section className="panel p-5" aria-label="Conversation with the Librarian">
         {started && (
@@ -500,7 +555,7 @@ function LibrarianContent() {
               <button type="button" onClick={() => setExpanded((value) => !value)} aria-pressed={expanded} className="rounded-lg border border-line px-3 py-1 text-xs text-secondary hover:text-foreground">
                 {expanded ? "Compact view" : "Expand transcript"}
               </button>
-              <button type="button" onClick={startOver} className="rounded-lg border border-line px-3 py-1 text-xs text-secondary hover:text-foreground">
+              <button type="button" onClick={startOver} disabled={creating || creatingProject} className="rounded-lg border border-line px-3 py-1 text-xs text-secondary hover:text-foreground">
                 Start over
               </button>
             </div>
@@ -511,7 +566,7 @@ function LibrarianContent() {
           role="log"
           aria-live="polite"
           aria-label="Transcript"
-          className={`space-y-4 overflow-y-auto pr-1 ${expanded ? "" : started ? "min-h-[50vh] max-h-[75vh]" : "max-h-[60vh]"}`}
+          className={`space-y-4 overflow-y-auto pr-1 ${expanded ? "" : started ? focusedPlanning ? "min-h-32 max-h-[50vh]" : "min-h-[50vh] max-h-[75vh]" : "max-h-[60vh]"}`}
         >
           {turns.length === 0 && answering && (
             <p className="text-secondary">
@@ -567,7 +622,7 @@ function LibrarianContent() {
           {sending && <p role="status" className="text-sm text-muted">{answering ? "The Librarian is reading the documents…" : "The Librarian is thinking…"}</p>}
         </div>
 
-        <div className="mt-4 space-y-2 text-sm">
+        {!focusedPlanning && <div className="mt-4 space-y-2 text-sm">
           <div role="radiogroup" aria-label="How the Librarian replies" className="flex flex-wrap items-center gap-x-4 gap-y-1">
             <label className="flex items-center gap-2">
               <input type="radio" name="librarian-mode" value="converse" checked={!answering && !listing} onChange={() => setMode("converse")} />
@@ -594,7 +649,7 @@ function LibrarianContent() {
               </label>
             </div>
           )}
-        </div>
+        </div>}
         <form
           onSubmit={(event) => { event.preventDefault(); void send(input); }}
           className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end"
@@ -618,13 +673,13 @@ function LibrarianContent() {
             />
           </div>
           <div className="flex gap-2">
-            <button type="submit" disabled={sending || !input.trim()} className={suggested ? secondaryButton : primaryButton}>
+            <button type="submit" disabled={sending || drafting || creating || creatingProject || !input.trim()} className={suggested ? secondaryButton : primaryButton}>
               {sending ? (answering ? "Asking…" : "Sending…") : answering ? "Ask" : listing ? "List" : "Send"}
             </button>
             <button
               type="button"
               onClick={() => void draftMission()}
-              disabled={!canDraft || drafting}
+              disabled={!canDraft || drafting || creating || creatingProject}
               title={projectId ? undefined : "Choose a project to draft a mission into"}
               data-suggested={suggested ? "true" : undefined}
               className={suggested ? primaryButton : secondaryButton}
@@ -636,19 +691,21 @@ function LibrarianContent() {
         {suggested && !draft && <p className="mt-2 text-sm text-accent-text">The Librarian thinks there is enough here for a mission.</p>}
       </section>
 
+      {focusedPlanning && projectPanel}
       {listing && listRequest && (
         <ChunkList key={listRequest.kind === "saved" ? listRequest.savedId : `${listRequest.projectId}:${listRequest.query}`} request={listRequest} projects={projects.data ?? []} />
       )}
-      {draft && <DraftPanel draft={draft} creating={creating} onCreate={() => void createMission()} onDismiss={() => setDraft(null)} panelRef={draftPanelRef} />}
+      {draft && projectReady && <DraftPanel draft={draft} creating={creating} disabled={sending || drafting} onCreate={() => void createMission()} onDismiss={() => setDraft(null)} panelRef={draftPanelRef} />}
       {feedback}
     </div>
   );
 }
 
 export default function LibrarianPage() {
+  const { user } = useAuth();
   return (
     <AuthGate>
-      <LibrarianContent />
+      <LibrarianContent key={user?.user_id ?? "guest"} />
     </AuthGate>
   );
 }

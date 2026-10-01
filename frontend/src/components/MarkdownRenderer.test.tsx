@@ -16,4 +16,13 @@ describe("accessible research markdown", () => {
     expect(screen.getByRole("region", { name: "Scrollable table" }).getAttribute("tabindex")).toBe("0");
     expect(screen.getByRole("table")).toBeTruthy();
   });
+  it("exposes fenced code as a focusable scroll region without altering its text", () => {
+    const source = 'console.log("A long line whose exact whitespace matters");';
+    render(<MarkdownRenderer content={`\`\`\`js\n${source}\n\`\`\``} />);
+    const region = screen.getByRole("region", { name: "Scrollable code block" });
+    expect(region.getAttribute("tabindex")).toBe("0");
+    expect(region.tagName).toBe("PRE");
+    expect(region.querySelector("code")?.textContent).toBe(source + "\n");
+    expect(region.className).toContain("focus-visible:ring-2");
+  });
 });

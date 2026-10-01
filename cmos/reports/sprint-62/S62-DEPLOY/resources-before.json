@@ -1,0 +1,231 @@
+{
+  "data": {
+    "environment": {
+      "deploymentTriggers": {
+        "edges": [
+          {
+            "node": {
+              "branch": "main",
+              "checkSuites": false,
+              "id": "120d122b-bd88-4f8e-8b54-886ffdcda20a",
+              "repository": "kneelinghorse/TraceLab",
+              "serviceId": "bb03daef-7b08-4ef9-b0db-b7b5d49c0721"
+            }
+          },
+          {
+            "node": {
+              "branch": "main",
+              "checkSuites": false,
+              "id": "42afaf52-a0b7-494c-b8e1-cd0c9d23ee42",
+              "repository": "kneelinghorse/DeepSearch.alpha",
+              "serviceId": "17d50d2f-4232-4ab9-a4c5-342125bc2636"
+            }
+          },
+          {
+            "node": {
+              "branch": "main",
+              "checkSuites": false,
+              "id": "4f3d5656-9cda-4035-b966-6074a3b7428c",
+              "repository": "kneelinghorse/TraceLab",
+              "serviceId": "0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7"
+            }
+          }
+        ]
+      },
+      "serviceInstances": {
+        "edges": [
+          {
+            "node": {
+              "domains": {
+                "customDomains": [],
+                "serviceDomains": []
+              },
+              "resolvedFileConfig": {
+                "commitHash": null,
+                "configFile": null,
+                "deploymentId": "8390c8a6-94ca-4edb-a4cb-adfc5aa940eb",
+                "fileManifest": {}
+              },
+              "serviceId": "4cf9227f-aea6-4693-890e-5b5288287940"
+            }
+          },
+          {
+            "node": {
+              "domains": {
+                "customDomains": [],
+                "serviceDomains": [
+                  {
+                    "domain": "qdrant-production-1e32.up.railway.app",
+                    "id": "d59df0f2-ee35-490d-88a1-38105fba16f3",
+                    "targetPort": null
+                  }
+                ]
+              },
+              "resolvedFileConfig": null,
+              "serviceId": "49499c1d-8864-46ad-ab8d-7de65d4a6b5d"
+            }
+          },
+          {
+            "node": {
+              "domains": {
+                "customDomains": [
+                  {
+                    "domain": "api.tracelab.aquex.ai",
+                    "id": "55dc2ee4-6dc3-46ee-920d-aa39e7479a70",
+                    "targetPort": 8080
+                  }
+                ],
+                "serviceDomains": [
+                  {
+                    "domain": "tracelab-production.up.railway.app",
+                    "id": "2c66b7b0-3b8b-4535-b3c1-e67b40300cfa",
+                    "targetPort": null
+                  }
+                ]
+              },
+              "resolvedFileConfig": {
+                "commitHash": "4495119551c67a39b393b40f0e0d176ea84128ba",
+                "configFile": "/railway.json",
+                "deploymentId": "92ce8d71-8095-4dde-a112-c7b1bb8c185d",
+                "fileManifest": {
+                  "build": {
+                    "builder": "NIXPACKS"
+                  },
+                  "deploy": {
+                    "restartPolicyMaxRetries": 10,
+                    "restartPolicyType": "ON_FAILURE",
+                    "startCommand": "bash -lc \"alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT\""
+                  }
+                }
+              },
+              "serviceId": "bb03daef-7b08-4ef9-b0db-b7b5d49c0721"
+            }
+          },
+          {
+            "node": {
+              "domains": {
+                "customDomains": [
+                  {
+                    "domain": "namozine.com",
+                    "id": "4ae0dca6-ff89-4540-84e0-5ece96f582e6",
+                    "targetPort": 8080
+                  },
+                  {
+                    "domain": "tracelab.aquex.ai",
+                    "id": "93b4ea9a-bd3b-402e-97ed-d8004b8bb452",
+                    "targetPort": 8080
+                  }
+                ],
+                "serviceDomains": [
+                  {
+                    "domain": "frontend-production-43c3.up.railway.app",
+                    "id": "7adcfa7f-3144-44b5-9d21-395f3fdbd7eb",
+                    "targetPort": 8080
+                  }
+                ]
+              },
+              "resolvedFileConfig": {
+                "commitHash": "4495119551c67a39b393b40f0e0d176ea84128ba",
+                "configFile": "/frontend/railway.json",
+                "deploymentId": "af496e92-c85e-4a7f-8ad3-e42b3ec36ae4",
+                "fileManifest": {
+                  "build": {
+                    "buildCommand": "npm install && npm run build",
+                    "builder": "NIXPACKS"
+                  },
+                  "deploy": {
+                    "healthcheckPath": "/admin/users",
+                    "healthcheckTimeout": 30,
+                    "numReplicas": 1,
+                    "restartPolicyMaxRetries": 10,
+                    "restartPolicyType": "ON_FAILURE",
+                    "startCommand": "npm run start -- -H 0.0.0.0 -p $PORT"
+                  }
+                }
+              },
+              "serviceId": "0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7"
+            }
+          },
+          {
+            "node": {
+              "domains": {
+                "customDomains": [],
+                "serviceDomains": [
+                  {
+                    "domain": "worker-service-deepsearch-production.up.railway.app",
+                    "id": "4c7889b1-03e3-4723-ae02-2a8c035eb6ad",
+                    "targetPort": 8080
+                  }
+                ]
+              },
+              "resolvedFileConfig": {
+                "commitHash": "5a75502727b889aa4a65a6373df4b74aa36da23b",
+                "configFile": "/railway.json",
+                "deploymentId": "17053355-f5a5-43b2-90d3-bbb4a75850e0",
+                "fileManifest": {
+                  "build": {
+                    "builder": "DOCKERFILE"
+                  },
+                  "deploy": {
+                    "restartPolicyMaxRetries": 5,
+                    "restartPolicyType": "ON_FAILURE"
+                  }
+                }
+              },
+              "serviceId": "17d50d2f-4232-4ab9-a4c5-342125bc2636"
+            }
+          }
+        ]
+      },
+      "volumeInstances": {
+        "edges": [
+          {
+            "node": {
+              "id": "26dd811f-9459-4d0d-80fc-d2981da9549f",
+              "mountPath": "/qdrant/storage",
+              "region": "us-east4-eqdc4a",
+              "serviceId": "49499c1d-8864-46ad-ab8d-7de65d4a6b5d",
+              "volumeId": "3ff123a8-7cf3-4675-8d0c-c43381825b09"
+            }
+          },
+          {
+            "node": {
+              "id": "3a27a349-bfa6-417f-9f7b-95b01f11354a",
+              "mountPath": "/var/lib/postgresql/data",
+              "region": "us-east4-eqdc4a",
+              "serviceId": null,
+              "volumeId": "466dd8f0-78b3-4de4-a525-d9925652ba08"
+            }
+          },
+          {
+            "node": {
+              "id": "77a9dd72-d13a-422d-b1ac-d83a21acb618",
+              "mountPath": "/var/lib/postgresql/data",
+              "region": "us-east4-eqdc4a",
+              "serviceId": null,
+              "volumeId": "fcad8a23-a727-475c-8960-7ef715e330b1"
+            }
+          },
+          {
+            "node": {
+              "id": "82246374-cfe9-4e71-a4e4-50404d943e9b",
+              "mountPath": "/var/lib/postgresql/data",
+              "region": "us-east4-eqdc4a",
+              "serviceId": null,
+              "volumeId": "9faaa1a4-1583-47c6-ae40-483c7352f1a8"
+            }
+          },
+          {
+            "node": {
+              "id": "958e1323-da87-4f2f-99a4-3037bee8572b",
+              "mountPath": "/var/lib/postgresql/data",
+              "region": "us-east4-eqdc4a",
+              "serviceId": "4cf9227f-aea6-4693-890e-5b5288287940",
+              "volumeId": "273439f4-83eb-496c-a027-1cb546427874"
+            }
+          }
+        ]
+      }
+    }
+  }
+}

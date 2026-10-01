@@ -16,6 +16,17 @@ class UploadRequest {
 beforeEach(() => { vi.clearAllMocks(); vi.stubGlobal("XMLHttpRequest", UploadRequest); });
 
 describe("authenticated upload transport", () => {
+  it.each([
+    ['{"detail":"Account is disabled"}', true],
+    ['{"detail":"Project access denied"}', false],
+    ['{malformed', false],
+    ['null', false],
+  ])("handles disabled upload response %s without broad 403 logout", async (body, expires) => {
+    const result = documentsApi.uploadDocument("project", new File(["source"], "source.txt"));
+    UploadRequest.last.status = 403; UploadRequest.last.responseText = body; UploadRequest.last.onload?.();
+    await expect(result).rejects.toMatchObject({ status: 403 });
+    expect(storage.clearStoredAuth).toHaveBeenCalledTimes(expires ? 1 : 0);
+  });
   it("sends multipart bytes and keeps progress distinct from server acceptance", async () => {
     const progress = vi.fn();
     const result = documentsApi.uploadDocument("project", new File(["source"], "source.txt"), progress);

@@ -1,6 +1,5 @@
 {
   "AUTH-1": {
-    "receipt_exists": true,
     "matching_files": [
       "alembic/versions/056_password_recovery.py",
       "app/api/v1/auth.py",
@@ -39,22 +38,6 @@
       "tests/test_password_recovery_migration.py"
     ],
     "missing_files": [],
-    "hash_fields": [
-      "mission",
-      "session",
-      "recorded_at",
-      "status",
-      "source_base",
-      "source_sha256",
-      "validation",
-      "failures_preserved",
-      "production_read_only_preflight",
-      "branch_protection_observed",
-      "must_pass_open",
-      "limitations",
-      "review_url",
-      "runtime_source_commit"
-    ],
     "file_history": {
       "app/api/v1/admin_users.py": [
         "db153f8 AUTH-2: let admins send audited password recovery links (#403)",
@@ -104,7 +87,6 @@
     }
   },
   "AUTH-2": {
-    "receipt_exists": true,
     "matching_files": [
       "app/api/v1/admin_users.py",
       "app/models/__init__.py",
@@ -123,23 +105,9 @@
     ],
     "changed_files": [],
     "missing_files": [],
-    "hash_fields": [
-      "mission",
-      "session",
-      "decision",
-      "recorded_at",
-      "status",
-      "source_base",
-      "source_sha256",
-      "validation",
-      "failures_preserved",
-      "must_pass_open",
-      "limits"
-    ],
     "file_history": {}
   },
   "LOG-1": {
-    "receipt_exists": true,
     "matching_files": [
       "app/dependencies.py",
       "app/models/mission_log.py",
@@ -151,59 +119,56 @@
       "tests/test_mission_log_migration.py",
       "tests/integration/test_mission_log_delivery_postgres.py",
       "tests/fixtures/mission-logs-v2/batch.json",
-      "tests/test_service_principal_route_boundary.py",
-      "tests/test_rbac_flip_regression.py",
-      "tests/test_rbac_route_enforcement_api.py"
+      "tests/test_rbac_flip_regression.py"
     ],
     "changed_files": [
       "app/api/v1/missions.py",
       "tests/test_mission_log_delivery.py",
       "cmos/contracts/mission-log-delivery-contract.md",
+      "tests/test_service_principal_route_boundary.py",
+      "tests/test_rbac_route_enforcement_api.py",
       "scripts/rbac_verify.py",
       "tests/test_rbac_verify_harness.py"
     ],
     "missing_files": [],
-    "hash_fields": [
-      "mission",
-      "session",
-      "recorded_at",
-      "base_commit",
-      "decisions",
-      "source_sha256",
-      "validation",
-      "failures_preserved",
-      "limits",
-      "deployment_probe_design"
-    ],
     "file_history": {
       "app/api/v1/missions.py": [
-        "623f036 LOG-2: retire legacy log appends after worker acceptance",
+        "4495119 LOG-2: retire legacy log appends after live worker acceptance (#406)",
         "55b5da6 LOG-1: receive owned mission logs with replay-safe acknowledgements (#404)",
         "329de9b METER-0: record what a mission costs, so metering is possible later (#353)"
       ],
       "tests/test_mission_log_delivery.py": [
-        "623f036 LOG-2: retire legacy log appends after worker acceptance",
+        "4495119 LOG-2: retire legacy log appends after live worker acceptance (#406)",
         "55b5da6 LOG-1: receive owned mission logs with replay-safe acknowledgements (#404)"
       ],
       "cmos/contracts/mission-log-delivery-contract.md": [
-        "47ddd07 LOG-2: preserve live acceptance and open legacy retirement gate",
-        "623f036 LOG-2: retire legacy log appends after worker acceptance",
-        "56aae00 LOG-2: show live mission observations and receipt freshness (#405)"
+        "4495119 LOG-2: retire legacy log appends after live worker acceptance (#406)",
+        "56aae00 LOG-2: show live mission observations and receipt freshness (#405)",
+        "55b5da6 LOG-1: receive owned mission logs with replay-safe acknowledgements (#404)"
+      ],
+      "tests/test_service_principal_route_boundary.py": [
+        "4495119 LOG-2: retire legacy log appends after live worker acceptance (#406)",
+        "55b5da6 LOG-1: receive owned mission logs with replay-safe acknowledgements (#404)",
+        "83b3c4f RECOVER-1 route CMOS bridge through real service authentication"
+      ],
+      "tests/test_rbac_route_enforcement_api.py": [
+        "4495119 LOG-2: retire legacy log appends after live worker acceptance (#406)",
+        "55b5da6 LOG-1: receive owned mission logs with replay-safe acknowledgements (#404)",
+        "e3dbf30 fix(SEC-1): authorize onboarding registration and idempotent replay"
       ],
       "scripts/rbac_verify.py": [
-        "623f036 LOG-2: retire legacy log appends after worker acceptance",
+        "4495119 LOG-2: retire legacy log appends after live worker acceptance (#406)",
         "55b5da6 LOG-1: receive owned mission logs with replay-safe acknowledgements (#404)",
         "93d71fc REPORT-1: preserve report citations through saving, reopening and export (#389)"
       ],
       "tests/test_rbac_verify_harness.py": [
-        "623f036 LOG-2: retire legacy log appends after worker acceptance",
+        "4495119 LOG-2: retire legacy log appends after live worker acceptance (#406)",
         "55b5da6 LOG-1: receive owned mission logs with replay-safe acknowledgements (#404)",
         "93d71fc REPORT-1: preserve report citations through saving, reopening and export (#389)"
       ]
     }
   },
   "LOG-2": {
-    "receipt_exists": true,
     "matching_files": [
       "TraceLab/cmos/contracts/mcp-parity-manifest.json",
       "TraceLab/frontend/src/__tests__/mission-run.test.tsx",
@@ -230,18 +195,29 @@
       "TraceLab-retirement/cmos/contracts/mission-log-delivery-contract.md"
     ],
     "missing_files": [],
-    "hash_fields": [
-      "observed_at",
-      "status",
-      "source",
-      "validation",
-      "failures_resolved",
-      "limits",
-      "paid_run",
-      "external_evidence_ids",
-      "source_file_sha256",
-      "screenshots"
-    ],
-    "file_history": {}
+    "file_history": {
+      "TraceLab/cmos/contracts/mission-log-delivery-contract.md": [
+        "4495119 LOG-2: retire legacy log appends after live worker acceptance (#406)",
+        "56aae00 LOG-2: show live mission observations and receipt freshness (#405)",
+        "55b5da6 LOG-1: receive owned mission logs with replay-safe acknowledgements (#404)"
+      ],
+      "TraceLab-retirement/cmos/contracts/mission-log-delivery-contract.md": [
+        "4495119 LOG-2: retire legacy log appends after live worker acceptance (#406)",
+        "56aae00 LOG-2: show live mission observations and receipt freshness (#405)",
+        "55b5da6 LOG-1: receive owned mission logs with replay-safe acknowledgements (#404)"
+      ]
+    }
+  },
+  "audit_notes": {
+    "no_missing_cited_source_files": true,
+    "AUTH-1_changes": "Superseded by AUTH-2 audit/service additions, LOG-1 dependency registration, and user-requested sign-in copy cleanup. Newer AUTH-2 source hashes all match.",
+    "LOG-1_changes": "PR406 retires only legacy appends and updates their refusal/RBAC consumers, including test_rbac_route_enforcement_api.py and test_service_principal_route_boundary.py. Existing v2 ownership/replay mechanisms remain; final 190 local and full required CI pass.",
+    "LOG-2_changes": "Only additive log contract documentation differs; all tested worker/UI/runtime files match their reviewed receipt.",
+    "historical_test_counts": "Preserved at their recorded source; current backend and PostgreSQL CI counts are recorded separately after the final head passes.",
+    "decision_ownership": "All ten active decision rows stamped sprint-61 belong to its recovery/logging scope. No next-sprint planning decision is mixed in. Learning273 was reviewed; verify statuses after close.",
+    "temporary_credentials": "Private bearer fixture files removed after deployed reset revoked them; saved main MCP credentials were never replaced.",
+    "reviewed_at": "2026-09-30T21:39:00.469991+00:00",
+    "reviewed_source": "4495119551c67a39b393b40f0e0d176ea84128ba",
+    "historical_pending_actions": "Moved under original_claim with resolved current-receipt links; no further operator action or paid rerun is requested."
   }
 }

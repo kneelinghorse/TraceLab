@@ -87,7 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setState({ token: null, user: null, isReady: true });
   }, []);
 
-  // When the http layer sees a 401 it clears storage and fires AUTH_EXPIRED_EVENT;
+  // A 401 or the specific disabled-account 403 clears storage and fires AUTH_EXPIRED_EVENT;
   // drop the in-memory session so the app falls back to the login screen instead of
   // a broken "signed in" shell (decision #315a). The listener is registered in an
   // effect; the state change happens in the event callback, not synchronously.

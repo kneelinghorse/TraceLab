@@ -2,7 +2,6 @@
   "mission": "AUTH-1",
   "session": "PS-2026-09-30-005",
   "recorded_at": "2026-09-30",
-  "status": "local_validation_passed_live_acceptance_pending",
   "source_base": "cc0c194696f12967666b60db4a7ea1310261f9b2",
   "source_sha256": {
     "alembic/versions/056_password_recovery.py": "6a3b0a327cb3e692a8c196d199867bbf852a27b7bb31dec05a03b3d62ded90c7",
@@ -163,12 +162,6 @@
     "lint",
     "mcp-package"
   ],
-  "must_pass_open": [
-    "Review/CI and deployment of this exact AUTH-1 source",
-    "Agree dedicated controlled mailbox/account and access to received link",
-    "Actual delivered email -> reset -> new login, with old credential rejection and unrelated-user/service retention",
-    "Disable/revoke temporary fixture and record exact serving build"
-  ],
   "limitations": [
     "Local browser API calls are intercepted fixtures; they do not prove real mailbox delivery.",
     "The full backend and full PostgreSQL suites have not been run locally; targeted checks are recorded here.",
@@ -176,5 +169,35 @@
     "No AUTH-2, LOG-1, LOG-2 or WALK-4 completion is claimed."
   ],
   "review_url": "https://github.com/kneelinghorse/TraceLab/pull/401",
-  "runtime_source_commit": "21a3e3c023b8dd0862e3186b6eb6224a3c254e18"
+  "runtime_source_commit": "21a3e3c023b8dd0862e3186b6eb6224a3c254e18",
+  "original_claim": {
+    "status": "local_validation_passed_live_acceptance_pending",
+    "must_pass_open": [
+      "Review/CI and deployment of this exact AUTH-1 source",
+      "Agree dedicated controlled mailbox/account and access to received link",
+      "Actual delivered email -> reset -> new login, with old credential rejection and unrelated-user/service retention",
+      "Disable/revoke temporary fixture and record exact serving build"
+    ]
+  },
+  "corrected_at_sprint_close": {
+    "date": "2026-09-30T21:39:00.469991+00:00",
+    "session": "PS-2026-09-30-010",
+    "reason": "Historical rollout gates are resolved; these are not current operator instructions. Original observations, counts and limitations remain scoped to their recorded builds.",
+    "current_receipts": [
+      "cmos/reports/sprint-61/LOG-2/deployed-acceptance.json",
+      "cmos/reports/sprint-61/WALK-4/recovery-acceptance.json",
+      "cmos/reports/sprint-61/WALK-4/final-validation.json"
+    ],
+    "commits": {
+      "AUTH-1": "68f607c",
+      "sign_in_copy": "7d1fe31",
+      "AUTH-2": "db153f8",
+      "LOG-1": "55b5da6",
+      "LOG-2_UI": "56aae006",
+      "LOG-2_retirement": "4495119551c67a39b393b40f0e0d176ea84128ba",
+      "DeepSearch": "5a75502727b889aa4a65a6373df4b74aa36da23b"
+    },
+    "account_state": "The candidate is active as the user left it after final login. The reset revoked every temporary key/grant; private fixture bearer files were removed. No main MCP credentials were changed.",
+    "operator_action_required": false
+  }
 }

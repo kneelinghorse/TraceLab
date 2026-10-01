@@ -4,6 +4,62 @@ This directory records the measured baseline behind CI-1. The introducing pull
 request must reproduce the blocking results below; this file is evidence, not a
 substitute for green GitHub checks.
 
+## Safe test providers (S62-ISO)
+
+Run application tests through `pytest` from the repository root. Root
+`tests/conftest.py` installs `scripts/pytest_isolation.py` **before** settings and
+cached clients load. Shell and `.env` Qdrant endpoints, credentials and collection
+names cannot survive this boundary. The SDK uses in-memory Qdrant by default;
+semantic cache remains enabled and real payload serialization stays exercised.
+Direct remote clients (including gRPC) are rejected. Real HTTPX transports are
+blocked; injected SDK doubles, MockTransport and in-process API clients still work.
+OpenAI/Librarian receive dummy credentials; mail and worker credentials are empty.
+Tests which need configured credentials must provide their own non-secret fixtures.
+
+```bash
+pytest tests/unit/test_test_isolation.py tests/test_rag_service.py tests/test_caching.py
+pytest tests/integration/test_qdrant_isolation.py --disposable-qdrant
+pytest tests/integration/test_collection_locking_postgres.py
+```
+
+`--disposable-qdrant` opts into a **new local Docker container**, never a supplied
+endpoint. Its fixture registers only the allocated HTTP origin, uses a unique
+`test_*` collection, deletes that collection and destroys the container on exit.
+Arbitrary endpoint/key environment variables cannot opt out of isolation. Without
+the flag the container test is explicitly skipped. PostgreSQL's existing
+testcontainer fixture remains unchanged. Do not load production credentials into
+pytest; use separately authorized live verification scripts for deployed checks.
+
+Entrypoint inventory: all `tests/{unit,integration,e2e,mcp_tools}` conftests inherit
+the root boundary, as do both backend GitHub workflows. The only application SDK
+constructor is `app/core/qdrant_client.py`; semantic cache, vector storage, retrieval
+and startup prewarming share it. SDK class references imported earlier are guarded
+at construction too. Loading app settings before this boundary fails explicitly.
+The CMOS JS integration runner validates the planning workspace, not app providers.
+
+## Controlled backend deadline (S62-CI)
+
+`python scripts/run_pytest.py -- <pytest arguments>` prints verbose test IDs and
+retains the existing 120-second all-thread stack dump. At the 35-minute process
+deadline it sends SIGINT to the test process group, allows 20 seconds for fixture
+cleanup/JUnit output, then kills any surviving descendants and exits 124. Genuine
+pytest exit codes are preserved; cancellation exits 130. This POSIX runner uses
+only the standard library. It does not disable tests or modify their assertions.
+
+CI caps dependency installation at five minutes and keeps its 45-minute job ceiling,
+leaving time after the controlled test stop for diagnostics. `set -euo pipefail`
+preserves failure through `2>&1 | tee`; the always-run artifact step retains the
+combined log and any generated JUnit report for seven days. A hard stop may prevent
+JUnit creation, so the combined log is the primary timeout evidence. The original
+12-node quarantine and its exact-count ratchet remain unchanged.
+
+`tests/unit/test_pytest_deadline.py` launches real passing, failing, hanging and
+interrupt-resistant pytest fixtures through the same tee pipeline, checking test
+identity, stack output, exit status and cleanup. The smoke transport regressions
+exercise both production and local-proxy branches: only the two exact viewed PUTs
+are fulfilled locally, while other mutations abort before production transport.
+The shell smoke defaults to Light/Dark at 390, 820 and 1440 pixels.
+
 ## 2026-08-21 post-PEDR-1C baseline
 
 | Lane | Command | Result |
@@ -51,17 +107,20 @@ nor resets it.
   after its deterministic job records five consecutive qualifying green runs.
 - ESLint reached zero errors and zero warnings in UX-5. CI-5 promoted its `lint`
   job after verifying five consecutive qualifying green runs at the job level.
-- `mcp-package` remains advisory and follows the five-run ratchet. Its promotion
-  is deferred to Sprint 53; CI-5 does not change its status.
+- `mcp-package` is required in the current readback below. Future promotions
+  continue to use the five-run ratchet; S62 does not change branch protection.
 - Any future full-repository Ruff or Python type-checking lane must first have
   a scoped remediation plan and reach a green baseline without a mechanical
   repository-wide rewrite. It then needs five consecutive qualifying green
   runs before promotion; CI-2 removes the existing never-green advisory jobs.
 
-The eight current required contexts are `backend-suite`, `vitest`, `type-check`,
-`ruff-diff`, `build-frontend-production`, `Secret Scan`, `backend-integration`,
-and `lint`. Production smoke and `mcp-package` remain advisory; no standalone
-Playwright, full-repository Ruff, or mypy lane is required.
+The nine current required contexts, read from GitHub protection on 2026-10-01
+UTC, are `backend-suite`, `vitest`, `type-check`, `ruff-diff`,
+`build-frontend-production`, `Secret Scan`, `backend-integration`, `lint`, and
+`mcp-package`. Strictness remains enabled and every context is bound to GitHub
+Actions app 15368. Production smoke remains advisory; no standalone Playwright,
+full-repository Ruff, or mypy lane is required. This records current state without
+inventing when `mcp-package` was promoted.
 
 ## CI-5 required-check promotion (2026-09-14)
 
@@ -79,7 +138,7 @@ Lint is measured per job: run `34797659698` failed on vitest while its lint job
 succeeded. `lint` is a generic context name bound to GitHub Actions app ID
 `15368`, as are all eight required contexts. Strict branch protection remains
 enabled; all other protection fields are preserved. The `mcp-package` lane had
-four qualifying main pushes at this check and stays on the ratchet.
+four qualifying main pushes at that historical check and was still on the ratchet.
 
 The [CI-5 receipt](../../cmos/reports/sprint-52/ci-5-validation.json) archives the
 full streak evidence, before/after protection readbacks, rollback payload,

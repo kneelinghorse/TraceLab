@@ -150,10 +150,10 @@ async def receive_deepsearch_webhook(
 
 @router.post(
     "/resend-inbound",
-    summary="Forward mail for Stage1's support address",
+    summary="Forward mail for the Stage1 and Aquex support addresses",
     description="""
-Resend Inbound calls this for every message received on aquex.ai. Messages to stage1@aquex.ai are fetched and
-re-sent to SUPPORT_FORWARD_TO (Stage1 s97-m02); every other event or recipient is acknowledged and ignored.
+Resend Inbound calls this for every message received on aquex.ai. Messages to stage1@aquex.ai or hello@aquex.ai
+are fetched and re-sent once to SUPPORT_FORWARD_TO; every other event or recipient is acknowledged and ignored.
 
 **Authentication**: Resend's Svix signature (`svix-id`, `svix-timestamp`, `svix-signature`) under
 `RESEND_WEBHOOK_SECRET`. The route fails closed (503) until the secret, `RESEND_INBOUND_API_KEY`,
@@ -162,7 +162,7 @@ the send's idempotency key makes a retry safe.
 """,
 )
 async def receive_resend_inbound(request: Request) -> dict[str, str]:
-    """Verify Resend's signature, then forward a message addressed to the support address."""
+    """Verify Resend's signature, then forward mail to the fixed support allowlist."""
     if not (settings.resend_webhook_secret and settings.resend_inbound_api_key and settings.support_forward_to and settings.resend_from_address):
         raise HTTPException(status_code=http_status.HTTP_503_SERVICE_UNAVAILABLE, detail="Support forwarding is not configured")
     body = await request.body()
@@ -171,11 +171,14 @@ async def receive_resend_inbound(request: Request) -> dict[str, str]:
         raise HTTPException(status_code=http_status.HTTP_401_UNAUTHORIZED, detail="Invalid signature")
     event = json.loads(body)
     data = event.get("data") or {}
-    if event.get("type") != "email.received" or not support_inbox.addressed_to_support(data):
+    if event.get("type") != "email.received":
+        return {"status": "ignored"}
+    matched_addresses = support_inbox.matched_support_addresses(data)
+    if not matched_addresses:
         return {"status": "ignored"}
     email_id = str(data.get("email_id", ""))
     try:
-        message_id = await support_inbox.forward(email_id)
+        message_id = await support_inbox.forward(email_id, matched_addresses)
     except httpx.HTTPError as exc:
         # The message id only: the body and addresses stay out of the logs.
         logger.warning("Forwarding received email %s failed: %s", email_id, type(exc).__name__)

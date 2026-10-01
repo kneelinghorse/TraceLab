@@ -1,0 +1,106 @@
+{
+  "review_head": "791462133c28361238242517985035bba458ea1d",
+  "merged_commit": "4495119551c67a39b393b40f0e0d176ea84128ba",
+  "required_contexts": [
+    "backend-suite",
+    "vitest",
+    "type-check",
+    "ruff-diff",
+    "build-frontend-production",
+    "Secret Scan",
+    "backend-integration",
+    "lint",
+    "mcp-package"
+  ],
+  "strict": true,
+  "checks": [
+    {
+      "name": "backend-integration",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/36778866599/job/110103592018"
+    },
+    {
+      "name": "ruff-diff",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/36778866548/job/110103591913"
+    },
+    {
+      "name": "backend-suite",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/36778866533/job/110103592069"
+    },
+    {
+      "name": "vitest",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/36778866518/job/110103591823"
+    },
+    {
+      "name": "build-frontend-production",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/36778866558/job/110103591677"
+    },
+    {
+      "name": "mcp-package",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/36778866579/job/110103592260"
+    },
+    {
+      "name": "Secret Scan",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/36778866573/job/110103591898"
+    },
+    {
+      "name": "Secret Scan",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/36778861551/job/110103574960"
+    },
+    {
+      "name": "type-check",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/36778866518/job/110103592156"
+    },
+    {
+      "name": "lint",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/36778866518/job/110103592316"
+    }
+  ],
+  "backend": {
+    "passed": 3074,
+    "skipped": 4,
+    "quarantined_deselections": 12,
+    "warnings": 49,
+    "seconds": 665.74
+  },
+  "postgres": {
+    "passed": 169,
+    "skipped": 2,
+    "warnings": 17,
+    "seconds": 104.93
+  },
+  "production_browser": {
+    "passed": 82
+  },
+  "retirement_boundaries_real_cross_service": {
+    "passed": 190,
+    "skipped": 0,
+    "warnings": 16,
+    "seconds": 57.99
+  },
+  "skip_scope": "Existing backend/PG skips and 12 quarantined nodes retained; CI external-checkout cross-service test skips without DEEPSEARCH_SOURCE_ROOT. The 190-test local run sets it and has no skips.",
+  "worker_baseline": {
+    "passed": 161,
+    "failed": 2,
+    "skipped": 0,
+    "failures": "Same two frozen S87 readiness pins failed on the pre-change baseline; no new worker failures."
+  },
+  "foundational_references": "passed",
+  "mcp_parity": {
+    "operations": 118,
+    "live": 113,
+    "dead": 5,
+    "tools": 9,
+    "actions": 50,
+    "errors": []
+  }
+}

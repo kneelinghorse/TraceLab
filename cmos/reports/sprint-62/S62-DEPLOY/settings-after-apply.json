@@ -1,0 +1,152 @@
+{
+  "data": {
+    "environment": {
+      "configEtag": "d3a5aecab34787aa1663e922d295aac3b23b769c0cc78cce1aa6cc5eb8794c21",
+      "iacPartials": {
+        "service.TraceLab": "tracelab",
+        "service.frontend": "tracelab"
+      },
+      "id": "4fb80245-6762-4438-ab94-6993c3568a92",
+      "name": "production",
+      "serviceInstances": {
+        "edges": [
+          {
+            "node": {
+              "buildCommand": null,
+              "builder": "RAILPACK",
+              "healthcheckPath": null,
+              "healthcheckTimeout": null,
+              "latestDeployment": {
+                "createdAt": "2026-03-26T21:41:23.114Z",
+                "id": "8390c8a6-94ca-4edb-a4cb-adfc5aa940eb",
+                "status": "SUCCESS"
+              },
+              "numReplicas": null,
+              "railwayConfigFile": null,
+              "region": null,
+              "restartPolicyMaxRetries": 10,
+              "restartPolicyType": "ON_FAILURE",
+              "rootDirectory": null,
+              "serviceId": "4cf9227f-aea6-4693-890e-5b5288287940",
+              "serviceName": "Postgres",
+              "sleepApplication": false,
+              "source": {
+                "image": "ghcr.io/railwayapp-templates/postgres-ssl:17",
+                "repo": null
+              },
+              "startCommand": null
+            }
+          },
+          {
+            "node": {
+              "buildCommand": null,
+              "builder": "RAILPACK",
+              "healthcheckPath": null,
+              "healthcheckTimeout": null,
+              "latestDeployment": {
+                "createdAt": "2025-11-04T05:21:41.726Z",
+                "id": "1e0932fd-5ecd-47c7-99b2-13665dccb5f9",
+                "status": "SUCCESS"
+              },
+              "numReplicas": null,
+              "railwayConfigFile": null,
+              "region": null,
+              "restartPolicyMaxRetries": 10,
+              "restartPolicyType": "ON_FAILURE",
+              "rootDirectory": null,
+              "serviceId": "49499c1d-8864-46ad-ab8d-7de65d4a6b5d",
+              "serviceName": "Qdrant",
+              "sleepApplication": false,
+              "source": {
+                "image": "qdrant/qdrant",
+                "repo": null
+              },
+              "startCommand": null
+            }
+          },
+          {
+            "node": {
+              "buildCommand": null,
+              "builder": "RAILPACK",
+              "healthcheckPath": null,
+              "healthcheckTimeout": null,
+              "latestDeployment": {
+                "createdAt": "2026-10-01T01:25:35.926Z",
+                "id": "7b9c19bd-fefe-4253-b13b-f6439b4d35de",
+                "status": "BUILDING"
+              },
+              "numReplicas": null,
+              "railwayConfigFile": null,
+              "region": null,
+              "restartPolicyMaxRetries": 10,
+              "restartPolicyType": "ON_FAILURE",
+              "rootDirectory": null,
+              "serviceId": "bb03daef-7b08-4ef9-b0db-b7b5d49c0721",
+              "serviceName": "TraceLab",
+              "sleepApplication": false,
+              "source": {
+                "image": null,
+                "repo": "kneelinghorse/TraceLab"
+              },
+              "startCommand": "bash -lc \"alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT\""
+            }
+          },
+          {
+            "node": {
+              "buildCommand": "npm install && npm run build",
+              "builder": "NIXPACKS",
+              "healthcheckPath": "/admin/users",
+              "healthcheckTimeout": 30,
+              "latestDeployment": {
+                "createdAt": "2026-10-01T01:25:36.045Z",
+                "id": "5bddbe22-fc41-4a26-96d2-5f5f7b323ed4",
+                "status": "BUILDING"
+              },
+              "numReplicas": null,
+              "railwayConfigFile": null,
+              "region": null,
+              "restartPolicyMaxRetries": 10,
+              "restartPolicyType": "ON_FAILURE",
+              "rootDirectory": "/frontend",
+              "serviceId": "0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7",
+              "serviceName": "frontend",
+              "sleepApplication": false,
+              "source": {
+                "image": null,
+                "repo": "kneelinghorse/TraceLab"
+              },
+              "startCommand": "npm run start -- -H 0.0.0.0 -p $PORT"
+            }
+          },
+          {
+            "node": {
+              "buildCommand": null,
+              "builder": "RAILPACK",
+              "healthcheckPath": null,
+              "healthcheckTimeout": null,
+              "latestDeployment": {
+                "createdAt": "2026-09-30T20:52:21.739Z",
+                "id": "17053355-f5a5-43b2-90d3-bbb4a75850e0",
+                "status": "SUCCESS"
+              },
+              "numReplicas": null,
+              "railwayConfigFile": null,
+              "region": null,
+              "restartPolicyMaxRetries": 10,
+              "restartPolicyType": "ON_FAILURE",
+              "rootDirectory": null,
+              "serviceId": "17d50d2f-4232-4ab9-a4c5-342125bc2636",
+              "serviceName": "worker-service deepSearch",
+              "sleepApplication": false,
+              "source": {
+                "image": null,
+                "repo": "kneelinghorse/DeepSearch.alpha"
+              },
+              "startCommand": null
+            }
+          }
+        ]
+      }
+    }
+  }
+}

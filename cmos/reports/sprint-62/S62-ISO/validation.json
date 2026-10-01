@@ -1,0 +1,160 @@
+{
+  "mission": "S62-ISO",
+  "status": "completed",
+  "source_base": "2d353e6",
+  "branch": "codex/sprint-62-build",
+  "implementation": "Pre-import test-only environment and SDK/HTTPX transport boundary; in-memory Qdrant with enabled cache behavior; fixture-owned local disposable Qdrant option.",
+  "validation": [
+    {
+      "selection": "sentinel before implementation",
+      "failed": 1,
+      "reason": "production-like Qdrant key inherited into settings; socket guard installed; no real production call"
+    },
+    {
+      "selection": "first targeted backend",
+      "passed": 74,
+      "failed": 1,
+      "reason": "RAG API test inherited user table from prior suites; fixed shared fixture to initialize its own auth database"
+    },
+    {
+      "selection": "unit + RAG/prewarm/cache/synthesis-cache/mail/password recovery",
+      "passed": 332,
+      "failed": 0,
+      "skipped": 0,
+      "deselected": 0
+    },
+    {
+      "selection": "disposable Qdrant roundtrip + PostgreSQL row locking",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "selection": "frontend",
+      "passed": 313,
+      "lint": "passed",
+      "types": "passed",
+      "production_build": "passed"
+    },
+    {
+      "selection": "MCP",
+      "unit_passed": 160,
+      "clean_installed_tarball_checks": 63,
+      "parity_intent_tests": 11,
+      "parity_audits": "passed"
+    },
+    {
+      "selection": "foundational references and changed-file Ruff",
+      "result": "passed"
+    },
+    {
+      "selection": "CMOS legacy JS integration runner",
+      "passed": 13,
+      "failed": 2,
+      "baseline_reproduced_at": "2d353e6",
+      "failures": [
+        "missing cmos/runtime/boomerang",
+        "legacy headings expected in cmos/agents.md"
+      ],
+      "disposition": "Unchanged historical harness assumptions; not runtime isolation failures. Preserved in integration-framework.json."
+    },
+    {
+      "selection": "full serialized backend, 638a931 plus equivalent cache-on default",
+      "passed": 3076,
+      "failed": 1,
+      "skipped": 4,
+      "deselected": 12,
+      "duration_seconds": 500.14,
+      "failure": "tests/performance/test_qdrant_performance.py::test_parameter_sweep_finds_configuration_with_latency_headroom",
+      "observed": "Sleeping stub p99 for ef128=4.497792ms, ef96=9.585083ms; latency ordering assertion failed. No real Qdrant transport in that test; no threshold or quarantine modification."
+    },
+    {
+      "selection": "final source: sentinel environment/dotenv, late import, parameter sweep, disposable Qdrant and PostgreSQL locking",
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0,
+      "deselected": 0,
+      "duration_seconds": 49.32
+    },
+    {
+      "selection": "GitHub initial source638a931",
+      "passed_contexts": [
+        "backend-integration",
+        "vitest",
+        "type-check",
+        "ruff-diff",
+        "build-frontend-production",
+        "Secret Scan",
+        "lint",
+        "mcp-package"
+      ],
+      "backend_suite": "in progress"
+    },
+    {
+      "selection": "final-source full backend, no simultaneous frontend builds",
+      "source": "55e08cf",
+      "passed": 3077,
+      "failed": 0,
+      "skipped": 4,
+      "deselected": 12,
+      "duration_seconds": 419.52
+    },
+    {
+      "selection": "default disposable integration opt-in",
+      "passed": 0,
+      "failed": 0,
+      "skipped": 1,
+      "reason": "No --disposable-qdrant; no container started"
+    },
+    {
+      "selection": "GitHub backend attempt1",
+      "run_id": 36790956131,
+      "job_id": 110143597703,
+      "conclusion": "cancelled for diagnosis after an unusually slow run",
+      "last_completed_module": "tests/test_project_management_api.py at66%",
+      "timeout_stack_dumps": 0,
+      "finding": "Recovered logs show continuous progress. Broad module slowdown compared with green main36780279747; no confirmed stuck call. Retried the job; no threshold or quarantine change."
+    },
+    {
+      "selection": "GitHub backend attempt2",
+      "source": "55e08cf",
+      "run_id": 36790956131,
+      "passed": 3077,
+      "failed": 0,
+      "skipped": 4,
+      "deselected": 12,
+      "duration_seconds": 646.51
+    },
+    {
+      "selection": "GitHub PostgreSQL integration",
+      "source": "55e08cf",
+      "run_id": 36790956132,
+      "passed": 169,
+      "failed": 0,
+      "skipped": 3,
+      "duration_seconds": 123.28
+    },
+    {
+      "selection": "all nine required CI contexts",
+      "source": "55e08cf",
+      "result": "passed",
+      "receipt": "ci-checks.json"
+    }
+  ],
+  "pending": [],
+  "external_calls": "Sentinel probes intercepted sockets; no production vector, mail or model calls. Container proof used newly created local Docker Qdrant and PostgreSQL.",
+  "scope_limits": [
+    "No application feature or server variable change",
+    "No quarantine changes",
+    "No production deployment required for this test-only mission",
+    "The first GitHub backend attempt was cancelled for diagnosis and is not passing evidence. Attempt2 passed unchanged in646.51s; no code, threshold or quarantine repair was needed for the slow runner."
+  ],
+  "dependency_audit_observation": "npm ci reported existing lockfile advisories: frontend21 (2 critical), MCP13 (1 critical). No dependencies changed; remediation outside the locked isolation mission.",
+  "source_files_sha256": {
+    "scripts/pytest_isolation.py": "1d6fab180d96bcbc7ba4e2a7f3dcb23f51a3b54cdd4eb939dd49f3898f07524b",
+    "tests/conftest.py": "b25d9a7bc8dd8c289ad010df0384a55f7a6a91f25bd1a5de375e73fcfe75739c",
+    "tests/integration/conftest.py": "8fb011f4d1e21a0072695782834919169fc61bc51ec3a4855fbff1bd8d1d205f",
+    "tests/unit/test_test_isolation.py": "9dba5cea81c0d0d1b1f0a68f87ee2569fe48109d97fafd59960c7fd762e0bcfb",
+    "tests/integration/test_qdrant_isolation.py": "7bea7d7fe6d273b32b43adbb13aa0118b76463abd7d5007b1b42ca6f147e6f56"
+  }
+}

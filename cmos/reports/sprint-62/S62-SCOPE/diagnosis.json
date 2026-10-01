@@ -1,0 +1,158 @@
+{
+  "mission": "S62-SCOPE",
+  "recorded_at": "2026-10-01T00:25:34.597990+00:00",
+  "source_commit": "515fe38931e46c60d1ccae3fe2677134c280e5e5",
+  "status": "diagnosis complete; P1 enforcement correction unresolved",
+  "guiding_templates": [
+    "cmos/foundational-docs/roadmap_template.md",
+    "cmos/foundational-docs/tech_arch_template.md"
+  ],
+  "evidence_index": [
+    {
+      "path": "cmos/reports/sprint-61/LOG-2/proposed-mission.json",
+      "sha256": "310a0cdb38196e1ae1fc8e9ec0cee7eaef3206a98d0b51a8f176ef5927c05784",
+      "origin": "unchanged committed S61 receipt"
+    },
+    {
+      "path": "cmos/reports/sprint-61/LOG-2/contract-preview.json",
+      "sha256": "349c2ac72224a4912c3dcfd6a6e4e27cc456e4cf4bcf78654543e4312777d23f",
+      "origin": "unchanged committed S61 receipt"
+    },
+    {
+      "path": "cmos/reports/sprint-61/LOG-2/worker-structural-contract.json",
+      "sha256": "2b601429b962daf6545c4edce6d48bf8bbfc95f013ee036b01a116f5ba655767",
+      "origin": "unchanged committed S61 receipt"
+    },
+    {
+      "path": "cmos/reports/sprint-61/LOG-2/deployed-acceptance.json",
+      "sha256": "22eff2dadd5c29a449ed9ad7bc21002f2c511d14af2a736957b8cbbcec2644f2",
+      "origin": "unchanged committed S61 receipt"
+    },
+    {
+      "path": "cmos/reports/sprint-61/LOG-2/README.md",
+      "sha256": "4de2afe54c56dfb3366df28495635ff1378faf10f371ad5ce5edb728b4f7d04c",
+      "origin": "unchanged committed S61 receipt"
+    },
+    {
+      "path": "cmos/reports/sprint-62/S62-SCOPE/readback.json",
+      "sha256": "b4d4d7291c136437bcccdb721d57c36334e416d761530e713ee4cfe73b69e5aa",
+      "origin": "read-only service snapshot"
+    },
+    {
+      "path": "cmos/reports/sprint-62/S62-SCOPE/reproducer.json",
+      "sha256": "8d692642eae2e9ae12a67ca592468fa1c78398f84cb7bc30e9012a2978389593",
+      "origin": "deterministic no-network local reproduction"
+    }
+  ],
+  "conclusion": "TraceLab retained the authored scope. The local compiler demonstrably reduces exact references to titles and leaves word/source limits as prose, but its preview is not the executed worker contract. Runtime collection and critique exceeded the authored source boundary, while completion accepted an oversized result. The exact first loss between worker input, enriched contract and prompt is not retained in the accessible evidence.",
+  "boundary_map": [
+    {
+      "boundary": "Proposed -> persisted authoring",
+      "evidence": "reproducer.json persisted_fields_equal_proposed; readback.json mission; app/services/mission_service.py create_mission",
+      "finding": "Objective, all criteria, both constraints, exact reference URLs, deliverables and format match. No demonstrated TraceLab storage loss."
+    },
+    {
+      "boundary": "Persisted mission -> local preview compiler input",
+      "evidence": "app/services/deepsearch_preview_client.py build_mission_context_from_mission and _build_preview_state; scripts/diagnose_s62_scope.py",
+      "finding": "Exact references and constraints enter the vendor. Preview is explicitly structural_only / schema1.0 / revision24e88100624e6221e5fa957508ab77c4b0f519f9."
+    },
+    {
+      "boundary": "Local compiled contract",
+      "evidence": "app/services/contract_compiler/contract.py _extract_reference_titles, _partition_success_criteria, MissionContract, ExecutionBudget",
+      "finding": "Changing only reference URLs leaves contract ID identical. URLs become titles; authored300\u2013500word/two-page criterion remains in success_criteria+constraints but is absent from required objective/acceptance checks. There is no typed maximum word/source count or positive URL allowlist in this vendor model. This is a preview enforcement gap, not proof that the runtime used it."
+    },
+    {
+      "boundary": "Saved worker structural preview -> actual executed worker contract",
+      "evidence": "S61 worker-structural-contract.json origin=s61_log2_no_provider_preview id106cb8668a3efdb8; live execution_metadata.contract_id=bae1333274533285",
+      "finding": "The preview preserves cap/constraints and has authority_seed_domains=[postgresql.org], which is guidance rather than an exact page allowlist. It is schema1.1/compiler_revision2. Actual compiled contract body and exact worker input/prompt are absent; compiler usage confirms a provider enrichment occurred. Do not equate the saved preview with execution."
+    },
+    {
+      "boundary": "Runtime retrieval",
+      "evidence": "readback.json mission.telemetry.tool_outcomes.records and sources_collected",
+      "finding": "First two recorded tool calls are broad web_search, max_results10 each,20discoveries, excluded_result_count0. Final grounding collection contains22URLs on7domains. Only2 source_fetch calls requested network; remaining successful source_fetch calls reread slices, and2failed stored-body lookups concern the /docs/18 date/time variant. Thus22collected does not mean22fresh body downloads, nor do2downloaded bodies imply an enforced two-source context."
+    },
+    {
+      "boundary": "Critique and completion",
+      "evidence": "readback.json critique_telemetry.assessment.records/evidence_manifest; completion_control; final_outcome",
+      "finding": "Critique manifest includes non-official snippets; supported assessment cites postgrespro.com E4.1. Completion coverage checks only broad content requirement One concise Markdown comparison note, reports satisfied, and returns normal_final_answer at22of40steps. The result is accepted with warnings, not a word/source-limit failure."
+    },
+    {
+      "boundary": "Rendered result -> downstream artifacts",
+      "evidence": "readback.json mission result hash, document pagination, report content, ledger entries",
+      "finding": "Result15440characters retains original S61 SHA256. Promoted document is5chunks, returned15670characters with chunk assembly differences and metadata word_count2349; it is not used as the canonical output counter. The report is a529character protocol summary with5chunk sources and no durable citations. The separate Ledger has24entries:4supporting+20background. None of these counts is the two-reference limit."
+    }
+  ],
+  "count_reconciliation": {
+    "words": "2285 is reproducible Python len(result_markdown.split()) on the full rendered result, including Markdown/table syntax, metadata and objective footer.2240 is the saved worker report_word_count/quality word_count. Delta45 is verified, but the retained data lacks the worker counter algorithm and its exact pre/post-render input. Removing header/footer or numeric markers alone does not reconcile it; no invented normalization explanation. Both counts independently exceed500 by more than4x. Follow-up must retain hashed before/after render texts and counter rule.",
+    "sources": "22grounding records=20search discoveries+2network-fetched current documentation pages. Final references contain2officialURLs; distinct final URLs measure citation presentation, not breadth of discovery or critique grounding. Domains:11URLs on www.postgresql.org and11across6otherdomains.24Ledger entries=4cited claims+20background discoveries, not24unique source pages.",
+    "usage": "492325input+26682output=519007observed tokens across24requests, including5167compiler tokens;513840legacy synthesis/critique tokens exclude compiler. No provider fees or actual dollar charge observed. Prior$5was planning allowance, not an enforced limiter."
+  },
+  "contradictory_evidence": {
+    "output_claim": "No third source was consulted, honoring the mission's two-page cap.",
+    "supporting_narrow_observation": "Only two requested official pages appear in final references; only two source_fetch records made network body requests.",
+    "contradiction": "Search admitted20additional discovery records and the critique explicitly used a postgrespro.com passage as supported evidence. A narrow claim about final citations cannot justify the broader statement about consultation."
+  },
+  "quality_warnings": {
+    "delivery_quality": "usable_with_warning",
+    "flags": [
+      "critique_assessment_partial",
+      "retrieval_failures_2_source_fetch"
+    ],
+    "interpretation": "Critique assessed4of7reportedanchors as supported,3unassessed; declared claim_count12 is not complete claim coverage. Two fetch errors are missing_stored_body, not evidence that both requested current pages failed. Coverage/structural failures were empty; warnings do not certify scope compliance."
+  },
+  "competing_hypotheses": [
+    {
+      "hypothesis": "Worker input adapter omitted constraints/references",
+      "evidence_for": "Historical boundary map documents SELECT omissions; actual worker input is not retained.",
+      "evidence_against": "Current persisted fields and separate worker structural preview retain scope; the historical SELECT map does not prove current worker behavior.",
+      "needed": "Saved claim/input payload and any project-context hydration for this exact attempt."
+    },
+    {
+      "hypothesis": "Enriched compiler/prompt reduced or omitted numeric/source scope",
+      "evidence_for": "Deterministic local compiler shows prose-only limits; actual contract ID differs from saved no-provider preview and compiler provider usage is present.",
+      "evidence_against": "No actual enriched contract body/prompt available.",
+      "needed": "Contractbae1333274533285, version/input hash and assembled synthesis+critique prompt policy."
+    },
+    {
+      "hypothesis": "Scope survived in prose but tool and completion enforcement did not honor it",
+      "evidence_for": "Broad searches, non-official critique evidence, overly broad completeness requirement, oversized accepted output.",
+      "evidence_against": "Cannot distinguish ignored prompt from absent prompt without exact runtime input.",
+      "needed": "Per-tool allowed-source decision receipts and final word/source validation policy/results."
+    }
+  ],
+  "follow_up": {
+    "severity": "P1 \u2014 authored scope and evidence trust; not a claim of known billed overspend",
+    "primary_owner": "DeepSearch worker/compiler/tool and final-validation maintainers",
+    "secondary_owner": "TraceLab preview/authoring boundary maintainers after a versioned worker fixture exists",
+    "cmos_capture_session": "PS-2026-09-30-013",
+    "cmos_parent_mission": "S62-SCOPE",
+    "acceptance_tests": [
+      "Load retained executed contract/input and compare authoring, exact URLs and300\u2013500words without provider calls.",
+      "Using a deterministic fake provider/tool corpus, reject search/fetch/critique evidence outside the exact two allowed pages; search snippets count as consulted evidence.",
+      "Refuse an oversized result or return explicit bounded partial outcome; do not satisfy scope merely because the broad deliverable text appears.",
+      "Freeze and report one specified word counter on hashed pre/post-render inputs; explain markup/citation adjustments.",
+      "Negative regression for only2finalreferences but22grounding sources and false no-third-source prose.",
+      "Preserve partial retrieval results with explicit unavailable-source warnings and no automatic paid retry.",
+      "Once worker semantics are fixed, version the deterministic fixture and resync TraceLab preview plus mission-authoring-contract.md in a separately scoped change."
+    ],
+    "sent_to_other_project": false,
+    "correction_implemented": false,
+    "cmos_next_step_id": 479,
+    "original_diagnosis_next_step_476": "closed as diagnosed; correction remains pending479"
+  },
+  "validation": {
+    "offline_reproducer": "pass; socket connect+DNS blocked",
+    "existing_preview_regressions": 13,
+    "ruff": "pass",
+    "paid_runs_dispatched": 0,
+    "sibling_repository_read_or_changed": false,
+    "worker_or_model_changed": false,
+    "historical_artifacts_modified": false
+  },
+  "evidence_ledger_finding_ids": [
+    "82192336-6a74-4d52-af94-9961e09dfe0f",
+    "39c6d944-30d5-455f-bd2d-bf2bab7ef1a7",
+    "7cdb2438-d3e6-43d6-8010-8dd7a56d07e8",
+    "c2219c24-2c00-462a-b510-3d11256b7bb5"
+  ]
+}

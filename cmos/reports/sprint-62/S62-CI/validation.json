@@ -1,0 +1,99 @@
+{
+  "mission": "S62-CI",
+  "recorded_at": "2026-10-01T00:13:50.765885+00:00",
+  "source_commit": "1fe3539d0aed9c3e0c1f24c93cfdfcc9711d12b1",
+  "pytest_deadline": {
+    "process_seconds": 2100,
+    "cleanup_seconds": 20,
+    "existing_stack_dump_seconds": 120,
+    "job_minutes": 45,
+    "dependency_install_minutes": 5,
+    "cases": [
+      "success exits0",
+      "assertion failure exits1",
+      "hanging fixture exits124 with test id/stacks and finally cleanup",
+      "SIGINT-resistant fixture exits124 with stack/test id and process killed"
+    ],
+    "tee_exit_preserved": true,
+    "tests_passed": 4
+  },
+  "isolation_regressions": {
+    "tests_passed": 3
+  },
+  "frontend": {
+    "tests_passed": 335,
+    "transport_tests_included": 22,
+    "lint": "pass",
+    "type_check": "pass",
+    "production_build": "pass"
+  },
+  "quarantine": {
+    "unchanged": true,
+    "nodes": 12,
+    "reasons_preserved": true
+  },
+  "checks": {
+    "foundational_references": "pass",
+    "mcp_operation_parity": "pass",
+    "mcp_argument_parity": "pass",
+    "argument_parity_regressions": 7,
+    "changed_python_ruff": "pass",
+    "credential_literal_scan": "pass"
+  },
+  "red_green": {
+    "deadline": "Failed before runner existed; four cases passed after implementation. Final version hangs in fixture setup, not only in test body.",
+    "smoke": "Two Evidence viewed cases failed in both modes before exact-path fix; all22 passed after."
+  },
+  "boundaries": [
+    "Default external integration opt-in remains skipped unless --disposable-qdrant is explicitly selected.",
+    "No new quarantine, assertion threshold relaxation, dependency change, branch-protection mutation or deployment.",
+    "Legacy CMOS JS runner has same two planning-baseline failures documented by S62-ISO; not repaired or claimed green.",
+    "Initial public identity probe received Cloudflare403 with generic urllib UA; existing wait_for_deploy.probe with honest project UA retrieved all three markers.",
+    "Mistyped nonexistent scripts/intent_parity_audit.mjs failed; correct scripts/mcp_argument_parity.mjs and its tests passed."
+  ],
+  "browser": {
+    "modes": [
+      "local production build with API proxy",
+      "direct production API"
+    ],
+    "routes": [
+      "/missions",
+      "/search",
+      "/settings",
+      "/admin/users",
+      "/evidence"
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "widths": [
+      390,
+      820,
+      1440
+    ],
+    "source_identity": "Smoke harness1fe3539; local frontend compiled with3fa0c31 marker (app sources unchanged); production frontend/backend4495119. See serving.json.",
+    "negative_write_proof": "22 actual-handler tests prove exact two PUTs fulfilled locally; other POST/PUT/PATCH/DELETE paths abort without fetch or route.continue.",
+    "passed": 60,
+    "failed": 0,
+    "visual_review": "Local Light1440 Missions screenshot inspected; long Dark390 Evidence screenshot inspected for gross layout only; all route DOM overflow/axe/theme/transport checks passed."
+  },
+  "ci": {
+    "source_commit": "1fe3539d0aed9c3e0c1f24c93cfdfcc9711d12b1",
+    "required_contexts": 9,
+    "all_passed": true,
+    "backend_summary": [
+      "2026-10-01T00:25:25.5941078Z === 3081 passed, 4 skipped, 12 deselected, 49 warnings in 676.09s (0:11:16) ===="
+    ],
+    "diagnostics_uploaded": [
+      {
+        "id": 11134130710,
+        "name": "backend-suite-diagnostics",
+        "size_in_bytes": 112822,
+        "expired": false,
+        "created_at": "2026-10-01T00:25:29Z",
+        "expires_at": "2026-10-08T00:25:28Z"
+      }
+    ]
+  }
+}

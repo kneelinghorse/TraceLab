@@ -1,0 +1,93 @@
+{
+  "sprint": "sprint-62",
+  "date": "2026-09-30",
+  "session": "PS-2026-09-30-012",
+  "decision": 576,
+  "kind": "planning-validation",
+  "branch": "codex/sprint-62-plan",
+  "base_commit": "09ae685",
+  "runtime_ancestor": "4495119",
+  "canonical_cmos_root": "/Users/systemsystems/portfolio/TraceLab",
+  "state": {
+    "sprint": "Planned",
+    "missions": 9,
+    "queued": 9,
+    "started": 0
+  },
+  "verification": {
+    "mission_readbacks": "All nine acceptance criteria, deliverables, source reference sets and states match the locked definitions.",
+    "dependency_readback": {
+      "expected": 15,
+      "actual": 15,
+      "type": "Requires",
+      "method": "Read-only SQLite URI; exact edge set matched intended graph."
+    },
+    "reference_files": {
+      "unique": 62,
+      "missing": 0
+    },
+    "local_document_links": "All relative Markdown file targets resolve in the handoff and living roadmap.",
+    "foundational_references": "Passed",
+    "mcp_parity": {
+      "passed": true,
+      "operations": 118,
+      "live": 113,
+      "dead": 5,
+      "tools": 9,
+      "actions": 50,
+      "errors": [],
+      "initial_attempt": "Clean worktree did not have TypeScript installed; audit could not start.",
+      "resolved_attempt": "Reran using NODE_PATH=/Users/systemsystems/portfolio/TraceLab/packages/tracelab-mcp/node_modules. MCP lockfile matches the source checkout; no dependencies or lockfiles changed."
+    },
+    "application_tests": {
+      "run": false,
+      "reason": "Planning and documentation only; no runtime changes."
+    }
+  },
+  "carryovers": {
+    "promoted_to_sprint_62": [
+      397,
+      426,
+      444,
+      445,
+      446,
+      447,
+      451,
+      464,
+      476,
+      478
+    ],
+    "remaining_outside": [
+      400,
+      403,
+      406,
+      407,
+      415,
+      422,
+      431,
+      448,
+      449,
+      450,
+      452,
+      454,
+      477
+    ],
+    "completed_by_planning": []
+  },
+  "build_entry": {
+    "mission": "S62-ISO",
+    "warning": "CMOS queue recommendations can be alphabetical, and Requires edges are advisory. Explicitly start S62-ISO; enforce readiness from the handoff graph.",
+    "handoff": "cmos/planning/sprint-62-HANDOFF.md"
+  },
+  "evidence_findings": [
+    "568aca7f-b47b-41a8-846f-3a20fec75530",
+    "98bcde7f-97a9-4ad3-a55b-6a7f1edb428c"
+  ],
+  "not_performed": [
+    "Application implementation",
+    "Deployments or Railway configuration changes",
+    "Real email or cross-project messages",
+    "Paid research runs",
+    "Sprint activation or completion"
+  ]
+}

@@ -254,6 +254,7 @@ export function MissionForm({ onSuccess, onCancel, source, seed, mode = "create"
   return (
     <form className="space-y-6" onSubmit={event => event.preventDefault()}>
       {projectsError && <PageState state="error" title="Projects could not load." onRetry={() => void reloadProjects()} />}
+      {mode === "create" && projectsData && projects.length === 0 && !projectsError && <section className="panel p-5" aria-label="Start with guided planning"><p>You need a project to save this mission. The Librarian can help you shape the question and create a project as you go.</p><Link href="/librarian?intent=mission" className="mt-2 inline-block text-accent-text underline">Plan a mission with the Librarian</Link></section>}
       {/* Basic Information */}
       <section className={`${SECTION_CLASS} space-y-4`}>
         <header>

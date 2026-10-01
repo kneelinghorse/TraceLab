@@ -9,8 +9,8 @@ their earliest emission, then correctly showed a quiet interval and all **12**
 terminal lines without manual log refresh. The worker's reported source-tree hash
 exactly matched the tested source. The [deployed receipt](deployed-acceptance.json),
 [HTTP snapshots](receipt-snapshots.json), and [browser observations](browser-observations.json)
-record the evidence and its limits. Legacy retirement is in this follow-on change;
-its final deployment verification remains required before LOG-2 closure.
+record the evidence and its limits. Legacy retirement is deployed and verified
+on both services at `4495119`; LOG-2's acceptance gates are complete.
 
 This package follows the [Sprint 61 handoff](../../../planning/sprint-61-HANDOFF.md)
 and [mission log contract](../../../contracts/mission-log-delivery-contract.md).
@@ -27,7 +27,7 @@ signed in, deployment `17053355-f5a5-43b2-90d3-bbb4a75850e0` succeeded with all
 | Accepted receiver | TraceLab `55b5da6a7cc2334350aa40a251d0c479a3c96914` | Receiver preserved in serving `56aae006`; schema 058 |
 | Worker | DeepSearch PR [179](https://github.com/kneelinghorse/DeepSearch.alpha/pull/179), merge `5a75502727b889aa4a65a6373df4b74aa36da23b` | Identical tree to tested `849389e`; deployed and accepted |
 | UI and real HTTP proof | TraceLab PR [405](https://github.com/kneelinghorse/TraceLab/pull/405), merge `56aae00673dda2c500edf41ab4aef3296d24a784` | All required CI passed; serving verification in rollout receipt |
-| Legacy append retirement | TraceLab `codex/sprint-61-retire-legacy-logs`, `623f036` | Rebased onto accepted UI; worker gate passed; this follow-on retires legacy appends |
+| Legacy append retirement | [PR #406](https://github.com/kneelinghorse/TraceLab/pull/406), `4495119551c67a39b393b40f0e0d176ea84128ba` | All nine required checks passed; both services serve the merge; live refusal/history checks passed |
 
 Observed worker source-tree hash (exact match):
 `fa31cba8cf6f88fe4c32980ecd1c2dee6b704b0ee8e5e3747823b7c935c04bcc`.
@@ -115,7 +115,7 @@ the authorization to proceed. Public prices were rechecked before the rollout;
 account-specific discounts and the eventual billed total remain unverified.
 No new budget mechanism is included in this logging change.
 
-## Observed outcome and remaining gates
+## Observed outcome and final verification
 
 Full research Markdown (15,440 characters) and the five-chunk processed/embedded
 document remain available. The existing materializer also produced a 529-character
@@ -142,10 +142,16 @@ Lost-ack replay, failures, stale ownership and multiple-attempt separation are
 covered by the real cross-service tests and LOG-1 deployed synthetic proof; this
 run was not deliberately disrupted. The terminal read stayed at 12 rows.
 
-Publish/deploy this legacy retirement only after the above acceptance, then verify
-capability `legacy=retired`, service legacy426, human403, anonymous401 and unchanged
-v2 history. WALK-4 retains the expanded live credential matrix and final serving
-build audit. Sprint 61 remains open until its must-pass gates are satisfied.
+Legacy retirement is deployed on both TraceLab services at `4495119551c67a39b393b40f0e0d176ea84128ba`.
+The [live refusal receipt](retirement-verification.json) confirms capability
+`legacy=retired`, service426, human403, anonymous401 and unowned v2 rejection409.
+The 12 accepted observations remain byte-for-byte unchanged; the published MCP
+reader returns the same rows. No research was dispatched by these checks.
+[Final CI](../WALK-4/final-validation.json): backend 3,074 passed / four skipped /
+12 unchanged quarantined deselections; PostgreSQL 169 passed / two skipped;
+82 production browser tests passed. The initial eight stale legacy201 assertions
+were corrected before this required-check pass; their failed run remains recorded.
+WALK-4's recovery matrix is accepted; no further user-assisted reset is needed.
 
 ## Rollback
 

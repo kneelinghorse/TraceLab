@@ -1,0 +1,22 @@
+{
+  "observed_at": "2026-09-30T21:38:27.576081+00:00",
+  "serving_backend": "4495119551c67a39b393b40f0e0d176ea84128ba",
+  "mission_uuid": "3f5c2641-7a47-45ed-a092-feebe9143ed1",
+  "capabilities": {
+    "contract_version": "tracelab-mission-logs-v2",
+    "max_batch_entries": 200,
+    "max_message_chars": 2048,
+    "final_flush": "terminal_result_key",
+    "legacy": "retired"
+  },
+  "checks": {
+    "service_legacy": 426,
+    "human_legacy": 403,
+    "anonymous_legacy": 401,
+    "unowned_v2": 409
+  },
+  "history_unchanged": true,
+  "retained_log_count": 12,
+  "mission_status": "completed",
+  "paid_runs_dispatched": 0
+}

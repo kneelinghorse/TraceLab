@@ -55,7 +55,7 @@ function MissionsContent() {
   return <div className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6">
     <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
       <div><h1 className="text-3xl font-bold">Missions</h1><p className="mt-2 text-secondary">Research runs and their results, newest first.</p></div>
-      <Link className="rounded-lg bg-accent px-4 py-2 text-center text-sm font-medium text-on-accent" href="/missions/new">Create Mission</Link>
+      <div className="flex flex-wrap items-center gap-4"><Link className="rounded-lg bg-accent px-4 py-2 text-center text-sm font-medium text-on-accent" href="/librarian?intent=mission">Plan a mission</Link><Link className="text-sm text-accent-text underline" href="/missions/new">Create manually</Link></div>
     </header>
     <section aria-label="Mission filters" className="panel flex flex-wrap items-end gap-3 p-4">
       <div><label htmlFor="status-filter" className="form-label">Status</label><select id="status-filter" className="form-input" value={status ?? ""} onChange={event => change({ status: event.target.value, page: 1 })}><option value="">All statuses</option>{STATUSES.map(value => <option key={value} value={value}>{value.replaceAll("_", " ")}</option>)}</select></div>
