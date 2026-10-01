@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from datetime import UTC, datetime
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -112,7 +113,14 @@ def _write_events(path: Path) -> None:
     path.write_text("\n".join(json.dumps(row) for row in rows), encoding="utf-8")
 
 
-def test_metrics_aggregator_generates_sections(tmp_path):
+def test_metrics_aggregator_generates_sections(tmp_path, monkeypatch):
+    # This is a rolling-window assertion; its fixture date must be its clock.
+    class FixtureClock(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return datetime(2025, 11, 15, 14, tzinfo=UTC)
+
+    monkeypatch.setattr("app.services.metrics_aggregator.datetime", FixtureClock)
     telemetry_path = tmp_path / "telemetry.jsonl"
     _write_events(telemetry_path)
     aggregator = MetricsAggregator(
@@ -135,6 +143,60 @@ def test_metrics_aggregator_generates_sections(tmp_path):
         "collection_missing",
     }
     assert payload["export_rows"]
+
+
+def test_dashboard_keeps_partial_observations_when_latency_is_unknown(tmp_path):
+    """The deployed legacy endpoint crashed sorting a valid null-latency event."""
+    path = tmp_path / "events.jsonl"
+    path.write_text(json.dumps({"ts": "2026-10-01T00:54:40Z", "latency_ms": None, "cost_usd": 0.1}))
+    aggregator = MetricsAggregator(telemetry_path=path, cost_monitor=_FakeCostMonitor(), cache_manager=_FakeCacheManager(), semantic_cache_metrics=_FakeSemanticMetrics(), engine=engine, qdrant_service_factory=_FakeQdrantService)
+    payload = aggregator.collect()
+    assert payload["query_performance"]["slow_queries"] == []
+    assert payload["cost_overview"]["recent_events"][0]["latency_ms"] is None
+    assert payload["system_health"]["database"]["status"] == "healthy"
+
+
+@pytest.mark.parametrize("failed_dependency", ["ttl", "semantic", "both"])
+def test_unavailable_cache_metrics_are_unknown_not_zero(tmp_path, failed_dependency):
+    class Unavailable:
+        def snapshot(self):
+            raise RuntimeError("private URL and credentials must not appear")
+
+    aggregator = MetricsAggregator(telemetry_path=tmp_path / "empty", cost_monitor=_FakeCostMonitor(), cache_manager=Unavailable() if failed_dependency in {"ttl", "both"} else _FakeCacheManager(), semantic_cache_metrics=Unavailable() if failed_dependency in {"semantic", "both"} else _FakeSemanticMetrics(), engine=engine, qdrant_service_factory=_FakeQdrantService)
+    payload = aggregator.collect()
+    cache = payload["cache_performance"]
+    for dependency, key, metric in [("ttl", "ttl_status", "ttl_average_hit_rate"), ("semantic", "semantic_status", "semantic_hit_rate")]:
+        failed = failed_dependency in {dependency, "both"}
+        assert cache[key] == ("unavailable" if failed else "available")
+        assert (cache["aggregate"][metric] is None) is failed
+    assert payload["cost_overview"]["totals"]["queries"] == 4
+    assert "private URL" not in json.dumps(payload)
+
+
+def test_real_aggregator_partial_endpoint_export_and_auth(tmp_path, auth_headers):
+    path = tmp_path / "events.jsonl"
+    path.write_text(json.dumps({"ts": "2026-10-01T00:54:40Z", "latency_ms": None, "cost_usd": 0.1}))
+
+    class Unavailable:
+        def snapshot(self):
+            raise RuntimeError("private dependency detail")
+
+    aggregator = MetricsAggregator(telemetry_path=path, cost_monitor=_FakeCostMonitor(), cache_manager=_FakeCacheManager(), semantic_cache_metrics=Unavailable(), engine=engine, qdrant_service_factory=_FakeQdrantService)
+    app.dependency_overrides[admin_router.get_dashboard_aggregator] = lambda: aggregator
+    try:
+        client = TestClient(app)
+        assert client.get("/api/v1/admin/dashboard/data").status_code == 401
+        response = client.get("/api/v1/admin/dashboard/data", headers=auth_headers)
+        assert response.status_code == 200
+        assert response.json()["cache_performance"]["semantic_status"] == "unavailable"
+        assert response.json()["query_performance"]["semantic_cache_hit_rate"] is None
+        export = client.get("/api/v1/admin/dashboard/export?format=csv", headers=auth_headers)
+        assert export.status_code == 200 and "today_cost_usd" in export.text
+        html = client.get("/api/v1/admin/dashboard", headers=auth_headers)
+        assert html.status_code == 200 and "Process-local counters" in html.text
+        assert "private dependency detail" not in response.text + html.text + export.text
+    finally:
+        app.dependency_overrides.pop(admin_router.get_dashboard_aggregator, None)
 
 
 class _StubAggregator:

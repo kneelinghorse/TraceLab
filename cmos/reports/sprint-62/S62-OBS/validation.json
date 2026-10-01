@@ -1,0 +1,55 @@
+{
+  "mission": "S62-OBS",
+  "checked_at": "2026-10-01T01:06:29.627096+00:00",
+  "decision": 582,
+  "status": "locally_verified_deployed_acceptance_pending",
+  "deployed_before": {
+    "serving": {
+      "backend": "4495119551c67a39b393b40f0e0d176ea84128ba",
+      "frontend": "4495119551c67a39b393b40f0e0d176ea84128ba"
+    },
+    "legacy_dashboard_data_status": 500,
+    "current_admin_stats_status": 200,
+    "trace_timestamp": "2026-10-01T00:54:40.925198380Z",
+    "trace_source": "app/services/metrics_aggregator.py:185",
+    "exception": "TypeError: float() argument must be a string or a real number, not NoneType",
+    "reproduction": "valid telemetry event with latency_ms=null reaches the sort before the later filter"
+  },
+  "changes": [
+    "Filter unknown latency before sorting; preserve the event in cost history",
+    "TTL/semantic snapshot outages produce explicit unavailable/null values, retain partial observations and render as Unavailable in legacy HTML",
+    "Bounded operation/error categories and one safe warning per pair/minute; constant-memory lookup averages; process-local counters explicitly labeled",
+    "Initialization, read, write and maintenance errors preserve fresh synthesis; malformed persisted timestamps and invalid response contracts are evicted diagnostic misses",
+    "Unique disposable-collection CLI diagnostic with fixture-only cleanup, no configured-cache mutation and no model calls"
+  ],
+  "validation": {
+    "cache_rag_scope_saved_search_admin_prewarm": {
+      "passed": 96,
+      "skipped": 0
+    },
+    "real_qdrant_postgres": {
+      "passed": 2,
+      "skipped": 0,
+      "seconds": 30.2
+    },
+    "real_sdk_serializer_positive_before_changes": "passed; no generalized serialization defect reproduced",
+    "red_regressions": {
+      "admin": 4,
+      "cache": 6
+    },
+    "ruff_changed_files": "passed",
+    "mcp_operation_parity": "118 operations; 0 errors",
+    "mcp_argument_parity": "125 advertised arguments; 0 gaps",
+    "foundational_refs": "passed"
+  },
+  "limits": [
+    "The cause of the historical empty semantic-cache observation remains unknown. Current serialization success and injected failures are not evidence of its historical cause.",
+    "Deployed endpoint repair and isolated collection diagnostic must be exercised after rollout; no production cache has been cleared.",
+    "API-process counters reset at restart and are not fleet-wide. Existing hit counts may include RAG application-TTL replays; only the explicit diagnostic proves persistence.",
+    "Frozen-clock dashboard test passes explicitly; the existing 12-node quarantine ratchet remains unchanged and its comment records this distinction.",
+    "Six pre-existing isinstance tuple lint violations in the now-touched aggregator were minimally updated because CI checks whole changed Python files."
+  ],
+  "next_step_444": "pending live acceptance; historical explanation explicitly unresolved",
+  "live_command": "python -m scripts.cache_diagnostic",
+  "receipts": "/tmp/s62-obs-suites.log; /tmp/s62-obs-integration.log"
+}

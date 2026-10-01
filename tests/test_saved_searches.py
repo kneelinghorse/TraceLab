@@ -214,7 +214,7 @@ def test_saved_search_replays_real_semantic_cache(
     assert body["saved_search"]["use_count"] == 1
     assert generate.call_count == pedr.search.call_count == int(invalid_field is not None)
     assert cache.metrics.miss_count == int(invalid_field is not None)
-    assert cache.metrics.error_count == int(invalid_field == "cleanup_failure")
+    assert cache.metrics.error_count == int(invalid_field is not None) + int(invalid_field == "cleanup_failure")
     if invalid_field:
         qdrant.delete.assert_called_once_with(
             collection_name=cache.collection_name, points_selector=[point.id], wait=True

@@ -14,5 +14,5 @@ tests/sprint_04/test_performance_metrics.py::test_cost_profile_within_budget # H
 tests/sprint_04/test_quality_and_load.py::test_quality_checks_block_and_pass # Historical Sprint-04 evaluator cannot find the enveloped quality event in its fixture.
 tests/sprint_04/test_quality_and_load.py::test_load_test_supports_target_concurrency # Historical Sprint-04 evaluator raises Load test telemetry missing; it does not unwrap envelopes.
 tests/sprint_04/test_tech_debt.py::test_playwright_migration_eliminates_cypress_cost # Historical Sprint-04 evaluator cannot find the enveloped tech-debt event in its fixture.
-tests/test_admin_dashboard.py::test_metrics_aggregator_generates_sections # Fixed 2025 cost-event timestamps fall outside the current rolling retention window; expected 0.45 is zero.
+tests/test_admin_dashboard.py::test_metrics_aggregator_generates_sections # S62-OBS freezes the 2025 fixture clock and this test passes explicitly; retain until the existing 12-node quarantine ratchet is deliberately revised.
 tests/test_document_ingestion.py::test_upload_and_process_endpoints_record_statuses # Document detail fixture expects processing_events, which the current DocumentResponse does not expose (KeyError).

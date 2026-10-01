@@ -202,9 +202,9 @@
         <article class="panel">
           <h2>Cache Overview</h2>
           <p class="metric-label">Semantic hit rate</p>
-          <p class="metric-value" id="semantic-hit">0.0%</p>
+          <p class="metric-value" id="semantic-hit">Unavailable</p>
           <p class="metric-label">TTL average hit rate</p>
-          <p class="metric-value" id="ttl-hit">0.0%</p>
+          <p class="metric-value" id="ttl-hit">Unavailable</p>
           <ul class="list-inline" id="cache-tags"></ul>
         </article>
       </section>
@@ -284,7 +284,7 @@
       }
 
       function formatPercent(value) {
-        if (typeof value !== 'number') return '0%';
+        if (typeof value !== 'number') return 'Unavailable';
         return `${(value * 100).toFixed(1)}%`;
       }
 
@@ -298,10 +298,13 @@
       }
 
       function updateCacheSection(cache) {
-        document.getElementById('semantic-hit').textContent = formatPercent(cache.semantic_cache?.hit_rate || 0);
-        document.getElementById('ttl-hit').textContent = formatPercent(cache.aggregate?.ttl_average_hit_rate || 0);
+        document.getElementById('semantic-hit').textContent = formatPercent(cache.semantic_cache?.hit_rate);
+        document.getElementById('ttl-hit').textContent = formatPercent(cache.aggregate?.ttl_average_hit_rate);
         const tagContainer = document.getElementById('cache-tags');
         tagContainer.innerHTML = '';
+        const scope = document.createElement('li');
+        scope.textContent = 'Process-local counters; reset when this process restarts';
+        tagContainer.appendChild(scope);
         (cache.ttl_caches || []).forEach((entry) => {
           const li = document.createElement('li');
           li.textContent = `${entry.name}: ${(entry.hit_rate * 100).toFixed(1)}%`

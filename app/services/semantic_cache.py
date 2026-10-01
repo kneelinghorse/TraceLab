@@ -8,6 +8,7 @@ import uuid
 from collections.abc import Iterable, Iterator
 from typing import Any
 
+import httpx
 from pydantic import ValidationError
 
 from app.core.config import settings
@@ -72,7 +73,23 @@ class SemanticCacheService:
         self._client = client if client is not None else get_qdrant_client()
 
         if self.enabled:
-            self._ensure_collection()
+            try:
+                self._ensure_collection()
+            except Exception as exc:
+                self._record_error("initialize", exc)
+
+    def _record_error(self, operation: str, error: Exception) -> None:
+        # Classify without serializing exception text, request URLs or payloads.
+        source = getattr(error, "source", error)
+        if isinstance(source, TimeoutError | httpx.TimeoutException):
+            category = "timeout"
+        elif isinstance(source, ConnectionError | httpx.TransportError) or getattr(source, "status_code", None):
+            category = "unavailable"
+        elif isinstance(source, TypeError | ValueError):
+            category = "serialization"
+        else:
+            category = "unknown"
+        self.metrics.record_error(operation, category)
 
     @property
     def client(self) -> QdrantClient:
@@ -215,8 +232,8 @@ class SemanticCacheService:
             )
             duration = time.perf_counter() - start
             self.metrics.observe_lookup(duration)
-        except Exception:  # pragma: no cover - defensive against qdrant outages
-            self.metrics.record_error()
+        except Exception as exc:  # cache outage is a fresh-answer fallback
+            self._record_error("lookup", exc)
             self.metrics.observe_lookup(time.perf_counter() - start)
             return None
 
@@ -225,48 +242,52 @@ class SemanticCacheService:
             return None
 
         hit = results[0]
-        payload = hit.payload or {}
-        now_ts = time.time()
-        expires_at = payload.get("expires_at")
-
-        if expires_at and expires_at <= now_ts:
-            # Expired entry; remove it eagerly.
-            self._delete_points([hit.id])
-            self.metrics.record_miss(project_id)
-            return None
-
-        created_at = payload.get("created_at", now_ts)
-        age_seconds = max(0.0, now_ts - created_at)
-        ttl_remaining = max(0.0, (expires_at - now_ts)) if expires_at else None
-
-        response = {
-            "answer": payload.get("answer", ""),
-            "citations": payload.get("citations", []),
-            "sources": payload.get("sources", []),
-            "compression": payload.get("compression", {}),
-            "quality": payload.get("quality"),
-            "routing": payload.get("routing"),
-            "search_mode": payload.get("search_mode"),
-            "latency_ms": round((time.perf_counter() - start) * 1000, 2),
-            "cache": {
-                "hit": True,
-                "score": float(hit.score),
-                "age_seconds": round(age_seconds, 3),
-                "ttl_seconds": ttl_remaining,
-            },
-        }
         try:
+            payload = hit.payload or {}
+            now_ts = time.time()
+            expires_at = payload.get("expires_at")
+
+            if expires_at and expires_at <= now_ts:
+                # Expired entry; remove it eagerly.
+                try:
+                    self._delete_points([hit.id])
+                except Exception as exc:
+                    self._record_error("maintenance", exc)
+                self.metrics.record_miss(project_id)
+                return None
+
+            created_at = payload.get("created_at", now_ts)
+            age_seconds = max(0.0, now_ts - created_at)
+            ttl_remaining = max(0.0, (expires_at - now_ts)) if expires_at else None
+
+            response = {
+                "answer": payload.get("answer", ""),
+                "citations": payload.get("citations", []),
+                "sources": payload.get("sources", []),
+                "compression": payload.get("compression", {}),
+                "quality": payload.get("quality"),
+                "routing": payload.get("routing"),
+                "search_mode": payload.get("search_mode"),
+                "latency_ms": round((time.perf_counter() - start) * 1000, 2),
+                "cache": {
+                    "hit": True,
+                    "score": float(hit.score),
+                    "age_seconds": round(age_seconds, 3),
+                    "ttl_seconds": ttl_remaining,
+                },
+            }
             RagResponse.model_validate(response)
-        except ValidationError:
+        except (ValidationError, TypeError, ValueError):
             # Older cache writers dropped required response metadata. Regenerate
             # it through the normal pipeline instead of returning an HTTP 500 or
             # inventing quality scores for an answer that was never assessed.
+            self.metrics.record_error("lookup", "invalid_payload")
             self.metrics.record_miss(project_id)
             try:
                 self._delete_points([hit.id])
                 self.metrics.record_eviction()
-            except Exception:  # cache cleanup must not prevent fresh synthesis
-                self.metrics.record_error()
+            except Exception as exc:  # cache cleanup must not prevent fresh synthesis
+                self._record_error("maintenance", exc)
             return None
         self.metrics.record_hit(project_id)
         return response
@@ -310,24 +331,24 @@ class SemanticCacheService:
             "expires_at": expires_at,
         }
 
-        point = PointStruct(
-            id=str(uuid.uuid4()),
-            vector=vector,
-            payload=payload,
-        )
-
         try:
+            point = PointStruct(id=str(uuid.uuid4()), vector=vector, payload=payload)
             self.client.upsert(
                 collection_name=self.collection_name, points=[point], wait=True
             )
+        except Exception as exc:
+            self._record_error("write", exc)
+            return
+
+        try:
             expired = self._evict_expired(now_ts)
             if expired:
                 self.metrics.record_eviction(expired)
             overflow = self._trim_to_max_items()
             if overflow:
                 self.metrics.record_eviction(overflow)
-        except Exception:  # pragma: no cover - defensive against qdrant outages
-            self.metrics.record_error()
+        except Exception as exc:
+            self._record_error("maintenance", exc)
 
     def _evict_expired(self, now_ts: float) -> int:
         if not self.ttl_seconds:
