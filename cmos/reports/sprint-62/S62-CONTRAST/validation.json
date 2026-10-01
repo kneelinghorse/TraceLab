@@ -132,7 +132,7 @@
   ],
   "mission": "S62-CONTRAST",
   "checked_at": "2026-10-01T02:50:21.965473+00:00",
-  "status": "local verified; deployed verification pending",
+  "status": "completed: deployed and live verified",
   "change": "Export anchor inherits existing body foreground #f1f5f9, overriding UA link and visited-link colors.",
   "minimum_contrast_over_white_backdrop": 8.7,
   "dashboard_pytest": {
@@ -141,5 +141,77 @@
     "warnings": 14
   },
   "foundational_refs": "passed",
-  "verification_scope": "Actual template CSS/DOM rendered without scripts/network at Light/Dark390/1440; keyboard focus and hover checked. No new permanent test for this single presentation property."
+  "verification_scope": "Actual template CSS/DOM rendered without scripts/network at Light/Dark390/1440; keyboard focus and hover checked. No new permanent test for this single presentation property.",
+  "deployed": {
+    "checked_at": "2026-10-01T03:14:24.508Z",
+    "serving_commit": "e276977ec55bb8c6b42f8328d57be6d98727834b",
+    "html_status": 200,
+    "csv_status": 200,
+    "csv_content_type": "text/csv; charset=utf-8",
+    "checks": [
+      {
+        "colorScheme": "light",
+        "width": 390,
+        "foreground": "rgb(241, 245, 249)",
+        "keyboard_focus": true,
+        "hover": true
+      },
+      {
+        "colorScheme": "light",
+        "width": 1440,
+        "foreground": "rgb(241, 245, 249)",
+        "keyboard_focus": true,
+        "hover": true
+      },
+      {
+        "colorScheme": "dark",
+        "width": 390,
+        "foreground": "rgb(241, 245, 249)",
+        "keyboard_focus": true,
+        "hover": true
+      },
+      {
+        "colorScheme": "dark",
+        "width": 1440,
+        "foreground": "rgb(241, 245, 249)",
+        "keyboard_focus": true,
+        "hover": true
+      }
+    ],
+    "passed": true
+  },
+  "serving": {
+    "sha": "e276977ec55bb8c6b42f8328d57be6d98727834b",
+    "ok": true,
+    "observed": {
+      "backend": "e276977ec55bb8c6b42f8328d57be6d98727834b",
+      "frontend": "e276977ec55bb8c6b42f8328d57be6d98727834b"
+    },
+    "seconds_to_serve": {
+      "backend": 122.5,
+      "frontend": 198.3
+    },
+    "budget_seconds": 900,
+    "elapsed_seconds": 198.3
+  },
+  "source_pr": "https://github.com/kneelinghorse/TraceLab/pull/409",
+  "source_head": "bdc930f62206b1e82cb271da7d56fbe4c734e559",
+  "required_ci_passed": [
+    "Secret Scan",
+    "backend-integration",
+    "backend-suite",
+    "build-frontend-production",
+    "lint",
+    "mcp-package",
+    "ruff-diff",
+    "type-check",
+    "vitest"
+  ],
+  "backend_ci": {
+    "passed": 3122,
+    "skipped": 4,
+    "unchanged_quarantined_deselections": 12,
+    "warnings": 49,
+    "seconds": 862.42
+  }
 }
