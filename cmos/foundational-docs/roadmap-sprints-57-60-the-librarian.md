@@ -358,6 +358,36 @@ prepared but unsent. The build scope includes package publication, the approved
 factual metadata correction and frontend acceptance. Cross-project messages,
 worker changes and paid research remain outside this sprint.
 
+### Follow-on — Sprint 64: Authored scope preview and result alignment (Planned 2026-10-01)
+
+Derek requested TraceLab integration planning after DeepSearch returned the
+authored-scope correction. Decision **#595**, session **PS-2026-10-01-012**, and
+the [Sprint 64 handoff](../planning/sprint-64-HANDOFF.md) define a focused four-mission
+plan. CMOS holds the detailed criteria and dependencies. **All four are Queued;
+no implementation or deployment has started.** Dates stay unset until execution.
+
+| Mission | Planned outcome | Requires |
+| --- | --- | --- |
+| **S64-VENDOR** | Offline schema 1.2/revision 3 compiler resync and exact canonical fixture parity | — |
+| **S64-SCOPE** | Preserve exact URLs and typed scope through manual/Librarian authoring, REST and MCP previews | VENDOR |
+| **S64-RESULT** | Show planned limits and retained partial/failure verdicts without losing complete artifacts | SCOPE |
+| **S64-ACCEPT** | Integrated fixture, package and TraceLab serving acceptance; record the worker delivery gate | All three |
+
+DeepSearch's handoff **ad16f01d** names implementation **79ef848** and closeout
+**1c5d352**: locally implemented and verified, explicitly **not pushed, merged or
+deployed**. Planning verified 17 fixture files and six structural source files
+against their pinned commit. The canonical fixture is **8ca1ebfaa604dc7e**,
+not the historical executed contract. The [intake receipt](../reports/sprint-64/planning/intake.json)
+preserves source identities, delivery limitations and test disclosures.
+
+Only existing **#479** moves into S64. The eleven other carryovers remain outside.
+TraceLab can accept its integration against the deterministic fixture; full #479
+closure additionally needs separately evidenced DeepSearch runtime delivery and
+authorized required-run acceptance. No paid rerun, worker deployment, or outgoing
+coordination reply is part of this planning turn. S63 remains the last completed
+sprint until the first S64 mission starts. The build handoff preserves the accepted
+S63 receipts and reconciles main without application changes.
+
 ### Running alongside: the guest expansion track
 
 > "tracelab has a few friends i've given access to but i think i want to expand that, so it will be for other software design pros to try it out."
@@ -426,6 +456,7 @@ Add to this list rather than resolving items silently.
 
 ## Change Log
 
+- **2026-10-01 UTC, Sprint 64 planning.** Decision #595 queues VENDOR → SCOPE → RESULT → ACCEPT for DeepSearch authored-scope parity. Verified the S94 local handoff's 17 fixture and six source hashes; worker rollout remains unproved. #479 is carried into S64, eleven other rows retain their scope, and S63 completed identity is preserved. The isolated planning branch reconciles current main with the later S63 closeout receipts; runtime implementation remains for a fresh build session.
 - **2026-10-01 UTC, Sprint 63 completed.** All three missions accepted. Interactive npm browser approval published 2.1.1; a fresh registry install matched the tested integrity and passed 63 real stdio checks with zero skips. Tag `tracelab-mcp-v2.1.1` identifies deployed merge `e716e34`. #449/#450/#481 closed; the twelve excluded rows retain ownership. Learning #295 corrects the earlier numeric-OTP assumption. Final receipts distinguish source CI and deployment from subsequent closeout-only commits.
 - **2026-10-01 UTC, Sprint 63 build checkpoint.** PUBLIC and CLEAN shipped in PR #412 (`e716e34`) with nine required checks passing. Both services serve that source; 42 authenticated read-only checks and five public production tests pass. Approved metadata applied; #449/#450 closed. RELEASE is blocked on npm EOTP and fresh registry acceptance; #481 and the twelve excluded rows stay open. Sprint identity remains active; no close claimed.
 - **2026-10-01 UTC, Sprint 63 opened.** Session PS-2026-10-01-008 started S63-PUBLIC from planning tip `c838140`; freshly fetched main remains `d7b8682`, registry latest remains 2.1.0 and the package matches its tag. Identity pointers synchronized; original checkout and user notes preserved. Publication and serving acceptance remain required for closeout.

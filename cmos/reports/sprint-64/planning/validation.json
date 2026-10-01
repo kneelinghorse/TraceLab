@@ -1,0 +1,69 @@
+{
+  "sprint_id": "sprint-64",
+  "session_id": "PS-2026-10-01-012",
+  "decision_id": 595,
+  "learning_id": 298,
+  "mission_ids": [
+    "S64-VENDOR",
+    "S64-SCOPE",
+    "S64-RESULT",
+    "S64-ACCEPT"
+  ],
+  "success_criteria_count": 28,
+  "requires": [
+    [
+      "S64-SCOPE",
+      "S64-VENDOR"
+    ],
+    [
+      "S64-RESULT",
+      "S64-SCOPE"
+    ],
+    [
+      "S64-ACCEPT",
+      "S64-VENDOR"
+    ],
+    [
+      "S64-ACCEPT",
+      "S64-SCOPE"
+    ],
+    [
+      "S64-ACCEPT",
+      "S64-RESULT"
+    ]
+  ],
+  "checks": {
+    "reference_files_checked": 45,
+    "missing_reference_files": [],
+    "local_markdown_links_checked": 29,
+    "missing_local_links": [],
+    "unresolved_merge_paths": [],
+    "non_cmos_changes_vs_main": [],
+    "foundational_refs": "passed",
+    "git_diff_check": "passed",
+    "mcp_operations": {
+      "operations": 118,
+      "tools": 9,
+      "actions": 50,
+      "errors": []
+    },
+    "mcp_arguments": {
+      "advertised_arguments": 125,
+      "gaps": []
+    },
+    "upstream_fixture_files": {
+      "checked": 17,
+      "mismatches": []
+    },
+    "upstream_structural_files": {
+      "checked": 6,
+      "mismatches": []
+    }
+  },
+  "not_run": {
+    "runtime_tests": "Planning only; no runtime code changed. Application/package/browser/deployed gates are defined in CMOS missions.",
+    "deepsearch_runtime_suites": "Upstream recorded results reviewed; hashes independently checked, provider/worker code not executed.",
+    "publish_deploy_dispatch": "No release, deployment or paid/provider dispatch in planning."
+  },
+  "merge_resolution": "Retained exact S63 closeout mirror and later roadmap outcome from0a04e23 over older active state in e716e34; added only S64 planning section."
+}

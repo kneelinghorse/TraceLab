@@ -1,0 +1,248 @@
+{
+  "sprint_id": "sprint-64",
+  "session_id": "PS-2026-10-01-012",
+  "decision_id": 595,
+  "learning_id": 298,
+  "date": "2026-10-01",
+  "canonical_cmos_root": "/Users/systemsystems/portfolio/TraceLab",
+  "source": {
+    "trace_receipt_base": "0a04e23bee2031529e4f964bcaf8f355394f6521",
+    "trace_runtime_main": "e716e34bcb1b60966ffcd8d67246f3c8e6026b40",
+    "planning_branch": "codex/sprint-64-plan",
+    "deepsearch_implementation": "79ef84842fb84259bafe59924b21fe2f5ad05d7d",
+    "deepsearch_closeout": "1c5d35283f35a94ae74328d3c11d1e62ab6aa483",
+    "deepsearch_checkout": "/Users/systemsystems/.codex/worktrees/s94-authored-scope/DeepSearch.alpha",
+    "deepsearch_delivery": "local, not pushed/merged/deployed per handoff; no newer delivery evidence reviewed"
+  },
+  "messages": {
+    "request": "096847da-aa08-4c65-aa11-1d9cd7a1be84",
+    "handoff": "ad16f01d-afe6-4553-a2c9-1bb721c67c04"
+  },
+  "upstream_contract": {
+    "schema": "1.2",
+    "compiler_revision": 3,
+    "fixture_version": "authored-scope-parity-v1",
+    "canonical_contract_id": "8ca1ebfaa604dc7e",
+    "manifest_sha256": "db256e5821393ca9750b704714b8e76803e3e8f7de86255a6f83d9d7cc0114cc",
+    "files_verified": [
+      {
+        "path": "22_sources-expected.json",
+        "sha256": "261a6790793d2efd3c8249b0fa84df4f0b0db462a0da144c698edad516b33772",
+        "matches_manifest": true,
+        "matches_implementation_commit": true
+      },
+      {
+        "path": "22_sources-persisted.md",
+        "sha256": "7ca225b9645230ea578f4e2ecd99807f280bb56c44286c43aece97c5d04de90e",
+        "matches_manifest": true,
+        "matches_implementation_commit": true
+      },
+      {
+        "path": "22_sources-pre-render.md",
+        "sha256": "aae0f63096fa6cfb646d81f1c784ecfbf088d1948d820acac4447d238e683f37",
+        "matches_manifest": true,
+        "matches_implementation_commit": true
+      },
+      {
+        "path": "actor-system.txt",
+        "sha256": "7af608fd09031d1c02e32d1c54af93e234b3f219e06322fd3e7c796733ce36f2",
+        "matches_manifest": true,
+        "matches_implementation_commit": true
+      },
+      {
+        "path": "actor-user.txt",
+        "sha256": "57e8feb1ac834b63394e17dfe2098c775da309f160e912d79d24333b49d9ae60",
+        "matches_manifest": true,
+        "matches_implementation_commit": true
+      },
+      {
+        "path": "canonical-contract.json",
+        "sha256": "163e7af36080b8440afe55f501b023cb2e3aba84e1b8644298fc0784167b5cb6",
+        "matches_manifest": true,
+        "matches_implementation_commit": true
+      },
+      {
+        "path": "canonical-input.json",
+        "sha256": "c7644ceb7d0dc9b194a67a5b403a93606c8870515231581e07f77c123c8e2c28",
+        "matches_manifest": true,
+        "matches_implementation_commit": true
+      },
+      {
+        "path": "compliant-expected.json",
+        "sha256": "5a1a5885de2e6dc82c8ccc9238604d051bade29d2e61a66a6f96de04b7920725",
+        "matches_manifest": true,
+        "matches_implementation_commit": true
+      },
+      {
+        "path": "compliant-persisted.md",
+        "sha256": "29a4eee9e63efe0b2e9f6210ef5ed78d41abd08c211dbbdbe2db4410d90ab1be",
+        "matches_manifest": true,
+        "matches_implementation_commit": true
+      },
+      {
+        "path": "compliant-pre-render.md",
+        "sha256": "aae0f63096fa6cfb646d81f1c784ecfbf088d1948d820acac4447d238e683f37",
+        "matches_manifest": true,
+        "matches_implementation_commit": true
+      },
+      {
+        "path": "partial-expected.json",
+        "sha256": "3fd36c3e94c123c9a074d6d4ecf487a48ca5c1272fecd0d38457b14f87c88ed3",
+        "matches_manifest": true,
+        "matches_implementation_commit": true
+      },
+      {
+        "path": "partial-persisted.md",
+        "sha256": "37c2a1d258f007c7a9d35e22434492967bc34d67c08c592ca18451330e625564",
+        "matches_manifest": true,
+        "matches_implementation_commit": true
+      },
+      {
+        "path": "partial-pre-render.md",
+        "sha256": "0bc4f19f8951307827919834c258d7b49be458c36885d4514a4f77eaf6e89fd0",
+        "matches_manifest": true,
+        "matches_implementation_commit": true
+      },
+      {
+        "path": "postgresql-authored.json",
+        "sha256": "310a0cdb38196e1ae1fc8e9ec0cee7eaef3206a98d0b51a8f176ef5927c05784",
+        "matches_manifest": true,
+        "matches_implementation_commit": true
+      },
+      {
+        "path": "too_long-expected.json",
+        "sha256": "6d82a0a562b32fed266240ed8a3fc646797c7750fea455a34a9ab4b857c52437",
+        "matches_manifest": true,
+        "matches_implementation_commit": true
+      },
+      {
+        "path": "too_long-persisted.md",
+        "sha256": "9d7d41e4a06b5ae2961ca3516154a8537af982a089f74cf41520ef5bf0dd9621",
+        "matches_manifest": true,
+        "matches_implementation_commit": true
+      },
+      {
+        "path": "too_long-pre-render.md",
+        "sha256": "d81ac3ebb2a317c29cb24f4a2a919b49567c6fce2bef846025c3f23fc47e0434",
+        "matches_manifest": true,
+        "matches_implementation_commit": true
+      }
+    ],
+    "structural_source_files": [
+      {
+        "path": "deepsearch/mission/compiler_provenance.py",
+        "sha256": "85bb7a28f4b460576c4c1e47920819c09f08ae1a48b1cc061f2e21f4f1d4d0a2",
+        "matches_implementation_commit": true
+      },
+      {
+        "path": "deepsearch/mission/contract.py",
+        "sha256": "e28d1c602b421a334e66b595c87427dbd85b176c41c636a308646a7b83f3c817",
+        "matches_implementation_commit": true
+      },
+      {
+        "path": "deepsearch/mission/scope.py",
+        "sha256": "7d102ac57b68cc772c1c57d2fa21c9d4c9cfef7873bacb14549e341c234db540",
+        "matches_implementation_commit": true
+      },
+      {
+        "path": "deepsearch/mission/title_utils.py",
+        "sha256": "791b90fce5dc0d0e71fc81b81acb57be6ae126edfe2f58d29c62958d42bd8114",
+        "matches_implementation_commit": true
+      },
+      {
+        "path": "deepsearch/agent/deliverable_schemas.py",
+        "sha256": "84a39bc568ca324fd9e0d83492a7042979319ddcb1cf9c18bee110a89638817b",
+        "matches_implementation_commit": true
+      },
+      {
+        "path": "deepsearch/domain_policy.py",
+        "sha256": "5a1b45e72db2c63f09548b97a1d073c32c37c8e9cb191e484aa6cff0d5c8b85b",
+        "matches_implementation_commit": true
+      }
+    ],
+    "actions": 8,
+    "outputs": [
+      {
+        "name": "compliant",
+        "mission_outcome": "complete",
+        "delivery_quality": "usable_with_warning"
+      },
+      {
+        "name": "partial",
+        "mission_outcome": "complete",
+        "delivery_quality": "degraded"
+      },
+      {
+        "name": "too_long",
+        "mission_outcome": "validation_failed",
+        "delivery_quality": "failed"
+      },
+      {
+        "name": "22_sources",
+        "mission_outcome": "validation_failed",
+        "delivery_quality": "failed"
+      }
+    ]
+  },
+  "observed_trace_gaps": [
+    "Compiler is pinned to24e8810/schema1.0; new structural source set has six modules and explicit enrichment_mode=none.",
+    "build_mission_context_from_mission does not forward context.authored_scope.",
+    "MissionDraft lacks references/context; _as_mission_namespace sets references=None/context={}.",
+    "Public preview dataclass/Pydantic/frontend type lack authored_scope and contract identity; TS summary is hand-shaped.",
+    "Preview state defaults min_loops0; canonical worker fixture uses2. Reconcile semantic defaults without silently masking canonical differences.",
+    "validation_failed is already a supported terminal status; result work should preserve existing lifecycle/artifact behavior.",
+    "DeepSearch compiler provenance resolves source identity via observability imports: use a local pure provenance adaptation rather than vendor runtime services."
+  ],
+  "upstream_reported_validation": {
+    "unit_passed": 3210,
+    "unit_baseline_failed": 4,
+    "integration_passed": 238,
+    "integration_baseline_failed": 6,
+    "integration_live_skipped": 10,
+    "legacy_passed": 163,
+    "focused_passed": 195,
+    "ruff_baseline_diagnostics": 95,
+    "mypy_baseline_diagnostics": 248,
+    "independently_rerun_in_planning": false
+  },
+  "historical_limits": {
+    "executed_contract": "bae1333274533285",
+    "saved_preview": "106cb8668a3efdb8",
+    "canonical_fixture_is_historical_reconstruction": false,
+    "count_delta_2285_vs_2240": "unresolved; both exceed500",
+    "worker_delivery_proven": false
+  },
+  "carryovers": {
+    "selected": [
+      479
+    ],
+    "not_selected": [
+      400,
+      403,
+      406,
+      407,
+      415,
+      422,
+      431,
+      448,
+      452,
+      454,
+      477
+    ],
+    "closed": []
+  },
+  "planning_checks": {
+    "fixture_hashes": {
+      "checked": 17,
+      "mismatches": []
+    },
+    "upstream_source_hashes": {
+      "checked": 6,
+      "mismatches": []
+    },
+    "provider_or_worker_code_executed": false,
+    "runtime_tests_run": false,
+    "outbound_messages_sent": false,
+    "upstream_files_changed": false
+  }
+}
