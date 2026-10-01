@@ -105,3 +105,14 @@ The [UI parity manifest](../cmos/contracts/mcp-parity-manifest.json) classifies
 every frontend API operation. Run `node scripts/mcp_parity_audit.mjs` from the
 repository root after installing MCP package dependencies. CI rejects new
 unclassified operations, stale consumers and mappings to absent source actions.
+
+### Authored scope preview (2.1.2)
+
+Mission create/update preserves `context.authored_scope` and structured reference
+seeds (exact `url`, optional `title`). Scope uses `restriction`, `allowed_urls`,
+`allowed_domains`, `min_words`, `max_words`, and `max_sources`. Ordinary references
+do not restrict sources. Preview returns `authored_scope`, canonical contract ID
+and SHA-256, semantic compiler revision and pinned source revision in both summary
+and full output. It is a structural plan; worker deployment is a separate gate.
+See the repository's `cmos/contracts/mission-authoring-contract.md` for the complete
+field map. Explicit save, preview and submit remain separate actions.

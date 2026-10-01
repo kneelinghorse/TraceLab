@@ -15,15 +15,51 @@ this stops being something we discover via paid smoke regressions."*
 | Project | Commit | Branch | Date |
 | --- | --- | --- | --- |
 | TraceLab | `21271b5` (lease-v2 runtime boundary in migration 039, landed on main; attribution in CMOS decision #328) | `main` | 2026-08-14 |
-| DeepSearch.alpha | `b7009c6` + uncommitted Sprint 91 lease-v2 working tree (evidence pending) | `contract-driven-pipeline` | 2026-08-14 |
+| DeepSearch.alpha | `79ef84842fb84259bafe59924b21fe2f5ad05d7d` (immutable S94 worker SELECT/converter and structural compiler) | `codex/s94-authored-scope` | 2026-10-01 |
 
-The vendored DS contract compiler at `app/services/contract_compiler/` is
-pinned separately to DS commit `24e8810`; see
-`cmos/contracts/deepsearch-compiler-vendor.md` for that ritual.
-Contract-preview responses expose `contract_version`, `compiler_revision`, and
-`fidelity`; the current value is `structural_only` because the pinned 1.0
-compiler is intentionally held until DeepSearch publishes a deterministic 1.1
-manifest and golden fixtures.
+The S64 scope additions are described below; lease-v2 attribution above remains
+historical. The compiler now pins schema 1.2/semantic revision 3 at `79ef848`;
+see [vendor contract](deepsearch-compiler-vendor.md) and its source manifest.
+Fidelity remains `structural_only`: canonical fixture parity does not prove worker
+deployment or configured enrichment. Guiding template:
+[technical architecture](../foundational-docs/tech_arch_template.md).
+
+## S64 authored scope and preview boundary (2026-10-01)
+
+`context.authored_scope` is the durable typed input, carried unchanged through
+manual create/edit, collection seeds, reviewed Librarian drafts and new-ID reruns.
+There is no new database column or top-level scope parameter. Unrelated context
+keys survive. New runs copy authored fields, not leases/results/execution metadata.
+The pinned worker SELECT reads the JSON `context` and dedicated authoring columns;
+`converter._build_mission_context` merges context and uses non-null columns as
+authoritative, including empty arrays/objects that explicitly clear legacy values.
+Null columns permit fallback. TraceLab preview and constraint read serializers now
+follow that rule; it supersedes the older empty/null fallback description.
+
+| Surface | Authored input | Compiled output |
+| --- | --- | --- |
+| REST/manual | `context.authored_scope`, structured `references` with exact `url`, optional `title` | GET `/missions/{id}/contract-preview` |
+| Librarian | `MissionDraft.context` and `.references` survive model validation, namespace preview, reviewed request and persistence | Preview before and after save has identical canonical identity and scope |
+| TS MCP | `tracelab_mission` create/update accepts context and references (including URL-only seeds); update null/empty clearing preserved | `tracelab_mission_execution.preview`: summary and full both carry scope/identity |
+| Python MCP | Legacy create accepts context and references; mission serializer preserves both | No separate Python preview tool exists; REST uses the shared shaper |
+| PostgreSQL / SQLite | JSONB / CrossDBJSON `context`, quoted `"references"` column | Both database boundaries tested |
+| DeepSearch S94 | `MissionRow.context` and `.references` → merged `mission_context` | `AuthoredScope` compiled before enrichment |
+
+Typed scope uses the pinned `AuthoredScope`: `version`, reference seeds,
+`restriction` (unrestricted/domains/exact_pages), `allowed_urls`, `allowed_domains`,
+`min_words`, `max_words`, `max_sources`. References alone remain seeds; only the
+supported compiler grammar or structured restrictions creates limits. Invalid
+scope produces an actionable 422 preview error (or Librarian preview_error), never
+an unrestricted fallback. A saved draft still requires explicit submit.
+
+Additive preview fields (shared dataclass → REST model → API/TS MCP/Librarian):
+`authored_scope`, `contract_id` (preview origin), `canonical_contract_id`,
+`canonical_contract_sha256` (complete canonical JSON, canonical origin/time,
+no enrichment), `compiler_semantic_revision` (3), and `compiler_source_revision`
+(exact vendor commit). Existing `compiler_revision` remains the source commit for
+compatibility; `contract_version` remains schema 1.2. `fidelity` stays
+`structural_only`. Old servers may omit additive fields; readers treat that as
+unknown. Runtime contract identity remains distinct from canonical preview.
 
 ## How to use this doc
 
@@ -228,30 +264,31 @@ both create and update flows unless noted.
 
 | MCP param | MCP type | Pydantic field | DB column | DB type | REST response field | DS worker SELECT |
 | --- | --- | --- | --- | --- | --- | --- |
-| `background` | string | `MissionCreate.background` | `background` | `Text` nullable | `background` | ✗ |
-| `focus` | string | `MissionCreate.focus` | `focus` | `Text` nullable | `focus` | ✗ |
-| `references` | array of `{title}` objects | `MissionCreate.references` | `"references"` | `CrossDBJSON` nullable | `references` | ✗ |
+| `background` | string | `MissionCreate.background` | `background` | `Text` nullable | `background` | ✓ (S94 pin) |
+| `focus` | string | `MissionCreate.focus` | `focus` | `Text` nullable | `focus` | ✓ (S94 pin) |
+| `references` | array of structured `{url?, title?, ...}` seeds | `MissionCreate.references` | `"references"` | `CrossDBJSON` nullable | `references` | ✓ (S94 pin) |
 | `required_entities` | array of strings | `MissionCreate.required_entities` | `required_entities` | `CrossDBJSON` nullable | `required_entities` | **✓** (added in DS S59.1) |
 | `excluded_entities` | array of strings | `MissionCreate.excluded_entities` | `excluded_entities` | `CrossDBJSON` nullable | `excluded_entities` | **✓** (added in DS S59.1) |
-| `expected_output_schema` | object (DS OutputSchema) | `MissionCreate.expected_output_schema` | `expected_output_schema` | `CrossDBJSON` nullable | `expected_output_schema` | ✗ |
-| `coverage_thresholds` | object (string→number) | `MissionCreate.coverage_thresholds` | `coverage_thresholds` | `CrossDBJSON` nullable | `coverage_thresholds` | ✗ |
-| `validation_thresholds` | object (string→number) | `MissionCreate.validation_thresholds` | `validation_thresholds` | `CrossDBJSON` nullable | `validation_thresholds` | ✗ |
-| `deliverable_format` | string | `MissionCreate.deliverable_format` | `deliverable_format` | `Text` nullable | `deliverable_format` | ✗ |
-| `max_loops` | integer ≥1 | `MissionCreate.max_loops` | `max_loops` | `Integer` nullable | `max_loops` | ✗ |
-| `min_loops` | integer ≥1 | `MissionCreate.min_loops` | `min_loops` | `Integer` nullable | `min_loops` | ✗ |
-| `constraints` | array of strings | `MissionCreate.constraints` | `constraints` | `CrossDBJSON` nullable | `constraints` (with fallback) | ✗ |
+| `expected_output_schema` | object (DS OutputSchema) | `MissionCreate.expected_output_schema` | `expected_output_schema` | `CrossDBJSON` nullable | `expected_output_schema` | ✓ (S94 pin) |
+| `coverage_thresholds` | object (string→number) | `MissionCreate.coverage_thresholds` | `coverage_thresholds` | `CrossDBJSON` nullable | `coverage_thresholds` | ✓ (S94 pin) |
+| `validation_thresholds` | object (string→number) | `MissionCreate.validation_thresholds` | `validation_thresholds` | `CrossDBJSON` nullable | `validation_thresholds` | ✓ (S94 pin) |
+| `deliverable_format` | string | `MissionCreate.deliverable_format` | `deliverable_format` | `Text` nullable | `deliverable_format` | ✓ (S94 pin) |
+| `max_loops` | integer ≥1 | `MissionCreate.max_loops` | `max_loops` | `Integer` nullable | `max_loops` | ✓ (S94 pin) |
+| `min_loops` | integer ≥1 | `MissionCreate.min_loops` | `min_loops` | `Integer` nullable | `min_loops` | ✓ (S94 pin) |
+| `constraints` | array of strings | `MissionCreate.constraints` | `constraints` | `CrossDBJSON` nullable | `constraints` (with fallback) | ✓ (S94 pin) |
 
-**Constraints fallback behavior:** Pre-T40.1 missions stored constraints
-inside `context['constraints']`. The REST `_to_response`, MCP
-`_serialize_mission`, and `build_mission_context_from_mission` all check
-`mission.constraints` first; if empty/null they fall back to
-`mission.context['constraints']`. New writes always go to the column.
+**Constraints fallback:** only a null column permits `context.constraints`.
+An explicit empty list clears it in REST, Python MCP, preview and the pinned worker.
+
+| Authored nested field | Pydantic | DB storage | REST | DS worker |
+| --- | --- | --- | --- | --- |
+| `context.authored_scope` | `MissionCreate.context` / `MissionUpdate.context`; compiler validates typed shape | JSON content inside existing `context` | preserved inside `context` | SELECT `context`; converter merges scope before compilation |
 
 ### Operational / output fields (not authoring)
 
 | MCP param | Pydantic field | DB column | DS worker SELECT |
 | --- | --- | --- | --- |
-| `context` (deprecated for new authoring) | `MissionCreate.context` | `context` | ✓ |
+| `context` (authored scope + legacy/provenance) | `MissionCreate.context` | `context` | ✓ |
 | `deliverables` | `MissionCreate.deliverables` | `deliverables` | ✓ |
 | `research_phases` | `MissionCreate.research_phases` | `research_phases` | ✓ |
 | `tags` | `MissionCreate.tags` | `tags` | ✗ |
@@ -385,10 +422,8 @@ them from `MissionUpdate` payloads.
 `references` is a Postgres reserved word. SQLAlchemy quotes it
 automatically when emitting SQL. Hand-written SQL (DS worker, raw
 Alembic migrations, ad-hoc psql) MUST quote it as `"references"`. The DS
-worker's CLAIM_MISSION_SQL doesn't currently SELECT `references` so the
-quoting requirement isn't yet exercised on the DS side, but adding it
-later requires the quoted form. TraceLab's existing migration 027
-demonstrates the pattern.
+worker's pinned S94 CLAIM_MISSION_SQL SELECTs `mission."references"`.
+TraceLab migration 027 demonstrates the same quoted-column pattern.
 
 ## Two MCP serialization surfaces (T41.4 critical learning)
 

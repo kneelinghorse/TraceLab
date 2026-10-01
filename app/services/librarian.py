@@ -368,6 +368,11 @@ def _draft_system_prompt() -> str:
         "or adjacent topics to rule out.\n"
         "- constraints: source-quality or recency rules, for example \"Prefer sources published in "
         "2025 or 2026\".\n"
+        "- references: preserve exact source URLs from the conversation with optional titles. "
+        "References alone are seeds. Preserve explicit scope under context.authored_scope: "
+        "restriction (unrestricted/domains/exact_pages), allowed_urls, allowed_domains, "
+        "min_words, max_words, max_sources. Exact pages need a nonempty allowed_urls list. "
+        "Do not invent limits or turn ordinary reference seeds into an allowlist.\n"
         "- deliverable_format: one line describing the report shape.\n"
         "- mission_id: short, uppercase letters, digits, dots or hyphens, for example ONBOARD-1. "
         "title: 3 to 120 characters.\n"
@@ -729,8 +734,6 @@ def _as_mission_namespace(draft: MissionDraft) -> SimpleNamespace:
     """A duck-typed mission for the offline compiler and the linter (both read attributes)."""
     return SimpleNamespace(
         **draft.model_dump(),
-        context={},
-        references=None,
         expected_output_schema=None,
         coverage_thresholds=None,
         validation_thresholds=None,

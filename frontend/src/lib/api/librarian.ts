@@ -1,3 +1,4 @@
+import type { AuthoredScope } from "@/types/mission";
 import { httpClient } from "@/lib/api/http";
 import type { ApiMission } from "@/types/mission";
 
@@ -59,6 +60,8 @@ export const ANSWER_BUDGETS = { short: 600, full: 2000 } as const;
 export type AnswerBudget = keyof typeof ANSWER_BUDGETS;
 
 export interface MissionDraft {
+  references?: Array<Record<string, unknown>> | null;
+  context?: Record<string, unknown> | null;
   mission_id: string;
   title: string;
   objective: string;
@@ -81,6 +84,13 @@ export interface LintViolation {
 }
 
 export interface DraftPreview {
+  contract_id?: string;
+  canonical_contract_id?: string;
+  canonical_contract_sha256?: string;
+  compiler_semantic_revision?: number;
+  compiler_source_revision?: string;
+  authored_scope?: AuthoredScope;
+
   contract_version: string;
   compiler_revision: string;
   fidelity: string;

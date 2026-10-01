@@ -1302,7 +1302,7 @@
       "mcp": "tracelab_mission_execution.preview",
       "classification": "covered",
       "baseline": "covered",
-      "rationale": "Existing action supplies this live UI operation through the authenticated REST API."
+      "rationale": "Existing action supplies this live UI operation through the authenticated REST API. S64: summary/full preserve authored_scope, canonical identity, schema and semantic/source revisions; structural-only fidelity."
     },
     {
       "id": "frontend/src/lib/api/missions.ts#missionsApi.promoteReport:POST:/missions/{missionId}/promote-report",

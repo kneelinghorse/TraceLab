@@ -856,3 +856,33 @@ class TestCanonicalMissionLinks:
         ):
             asyncio.run(exercise())
         assert db.close.call_count == 5
+
+
+def test_legacy_mcp_create_preserves_scope_and_url_only_references(monkeypatch):
+    """The parallel Python create/serialize path must not erase worker scope."""
+    import asyncio
+    import json
+
+    from app.mcp_server.tools import missions
+
+    context = {"authored_scope": {"restriction": "exact_pages", "allowed_urls": ["https://example.test/page"], "max_words": 500}, "keep": "context"}
+    references = [{"url": "https://example.test/page"}]
+    captured = []
+    db = MagicMock()
+    monkeypatch.setattr(missions, "get_db", lambda: iter([db]))
+
+    def create(session, data):
+        captured.append(data)
+        return _make_mission_mock(context=data.context, references=data.references)
+
+    monkeypatch.setattr(missions._mission_service, "create_mission", create)
+    result = asyncio.run(missions.handle_create_mission({
+        "mission_id": "SCOPE-PY", "title": "Exact source scope", "objective": "Preserve exact authored scope",
+        "success_criteria": ["One cited result"], "project_id": "00000000-0000-4000-8000-000000000001",
+        "context": context, "references": references,
+    }))
+    assert captured[0].context == context
+    assert captured[0].references == references
+    body = json.loads(result[0].text)
+    assert body["context"] == context
+    assert body["references"] == references

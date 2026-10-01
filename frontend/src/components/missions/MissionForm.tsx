@@ -166,7 +166,7 @@ export function MissionForm({ onSuccess, onCancel, source, seed, mode = "create"
 
     const references = (values.references ?? [])
       .map((ref) => (typeof ref === "string" ? { title: ref } : ref))
-      .filter((ref) => ref && typeof ref.title === "string" && ref.title.trim() !== "");
+      .filter((ref) => ref && (ref.title?.trim() || ref.url || ref.document_id));
 
     try {
       const payload: ApiMissionCreate = {
@@ -411,7 +411,7 @@ export function MissionForm({ onSuccess, onCancel, source, seed, mode = "create"
             <DynamicListInput
               label="References"
               items={(field.value ?? []).map((r) =>
-                typeof r === "string" ? r : (r?.title ?? "")
+                typeof r === "string" ? r : (r?.title ?? r?.url ?? "")
               )}
               onChange={(_items, change) => {
                 const references = field.value ?? [];

@@ -1,0 +1,74 @@
+{
+  "mission": "S64-SCOPE",
+  "session": "PS-2026-10-01-013",
+  "status": "accepted",
+  "tests": {
+    "backend_authoring_protocol_compiler": {
+      "passed": 196,
+      "skipped": 0
+    },
+    "additional_scoped_RBAC_and_API": {
+      "passed": 3,
+      "skipped": 0,
+      "overlap_with_backend": 2
+    },
+    "postgresql_scope_boundary": {
+      "passed": 2,
+      "skipped": 0
+    },
+    "frontend_authoring_librarian": {
+      "passed": 41,
+      "skipped": 0
+    },
+    "mcp_unit": {
+      "passed": 160,
+      "skipped": 0
+    },
+    "installed_tarball_stdio": {
+      "passed": 66,
+      "skipped": 0
+    }
+  },
+  "checks": {
+    "frontend_types": "pass",
+    "changed_python_lint": "pass",
+    "mcp_argument_parity": "pass: 9 tools/50 actions/125 arguments",
+    "mcp_operation_parity": "pass:118 operations",
+    "foundational_refs": "pass"
+  },
+  "package": {
+    "candidate": "2.1.2",
+    "registry_latest_at_selection": "2.1.1",
+    "built_packed_cleanly_installed_and_entrypoint_exercised": true,
+    "registry_publication": "S64-ACCEPT pending"
+  },
+  "transport_evidence": "Clean installed stdio client asserts exact create POST, update PATCH, preview GET, preservation of context, long URL-only references, empty/null clearing, full and summary scope/identity. Real REST tests separately exercise SQLite/PostgreSQL persistence, canonical identity, malformed scope and member/denied access. Python legacy MCP handler+serializer roundtrip covered.",
+  "source_sha256": {
+    "app/api/v1/missions.py": "09c3f51486ca5c5d1bf248522a12c4e48baa92dc768631915aff658480af3337",
+    "app/mcp_server/tools/missions.py": "0ba4bdbe0f921d823176658896017daecae575bd8a8cffb56232a7059d60f3ad",
+    "app/schemas/librarian.py": "211b29beebaed25b2f5d7b341a0f86ebbd36003883e07528b0265222c77abdd6",
+    "app/schemas/mission.py": "f35bdbc5c6f76a20373d6eb57550c7bcae41465e641994f41ee2e9afb20e5996",
+    "app/services/deepsearch_preview_client.py": "1358a8b0848dc8d1b04924d002d17a5950ba1833b8d5ed6580a2e58df55795f1",
+    "app/services/librarian.py": "2ee81ef34cec38e753fb1ef1224255f86887055aa59100c37581bc9cee4d4180",
+    "cmos/contracts/mcp-parity-manifest.json": "c7b5cfcfa7a182ec9af21974f0b3ab11874f7d9314a362149ffdeb6cf585ea90",
+    "cmos/contracts/mission-authoring-contract.md": "4da8470c7d46a8c3cddc7fac590eb7a067aa6134f0079c4d8f0bb31695f4a677",
+    "docs/mcp-tools.md": "9dddfbbdafb215b2b5f8bdc30de6e11fd3156a69216b31865c28c7b5d48b7c30",
+    "frontend/src/__tests__/mission-authoring.test.tsx": "672f2274dbb507063c6f83e62e373ae65e10e2205865409da443ec0a953c874e",
+    "frontend/src/components/missions/MissionForm.tsx": "6a271df112b03c411e24c4730c49c0a6ff7af73a557e93dabee493774d93d9ed",
+    "frontend/src/lib/api/librarian.ts": "8c4601cb1027ab90017b108ac58936ba71f1d572d6890d423b070f31e1c68eb4",
+    "frontend/src/lib/schemas/apiMissionForm.ts": "8df9e2dbc323a07fc69d9df1e1f055b9f5bc5133a7454c044705fbcec5c06d08",
+    "frontend/src/types/mission.ts": "b81494ec12e65fadfad8dd43026797f20f352e5d547d834c24db246620ddae4f",
+    "packages/tracelab-mcp/CHANGELOG.md": "02f007d23dcf884a1f151fc89294f519dba0d83f730c11dd16ce235f4f781385",
+    "packages/tracelab-mcp/README.md": "62914571593bf8994b40efe5b2637ea45793c5d21cea27a90771b0f439e1b318",
+    "packages/tracelab-mcp/package-lock.json": "cccf1714f84e2cd5db9941ab7aa6a068289d6c2d660f80d0769104e34392aced",
+    "packages/tracelab-mcp/package.json": "b3c705d9441294ca315d148985f736efc5f0bcbe7622c03a32119d22c780d44f",
+    "packages/tracelab-mcp/scripts/check-canonical-links.mjs": "b63399107857fa9fa71cca200420c1c608be6d4c38cc93a90b8be3fee2b9bf00",
+    "packages/tracelab-mcp/src/api-client.ts": "6df82d6de1cd2ecce63001cff149b7df860a95e558bc7c6face253900734d0f6",
+    "packages/tracelab-mcp/src/index.ts": "c2632aa12afdb30e4b4f7e54589eb98e6bb29607127aa206f39b0a53fabf662e",
+    "tests/mcp_tools/test_mcp_missions_unit.py": "2458f457ac42614fc8547fc70acc056bb171f998019983e83bad532debbfbab8",
+    "tests/test_librarian_api.py": "98217821e36ebf83e0daa32f4513d4db1971957155481abeb19e39ddba25cb5c",
+    "tests/test_mission_contract_preview.py": "9a864652d22f53bd327c7e7a23f2bdabdfd1886ee2b14720e139e0ff178e7534",
+    "tests/test_authored_scope_api.py": "af174bbed8c994e492eae92f688b7312880f9353691bd722652e2cc8557f7356",
+    "tests/integration/test_authored_scope_roundtrip.py": "ecd16d0d5696f5793f2efbaf976343f52028c24c4273124b16fb93d0782dc269"
+  }
+}

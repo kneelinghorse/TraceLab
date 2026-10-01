@@ -10,7 +10,8 @@ import { z } from "zod";
  * by DeepSearch's contract compiler.
  */
 const missionReferenceSchema = z.object({
-  title: z.string().min(1),
+  title: z.string().optional(),
+  url: z.string().optional(),
 }).passthrough();
 
 export const apiMissionFormSchema = z.object({

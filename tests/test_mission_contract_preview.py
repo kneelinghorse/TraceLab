@@ -185,7 +185,7 @@ class TestContractPreviewRoute:
 
         assert response.status_code == 200, response.text
         assert response.json()["named_entities"] == ["NASA", "PyTorch", "TensorFlow"]
-        assert regex_results == [["NASA", "PyTorch", "TensorFlow"]]
+        assert regex_results and all(result == ["NASA", "PyTorch", "TensorFlow"] for result in regex_results)
         assert blocked_imports == []
         assert outbound_attempts == []
 

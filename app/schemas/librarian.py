@@ -162,6 +162,8 @@ class MissionDraft(MissionBase):
     unmodified.
     """
 
+    references: list[dict[str, Any]] | None = None
+    context: dict[str, Any] | None = None
     background: str | None = None
     focus: str | None = None
     required_entities: list[str] | None = None
