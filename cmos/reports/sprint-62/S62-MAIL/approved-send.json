@@ -1,0 +1,15 @@
+{
+  "checked_at": "2026-10-01T02:48:40.842528+00:00",
+  "serving_commit": "4317a75d6ba1518cd94226847257880b6609243b",
+  "authorization": "User approved proceeding after reviewed single-message request",
+  "recipient": "hello@aquex.ai",
+  "subject": "TraceLab S62-MAIL delivery verification \u2014 4317a75",
+  "marker": "S62-MAIL-4317a75",
+  "attachments": 0,
+  "provider_http_status": 200,
+  "provider_accepted": true,
+  "destination_inbox_received": false,
+  "reply_to_verified_in_destination_inbox": false,
+  "provider_send_id": "01a0f55d-324a-759a-8c99-f6e7baeca3ca",
+  "provider_status_read_http": 404
+}

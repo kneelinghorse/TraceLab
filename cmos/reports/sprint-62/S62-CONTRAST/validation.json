@@ -1,0 +1,145 @@
+{
+  "checks": 4,
+  "results": [
+    {
+      "scheme": "light",
+      "width": 390,
+      "before": {
+        "color": "rgb(0, 0, 238)",
+        "background": "rgba(15, 23, 42, 0.8)",
+        "href": "https://api.tracelab.aquex.ai/api/v1/admin/dashboard/export?format=csv",
+        "focused": false,
+        "outline": "none"
+      },
+      "after": {
+        "color": "rgb(241, 245, 249)",
+        "background": "rgba(15, 23, 42, 0.8)",
+        "href": "https://api.tracelab.aquex.ai/api/v1/admin/dashboard/export?format=csv",
+        "focused": false,
+        "outline": "none"
+      },
+      "focus": {
+        "color": "rgb(241, 245, 249)",
+        "background": "rgba(15, 23, 42, 0.8)",
+        "href": "https://api.tracelab.aquex.ai/api/v1/admin/dashboard/export?format=csv",
+        "focused": true,
+        "outline": "auto"
+      },
+      "hover": {
+        "color": "rgb(241, 245, 249)",
+        "background": "rgba(15, 23, 42, 0.8)",
+        "href": "https://api.tracelab.aquex.ai/api/v1/admin/dashboard/export?format=csv",
+        "focused": true,
+        "outline": "auto"
+      }
+    },
+    {
+      "scheme": "light",
+      "width": 1440,
+      "before": {
+        "color": "rgb(0, 0, 238)",
+        "background": "rgba(15, 23, 42, 0.8)",
+        "href": "https://api.tracelab.aquex.ai/api/v1/admin/dashboard/export?format=csv",
+        "focused": false,
+        "outline": "none"
+      },
+      "after": {
+        "color": "rgb(241, 245, 249)",
+        "background": "rgba(15, 23, 42, 0.8)",
+        "href": "https://api.tracelab.aquex.ai/api/v1/admin/dashboard/export?format=csv",
+        "focused": false,
+        "outline": "none"
+      },
+      "focus": {
+        "color": "rgb(241, 245, 249)",
+        "background": "rgba(15, 23, 42, 0.8)",
+        "href": "https://api.tracelab.aquex.ai/api/v1/admin/dashboard/export?format=csv",
+        "focused": true,
+        "outline": "auto"
+      },
+      "hover": {
+        "color": "rgb(241, 245, 249)",
+        "background": "rgba(15, 23, 42, 0.8)",
+        "href": "https://api.tracelab.aquex.ai/api/v1/admin/dashboard/export?format=csv",
+        "focused": true,
+        "outline": "auto"
+      }
+    },
+    {
+      "scheme": "dark",
+      "width": 390,
+      "before": {
+        "color": "rgb(158, 158, 255)",
+        "background": "rgba(15, 23, 42, 0.8)",
+        "href": "https://api.tracelab.aquex.ai/api/v1/admin/dashboard/export?format=csv",
+        "focused": false,
+        "outline": "none"
+      },
+      "after": {
+        "color": "rgb(241, 245, 249)",
+        "background": "rgba(15, 23, 42, 0.8)",
+        "href": "https://api.tracelab.aquex.ai/api/v1/admin/dashboard/export?format=csv",
+        "focused": false,
+        "outline": "none"
+      },
+      "focus": {
+        "color": "rgb(241, 245, 249)",
+        "background": "rgba(15, 23, 42, 0.8)",
+        "href": "https://api.tracelab.aquex.ai/api/v1/admin/dashboard/export?format=csv",
+        "focused": true,
+        "outline": "auto"
+      },
+      "hover": {
+        "color": "rgb(241, 245, 249)",
+        "background": "rgba(15, 23, 42, 0.8)",
+        "href": "https://api.tracelab.aquex.ai/api/v1/admin/dashboard/export?format=csv",
+        "focused": true,
+        "outline": "auto"
+      }
+    },
+    {
+      "scheme": "dark",
+      "width": 1440,
+      "before": {
+        "color": "rgb(158, 158, 255)",
+        "background": "rgba(15, 23, 42, 0.8)",
+        "href": "https://api.tracelab.aquex.ai/api/v1/admin/dashboard/export?format=csv",
+        "focused": false,
+        "outline": "none"
+      },
+      "after": {
+        "color": "rgb(241, 245, 249)",
+        "background": "rgba(15, 23, 42, 0.8)",
+        "href": "https://api.tracelab.aquex.ai/api/v1/admin/dashboard/export?format=csv",
+        "focused": false,
+        "outline": "none"
+      },
+      "focus": {
+        "color": "rgb(241, 245, 249)",
+        "background": "rgba(15, 23, 42, 0.8)",
+        "href": "https://api.tracelab.aquex.ai/api/v1/admin/dashboard/export?format=csv",
+        "focused": true,
+        "outline": "auto"
+      },
+      "hover": {
+        "color": "rgb(241, 245, 249)",
+        "background": "rgba(15, 23, 42, 0.8)",
+        "href": "https://api.tracelab.aquex.ai/api/v1/admin/dashboard/export?format=csv",
+        "focused": true,
+        "outline": "auto"
+      }
+    }
+  ],
+  "mission": "S62-CONTRAST",
+  "checked_at": "2026-10-01T02:50:21.965473+00:00",
+  "status": "local verified; deployed verification pending",
+  "change": "Export anchor inherits existing body foreground #f1f5f9, overriding UA link and visited-link colors.",
+  "minimum_contrast_over_white_backdrop": 8.7,
+  "dashboard_pytest": {
+    "passed": 9,
+    "skipped": 0,
+    "warnings": 14
+  },
+  "foundational_refs": "passed",
+  "verification_scope": "Actual template CSS/DOM rendered without scripts/network at Light/Dark390/1440; keyboard focus and hover checked. No new permanent test for this single presentation property."
+}
