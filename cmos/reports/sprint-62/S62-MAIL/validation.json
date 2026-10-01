@@ -1,7 +1,7 @@
 {
   "mission": "S62-MAIL",
   "recorded_at": "2026-10-01T00:18:55.855945+00:00",
-  "status": "implementation verified; deployed inbox acceptance pending",
+  "status": "deployed and regression verified; controlled send and real inbox acceptance blocked",
   "validation": {
     "webhook_and_related_tests": 93,
     "test_command": "pytest tests/test_support_inbox.py tests/test_webhook_handler.py tests/test_notifications.py tests/unit/test_test_isolation.py -q --tb=short",
@@ -26,12 +26,11 @@
     "new_environment_variables": []
   },
   "live_acceptance": {
-    "deployed": false,
+    "deployed": true,
     "provider_accepted": false,
     "destination_inbox_received": false,
     "reply_to_verified": false,
     "required_before_complete": [
-      "Deploy tested commit and read serving SHA.",
       "Send one controlled hello email after explicit send instruction.",
       "Confirm actual destination inbox receipt plus Reply-To; provider acceptance alone is insufficient."
     ],
@@ -41,8 +40,8 @@
         "hello@aquex.ai"
       ],
       "reply_to": "existing controlled SUPPORT_FORWARD_TO mailbox",
-      "subject": "TraceLab S62-MAIL delivery verification \u2014 <deployed SHA>",
-      "text": "Controlled delivery check for hello@aquex.ai forwarding. Verification marker: S62-MAIL-<deployed SHA>. No response or action is requested beyond confirming this message arrived and its Reply-To matches the controlled sender mailbox.",
+      "subject": "TraceLab S62-MAIL delivery verification \u2014 4317a75",
+      "text": "Controlled delivery check for hello@aquex.ai forwarding. Verification marker: S62-MAIL-4317a75. Please confirm arrival and the Reply-To address in the destination inbox.",
       "attachments": []
     },
     "operator_receipt_fields": [
@@ -51,7 +50,10 @@
       "inbound and forward provider IDs if available",
       "unique marker found in destination inbox",
       "Reply-To matches controlled address (boolean; no private address in committed receipt)"
-    ]
+    ],
+    "serving_commit": "4317a75d6ba1518cd94226847257880b6609243b",
+    "deployed_receipt": "../S62-DEPLOY/deployed-acceptance.json",
+    "send_authorization": "requested; no answer received; no message sent"
   },
   "aquex_summary_draft": {
     "status": "not sent; fill only after deployed inbox acceptance",

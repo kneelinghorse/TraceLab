@@ -25,7 +25,10 @@
     "authenticated_ui_checks": 6,
     "ui_failures": 0,
     "new_server_environment_variables": 0,
-    "root_tooling_npm_audit_findings": 0
+    "root_tooling_npm_audit_findings": 0,
+    "broad_ui_checks": 192,
+    "broad_ui_routes": 32,
+    "broad_ui_failures": 0
   },
   "receipts": [
     "inventory-before.json",
@@ -36,7 +39,8 @@
     "resource-parity.json",
     "final-source-ci.json",
     "deployed-acceptance.json",
-    "authenticated-ui-smoke.json"
+    "authenticated-ui-smoke.json",
+    "broad-ui-smoke.json"
   ],
   "limitations": [
     "Combined first-use acceptance belongs to S62-WALK and is blocked by existing provider429 insufficient_quota; see first-use-blocker.json.",
