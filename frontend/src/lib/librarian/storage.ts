@@ -58,7 +58,7 @@ export function readLibrarianState(userId?: string | null): StoredLibrarianState
 
 export function writeLibrarianState(userId: string | null | undefined, state: StoredLibrarianState) {
   try {
-    if (state.turns.length === 0 && !state.draft) {
+    if (!state.projectId && state.turns.length === 0 && !state.draft) {
       window.localStorage.removeItem(librarianStateKey(userId));
     } else {
       window.localStorage.setItem(librarianStateKey(userId), JSON.stringify(state));

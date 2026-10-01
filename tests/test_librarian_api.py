@@ -346,6 +346,29 @@ class TestDraft:
 
 
 class TestCreate:
+    def test_access_is_rechecked_after_a_reviewed_draft_was_generated(
+        self, librarian, db_session, project, monkeypatch
+    ):
+        """A previously valid preview must not authorize a save after revocation."""
+        monkeypatch.setattr(authorization.settings, "rbac_enabled", True)
+        owner = _seed_user(db_session)
+        project.owner_id = owner.id
+        db_session.commit()
+        member = AuthenticatedUser(user_id=owner.id, email=owner.email, display_name="Member", role="member")
+        app.dependency_overrides[require_authenticated_user] = lambda: member
+        librarian(ModelReply(content=json.dumps(VALID_DRAFT), usage=_usage()))
+        client = TestClient(app)
+        preview = client.post("/api/v1/librarian/drafts", json={"project_id": str(project.id), "messages": _messages("Plan onboarding research")})
+        assert preview.status_code == 200, preview.text
+        # Transfer the only ownership grant between review and confirmation.
+        project.owner_id = None
+        db_session.commit()
+        response = client.post("/api/v1/librarian/missions", json={"project_id": str(project.id), "draft": preview.json()["draft"]})
+        assert response.status_code == 403
+        from app.models.mission import Mission
+
+        assert db_session.query(Mission).filter(Mission.project_id == project.id).count() == 0
+
     def test_creates_a_pristine_librarian_marked_draft_idempotently(self, librarian, project, auth_headers):
         librarian()
         client = TestClient(app)

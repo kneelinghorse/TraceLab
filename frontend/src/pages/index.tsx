@@ -95,7 +95,7 @@ function HomeContent() {
     <Head><title>Home · TraceLab</title></Head>
     <header className="flex flex-wrap items-end justify-between gap-5">
       <div><p className="mb-2 text-xs font-semibold uppercase tracking-widest text-muted">Research workspace</p><h1 className="text-3xl font-semibold tracking-tight">Home</h1><p className="mt-2 max-w-xl text-secondary">What happened most recently across your missions, reports and evidence.</p></div>
-      <Link href="/missions/new" className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-on-accent"><NavigationIcon name="mission" />New mission</Link>
+      <div className="flex flex-wrap items-center gap-4"><Link href="/librarian?intent=mission" className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-on-accent"><NavigationIcon name="mission" />Plan a mission</Link><Link href="/missions/new" className="text-sm text-accent-text underline">Create manually</Link></div>
     </header>
     <button type="button" onClick={openCommandPalette} className="panel flex w-full items-center gap-3 px-5 py-4 text-left text-secondary hover:border-line-strong">
       <NavigationIcon name="search" /><span className="min-w-0 flex-1">Search research or jump to a section</span><kbd className="hidden rounded border border-line px-2 py-1 text-xs sm:inline">⌘ K</kbd>

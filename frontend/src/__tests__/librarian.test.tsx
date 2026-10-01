@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom/vitest";
-vi.mock("@/components/librarian/ProjectDescription", () => ({ ProjectDescription: () => null }));
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+vi.mock("@/components/librarian/ProjectDescription", () => ({ ProjectDescription: () => <section aria-label="Project description tool">Project description tool</section> }));
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { SWRConfig } from "swr";
 
@@ -8,6 +8,7 @@ import { HttpError } from "@/lib/api/http";
 import LibrarianPage from "@/pages/librarian";
 
 const mocks = vi.hoisted(() => ({
+  userId: "reader",
   turn: vi.fn(),
   draft: vi.fn(),
   createMission: vi.fn(),
@@ -31,7 +32,7 @@ vi.mock("@/lib/api/librarian", async () => {
 vi.mock("@/lib/api/projects", () => ({ projectsApi: { listAllProjects: mocks.listAllProjects, createProject: mocks.createProject } }));
 vi.mock("@/lib/api/spaces", () => ({ spacesApi: { list: mocks.listSpaces } }));
 vi.mock("@/contexts/AuthContext", () => ({
-  useAuth: () => ({ isReady: true, isAuthenticated: true, user: { user_id: "reader" } }),
+  useAuth: () => ({ isReady: true, isAuthenticated: true, user: { user_id: mocks.userId } }),
 }));
 vi.mock("@/components/AuthGate", () => ({ AuthGate: ({ children }: { children: React.ReactNode }) => <>{children}</> }));
 vi.mock("@/lib/api/search", () => ({ searchApi: { pedrSearch: mocks.pedrSearch } }));
@@ -64,6 +65,7 @@ beforeEach(() => {
   mocks.listSpaces.mockResolvedValue([{ id: "space-mine", name: "Reader's Space", created_at: "", personal_owner_id: "reader" }]);
   mocks.push.mockResolvedValue(true);
   mocks.query = {};
+  mocks.userId = "reader";
 });
 
 describe("Librarian page", () => {
@@ -399,7 +401,7 @@ describe("Librarian page, listing the chunks", () => {
   });
 
   it("lists the ranked chunks for the URL's phrase, each linking to its place in its document", async () => {
-    mocks.query = { q: "onboarding friction", project: projectId };
+    mocks.query = { q: "onboarding friction", project: projectId, intent: "mission" };
     page();
     const list = await screen.findByRole("region", { name: "Matching chunks" });
     expect(screen.getByRole("radio", { name: "List the chunks" })).toBeChecked();
@@ -487,11 +489,150 @@ describe("Librarian page, listing the chunks", () => {
   });
 
   it("says a deleted saved search no longer exists instead of offering a retry", async () => {
-    mocks.query = { saved: "gone" };
+    mocks.query = { saved: "gone", intent: "mission" };
     mocks.execute.mockRejectedValue(new HttpError("Saved search not found.", 404));
     page();
     const list = await screen.findByRole("region", { name: "Matching chunks" });
     expect(await within(list).findByRole("alert")).toHaveTextContent("This saved search no longer exists");
     expect(within(list).queryByRole("button", { name: "Retry" })).toBeNull();
+  });
+});
+
+
+const focusedDraft = {
+  draft: { mission_id: "FOCUS-1", title: "Reviewed plan", objective: "Compare onboarding needs", success_criteria: ["Use two primary sources"], deliverables: ["A short comparison"], tags: [] },
+  preview: { contract_version: "1.0", compiler_revision: "24e8810", fidelity: "structural_only", named_entities: [], objectives: [], evidence_slots: [], acceptance_checks: [], deliverable_schemas: [], coverage_thresholds: {}, validation_thresholds: {} },
+  preview_error: null, lint_errors: [], lint_warnings: [], notes: [], usage: null, model: "fixture",
+};
+function storedPlan() { return { projectId, turns: [{ role: "user", text: "Compare onboarding needs" }], draft: focusedDraft }; }
+
+describe("focused mission planning", () => {
+  it("retries failed project creation and retains a successful destination without another list", async () => {
+    mocks.query = { intent: "mission" };
+    mocks.listAllProjects.mockResolvedValue([]);
+    mocks.createProject.mockRejectedValueOnce(new Error("Project save failed")).mockResolvedValue({ id: projectId, name: "New research" });
+    page(); await waitFor(() => expect(mocks.listAllProjects).toHaveBeenCalledTimes(1));
+    fireEvent.change(screen.getByLabelText("New project"), { target: { value: "New research" } });
+    fireEvent.click(screen.getByRole("button", { name: "Create", exact: true }));
+    await screen.findByText("Project save failed");
+    expect(screen.getByLabelText("New project")).toHaveValue("New research");
+    fireEvent.click(screen.getByRole("button", { name: "Create", exact: true }));
+    await screen.findByRole("option", { name: "New research" });
+    await waitFor(() => expect(screen.getByRole("combobox", { name: "Project" })).toHaveValue(projectId));
+    expect(mocks.listAllProjects).toHaveBeenCalledTimes(1);
+    expect(mocks.createProject).toHaveBeenCalledTimes(2);
+  });
+  it("refines before regeneration, and retries a failed save without losing the reviewed draft", async () => {
+    mocks.query = { intent: "mission" };
+    localStorage.setItem("tracelab.librarian.v1:reader", JSON.stringify(storedPlan()));
+    mocks.turn.mockResolvedValue({ segments: [{ kind: "prose", text: "Use a narrower scope", citations: [] }], evidence: [] });
+    mocks.draft.mockResolvedValue({ ...focusedDraft, draft: { ...focusedDraft.draft, title: "Refined plan" } });
+    mocks.createMission.mockRejectedValueOnce(new Error("Save response lost")).mockResolvedValue({ created: false, mission: { id: "existing" } });
+    page(); await screen.findByRole("heading", { name: "Reviewed plan" });
+    fireEvent.change(screen.getByLabelText("Message the Librarian"), { target: { value: "Narrow this to one audience" } });
+    fireEvent.click(screen.getByRole("button", { name: "Send" }));
+    await screen.findByText("Use a narrower scope");
+    expect(screen.queryByRole("region", { name: "Mission draft" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Draft a mission" }));
+    await screen.findByRole("heading", { name: "Refined plan" });
+    expect(mocks.draft.mock.calls[0][0]).toEqual(expect.arrayContaining([{ role: "user", content: "Narrow this to one audience" }]));
+    fireEvent.click(screen.getByRole("button", { name: "Create draft mission" }));
+    await screen.findByText("Save response lost");
+    expect(screen.getByRole("heading", { name: "Refined plan" })).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "Create draft mission" }));
+    await waitFor(() => expect(mocks.push).toHaveBeenCalledWith("/missions/existing?from=librarian"));
+    expect(mocks.createMission.mock.calls[0]).toEqual(mocks.createMission.mock.calls[1]);
+  });
+  it("drops the previous user's state and pending reply when the account changes", async () => {
+    mocks.query = { intent: "mission" };
+    localStorage.setItem("tracelab.librarian.v1:reader", JSON.stringify(storedPlan()));
+    let finish!: (value: unknown) => void;
+    mocks.turn.mockReturnValue(new Promise(resolve => { finish = resolve; }));
+    const view = page();
+    await screen.findByRole("heading", { name: "Reviewed plan" });
+    fireEvent.change(screen.getByLabelText("Message the Librarian"), { target: { value: "Private refinement" } });
+    fireEvent.click(screen.getByRole("button", { name: "Send" }));
+    mocks.userId = "second-reader";
+    view.rerender(<SWRConfig value={{ provider: () => new Map() }}><LibrarianPage /></SWRConfig>);
+    await act(async () => { finish({ segments: [{ kind: "prose", text: "Private answer", citations: [] }], evidence: [] }); });
+    expect(screen.getByRole("log")).not.toHaveTextContent(/Private|Compare onboarding/);
+    expect(screen.queryByRole("region", { name: "Mission draft" })).toBeNull();
+    expect(localStorage.getItem("tracelab.librarian.v1:second-reader")).toBeNull();
+    expect(mocks.createMission).not.toHaveBeenCalled();
+  });
+  it("requires a fresh destination when access is revoked at save time", async () => {
+    mocks.query = { intent: "mission" };
+    localStorage.setItem("tracelab.librarian.v1:reader", JSON.stringify(storedPlan()));
+    mocks.createMission.mockRejectedValue(new HttpError("Project access denied", 403));
+    page(); await screen.findByRole("heading", { name: "Reviewed plan" });
+    fireEvent.click(screen.getByRole("button", { name: "Create draft mission" }));
+    await screen.findByText(/selected project is no longer available/);
+    expect(screen.queryByRole("region", { name: "Mission draft" })).toBeNull();
+    expect(screen.getByRole("log")).toHaveTextContent("Compare onboarding needs");
+    expect(mocks.push).not.toHaveBeenCalled();
+  });
+  it("keeps a restored conversation through project loading failure and retry", async () => {
+    mocks.query = { intent: "mission" };
+    localStorage.setItem("tracelab.librarian.v1:reader", JSON.stringify(storedPlan()));
+    mocks.listAllProjects.mockRejectedValueOnce(new Error("Offline"));
+    page(); await screen.findByText(/Projects could not load/);
+    expect(screen.getByRole("button", { name: "Draft a mission" })).toBeDisabled();
+    expect(screen.queryByRole("region", { name: "Mission draft" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Retry" }));
+    expect(await screen.findByRole("heading", { name: "Reviewed plan" })).toBeVisible();
+    expect(screen.getByRole("log")).toHaveTextContent("Compare onboarding needs");
+    expect(mocks.createProject).not.toHaveBeenCalled();
+  });
+  it("persists an explicitly selected project before the first message", async () => {
+    mocks.query = { intent: "mission" };
+    const view = page(); await chooseProject(); view.unmount(); page();
+    await screen.findByRole("option", { name: "Onboarding" });
+    expect(screen.getByRole("combobox", { name: "Project" })).toHaveValue(projectId);
+    expect(mocks.turn).not.toHaveBeenCalled();
+  });
+  it("lets zero-project users begin without creating or submitting anything", async () => {
+    mocks.query = { intent: "mission" }; mocks.listAllProjects.mockResolvedValue([]); page();
+    expect(await screen.findByRole("heading", { name: "Plan a mission" })).toBeVisible();
+    expect(screen.getByRole("link", { name: "Create manually" })).toHaveAttribute("href", "/missions/new");
+    expect(screen.queryByRole("radiogroup", { name: "How the Librarian replies" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Draft a mission" })).toBeDisabled();
+    for (const call of [mocks.turn, mocks.draft, mocks.createProject, mocks.createMission]) expect(call).not.toHaveBeenCalled();
+  });
+  it("restores the same user's conversation and draft without project tools", async () => {
+    mocks.query = { intent: "mission" }; localStorage.setItem("tracelab.librarian.v1:reader", JSON.stringify(storedPlan())); page();
+    expect(await screen.findByRole("heading", { name: "Reviewed plan" })).toBeVisible();
+    expect(screen.getByRole("log")).toHaveTextContent("Compare onboarding needs");
+    expect(screen.queryByRole("region", { name: "Project description tool" })).toBeNull();
+    expect(mocks.draft).not.toHaveBeenCalled(); expect(mocks.createMission).not.toHaveBeenCalled();
+  });
+  it("never restores an old draft into a different URL destination", async () => {
+    mocks.query = { intent: "mission", project: "second" };
+    mocks.listAllProjects.mockResolvedValue([{ id: projectId, name: "Onboarding" }, { id: "second", name: "Second project" }]);
+    localStorage.setItem("tracelab.librarian.v1:reader", JSON.stringify(storedPlan())); page();
+    await screen.findByRole("option", { name: "Second project" });
+    expect(screen.queryByRole("region", { name: "Mission draft" })).toBeNull();
+    expect(screen.getByRole("log")).toHaveTextContent("Compare onboarding needs");
+    expect(screen.getByRole("combobox", { name: "Project" })).toHaveValue("second");
+  });
+  it("keeps conversation but prevents saving after project revocation", async () => {
+    mocks.query = { intent: "mission" }; mocks.listAllProjects.mockResolvedValue([]);
+    localStorage.setItem("tracelab.librarian.v1:reader", JSON.stringify(storedPlan())); page();
+    expect(await screen.findByText(/selected project is no longer available/)).toBeVisible();
+    expect(screen.queryByRole("region", { name: "Mission draft" })).toBeNull();
+    expect(screen.getByRole("combobox", { name: "Project" })).toHaveValue("");
+    expect(screen.getByRole("log")).toHaveTextContent("Compare onboarding needs");
+    expect(screen.getByRole("button", { name: "Draft a mission" })).toBeDisabled();
+  });
+  it("discards a draft response arriving after its destination changes", async () => {
+    mocks.query = { intent: "mission" };
+    mocks.listAllProjects.mockResolvedValue([{ id: projectId, name: "Onboarding" }, { id: "second", name: "Second project" }]);
+    localStorage.setItem("tracelab.librarian.v1:reader", JSON.stringify({ ...storedPlan(), draft: null }));
+    let finish!: (value: typeof focusedDraft) => void;
+    mocks.draft.mockReturnValue(new Promise(resolve => { finish = resolve; }));
+    page(); await chooseProject(); fireEvent.click(screen.getByRole("button", { name: "Draft a mission" }));
+    await waitFor(() => expect(mocks.draft).toHaveBeenCalledTimes(1));
+    fireEvent.change(screen.getByRole("combobox", { name: "Project" }), { target: { value: "second" } }); await act(async () => { finish(focusedDraft); });
+    await waitFor(() => expect(screen.getByRole("button", { name: "Draft a mission" })).toBeEnabled());
+    expect(screen.queryByRole("region", { name: "Mission draft" })).toBeNull(); expect(mocks.createMission).not.toHaveBeenCalled();
   });
 });

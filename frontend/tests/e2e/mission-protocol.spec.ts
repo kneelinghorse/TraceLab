@@ -49,7 +49,7 @@ for (const theme of ["light", "dark"] as const) for (const width of [390, 820, 1
     await expect(page.getByText("143 matching missions")).toBeVisible();
     await accessible(page);
     await page.screenshot({ path: info.outputPath("list.png"), fullPage: true });
-    await page.getByRole("link", { name: "Create Mission" }).click();
+    await page.getByRole("link", { name: "Create manually" }).click();
     await page.getByLabel("Mission ID", { exact: false }).fill("UX6-TEST");
     await page.getByLabel("Title", { exact: false }).fill(state.title);
     await page.getByLabel("Objective", { exact: false }).fill(state.objective);

@@ -73,7 +73,7 @@ for (const theme of ["light", "dark"] as const) {
       const dialog = page.getByRole("dialog", { name: "Search and navigation" });
       const query = dialog.getByRole("textbox");
       await expect(query).toBeFocused();
-      await expect(dialog.getByRole("button", { name: "New mission", exact: true })).toBeVisible();
+      await expect(dialog.getByRole("button", { name: "Plan a mission", exact: true })).toBeVisible();
       await expect(dialog.getByRole("button", { name: "Upload documents", exact: true })).toBeVisible();
       await expect(dialog.getByRole("button", { name: "Users", exact: true })).toHaveCount(0);
       await query.fill("all");

@@ -138,7 +138,7 @@ describe("scoped palette data and actions", () => {
     fireEvent.click(screen.getByRole("button", { name: "Saved research", exact: true }));
     expect(mocks.router.push).toHaveBeenCalledWith("/librarian?saved=saved-id");
     open();
-    expect(screen.getByRole("button", { name: "New mission", exact: true })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Plan a mission", exact: true })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Upload documents", exact: true })).toBeTruthy();
     expect(screen.getByText("Keyboard help")).toBeTruthy();
   });

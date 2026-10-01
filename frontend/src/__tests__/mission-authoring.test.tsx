@@ -36,6 +36,15 @@ beforeEach(() => {
   mocks.previewContract.mockResolvedValue(preview);
 });
 
+it("offers guided planning for zero projects without discarding a repeat seed", async () => {
+  mocks.listAllProjects.mockResolvedValue([]);
+  form();
+  expect(await screen.findByRole("link", { name: "Plan a mission with the Librarian" })).toHaveAttribute("href", "/librarian?intent=mission");
+  expect(screen.getByLabelText(/Objective/)).toHaveValue(source.objective);
+  expect(screen.getByLabelText(/Title/)).toHaveValue(source.title);
+  expect(mocks.create).not.toHaveBeenCalled();
+});
+
 it("saves and previews inline, preserves authored fields, and submits the same pristine draft", async () => {
   const onSuccess = form();
   await screen.findByRole("option", { name: "Research" });
