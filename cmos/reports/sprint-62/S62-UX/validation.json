@@ -66,5 +66,12 @@
   },
   "limits": [
     "Deployed sprint acceptance remains S62-WALK; these browser checks use the local production build with controlled API responses."
-  ]
+  ],
+  "corrected_at_sprint_close": {
+    "date": "2026-10-01T04:07:58.926406+00:00",
+    "session": "PS-2026-10-01-003",
+    "source_pr": "https://github.com/kneelinghorse/TraceLab/pull/410",
+    "final_acceptance": "../S62-WALK/final-acceptance.json",
+    "note": "Deployed disabled-session acceptance passed in ../S62-WALK/deployed-first-use.json; existing local Light/Dark390/820/1440 keyboard/code and transport receipts remain applicable."
+  }
 }

@@ -1,6 +1,6 @@
 {
   "mission": "S62-WALK",
-  "status": "in progress; quota resolved; transcript keyboard fix awaiting deployment",
+  "status": "superseded by complete deployed acceptance",
   "checked_at": "2026-10-01T03:49:31.007562+00:00",
   "serving_commit": "e276977ec55bb8c6b42f8328d57be6d98727834b",
   "source_pr": "https://github.com/kneelinghorse/TraceLab/pull/409",
@@ -80,11 +80,9 @@
     ],
     "all_verified": true
   },
-  "remaining_gate": "Deploy the minimal transcript tabindex/focus-ring fix after required checks, then finish real draft save, no automatic research and disabled-session recovery on the exact serving commit.",
+  "remaining_gate": "None: deployed-first-use.json passed on d7b8682; see final-acceptance.json.",
   "limitations": [
-    "Real planning and generated drafts now succeed; full saved-draft acceptance remains pending.",
-    "Legacy CMOS integration runner retains13passes/2 independently verified baseline failures; not claimed green.",
-    "Sprint remains Active until all live checks and final audit pass."
+    "This file preserves partial acceptance history; final-acceptance.json is authoritative for the accepted result."
   ],
   "historical_quota_failure": {
     "real_first_use_retry": {
@@ -123,5 +121,20 @@
       "after-credits-first-attempt.json",
       "after-credits-diagnostic.json"
     ]
+  },
+  "original_claim": {
+    "status": "in progress; quota resolved; transcript keyboard fix awaiting deployment",
+    "remaining_gate": "Deploy the minimal transcript tabindex/focus-ring fix after required checks, then finish real draft save, no automatic research and disabled-session recovery on the exact serving commit.",
+    "limitations": [
+      "Real planning and generated drafts now succeed; full saved-draft acceptance remains pending.",
+      "Legacy CMOS integration runner retains13passes/2 independently verified baseline failures; not claimed green.",
+      "Sprint remains Active until all live checks and final audit pass."
+    ]
+  },
+  "corrected_at_sprint_close": {
+    "date": "2026-10-01T04:07:58.926406+00:00",
+    "session": "PS-2026-10-01-003",
+    "source_pr": "https://github.com/kneelinghorse/TraceLab/pull/410",
+    "replacement": "final-acceptance.json"
   }
 }

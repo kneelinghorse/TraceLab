@@ -1,7 +1,7 @@
 {
   "checked_at": "2026-10-01T01:47:51.133952+00:00",
   "served_commit": "4317a75d6ba1518cd94226847257880b6609243b",
-  "result": "blocked_external_provider_quota",
+  "result": "resolved_external_provider_quota",
   "public_endpoint": "POST /api/v1/librarian/turns",
   "public_status": 502,
   "provider_errors": [
@@ -19,5 +19,16 @@
   "fixtures": "Two fresh invited members had zero visible projects; both were deleted after the rejected first turn. No project or mission was created.",
   "no_provider_change": true,
   "no_research_submitted": true,
-  "required": "Restore quota/access for the existing configured Librarian provider, then rerun deployed-mission-acceptance.mjs. Local scripted-model tests are not live first-use proof."
+  "required": "No remaining action: credits restored; real deployed planning/draft/save and disabled-session acceptance passed on d7b8682. See ../S62-WALK/deployed-first-use.json.",
+  "original_claim": {
+    "result": "blocked_external_provider_quota",
+    "required": "Restore quota/access for the existing configured Librarian provider, then rerun deployed-mission-acceptance.mjs. Local scripted-model tests are not live first-use proof."
+  },
+  "corrected_at_sprint_close": {
+    "date": "2026-10-01T03:59:08.824694+00:00",
+    "session": "PS-2026-10-01-003",
+    "pr": "https://github.com/kneelinghorse/TraceLab/pull/410",
+    "evidence": "../S62-WALK/after-credits-diagnostic.json",
+    "resolution": "Quota480 resolved by user-added credits; full real gpt-5.1 first-use accepted after transcript focus fix. No provider/model switch."
+  }
 }

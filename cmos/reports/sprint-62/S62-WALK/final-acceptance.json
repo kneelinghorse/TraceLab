@@ -1,0 +1,135 @@
+{
+  "mission": "S62-WALK",
+  "status": "completed",
+  "checked_at": "2026-10-01T04:07:58.926406+00:00",
+  "serving_commit": "d7b8682c35104c627691f1ebb2782e5e04e33868",
+  "source_pr": "https://github.com/kneelinghorse/TraceLab/pull/410",
+  "tested_head": "15571a625bf6bbbb968b97755bdc0ec0d2c700d1",
+  "guiding_templates": [
+    "cmos/foundational-docs/roadmap_template.md",
+    "cmos/foundational-docs/tech_arch_template.md"
+  ],
+  "accepted_missions": [
+    "S62-ISO",
+    "S62-CI",
+    "S62-MAIL",
+    "S62-SCOPE",
+    "S62-ENTRY",
+    "S62-OBS",
+    "S62-UX",
+    "S62-DEPLOY",
+    "S62-CONTRAST",
+    "S62-WALK"
+  ],
+  "receipts": {
+    "source_and_citations": "source-audit.json",
+    "required_ci": "final-source-ci.json",
+    "serving_identity": "serving-acceptance.json",
+    "real_first_use": "deployed-first-use.json",
+    "long_transcript_browser": "transcript-validation.json",
+    "mail": "../S62-MAIL/approved-send.json",
+    "csv_contrast": "../S62-CONTRAST/validation.json",
+    "scope_diagnosis": "../S62-SCOPE/diagnosis.json",
+    "cache": "../S62-OBS/deployed-acceptance.json",
+    "railway": "../S62-DEPLOY/validation.json"
+  },
+  "checks": {
+    "required_ci_contexts": 9,
+    "backend_passed": 3122,
+    "backend_skipped": 4,
+    "unchanged_quarantines": 12,
+    "postgres_passed": 169,
+    "postgres_skipped": 3,
+    "frontend_unit_passed": 368,
+    "production_shell_browser_passed": 82,
+    "long_transcript_real_local_member_cases": 12,
+    "deployed_real_first_use_audits": 3,
+    "deployed_first_use_lint_errors": 0,
+    "reused_broad_ui_checks": 192,
+    "reused_s61_logs_checks": 6,
+    "reused_export_cases": 4,
+    "source_evidence_hashes": 23,
+    "unchanged_hashes": 22,
+    "retested_changed_sources": 1,
+    "path_citations_accounted_for": 60,
+    "mcp_operation_errors": 0,
+    "mcp_argument_gaps": 0,
+    "foundational_refs": "passed"
+  },
+  "model_decision": {
+    "id": 585,
+    "model": "gpt-5.1",
+    "changed": false,
+    "reason": "Credit recovery fixed actual provider access; no demonstrated migration reason for this release.",
+    "sources": [
+      "https://developers.openai.com/api/docs/models/gpt-5.3-codex",
+      "https://developers.openai.com/api/docs/deprecations"
+    ]
+  },
+  "learning_ids": [
+    283,
+    284,
+    285,
+    286,
+    287,
+    288
+  ],
+  "decision_ids": [
+    575,
+    576,
+    577,
+    578,
+    579,
+    580,
+    581,
+    582,
+    583,
+    584,
+    585
+  ],
+  "decision_project_sprint_ownership_verified": true,
+  "closed_promoted_next_steps": [
+    397,
+    426,
+    444,
+    445,
+    446,
+    447,
+    451,
+    464,
+    476,
+    478
+  ],
+  "closed_quota_successor": 480,
+  "open_scope_correction": 479,
+  "untouched_carried_steps": [
+    400,
+    403,
+    406,
+    407,
+    415,
+    422,
+    431,
+    448,
+    449,
+    450,
+    452,
+    454,
+    477
+  ],
+  "total_remaining_open": 14,
+  "preserved_boundaries": [
+    "Research not submitted; exactly one reviewed draft saved and deleted.",
+    "Only the earlier specifically approved hello test email sent; no additional email or outbound cross-project handoff.",
+    "Model/provider/configuration unchanged for quota retry.",
+    "Thirteen unrelated carryovers retained; SCOPE diagnosed, enforcement correction still owned by DeepSearch as479."
+  ],
+  "limitations": [
+    "12backend quarantine deselections and4backend/3PG skips are disclosed in final-source-ci.json; not reported as passes.",
+    "Legacy CMOS integration runner13passed/2baseline failures independently verified on planning base; no repair claimed.",
+    "Historical empty-cache root cause remains unknown.",
+    "Scope enforcement correction remains open; no paid research rerun or worker change.",
+    "Aquex contact-link work and completion-summary send remain outside this build."
+  ],
+  "cmos_closeout": "cmos-closeout.json"
+}

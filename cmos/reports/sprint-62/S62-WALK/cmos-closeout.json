@@ -1,0 +1,132 @@
+{
+  "completedAt": "2026-10-01T04:08:36.875Z",
+  "readiness": {
+    "totalMissions": 10,
+    "completedMissions": 10,
+    "blockedMissions": 0,
+    "skippedMissions": 0,
+    "openMissions": 0,
+    "parkedMissions": 0,
+    "completedMissionIds": [
+      "S62-CI",
+      "S62-CONTRAST",
+      "S62-DEPLOY",
+      "S62-ENTRY",
+      "S62-ISO",
+      "S62-MAIL",
+      "S62-OBS",
+      "S62-SCOPE",
+      "S62-UX",
+      "S62-WALK"
+    ],
+    "blockedMissionIds": [],
+    "skippedMissionIds": [],
+    "openMissionIds": []
+  },
+  "lifecycle": {
+    "decisionsArchived": 10,
+    "learningsArchived": 2,
+    "archivedDecisionIds": [
+      576,
+      577,
+      578,
+      579,
+      580,
+      581,
+      582,
+      583,
+      584,
+      585
+    ],
+    "learningIds": [
+      283,
+      284
+    ],
+    "kpis": {
+      "completionRate": 1,
+      "avgCycleTimeDays": 0.03,
+      "decisionCount": 11,
+      "learningCount": 6,
+      "blockedCount": 0
+    },
+    "preCloseSnapshotId": "snapshot-20261001T040836564Z-dbf8",
+    "dbSnapshotId": "snapshot-20261001T040836938Z-29fe"
+  },
+  "sessionId": "PS-2026-10-01-003",
+  "sessionCompletedAt": "2026-10-01T04:09:09.517Z",
+  "parity": {
+    "tables": [
+      {
+        "table": "sprints",
+        "sqliteCount": 63,
+        "pgCount": 63,
+        "match": true,
+        "delta": 0
+      },
+      {
+        "table": "missions",
+        "sqliteCount": 424,
+        "pgCount": 424,
+        "match": true,
+        "delta": 0
+      },
+      {
+        "table": "sessions",
+        "sqliteCount": 220,
+        "pgCount": 220,
+        "match": true,
+        "delta": 0
+      },
+      {
+        "table": "strategic_decisions",
+        "sqliteCount": 585,
+        "pgCount": 585,
+        "match": true,
+        "delta": 0
+      },
+      {
+        "table": "learnings",
+        "sqliteCount": 288,
+        "pgCount": 288,
+        "match": true,
+        "delta": 0
+      },
+      {
+        "table": "mission_dependencies",
+        "sqliteCount": 225,
+        "pgCount": 225,
+        "match": true,
+        "delta": 0
+      }
+    ],
+    "allMatch": true,
+    "totalSqlite": 1805,
+    "totalPg": 1805,
+    "projectScoped": true,
+    "projectSlug": "tracelab",
+    "syncLogEntries": 275,
+    "failedEntries": 0,
+    "lastSyncAt": "2026-10-01T04:09:24.145Z"
+  },
+  "snapshot": "snapshot-20261001T040925017Z-957e",
+  "identity": {
+    "identity": "sprint-62-complete",
+    "metadata": {
+      "last_condensation": "2026-03-08T22:28:45.820723Z",
+      "condensation_note": "T31.5: Heavy manual pruning of stale fields, old sprint data, and planning text.",
+      "current_sprint": "sprint-62",
+      "sprint_status": "Completed"
+    },
+    "current_sprint": {
+      "id": "sprint-62",
+      "name": "Sprint 62 — Reliable operations and guided mission creation",
+      "status": "Completed",
+      "focus": "Completed10/10on2026-10-01. Realgpt-5.1 zero-project member journey passed on bothservicesd7b8682: reviewed saved draft,no dispatch,disabled-session recovery,cleanup. Credits resolved480; transcript focus fix,MAIL/inbox,CSV/cache/config accepted. RequiredCI9/9green;3122backend/4skip/12unchangedquarantines,169PG/3skip,368frontend,82builtbrowser,12longreplycases;23hashes22same+1retested,60paths accounted. P1DeepSearch scope correction479 and13untouchedcarryovers remain14open. LegacyCMOS2baselinefail disclosed; noextra mail/research/cross-project work."
+    },
+    "sprint_tracking": {
+      "current_sprint": null,
+      "last_completed_sprint": "sprint-62"
+    }
+  },
+  "openNextSteps": 14
+}

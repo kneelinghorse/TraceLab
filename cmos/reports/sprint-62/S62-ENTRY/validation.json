@@ -78,5 +78,12 @@
     "This is local production-build acceptance against an isolated real API with scripted model, not a deployed-provider test; final deployed acceptance belongs to S62-WALK.",
     "Known baseline dependency and React test warnings retained; no dependency changes.",
     "Previously documented CMOS legacy integration-runner two baseline failures and 12 backend quarantine entries unchanged."
-  ]
+  ],
+  "corrected_at_sprint_close": {
+    "date": "2026-10-01T04:07:58.926406+00:00",
+    "session": "PS-2026-10-01-003",
+    "source_pr": "https://github.com/kneelinghorse/TraceLab/pull/410",
+    "final_acceptance": "../S62-WALK/final-acceptance.json",
+    "note": "Prior transcript source hash remains historical; tabindex/focus ring added in15571a6 and revalidated in12long-reply local cases plus deployed-first-use.json."
+  }
 }
