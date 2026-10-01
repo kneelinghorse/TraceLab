@@ -1,0 +1,99 @@
+{
+  "mission": "S63-CLEAN",
+  "status": "local-acceptance-passed; deployed acceptance belongs to S63-RELEASE",
+  "date": "2026-10-01",
+  "source_base": "3e3dad7e5a98112b3579480d8d22c162001ad444",
+  "session": "PS-2026-10-01-008",
+  "changes": [
+    "Remove unused preset/onPresetConsumed props, effect and exclusively dead source/suggestedName handling",
+    "Keep SaveSearchPreset internal draft and unchanged REST serialization, error handling, limit/query/name guards and onSaved callback",
+    "Correct only mission routes/filters, palette and saved-search descriptions; retain queue404 tombstone and route map"
+  ],
+  "validation": [
+    {
+      "command": "npm run test:unit -- --run src/__tests__/save-search-button.test.tsx (before removal)",
+      "passed": 3,
+      "skipped": 0,
+      "purpose": "Document existing reviewed-snapshot behavior before deleting unused input path"
+    },
+    {
+      "command": "npm run test:unit -- --run src/__tests__/librarian.test.tsx src/__tests__/save-search-button.test.tsx",
+      "passed": 33,
+      "skipped": 0
+    },
+    {
+      "command": "npm run type-check",
+      "result": "passed"
+    },
+    {
+      "command": "npm run lint",
+      "result": "passed"
+    },
+    {
+      "command": "npm run build",
+      "result": "passed"
+    },
+    {
+      "command": "PLAYWRIGHT_BASE_URL=http://127.0.0.1:3163 PLAYWRIGHT_SKIP_SERVER=1 npx playwright test tests/e2e/search-command.spec.ts tests/e2e/route-migration.spec.ts --workers=2",
+      "passed": 16,
+      "skipped": 0,
+      "retries": 0,
+      "server": "next start",
+      "route_checks": 20,
+      "route_map_rows": 10,
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        390,
+        820,
+        1440
+      ],
+      "checks": "Keyboard opening/name/description/save, palette focus/restore/navigation, real save payload/feedback/link/rerun; axe serious/critical and horizontal-overflow checks for palette/chunks/open save form"
+    },
+    {
+      "command": "/Users/systemsystems/portfolio/TraceLab/.venv/bin/python -m pytest tests/test_saved_searches.py -q",
+      "passed": 16,
+      "skipped": 0,
+      "warnings": 14,
+      "provider_isolation": "S62 tests/conftest.py -> scripts/pytest_isolation.py",
+      "duration_seconds": 13.16
+    },
+    {
+      "command": "python3 cmos/scripts/validate_foundational_refs.py",
+      "result": "passed"
+    }
+  ],
+  "warnings": [
+    "Existing Librarian act()/TimeoutNaN unit warnings; tests passed",
+    "Existing baseline-browser-mapping stale-data notice; no dependency edits",
+    "Backend deprecated on_event and related existing warnings"
+  ],
+  "visual_review": [
+    "save-search-form-light-390.png",
+    "save-search-form-dark-1440.png"
+  ],
+  "not_run_here": [
+    "Full backend and broader frontend suites: current required CI in S63-RELEASE",
+    "Registry publication and deployed read-only browser baseline: S63-RELEASE"
+  ],
+  "source_files_sha256": {
+    "frontend/src/components/SaveSearchButton.tsx": "1373ddb9e93dca321ed8d5f8a9b43886881d1e344a8c605241484bf37bf537cd",
+    "frontend/src/types/saved-searches.ts": "a6a2486620663f9c90bca08e3a45be971a8c5671ccc09c1cc35406f78b771314",
+    "frontend/src/components/librarian/ChunkList.tsx": "9db83d13011d5aa54fef3a25f5f83c1ccca061395c255fbc1f0ea634480ff2d5",
+    "frontend/src/lib/api/savedSearches.ts": "79f213f882f0844b9131724cbce46a8c338c02061afaed49e0f0f10e69df88e7",
+    "frontend/src/pages/missions/queue.tsx": "0302112b498b8dd48ffe43e6bdb9b507f185a59883299df951243bd81373e802",
+    "frontend/src/lib/route-migrations.json": "9124b4ebdb0f2a0e3871f4a37b2c1ac1e454afbda74b30c0457a7996dfeadb8a",
+    "frontend/src/components/CommandPalette.tsx": "e4259c81ea2c227b3f701fa028f57277777bbeb193b5612d06945eeb2d20ef48",
+    "frontend/src/pages/missions/index.tsx": "c5d27cb82f2280b075420d3529f094e4c3d033841626ca6b4be3c0d00b6af392",
+    "frontend/src/__tests__/save-search-button.test.tsx": "f4e18a1680ce7d2262d7a1570c4d981476fdb56c95e594e664b8675e1fe1c654",
+    "frontend/src/__tests__/librarian.test.tsx": "7fe4a791be5d7c6445cd271dbe00747b787a8b25bfe8b5a35184d7fd9d556271",
+    "frontend/tests/e2e/search-command.spec.ts": "3e5693b613249bd1e44c92cf5a145b2a7f5e84f156bb3df700b8015862625018",
+    "frontend/tests/e2e/route-migration.spec.ts": "bd6753f9394da726e6acb9735220326a18e4b58f21b5b76e9b1b19036f66ec59",
+    "docs/frontend_architecture.md": "e9703ef6c7b515e02c1aee70f611c9e77f7b0722e6ea4cb6e1c2ede0f8ea2e43",
+    "tests/test_saved_searches.py": "6b4bcf9f0e3deedbaf9c0ae53f10a77dc60c25c97811982cf1df3a0508366491",
+    "scripts/pytest_isolation.py": "1d6fab180d96bcbc7ba4e2a7f3dcb23f51a3b54cdd4eb939dd49f3898f07524b",
+    "tests/conftest.py": "b25d9a7bc8dd8c289ad010df0384a55f7a6a91f25bd1a5de375e73fcfe75739c"
+  }
+}

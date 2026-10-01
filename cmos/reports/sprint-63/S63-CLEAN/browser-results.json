@@ -1,0 +1,211 @@
+{
+  "tool": "playwright",
+  "generatedAt": "2026-10-01T13:47:00.612Z",
+  "completedAt": "2026-10-01T13:47:22.875Z",
+  "status": "passed",
+  "summary": {
+    "total": 16,
+    "expected": 16,
+    "passed": 16,
+    "failed": 0,
+    "skipped": 0,
+    "interrupted": 0,
+    "durationSeconds": 22.263,
+    "retries": 0
+  },
+  "environment": {
+    "node": "v24.6.0",
+    "ci": {
+      "provider": null
+    },
+    "projects": [
+      "chromium"
+    ],
+    "browsers": []
+  },
+  "tests": [
+    {
+      "title": "every maintained migration preserves its destination and query parameters",
+      "file": "frontend/tests/e2e/route-migration.spec.ts",
+      "line": 5,
+      "column": 5,
+      "status": "passed",
+      "durationMs": 179,
+      "annotations": [],
+      "attachments": [
+        {
+          "name": "route-migration-coverage",
+          "contentType": "application/json",
+          "path": "frontend/test-results/route-migration-every-main-a90a2-nation-and-query-parameters-chromium/attachments/route-migration-coverage-dce7a4058f76783ac7e668a8eb732d8357f7be7e.json"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "title": "the Librarian lists what /search found, keeps it as a collection and reruns a saved search in light at 390px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "line": 114,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 2268,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "palette keyboard reach, paging and focus in light at 390px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "line": 65,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 5235,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "palette keyboard reach, paging and focus in light at 820px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "line": 65,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 4419,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "the Librarian lists what /search found, keeps it as a collection and reruns a saved search in light at 820px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "line": 114,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 1862,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "the Librarian lists what /search found, keeps it as a collection and reruns a saved search in light at 1440px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "line": 114,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 2269,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "palette keyboard reach, paging and focus in light at 1440px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "line": 65,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 5058,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "the Librarian lists what /search found, keeps it as a collection and reruns a saved search in dark at 390px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "line": 114,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 2222,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "palette keyboard reach, paging and focus in dark at 390px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "line": 65,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 4899,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "the Librarian lists what /search found, keeps it as a collection and reruns a saved search in dark at 820px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "line": 114,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 1622,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "palette keyboard reach, paging and focus in dark at 820px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "line": 65,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 4355,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "the Librarian lists what /search found, keeps it as a collection and reruns a saved search in dark at 1440px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "line": 114,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 1886,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "palette keyboard reach, paging and focus in dark at 1440px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "line": 65,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 4395,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "the retired /search/results alias is gone rather than silently redirecting",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "line": 177,
+      "column": 5,
+      "status": "passed",
+      "durationMs": 21,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "saved search times use UTC even outside the UTC timezone",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "line": 168,
+      "column": 5,
+      "status": "passed",
+      "durationMs": 307,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "loading, no matches, service failure and missing saved search stay distinct",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "line": 184,
+      "column": 5,
+      "status": "passed",
+      "durationMs": 613,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    }
+  ],
+  "artifactPath": "/tmp/s63-clean/browser-results.json"
+}
