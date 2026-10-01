@@ -25,5 +25,8 @@
   "bugs": {
     "url": "https://github.com/kneelinghorse/TraceLab/issues"
   },
-  "homepage": "https://github.com/kneelinghorse/TraceLab#readme"
+  "homepage": "https://github.com/kneelinghorse/TraceLab#readme",
+  "devDependencies": {
+    "railway": "3.12.0"
+  }
 }

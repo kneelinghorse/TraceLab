@@ -1,0 +1,60 @@
+{
+  "ok": true,
+  "currentEnvironment": {
+    "projectId": "4e3adf39-f05e-48f8-8c7c-f2f27621b484",
+    "projectName": "TraceLab",
+    "environmentId": "4fb80245-6762-4438-ab94-6993c3568a92",
+    "environmentName": "production",
+    "configEtag": "13264de0e9634af21d366533a464b3bf3024ab73179fc5cfb3dd329ac894a8c5"
+  },
+  "changeSet": {
+    "changes": [
+      {
+        "summary": "Update TraceLab build.builder, build.dockerfilePath, build.watchPatterns",
+        "severity": "safe",
+        "kind": "resource.update",
+        "details": [
+          "build.builder (null \u2192 \"DOCKERFILE\")",
+          "build.dockerfilePath (null \u2192 \"/Dockerfile\")",
+          "build.watchPatterns (null \u2192 [])"
+        ]
+      },
+      {
+        "summary": "Update TraceLab deploy.numReplicas, deploy.restartPolicyMaxRetries, deploy.restartPolicyType and 2 more",
+        "severity": "safe",
+        "kind": "resource.update",
+        "details": [
+          "deploy.numReplicas (null \u2192 1)",
+          "deploy.restartPolicyMaxRetries (null \u2192 10)",
+          "deploy.restartPolicyType (null \u2192 \"ON_FAILURE\")",
+          "deploy.sleepApplication (null \u2192 false)",
+          "deploy.startCommand (null \u2192 \"bash -lc \\\"alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT\\\"\")"
+        ]
+      },
+      {
+        "summary": "Update frontend build.builder, build.watchPatterns",
+        "severity": "safe",
+        "kind": "resource.update",
+        "details": [
+          "build.builder (null \u2192 \"NIXPACKS\")",
+          "build.watchPatterns (null \u2192 [])"
+        ]
+      },
+      {
+        "summary": "Update frontend deploy.healthcheckPath, deploy.numReplicas, deploy.restartPolicyMaxRetries and 3 more",
+        "severity": "safe",
+        "kind": "resource.update",
+        "details": [
+          "deploy.healthcheckPath (\"/missions\" \u2192 \"/admin/users\")",
+          "deploy.numReplicas (null \u2192 1)",
+          "deploy.restartPolicyMaxRetries (null \u2192 10)",
+          "deploy.restartPolicyType (null \u2192 \"ON_FAILURE\")",
+          "deploy.sleepApplication (null \u2192 false)",
+          "deploy.startCommand (\"npm run start -- --hostname 0.0.0.0 --port $PORT\" \u2192 \"npm run start -- -H 0.0.0.0 -p $PORT\")"
+        ]
+      }
+    ]
+  },
+  "diagnostics": [],
+  "verified": "Exact active build/deploy settings; source/network/variables/volumes unchanged; only2services owned."
+}
