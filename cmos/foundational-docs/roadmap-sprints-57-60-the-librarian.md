@@ -294,6 +294,13 @@ and no research was submitted. Restore the existing provider quota/access, then 
 `frontend/scripts/deployed-mission-acceptance.mjs` against the serving commit. Local
 guided-flow tests do not replace this live gate. Sprint 62 remains Active.
 
+**User acceptance addendum, 2026-10-01 UTC:** S62-CONTRAST adds one narrow
+mission to the original nine: make the legacy dashboard Export CSV label inherit
+the existing light foreground. Four local browser cases and nine dashboard tests
+passed; deployment acceptance follows PR #409. The user also approved the prepared
+single hello test email. Resend records one delivered forward with the expected
+marker and Reply-To; actual destination-inbox confirmation remains required.
+
 The primary Home, Missions and command-palette action becomes **Plan a mission**,
 opening a focused Librarian view. A new user can describe research before choosing
 or creating a project inline, then review and refine the generated draft, save it,
