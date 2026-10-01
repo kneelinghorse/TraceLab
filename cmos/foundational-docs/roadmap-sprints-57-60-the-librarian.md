@@ -288,13 +288,15 @@ passed 192 checks across 32 routes, plus six S61 mission-log checks.
 
 **S62-MAIL is complete**: the approved controlled email produced one delivered
 forward, and the user supplied the observed inbox Reply-To, which matched the
-configured controlled address. **S62-WALK is Blocked** on the remaining live
-first-use gate. Three real zero-project member attempts stopped at the first
-Librarian turn because the existing provider returned `429 insufficient_quota`;
-all disposable accounts were removed and no research was submitted. Restore the
-existing provider quota/access (**#480**), then rerun
-`frontend/scripts/deployed-mission-acceptance.mjs` against the serving commit. Local
-guided-flow tests do not replace this live gate. Sprint 62 remains Active.
+configured controlled address. **S62-WALK is In Progress**. User-added credits
+resolved the provider quota failure (**#480** closed): two real zero-project
+member attempts received `gpt-5.1` replies and generated drafts with zero lint
+errors. A long reply exposed missing explicit keyboard focus on the scrollable
+transcript. A minimal focus/visible-ring fix and longer browser fixture are being
+validated before the final deployed draft-save and disabled-session checks.
+All disposable accounts/projects were cleaned; no research was submitted.
+Keep `gpt-5.1` for this release (decision **#585**); quota recovery did not require
+a model switch. Sprint 62 remains Active until the complete live gate passes.
 
 **User acceptance addendum, 2026-10-01 UTC:** S62-CONTRAST adds one narrow
 mission to the original nine: make the legacy dashboard Export CSV label inherit
@@ -335,8 +337,8 @@ block gap. S62-OBS distinguishes the old metrics endpoint from the current admin
 
 All ten promoted next-steps, #397, #426, #444, #445, #446, #447, #451, #464,
 #476 and #478, are accepted. Thirteen
-other carryovers stay outside scope. The scope-enforcement correction #479 and
-the provider-quota acceptance blocker also remain unresolved. Full redesign, sharing, unrelated cleanup,
+other carryovers stay outside scope. The scope-enforcement correction #479 remains unresolved. The provider-quota
+blocker #480 is resolved; final first-use acceptance is still in progress. Full redesign, sharing, unrelated cleanup,
 model/provider changes and worker implementation are not part of this plan.
 Aquex owns its site contact change; its completion summary is ready but unsent.
 Only the explicitly approved controlled email was sent.

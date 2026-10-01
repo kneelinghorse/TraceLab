@@ -1,7 +1,7 @@
 {
   "mission": "S62-WALK",
-  "status": "blocked; not complete",
-  "checked_at": "2026-10-01T03:17:28.720896+00:00",
+  "status": "in progress; quota resolved; transcript keyboard fix awaiting deployment",
+  "checked_at": "2026-10-01T03:49:31.007562+00:00",
   "serving_commit": "e276977ec55bb8c6b42f8328d57be6d98727834b",
   "source_pr": "https://github.com/kneelinghorse/TraceLab/pull/409",
   "accepted_prerequisites": [
@@ -31,32 +31,7 @@
     "mcp_argument_gaps": 0,
     "foundational_refs": "passed"
   },
-  "reuse_boundary": "Since4317a75, the only app/frontend-src/test code change is one export-anchor style property. Prior isolation/cache/ENTRY/UX/S61 receipts remain applicable; hash audit records exact checked files and saved evidence. Real first-use is still not accepted.",
-  "real_first_use_retry": {
-    "checked_at": "2026-10-01T02:52:09.398Z",
-    "expected_commit": "4317a75d6ba1518cd94226847257880b6609243b",
-    "marker": "S62 acceptance e5834dcf-ff2c-4f06-92b0-f453c10648f1",
-    "checks": [],
-    "cleanup": [
-      {
-        "label": "user",
-        "passed": true
-      }
-    ],
-    "fixture_user_id": "6db293d0-0c1b-4aed-979d-2ed8b18b1de8",
-    "initial_projects": 0,
-    "passed": false,
-    "failed_stage": "real planning turn",
-    "error_type": "AssertionError",
-    "actual": 502,
-    "expected": 200,
-    "error": "Expected values to be strictly equal:"
-  },
-  "provider_evidence": {
-    "timestamp": "2026-10-01T02:52:14.695869703Z",
-    "http_status": 429,
-    "code": "insufficient_quota"
-  },
+  "reuse_boundary": "The Librarian transcript now gains explicit keyboard focus and a visible focus ring; its prior source hash is superseded and its local/live browser acceptance must be rerun. Other prior source hashes are audited separately.",
   "closed_promoted_next_steps": [
     397,
     426,
@@ -85,8 +60,7 @@
     477
   ],
   "open_successors": [
-    479,
-    480
+    479
   ],
   "decision_ownership": {
     "project": "tracelab",
@@ -101,14 +75,53 @@
       581,
       582,
       583,
-      584
+      584,
+      585
     ],
     "all_verified": true
   },
-  "remaining_gate": "Restore quota/access for the existing configured Librarian provider, then run EXPECTED_COMMIT=<both-serving-SHA> node frontend/scripts/deployed-mission-acceptance.mjs. Do not replace the provider/model, alter billing or launch research as a bypass.",
+  "remaining_gate": "Deploy the minimal transcript tabindex/focus-ring fix after required checks, then finish real draft save, no automatic research and disabled-session recovery on the exact serving commit.",
   "limitations": [
-    "Full first-use path remains blocked and unverified against the live provider.",
+    "Real planning and generated drafts now succeed; full saved-draft acceptance remains pending.",
     "Legacy CMOS integration runner retains13passes/2 independently verified baseline failures; not claimed green.",
-    "Sprint remains Active; final closure/identity transition is intentionally pending."
-  ]
+    "Sprint remains Active until all live checks and final audit pass."
+  ],
+  "historical_quota_failure": {
+    "real_first_use_retry": {
+      "checked_at": "2026-10-01T02:52:09.398Z",
+      "expected_commit": "4317a75d6ba1518cd94226847257880b6609243b",
+      "marker": "S62 acceptance e5834dcf-ff2c-4f06-92b0-f453c10648f1",
+      "checks": [],
+      "cleanup": [
+        {
+          "label": "user",
+          "passed": true
+        }
+      ],
+      "fixture_user_id": "6db293d0-0c1b-4aed-979d-2ed8b18b1de8",
+      "initial_projects": 0,
+      "passed": false,
+      "failed_stage": "real planning turn",
+      "error_type": "AssertionError",
+      "actual": 502,
+      "expected": 200,
+      "error": "Expected values to be strictly equal:"
+    },
+    "provider_evidence": {
+      "timestamp": "2026-10-01T02:52:14.695869703Z",
+      "http_status": 429,
+      "code": "insufficient_quota"
+    }
+  },
+  "after_credit_retry": {
+    "model": "gpt-5.1",
+    "real_turns_and_drafts_succeeded": 2,
+    "lint_errors": 0,
+    "quota_successor_480": "completed",
+    "remaining_failure": "scrollable-region-focusable during generated draft review",
+    "receipts": [
+      "after-credits-first-attempt.json",
+      "after-credits-diagnostic.json"
+    ]
+  }
 }
