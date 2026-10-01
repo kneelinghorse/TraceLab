@@ -8,8 +8,8 @@
   "attachments": 0,
   "provider_http_status": 200,
   "provider_accepted": true,
-  "destination_inbox_received": false,
-  "reply_to_verified_in_destination_inbox": false,
+  "destination_inbox_received": true,
+  "reply_to_verified_in_destination_inbox": true,
   "provider_send_id": "01a0f55d-324a-759a-8c99-f6e7baeca3ca",
   "provider_status_read_http": 404,
   "readback_at": "2026-10-01T02:50:55.593624+00:00",
@@ -52,5 +52,7 @@
         "verification_marker_present": true
       }
     ]
-  }
+  },
+  "confirmation_recorded_at": "2026-10-01T03:00:37.810415+00:00",
+  "confirmation_source": "User supplied the observed Reply-To in response to the exact-subject/marker inbox question; it equals the configured controlled address."
 }
