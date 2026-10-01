@@ -1,0 +1,82 @@
+{
+  "sessionId": "PS-2026-10-01-008",
+  "sessionStatus": "Completed",
+  "sprintStatus": "Active",
+  "missionStatus": {
+    "activeCount": 0,
+    "queuedCount": 0,
+    "blockedCount": 1,
+    "nextAction": "All missions blocked (1). Resolve blockers before continuing."
+  },
+  "health": true,
+  "parity": {
+    "tables": [
+      {
+        "table": "sprints",
+        "sqliteCount": 64,
+        "pgCount": 64,
+        "match": true,
+        "delta": 0
+      },
+      {
+        "table": "missions",
+        "sqliteCount": 427,
+        "pgCount": 427,
+        "match": true,
+        "delta": 0
+      },
+      {
+        "table": "sessions",
+        "sqliteCount": 225,
+        "pgCount": 225,
+        "match": true,
+        "delta": 0
+      },
+      {
+        "table": "strategic_decisions",
+        "sqliteCount": 591,
+        "pgCount": 591,
+        "match": true,
+        "delta": 0
+      },
+      {
+        "table": "learnings",
+        "sqliteCount": 294,
+        "pgCount": 294,
+        "match": true,
+        "delta": 0
+      },
+      {
+        "table": "mission_dependencies",
+        "sqliteCount": 227,
+        "pgCount": 227,
+        "match": true,
+        "delta": 0
+      }
+    ],
+    "allMatch": true,
+    "totalSqlite": 1828,
+    "totalPg": 1828,
+    "projectScoped": true,
+    "projectSlug": "tracelab",
+    "syncLogEntries": 284,
+    "failedEntries": 0,
+    "lastSyncAt": "2026-10-01T14:15:02.897Z"
+  },
+  "openNextSteps": [
+    400,
+    403,
+    406,
+    407,
+    415,
+    422,
+    431,
+    448,
+    452,
+    454,
+    477,
+    479,
+    481
+  ],
+  "masterSnapshotId": 1319
+}

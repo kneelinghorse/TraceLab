@@ -1,0 +1,90 @@
+{
+  "tool": "playwright",
+  "generatedAt": "2026-10-01T14:08:49.914Z",
+  "completedAt": "2026-10-01T14:08:57.720Z",
+  "status": "passed",
+  "summary": {
+    "total": 5,
+    "expected": 5,
+    "passed": 5,
+    "failed": 0,
+    "skipped": 0,
+    "interrupted": 0,
+    "durationSeconds": 7.806,
+    "retries": 0
+  },
+  "environment": {
+    "node": "v24.6.0",
+    "ci": {
+      "provider": null
+    },
+    "projects": [
+      "chromium"
+    ],
+    "browsers": []
+  },
+  "tests": [
+    {
+      "title": "missions route responds at the public domain",
+      "file": "frontend/tests/e2e/production-smoke.spec.ts",
+      "line": 17,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 1312,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "/admin/users is deployed as its own Next page",
+      "file": "frontend/tests/e2e/production-smoke.spec.ts",
+      "line": 23,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 1340,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "API health endpoint confirms production authorization and reconciler freshness",
+      "file": "frontend/tests/e2e/production-smoke.spec.ts",
+      "line": 33,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 1018,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "/admin/spaces is deployed as its own Next page",
+      "file": "frontend/tests/e2e/production-smoke.spec.ts",
+      "line": 23,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 1028,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "every maintained migration preserves its destination and query parameters",
+      "file": "frontend/tests/e2e/route-migration.spec.ts",
+      "line": 5,
+      "column": 5,
+      "status": "passed",
+      "durationMs": 1450,
+      "annotations": [],
+      "attachments": [
+        {
+          "name": "route-migration-coverage",
+          "contentType": "application/json",
+          "path": "frontend/test-results/route-migration-every-main-a90a2-nation-and-query-parameters-chromium/attachments/route-migration-coverage-dce7a4058f76783ac7e668a8eb732d8357f7be7e.json"
+        }
+      ],
+      "errors": []
+    }
+  ],
+  "artifactPath": "/tmp/s63-release/production-browser.json"
+}

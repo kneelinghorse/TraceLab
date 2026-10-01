@@ -1,0 +1,196 @@
+{
+  "checked_paths": 31,
+  "all_match": true,
+  "checks": [
+    {
+      "mission": "S63-PUBLIC",
+      "path": "packages/tracelab-mcp/README.md",
+      "sha256": "cbb41d346cdb37523e369fe745ba35c88bb49e4adace71d8b22ac8c9c1a9f596",
+      "matches": true
+    },
+    {
+      "mission": "S63-PUBLIC",
+      "path": "packages/tracelab-mcp/CHANGELOG.md",
+      "sha256": "34c2d258011239aff27324c27d49e900146721c8978960e4a6297962660f73a9",
+      "matches": true
+    },
+    {
+      "mission": "S63-PUBLIC",
+      "path": "packages/tracelab-mcp/package.json",
+      "sha256": "c714e7f8d0099bfd400d6a41a84261b166861d21830f31083dd8432c292fba36",
+      "matches": true
+    },
+    {
+      "mission": "S63-PUBLIC",
+      "path": "packages/tracelab-mcp/package-lock.json",
+      "sha256": "4e5d31f82eed0549695ca1b181f8e942a260132b8e43e1dffb595348cc13a800",
+      "matches": true
+    },
+    {
+      "mission": "S63-PUBLIC",
+      "path": "packages/tracelab-mcp/LICENSE",
+      "sha256": "0214cd4e166c8bb98b8d955bec2836ba281127e7cd0bd2944616071aefbc4887",
+      "matches": true
+    },
+    {
+      "mission": "S63-PUBLIC",
+      "path": "packages/tracelab-mcp/src/index.ts",
+      "sha256": "d927e38de770e220cf43322a8994f2f28552c1ac01fbbc6441f7d9e6404047e1",
+      "matches": true
+    },
+    {
+      "mission": "S63-PUBLIC",
+      "path": "packages/tracelab-mcp/src/auth/device-code.ts",
+      "sha256": "061932fabbcce955b1ccf741b1a3d525c7b1bd8a54afd5eb6db971d96b6844a3",
+      "matches": true
+    },
+    {
+      "mission": "S63-PUBLIC",
+      "path": "packages/tracelab-mcp/src/auth/credential-store.ts",
+      "sha256": "c0bfe64b57d3d171b82cd0fad29b862237049e08e9fb26c79c7ea67dbda4dc3f",
+      "matches": true
+    },
+    {
+      "mission": "S63-PUBLIC",
+      "path": "packages/tracelab-mcp/scripts/check-package.sh",
+      "sha256": "30cbb4eecc29ea63f986ba67432ba03c40b059fb460655680b4b5ffbe3ebe619",
+      "matches": true
+    },
+    {
+      "mission": "S63-PUBLIC",
+      "path": "packages/tracelab-mcp/scripts/check-canonical-links.mjs",
+      "sha256": "6770cce7bbba81e5e0e2542ae180d426de5b0b90a3c89808084990235cebe6cf",
+      "matches": true
+    },
+    {
+      "mission": "S63-CLEAN",
+      "path": "frontend/src/components/SaveSearchButton.tsx",
+      "sha256": "1373ddb9e93dca321ed8d5f8a9b43886881d1e344a8c605241484bf37bf537cd",
+      "matches": true
+    },
+    {
+      "mission": "S63-CLEAN",
+      "path": "frontend/src/types/saved-searches.ts",
+      "sha256": "a6a2486620663f9c90bca08e3a45be971a8c5671ccc09c1cc35406f78b771314",
+      "matches": true
+    },
+    {
+      "mission": "S63-CLEAN",
+      "path": "frontend/src/components/librarian/ChunkList.tsx",
+      "sha256": "9db83d13011d5aa54fef3a25f5f83c1ccca061395c255fbc1f0ea634480ff2d5",
+      "matches": true
+    },
+    {
+      "mission": "S63-CLEAN",
+      "path": "frontend/src/lib/api/savedSearches.ts",
+      "sha256": "79f213f882f0844b9131724cbce46a8c338c02061afaed49e0f0f10e69df88e7",
+      "matches": true
+    },
+    {
+      "mission": "S63-CLEAN",
+      "path": "frontend/src/pages/missions/queue.tsx",
+      "sha256": "0302112b498b8dd48ffe43e6bdb9b507f185a59883299df951243bd81373e802",
+      "matches": true
+    },
+    {
+      "mission": "S63-CLEAN",
+      "path": "frontend/src/lib/route-migrations.json",
+      "sha256": "9124b4ebdb0f2a0e3871f4a37b2c1ac1e454afbda74b30c0457a7996dfeadb8a",
+      "matches": true
+    },
+    {
+      "mission": "S63-CLEAN",
+      "path": "frontend/src/components/CommandPalette.tsx",
+      "sha256": "e4259c81ea2c227b3f701fa028f57277777bbeb193b5612d06945eeb2d20ef48",
+      "matches": true
+    },
+    {
+      "mission": "S63-CLEAN",
+      "path": "frontend/src/pages/missions/index.tsx",
+      "sha256": "c5d27cb82f2280b075420d3529f094e4c3d033841626ca6b4be3c0d00b6af392",
+      "matches": true
+    },
+    {
+      "mission": "S63-CLEAN",
+      "path": "frontend/src/__tests__/save-search-button.test.tsx",
+      "sha256": "f4e18a1680ce7d2262d7a1570c4d981476fdb56c95e594e664b8675e1fe1c654",
+      "matches": true
+    },
+    {
+      "mission": "S63-CLEAN",
+      "path": "frontend/src/__tests__/librarian.test.tsx",
+      "sha256": "7fe4a791be5d7c6445cd271dbe00747b787a8b25bfe8b5a35184d7fd9d556271",
+      "matches": true
+    },
+    {
+      "mission": "S63-CLEAN",
+      "path": "frontend/tests/e2e/search-command.spec.ts",
+      "sha256": "3e5693b613249bd1e44c92cf5a145b2a7f5e84f156bb3df700b8015862625018",
+      "matches": true
+    },
+    {
+      "mission": "S63-CLEAN",
+      "path": "frontend/tests/e2e/route-migration.spec.ts",
+      "sha256": "bd6753f9394da726e6acb9735220326a18e4b58f21b5b76e9b1b19036f66ec59",
+      "matches": true
+    },
+    {
+      "mission": "S63-CLEAN",
+      "path": "docs/frontend_architecture.md",
+      "sha256": "e9703ef6c7b515e02c1aee70f611c9e77f7b0722e6ea4cb6e1c2ede0f8ea2e43",
+      "matches": true
+    },
+    {
+      "mission": "S63-CLEAN",
+      "path": "tests/test_saved_searches.py",
+      "sha256": "6b4bcf9f0e3deedbaf9c0ae53f10a77dc60c25c97811982cf1df3a0508366491",
+      "matches": true
+    },
+    {
+      "mission": "S63-CLEAN",
+      "path": "scripts/pytest_isolation.py",
+      "sha256": "1d6fab180d96bcbc7ba4e2a7f3dcb23f51a3b54cdd4eb939dd49f3898f07524b",
+      "matches": true
+    },
+    {
+      "mission": "S63-CLEAN",
+      "path": "tests/conftest.py",
+      "sha256": "b25d9a7bc8dd8c289ad010df0384a55f7a6a91f25bd1a5de375e73fcfe75739c",
+      "matches": true
+    },
+    {
+      "mission": "S63-RELEASE",
+      "path": "frontend/scripts/ui-shell-smoke.mjs",
+      "sha256": "d0a424f8bdbe37c507a6599df7b5a5f906fb1f9fd76bf0149503be173eb3773f",
+      "matches": true
+    },
+    {
+      "mission": "S63-RELEASE",
+      "path": "frontend/scripts/ui-shell-transport.mjs",
+      "sha256": "4fa0805b50c43de574d4b814afff281669eaf8eaf1151b696abd98fde88445e6",
+      "matches": true
+    },
+    {
+      "mission": "S63-RELEASE",
+      "path": "frontend/tests/e2e/production-smoke.spec.ts",
+      "sha256": "49e9aa816cd05a161e5ed6e77d20322f61bb79a7aa2246a9df94df52e7f66979",
+      "matches": true
+    },
+    {
+      "mission": "S63-RELEASE",
+      "path": "scripts/wait_for_deploy.py",
+      "sha256": "ad453680a7694d45bcb1d44c59955c139d4681a9ec267614b1bf6df83fb2e161",
+      "matches": true
+    },
+    {
+      "mission": "S63-RELEASE",
+      "path": "packages/tracelab-mcp/scripts/check-canonical-links.mjs",
+      "sha256": "6770cce7bbba81e5e0e2542ae180d426de5b0b90a3c89808084990235cebe6cf",
+      "matches": true
+    }
+  ],
+  "historical_exceptions": [
+    "Legacy runner explicitly documents missing runtime/boomerang and obsolete headings; not a passing source citation",
+    "S63 planning handoff and S62 receipts retain their stated historical source identity"
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-01",
+  "repo": "kneelinghorse/TraceLab",
+  "before": {
+    "description": "A personal-scale research repository with RAG-powered semantic search, Mission Protocol integration, and privacy-compliant data processing. The architecture prioritizes rigor, traceability, local control, and cost-effectiveness.",
+    "visibility": "public",
+    "private": false,
+    "topics": [],
+    "homepage": null,
+    "default_branch": "main",
+    "has_issues": true,
+    "has_wiki": true,
+    "has_projects": true,
+    "allow_squash_merge": true,
+    "allow_merge_commit": true,
+    "allow_rebase_merge": true,
+    "delete_branch_on_merge": false
+  },
+  "after": {
+    "description": "A personal-scale research repository with RAG-powered semantic search, Mission Protocol integration, and document processing with PII redaction. The architecture prioritizes rigor, traceability, local control, and cost-effectiveness.",
+    "visibility": "public",
+    "private": false,
+    "topics": [],
+    "homepage": null,
+    "default_branch": "main",
+    "has_issues": true,
+    "has_wiki": true,
+    "has_projects": true,
+    "allow_squash_merge": true,
+    "allow_merge_commit": true,
+    "allow_rebase_merge": true,
+    "delete_branch_on_merge": false
+  },
+  "only_intended_setting_changed": true,
+  "license_scope": "Existing adapter MIT; no service license added",
+  "readback": "gh repo view --json description,visibility,repositoryTopics matches approved text"
+}
