@@ -224,18 +224,11 @@ If a migration fails mid-way:
 
 ### Railway Deployment Behavior
 
-Current `railway.json`:
-```json
-{
-  "deploy": {
-    "startCommand": "bash -lc \"alembic upgrade head && uvicorn app.main:app ...\""
-  }
-}
-```
-
-**Risk**: If migration fails, service won't start. Railway will retry up to 10 times.
-
-**Recommendation**: Add migration verification step before uvicorn starts.
+The [scoped Railway configuration](../.railway/README.md) preserves
+`alembic upgrade head && uvicorn ...` in the backend start command. Migrations
+must succeed before the API starts. Verify Alembic execution in the deployed
+service logs even when the database is already at head. The effective restart
+policy is ON_FAILURE with ten retries; a migration failure prevents startup.
 
 ---
 

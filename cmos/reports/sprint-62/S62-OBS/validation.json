@@ -2,7 +2,7 @@
   "mission": "S62-OBS",
   "checked_at": "2026-10-01T01:06:29.627096+00:00",
   "decision": 582,
-  "status": "locally_verified_deployed_acceptance_pending",
+  "status": "completed_deployed_acceptance_verified",
   "deployed_before": {
     "serving": {
       "backend": "4495119551c67a39b393b40f0e0d176ea84128ba",
@@ -51,5 +51,6 @@
   ],
   "next_step_444": "pending live acceptance; historical explanation explicitly unresolved",
   "live_command": "python -m scripts.cache_diagnostic",
-  "receipts": "/tmp/s62-obs-suites.log; /tmp/s62-obs-integration.log"
+  "receipts": "/tmp/s62-obs-suites.log; /tmp/s62-obs-integration.log",
+  "deployed_acceptance_receipt": "deployed-acceptance.json"
 }

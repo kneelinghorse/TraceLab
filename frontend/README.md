@@ -33,8 +33,8 @@ Playwright reads `PLAYWRIGHT_BASE_URL` / `PLAYWRIGHT_PORT` when the UI runs on a
 
 ## Railway Deployment
 
-1. Create a new Railway service that points at this repository and set the **Root Directory** to `frontend/`.
-2. Railway loads `frontend/railway.json` as the live service configuration. Keep the root `railway.frontend.json` synchronized only as a fallback/template.
+1. Production uses the existing `frontend` service with **Root Directory** `/frontend`.
+2. Follow [the scoped Railway configuration guide](../.railway/README.md). `.railway/railway.ts` owns both TraceLab services; configuration changes require an explicit reviewed plan/apply. Legacy `railway.json` files are retired. A separate environment needs its own reviewed target configuration.
 3. Add the environment variables listed in `.env.production.example`. Retrieve `NEXT_PUBLIC_DEFAULT_PROJECT_ID` by calling `GET /api/v1/projects` on the FastAPI backend and selecting the default project UUID.
 4. Trigger a deploy and verify logs show a successful build + `Ready` state. Railway will expose a domain such as `https://<service>.up.railway.app`.
 5. Smoke test the configured health route with `curl https://<service>.up.railway.app/admin/users` (or run `PLAYWRIGHT_BASE_URL=https://<service>.up.railway.app npm run test:e2e`). A passing route check proves that page is served, but not that Railway is running the latest commit.

@@ -1,0 +1,23 @@
+{
+  "checked_at": "2026-10-01T01:47:51.133952+00:00",
+  "served_commit": "4317a75d6ba1518cd94226847257880b6609243b",
+  "result": "blocked_external_provider_quota",
+  "public_endpoint": "POST /api/v1/librarian/turns",
+  "public_status": 502,
+  "provider_errors": [
+    {
+      "timestamp": "2026-10-01T01:45:06.027247771Z",
+      "http_status": 429,
+      "insufficient_quota": true
+    },
+    {
+      "timestamp": "2026-10-01T01:46:00.213890243Z",
+      "http_status": 429,
+      "insufficient_quota": true
+    }
+  ],
+  "fixtures": "Two fresh invited members had zero visible projects; both were deleted after the rejected first turn. No project or mission was created.",
+  "no_provider_change": true,
+  "no_research_submitted": true,
+  "required": "Restore quota/access for the existing configured Librarian provider, then rerun deployed-mission-acceptance.mjs. Local scripted-model tests are not live first-use proof."
+}

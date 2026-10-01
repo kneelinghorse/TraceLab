@@ -1,0 +1,244 @@
+{
+  "checked_at": "2026-10-01T01:45:45.337641+00:00",
+  "serving": {
+    "sha": "4317a75d6ba1518cd94226847257880b6609243b",
+    "ok": true,
+    "observed": {
+      "backend": "4317a75d6ba1518cd94226847257880b6609243b",
+      "frontend": "4317a75d6ba1518cd94226847257880b6609243b"
+    },
+    "seconds_to_serve": {
+      "backend": 121.3,
+      "frontend": 212.0
+    },
+    "budget_seconds": 1200,
+    "elapsed_seconds": 212.0
+  },
+  "ownership": {
+    "configEtag": "d3a5aecab34787aa1663e922d295aac3b23b769c0cc78cce1aa6cc5eb8794c21",
+    "environmentId": "4fb80245-6762-4438-ab94-6993c3568a92",
+    "environmentName": "production",
+    "iacPartials": {
+      "service.TraceLab": "tracelab",
+      "service.frontend": "tracelab"
+    },
+    "ok": true,
+    "wholeProjectAvailable": false
+  },
+  "services": [
+    {
+      "activeDeployments": [
+        {
+          "createdAt": "2026-10-01T01:40:44.472Z",
+          "id": "2a5c30ac-9efb-4109-8771-a6282ab95962",
+          "meta": {
+            "commitHash": "4317a75d6ba1518cd94226847257880b6609243b",
+            "configFile": null,
+            "fileServiceManifest": {},
+            "serviceManifest": {
+              "build": {
+                "buildCommand": null,
+                "buildEnvironment": "V3",
+                "builder": "DOCKERFILE",
+                "dockerfilePath": "/Dockerfile",
+                "nixpacksConfigPath": null,
+                "nixpacksPlan": null,
+                "watchPatterns": []
+              },
+              "deploy": {
+                "cronSchedule": null,
+                "drainingSeconds": null,
+                "healthcheckPath": null,
+                "healthcheckTimeout": null,
+                "ipv6EgressEnabled": false,
+                "limitOverride": null,
+                "multiRegionConfig": {
+                  "us-east4-eqdc4a": {
+                    "numReplicas": 1
+                  }
+                },
+                "numReplicas": 1,
+                "overlapSeconds": null,
+                "preDeployCommand": null,
+                "preDeployTimeoutSeconds": null,
+                "region": null,
+                "registryCredentials": null,
+                "requiredMountPath": null,
+                "restartPolicyMaxRetries": 10,
+                "restartPolicyType": "ON_FAILURE",
+                "runtime": "V2",
+                "sleepApplication": false,
+                "startCommand": "bash -lc \"alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT\"",
+                "useLegacyStacker": false
+              }
+            },
+            "rootDirectory": null,
+            "repo": "kneelinghorse/TraceLab",
+            "branch": "main"
+          },
+          "status": "SUCCESS"
+        }
+      ],
+      "buildCommand": null,
+      "healthcheckPath": null,
+      "healthcheckTimeout": null,
+      "numReplicas": null,
+      "railwayConfigFile": null,
+      "region": null,
+      "resolvedFileConfig": {
+        "commitHash": "4317a75d6ba1518cd94226847257880b6609243b",
+        "configFile": null,
+        "deploymentId": "2a5c30ac-9efb-4109-8771-a6282ab95962",
+        "fileManifest": {}
+      },
+      "restartPolicyMaxRetries": 10,
+      "restartPolicyType": "ON_FAILURE",
+      "rootDirectory": null,
+      "serviceId": "bb03daef-7b08-4ef9-b0db-b7b5d49c0721",
+      "serviceName": "TraceLab",
+      "sleepApplication": false,
+      "startCommand": "bash -lc \"alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT\""
+    },
+    {
+      "activeDeployments": [
+        {
+          "createdAt": "2026-10-01T01:40:44.472Z",
+          "id": "70b2e488-fcc3-4b97-b898-b92033fcaa64",
+          "meta": {
+            "commitHash": "4317a75d6ba1518cd94226847257880b6609243b",
+            "configFile": null,
+            "fileServiceManifest": {},
+            "serviceManifest": {
+              "build": {
+                "buildCommand": "npm install && npm run build",
+                "buildEnvironment": "V3",
+                "builder": "NIXPACKS",
+                "dockerfilePath": null,
+                "nixpacksPlan": null,
+                "watchPatterns": []
+              },
+              "deploy": {
+                "cronSchedule": null,
+                "drainingSeconds": null,
+                "healthcheckPath": "/admin/users",
+                "healthcheckTimeout": 30,
+                "ipv6EgressEnabled": false,
+                "limitOverride": null,
+                "multiRegionConfig": {
+                  "us-east4-eqdc4a": {
+                    "numReplicas": 1
+                  }
+                },
+                "numReplicas": 1,
+                "overlapSeconds": null,
+                "preDeployCommand": null,
+                "preDeployTimeoutSeconds": null,
+                "region": null,
+                "registryCredentials": null,
+                "requiredMountPath": null,
+                "restartPolicyMaxRetries": 10,
+                "restartPolicyType": "ON_FAILURE",
+                "runtime": "V2",
+                "sleepApplication": false,
+                "startCommand": "npm run start -- -H 0.0.0.0 -p $PORT",
+                "useLegacyStacker": false
+              }
+            },
+            "rootDirectory": "/frontend",
+            "repo": "kneelinghorse/TraceLab",
+            "branch": "main"
+          },
+          "status": "SUCCESS"
+        }
+      ],
+      "buildCommand": "npm install && npm run build",
+      "healthcheckPath": "/admin/users",
+      "healthcheckTimeout": 30,
+      "numReplicas": null,
+      "railwayConfigFile": null,
+      "region": null,
+      "resolvedFileConfig": {
+        "commitHash": "4317a75d6ba1518cd94226847257880b6609243b",
+        "configFile": null,
+        "deploymentId": "70b2e488-fcc3-4b97-b898-b92033fcaa64",
+        "fileManifest": {}
+      },
+      "restartPolicyMaxRetries": 10,
+      "restartPolicyType": "ON_FAILURE",
+      "rootDirectory": "/frontend",
+      "serviceId": "0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7",
+      "serviceName": "frontend",
+      "sleepApplication": false,
+      "startCommand": "npm run start -- -H 0.0.0.0 -p $PORT"
+    }
+  ],
+  "supported_config_plan_changes": [],
+  "deploy_logs": [
+    {
+      "service": "TraceLab",
+      "mode": "--deployment",
+      "timestamp": "2026-10-01T01:42:53.620685183Z",
+      "message": "INFO  [alembic.runtime.migration] Context impl PostgresqlImpl."
+    },
+    {
+      "service": "TraceLab",
+      "mode": "--deployment",
+      "timestamp": "2026-10-01T01:42:53.620687923Z",
+      "message": "INFO  [alembic.runtime.migration] Will assume transactional DDL."
+    },
+    {
+      "service": "TraceLab",
+      "mode": "--deployment",
+      "timestamp": "2026-10-01T01:42:55.601372008Z",
+      "message": "INFO:     Application startup complete."
+    },
+    {
+      "service": "TraceLab",
+      "mode": "--deployment",
+      "timestamp": "2026-10-01T01:42:55.609261717Z",
+      "message": "INFO:     Uvicorn running on [URL] (Press CTRL+C to quit)"
+    },
+    {
+      "service": "frontend",
+      "mode": "--build",
+      "timestamp": "2026-10-01T01:41:44.547607243Z",
+      "message": "\n\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 Nixpacks v1.41.0 \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557\n\u2551 setup      \u2502 nodejs_24, npm-9_x                   \u2551\n\u2551\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2551\n\u2551 install    \u2502 npm ci                               \u2551\n\u2551\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2551\n\u2551 build      \u2502 npm install && npm run build         \u2551\n\u2551\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2551\n\u2551 start      \u2502 npm run start -- -H 0.0.0.0 -p $PORT \u2551\n\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d\n\n"
+    },
+    {
+      "service": "frontend",
+      "mode": "--build",
+      "timestamp": "2026-10-01T01:41:45.413652067Z",
+      "message": "[stage-0  8/10] RUN --mount=type=cache,id=s/0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7-next/cache,target=/app/.next/cache --mount=type=cache,id=s/0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7-node_modules/cache,target=/app/node_modules/.cache npm install && npm run build"
+    },
+    {
+      "service": "frontend",
+      "mode": "--build",
+      "timestamp": "2026-10-01T01:42:00.151221353Z",
+      "message": "[stage-0  8/10] RUN --mount=type=cache,id=s/0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7-next/cache,target=/app/.next/cache --mount=type=cache,id=s/0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7-node_modules/cache,target=/app/node_modules/.cache npm install && npm run build"
+    },
+    {
+      "service": "frontend",
+      "mode": "--build",
+      "timestamp": "2026-10-01T01:42:16.946839237Z",
+      "message": " \u2713 Compiled successfully in 3.2s\n"
+    },
+    {
+      "service": "frontend",
+      "mode": "--build",
+      "timestamp": "2026-10-01T01:42:19.172345266Z",
+      "message": "[stage-0  8/10] RUN --mount=type=cache,id=s/0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7-next/cache,target=/app/.next/cache --mount=type=cache,id=s/0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7-node_modules/cache,target=/app/node_modules/.cache npm install && npm run build"
+    },
+    {
+      "service": "frontend",
+      "mode": "--build",
+      "timestamp": "2026-10-01T01:43:59.263493168Z",
+      "message": "\u001b[92m[1/1] Healthcheck succeeded!\u001b[0m"
+    },
+    {
+      "service": "frontend",
+      "mode": "--deployment",
+      "timestamp": "2026-10-01T01:43:58.875505568Z",
+      "message": " \u2713 Ready in 397ms"
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+[
+  {
+    "service": "backend",
+    "mode": "--deployment",
+    "timestamp": "2026-10-01T01:27:29.205653409Z",
+    "message": "INFO  [alembic.runtime.migration] Context impl PostgresqlImpl."
+  },
+  {
+    "service": "backend",
+    "mode": "--deployment",
+    "timestamp": "2026-10-01T01:27:29.205660630Z",
+    "message": "INFO  [alembic.runtime.migration] Will assume transactional DDL."
+  },
+  {
+    "service": "backend",
+    "mode": "--deployment",
+    "timestamp": "2026-10-01T01:27:33.250261332Z",
+    "message": "INFO:     Application startup complete."
+  },
+  {
+    "service": "backend",
+    "mode": "--deployment",
+    "timestamp": "2026-10-01T01:27:33.250269931Z",
+    "message": "INFO:     Uvicorn running on [URL] (Press CTRL+C to quit)"
+  },
+  {
+    "service": "frontend",
+    "mode": "--build",
+    "timestamp": "2026-10-01T01:27:08.189127759Z",
+    "message": "\n\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 Nixpacks v1.41.0 \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557\n\u2551 setup      \u2502 nodejs_24, npm-9_x                   \u2551\n\u2551\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2551\n\u2551 install    \u2502 npm ci                               \u2551\n\u2551\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2551\n\u2551 build      \u2502 npm install && npm run build         \u2551\n\u2551\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2551\n\u2551 start      \u2502 npm run start -- -H 0.0.0.0 -p $PORT \u2551\n\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d\n\n"
+  },
+  {
+    "service": "frontend",
+    "mode": "--build",
+    "timestamp": "2026-10-01T01:27:09.072519928Z",
+    "message": "[stage-0  8/10] RUN --mount=type=cache,id=s/0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7-next/cache,target=/app/.next/cache --mount=type=cache,id=s/0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7-node_modules/cache,target=/app/node_modules/.cache npm install && npm run build"
+  },
+  {
+    "service": "frontend",
+    "mode": "--build",
+    "timestamp": "2026-10-01T01:27:24.836181103Z",
+    "message": "[stage-0  8/10] RUN --mount=type=cache,id=s/0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7-next/cache,target=/app/.next/cache --mount=type=cache,id=s/0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7-node_modules/cache,target=/app/node_modules/.cache npm install && npm run build"
+  },
+  {
+    "service": "frontend",
+    "mode": "--build",
+    "timestamp": "2026-10-01T01:27:52.490461624Z",
+    "message": " \u2713 Compiled successfully in 3.8s\n"
+  },
+  {
+    "service": "frontend",
+    "mode": "--build",
+    "timestamp": "2026-10-01T01:27:55.584576122Z",
+    "message": "[stage-0  8/10] RUN --mount=type=cache,id=s/0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7-next/cache,target=/app/.next/cache --mount=type=cache,id=s/0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7-node_modules/cache,target=/app/node_modules/.cache npm install && npm run build"
+  },
+  {
+    "service": "frontend",
+    "mode": "--build",
+    "timestamp": "2026-10-01T01:28:40.516848153Z",
+    "message": "\u001b[92m[1/1] Healthcheck succeeded!\u001b[0m"
+  },
+  {
+    "service": "frontend",
+    "mode": "--deployment",
+    "timestamp": "2026-10-01T01:28:40.338474484Z",
+    "message": " \u2713 Ready in 302ms"
+  }
+]

@@ -1,0 +1,50 @@
+// Controlled post-deploy acceptance. Creates/removes its own member, project and draft only.
+// EXPECTED_COMMIT must match both public services; research submission and mail are blocked.
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import {createRequire} from 'node:module';
+const require=createRequire(new URL('../package.json', import.meta.url));
+const {chromium}=require('playwright');
+const {expect}=require('@playwright/test');
+const api='https://api.tracelab.aquex.ai', ui='https://tracelab.aquex.ai';
+const expected=process.env.EXPECTED_COMMIT; assert(/^[a-f0-9]{40}$/.test(expected));
+const credentials=JSON.parse(await fs.readFile(path.join(os.homedir(),'.config/tracelab-mcp/credentials.json'),'utf8'));
+assert.equal(credentials.apiBaseUrl.replace(/\/$/,''),api);
+const admin={'X-API-Key':credentials.key};
+const marker='S62 acceptance '+crypto.randomUUID();
+const receipt={checked_at:new Date().toISOString(),expected_commit:expected,marker,checks:[],cleanup:[]};
+const out='/tmp/s62-deployed-acceptance';await fs.mkdir(out,{recursive:true});
+let user,invite,projectId,missionId,browser,stage='identity';
+async function request(method,route,body,headers=admin){const r=await fetch(api+'/api/v1'+route,{method,headers:{...headers,'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});assert(r.ok,`${method} ${route.split('?')[0]} status ${r.status}`);return r.status===204?null:r.json()}
+async function audit(page,label){await page.addScriptTag({path:require.resolve('axe-core/axe.min.js')});const x=await page.evaluate(async()=>({overflow:document.documentElement.scrollWidth>innerWidth,violations:(await window.axe.run(document)).violations.filter(v=>['critical','serious'].includes(v.impact)).map(v=>v.id)}));assert.deepEqual(x,{overflow:false,violations:[]});await page.screenshot({path:path.join(out,label+'.png'),fullPage:true});receipt.checks.push({label,...x})}
+try{
+ const [backend,frontend]=await Promise.all([fetch(api+'/api/v1/health').then(r=>r.json()),fetch(ui+'/api/version',{headers:{'User-Agent':'TraceLab-post-deploy-check/1.0','Cache-Control':'no-cache'}}).then(r=>r.json())]);
+ // Match the application's public revision marker, regardless of its nesting.
+ assert(JSON.stringify(backend).includes(expected));assert(JSON.stringify(frontend).includes(expected));
+ stage='register disposable member';invite=await request('POST','/auth/invite-codes');
+ const registered=await request('POST','/auth/register',{email:'s62-'+crypto.randomUUID()+'@example.test',password:crypto.randomBytes(24).toString('base64url'),display_name:marker,invite_code:invite.code},{});
+ user=registered.user;const auth={Authorization:'Bearer '+registered.access_token};
+ assert.equal((await request('GET','/auth/me',null,auth)).role,'member');assert.equal((await request('GET','/projects',null,auth)).pagination.total,0);
+ receipt.fixture_user_id=user.user_id;receipt.initial_projects=0;
+ browser=await chromium.launch();const context=await browser.newContext({viewport:{width:390,height:1000},colorScheme:'light'});
+ await context.addInitScript(({user,token})=>{if(!sessionStorage.getItem('initialized')){localStorage.setItem('tracelab.auth.v2',JSON.stringify({...user,token}));localStorage.setItem('tracelab.theme.v1:'+user.user_id,'light');sessionStorage.setItem('initialized','true')}},{user,token:registered.access_token});
+ const writes=[],errors=[],suppressedWrites=[];await context.route(api+'/**',async route=>{const r=route.request(),u=new URL(r.url());if(r.method()==='PUT'&&['/api/v1/activity/viewed','/api/v1/activity/viewed/evidence'].includes(u.pathname)){suppressedWrites.push(u.pathname);return route.fulfill({status:200,json:{viewed:0,new_total:0},headers:{'access-control-allow-origin':ui,'access-control-allow-credentials':'true'}})}if(!['GET','HEAD','OPTIONS'].includes(r.method())){const allowed=r.method()==='POST'&&['/api/v1/librarian/turns','/api/v1/librarian/drafts','/api/v1/librarian/missions','/api/v1/projects'].includes(u.pathname);if(!allowed){errors.push('Blocked unexpected write '+r.method()+' '+u.pathname);return route.abort()}writes.push(u.pathname)}return route.continue()});
+ const page=await context.newPage();page.on('pageerror',()=>errors.push('Client exception'));
+ stage='home entry';await page.goto(ui,{waitUntil:'networkidle'});const plan=page.getByRole('link',{name:'Plan a mission',exact:true});await expect(plan).toHaveAttribute('href','/librarian?intent=mission');await plan.focus();await page.keyboard.press('Enter');await expect(page.getByRole('heading',{name:'Plan a mission',exact:true})).toBeVisible();await expect(page.getByRole('link',{name:'Create manually',exact:true})).toHaveAttribute('href','/missions/new');await expect(page.getByRole('button',{name:'Draft a mission',exact:true})).toBeDisabled();
+ stage='real planning turn';const turn=page.waitForResponse(r=>r.url().endsWith('/librarian/turns')&&r.request().method()==='POST',{timeout:90000});await page.getByLabel('Message the Librarian').fill('Help me plan, but do not execute, a small comparison of official PostgreSQL and SQLite transaction documentation for a developer choosing a local prototype database. The draft should request a 300 to 500 word Markdown comparison, only official documentation, with two source URLs and one recommendation. Do not research or run the mission; I will review the draft first. Use this unique mission_id for the disposable acceptance draft: S62-ACCEPT-' + marker.split(' ').at(-1) + '.');await page.keyboard.press('Enter');assert.equal((await turn).status(),200);await expect(page.getByRole('button',{name:'Send',exact:true})).toBeVisible();
+ stage='inline personal project';const projectResponse=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/v1/projects'&&r.request().method()==='POST');await page.getByLabel('New project',{exact:true}).fill(marker);await page.getByRole('button',{name:'Create',exact:true}).click();const project=await (await projectResponse).json();projectId=project.id;assert(projectId);receipt.fixture_project_id=projectId;
+ await expect(page.getByRole('button',{name:'Draft a mission',exact:true})).toBeEnabled();
+ stage='review generated draft';const drafted=page.waitForResponse(r=>r.url().endsWith('/librarian/drafts')&&r.request().method()==='POST',{timeout:90000});await page.getByRole('button',{name:'Draft a mission',exact:true}).click();const dr=await drafted;assert.equal(dr.status(),200);const data=await dr.json();assert(data.draft.objective&&data.draft.success_criteria.length);receipt.planning_model=data.model;receipt.planning_usage=data.usage;receipt.preview_fidelity=data.preview?.fidelity;receipt.lint_errors=data.lint_errors.length;
+ const draft=page.getByRole('region',{name:'Mission draft',exact:true});await expect(draft).toBeVisible();await expect(draft).toBeFocused();await audit(page,'review-light-390');await page.reload({waitUntil:'networkidle'});await expect(draft).toBeVisible();await expect(page.getByRole('combobox',{name:'Project',exact:true})).toHaveValue(projectId);
+ stage='save without dispatch';const created=page.waitForResponse(r=>r.url().endsWith('/librarian/missions')&&r.request().method()==='POST',{timeout:30000});await page.getByRole('button',{name:'Create draft mission',exact:true}).dblclick();const cr=await created;assert([200,201].includes(cr.status()));const saved=await cr.json();missionId=saved.mission.id;receipt.fixture_mission_id=missionId;await expect(page).toHaveURL(new RegExp('/missions/'+missionId+'\\?from=librarian$'));await expect(page.getByRole('button',{name:'Submit to DeepSearch',exact:true})).toBeVisible();await page.waitForLoadState('networkidle');
+ const mission=await request('GET','/missions/'+missionId,null,auth);assert.equal(mission.status,'draft');assert.equal(mission.started_at,null);assert.equal(mission.deepsearch_job_id,null);receipt.saved_status=mission.status;receipt.research_submitted=false;receipt.writes=writes;receipt.suppressed_activity_writes=suppressedWrites;assert.equal(writes.filter(p=>p==='/api/v1/librarian/missions').length,1);await audit(page,'saved-light-390');
+ stage='disabled fixture session';await request('PATCH','/admin/users/'+user.user_id+'/active',{is_active:false});await page.reload({waitUntil:'networkidle'});await expect(page.getByRole('heading',{name:'Sign in',exact:true})).toBeVisible();assert.equal(await page.evaluate(()=>localStorage.getItem('tracelab.auth.v2')),null);await expect(page.locator('.app-workspace')).toHaveCount(0);await page.getByRole('link',{name:'Forgot password?',exact:true}).click();await expect(page.getByRole('heading',{name:'Forgot password?',exact:true})).toBeVisible();await audit(page,'disabled-recovery-light-390');assert.deepEqual(errors,[]);receipt.disabled_session='persistent and in-memory auth cleared; private shell removed; recovery reachable';receipt.passed=true;
+}catch(error){receipt.passed=false;receipt.failed_stage=stage;receipt.error_type=error?.name;if(typeof error?.actual==='number')receipt.actual=error.actual;if(typeof error?.expected==='number')receipt.expected=error.expected;receipt.error=String(error?.message??'Unknown failure').split('\n')[0].replace(/https?:\/\/\S+/g,'[URL]').slice(0,250);process.exitCode=1}
+finally{
+ await browser?.close();
+ for(const [label,route,method] of [['mission',missionId&&'/missions/'+missionId,'DELETE'],['project_soft_delete',projectId&&'/projects/'+projectId+'?confirm=true','DELETE'],['user',user&&'/admin/users/'+user.user_id,'DELETE'],['unused_invite',!user&&invite&&'/auth/invite-codes/'+invite.id,'DELETE']])if(route){try{await request(method,route);receipt.cleanup.push({label,passed:true})}catch{receipt.cleanup.push({label,passed:false});process.exitCode=1}}
+ await fs.writeFile(path.join(out,'receipt.json'),JSON.stringify(receipt,null,2));console.log(JSON.stringify({passed:receipt.passed,failed_stage:receipt.failed_stage,checks:receipt.checks.length,cleanup:receipt.cleanup}));
+}

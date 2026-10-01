@@ -1,0 +1,46 @@
+{
+  "mission": "S62-DEPLOY",
+  "status": "completed",
+  "checked_at": "2026-10-01T01:50:38.888896+00:00",
+  "pr": "https://github.com/kneelinghorse/TraceLab/pull/408",
+  "tested_head": "f8cd77397c19c40e38e4942578da9080716818e1",
+  "serving_commit": "4317a75d6ba1518cd94226847257880b6609243b",
+  "decision": 584,
+  "checks": {
+    "required_ci_contexts": 9,
+    "all_required_passed": true,
+    "backend_passed": 3122,
+    "backend_skipped": 4,
+    "quarantine_unchanged": 12,
+    "effective_config_source": "named partial tracelab; both resolved legacy manifests empty and configFile=null",
+    "post_rollout_plan_changes": 0,
+    "owned_services": 2,
+    "unchanged_unrelated_resources": 8,
+    "backend_alembic_before_uvicorn": "live logs verified",
+    "frontend_build_start_health": "live logs verified",
+    "authenticated_metrics_http_statuses": [
+      200,
+      200
+    ],
+    "authenticated_ui_checks": 6,
+    "ui_failures": 0,
+    "new_server_environment_variables": 0,
+    "root_tooling_npm_audit_findings": 0
+  },
+  "receipts": [
+    "inventory-before.json",
+    "resources-before.json",
+    "plan-reviewed.json",
+    "apply-receipt.json",
+    "settings-after-apply.json",
+    "resource-parity.json",
+    "final-source-ci.json",
+    "deployed-acceptance.json",
+    "authenticated-ui-smoke.json"
+  ],
+  "limitations": [
+    "Combined first-use acceptance belongs to S62-WALK and is blocked by existing provider429 insufficient_quota; see first-use-blocker.json.",
+    "Hello real inbox acceptance belongs to S62-MAIL and remains pending explicit send authorization and actual inbox/Reply-To proof.",
+    "Local full CMOS integration runner retains two independently verified baseline failures; not misreported as passing."
+  ]
+}
