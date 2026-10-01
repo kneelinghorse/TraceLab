@@ -136,7 +136,9 @@
       "Once worker semantics are fixed, version the deterministic fixture and resync TraceLab preview plus mission-authoring-contract.md in a separately scoped change."
     ],
     "sent_to_other_project": false,
-    "correction_implemented": false
+    "correction_implemented": false,
+    "cmos_next_step_id": 479,
+    "original_diagnosis_next_step_476": "closed as diagnosed; correction remains pending479"
   },
   "validation": {
     "offline_reproducer": "pass; socket connect+DNS blocked",
@@ -146,5 +148,11 @@
     "sibling_repository_read_or_changed": false,
     "worker_or_model_changed": false,
     "historical_artifacts_modified": false
-  }
+  },
+  "evidence_ledger_finding_ids": [
+    "82192336-6a74-4d52-af94-9961e09dfe0f",
+    "39c6d944-30d5-455f-bd2d-bf2bab7ef1a7",
+    "7cdb2438-d3e6-43d6-8010-8dd7a56d07e8",
+    "c2219c24-2c00-462a-b510-3d11256b7bb5"
+  ]
 }

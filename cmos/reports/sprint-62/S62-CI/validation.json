@@ -78,5 +78,22 @@
     "failed": 0,
     "visual_review": "Local Light1440 Missions screenshot inspected; long Dark390 Evidence screenshot inspected for gross layout only; all route DOM overflow/axe/theme/transport checks passed."
   },
-  "ci": "Nine required GitHub contexts launched on1fe3539; final receipt pending."
+  "ci": {
+    "source_commit": "1fe3539d0aed9c3e0c1f24c93cfdfcc9711d12b1",
+    "required_contexts": 9,
+    "all_passed": true,
+    "backend_summary": [
+      "2026-10-01T00:25:25.5941078Z === 3081 passed, 4 skipped, 12 deselected, 49 warnings in 676.09s (0:11:16) ===="
+    ],
+    "diagnostics_uploaded": [
+      {
+        "id": 11134130710,
+        "name": "backend-suite-diagnostics",
+        "size_in_bytes": 112822,
+        "expired": false,
+        "created_at": "2026-10-01T00:25:29Z",
+        "expires_at": "2026-10-08T00:25:28Z"
+      }
+    ]
+  }
 }
