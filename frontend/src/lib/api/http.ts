@@ -3,7 +3,7 @@ import { clearStoredAuth, getStoredAuth } from "@/lib/auth/storage";
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
 
 /**
- * Fired on the window when an authenticated request gets a 401. AuthContext
+ * Fired when an authenticated request is unauthorized or its account is disabled. AuthContext
  * listens and drives a full logout — clearing localStorage alone (below) leaves
  * a "signed in" shell whose in-memory token keeps isAuthenticated=true while
  * every call 401s (decision #315a). A window event decouples this module from
@@ -83,15 +83,24 @@ export class HttpError extends Error {
   constructor(message: string, readonly status: number) { super(message); this.name = "HttpError"; }
 }
 
+/** Shared by JSON requests, multipart uploads and file downloads. */
+export function expireRejectedSession(status: number, body: unknown, requestToken?: string | null, skipAuth = false): void {
+  const disabled = status === 403 && typeof body === "object" && body !== null && "detail" in body && body.detail === "Account is disabled";
+  // A delayed rejection from an old account must not sign out a newer session.
+  if (skipAuth || (requestToken || null) !== (getStoredAuth()?.token || null) || (status !== 401 && !disabled)) return;
+  clearStoredAuth();
+  if (typeof window !== "undefined") window.dispatchEvent(new Event(AUTH_EXPIRED_EVENT));
+}
+
 export async function apiRequest<T>(path: string, options: ApiRequestOptions = {}): Promise<T> {
   const { skipAuth = false, headers, params, ...rest } = options;
   const resolvedHeaders = new Headers(headers ?? undefined);
   resolvedHeaders.set("Content-Type", "application/json");
+  const requestToken = getStoredAuth()?.token;
 
   if (!skipAuth) {
-    const auth = getStoredAuth();
-    if (auth?.token) {
-      resolvedHeaders.set("Authorization", `Bearer ${auth.token}`);
+    if (requestToken) {
+      resolvedHeaders.set("Authorization", `Bearer ${requestToken}`);
     }
   }
 
@@ -101,20 +110,13 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
     headers: resolvedHeaders,
   });
 
-  if (response.status === 401 && !skipAuth) {
-    clearStoredAuth();
-    // Drop AuthContext's in-memory session too, else the user is left in a
-    // logged-in-looking but fully broken shell (decision #315a).
-    if (typeof window !== "undefined") {
-      window.dispatchEvent(new Event(AUTH_EXPIRED_EVENT));
-    }
-    const detail = await response.text();
-    throw new HttpError(detail || "Unauthorized – please sign in again.", 401);
-  }
-
   if (!response.ok) {
-    const detail = await response.text();
-    throw new HttpError(detail || `Request to ${path} failed with status ${response.status}`, response.status);
+    const detail = await response.text().catch(() => "");
+    let body: unknown;
+    try { body = JSON.parse(detail); } catch { /* Non-JSON errors cannot identify a disabled account. */ }
+    expireRejectedSession(response.status, body, requestToken, skipAuth);
+    const fallback = response.status === 401 && !skipAuth ? "Unauthorized – please sign in again." : `Request to ${path} failed with status ${response.status}`;
+    throw new HttpError(detail || fallback, response.status);
   }
 
   if (response.status === 204) {

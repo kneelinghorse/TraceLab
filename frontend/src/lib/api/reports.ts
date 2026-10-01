@@ -2,7 +2,7 @@
  * Reports API client
  */
 
-import { buildApiUrl, httpClient } from "./http";
+import { buildApiUrl, expireRejectedSession, httpClient } from "./http";
 import { getStoredAuth } from "@/lib/auth/storage";
 
 export type ReportStatus = "draft" | "final";
@@ -137,7 +137,8 @@ export const reportsApi = {
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({ detail: "Export failed" }));
-      throw new Error(error.detail || "Export failed");
+      expireRejectedSession(response.status, error, token);
+      throw new Error(error?.detail || "Export failed");
     }
 
     return response.blob();

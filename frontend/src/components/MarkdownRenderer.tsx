@@ -17,7 +17,7 @@ const components: Components = {
   // Code uses the same semantic surfaces in every theme.
   pre({ children }) {
     return (
-      <pre className="bg-surface rounded-lg p-4 overflow-x-auto text-sm text-foreground">
+      <pre tabIndex={0} role="region" aria-label="Scrollable code block" className="bg-surface rounded-lg p-4 overflow-x-auto text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus">
         {children}
       </pre>
     );

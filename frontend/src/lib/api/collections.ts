@@ -2,7 +2,7 @@
  * Collections API client
  */
 
-import { buildApiUrl, httpClient } from "./http";
+import { buildApiUrl, expireRejectedSession, httpClient } from "./http";
 import { getStoredAuth } from "@/lib/auth/storage";
 
 export type Collection = {
@@ -143,7 +143,8 @@ export const collectionsApi = {
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({ detail: "Export failed" }));
-      throw new Error(error.detail || "Export failed");
+      expireRejectedSession(response.status, error, auth?.token);
+      throw new Error(error?.detail || "Export failed");
     }
 
     // Get filename from Content-Disposition header or use default

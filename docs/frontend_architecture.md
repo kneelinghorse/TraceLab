@@ -50,8 +50,10 @@ roadmap's Route Migration Map section. Redirects are covered by `frontend/tests/
   `CommandPalette.tsx`.
 - **Authentication.** `frontend/src/contexts/AuthContext.tsx` owns the session and
   `frontend/src/lib/auth/storage.ts` persists it in local storage under `tracelab.auth.v2`;
-  `components/AuthGate.tsx` wraps every page; a 401 from any request clears the session
-  through the `tracelab:auth-expired` window event in `lib/api/http.ts`.
+  `components/AuthGate.tsx` wraps every page. Authenticated JSON, upload, and download requests
+  clear the session on 401 or the exact 403 detail `Account is disabled`, through the
+  `tracelab:auth-expired` window event in `lib/api/http.ts`. Ordinary permission failures
+  preserve the session; a delayed rejection for a previous token cannot clear a newer login.
 - **Role channel.** `frontend/src/contexts/RoleContext.tsx` reads the role from a live
   `GET /api/v1/auth/me` only, never from the token or stored auth; `components/RequireAdmin.tsx` fails
   closed and admin navigation groups are filtered by `useRole().isAdmin`.
