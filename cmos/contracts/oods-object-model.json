@@ -2711,6 +2711,30 @@
           "validation_thresholds": {
             "annotation": "dict[str, float]",
             "mapping": "Mission.validation_thresholds"
+          },
+          "contract_id": {
+            "annotation": "<class 'str'>",
+            "mapping": "Read-only API preview identity; never substitute for an executed run contract."
+          },
+          "canonical_contract_id": {
+            "annotation": "<class 'str'>",
+            "mapping": "Read-only canonical structural identity in the full preview; not historical execution evidence."
+          },
+          "canonical_contract_sha256": {
+            "annotation": "<class 'str'>",
+            "mapping": "Read-only SHA-256 of the canonical structural contract in the full preview."
+          },
+          "compiler_semantic_revision": {
+            "annotation": "<class 'int'>",
+            "mapping": "Read-only semantic compiler revision; separate from the pinned source commit."
+          },
+          "compiler_source_revision": {
+            "annotation": "<class 'str'>",
+            "mapping": "Read-only pinned compiler source commit; preserve structural_only qualification."
+          },
+          "authored_scope": {
+            "annotation": "<class 'app.services.contract_compiler.scope.AuthoredScope'>",
+            "mapping": "Read-only planned word/source limits and seed URLs in mission and Librarian review; parsed from authored inputs, not deployed-worker proof."
           }
         }
       },
@@ -3830,6 +3854,40 @@
       "tag_id": {
         "annotation": "<class 'uuid.UUID'>",
         "mapping": "Document.tags[].tag_id"
+      }
+    },
+    "app.services.contract_compiler.scope.AuthoredScope": {
+      "version": {
+        "annotation": "typing.Literal['authored-scope-v1']",
+        "mapping": "Scope schema identity; unknown versions remain unavailable."
+      },
+      "reference_urls": {
+        "annotation": "list[str]",
+        "mapping": "Reference seeds disclosure; seeds alone do not restrict research."
+      },
+      "restriction": {
+        "annotation": "typing.Literal['unrestricted', 'domains', 'exact_pages']",
+        "mapping": "Planned source restriction: unrestricted, domains or exact pages."
+      },
+      "allowed_urls": {
+        "annotation": "list[str]",
+        "mapping": "Exact allowed pages with complete URLs and wrapping."
+      },
+      "allowed_domains": {
+        "annotation": "list[str]",
+        "mapping": "Allowed domains and subdomains, distinct from exact pages."
+      },
+      "min_words": {
+        "annotation": "int | None",
+        "mapping": "Parsed minimum word bound; null remains unspecified."
+      },
+      "max_words": {
+        "annotation": "int | None",
+        "mapping": "Parsed maximum word bound; null remains unspecified."
+      },
+      "max_sources": {
+        "annotation": "int | None",
+        "mapping": "Maximum distinct consulted pages; null remains unspecified."
       }
     }
   },

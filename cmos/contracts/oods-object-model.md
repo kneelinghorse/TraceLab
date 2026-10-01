@@ -209,6 +209,12 @@ Source: `app.schemas.mission`. Traits: `content/Labelled`, `lifecycle/Stateful`,
 | `mission_uuid` | `MissionContractPreviewResponse` | Transport/request envelope; not a displayed object field. |
 | `contract_version` | `MissionContractPreviewResponse` | Transport/request envelope; not a displayed object field. |
 | `compiler_revision` | `MissionContractPreviewResponse` | Transport/request envelope; not a displayed object field. |
+| `contract_id` | `MissionContractPreviewResponse` | Read-only API preview identity; never substitute for an executed run contract. |
+| `canonical_contract_id` | `MissionContractPreviewResponse` | Read-only canonical structural identity in the full preview; not historical execution evidence. |
+| `canonical_contract_sha256` | `MissionContractPreviewResponse` | Read-only SHA-256 of the canonical structural contract in the full preview. |
+| `compiler_semantic_revision` | `MissionContractPreviewResponse` | Read-only semantic compiler revision, separate from the source commit. |
+| `compiler_source_revision` | `MissionContractPreviewResponse` | Read-only pinned source commit; retain structural-only qualification. |
+| `authored_scope` | `MissionContractPreviewResponse` | Planned limits in mission/Librarian review: word bounds, consulted-page cap, exact pages or domains, and separate reference seeds. Parsed plans do not prove deployed-worker enforcement. |
 | `fidelity` | `MissionContractPreviewResponse` | Transport/request envelope; not a displayed object field. |
 | `named_entities` | `MissionContractPreviewResponse` | Transport/request envelope; not a displayed object field. |
 | `objectives` | `MissionContractPreviewResponse` | Transport/request envelope; not a displayed object field. |
