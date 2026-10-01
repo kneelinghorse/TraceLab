@@ -131,11 +131,20 @@ for (const theme of ["light", "dark"] as const) {
       await expect(list.getByRole("link", { name: "scope & provenance", exact: true })).toHaveAttribute("href", `/collections/${collectionId}`);
       expect(requests.filter(item => item.pathname.endsWith(`/collections/${collectionId}/chunks`)).map(item => item.body?.chunk_id)).toEqual(chunkIds);
 
-      await list.getByRole("button", { name: "Save current search", exact: true }).click();
+      await list.getByRole("button", { name: "Save current search", exact: true }).focus();
+      await page.keyboard.press("Enter");
+      await page.keyboard.press("Tab");
+      await expect(page.getByLabel("Name", { exact: true })).toBeFocused();
       await page.getByLabel("Name", { exact: true }).fill("Saved browser round trip");
-      await page.getByRole("button", { name: "Save search", exact: true }).click();
+      await page.keyboard.press("Tab");
+      await expect(page.getByLabel("Description", { exact: true })).toBeFocused();
+      await page.getByLabel("Description", { exact: true }).fill("Reviewed browser scope");
+      await audit(page, `save-search-form-${theme}-${width}`);
+      await page.keyboard.press("Tab");
+      await expect(page.getByRole("button", { name: "Save search", exact: true })).toBeFocused();
+      await page.keyboard.press("Enter");
       await expect(list.getByText(/^Search saved\./)).toBeVisible();
-      expect(requests.find(item => item.method === "POST" && item.pathname.endsWith("/saved-searches"))?.body).toMatchObject({ query_text: "scope & provenance", top_k: 20, filters: {} });
+      expect(requests.find(item => item.method === "POST" && item.pathname.endsWith("/saved-searches"))?.body).toMatchObject({ name: "Saved browser round trip", description: "Reviewed browser scope", query_text: "scope & provenance", top_k: 20, filters: {} });
 
       await page.goto("/saved-searches");
       const saved = page.getByRole("article").filter({ has: page.getByRole("button", { name: "Saved browser round trip", exact: true }) });

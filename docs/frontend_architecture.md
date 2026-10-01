@@ -1,7 +1,9 @@
 # Frontend Architecture (as built)
 
-As of main `bf750cb70550a33f179b0ca4c2518454122ff87c` (2026-09-15, end of the Sprint 52 build). This page describes the
-frontend that ships from `frontend/` today. Intent and the sprint plan live in the living
+Baseline: main `bf750cb70550a33f179b0ca4c2518454122ff87c` (2026-09-15, end of the Sprint 52 build), with
+later scoped updates. S63-CLEAN (2026-10-01) verified the mission routes/filters,
+command palette and saved-search path below; it did not re-audit the entire page.
+Architecture follows `cmos/foundational-docs/tech_arch_template.md`. Intent and the sprint plan live in the living
 roadmap, `cmos/foundational-docs/roadmap-sprints-50-53-ux-overhaul.md`; CMOS holds mission
 status. The Sprint 03 "Mission Protocol UI" notes this page replaces are in git history
 (`git show 3a498c6:docs/frontend_architecture.md`).
@@ -28,7 +30,7 @@ status. The Sprint 03 "Mission Protocol UI" notes this page replaces are in git 
 | `/projects`, `/projects/[id]` | `projects/index.tsx`, `projects/[id].tsx` | Project list and bundle |
 | `/documents`, `/documents/[id]`, `/documents/upload` | `documents/*.tsx` | Document list, detail (full text first via `GET /documents/{id}/content`, Overview/Chunks/Evidence tabs, `?tab=` deep links, `?chunk=<id>&index=<n>` citation links that open the Chunks tab on the cited chunk expanded and marked (QA-1), Open report/mission links from the server-resolved `links`), upload |
 | `/collections`, `/collections/[id]` | `collections/*.tsx` | Collections and collection context |
-| `/missions`, `/missions/[id]`, `/missions/new`, `/missions/queue` | `missions/*.tsx` | Mission list with views and reason filters, run detail, authoring, queue |
+| `/missions`, `/missions/[id]`, `/missions/new` | `missions/index.tsx`, `missions/[id].tsx`, `missions/new.tsx` | Mission list with status/project filters and created/updated sorting, run detail and manual authoring. Plan a mission opens `/librarian?intent=mission`; saved mission views and reason filters were removed in ACT-1 |
 | `/reports`, `/reports/[id]` | `reports/*.tsx` | Reports |
 | `/librarian` | `librarian.tsx` | Since S62-ENTRY, fresh mission CTAs on Home, Missions and the command palette open `/librarian?intent=mission`: focused conversation, explicit project selection/creation, then reviewed draft saving. Manual `/missions/new` remains a secondary link and retains repeat/collection seeds; zero-project manual entry links back to guided planning. Explicit `q` or `saved` search parameters take precedence over planning intent. A changed or revoked destination invalidates the generated draft while retaining the conversation; account changes remount the per-user planner. The Librarian (Sprint 57, LIB-1): conversation with typed provenance (prose vs cited corpus claims), mission draft with compiled contract and lint, explicit creation of a draft mission. Since LIB-2 the conversation, project and draft persist per user in localStorage (`lib/librarian/storage.ts`), a fresh draft takes focus, the three-step strip (`components/librarian/LibrarianSteps`) and the mission page's `?from=librarian` notice share one "don't show again" preference. Since QA-1, "Ask the documents" sends a turn in answer mode with a chosen budget (Short answer 600 tokens, Full synthesis 2000, `ANSWER_BUDGETS` in `lib/api/librarian.ts`): cited passages link to their chunks, uncited text renders as prose, and a refusal renders as a note that asserts nothing. Since QA-2 (Sprint 59, decision #545), "List the chunks" is search inside the Librarian: `components/librarian/ChunkList.tsx` lists the 20 best chunks for a phrase from `POST /pedr/search` (the selected project, or every readable project), each linking to its `?chunk=&index=` place in the document, and saves the list as a collection or the phrase as a saved search. The URL carries it: `?q=<phrase>&project=<id>`, or `?saved=<id>`, which runs a saved search through `POST /saved-searches/{id}/execute` and lists its ranked chunks. The standalone Search page is retired and `/search` redirects here with its query |
 | `/graph` | `graph.tsx` | Relationship neighborhood (Sprint 52, UX-11) |
@@ -41,6 +43,9 @@ status. The Sprint 03 "Mission Protocol UI" notes this page replaces are in git 
 carries the theme bootstrap. Legacy routes redirect: `frontend/src/lib/route-migrations.json`
 (ten rows: one page, two live redirects, seven retired aliases) feeds `redirects()` in `frontend/next.config.ts`, and the canonical map is the
 roadmap's Route Migration Map section. Redirects are covered by `frontend/tests/e2e/route-migration.spec.ts`.
+`/missions/queue` is retired: `missions/queue.tsx` deliberately returns 404 so
+`missions/[id].tsx` cannot interpret `queue` as a mission ID. Keep this tombstone
+and the route-migration map together.
 
 ## Shell
 
@@ -62,10 +67,17 @@ roadmap's Route Migration Map section. Redirects are covered by `frontend/tests/
   `data-theme` with semantic tokens only: no fixed palette classes and no `dark:` utilities, enforced by
   `frontend/scripts/check-token-colors.mjs`. High contrast is deferred to THEME-2 in Sprint 54.
 - **Command palette.** ⌘K / Ctrl-K opens `CommandPalette.tsx`: name lookup through
-  `lib/api/navigation.ts` (`GET /api/v1/navigation/search`), saved searches, saved mission
-  views, and "Go to" entries derived from `navigationGroups`. Enter searches research in the
+  `lib/api/navigation.ts` (`GET /api/v1/navigation/search`), saved searches, and role-filtered
+  "Go to" entries derived from `navigationGroups`. With an empty query, Actions offers
+  Plan a mission, New project, New collection and Upload documents. Enter searches research in the
   Librarian's chunk list (`/librarian?q=`); a saved search opens `/librarian?saved=<id>`. Recent searches
   left with the Search page in QA-2: the chunk list records no search history.
+- **Save current search.** The Librarian's chunk list is the sole `SaveSearchButton.tsx`
+  caller. Opening its manual form captures the current query, filters and top K in
+  an internal draft; later parent changes do not change the reviewed scope. Saving
+  preserves the name/description and serialized filters, then refreshes the saved
+  list and shows its link. Cancel discards the draft. Saved searches remain active;
+  the abandoned external preset/auto-open path was removed in S63-CLEAN.
 
 ## Data layer (`frontend/src/lib/api`)
 

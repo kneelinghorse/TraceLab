@@ -1,0 +1,106 @@
+{
+  "sprint_id": "sprint-63",
+  "session_id": "PS-2026-10-01-007",
+  "decision_id": 589,
+  "learning_id": 293,
+  "planning_date": "2026-10-01",
+  "branch": "codex/sprint-63-plan",
+  "base_commit": "9caa93b8f6adbf11e4431c5616b380d478f67a37",
+  "runtime_ancestor": "d7b8682c35104c627691f1ebb2782e5e04e33868",
+  "canonical_cmos_root": "/Users/systemsystems/portfolio/TraceLab",
+  "guiding_templates": [
+    "cmos/foundational-docs/roadmap_template.md",
+    "cmos/foundational-docs/tech_arch_template.md"
+  ],
+  "mission_definitions": {
+    "authoritative_store": "CMOS SQLite through MCP",
+    "ids": [
+      "S63-PUBLIC",
+      "S63-CLEAN",
+      "S63-RELEASE"
+    ],
+    "status": "Queued",
+    "success_criteria_count": 20,
+    "requires": [
+      [
+        "S63-RELEASE",
+        "S63-PUBLIC"
+      ],
+      [
+        "S63-RELEASE",
+        "S63-CLEAN"
+      ]
+    ],
+    "sprint_status": "Planned",
+    "start_date": null,
+    "end_date": null
+  },
+  "checks": {
+    "foundational_references": "passed",
+    "git_diff_check": "passed",
+    "mission_reference_files": {
+      "checked": 45,
+      "missing": []
+    },
+    "handoff_local_links": {
+      "checked": 19,
+      "missing": []
+    },
+    "mcp_operations": {
+      "operations": 118,
+      "tools": 9,
+      "actions": 50,
+      "errors": []
+    },
+    "mcp_arguments": {
+      "advertised_arguments": 125,
+      "gaps": []
+    },
+    "registry_readback": {
+      "latest": "2.1.0",
+      "target_patch": "2.1.1",
+      "recheck_at_build": true
+    },
+    "package_diff_from_release_tag": {
+      "tag": "tracelab-mcp-v2.1.0",
+      "changed_files": 0
+    },
+    "provider_isolation": "Planning checks did not import/run the app or contact model/mail/vector providers."
+  },
+  "next_steps": {
+    "open_count": 15,
+    "assigned_to_sprint_63": [
+      449,
+      450,
+      481
+    ],
+    "not_selected": [
+      400,
+      403,
+      406,
+      407,
+      415,
+      422,
+      431,
+      448,
+      452,
+      454,
+      477,
+      479
+    ],
+    "closed": []
+  },
+  "not_run": {
+    "runtime_tests": "No application/runtime change in planning; implementation test gates are defined in the missions and handoff.",
+    "package_build_pack_or_publish": "Deferred to PUBLIC/RELEASE.",
+    "production_acceptance": "Deferred to RELEASE; no new deployment, mail or provider call.",
+    "cross_project_replies": "Prepared prior mail reply and DeepSearch follow-up remain unsent."
+  },
+  "observations": [
+    "Package LICENSE exists; repository root license link returns404. No service-wide license selected.",
+    "SaveSearchPreset remains an internal draft type despite unused preset inputs.",
+    "Mission queue page is an intentional404 tombstone and must remain.",
+    "Original checkout and its two untracked user notes were preserved."
+  ],
+  "validation_runtime": "MCP parity scripts used TypeScript from the existing S62 package node_modules via NODE_PATH; no dependency files were changed."
+}

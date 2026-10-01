@@ -49,5 +49,4 @@ export type SaveSearchPreset = {
   query: string;
   filters: SearchFiltersState;
   topK: number;
-  suggestedName?: string;
 };

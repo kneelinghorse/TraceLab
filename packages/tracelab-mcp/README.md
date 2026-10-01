@@ -11,23 +11,24 @@ base.
 - Works out of the box with **Claude Desktop**, **Claude Code**, and any
   Model Context Protocol client over stdio
 
-Requirements: Node ≥ 18 and a reachable TraceLab API endpoint.
+Requirements: Node ≥ 18, a reachable TraceLab API endpoint, and an invited
+TraceLab account with access to that deployment.
 
 ---
 
 ## Install
 
-The fastest path is `npx` — no global install, always picks up the latest
-published version:
+Configure your stdio MCP client to launch the current published adapter with
+`npx` — no global install needed:
 
 ```bash
-npx @aquex/tracelab-mcp
+npx -y @aquex/tracelab-mcp@latest
 ```
 
-Global install if you'd rather pin once:
+For a reproducible install, pin the current documentation patch, **2.1.1**:
 
 ```bash
-npm install -g @aquex/tracelab-mcp
+npm install -g @aquex/tracelab-mcp@2.1.1
 tracelab-mcp
 ```
 
@@ -41,12 +42,63 @@ npm run build
 node dist/index.js
 ```
 
+These commands launch a long-running stdio server for your MCP client. They
+are not shell commands for individual tool calls.
+
+---
+
+## First run: from sign-in to a cited answer
+
+1. Obtain an invitation and sign in to the [TraceLab browser app](https://tracelab.aquex.ai).
+   [Configure your MCP client](#configure-your-mcp-client) with the API origin
+   `https://api.tracelab.aquex.ai`, then let the client launch the adapter.
+2. Open the device-approval URL shown in the client's server logs and approve
+   that launch in your signed-in browser. See [First-time login](#first-time-login)
+   below. Allow enough startup time for the device flow to finish; if your client
+   stops the process first, increase its startup timeout and relaunch to get a
+   fresh code.
+3. Ask the MCP client to call `tracelab_project` with `action="list"`:
+
+   ```json
+   { "name": "tracelab_project", "arguments": { "action": "list" } }
+   ```
+
+   Select a returned project's `id` for `project_id`. Signup creates a personal
+   Space, **not a project or bundled corpus**; shared access may make existing
+   projects visible. If the list is empty, create a project in the browser app
+   (or with `tracelab_project`, `action="create"`, and `name`). Upload and process
+   documents in that project before asking about them. Do the same if a visible
+   project has no indexed documents yet. The adapter also exposes
+   `tracelab_document` actions `upload` and `process` for this ingestion path.
+4. Call `tracelab_search` with `action="ask"`, the selected `project_id`, and
+   your `question`. Replace this example UUID with the ID returned above:
+
+   ```json
+   {
+     "name": "tracelab_search",
+     "arguments": {
+       "action": "ask",
+       "project_id": "fbd3bd03-5ddc-49ee-8013-529163a99290",
+       "question": "What do these documents say about onboarding?"
+     }
+   }
+   ```
+
+   Open a returned `citations[].url` to view its supporting chunk in the
+   document. `no_evidence: true` is expected when the accessible indexed
+   documents do not support an answer. This action answers only from that
+   project's corpus; general Librarian chat/planning is a separate interaction.
+   Asking does not submit a DeepSearch mission. Any paid model call is recorded
+   as your usage.
+
+The JSON above describes MCP tool calls made by your client, not terminal input.
+
 ---
 
 ## First-time login
 
-The first time you launch `tracelab-mcp` against an account that has never
-issued an MCP credential, the server runs an RFC 8628 device-authorization
+When neither an environment credential nor a stored credential matching the
+API origin is available, `tracelab-mcp` runs an RFC 8628 device-authorization
 flow. You'll see this on stderr:
 
 ```
@@ -66,8 +118,8 @@ Code:  WDJB-MJHT
    continues startup.
 
 The minted key is stored at `~/.config/tracelab-mcp/credentials.json`
-(`chmod 600`). Subsequent launches reuse it; you never see the login prompt
-again on that machine.
+(`chmod 600`). Subsequent launches against the same API origin reuse it. A
+revoked credential must be removed and replaced through a fresh login.
 
 To revoke a key, delete the credential file *and* delete the key from your
 TraceLab account at `/profile` → API Keys. To force a re-login, delete the
@@ -102,13 +154,15 @@ Add the stdio server to `~/.codex/config.toml`:
 ```toml
 [mcp_servers.tracelab]
 command = "npx"
-args = ["-y", "@aquex/tracelab-mcp"]
-startup_timeout_sec = 30
+args = ["-y", "@aquex/tracelab-mcp@latest"]
+startup_timeout_sec = 600
 
 [mcp_servers.tracelab.env]
 TRACELAB_API_URL = "https://api.tracelab.aquex.ai"
 ```
 
+The [startup timeout](https://learn.chatgpt.com/docs/config-file/config-reference)
+allows time to approve the device code before the adapter registers its tools.
 Restart Codex after saving the configuration. TraceLab does not expose a
 remote SSE MCP endpoint; a connector configured with `url =
 "https://aquex.ai/mcp"` is not the TraceLab MCP server.
@@ -122,7 +176,7 @@ Add to `claude_desktop_config.json`:
   "mcpServers": {
     "tracelab": {
       "command": "npx",
-      "args": ["-y", "@aquex/tracelab-mcp"],
+      "args": ["-y", "@aquex/tracelab-mcp@latest"],
       "env": {
         "TRACELAB_API_URL": "https://api.tracelab.aquex.ai"
       }
@@ -139,14 +193,14 @@ on stderr (visible in Claude Desktop's MCP server logs).
 ```bash
 claude mcp add --transport stdio tracelab \
   --env TRACELAB_API_URL=https://api.tracelab.aquex.ai \
-  -- npx -y @aquex/tracelab-mcp
+  -- npx -y @aquex/tracelab-mcp@latest
 ```
 
 ### Other MCP clients
 
 The server speaks stdio. Any MCP-compatible client that can launch a
-subprocess will work — point it at `tracelab-mcp` (or `npx
-@aquex/tracelab-mcp`) and pass `TRACELAB_API_URL` in the environment.
+subprocess will work — point it at `tracelab-mcp` (or
+`npx -y @aquex/tracelab-mcp@latest`) and pass `TRACELAB_API_URL` in the environment.
 
 ---
 
@@ -190,10 +244,10 @@ selected via the `action` parameter.
 | `tracelab_home` | `snapshot`, `favorites`, `activity`, `activity_summary` | Caller-scoped home and recent-activity reads (human credential required). |
 
 
-Sprint 52 additions below ship in **1.2.0**, the single publish that decision #425
-called for after every Sprint 52 MCP change landed. Installing 1.1.1 from npm
-does not provide these actions; use `npx -y @aquex/tracelab-mcp` (latest) or pin
-`@aquex/tracelab-mcp@1.2.0`.
+The Sprint 52 additions below first shipped in **1.2.0**. These sections record
+release history; subsequent changes are called out below and in the changelog.
+For current installation guidance, use [Install](#install); the current surface
+is the nine-tool, fifty-action table above.
 
 ### Sprint 52 read parameters (1.2.0)
 
@@ -367,7 +421,7 @@ Synthesize a collection into a report:
   "arguments": {
     "action": "synthesize",
     "collection_id": "11111111-1111-1111-1111-111111111111",
-    "synthesis_prompt": "Compare the platforms on cold-start latency and cost."
+    "prompt": "Compare the platforms on cold-start latency and cost."
   }
 }
 ```
@@ -453,7 +507,9 @@ If you previously used the un-published `@tracelab/mcp-server` name from
 this repo, the only change is the package name on install. Tool names,
 schemas, and behavior are unchanged. The flat `~24` tool surface from
 sprint-40 was collapsed into 7 clusters in sprint-41 (T41.7), then extended
-to 8 by the additive Evidence Ledger cluster in LEDGER-1;
+to 8 by the additive Evidence Ledger cluster in LEDGER-1, and to 9 with
+`tracelab_home` in 1.2.0. The 2.0.0 activity changes and 2.1.0 corpus Q&A addition
+bring the current surface to 9 tools / 50 actions. As before,
 calls to the legacy names return a friendly migration error pointing at
 the cluster equivalent.
 
@@ -527,7 +583,10 @@ published tarball never contains stale builds.
 
 ## License
 
-MIT. See [LICENSE](https://github.com/kneelinghorse/TraceLab/blob/main/LICENSE).
+The `@aquex/tracelab-mcp` adapter is MIT licensed. See its
+[LICENSE](https://github.com/kneelinghorse/TraceLab/blob/main/packages/tracelab-mcp/LICENSE).
+This license applies to the adapter package; it does not grant a license to the
+entire TraceLab service.
 
 ## Links
 
