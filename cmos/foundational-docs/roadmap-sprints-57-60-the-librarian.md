@@ -275,9 +275,10 @@ holds their complete acceptance criteria and dependencies. Build session
 PS-2026-09-30-013 started S62-ISO first from the accepted planning branch;
 the remaining mission order and acceptance boundaries below are unchanged.
 
-**Build checkpoint, 2026-10-01 UTC:** seven of nine missions are complete.
-[PR #408](https://github.com/kneelinghorse/TraceLab/pull/408) merged, and both
-production services serve `4317a75`. Test isolation, controlled CI diagnostics,
+**Build checkpoint, 2026-10-01 UTC:** nine of ten missions are complete, including
+the user-requested contrast addendum. [PR #408](https://github.com/kneelinghorse/TraceLab/pull/408)
+and [PR #409](https://github.com/kneelinghorse/TraceLab/pull/409) merged; both
+production services serve `e276977`. Test isolation, controlled CI diagnostics,
 guided mission entry, cache/metrics repairs, disabled-session/code accessibility
 and the scoped Railway migration are deployed. The saved-run scope diagnosis is
 complete; its P1 DeepSearch correction remains open as **#479**. All nine required
@@ -285,21 +286,25 @@ CI checks passed (backend: 3,122 passed, four skipped, twelve unchanged quaranti
 Frontend unit tests passed 368 cases, and the production read-only browser pass
 passed 192 checks across 32 routes, plus six S61 mission-log checks.
 
-**S62-MAIL remains Blocked**: code and configuration are deployed, but the controlled
-test email awaits explicit send authorization and actual destination-inbox/Reply-To
-evidence. **S62-WALK remains Queued** until its prerequisites are met. Two real
-zero-project member attempts stopped at the first Librarian turn because the existing
-provider returned `429 insufficient_quota`; both disposable accounts were removed
-and no research was submitted. Restore the existing provider quota/access, then rerun
-`frontend/scripts/deployed-mission-acceptance.mjs` against the serving commit. Local
-guided-flow tests do not replace this live gate. Sprint 62 remains Active.
+**S62-MAIL is complete**: the approved controlled email produced one delivered
+forward, and the user supplied the observed inbox Reply-To, which matched the
+configured controlled address. **S62-WALK is In Progress**. User-added credits
+resolved the provider quota failure (**#480** closed): two real zero-project
+member attempts received `gpt-5.1` replies and generated drafts with zero lint
+errors. A long reply exposed missing explicit keyboard focus on the scrollable
+transcript. A minimal focus/visible-ring fix and longer browser fixture are being
+validated before the final deployed draft-save and disabled-session checks.
+All disposable accounts/projects were cleaned; no research was submitted.
+Keep `gpt-5.1` for this release (decision **#585**); quota recovery did not require
+a model switch. Sprint 62 remains Active until the complete live gate passes.
 
 **User acceptance addendum, 2026-10-01 UTC:** S62-CONTRAST adds one narrow
 mission to the original nine: make the legacy dashboard Export CSV label inherit
 the existing light foreground. Four local browser cases and nine dashboard tests
-passed; deployment acceptance follows PR #409. The user also approved the prepared
-single hello test email. Resend records one delivered forward with the expected
-marker and Reply-To; actual destination-inbox confirmation remains required.
+passed. Live acceptance on `e276977` passed four more Light/Dark, mobile/desktop
+label/focus/hover checks and the authenticated CSV response. The conservative
+contrast ratio is 8.7:1. Mail and contrast are accepted; the sprint stays Active
+until the real first-use gate passes.
 
 The primary Home, Missions and command-palette action becomes **Plan a mission**,
 opening a focused Librarian view. A new user can describe research before choosing
@@ -330,12 +335,13 @@ promoted into the sprint, with effective-config readback and backend Alembic sta
 proof. S62-UX verifies existing table focus behavior and fixes the remaining code
 block gap. S62-OBS distinguishes the old metrics endpoint from the current admin UI.
 
-Of the ten promoted next-steps, #397, #426, #444, #445, #446, #447, #451, #464
-and #476 are accepted; #478 remains open for real inbox acceptance. Thirteen
-other carryovers stay outside scope. The scope-enforcement correction #479 and
-the provider-quota acceptance blocker also remain unresolved. Full redesign, sharing, unrelated cleanup,
+All ten promoted next-steps, #397, #426, #444, #445, #446, #447, #451, #464,
+#476 and #478, are accepted. Thirteen
+other carryovers stay outside scope. The scope-enforcement correction #479 remains unresolved. The provider-quota
+blocker #480 is resolved; final first-use acceptance is still in progress. Full redesign, sharing, unrelated cleanup,
 model/provider changes and worker implementation are not part of this plan.
-Aquex owns its site contact change; no email or cross-project reply has been sent.
+Aquex owns its site contact change; its completion summary is ready but unsent.
+Only the explicitly approved controlled email was sent.
 
 ### Running alongside: the guest expansion track
 
@@ -405,6 +411,7 @@ Add to this list rather than resolving items silently.
 
 ## Change Log
 
+- **2026-10-01 UTC, Sprint 62 acceptance follow-up; still Active.** PR #409 deployed as `e276977`, with the requested CSV label correction and live HTML/CSV checks passing. MAIL and #478 closed after the single approved forward and user-observed matching inbox Reply-To. Nine of ten missions are accepted; WALK is Blocked on existing provider quota (#480), reconfirmed by the cleaned-up third fixture attempt. No further mail, paid research, provider changes or cross-project reply.
 - **2026-10-01 UTC, Sprint 62 build checkpoint; still Active.** Seven missions complete, PR #408 deployed as `4317a75`, all required source CI green with existing skips/quarantine disclosed. Scoped Railway migration and live cache diagnostics accepted; 192 broad UI checks and six S61 log-page checks passed. MAIL awaits authorized send and actual inbox/Reply-To proof; WALK awaits MAIL and a real first-use rerun after provider quota is restored. The P1 DeepSearch correction remains separately owned as #479. No sprint closure, email or cross-project reply claimed.
 - **2026-09-30 UTC, Sprint 62 opened.** S62-ISO started in an isolated build worktree from `2d353e6`; CMOS identity and sprint pointers synchronized. Mandatory delivery and deployed acceptance gates remain open.
 - **2026-09-30 UTC, Sprint 62 locked for fresh build (decision #576).** Nine Queued missions cover test isolation, CI diagnostics, hello forwarding, saved-run scope diagnosis, guided mission entry, cache observability, two narrow UX defects, supported Railway configuration and final acceptance. Ten existing follow-ups promoted; thirteen remain outside scope. Official Railway cutoff corroborated in Evidence Ledger; no runtime/deploy/mail/paid-run action. [Build handoff](../planning/sprint-62-HANDOFF.md).

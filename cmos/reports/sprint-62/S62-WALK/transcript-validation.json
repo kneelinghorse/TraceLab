@@ -1,0 +1,50 @@
+{
+  "checked_at": "2026-10-01T03:49:59.983661+00:00",
+  "mission": "S62-WALK",
+  "source_base": "241c61bca0572cc12070d719abf057246587ecd7",
+  "failure_reproduction": "Real provider draft review failed axe scrollable-region-focusable on e276977; long link-free local fixture failed missing visible transcript focus before fix. Chromium native auto-focus allowed Tab/ArrowUp, so explicit focus and visible indicator are both tested.",
+  "fix": "Transcript tabIndex=0 and existing focus-visible token ring; no model/provider change.",
+  "source_sha256": {
+    "frontend/src/pages/librarian.tsx": "3d21d69034d5c612a45d6569d7a1381cd43eed4cd89c6cb05aba61817853f295",
+    "frontend/scripts/guided-mission-live.mjs": "bddfc2e13a93676f10c1d25c795b0a157f7b704f2bd1a746d0b6ef9bab19fece",
+    "frontend/scripts/deployed-mission-acceptance.mjs": "a34fc341c94f631c2c95586bd0540e9cd9b3bb65bd4173408b1cf78e0716847c",
+    "tests/e2e/guided_mission_fixture.py": "c3d67f8fe9d0ef04ad9b349fb1a26e1626aa78c38ae8cd1a98762121c955fd5c"
+  },
+  "validation": {
+    "real_local_member_browser_cases": 12,
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "widths": [
+      390,
+      820,
+      1440
+    ],
+    "entrypoints": [
+      "/",
+      "/missions"
+    ],
+    "real_api_and_rbac": true,
+    "model_scripted": true,
+    "transcript_actual_overflow": true,
+    "tab_focus_arrow_scroll_visible_ring": true,
+    "axe_serious_critical": 0,
+    "document_overflow": 0,
+    "draft_saves": 12,
+    "research_runs": 0,
+    "pytest_passed": 1,
+    "pytest_skipped": 0,
+    "pytest_warnings": 16,
+    "pytest_seconds": 41.87,
+    "frontend_unit_passed": 368,
+    "frontend_unit_skipped": 0,
+    "lint": "passed",
+    "production_build_and_types": "passed",
+    "ruff_changed_python": "passed",
+    "foundational_refs": "passed",
+    "mcp_operation_errors": 0,
+    "mcp_argument_gaps": 0
+  },
+  "limit": "Local production build acceptance; exact deployed acceptance pending required CI/merge/deploy. One initial reproduction targeted the unrelated original-checkout local server and is excluded; the correct build then reproduced the missing visible focus indicator."
+}

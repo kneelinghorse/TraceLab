@@ -1,0 +1,39 @@
+{
+  "checked_at": "2026-10-01T03:42:20.492Z",
+  "expected_commit": "e276977ec55bb8c6b42f8328d57be6d98727834b",
+  "marker": "S62 acceptance 874582a0-0f22-4104-a4e3-9986c31e5731",
+  "checks": [
+    {
+      "label": "review-light-390",
+      "overflow": false,
+      "violations": [
+        "scrollable-region-focusable"
+      ]
+    }
+  ],
+  "cleanup": [
+    {
+      "label": "project_soft_delete",
+      "passed": true
+    },
+    {
+      "label": "user",
+      "passed": true
+    }
+  ],
+  "fixture_user_id": "47f15b38-d58b-48b5-8e5d-76e57e64a28e",
+  "initial_projects": 0,
+  "fixture_project_id": "4ea7cb2d-5242-4c8d-a968-9dfa9870dbf4",
+  "planning_model": "gpt-5.1",
+  "planning_usage": {
+    "prompt_tokens": 1396,
+    "completion_tokens": 351,
+    "total_tokens": 1747
+  },
+  "preview_fidelity": "structural_only",
+  "lint_errors": 0,
+  "passed": false,
+  "failed_stage": "review generated draft",
+  "error_type": "AssertionError",
+  "error": "Expected values to be strictly deep-equal:"
+}

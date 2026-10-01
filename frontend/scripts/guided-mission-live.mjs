@@ -61,6 +61,16 @@ try {
     await page.getByLabel('Message the Librarian').fill('Help me compare onboarding needs for new research teams.');
     await page.keyboard.press('Enter');
     await expect(page.getByRole('log')).toContainText('Who is the audience');
+    const transcript = page.getByRole('log', {name: 'Transcript'});
+    assert(await transcript.evaluate(el => el.scrollHeight > el.clientHeight), 'The fixture must exercise a genuinely overflowing transcript');
+    await page.getByRole('button', {name: 'Start over', exact: true}).focus();
+    await page.keyboard.press('Tab');
+    await expect(transcript).toBeFocused();
+    const scrollBefore = await transcript.evaluate(el => el.scrollTop);
+    await page.keyboard.press('ArrowUp');
+    await expect.poll(() => transcript.evaluate(el => el.scrollTop)).toBeLessThan(scrollBefore);
+    const focusRing = await transcript.evaluate(el => getComputedStyle(el).boxShadow);
+    assert.notEqual(focusRing, 'none', 'Keyboard users must see the transcript focus target');
     await expect(page.getByRole('button', {name: 'Draft a mission', exact: true})).toBeDisabled();
     await page.getByLabel('New project', {exact: true}).fill('Guided planning ' + results.length);
     await page.getByRole('button', {name: 'Create', exact: true}).click();
@@ -89,7 +99,7 @@ try {
     await page.waitForLoadState('networkidle', {timeout: 15000});
     await context.unrouteAll({behavior: 'ignoreErrors'});
     assert.deepEqual(errors, []); assert.deepEqual(failed, []);
-    results.push({entry, theme, width, role: 'member', initialProjects: 0, destination: 'personal-space', savedStatus: 'draft', executed: false, ...layout, screenshot});
+    results.push({entry, theme, width, role: 'member', initialProjects: 0, destination: 'personal-space', savedStatus: 'draft', executed: false, transcriptKeyboardScroll: true, transcriptFocusVisible: true, ...layout, screenshot});
     await fs.writeFile(path.join(out, 'results.json'), JSON.stringify(results, null, 2));
     console.log(JSON.stringify({entry, theme, width, passed: true}));
     await context.close();

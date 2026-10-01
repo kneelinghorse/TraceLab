@@ -564,9 +564,10 @@ function LibrarianContent() {
         <div
           ref={logRef}
           role="log"
+          tabIndex={0}
           aria-live="polite"
           aria-label="Transcript"
-          className={`space-y-4 overflow-y-auto pr-1 ${expanded ? "" : started ? focusedPlanning ? "min-h-32 max-h-[50vh]" : "min-h-[50vh] max-h-[75vh]" : "max-h-[60vh]"}`}
+          className={`space-y-4 overflow-y-auto pr-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus ${expanded ? "" : started ? focusedPlanning ? "min-h-32 max-h-[50vh]" : "min-h-[50vh] max-h-[75vh]" : "max-h-[60vh]"}`}
         >
           {turns.length === 0 && answering && (
             <p className="text-secondary">

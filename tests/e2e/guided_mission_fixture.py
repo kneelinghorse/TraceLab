@@ -58,7 +58,13 @@ class PlanningModel:
             }
         else:
             self.turns += 1
-            payload = {"segments": [{"kind": "prose", "text": "Who is the audience for this research?", "citations": []}], "suggested_action": "draft_mission"}
+            # Real planning replies can overflow without containing any links.
+            # Short replies hid the transcript's missing keyboard scroll target.
+            reply = "Who is the audience for this research?\n\n" + "\n\n".join(
+                f"Planning consideration {index}: compare the audience, scope and primary sources before creating a draft."
+                for index in range(20)
+            )
+            payload = {"segments": [{"kind": "prose", "text": reply, "citations": []}], "suggested_action": "draft_mission"}
         return ModelReply(content=json.dumps(payload), usage={"prompt_tokens": 10, "completion_tokens": 10, "total_tokens": 20})
 
 
