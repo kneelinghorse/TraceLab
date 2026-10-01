@@ -166,7 +166,8 @@ def _build_preview_state(mission_context: dict[str, Any]) -> dict[str, Any]:
         # that was ever the default.
         "research_depth": "baseline",
         "max_loops": mission_context.get("max_loops") or 3,
-        "min_loops": mission_context.get("min_loops") or 0,
+        "min_loops": mission_context.get("min_loops") if mission_context.get("min_loops") is not None else 2,
+        "project_id": None,  # Worker converter leaves association to TraceLab.
         "depth_config": {},
     }
 
@@ -228,7 +229,7 @@ def preview_mission_contract(
     state = _build_preview_state(mission_context)
 
     try:
-        contract = compile_contract_from_state(state, origin="api_preview")
+        contract = compile_contract_from_state(state, origin="api_preview", enrichment_mode="none")
     except ValueError as exc:
         # Mirrors DS's HTTP layer mapping: ValueError → 422 compiler reject.
         raise ContractPreviewError(

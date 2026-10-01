@@ -358,13 +358,14 @@ prepared but unsent. The build scope includes package publication, the approved
 factual metadata correction and frontend acceptance. Cross-project messages,
 worker changes and paid research remain outside this sprint.
 
-### Follow-on — Sprint 64: Authored scope preview and result alignment (Planned 2026-10-01)
+### Follow-on — Sprint 64: Authored scope preview and result alignment (Active 2026-10-01)
 
 Derek requested TraceLab integration planning after DeepSearch returned the
 authored-scope correction. Decision **#595**, session **PS-2026-10-01-012**, and
 the [Sprint 64 handoff](../planning/sprint-64-HANDOFF.md) define a focused four-mission
-plan. CMOS holds the detailed criteria and dependencies. **All four are Queued;
-no implementation or deployment has started.** Dates stay unset until execution.
+plan. CMOS holds the detailed criteria and dependencies. **S64-VENDOR started in build session PS-2026-10-01-013** from planning tip
+`f1a854e` in isolated `codex/sprint-64-build`. Follow Requires order; release
+and worker acceptance remain separate gates.
 
 | Mission | Planned outcome | Requires |
 | --- | --- | --- |
@@ -456,6 +457,7 @@ Add to this list rather than resolving items silently.
 
 ## Change Log
 
+- **2026-10-01 UTC, Sprint 64 opened.** Session PS-2026-10-01-013 started VENDOR from `f1a854e`; fetched main has no newer changes outside the plan. CMOS identity synchronized to sprint-64-active.
 - **2026-10-01 UTC, Sprint 64 planning.** Decision #595 queues VENDOR → SCOPE → RESULT → ACCEPT for DeepSearch authored-scope parity. Verified the S94 local handoff's 17 fixture and six source hashes; worker rollout remains unproved. #479 is carried into S64, eleven other rows retain their scope, and S63 completed identity is preserved. The isolated planning branch reconciles current main with the later S63 closeout receipts; runtime implementation remains for a fresh build session.
 - **2026-10-01 UTC, Sprint 63 completed.** All three missions accepted. Interactive npm browser approval published 2.1.1; a fresh registry install matched the tested integrity and passed 63 real stdio checks with zero skips. Tag `tracelab-mcp-v2.1.1` identifies deployed merge `e716e34`. #449/#450/#481 closed; the twelve excluded rows retain ownership. Learning #295 corrects the earlier numeric-OTP assumption. Final receipts distinguish source CI and deployment from subsequent closeout-only commits.
 - **2026-10-01 UTC, Sprint 63 build checkpoint.** PUBLIC and CLEAN shipped in PR #412 (`e716e34`) with nine required checks passing. Both services serve that source; 42 authenticated read-only checks and five public production tests pass. Approved metadata applied; #449/#450 closed. RELEASE is blocked on npm EOTP and fresh registry acceptance; #481 and the twelve excluded rows stay open. Sprint identity remains active; no close claimed.
