@@ -1,6 +1,6 @@
 {
   "mission": "S62-ISO",
-  "status": "verification-in-progress",
+  "status": "completed",
   "source_base": "2d353e6",
   "branch": "codex/sprint-62-build",
   "implementation": "Pre-import test-only environment and SDK/HTTPX transport boundary; in-memory Qdrant with enabled cache behavior; fixture-owned local disposable Qdrant option.",
@@ -89,16 +89,65 @@
         "mcp-package"
       ],
       "backend_suite": "in progress"
+    },
+    {
+      "selection": "final-source full backend, no simultaneous frontend builds",
+      "source": "55e08cf",
+      "passed": 3077,
+      "failed": 0,
+      "skipped": 4,
+      "deselected": 12,
+      "duration_seconds": 419.52
+    },
+    {
+      "selection": "default disposable integration opt-in",
+      "passed": 0,
+      "failed": 0,
+      "skipped": 1,
+      "reason": "No --disposable-qdrant; no container started"
+    },
+    {
+      "selection": "GitHub backend attempt1",
+      "run_id": 36790956131,
+      "job_id": 110143597703,
+      "conclusion": "cancelled for diagnosis after an unusually slow run",
+      "last_completed_module": "tests/test_project_management_api.py at66%",
+      "timeout_stack_dumps": 0,
+      "finding": "Recovered logs show continuous progress. Broad module slowdown compared with green main36780279747; no confirmed stuck call. Retried the job; no threshold or quarantine change."
+    },
+    {
+      "selection": "GitHub backend attempt2",
+      "source": "55e08cf",
+      "run_id": 36790956131,
+      "passed": 3077,
+      "failed": 0,
+      "skipped": 4,
+      "deselected": 12,
+      "duration_seconds": 646.51
+    },
+    {
+      "selection": "GitHub PostgreSQL integration",
+      "source": "55e08cf",
+      "run_id": 36790956132,
+      "passed": 169,
+      "failed": 0,
+      "skipped": 3,
+      "duration_seconds": 123.28
+    },
+    {
+      "selection": "all nine required CI contexts",
+      "source": "55e08cf",
+      "result": "passed",
+      "receipt": "ci-checks.json"
     }
   ],
-  "pending": [
-    "Required GitHub checks for final source"
-  ],
+  "pending": [],
   "external_calls": "Sentinel probes intercepted sockets; no production vector, mail or model calls. Container proof used newly created local Docker Qdrant and PostgreSQL.",
   "scope_limits": [
     "No application feature or server variable change",
     "No quarantine changes",
-    "No production deployment required for this test-only mission"
+    "No production deployment required for this test-only mission",
+    "The first GitHub backend attempt was cancelled for diagnosis and is not passing evidence. Attempt2 passed unchanged in646.51s; no code, threshold or quarantine repair was needed for the slow runner."
   ],
   "dependency_audit_observation": "npm ci reported existing lockfile advisories: frontend21 (2 critical), MCP13 (1 critical). No dependencies changed; remediation outside the locked isolation mission.",
   "source_files_sha256": {
