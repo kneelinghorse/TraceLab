@@ -6,6 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import {createRequire} from 'node:module';
 import {inspectInternalLinks} from './route-migration-links.mjs';
+import {handleSmokeApiRequest} from './ui-shell-transport.mjs';
 const require=createRequire(new URL("../package.json", import.meta.url));
 const {chromium}=require('playwright');
 let browser;
@@ -30,36 +31,11 @@ const selected=process.env.UI_ROUTE?[process.env.UI_ROUTE]:process.env.UI_PROBE?
 browser=await chromium.launch({headless:true});
 const results=[];
 for (const theme of (process.env.UI_THEME?[process.env.UI_THEME]:['light','dark'])) {
- for (const width of (process.env.UI_WIDTH?[Number(process.env.UI_WIDTH)]:[1440,390])) {
+ for (const width of (process.env.UI_WIDTH?[Number(process.env.UI_WIDTH)]:[1440,820,390])) {
   let transportErrors=[]; let navigationCancellations=[]; let suppressedWrites=[];
   const context=await browser.newContext({timezoneId,viewport:{width,height:1000},colorScheme:theme === 'dark' ? 'dark' : 'light'});
-  await context.route(/https?:\/\/(api\.tracelab\.aquex\.ai|localhost:8000|127\.0\.0\.1:8103)\/.*/, async route => {
-    const incoming = new URL(route.request().url());
-    const method = route.request().method();
-    // The Librarian's chunk list is an authenticated read even though its API uses POST (QA-2).
-    const readOnly = method === 'GET' || (method === 'POST' && incoming.pathname === '/api/v1/pedr/search');
-    // Opening a mission or report marks it viewed (ACT-1). The smoke must not write, so it answers that call locally.
-    const localWrite = method === 'PUT' && incoming.pathname === '/api/v1/activity/viewed';
-    try {
-      if (directProduction) {
-        if (incoming.origin !== api) throw Error('Production UI requested a non-production API');
-        if (route.request().method() === 'OPTIONS') { await route.continue(); return; }
-        if (localWrite) { suppressedWrites.push({method, path:incoming.pathname}); await route.fulfill({status:200, json:{viewed:0,new_total:0}, headers:{'access-control-allow-origin':base,'access-control-allow-credentials':'true'}}); return; }
-        if (!readOnly) throw Error('Smoke forbids API writes');
-        const headers = {...route.request().headers(), 'x-api-key':creds.key};
-        delete headers.authorization;
-        await route.continue({headers}); return;
-      }
-      if (route.request().method() === 'OPTIONS') {
-        await route.fulfill({status:204, headers:{'access-control-allow-origin':base,'access-control-allow-headers':'authorization,content-type,x-api-key','access-control-allow-methods':'GET,POST,PUT,OPTIONS'}}); return;
-      }
-      if (localWrite) { suppressedWrites.push({method, path:incoming.pathname}); await route.fulfill({status:200, json:{viewed:0,new_total:0}, headers:{'access-control-allow-origin':base}}); return; }
-      if (!readOnly) throw Error('Smoke forbids API writes');
-      const response = await fetch(api + incoming.pathname + incoming.search, {method, headers:{'X-API-Key':creds.key,'Content-Type':'application/json'}, ...(method === 'POST' ? {body:route.request().postData()} : {})});
-      if (!response.ok) transportErrors.push({path:incoming.pathname,status:response.status});
-      await route.fulfill({status:response.status,body:await response.text(),headers:{'content-type':'application/json','access-control-allow-origin':base}});
-    } catch { transportErrors.push({path:incoming.pathname,error:'API smoke request failed'}); await route.abort().catch(() => {}); }
-  });
+  await context.route(/https?:\/\/(api\.tracelab\.aquex\.ai|localhost:8000|127\.0\.0\.1:8103)\/.*/, route =>
+    handleSmokeApiRequest(route, {api, base, directProduction, apiKey:creds.key, transportErrors, suppressedWrites}));
   await context.addInitScript(({user,theme})=>{
    localStorage.setItem('tracelab.auth.v2',JSON.stringify({token:'ui-smoke-placeholder',user_id:user.user_id,email:user.email,display_name:'UX validation'}));
    localStorage.setItem('tracelab.theme.v1:'+user.user_id,theme);

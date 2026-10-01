@@ -31,6 +31,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install dependencies
+        timeout-minutes: 5
         run: pip install -e '.[dev,test]'
       - name: Run serialized backend suite
         shell: bash
@@ -55,11 +56,18 @@ jobs:
             exit 1
           fi
 
-          pytest_output="$(mktemp)"
-          trap 'rm -f "$pytest_output"' EXIT
-          pytest --ignore=tests/integration --durations=25 -o faulthandler_timeout=120 "${deselect_args[@]}" | tee "$pytest_output"
+          mkdir -p test-results
+          pytest_output="test-results/backend-suite.log"
+          python scripts/run_pytest.py --timeout-seconds 2100 --grace-seconds 20 -- --ignore=tests/integration --durations=25 --junitxml=test-results/backend-suite.xml "${deselect_args[@]}" 2>&1 | tee "$pytest_output"
 
           if ! grep -Eq '(^|, )12 deselected(,| in )' "$pytest_output"; then
             echo "Pytest did not report exactly 12 deselected tests." >&2
             exit 1
           fi
+      - name: Preserve backend diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-suite-diagnostics
+          path: test-results/
+          retention-days: 7
