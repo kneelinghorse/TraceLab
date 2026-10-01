@@ -43,8 +43,21 @@
     "broad-ui-smoke.json"
   ],
   "limitations": [
-    "Combined first-use acceptance belongs to S62-WALK and is blocked by existing provider429 insufficient_quota; see first-use-blocker.json.",
-    "Hello real inbox acceptance belongs to S62-MAIL and remains pending explicit send authorization and actual inbox/Reply-To proof.",
+    "Combined real first-use accepted on d7b8682: ../S62-WALK/deployed-first-use.json. Historical quota failure is resolved.",
+    "Hello acceptance complete: exactly one approved controlled email delivered, user-observed Reply-To matched; see ../S62-MAIL/approved-send.json.",
     "Local full CMOS integration runner retains two independently verified baseline failures; not misreported as passing."
-  ]
+  ],
+  "original_claim": {
+    "limitations": [
+      "Combined first-use acceptance belongs to S62-WALK and is blocked by existing provider429 insufficient_quota; see first-use-blocker.json.",
+      "Hello real inbox acceptance belongs to S62-MAIL and remains pending explicit send authorization and actual inbox/Reply-To proof.",
+      "Local full CMOS integration runner retains two independently verified baseline failures; not misreported as passing."
+    ]
+  },
+  "corrected_at_sprint_close": {
+    "date": "2026-10-01T03:59:08.824694+00:00",
+    "session": "PS-2026-10-01-003",
+    "pr": "https://github.com/kneelinghorse/TraceLab/pull/410",
+    "reason": "Supersede historical operator requests; retain original deployment results and failure history."
+  }
 }

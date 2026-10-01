@@ -1,0 +1,17 @@
+{
+  "sha": "d7b8682c35104c627691f1ebb2782e5e04e33868",
+  "ok": true,
+  "observed": {
+    "backend": "d7b8682c35104c627691f1ebb2782e5e04e33868",
+    "frontend": "d7b8682c35104c627691f1ebb2782e5e04e33868"
+  },
+  "seconds_to_serve": {
+    "backend": 121.6,
+    "frontend": 182.1
+  },
+  "budget_seconds": 900,
+  "elapsed_seconds": 182.1,
+  "source_pr": "https://github.com/kneelinghorse/TraceLab/pull/410",
+  "backend_deployment": "1d7a6c89-6adc-4a0f-a268-890ab9de26e0",
+  "frontend_deployment": "eeb94552-7211-48b2-8dc3-522bd1d475c1"
+}

@@ -266,82 +266,84 @@ deadline. DeepSearch's model evaluation, provider configuration and other paid w
 were not changed. Sprint identity, decision ownership and CMOS parity are checked
 at close; the historical receipts now identify resolved operator instructions.
 
-### Follow-on — Sprint 62: Reliable operations and guided mission creation (Active, opened 2026-09-30)
+### Follow-on — Sprint 62: Reliable operations and guided mission creation (Completed 2026-10-01)
 
-Derek approved the reliability and mission-entry recommendation and asked for a
-fresh-session build handoff. Decision **#576** and the
-[Sprint 62 handoff](../planning/sprint-62-HANDOFF.md) lock nine missions; CMOS
-holds their complete acceptance criteria and dependencies. Build session
-PS-2026-09-30-013 started S62-ISO first from the accepted planning branch;
-the remaining mission order and acceptance boundaries below are unchanged.
+The nine planned missions and user-requested CSV contrast addendum are accepted.
+Decision **#576** and the [Sprint 62 handoff](../planning/sprint-62-HANDOFF.md)
+record the scope; [final acceptance](../reports/sprint-62/S62-WALK/final-acceptance.json)
+records the measured outcome. PRs [#408](https://github.com/kneelinghorse/TraceLab/pull/408),
+[#409](https://github.com/kneelinghorse/TraceLab/pull/409) and
+[#410](https://github.com/kneelinghorse/TraceLab/pull/410) merged; both services
+served `d7b8682` for the final real-provider acceptance.
 
-**Build checkpoint, 2026-10-01 UTC:** nine of ten missions are complete, including
-the user-requested contrast addendum. [PR #408](https://github.com/kneelinghorse/TraceLab/pull/408)
-and [PR #409](https://github.com/kneelinghorse/TraceLab/pull/409) merged; both
-production services serve `e276977`. Test isolation, controlled CI diagnostics,
-guided mission entry, cache/metrics repairs, disabled-session/code accessibility
-and the scoped Railway migration are deployed. The saved-run scope diagnosis is
-complete; its P1 DeepSearch correction remains open as **#479**. All nine required
-CI checks passed (backend: 3,122 passed, four skipped, twelve unchanged quarantines).
-Frontend unit tests passed 368 cases, and the production read-only browser pass
-passed 192 checks across 32 routes, plus six S61 mission-log checks.
+| Mission | Accepted outcome |
+| --- | --- |
+| **S62-ISO** | Pre-import provider isolation, in-memory cache fidelity, and explicit disposable Qdrant/PostgreSQL proof |
+| **S62-CI** | Controlled backend deadline/cleanup diagnostics, exact activity-write smoke rules, unchanged twelve-test quarantine |
+| **S62-MAIL** | One approved hello test email forwarded once; provider delivery and user-observed inbox Reply-To matched; Stage1 regressions retained |
+| **S62-SCOPE** | Saved-run scope diagnosis completed; P1 DeepSearch correction remains open as **#479**, with exact evidence/fixture requirements |
+| **S62-ENTRY** | Home/Missions/palette open focused planning; explicit inline project creation and reviewed draft save; manual/seed/repeat/general paths retained |
+| **S62-OBS** | Legacy metrics failure repaired; bounded safe cache diagnostics distinguish outages from healthy zero; real isolated cache write/replay verified |
+| **S62-UX** | Disabled sessions clear private state across transports; overflowing code is keyboard accessible |
+| **S62-DEPLOY** | Named Railway partial owns only the two TraceLab services; effective runtime behavior, migration startup and eight unrelated resources preserved |
+| **S62-CONTRAST** | Export CSV inherits readable foreground; four live theme/width checks and authenticated CSV download passed |
+| **S62-WALK** | Real zero-project member planned with GPT-5.1, created a personal project, reviewed/saved one draft without dispatch, then passed disabled-session recovery and cleanup |
 
-**S62-MAIL is complete**: the approved controlled email produced one delivered
-forward, and the user supplied the observed inbox Reply-To, which matched the
-configured controlled address. **S62-WALK is In Progress**. User-added credits
-resolved the provider quota failure (**#480** closed): two real zero-project
-member attempts received `gpt-5.1` replies and generated drafts with zero lint
-errors. A long reply exposed missing explicit keyboard focus on the scrollable
-transcript. A minimal focus/visible-ring fix and longer browser fixture are being
-validated before the final deployed draft-save and disabled-session checks.
-All disposable accounts/projects were cleaned; no research was submitted.
-Keep `gpt-5.1` for this release (decision **#585**); quota recovery did not require
-a model switch. Sprint 62 remains Active until the complete live gate passes.
+The first three real-provider attempts failed with `429 insufficient_quota`.
+User-added credits resolved **#480** without changing model or provider. Subsequent
+long replies exposed missing explicit transcript keyboard focus; the narrow fix
+passed twelve real-local-API browser cases in Light/Dark at 390/820/1440 and the
+complete deployed journey. Keep **GPT-5.1** for this release (decision **#585**).
+Long link-free response fixtures and visible focus are now required regression
+coverage (learning **#288**).
 
-**User acceptance addendum, 2026-10-01 UTC:** S62-CONTRAST adds one narrow
-mission to the original nine: make the legacy dashboard Export CSV label inherit
-the existing light foreground. Four local browser cases and nine dashboard tests
-passed. Live acceptance on `e276977` passed four more Light/Dark, mobile/desktop
-label/focus/hover checks and the authenticated CSV response. The conservative
-contrast ratio is 8.7:1. Mail and contrast are accepted; the sprint stays Active
-until the real first-use gate passes.
+All nine required checks passed on the shipped source: backend **3,122 passed,
+four skipped, twelve unchanged deselections**; PostgreSQL **169 passed, three
+skipped**; frontend **368 unit tests** and **82 production browser checks**.
+The final live run had zero draft lint errors, serious/critical axe findings or
+page overflow. It saved exactly one draft and dispatched no research. Existing
+192 broad-route, six S61 log-page and four live CSV checks remain applicable;
+22 of 23 prior hashes are unchanged, with the changed Librarian source explicitly
+retested. All 60 source-path citations are accounted for. The legacy CMOS runner
+still has two independently verified baseline failures, which are not claimed green.
 
-The primary Home, Missions and command-palette action becomes **Plan a mission**,
-opening a focused Librarian view. A new user can describe research before choosing
-or creating a project inline, then review and refine the generated draft, save it,
-and explicitly submit from the mission page. Manual authoring, seeded/repeat runs
-and the general Librarian remain available. This fixes the zero-project dead end
-without a full Librarian redesign or automatic project/mission/run creation.
+All ten promoted follow-ups **#397/#426/#444/#445/#446/#447/#451/#464/#476/#478**
+and quota successor **#480** are resolved. **Fourteen remain open**: the thirteen
+untouched carryovers plus P1 scope correction **#479**. The scope diagnosis does
+not claim worker enforcement is fixed, and the historical empty-cache cause is
+still unknown. Aquex owns its separate site-contact change; its completion
+summary is ready but unsent. No additional mail, worker changes or paid research
+were performed.
 
-| Priority order | Mission | Planned outcome |
+### Follow-on — Sprint 63: Clear onboarding and focused maintenance (Opened 2026-10-01)
+
+Derek approved the post-S62 maintenance recommendation and requested a locked
+handoff for a fresh build session. Decision **#589** and the
+[Sprint 63 handoff](../planning/sprint-63-HANDOFF.md) define the scope; CMOS holds
+the detailed acceptance criteria. Build session **PS-2026-10-01-008** started
+S63-PUBLIC on 2026-10-01 from planning tip `c838140` in the isolated
+`codex/sprint-63-build` checkout. PUBLIC precedes CLEAN; RELEASE requires both.
+The sprint is active; release acceptance and the end date remain open:
+
+| Mission | Planned outcome | Requires |
 | --- | --- | --- |
-| 1 | **S62-ISO** | Prevent inherited production Qdrant access during tests; preserve disposable integrations |
-| 2 | **S62-CI** | Controlled timeout diagnostics, exact Evidence smoke handling and current required-check guidance |
-| 3 | **S62-MAIL** | Forward hello@aquex.ai alongside Stage1 with one per-email retry identity and real inbox acceptance |
-| 4 | **S62-SCOPE** | Diagnose saved S61 research scope divergence and specify the owning correction, without a paid rerun |
-| 5 | **S62-ENTRY** | Focused guided mission entry, inline project creation and retained advanced paths |
-| 6 | **S62-OBS** | Restore useful cache and legacy metrics failure diagnostics |
-| 7 | **S62-UX** | Exit disabled sessions correctly and make overflowing code keyboard accessible |
-| 8 | **S62-DEPLOY** | Migrate both TraceLab services to supported Railway configuration with behavior parity |
-| 9 | **S62-WALK** | Verify deployed outcomes, final-source receipts and accurate carryover closure |
+| **S63-PUBLIC** | Accurate package license/version/tool guidance, first-run and empty-account path, factual repository description; documentation patch prepared | — |
+| **S63-CLEAN** | Remove unused saved-search preset inputs while preserving the working save flow; correct affected frontend route/palette documentation | — |
+| **S63-RELEASE** | Verify the published npm artifact, public metadata and frontend delivery; close accepted carryovers and record the outcome | PUBLIC, CLEAN |
 
-Isolation precedes CI tooling; CI precedes the feature/operations changes. Scope
-diagnosis requires isolation, and final acceptance requires all eight preceding
-missions. These are recorded dependencies, not automatic execution enforcement.
+The package is currently 2.1.0, with source matching its release tag; target a
+2.1.1 documentation patch after a fresh registry/source check. The existing MIT
+license applies to the adapter; this sprint does not select a service-wide license.
+Preserve the retired mission-queue 404 tombstone and the save form's internal
+draft snapshot. Acceptance includes the clean registry install required by DoD-1.
 
-Railway's [official Config as Code documentation](https://docs.railway.com/config-as-code)
-was checked on 2026-09-30 and confirms the **2026-12-01** cutoff. #451 is therefore
-promoted into the sprint, with effective-config readback and backend Alembic startup
-proof. S62-UX verifies existing table focus behavior and fixes the remaining code
-block gap. S62-OBS distinguishes the old metrics endpoint from the current admin UI.
-
-All ten promoted next-steps, #397, #426, #444, #445, #446, #447, #451, #464,
-#476 and #478, are accepted. Thirteen
-other carryovers stay outside scope. The scope-enforcement correction #479 remains unresolved. The provider-quota
-blocker #480 is resolved; final first-use acceptance is still in progress. Full redesign, sharing, unrelated cleanup,
-model/provider changes and worker implementation are not part of this plan.
-Aquex owns its site contact change; its completion summary is ready but unsent.
-Only the explicitly approved controlled email was sent.
+Existing **#449/#450/#481** are assigned to S63 and stay open until acceptance.
+The other twelve rows remain outside, including P1 DeepSearch scope correction
+**#479**, whose worker fixture must precede TraceLab vendor parity. Sharing remains
+deferred. Aquex's hello forwarding is already accepted; its completion reply is
+prepared but unsent. The build scope includes package publication, the approved
+factual metadata correction and frontend acceptance. Cross-project messages,
+worker changes and paid research remain outside this sprint.
 
 ### Running alongside: the guest expansion track
 
@@ -410,6 +412,11 @@ Add to this list rather than resolving items silently.
 ---
 
 ## Change Log
+
+- **2026-10-01 UTC, Sprint 63 opened.** Session PS-2026-10-01-008 started S63-PUBLIC from planning tip `c838140`; freshly fetched main remains `d7b8682`, registry latest remains 2.1.0 and the package matches its tag. Identity pointers synchronized; original checkout and user notes preserved. Publication and serving acceptance remain required for closeout.
+- **2026-10-01 UTC, Sprint 63 planning locked.** Decision #589: three Queued missions for package onboarding/metadata, confirmed frontend cleanup and release acceptance. Selected carry-forwards #449/#450/#481 remain open; twelve others retain their ownership. Fresh build begins from `codex/sprint-63-plan`, based on S62 closeout receipts `9caa93b`; no implementation started.
+
+- **2026-10-01 UTC, Sprint 62 completed.** Ten of ten outcomes verified on `d7b8682`; real GPT-5.1 first-use passed after user-added credits and the narrow transcript keyboard fix. Mail/CSV accepted, #480 resolved, fourteen precisely scoped carryovers remain. See S62-WALK final acceptance.
 
 - **2026-10-01 UTC, Sprint 62 acceptance follow-up; still Active.** PR #409 deployed as `e276977`, with the requested CSV label correction and live HTML/CSV checks passing. MAIL and #478 closed after the single approved forward and user-observed matching inbox Reply-To. Nine of ten missions are accepted; WALK is Blocked on existing provider quota (#480), reconfirmed by the cleaned-up third fixture attempt. No further mail, paid research, provider changes or cross-project reply.
 - **2026-10-01 UTC, Sprint 62 build checkpoint; still Active.** Seven missions complete, PR #408 deployed as `4317a75`, all required source CI green with existing skips/quarantine disclosed. Scoped Railway migration and live cache diagnostics accepted; 192 broad UI checks and six S61 log-page checks passed. MAIL awaits authorized send and actual inbox/Reply-To proof; WALK awaits MAIL and a real first-use rerun after provider quota is restored. The P1 DeepSearch correction remains separately owned as #479. No sprint closure, email or cross-project reply claimed.

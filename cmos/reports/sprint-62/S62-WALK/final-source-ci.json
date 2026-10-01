@@ -1,0 +1,105 @@
+{
+  "pr": "https://github.com/kneelinghorse/TraceLab/pull/410",
+  "tested_head": "15571a625bf6bbbb968b97755bdc0ec0d2c700d1",
+  "backend_suite": {
+    "run": 36812324508,
+    "job": 110209880343,
+    "status": "passed",
+    "passed": 3122,
+    "skipped": 4,
+    "deselected": 12,
+    "quarantine_unchanged": true,
+    "warnings": 49,
+    "seconds": 549.14,
+    "skip_nodes": [
+      "tests/test_auto_ingest.py::TestAutoIngestIntegration::test_auto_ingest_full_pipeline",
+      "tests/test_live_log_cross_service.py::test_real_sender_receives_replay_ack_and_streams_before_terminal",
+      "tests/test_pedr_unified_search.py::TestPEDRIntegration::test_create_orchestrator_factory",
+      "tests/test_pedr_unified_search.py::TestPEDRIntegration::test_full_search_pipeline"
+    ]
+  },
+  "backend_integration": {
+    "run": 36812324911,
+    "passed": 169,
+    "skipped": 3,
+    "warnings": 17,
+    "seconds": 124.06,
+    "skip_nodes": [
+      "tests/integration/test_e2e_rbac_live.py::test_live_rbac_matrix",
+      "tests/integration/test_ingestion_flow.py::test_markdown_cli_flow",
+      "tests/integration/test_qdrant_isolation.py::test_disposable_qdrant_cache_round_trip"
+    ]
+  },
+  "frontend_unit": {
+    "passed": 368,
+    "files": 43,
+    "skipped": 0
+  },
+  "production_build_browser": {
+    "run": 36812325889,
+    "passed": 82,
+    "minutes": 2.8
+  },
+  "local_long_transcript": {
+    "cases": 12,
+    "model_only_scripted": true,
+    "actual_member_project_preview_save": true,
+    "focus_scroll_axe_passed": true,
+    "research_dispatched": false
+  },
+  "checked_at": "2026-10-01T04:02:16.896803+00:00",
+  "merge_commit": "d7b8682c35104c627691f1ebb2782e5e04e33868",
+  "checks": [
+    {
+      "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36812325889/job/110209883713",
+      "name": "build-frontend-production",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36812324508/job/110209880343",
+      "name": "backend-suite",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36812324528/job/110209880350",
+      "name": "vitest",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36812324439/job/110209880760",
+      "name": "Secret Scan",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36812324911/job/110209881350",
+      "name": "backend-integration",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36812324699/job/110209881462",
+      "name": "ruff-diff",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36812324494/job/110209879623",
+      "name": "mcp-package",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36812324528/job/110209880451",
+      "name": "type-check",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36812324528/job/110209879995",
+      "name": "lint",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36812320315/job/110209867834",
+      "name": "Secret Scan",
+      "state": "SUCCESS"
+    }
+  ],
+  "required_contexts": 9
+}

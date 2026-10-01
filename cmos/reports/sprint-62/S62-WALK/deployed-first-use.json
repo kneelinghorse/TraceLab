@@ -1,0 +1,61 @@
+{
+  "checked_at": "2026-10-01T04:05:23.547Z",
+  "expected_commit": "d7b8682c35104c627691f1ebb2782e5e04e33868",
+  "marker": "S62 acceptance 400c3c26-f3d3-44e5-8faf-21c0f692bd49",
+  "checks": [
+    {
+      "label": "review-light-390",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "label": "saved-light-390",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "label": "disabled-recovery-light-390",
+      "overflow": false,
+      "violations": []
+    }
+  ],
+  "cleanup": [
+    {
+      "label": "mission",
+      "passed": true
+    },
+    {
+      "label": "project_soft_delete",
+      "passed": true
+    },
+    {
+      "label": "user",
+      "passed": true
+    }
+  ],
+  "fixture_user_id": "4958bd32-0aae-4ac0-975e-d1c07b221848",
+  "initial_projects": 0,
+  "fixture_project_id": "0cd2ac6f-29ca-4049-8043-08a7f941ea53",
+  "planning_model": "gpt-5.1",
+  "planning_usage": {
+    "prompt_tokens": 1408,
+    "completion_tokens": 384,
+    "total_tokens": 1792
+  },
+  "preview_fidelity": "structural_only",
+  "lint_errors": 0,
+  "fixture_mission_id": "028b0483-48a2-4e77-992a-1918b03df0b8",
+  "saved_status": "draft",
+  "research_submitted": false,
+  "writes": [
+    "/api/v1/librarian/turns",
+    "/api/v1/projects",
+    "/api/v1/librarian/drafts",
+    "/api/v1/librarian/missions"
+  ],
+  "suppressed_activity_writes": [
+    "/api/v1/activity/viewed"
+  ],
+  "disabled_session": "persistent and in-memory auth cleared; private shell removed; recovery reachable",
+  "passed": true
+}

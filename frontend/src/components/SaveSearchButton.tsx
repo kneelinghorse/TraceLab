@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { savedSearchesApi } from "@/lib/api/savedSearches";
 import type { SaveSearchPreset, SearchFiltersState } from "@/types/saved-searches";
@@ -9,8 +9,6 @@ type SaveSearchButtonProps = {
   topK: number;
   savedSearchCount: number;
   limitPerUser: number;
-  preset?: SaveSearchPreset | null;
-  onPresetConsumed?: () => void;
   onSaved?: () => void;
 };
 
@@ -27,8 +25,6 @@ export function SaveSearchButton({
   topK,
   savedSearchCount,
   limitPerUser,
-  preset,
-  onPresetConsumed,
   onSaved,
 }: SaveSearchButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -41,26 +37,23 @@ export function SaveSearchButton({
   const canCreate = savedSearchCount < limitPerUser;
   const filtersSummary = useMemo(() => summarizeFilters(draft?.filters ?? filters), [draft?.filters, filters]);
 
-  const openPanel = (source?: SaveSearchPreset) => {
+  const openPanel = () => {
     if (!canCreate) {
       setError("Saved search limit reached. Delete one to create another.");
       return;
     }
-    const query = source?.query ?? currentQuery;
+    const query = currentQuery;
     if (!query.trim()) {
       setError("Run a query before saving it.");
       return;
     }
-    const activeFilters = source?.filters ?? filters;
-    const topKValue = source?.topK ?? topK;
     setDraft({
       query,
-      filters: activeFilters,
-      topK: topKValue,
-      suggestedName: source?.suggestedName,
+      filters,
+      topK,
     });
     const defaultName = query.slice(0, 80) || "Saved search";
-    setName(source?.suggestedName ?? defaultName);
+    setName(defaultName);
     setDescription("");
     setError(null);
     setIsOpen(true);
@@ -105,14 +98,6 @@ export function SaveSearchButton({
       setIsSaving(false);
     }
   };
-
-  useEffect(() => {
-    if (preset) {
-      openPanel(preset);
-      onPresetConsumed?.();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [preset]);
 
   return (
     <div className="space-y-3">

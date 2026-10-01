@@ -7,6 +7,19 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.1.1] — 2026-10-01
+
+### Fixed
+
+- Correct the adapter's MIT license link and clarify its package scope.
+- Replace obsolete installation advice with current version guidance and a
+  numbered invited-account, device-login, project-list and cited-answer path.
+- Explain personal Spaces, empty projects, document processing and `no_evidence`;
+  complete the historical account of the nine-tool, fifty-action surface.
+
+Documentation-only patch: runtime, tool schemas, dependencies and Node >=18
+support are unchanged.
+
 ## [2.1.0] — 2026-09-23
 
 A **minor** release: one new action; nothing is removed or changed (mission

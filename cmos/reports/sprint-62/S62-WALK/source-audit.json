@@ -3,117 +3,170 @@
     {
       "receipt": "cmos/reports/sprint-62/S62-ENTRY/validation.json",
       "path": "frontend/src/pages/librarian.tsx",
-      "matches": true
+      "matches": false,
+      "expected_sha256": "711930b5667da00db8553d98cf0ccbe928dede1db462fba2ea3cf7466e4c4c13",
+      "current_sha256": "3d21d69034d5c612a45d6569d7a1381cd43eed4cd89c6cb05aba61817853f295",
+      "verified_change": {
+        "commit": "15571a6",
+        "change": "Explicit transcript Tab focus and visible ring only",
+        "replacement_validation": "transcript-validation.json; transcript-browser-results.json",
+        "cases": 12,
+        "deployed_acceptance": "passed: deployed-first-use.json on d7b8682"
+      }
     },
     {
       "receipt": "cmos/reports/sprint-62/S62-ENTRY/validation.json",
       "path": "frontend/src/pages/index.tsx",
-      "matches": true
+      "matches": true,
+      "expected_sha256": "138eaf20a2cc87420d6af603359a54ed69a3b882144fc789a82ed6cd2fafb14f",
+      "current_sha256": "138eaf20a2cc87420d6af603359a54ed69a3b882144fc789a82ed6cd2fafb14f"
     },
     {
       "receipt": "cmos/reports/sprint-62/S62-ENTRY/validation.json",
       "path": "frontend/src/pages/missions/index.tsx",
-      "matches": true
+      "matches": true,
+      "expected_sha256": "c5d27cb82f2280b075420d3529f094e4c3d033841626ca6b4be3c0d00b6af392",
+      "current_sha256": "c5d27cb82f2280b075420d3529f094e4c3d033841626ca6b4be3c0d00b6af392"
     },
     {
       "receipt": "cmos/reports/sprint-62/S62-ENTRY/validation.json",
       "path": "frontend/src/components/CommandPalette.tsx",
-      "matches": true
+      "matches": true,
+      "expected_sha256": "e4259c81ea2c227b3f701fa028f57277777bbeb193b5612d06945eeb2d20ef48",
+      "current_sha256": "e4259c81ea2c227b3f701fa028f57277777bbeb193b5612d06945eeb2d20ef48"
     },
     {
       "receipt": "cmos/reports/sprint-62/S62-ENTRY/validation.json",
       "path": "frontend/src/components/missions/MissionForm.tsx",
-      "matches": true
+      "matches": true,
+      "expected_sha256": "f8c8387c71f1bfb2874c2bf68b3e9877f926d3dfe96d61052ab2bbdde94b27e1",
+      "current_sha256": "f8c8387c71f1bfb2874c2bf68b3e9877f926d3dfe96d61052ab2bbdde94b27e1"
     },
     {
       "receipt": "cmos/reports/sprint-62/S62-ENTRY/validation.json",
       "path": "frontend/src/lib/librarian/storage.ts",
-      "matches": true
+      "matches": true,
+      "expected_sha256": "4a7a6b1e9d5656270641aa10540787322f9807cf561e982ab9507ab7437fa9d0",
+      "current_sha256": "4a7a6b1e9d5656270641aa10540787322f9807cf561e982ab9507ab7437fa9d0"
     },
     {
       "receipt": "cmos/reports/sprint-62/S62-ISO/validation.json",
       "path": "scripts/pytest_isolation.py",
-      "matches": true
+      "matches": true,
+      "expected_sha256": "1d6fab180d96bcbc7ba4e2a7f3dcb23f51a3b54cdd4eb939dd49f3898f07524b",
+      "current_sha256": "1d6fab180d96bcbc7ba4e2a7f3dcb23f51a3b54cdd4eb939dd49f3898f07524b"
     },
     {
       "receipt": "cmos/reports/sprint-62/S62-ISO/validation.json",
       "path": "tests/conftest.py",
-      "matches": true
+      "matches": true,
+      "expected_sha256": "b25d9a7bc8dd8c289ad010df0384a55f7a6a91f25bd1a5de375e73fcfe75739c",
+      "current_sha256": "b25d9a7bc8dd8c289ad010df0384a55f7a6a91f25bd1a5de375e73fcfe75739c"
     },
     {
       "receipt": "cmos/reports/sprint-62/S62-ISO/validation.json",
       "path": "tests/integration/conftest.py",
-      "matches": true
+      "matches": true,
+      "expected_sha256": "8fb011f4d1e21a0072695782834919169fc61bc51ec3a4855fbff1bd8d1d205f",
+      "current_sha256": "8fb011f4d1e21a0072695782834919169fc61bc51ec3a4855fbff1bd8d1d205f"
     },
     {
       "receipt": "cmos/reports/sprint-62/S62-ISO/validation.json",
       "path": "tests/unit/test_test_isolation.py",
-      "matches": true
+      "matches": true,
+      "expected_sha256": "9dba5cea81c0d0d1b1f0a68f87ee2569fe48109d97fafd59960c7fd762e0bcfb",
+      "current_sha256": "9dba5cea81c0d0d1b1f0a68f87ee2569fe48109d97fafd59960c7fd762e0bcfb"
     },
     {
       "receipt": "cmos/reports/sprint-62/S62-ISO/validation.json",
       "path": "tests/integration/test_qdrant_isolation.py",
-      "matches": true
+      "matches": true,
+      "expected_sha256": "7bea7d7fe6d273b32b43adbb13aa0118b76463abd7d5007b1b42ca6f147e6f56",
+      "current_sha256": "7bea7d7fe6d273b32b43adbb13aa0118b76463abd7d5007b1b42ca6f147e6f56"
     },
     {
       "receipt": "cmos/reports/sprint-62/S62-UX/validation.json",
       "path": "frontend/src/lib/api/http.ts",
-      "matches": true
+      "matches": true,
+      "expected_sha256": "2089fe06f6c528d8a719dcf250bcae57295e630fd932a531f4e4fb44df44a579",
+      "current_sha256": "2089fe06f6c528d8a719dcf250bcae57295e630fd932a531f4e4fb44df44a579"
     },
     {
       "receipt": "cmos/reports/sprint-62/S62-UX/validation.json",
       "path": "frontend/src/lib/api/documents.ts",
-      "matches": true
+      "matches": true,
+      "expected_sha256": "091623bec87ed3ea79337ea3abf799137854435520ba3ea612fa2920478a0cde",
+      "current_sha256": "091623bec87ed3ea79337ea3abf799137854435520ba3ea612fa2920478a0cde"
     },
     {
       "receipt": "cmos/reports/sprint-62/S62-UX/validation.json",
       "path": "frontend/src/lib/api/reports.ts",
-      "matches": true
+      "matches": true,
+      "expected_sha256": "f0261a82c7f2dbe210ab9ed39f167cff007fa7d490e097d08839d6588de81eff",
+      "current_sha256": "f0261a82c7f2dbe210ab9ed39f167cff007fa7d490e097d08839d6588de81eff"
     },
     {
       "receipt": "cmos/reports/sprint-62/S62-UX/validation.json",
       "path": "frontend/src/lib/api/collections.ts",
-      "matches": true
+      "matches": true,
+      "expected_sha256": "c25a6fe5084afe08ab42ffb4f38b69238a65038277b18cda9707d86184a4b9f7",
+      "current_sha256": "c25a6fe5084afe08ab42ffb4f38b69238a65038277b18cda9707d86184a4b9f7"
     },
     {
       "receipt": "cmos/reports/sprint-62/S62-UX/validation.json",
       "path": "frontend/src/components/MarkdownRenderer.tsx",
-      "matches": true
+      "matches": true,
+      "expected_sha256": "a1836ffa1a95750b30b615a51c538631317bb4270d59aba4e2bfcaec42a91c8b",
+      "current_sha256": "a1836ffa1a95750b30b615a51c538631317bb4270d59aba4e2bfcaec42a91c8b"
     },
     {
       "receipt": "S62-SCOPE/diagnosis.json",
       "path": "cmos/reports/sprint-61/LOG-2/proposed-mission.json",
-      "matches": true
+      "matches": true,
+      "expected_sha256": "310a0cdb38196e1ae1fc8e9ec0cee7eaef3206a98d0b51a8f176ef5927c05784",
+      "current_sha256": "310a0cdb38196e1ae1fc8e9ec0cee7eaef3206a98d0b51a8f176ef5927c05784"
     },
     {
       "receipt": "S62-SCOPE/diagnosis.json",
       "path": "cmos/reports/sprint-61/LOG-2/contract-preview.json",
-      "matches": true
+      "matches": true,
+      "expected_sha256": "349c2ac72224a4912c3dcfd6a6e4e27cc456e4cf4bcf78654543e4312777d23f",
+      "current_sha256": "349c2ac72224a4912c3dcfd6a6e4e27cc456e4cf4bcf78654543e4312777d23f"
     },
     {
       "receipt": "S62-SCOPE/diagnosis.json",
       "path": "cmos/reports/sprint-61/LOG-2/worker-structural-contract.json",
-      "matches": true
+      "matches": true,
+      "expected_sha256": "2b601429b962daf6545c4edce6d48bf8bbfc95f013ee036b01a116f5ba655767",
+      "current_sha256": "2b601429b962daf6545c4edce6d48bf8bbfc95f013ee036b01a116f5ba655767"
     },
     {
       "receipt": "S62-SCOPE/diagnosis.json",
       "path": "cmos/reports/sprint-61/LOG-2/deployed-acceptance.json",
-      "matches": true
+      "matches": true,
+      "expected_sha256": "22eff2dadd5c29a449ed9ad7bc21002f2c511d14af2a736957b8cbbcec2644f2",
+      "current_sha256": "22eff2dadd5c29a449ed9ad7bc21002f2c511d14af2a736957b8cbbcec2644f2"
     },
     {
       "receipt": "S62-SCOPE/diagnosis.json",
       "path": "cmos/reports/sprint-61/LOG-2/README.md",
-      "matches": true
+      "matches": true,
+      "expected_sha256": "4de2afe54c56dfb3366df28495635ff1378faf10f371ad5ce5edb728b4f7d04c",
+      "current_sha256": "4de2afe54c56dfb3366df28495635ff1378faf10f371ad5ce5edb728b4f7d04c"
     },
     {
       "receipt": "S62-SCOPE/diagnosis.json",
       "path": "cmos/reports/sprint-62/S62-SCOPE/readback.json",
-      "matches": true
+      "matches": true,
+      "expected_sha256": "b4d4d7291c136437bcccdb721d57c36334e416d761530e713ee4cfe73b69e5aa",
+      "current_sha256": "b4d4d7291c136437bcccdb721d57c36334e416d761530e713ee4cfe73b69e5aa"
     },
     {
       "receipt": "S62-SCOPE/diagnosis.json",
       "path": "cmos/reports/sprint-62/S62-SCOPE/reproducer.json",
-      "matches": true
+      "matches": true,
+      "expected_sha256": "8d692642eae2e9ae12a67ca592468fa1c78398f84cb7bc30e9012a2978389593",
+      "current_sha256": "8d692642eae2e9ae12a67ca592468fa1c78398f84cb7bc30e9012a2978389593"
     }
   ],
   "source_file_citations": [
@@ -148,5 +201,388 @@
       "exists": true
     }
   ],
-  "missing_files": []
+  "missing_files": [],
+  "checked_at": "2026-10-01T04:07:58.926406+00:00",
+  "source_commit": "d7b8682c35104c627691f1ebb2782e5e04e33868",
+  "all_path_citations": [
+    {
+      "reported": "app/services/contract_compiler/contract.py",
+      "receipt": "cmos/reports/sprint-62/S62-SCOPE/diagnosis.json",
+      "resolved": "app/services/contract_compiler/contract.py",
+      "exists": true
+    },
+    {
+      "reported": "app/services/deepsearch_preview_client.py",
+      "receipt": "cmos/reports/sprint-62/S62-SCOPE/diagnosis.json",
+      "resolved": "app/services/deepsearch_preview_client.py",
+      "exists": true
+    },
+    {
+      "reported": "app/services/metrics_aggregator.py",
+      "receipt": "cmos/reports/sprint-62/S62-OBS/validation.json",
+      "resolved": "app/services/metrics_aggregator.py",
+      "exists": true
+    },
+    {
+      "reported": "app/services/mission_service.py",
+      "receipt": "cmos/reports/sprint-62/S62-SCOPE/diagnosis.json",
+      "resolved": "app/services/mission_service.py",
+      "exists": true
+    },
+    {
+      "reported": "cmos/agents.md",
+      "receipt": "cmos/reports/sprint-62/S62-ISO/validation.json",
+      "resolved": "cmos/agents.md",
+      "exists": true
+    },
+    {
+      "reported": "cmos/foundational-docs/roadmap_template.md",
+      "receipt": "cmos/reports/sprint-62/S62-SCOPE/diagnosis.json",
+      "resolved": "cmos/foundational-docs/roadmap_template.md",
+      "exists": true
+    },
+    {
+      "reported": "cmos/foundational-docs/tech_arch_template.md",
+      "receipt": "cmos/reports/sprint-62/S62-SCOPE/diagnosis.json",
+      "resolved": "cmos/foundational-docs/tech_arch_template.md",
+      "exists": true
+    },
+    {
+      "reported": "cmos/planning/sprint-62-HANDOFF.md",
+      "receipt": "cmos/reports/sprint-62/planning-validation.json",
+      "resolved": "cmos/planning/sprint-62-HANDOFF.md",
+      "exists": true
+    },
+    {
+      "reported": "cmos/reports/sprint-61/LOG-2/README.md",
+      "receipt": "cmos/reports/sprint-62/S62-SCOPE/diagnosis.json",
+      "resolved": "cmos/reports/sprint-61/LOG-2/README.md",
+      "exists": true
+    },
+    {
+      "reported": "cmos/reports/sprint-61/LOG-2/contract-preview.json",
+      "receipt": "cmos/reports/sprint-62/S62-SCOPE/diagnosis.json",
+      "resolved": "cmos/reports/sprint-61/LOG-2/contract-preview.json",
+      "exists": true
+    },
+    {
+      "reported": "cmos/reports/sprint-61/LOG-2/deployed-acceptance.json",
+      "receipt": "cmos/reports/sprint-62/S62-SCOPE/diagnosis.json",
+      "resolved": "cmos/reports/sprint-61/LOG-2/deployed-acceptance.json",
+      "exists": true
+    },
+    {
+      "reported": "cmos/reports/sprint-61/LOG-2/proposed-mission.json",
+      "receipt": "cmos/reports/sprint-62/S62-SCOPE/diagnosis.json",
+      "resolved": "cmos/reports/sprint-61/LOG-2/proposed-mission.json",
+      "exists": true
+    },
+    {
+      "reported": "cmos/reports/sprint-61/LOG-2/worker-structural-contract.json",
+      "receipt": "cmos/reports/sprint-62/S62-SCOPE/diagnosis.json",
+      "resolved": "cmos/reports/sprint-61/LOG-2/worker-structural-contract.json",
+      "exists": true
+    },
+    {
+      "reported": "cmos/reports/sprint-62/S62-ENTRY/validation.json",
+      "receipt": "cmos/reports/sprint-62/S62-WALK/source-audit.json",
+      "resolved": "cmos/reports/sprint-62/S62-ENTRY/validation.json",
+      "exists": true
+    },
+    {
+      "reported": "cmos/reports/sprint-62/S62-ISO/validation.json",
+      "receipt": "cmos/reports/sprint-62/S62-WALK/source-audit.json",
+      "resolved": "cmos/reports/sprint-62/S62-ISO/validation.json",
+      "exists": true
+    },
+    {
+      "reported": "cmos/reports/sprint-62/S62-MAIL/approved-send.json",
+      "receipt": "cmos/reports/sprint-62/S62-MAIL/validation.json",
+      "resolved": "cmos/reports/sprint-62/S62-MAIL/approved-send.json",
+      "exists": true
+    },
+    {
+      "reported": "cmos/reports/sprint-62/S62-SCOPE/readback.json",
+      "receipt": "cmos/reports/sprint-62/S62-SCOPE/diagnosis.json",
+      "resolved": "cmos/reports/sprint-62/S62-SCOPE/readback.json",
+      "exists": true
+    },
+    {
+      "reported": "cmos/reports/sprint-62/S62-SCOPE/reproducer.json",
+      "receipt": "cmos/reports/sprint-62/S62-SCOPE/diagnosis.json",
+      "resolved": "cmos/reports/sprint-62/S62-SCOPE/reproducer.json",
+      "exists": true
+    },
+    {
+      "reported": "cmos/reports/sprint-62/S62-UX/validation.json",
+      "receipt": "cmos/reports/sprint-62/S62-WALK/source-audit.json",
+      "resolved": "cmos/reports/sprint-62/S62-UX/validation.json",
+      "exists": true
+    },
+    {
+      "reported": "cmos/runtime/boomerang",
+      "receipt": "cmos/reports/sprint-62/S62-ISO/validation.json",
+      "exists": false,
+      "classification": "historical failure or non-path prose",
+      "explanation": "Explicit known retired-runtime baseline failure; not claimed present."
+    },
+    {
+      "reported": "cmos/tests/integration/test_manifest.json",
+      "receipt": "cmos/reports/sprint-62/S62-WALK/source-audit.json",
+      "resolved": "cmos/tests/integration/test_manifest.json",
+      "exists": true
+    },
+    {
+      "reported": "cmos/tests/performance/benchmarks.json",
+      "receipt": "cmos/reports/sprint-62/S62-WALK/source-audit.json",
+      "resolved": "cmos/tests/performance/benchmarks.json",
+      "exists": true
+    },
+    {
+      "reported": "docs/integration-testing-guide.md",
+      "receipt": "cmos/reports/sprint-62/S62-ISO/integration-framework.json",
+      "resolved": "cmos/docs/integration-testing-guide.md",
+      "exists": true,
+      "scope": "CMOS-relative"
+    },
+    {
+      "reported": "frontend/backend4495119",
+      "receipt": "cmos/reports/sprint-62/S62-CI/validation.json",
+      "exists": false,
+      "classification": "historical failure or non-path prose",
+      "explanation": "Prose revision identity, not a source path."
+    },
+    {
+      "reported": "frontend/scripts/deployed-mission-acceptance.mjs",
+      "receipt": "cmos/reports/sprint-62/S62-WALK/transcript-validation.json",
+      "resolved": "frontend/scripts/deployed-mission-acceptance.mjs",
+      "exists": true
+    },
+    {
+      "reported": "frontend/scripts/guided-mission-live.mjs",
+      "receipt": "cmos/reports/sprint-62/S62-WALK/transcript-validation.json",
+      "resolved": "frontend/scripts/guided-mission-live.mjs",
+      "exists": true
+    },
+    {
+      "reported": "frontend/src/components/CommandPalette.tsx",
+      "receipt": "cmos/reports/sprint-62/S62-ENTRY/validation.json",
+      "resolved": "frontend/src/components/CommandPalette.tsx",
+      "exists": true
+    },
+    {
+      "reported": "frontend/src/components/MarkdownRenderer.tsx",
+      "receipt": "cmos/reports/sprint-62/S62-UX/validation.json",
+      "resolved": "frontend/src/components/MarkdownRenderer.tsx",
+      "exists": true
+    },
+    {
+      "reported": "frontend/src/components/missions/MissionForm.tsx",
+      "receipt": "cmos/reports/sprint-62/S62-ENTRY/validation.json",
+      "resolved": "frontend/src/components/missions/MissionForm.tsx",
+      "exists": true
+    },
+    {
+      "reported": "frontend/src/lib/api/collections.ts",
+      "receipt": "cmos/reports/sprint-62/S62-UX/validation.json",
+      "resolved": "frontend/src/lib/api/collections.ts",
+      "exists": true
+    },
+    {
+      "reported": "frontend/src/lib/api/documents.ts",
+      "receipt": "cmos/reports/sprint-62/S62-UX/validation.json",
+      "resolved": "frontend/src/lib/api/documents.ts",
+      "exists": true
+    },
+    {
+      "reported": "frontend/src/lib/api/http.ts",
+      "receipt": "cmos/reports/sprint-62/S62-UX/validation.json",
+      "resolved": "frontend/src/lib/api/http.ts",
+      "exists": true
+    },
+    {
+      "reported": "frontend/src/lib/api/reports.ts",
+      "receipt": "cmos/reports/sprint-62/S62-UX/validation.json",
+      "resolved": "frontend/src/lib/api/reports.ts",
+      "exists": true
+    },
+    {
+      "reported": "frontend/src/lib/librarian/storage.ts",
+      "receipt": "cmos/reports/sprint-62/S62-ENTRY/validation.json",
+      "resolved": "frontend/src/lib/librarian/storage.ts",
+      "exists": true
+    },
+    {
+      "reported": "frontend/src/pages/index.tsx",
+      "receipt": "cmos/reports/sprint-62/S62-ENTRY/validation.json",
+      "resolved": "frontend/src/pages/index.tsx",
+      "exists": true
+    },
+    {
+      "reported": "frontend/src/pages/librarian.tsx",
+      "receipt": "cmos/reports/sprint-62/S62-ENTRY/validation.json",
+      "resolved": "frontend/src/pages/librarian.tsx",
+      "exists": true
+    },
+    {
+      "reported": "frontend/src/pages/missions/index.tsx",
+      "receipt": "cmos/reports/sprint-62/S62-ENTRY/validation.json",
+      "resolved": "frontend/src/pages/missions/index.tsx",
+      "exists": true
+    },
+    {
+      "reported": "scripts/diagnose_s62_scope.py",
+      "receipt": "cmos/reports/sprint-62/S62-SCOPE/diagnosis.json",
+      "resolved": "scripts/diagnose_s62_scope.py",
+      "exists": true
+    },
+    {
+      "reported": "scripts/intent_parity_audit.mjs",
+      "receipt": "cmos/reports/sprint-62/S62-CI/validation.json",
+      "exists": false,
+      "classification": "historical failure or non-path prose",
+      "explanation": "Explicitly recorded mistyped failed command; actual audit scripts/mcp_argument_parity.mjs exists and passes."
+    },
+    {
+      "reported": "scripts/mcp_argument_parity.mjs",
+      "receipt": "cmos/reports/sprint-62/S62-CI/validation.json",
+      "resolved": "scripts/mcp_argument_parity.mjs",
+      "exists": true
+    },
+    {
+      "reported": "scripts/network",
+      "receipt": "cmos/reports/sprint-62/S62-CONTRAST/validation.json",
+      "exists": false,
+      "classification": "historical failure or non-path prose",
+      "explanation": "Prose statement about disabled scripts/network in rendered HTML check, not a source path."
+    },
+    {
+      "reported": "scripts/pytest_isolation.py",
+      "receipt": "cmos/reports/sprint-62/S62-ISO/validation.json",
+      "resolved": "scripts/pytest_isolation.py",
+      "exists": true
+    },
+    {
+      "reported": "tests/backward_compatibility/checklist.md",
+      "receipt": "cmos/reports/sprint-62/S62-ISO/integration-framework.json",
+      "resolved": "cmos/tests/backward_compatibility/checklist.md",
+      "exists": true,
+      "scope": "CMOS-relative"
+    },
+    {
+      "reported": "tests/backward_compatibility/scenarios.yaml",
+      "receipt": "cmos/reports/sprint-62/S62-ISO/integration-framework.json",
+      "resolved": "cmos/tests/backward_compatibility/scenarios.yaml",
+      "exists": true,
+      "scope": "CMOS-relative"
+    },
+    {
+      "reported": "tests/conftest.py",
+      "receipt": "cmos/reports/sprint-62/S62-ISO/validation.json",
+      "resolved": "tests/conftest.py",
+      "exists": true
+    },
+    {
+      "reported": "tests/e2e/guided_mission_fixture.py",
+      "receipt": "cmos/reports/sprint-62/S62-WALK/transcript-validation.json",
+      "resolved": "tests/e2e/guided_mission_fixture.py",
+      "exists": true
+    },
+    {
+      "reported": "tests/integration/conftest.py",
+      "receipt": "cmos/reports/sprint-62/S62-ISO/validation.json",
+      "resolved": "tests/integration/conftest.py",
+      "exists": true
+    },
+    {
+      "reported": "tests/integration/test_manifest.json",
+      "receipt": "cmos/reports/sprint-62/S62-ISO/integration-framework.json",
+      "resolved": "cmos/tests/integration/test_manifest.json",
+      "exists": true,
+      "scope": "CMOS-relative"
+    },
+    {
+      "reported": "tests/integration/test_qdrant_isolation.py",
+      "receipt": "cmos/reports/sprint-62/S62-ISO/validation.json",
+      "resolved": "tests/integration/test_qdrant_isolation.py",
+      "exists": true
+    },
+    {
+      "reported": "tests/performance/benchmarks.json",
+      "receipt": "cmos/reports/sprint-62/S62-ISO/integration-framework.json",
+      "resolved": "cmos/tests/performance/benchmarks.json",
+      "exists": true,
+      "scope": "CMOS-relative"
+    },
+    {
+      "reported": "tests/performance/test_qdrant_performance.py",
+      "receipt": "cmos/reports/sprint-62/S62-ISO/validation.json",
+      "resolved": "tests/performance/test_qdrant_performance.py",
+      "exists": true
+    },
+    {
+      "reported": "tests/quality/sample-risky.js",
+      "receipt": "cmos/reports/sprint-62/S62-ISO/integration-framework.json",
+      "resolved": "cmos/tests/quality/sample-risky.js",
+      "exists": true,
+      "scope": "CMOS-relative"
+    },
+    {
+      "reported": "tests/quality/sample-safe.js",
+      "receipt": "cmos/reports/sprint-62/S62-ISO/integration-framework.json",
+      "resolved": "cmos/tests/quality/sample-safe.js",
+      "exists": true,
+      "scope": "CMOS-relative"
+    },
+    {
+      "reported": "tests/security/context-risky.yaml",
+      "receipt": "cmos/reports/sprint-62/S62-ISO/integration-framework.json",
+      "resolved": "cmos/tests/security/context-risky.yaml",
+      "exists": true,
+      "scope": "CMOS-relative"
+    },
+    {
+      "reported": "tests/security/context-safe.yaml",
+      "receipt": "cmos/reports/sprint-62/S62-ISO/integration-framework.json",
+      "resolved": "cmos/tests/security/context-safe.yaml",
+      "exists": true,
+      "scope": "CMOS-relative"
+    },
+    {
+      "reported": "tests/test_notifications.py",
+      "receipt": "cmos/reports/sprint-62/S62-MAIL/validation.json",
+      "resolved": "tests/test_notifications.py",
+      "exists": true
+    },
+    {
+      "reported": "tests/test_project_management_api.py",
+      "receipt": "cmos/reports/sprint-62/S62-ISO/validation.json",
+      "resolved": "tests/test_project_management_api.py",
+      "exists": true
+    },
+    {
+      "reported": "tests/test_support_inbox.py",
+      "receipt": "cmos/reports/sprint-62/S62-MAIL/validation.json",
+      "resolved": "tests/test_support_inbox.py",
+      "exists": true
+    },
+    {
+      "reported": "tests/test_webhook_handler.py",
+      "receipt": "cmos/reports/sprint-62/S62-MAIL/validation.json",
+      "resolved": "tests/test_webhook_handler.py",
+      "exists": true
+    },
+    {
+      "reported": "tests/unit/test_test_isolation.py",
+      "receipt": "cmos/reports/sprint-62/S62-ISO/validation.json",
+      "resolved": "tests/unit/test_test_isolation.py",
+      "exists": true
+    }
+  ],
+  "current_validation_hashes": {
+    "frontend/src/pages/librarian.tsx": "3d21d69034d5c612a45d6569d7a1381cd43eed4cd89c6cb05aba61817853f295",
+    "frontend/scripts/guided-mission-live.mjs": "bddfc2e13a93676f10c1d25c795b0a157f7b704f2bd1a746d0b6ef9bab19fece",
+    "frontend/scripts/deployed-mission-acceptance.mjs": "a34fc341c94f631c2c95586bd0540e9cd9b3bb65bd4173408b1cf78e0716847c",
+    "tests/e2e/guided_mission_fixture.py": "c3d67f8fe9d0ef04ad9b349fb1a26e1626aa78c38ae8cd1a98762121c955fd5c"
+  }
 }
