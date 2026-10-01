@@ -1,0 +1,259 @@
+{
+  "mission": "S63-PUBLIC",
+  "status": "source-and-packed-artifact-accepted; registry acceptance belongs to S63-RELEASE",
+  "date": "2026-10-01",
+  "session": "PS-2026-10-01-008",
+  "source_base": "c838140d6b2bb8ed78d01a4fb03aec7d39f24d2f",
+  "branch": "codex/sprint-63-build",
+  "registry_baseline": {
+    "version": "2.1.0",
+    "latest": "2.1.0",
+    "package_diff_from_release_tag": "empty before this patch"
+  },
+  "scope": "Documentation and version metadata only; runtime, dependencies, adapter MIT license and Node>=18 unchanged. All ten JSON tool examples checked against descriptors; corrected the old synthesis_prompt example to prompt.",
+  "validation": [
+    {
+      "command": "npm run build",
+      "result": "passed"
+    },
+    {
+      "command": "npm run test:run",
+      "passed": 160,
+      "skipped": 0,
+      "files": 7
+    },
+    {
+      "command": "npm run test:contract",
+      "passed": 63,
+      "http_requests": 64,
+      "generated_links": 73
+    },
+    {
+      "command": "npm run test:package",
+      "passed": 63,
+      "clean_tarball_install": true
+    },
+    {
+      "command": "final npm pack -> fresh npm install -> check-canonical-links.mjs installed/dist/index.js",
+      "passed": 63,
+      "http_requests": 64,
+      "generated_links": 73
+    },
+    {
+      "command": "node scripts/mcp_parity_audit.mjs",
+      "result": {
+        "totals": {
+          "operations": 118,
+          "live": 113,
+          "dead": 5,
+          "tools": 9,
+          "actions": 50,
+          "classifications": {
+            "covered": 21,
+            "partial": 0,
+            "closed-MCP-1": 17,
+            "closed-MCP-2": 7,
+            "rest-only-by-design": 68,
+            "deferred-MCP-2": 0,
+            "needs-derek": 0,
+            "dead-client-code": 5
+          }
+        },
+        "errors": []
+      }
+    },
+    {
+      "command": "node scripts/mcp_argument_parity.mjs",
+      "result": {
+        "tools": 9,
+        "actions": 50,
+        "advertised_arguments": 125,
+        "gaps": []
+      }
+    },
+    {
+      "command": "node --test scripts/mcp_argument_parity.test.mjs",
+      "passed": 7,
+      "skipped": 0
+    }
+  ],
+  "artifact": {
+    "id": "@aquex/tracelab-mcp@2.1.1",
+    "name": "@aquex/tracelab-mcp",
+    "version": "2.1.1",
+    "size": 75254,
+    "unpackedSize": 367630,
+    "shasum": "ca37c89eeffa4ab18bb21835f0f1c06fe9a93ee6",
+    "integrity": "sha512-G9RMB+NXOm/so6fKOkfs9yBAUp5kLt8e74rW1rt095x4Nh471g33J/pQ8zHF3QiVQHzQGASsdbbR2gtwg4USAQ==",
+    "filename": "aquex-tracelab-mcp-2.1.1.tgz",
+    "files": [
+      {
+        "path": "CHANGELOG.md",
+        "size": 14268,
+        "mode": 420
+      },
+      {
+        "path": "LICENSE",
+        "size": 1062,
+        "mode": 420
+      },
+      {
+        "path": "README.md",
+        "size": 25483,
+        "mode": 420
+      },
+      {
+        "path": "dist/api-client.d.ts",
+        "size": 23349,
+        "mode": 420
+      },
+      {
+        "path": "dist/api-client.d.ts.map",
+        "size": 22229,
+        "mode": 420
+      },
+      {
+        "path": "dist/api-client.js",
+        "size": 15482,
+        "mode": 420
+      },
+      {
+        "path": "dist/api-client.js.map",
+        "size": 12681,
+        "mode": 420
+      },
+      {
+        "path": "dist/auth/credential-store.d.ts",
+        "size": 1655,
+        "mode": 420
+      },
+      {
+        "path": "dist/auth/credential-store.d.ts.map",
+        "size": 690,
+        "mode": 420
+      },
+      {
+        "path": "dist/auth/credential-store.js",
+        "size": 2958,
+        "mode": 420
+      },
+      {
+        "path": "dist/auth/credential-store.js.map",
+        "size": 2281,
+        "mode": 420
+      },
+      {
+        "path": "dist/auth/device-code.d.ts",
+        "size": 3884,
+        "mode": 420
+      },
+      {
+        "path": "dist/auth/device-code.d.ts.map",
+        "size": 2224,
+        "mode": 420
+      },
+      {
+        "path": "dist/auth/device-code.js",
+        "size": 11127,
+        "mode": 420
+      },
+      {
+        "path": "dist/auth/device-code.js.map",
+        "size": 8452,
+        "mode": 420
+      },
+      {
+        "path": "dist/canonical-link.d.ts",
+        "size": 644,
+        "mode": 420
+      },
+      {
+        "path": "dist/canonical-link.d.ts.map",
+        "size": 334,
+        "mode": 420
+      },
+      {
+        "path": "dist/canonical-link.js",
+        "size": 1632,
+        "mode": 420
+      },
+      {
+        "path": "dist/canonical-link.js.map",
+        "size": 1460,
+        "mode": 420
+      },
+      {
+        "path": "dist/index.d.ts",
+        "size": 5271,
+        "mode": 420
+      },
+      {
+        "path": "dist/index.d.ts.map",
+        "size": 1119,
+        "mode": 420
+      },
+      {
+        "path": "dist/index.js",
+        "size": 124439,
+        "mode": 420
+      },
+      {
+        "path": "dist/index.js.map",
+        "size": 83157,
+        "mode": 420
+      },
+      {
+        "path": "package.json",
+        "size": 1749,
+        "mode": 420
+      }
+    ],
+    "entryCount": 24,
+    "bundled": []
+  },
+  "inspection": {
+    "handshake": {
+      "name": "tracelab-mcp",
+      "version": "2.1.1"
+    },
+    "tools": 9,
+    "actions": 50,
+    "descriptor_validated_examples": 10,
+    "packed_files_match_source": [
+      "README.md",
+      "LICENSE",
+      "CHANGELOG.md",
+      "package.json"
+    ]
+  },
+  "license_link": {
+    "url": "https://github.com/kneelinghorse/TraceLab/blob/main/packages/tracelab-mcp/LICENSE",
+    "http_status": 200
+  },
+  "auth_evidence": [
+    "packages/tracelab-mcp/src/auth/device-code.test.ts (12 passed)",
+    "packages/tracelab-mcp/src/auth/credential-store.test.ts (6 passed)",
+    "app/api/v1/auth.py::register calls ensure_personal_space; no bundled project/document",
+    "tests/test_personal_spaces.py::test_register_creates_the_personal_space_and_the_first_project_lands_there"
+  ],
+  "codex_timeout_reference": "https://learn.chatgpt.com/docs/config-file/config-reference",
+  "cjs_scan": "Only locally defined __dirname = path.dirname(fileURLToPath(import.meta.url)) in src/auth/device-code.ts; no unbound CJS global. Installed ESM entrypoint passes.",
+  "github_description_prepared": "A personal-scale research repository with RAG-powered semantic search, Mission Protocol integration, and document processing with PII redaction. The architecture prioritizes rigor, traceability, local control, and cost-effectiveness.",
+  "pending": [
+    "Publish and independently install registry 2.1.1 artifact",
+    "Apply/read back approved description; preserve all other repo settings",
+    "Required CI and deployed frontend acceptance"
+  ],
+  "source_files_sha256": {
+    "packages/tracelab-mcp/README.md": "cbb41d346cdb37523e369fe745ba35c88bb49e4adace71d8b22ac8c9c1a9f596",
+    "packages/tracelab-mcp/CHANGELOG.md": "34c2d258011239aff27324c27d49e900146721c8978960e4a6297962660f73a9",
+    "packages/tracelab-mcp/package.json": "c714e7f8d0099bfd400d6a41a84261b166861d21830f31083dd8432c292fba36",
+    "packages/tracelab-mcp/package-lock.json": "4e5d31f82eed0549695ca1b181f8e942a260132b8e43e1dffb595348cc13a800",
+    "packages/tracelab-mcp/LICENSE": "0214cd4e166c8bb98b8d955bec2836ba281127e7cd0bd2944616071aefbc4887",
+    "packages/tracelab-mcp/src/index.ts": "d927e38de770e220cf43322a8994f2f28552c1ac01fbbc6441f7d9e6404047e1",
+    "packages/tracelab-mcp/src/auth/device-code.ts": "061932fabbcce955b1ccf741b1a3d525c7b1bd8a54afd5eb6db971d96b6844a3",
+    "packages/tracelab-mcp/src/auth/credential-store.ts": "c0bfe64b57d3d171b82cd0fad29b862237049e08e9fb26c79c7ea67dbda4dc3f",
+    "packages/tracelab-mcp/scripts/check-package.sh": "30cbb4eecc29ea63f986ba67432ba03c40b059fb460655680b4b5ffbe3ebe619",
+    "packages/tracelab-mcp/scripts/check-canonical-links.mjs": "6770cce7bbba81e5e0e2542ae180d426de5b0b90a3c89808084990235cebe6cf"
+  }
+}

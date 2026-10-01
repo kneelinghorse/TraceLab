@@ -315,13 +315,15 @@ still unknown. Aquex owns its separate site-contact change; its completion
 summary is ready but unsent. No additional mail, worker changes or paid research
 were performed.
 
-### Follow-on — Sprint 63: Clear onboarding and focused maintenance (Planned 2026-10-01)
+### Follow-on — Sprint 63: Clear onboarding and focused maintenance (Opened 2026-10-01)
 
 Derek approved the post-S62 maintenance recommendation and requested a locked
 handoff for a fresh build session. Decision **#589** and the
 [Sprint 63 handoff](../planning/sprint-63-HANDOFF.md) define the scope; CMOS holds
-the detailed acceptance criteria. Three missions are **Queued**, with no build
-start/end dates yet:
+the detailed acceptance criteria. Build session **PS-2026-10-01-008** started
+S63-PUBLIC on 2026-10-01 from planning tip `c838140` in the isolated
+`codex/sprint-63-build` checkout. PUBLIC precedes CLEAN; RELEASE requires both.
+The sprint is active; release acceptance and the end date remain open:
 
 | Mission | Planned outcome | Requires |
 | --- | --- | --- |
@@ -339,8 +341,9 @@ Existing **#449/#450/#481** are assigned to S63 and stay open until acceptance.
 The other twelve rows remain outside, including P1 DeepSearch scope correction
 **#479**, whose worker fixture must precede TraceLab vendor parity. Sharing remains
 deferred. Aquex's hello forwarding is already accepted; its completion reply is
-prepared but unsent. Planning performs no implementation, release, deployment,
-public metadata write, cross-project message or paid research.
+prepared but unsent. The build scope includes package publication, the approved
+factual metadata correction and frontend acceptance. Cross-project messages,
+worker changes and paid research remain outside this sprint.
 
 ### Running alongside: the guest expansion track
 
@@ -410,6 +413,7 @@ Add to this list rather than resolving items silently.
 
 ## Change Log
 
+- **2026-10-01 UTC, Sprint 63 opened.** Session PS-2026-10-01-008 started S63-PUBLIC from planning tip `c838140`; freshly fetched main remains `d7b8682`, registry latest remains 2.1.0 and the package matches its tag. Identity pointers synchronized; original checkout and user notes preserved. Publication and serving acceptance remain required for closeout.
 - **2026-10-01 UTC, Sprint 63 planning locked.** Decision #589: three Queued missions for package onboarding/metadata, confirmed frontend cleanup and release acceptance. Selected carry-forwards #449/#450/#481 remain open; twelve others retain their ownership. Fresh build begins from `codex/sprint-63-plan`, based on S62 closeout receipts `9caa93b`; no implementation started.
 
 - **2026-10-01 UTC, Sprint 62 completed.** Ten of ten outcomes verified on `d7b8682`; real GPT-5.1 first-use passed after user-added credits and the narrow transcript keyboard fix. Mail/CSV accepted, #480 resolved, fourteen precisely scoped carryovers remain. See S62-WALK final acceptance.
