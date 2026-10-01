@@ -1,6 +1,6 @@
 {
   "mission": "S63-RELEASE",
-  "status": "blocked-publication-OTP",
+  "status": "accepted",
   "date": "2026-10-01",
   "session": "PS-2026-10-01-008",
   "source": {
@@ -60,10 +60,13 @@
     "other_repo_settings_unchanged": true,
     "main_readme_equals_tested_readme": true,
     "public_license_equals_adapter_MIT": true,
-    "registry_version": "2.1.0",
-    "registry_latest": "2.1.0",
-    "publish_attempt": "npm publish exact tarball --access public --tag latest",
-    "publish_result": "EOTP; authenticated account requires owner authenticator code; no publication claimed"
+    "registry_version": "2.1.1",
+    "registry_latest": "2.1.1",
+    "publish_attempt": "npm publish exact tarball --access public --tag latest --auth-type=web in interactive PTY",
+    "publish_result": "+ @aquex/tracelab-mcp@2.1.1; interactive browser approval succeeded; independent registry installation accepted",
+    "prior_publish_result": "EOTP from noninteractive invocation; later inspection of npm11.5.1 utils/auth.js confirmed non-TTY exits before web OTP flow. The earlier claim that owner needed a numeric authenticator code was incorrect.",
+    "published_acceptance_receipt": "published-acceptance.json",
+    "release_tag": "tracelab-mcp-v2.1.1"
   },
   "deployment": {
     "both_services_serve": "e716e34bcb1b60966ffcd8d67246f3c8e6026b40",
@@ -105,9 +108,9 @@
   "carryovers": {
     "closed": [
       449,
-      450
+      450,
+      481
     ],
-    "publication_blocked": 481,
     "unchanged_open": [
       400,
       403,
@@ -122,13 +125,9 @@
       477,
       479
     ],
-    "total_open": 13
+    "total_open": 12
   },
-  "pending": [
-    "Owner publishes exact tested tarball with npm authenticator OTP",
-    "Fresh independent registry installation: version/latest/integrity/docs/LICENSE/handshake, then63real-stdio checks against installed entrypoint",
-    "Close481 only after registry acceptance; unblock/complete RELEASE, close sprint and synchronize identity/snapshot"
-  ],
+  "pending": [],
   "boundaries": [
     "No DeepSearch worker changes, paid research, cross-project replies or outbound email",
     "Original checkout and two user notes untouched",
@@ -140,5 +139,27 @@
     "frontend/tests/e2e/production-smoke.spec.ts": "49e9aa816cd05a161e5ed6e77d20322f61bb79a7aa2246a9df94df52e7f66979",
     "scripts/wait_for_deploy.py": "ad453680a7694d45bcb1d44c59955c139d4681a9ec267614b1bf6df83fb2e161",
     "packages/tracelab-mcp/scripts/check-canonical-links.mjs": "6770cce7bbba81e5e0e2542ae180d426de5b0b90a3c89808084990235cebe6cf"
+  },
+  "closeout_session": "PS-2026-10-01-009",
+  "published_artifact_acceptance": {
+    "passed": true,
+    "integrity_matches_prepublication": true,
+    "fresh_directory_and_cache": true,
+    "stdio_checks": 63,
+    "skipped": 0,
+    "http_requests": 64,
+    "generated_links": 73,
+    "handshake": "2.1.1",
+    "tools": 9,
+    "actions": 50,
+    "README_tool_examples": 10,
+    "packed_files_match_source": [
+      "README.md",
+      "LICENSE",
+      "CHANGELOG.md",
+      "package.json"
+    ],
+    "provider_calls": 0,
+    "accepted_at": "2026-10-01T14:28:25.552355+00:00"
   }
 }

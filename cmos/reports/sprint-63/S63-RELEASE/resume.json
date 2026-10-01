@@ -2,24 +2,21 @@
   "projectRoot": "/Users/systemsystems/portfolio/TraceLab",
   "worktree": "/Users/systemsystems/.codex/worktrees/sprint-63-build/TraceLab",
   "mission": "S63-RELEASE",
-  "status": "Blocked",
-  "publication_command": "npm publish /Users/systemsystems/.codex/worktrees/sprint-63-build/TraceLab/artifacts/releases/aquex-tracelab-mcp-2.1.1.tgz --access public --tag latest --otp=YOUR_CODE",
+  "status": "Complete; no release action remaining",
+  "publication_command": "npm publish /Users/systemsystems/.codex/worktrees/sprint-63-build/TraceLab/artifacts/releases/aquex-tracelab-mcp-2.1.1.tgz --access public --tag latest --auth-type=web",
   "tarball_sha1": "ca37c89eeffa4ab18bb21835f0f1c06fe9a93ee6",
   "expected_registry_integrity": "sha512-G9RMB+NXOm/so6fKOkfs9yBAUp5kLt8e74rW1rt095x4Nh471g33J/pQ8zHF3QiVQHzQGASsdbbR2gtwg4USAQ==",
-  "resume": [
-    "Read validation.json and all three CMOS mission definitions; call review/status against canonical projectRoot",
-    "Check registry before retrying publication; never republish an existing version",
-    "After owner publish, install @aquex/tracelab-mcp@2.1.1 into a new temp directory using a fresh npm cache; compare registry dist.shasum/integrity and latest tag with this receipt",
-    "Compare installed README/LICENSE/CHANGELOG/package.json with accepted source; use MCP client to verify handshake2.1.1 and9tools/50actions",
-    "From packages/tracelab-mcp run node scripts/check-canonical-links.mjs <fresh-install>/node_modules/@aquex/tracelab-mcp/dist/index.js; expect63checks/64fixtureHTTPrequests/73links, no live providers",
-    "Create release tag tracelab-mcp-v2.1.1 at merged e716e34 if absent, after verifying release identity",
-    "Close existing481; preserve twelve excluded rows. Complete RELEASE only once published acceptance passes",
-    "Run health/project-scoped sync parity, complete sprint/session, synchronize identity and export/snapshot master_context; update roadmap to outcome and commit receipts. No outbound messages or paid runs."
-  ],
+  "resume": [],
   "already_done": [
     "PR412 merged; all9requiredchecks; complete source tree equals tested07874dc",
     "Both services servee716e34;42authenticated read-only and5production tests passed",
-    "Public description/README/license accepted;449/450closed"
+    "Public description/README/license accepted;449/450closed",
+    "Interactive browser approval published exact tested2.1.1 tarball",
+    "Fresh independent registry installation accepted: latest/integrity/docs/LICENSE/handshake;63stdio checks passed,0skips",
+    "Release tag tracelab-mcp-v2.1.1 pushed at merged e716e34;481closed"
   ],
-  "local_receipt_note": "This checkpoint adds receipts/roadmap/context only beyond merged source; revalidate changed runtime sources if any later edit is made."
+  "local_receipt_note": "This checkpoint adds receipts/roadmap/context only beyond merged source; revalidate changed runtime sources if any later edit is made.",
+  "publication_terminal_requirement": "Use an interactive terminal/PTY (tty:true). npm opens browser approval and resumes after the owner approves; a numeric authenticator code is not required for this successful web flow.",
+  "prior_blocker_correction": "The prior noninteractive invocation suppressed npm browser approval and returned EOTP. Retried interactively in PS-2026-10-01-009; browser approval succeeded and npm reported + @aquex/tracelab-mcp@2.1.1.",
+  "publication_command_note": "Historical command only; version2.1.1 is already published. Do not rerun."
 }

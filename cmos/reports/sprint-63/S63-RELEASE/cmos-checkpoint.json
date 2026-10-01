@@ -1,12 +1,17 @@
 {
-  "sessionId": "PS-2026-10-01-008",
+  "sessionId": "PS-2026-10-01-009",
   "sessionStatus": "Completed",
-  "sprintStatus": "Active",
+  "priorSessionId": "PS-2026-10-01-008",
+  "sprintStatus": "Completed",
+  "completedMissions": [
+    "S63-PUBLIC",
+    "S63-CLEAN",
+    "S63-RELEASE"
+  ],
   "missionStatus": {
     "activeCount": 0,
     "queuedCount": 0,
-    "blockedCount": 1,
-    "nextAction": "All missions blocked (1). Resolve blockers before continuing."
+    "blockedCount": 0
   },
   "health": true,
   "parity": {
@@ -27,8 +32,8 @@
       },
       {
         "table": "sessions",
-        "sqliteCount": 225,
-        "pgCount": 225,
+        "sqliteCount": 226,
+        "pgCount": 226,
         "match": true,
         "delta": 0
       },
@@ -41,8 +46,8 @@
       },
       {
         "table": "learnings",
-        "sqliteCount": 294,
-        "pgCount": 294,
+        "sqliteCount": 295,
+        "pgCount": 295,
         "match": true,
         "delta": 0
       },
@@ -55,13 +60,13 @@
       }
     ],
     "allMatch": true,
-    "totalSqlite": 1828,
-    "totalPg": 1828,
+    "totalSqlite": 1830,
+    "totalPg": 1830,
     "projectScoped": true,
     "projectSlug": "tracelab",
-    "syncLogEntries": 284,
+    "syncLogEntries": 288,
     "failedEntries": 0,
-    "lastSyncAt": "2026-10-01T14:15:02.897Z"
+    "lastSyncAt": "2026-10-01T14:30:58.619Z"
   },
   "openNextSteps": [
     400,
@@ -75,8 +80,39 @@
     452,
     454,
     477,
-    479,
+    479
+  ],
+  "outsideRowsUnchanged": true,
+  "closedNextSteps": [
+    449,
+    450,
     481
   ],
-  "masterSnapshotId": 1319
+  "masterSnapshotId": 1323,
+  "identity": {
+    "layer0": "sprint-63-complete",
+    "master": "sprint-63-complete",
+    "sprintTracking": {
+      "current_sprint": null,
+      "last_completed_sprint": "sprint-63"
+    }
+  },
+  "lifecycle": {
+    "archivedDecisionIds": [
+      589,
+      590,
+      591
+    ],
+    "archivedLearningIds": [
+      293,
+      294
+    ],
+    "evergreenLearningPreserved": 295
+  },
+  "release": {
+    "package": "@aquex/tracelab-mcp@2.1.1",
+    "registryLatest": "2.1.1",
+    "source": "e716e34bcb1b60966ffcd8d67246f3c8e6026b40",
+    "tag": "tracelab-mcp-v2.1.1"
+  }
 }

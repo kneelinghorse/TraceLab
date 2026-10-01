@@ -315,7 +315,7 @@ still unknown. Aquex owns its separate site-contact change; its completion
 summary is ready but unsent. No additional mail, worker changes or paid research
 were performed.
 
-### Follow-on — Sprint 63: Clear onboarding and focused maintenance (Opened 2026-10-01)
+### Follow-on — Sprint 63: Clear onboarding and focused maintenance (Completed 2026-10-01)
 
 Derek approved the post-S62 maintenance recommendation and requested a locked
 handoff for a fresh build session. Decision **#589** and the
@@ -323,26 +323,34 @@ handoff for a fresh build session. Decision **#589** and the
 the detailed acceptance criteria. Build session **PS-2026-10-01-008** started
 S63-PUBLIC on 2026-10-01 from planning tip `c838140` in the isolated
 `codex/sprint-63-build` checkout. PUBLIC precedes CLEAN; RELEASE requires both.
-PUBLIC and CLEAN are complete and shipped in PR #412 (`e716e34`); RELEASE is
-blocked on npm's owner authenticator code and the subsequent registry-install
-acceptance. The sprint remains active and its end date stays unset:
+All three missions are complete. PUBLIC and CLEAN shipped in PR #412 (`e716e34`);
+RELEASE independently verified the published 2.1.1 artifact in session
+**PS-2026-10-01-009**, after browser approval through interactive npm publishing:
 
 | Mission | Outcome / remaining acceptance | Requires |
 | --- | --- | --- |
 | **S63-PUBLIC** | Complete: corrected license/version/examples, numbered first run and empty-corpus path; tested 2.1.1 documentation patch prepared | — |
 | **S63-CLEAN** | Complete: unused preset/effect/suggested-name path removed; reviewed draft preserved; affected route/palette docs corrected. Save/keyboard/theme and route tests pass | — |
-| **S63-RELEASE** | Nine required CI checks, metadata readback, exact serving revision, 42 authenticated read-only browser checks and five public tests pass. npm publish returned EOTP; owner publication and independent registry acceptance remain | PUBLIC, CLEAN |
+| **S63-RELEASE** | Complete: nine required CI checks, metadata readback, exact serving revision, 42 authenticated read-only browser checks and five public tests; published 2.1.1 independently installed and passed 63 real stdio checks with zero skips | PUBLIC, CLEAN |
 
-The registry remains at 2.1.0. The prepared 2.1.1 tarball passed 63 installed
-stdio checks and reports the correct handshake, nine tools and fifty actions.
-Its source, checksum and exact resume steps are in
+The registry's latest version is **2.1.1**, with SHA1
+`ca37c89eeffa4ab18bb21835f0f1c06fe9a93ee6`, matching the tested tarball.
+A fresh registry installation passed 63 stdio checks, 64 fixture HTTP requests
+and 73 generated links; handshake 2.1.1, nine tools, fifty actions and all ten
+README JSON tool examples were verified. The release tag
+`tracelab-mcp-v2.1.1` points to merged source `e716e34`.
+Source, checksum, published acceptance and closeout receipts are in
 `cmos/reports/sprint-63/S63-RELEASE/`. The existing MIT
 license applies to the adapter; this sprint does not select a service-wide license.
 Preserve the retired mission-queue 404 tombstone and the save form's internal
 draft snapshot. Acceptance includes the clean registry install required by DoD-1.
 
-Existing **#449/#450** are accepted and closed. **#481** stays open until the
-published registry artifact passes acceptance; source/tarball tests do not replace it.
+Existing **#449/#450/#481** are accepted and closed. The initial noninteractive
+npm invocation suppressed browser approval and returned EOTP; an interactive
+terminal with `--auth-type=web` resolved it without requesting a numeric code.
+Learning **#295** preserves that workflow. CI's four backend and three PostgreSQL
+skips, twelve quarantined tests and two known legacy CMOS runner failures remain
+explicitly recorded; none was repaired or counted as passing.
 The other twelve rows remain outside, including P1 DeepSearch scope correction
 **#479**, whose worker fixture must precede TraceLab vendor parity. Sharing remains
 deferred. Aquex's hello forwarding is already accepted; its completion reply is
@@ -418,6 +426,7 @@ Add to this list rather than resolving items silently.
 
 ## Change Log
 
+- **2026-10-01 UTC, Sprint 63 completed.** All three missions accepted. Interactive npm browser approval published 2.1.1; a fresh registry install matched the tested integrity and passed 63 real stdio checks with zero skips. Tag `tracelab-mcp-v2.1.1` identifies deployed merge `e716e34`. #449/#450/#481 closed; the twelve excluded rows retain ownership. Learning #295 corrects the earlier numeric-OTP assumption. Final receipts distinguish source CI and deployment from subsequent closeout-only commits.
 - **2026-10-01 UTC, Sprint 63 build checkpoint.** PUBLIC and CLEAN shipped in PR #412 (`e716e34`) with nine required checks passing. Both services serve that source; 42 authenticated read-only checks and five public production tests pass. Approved metadata applied; #449/#450 closed. RELEASE is blocked on npm EOTP and fresh registry acceptance; #481 and the twelve excluded rows stay open. Sprint identity remains active; no close claimed.
 - **2026-10-01 UTC, Sprint 63 opened.** Session PS-2026-10-01-008 started S63-PUBLIC from planning tip `c838140`; freshly fetched main remains `d7b8682`, registry latest remains 2.1.0 and the package matches its tag. Identity pointers synchronized; original checkout and user notes preserved. Publication and serving acceptance remain required for closeout.
 - **2026-10-01 UTC, Sprint 63 planning locked.** Decision #589: three Queued missions for package onboarding/metadata, confirmed frontend cleanup and release acceptance. Selected carry-forwards #449/#450/#481 remain open; twelve others retain their ownership. Fresh build begins from `codex/sprint-63-plan`, based on S62 closeout receipts `9caa93b`; no implementation started.
