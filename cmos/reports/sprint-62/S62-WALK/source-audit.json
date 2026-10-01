@@ -1,0 +1,152 @@
+{
+  "hashes": [
+    {
+      "receipt": "cmos/reports/sprint-62/S62-ENTRY/validation.json",
+      "path": "frontend/src/pages/librarian.tsx",
+      "matches": true
+    },
+    {
+      "receipt": "cmos/reports/sprint-62/S62-ENTRY/validation.json",
+      "path": "frontend/src/pages/index.tsx",
+      "matches": true
+    },
+    {
+      "receipt": "cmos/reports/sprint-62/S62-ENTRY/validation.json",
+      "path": "frontend/src/pages/missions/index.tsx",
+      "matches": true
+    },
+    {
+      "receipt": "cmos/reports/sprint-62/S62-ENTRY/validation.json",
+      "path": "frontend/src/components/CommandPalette.tsx",
+      "matches": true
+    },
+    {
+      "receipt": "cmos/reports/sprint-62/S62-ENTRY/validation.json",
+      "path": "frontend/src/components/missions/MissionForm.tsx",
+      "matches": true
+    },
+    {
+      "receipt": "cmos/reports/sprint-62/S62-ENTRY/validation.json",
+      "path": "frontend/src/lib/librarian/storage.ts",
+      "matches": true
+    },
+    {
+      "receipt": "cmos/reports/sprint-62/S62-ISO/validation.json",
+      "path": "scripts/pytest_isolation.py",
+      "matches": true
+    },
+    {
+      "receipt": "cmos/reports/sprint-62/S62-ISO/validation.json",
+      "path": "tests/conftest.py",
+      "matches": true
+    },
+    {
+      "receipt": "cmos/reports/sprint-62/S62-ISO/validation.json",
+      "path": "tests/integration/conftest.py",
+      "matches": true
+    },
+    {
+      "receipt": "cmos/reports/sprint-62/S62-ISO/validation.json",
+      "path": "tests/unit/test_test_isolation.py",
+      "matches": true
+    },
+    {
+      "receipt": "cmos/reports/sprint-62/S62-ISO/validation.json",
+      "path": "tests/integration/test_qdrant_isolation.py",
+      "matches": true
+    },
+    {
+      "receipt": "cmos/reports/sprint-62/S62-UX/validation.json",
+      "path": "frontend/src/lib/api/http.ts",
+      "matches": true
+    },
+    {
+      "receipt": "cmos/reports/sprint-62/S62-UX/validation.json",
+      "path": "frontend/src/lib/api/documents.ts",
+      "matches": true
+    },
+    {
+      "receipt": "cmos/reports/sprint-62/S62-UX/validation.json",
+      "path": "frontend/src/lib/api/reports.ts",
+      "matches": true
+    },
+    {
+      "receipt": "cmos/reports/sprint-62/S62-UX/validation.json",
+      "path": "frontend/src/lib/api/collections.ts",
+      "matches": true
+    },
+    {
+      "receipt": "cmos/reports/sprint-62/S62-UX/validation.json",
+      "path": "frontend/src/components/MarkdownRenderer.tsx",
+      "matches": true
+    },
+    {
+      "receipt": "S62-SCOPE/diagnosis.json",
+      "path": "cmos/reports/sprint-61/LOG-2/proposed-mission.json",
+      "matches": true
+    },
+    {
+      "receipt": "S62-SCOPE/diagnosis.json",
+      "path": "cmos/reports/sprint-61/LOG-2/contract-preview.json",
+      "matches": true
+    },
+    {
+      "receipt": "S62-SCOPE/diagnosis.json",
+      "path": "cmos/reports/sprint-61/LOG-2/worker-structural-contract.json",
+      "matches": true
+    },
+    {
+      "receipt": "S62-SCOPE/diagnosis.json",
+      "path": "cmos/reports/sprint-61/LOG-2/deployed-acceptance.json",
+      "matches": true
+    },
+    {
+      "receipt": "S62-SCOPE/diagnosis.json",
+      "path": "cmos/reports/sprint-61/LOG-2/README.md",
+      "matches": true
+    },
+    {
+      "receipt": "S62-SCOPE/diagnosis.json",
+      "path": "cmos/reports/sprint-62/S62-SCOPE/readback.json",
+      "matches": true
+    },
+    {
+      "receipt": "S62-SCOPE/diagnosis.json",
+      "path": "cmos/reports/sprint-62/S62-SCOPE/reproducer.json",
+      "matches": true
+    }
+  ],
+  "source_file_citations": [
+    "frontend/src/components/CommandPalette.tsx",
+    "frontend/src/components/MarkdownRenderer.tsx",
+    "frontend/src/components/missions/MissionForm.tsx",
+    "frontend/src/lib/api/collections.ts",
+    "frontend/src/lib/api/documents.ts",
+    "frontend/src/lib/api/http.ts",
+    "frontend/src/lib/api/reports.ts",
+    "frontend/src/lib/librarian/storage.ts",
+    "frontend/src/pages/index.tsx",
+    "frontend/src/pages/librarian.tsx",
+    "frontend/src/pages/missions/index.tsx",
+    "scripts/pytest_isolation.py",
+    "tests/conftest.py",
+    "tests/integration/conftest.py",
+    "tests/integration/test_manifest.json",
+    "tests/integration/test_qdrant_isolation.py",
+    "tests/performance/benchmarks.json",
+    "tests/unit/test_test_isolation.py"
+  ],
+  "runner_relative_files": [
+    {
+      "reported": "tests/integration/test_manifest.json",
+      "resolved": "cmos/tests/integration/test_manifest.json",
+      "exists": true
+    },
+    {
+      "reported": "tests/performance/benchmarks.json",
+      "resolved": "cmos/tests/performance/benchmarks.json",
+      "exists": true
+    }
+  ],
+  "missing_files": []
+}
