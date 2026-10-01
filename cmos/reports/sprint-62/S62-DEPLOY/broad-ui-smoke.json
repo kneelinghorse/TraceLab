@@ -1,0 +1,3205 @@
+{
+  "base": "https://tracelab.aquex.ai",
+  "timezoneId": "America/Chicago",
+  "checkedAt": "2026-10-01T01:53:54.464Z",
+  "checks": 192,
+  "routes": 32,
+  "failures": [],
+  "legacyInternalLinks": [],
+  "readOnly": true,
+  "suppressedWrites": 24,
+  "directProductionApi": true,
+  "readOnlyApiProxy": false,
+  "serving_commit": "4317a75d6ba1518cd94226847257880b6609243b",
+  "themes": [
+    "dark",
+    "light"
+  ],
+  "widths": [
+    390,
+    820,
+    1440
+  ],
+  "results": [
+    {
+      "route": "/",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/graph",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/graph?root=project:0afcc588-e722-45bd-8320-f486601b877c",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/projects",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/projects/new",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/projects/0afcc588-e722-45bd-8320-f486601b877c",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/documents",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/documents/87bcd621-5a73-4b5f-8cc6-d83912ed8d4a",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/documents/upload",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/collections",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/collections/new",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/collections/98e1d368-0d6d-4947-96ec-9c70ecd0ccc4",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/reports",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/reports/78b5bda7-6358-45db-8a00-800d60af68f5",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/missions",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/missions/7b847edd-5433-4237-a899-57b47e6edf0a?tab=results",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 200,
+      "overflow": [
+        {
+          "tag": "TABLE",
+          "class": "min-w-full border border-line rounded-lg",
+          "text": "ProductNavigation modelPrimary object hierarc"
+        },
+        {
+          "tag": "THEAD",
+          "class": "",
+          "text": "ProductNavigation modelPrimary object hierarc"
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "ProductNavigation modelPrimary object hierarc"
+        },
+        {
+          "tag": "TH",
+          "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+          "text": "Agent/automation surfaces"
+        },
+        {
+          "tag": "TBODY",
+          "class": "",
+          "text": "DovetailSidebar \u2318K; Channels-vs-Projects spli"
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "DovetailSidebar \u2318K; Channels-vs-Projects spli"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "Agents (5-part config), MCP server, API/CLI, "
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "CondensLeft menu \u2192 Projects/Folders [1]Home \u2192"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "Condens AI Chat [1]"
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "AureliusProject-first with tags/notes [20]Pro"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "\u2014 (Data unavailable in primary sources)"
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "NotebookLMThree-pane notebook (Sources/Chat/S"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "Audio Overviews generated artifacts [18]"
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "ElicitHome \u2192 workflow picker [4]Six workflows"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "Research Report auto-run with progress sideba"
+        }
+      ],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/missions/new",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/missions?status=completed&sort=updated_desc",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/search",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/librarian",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/librarian?q=Qdrant&project=0afcc588-e722-45bd-8320-f486601b877c",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/saved-searches",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/settings",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/device",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/admin/users",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/admin/spaces",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/404",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 404,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/evidence",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/admin/observability",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/admin/corrections",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/evidence/194131c0-d3d1-4838-833d-0c1647074fdb",
+      "themeRequested": "light",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/graph",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/graph?root=project:0afcc588-e722-45bd-8320-f486601b877c",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/projects",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/projects/new",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/projects/0afcc588-e722-45bd-8320-f486601b877c",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/documents",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/documents/87bcd621-5a73-4b5f-8cc6-d83912ed8d4a",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 200,
+      "overflow": [
+        {
+          "tag": "TABLE",
+          "class": "min-w-full border border-line rounded-lg",
+          "text": "FunctionWhat it returns (per docs)Behavior du"
+        },
+        {
+          "tag": "THEAD",
+          "class": "",
+          "text": "FunctionWhat it returns (per docs)Behavior du"
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "FunctionWhat it returns (per docs)Behavior du"
+        },
+        {
+          "tag": "TH",
+          "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+          "text": "Suitability for post-wait lease validation"
+        },
+        {
+          "tag": "TBODY",
+          "class": "",
+          "text": "CURRENT_TIMESTAMP / transaction_timestamp() /"
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "CURRENT_TIMESTAMP / transaction_timestamp() /"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "Unsafe \u2014 can accept an expired lease [1]"
+        },
+        {
+          "tag": "STRONG",
+          "class": "font-semibold text-foreground",
+          "text": "Unsafe"
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "statement_timestamp()\"start of current statem"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "Partially safe \u2014 narrower window, still not t"
+        },
+        {
+          "tag": "STRONG",
+          "class": "font-semibold text-foreground",
+          "text": "Partially safe"
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "clock_timestamp()\"changes during statement ex"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "Recommended \u2014 the only observation that sees "
+        },
+        {
+          "tag": "STRONG",
+          "class": "font-semibold text-foreground",
+          "text": "Recommended"
+        },
+        {
+          "tag": "TABLE",
+          "class": "min-w-full border border-line rounded-lg",
+          "text": "StepActorActionDocumented effectTimestamp beh"
+        }
+      ],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/documents/upload",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/collections",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/collections/new",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/collections/98e1d368-0d6d-4947-96ec-9c70ecd0ccc4",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/reports",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/reports/78b5bda7-6358-45db-8a00-800d60af68f5",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/missions",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/missions/7b847edd-5433-4237-a899-57b47e6edf0a?tab=results",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 200,
+      "overflow": [
+        {
+          "tag": "TABLE",
+          "class": "min-w-full border border-line rounded-lg",
+          "text": "ProductNavigation modelPrimary object hierarc"
+        },
+        {
+          "tag": "THEAD",
+          "class": "",
+          "text": "ProductNavigation modelPrimary object hierarc"
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "ProductNavigation modelPrimary object hierarc"
+        },
+        {
+          "tag": "TH",
+          "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+          "text": "Search placement"
+        },
+        {
+          "tag": "TH",
+          "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+          "text": "Home/dashboard design"
+        },
+        {
+          "tag": "TH",
+          "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+          "text": "Dark-mode strategy"
+        },
+        {
+          "tag": "TH",
+          "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+          "text": "Agent/automation surfaces"
+        },
+        {
+          "tag": "TBODY",
+          "class": "",
+          "text": "DovetailSidebar \u2318K; Channels-vs-Projects spli"
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "DovetailSidebar \u2318K; Channels-vs-Projects spli"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "Global \u2318K + contextual Chat [8]"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "\u2014 (Data unavailable in primary sources)"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "\u2014 (Data unavailable in primary sources)"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "Agents (5-part config), MCP server, API/CLI, "
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "CondensLeft menu \u2192 Projects/Folders [1]Home \u2192"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "Home AI search across repository [1]"
+        }
+      ],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/missions/new",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/missions?status=completed&sort=updated_desc",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/search",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/librarian",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/librarian?q=Qdrant&project=0afcc588-e722-45bd-8320-f486601b877c",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/saved-searches",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/settings",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/device",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/admin/users",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 200,
+      "overflow": [
+        {
+          "tag": "TABLE",
+          "class": "w-full min-w-[52rem] text-sm",
+          "text": "EmailNameRoleStatusActionskneelinghorse@trace"
+        },
+        {
+          "tag": "THEAD",
+          "class": "",
+          "text": "EmailNameRoleStatusActions"
+        },
+        {
+          "tag": "TR",
+          "class": "text-left text-xs uppercase tracking-wide text-muted border-b border-line",
+          "text": "EmailNameRoleStatusActions"
+        },
+        {
+          "tag": "TH",
+          "class": "py-2 pr-4 font-medium",
+          "text": "Actions"
+        },
+        {
+          "tag": "TBODY",
+          "class": "",
+          "text": "kneelinghorse@tracelab.localkneelinghorse (le"
+        },
+        {
+          "tag": "TR",
+          "class": "border-b border-line",
+          "text": "kneelinghorse@tracelab.localkneelinghorse (le"
+        },
+        {
+          "tag": "TD",
+          "class": "py-3 pr-4",
+          "text": "Send password reset linkDisableDelete"
+        },
+        {
+          "tag": "DIV",
+          "class": "flex min-w-48 flex-wrap items-center gap-3",
+          "text": "Send password reset linkDisableDelete"
+        },
+        {
+          "tag": "BUTTON",
+          "class": "text-secondary hover:text-foreground disabled:opacity-40",
+          "text": "Disable"
+        },
+        {
+          "tag": "TR",
+          "class": "border-b border-line",
+          "text": "derek@deniedart.com(you)kneelinghorseviewerme"
+        },
+        {
+          "tag": "TD",
+          "class": "py-3 pr-4",
+          "text": "Send password reset linkDisableDelete"
+        },
+        {
+          "tag": "DIV",
+          "class": "flex min-w-48 flex-wrap items-center gap-3",
+          "text": "Send password reset linkDisableDelete"
+        },
+        {
+          "tag": "BUTTON",
+          "class": "text-secondary hover:text-foreground disabled:opacity-40",
+          "text": "Disable"
+        },
+        {
+          "tag": "TR",
+          "class": "border-b border-line",
+          "text": "birch@chimptek.comBirchviewermemberadminowner"
+        },
+        {
+          "tag": "TD",
+          "class": "py-3 pr-4",
+          "text": "Send password reset linkDisableDelete"
+        }
+      ],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/admin/spaces",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/404",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 404,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/evidence",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/admin/observability",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/admin/corrections",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/evidence/194131c0-d3d1-4838-833d-0c1647074fdb",
+      "themeRequested": "light",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/graph",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/graph?root=project:0afcc588-e722-45bd-8320-f486601b877c",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/projects",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/projects/new",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/projects/0afcc588-e722-45bd-8320-f486601b877c",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/documents",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/documents/87bcd621-5a73-4b5f-8cc6-d83912ed8d4a",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 200,
+      "overflow": [
+        {
+          "tag": "TABLE",
+          "class": "min-w-full border border-line rounded-lg",
+          "text": "FunctionSamplesStable withinSafe for post-loc"
+        },
+        {
+          "tag": "THEAD",
+          "class": "",
+          "text": "FunctionSamplesStable withinSafe for post-loc"
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "FunctionSamplesStable withinSafe for post-loc"
+        },
+        {
+          "tag": "TH",
+          "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+          "text": "Samples"
+        },
+        {
+          "tag": "TH",
+          "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+          "text": "Stable within"
+        },
+        {
+          "tag": "TH",
+          "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+          "text": "Safe for post-lock-wait lease check?"
+        },
+        {
+          "tag": "TBODY",
+          "class": "",
+          "text": "transaction_timestamp() = CURRENT_TIMESTAMP ="
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "transaction_timestamp() = CURRENT_TIMESTAMP ="
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "start of transaction [1]"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "whole transaction [1]"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "No \u2014 frozen before the wait [1]"
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "statement_timestamp()start of statement [1]wh"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "start of statement [1]"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "whole statement [1]"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "Partly \u2014 fixed at command receipt [1]"
+        }
+      ],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/documents/upload",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/collections",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/collections/new",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/collections/98e1d368-0d6d-4947-96ec-9c70ecd0ccc4",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/reports",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/reports/78b5bda7-6358-45db-8a00-800d60af68f5",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/missions",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/missions/7b847edd-5433-4237-a899-57b47e6edf0a?tab=results",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 200,
+      "overflow": [
+        {
+          "tag": "TABLE",
+          "class": "min-w-full border border-line rounded-lg",
+          "text": "ProductNavigation modelPrimary object hierarc"
+        },
+        {
+          "tag": "THEAD",
+          "class": "",
+          "text": "ProductNavigation modelPrimary object hierarc"
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "ProductNavigation modelPrimary object hierarc"
+        },
+        {
+          "tag": "TH",
+          "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+          "text": "Primary object hierarchy"
+        },
+        {
+          "tag": "TH",
+          "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+          "text": "Search placement"
+        },
+        {
+          "tag": "TH",
+          "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+          "text": "Home/dashboard design"
+        },
+        {
+          "tag": "TH",
+          "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+          "text": "Dark-mode strategy"
+        },
+        {
+          "tag": "TH",
+          "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+          "text": "Agent/automation surfaces"
+        },
+        {
+          "tag": "TBODY",
+          "class": "",
+          "text": "DovetailSidebar \u2318K; Channels-vs-Projects spli"
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "DovetailSidebar \u2318K; Channels-vs-Projects spli"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "Workspace \u2192 Folders \u2192 Projects / Channels \u2192 I"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "Global \u2318K + contextual Chat [8]"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "\u2014 (Data unavailable in primary sources)"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "\u2014 (Data unavailable in primary sources)"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "Agents (5-part config), MCP server, API/CLI, "
+        }
+      ],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/missions/new",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/missions?status=completed&sort=updated_desc",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/search",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/librarian",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/librarian?q=Qdrant&project=0afcc588-e722-45bd-8320-f486601b877c",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/saved-searches",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/settings",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/device",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/admin/users",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 200,
+      "overflow": [
+        {
+          "tag": "TABLE",
+          "class": "w-full min-w-[52rem] text-sm",
+          "text": "EmailNameRoleStatusActionskneelinghorse@trace"
+        },
+        {
+          "tag": "THEAD",
+          "class": "",
+          "text": "EmailNameRoleStatusActions"
+        },
+        {
+          "tag": "TR",
+          "class": "text-left text-xs uppercase tracking-wide text-muted border-b border-line",
+          "text": "EmailNameRoleStatusActions"
+        },
+        {
+          "tag": "TH",
+          "class": "py-2 pr-4 font-medium",
+          "text": "Role"
+        },
+        {
+          "tag": "TH",
+          "class": "py-2 pr-4 font-medium",
+          "text": "Status"
+        },
+        {
+          "tag": "TH",
+          "class": "py-2 pr-4 font-medium",
+          "text": "Actions"
+        },
+        {
+          "tag": "TBODY",
+          "class": "",
+          "text": "kneelinghorse@tracelab.localkneelinghorse (le"
+        },
+        {
+          "tag": "TR",
+          "class": "border-b border-line",
+          "text": "kneelinghorse@tracelab.localkneelinghorse (le"
+        },
+        {
+          "tag": "TD",
+          "class": "py-3 pr-4",
+          "text": "viewermemberadminownerservice"
+        },
+        {
+          "tag": "SELECT",
+          "class": "rounded-md border border-line-strong bg-surface px-2 py-1 text-sm text-foreground disabled:opacity-50",
+          "text": "viewermemberadminownerservice"
+        },
+        {
+          "tag": "TD",
+          "class": "py-3 pr-4",
+          "text": "\u2713Active complete"
+        },
+        {
+          "tag": "SPAN",
+          "class": "inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium bg-success-surface text-success",
+          "text": "\u2713Active complete"
+        },
+        {
+          "tag": "SPAN",
+          "class": "",
+          "text": "\u2713"
+        },
+        {
+          "tag": "SPAN",
+          "class": "sr-only",
+          "text": " complete"
+        },
+        {
+          "tag": "TD",
+          "class": "py-3 pr-4",
+          "text": "Send password reset linkDisableDelete"
+        }
+      ],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/admin/spaces",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/404",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 404,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/evidence",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/admin/observability",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/admin/corrections",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/evidence/194131c0-d3d1-4838-833d-0c1647074fdb",
+      "themeRequested": "light",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/graph",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/graph?root=project:0afcc588-e722-45bd-8320-f486601b877c",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/projects",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/projects/new",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/projects/0afcc588-e722-45bd-8320-f486601b877c",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/documents",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/documents/87bcd621-5a73-4b5f-8cc6-d83912ed8d4a",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/documents/upload",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/collections",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/collections/new",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/collections/98e1d368-0d6d-4947-96ec-9c70ecd0ccc4",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/reports",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/reports/78b5bda7-6358-45db-8a00-800d60af68f5",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/missions",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/missions/7b847edd-5433-4237-a899-57b47e6edf0a?tab=results",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 200,
+      "overflow": [
+        {
+          "tag": "TABLE",
+          "class": "min-w-full border border-line rounded-lg",
+          "text": "ProductNavigation modelPrimary object hierarc"
+        },
+        {
+          "tag": "THEAD",
+          "class": "",
+          "text": "ProductNavigation modelPrimary object hierarc"
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "ProductNavigation modelPrimary object hierarc"
+        },
+        {
+          "tag": "TH",
+          "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+          "text": "Agent/automation surfaces"
+        },
+        {
+          "tag": "TBODY",
+          "class": "",
+          "text": "DovetailSidebar \u2318K; Channels-vs-Projects spli"
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "DovetailSidebar \u2318K; Channels-vs-Projects spli"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "Agents (5-part config), MCP server, API/CLI, "
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "CondensLeft menu \u2192 Projects/Folders [1]Home \u2192"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "Condens AI Chat [1]"
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "AureliusProject-first with tags/notes [20]Pro"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "\u2014 (Data unavailable in primary sources)"
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "NotebookLMThree-pane notebook (Sources/Chat/S"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "Audio Overviews generated artifacts [18]"
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "ElicitHome \u2192 workflow picker [4]Six workflows"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "Research Report auto-run with progress sideba"
+        }
+      ],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/missions/new",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/missions?status=completed&sort=updated_desc",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/search",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/librarian",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/librarian?q=Qdrant&project=0afcc588-e722-45bd-8320-f486601b877c",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/saved-searches",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/settings",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/device",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/admin/users",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/admin/spaces",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/404",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 404,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/evidence",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/admin/observability",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/admin/corrections",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/evidence/194131c0-d3d1-4838-833d-0c1647074fdb",
+      "themeRequested": "dark",
+      "width": 1440,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/graph",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/graph?root=project:0afcc588-e722-45bd-8320-f486601b877c",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/projects",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/projects/new",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/projects/0afcc588-e722-45bd-8320-f486601b877c",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/documents",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/documents/87bcd621-5a73-4b5f-8cc6-d83912ed8d4a",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 200,
+      "overflow": [
+        {
+          "tag": "TABLE",
+          "class": "min-w-full border border-line rounded-lg",
+          "text": "FunctionWhat it returns (per docs)Behavior du"
+        },
+        {
+          "tag": "THEAD",
+          "class": "",
+          "text": "FunctionWhat it returns (per docs)Behavior du"
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "FunctionWhat it returns (per docs)Behavior du"
+        },
+        {
+          "tag": "TH",
+          "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+          "text": "Suitability for post-wait lease validation"
+        },
+        {
+          "tag": "TBODY",
+          "class": "",
+          "text": "CURRENT_TIMESTAMP / transaction_timestamp() /"
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "CURRENT_TIMESTAMP / transaction_timestamp() /"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "Unsafe \u2014 can accept an expired lease [1]"
+        },
+        {
+          "tag": "STRONG",
+          "class": "font-semibold text-foreground",
+          "text": "Unsafe"
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "statement_timestamp()\"start of current statem"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "Partially safe \u2014 narrower window, still not t"
+        },
+        {
+          "tag": "STRONG",
+          "class": "font-semibold text-foreground",
+          "text": "Partially safe"
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "clock_timestamp()\"changes during statement ex"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "Recommended \u2014 the only observation that sees "
+        },
+        {
+          "tag": "STRONG",
+          "class": "font-semibold text-foreground",
+          "text": "Recommended"
+        },
+        {
+          "tag": "TABLE",
+          "class": "min-w-full border border-line rounded-lg",
+          "text": "StepActorActionDocumented effectTimestamp beh"
+        }
+      ],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/documents/upload",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/collections",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/collections/new",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/collections/98e1d368-0d6d-4947-96ec-9c70ecd0ccc4",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/reports",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/reports/78b5bda7-6358-45db-8a00-800d60af68f5",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/missions",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/missions/7b847edd-5433-4237-a899-57b47e6edf0a?tab=results",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 200,
+      "overflow": [
+        {
+          "tag": "TABLE",
+          "class": "min-w-full border border-line rounded-lg",
+          "text": "ProductNavigation modelPrimary object hierarc"
+        },
+        {
+          "tag": "THEAD",
+          "class": "",
+          "text": "ProductNavigation modelPrimary object hierarc"
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "ProductNavigation modelPrimary object hierarc"
+        },
+        {
+          "tag": "TH",
+          "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+          "text": "Search placement"
+        },
+        {
+          "tag": "TH",
+          "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+          "text": "Home/dashboard design"
+        },
+        {
+          "tag": "TH",
+          "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+          "text": "Dark-mode strategy"
+        },
+        {
+          "tag": "TH",
+          "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+          "text": "Agent/automation surfaces"
+        },
+        {
+          "tag": "TBODY",
+          "class": "",
+          "text": "DovetailSidebar \u2318K; Channels-vs-Projects spli"
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "DovetailSidebar \u2318K; Channels-vs-Projects spli"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "Global \u2318K + contextual Chat [8]"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "\u2014 (Data unavailable in primary sources)"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "\u2014 (Data unavailable in primary sources)"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "Agents (5-part config), MCP server, API/CLI, "
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "CondensLeft menu \u2192 Projects/Folders [1]Home \u2192"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "Home AI search across repository [1]"
+        }
+      ],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/missions/new",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/missions?status=completed&sort=updated_desc",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/search",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/librarian",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/librarian?q=Qdrant&project=0afcc588-e722-45bd-8320-f486601b877c",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/saved-searches",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/settings",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/device",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/admin/users",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 200,
+      "overflow": [
+        {
+          "tag": "TABLE",
+          "class": "w-full min-w-[52rem] text-sm",
+          "text": "EmailNameRoleStatusActionskneelinghorse@trace"
+        },
+        {
+          "tag": "THEAD",
+          "class": "",
+          "text": "EmailNameRoleStatusActions"
+        },
+        {
+          "tag": "TR",
+          "class": "text-left text-xs uppercase tracking-wide text-muted border-b border-line",
+          "text": "EmailNameRoleStatusActions"
+        },
+        {
+          "tag": "TH",
+          "class": "py-2 pr-4 font-medium",
+          "text": "Actions"
+        },
+        {
+          "tag": "TBODY",
+          "class": "",
+          "text": "kneelinghorse@tracelab.localkneelinghorse (le"
+        },
+        {
+          "tag": "TR",
+          "class": "border-b border-line",
+          "text": "kneelinghorse@tracelab.localkneelinghorse (le"
+        },
+        {
+          "tag": "TD",
+          "class": "py-3 pr-4",
+          "text": "Send password reset linkDisableDelete"
+        },
+        {
+          "tag": "DIV",
+          "class": "flex min-w-48 flex-wrap items-center gap-3",
+          "text": "Send password reset linkDisableDelete"
+        },
+        {
+          "tag": "BUTTON",
+          "class": "text-secondary hover:text-foreground disabled:opacity-40",
+          "text": "Disable"
+        },
+        {
+          "tag": "TR",
+          "class": "border-b border-line",
+          "text": "derek@deniedart.com(you)kneelinghorseviewerme"
+        },
+        {
+          "tag": "TD",
+          "class": "py-3 pr-4",
+          "text": "Send password reset linkDisableDelete"
+        },
+        {
+          "tag": "DIV",
+          "class": "flex min-w-48 flex-wrap items-center gap-3",
+          "text": "Send password reset linkDisableDelete"
+        },
+        {
+          "tag": "BUTTON",
+          "class": "text-secondary hover:text-foreground disabled:opacity-40",
+          "text": "Disable"
+        },
+        {
+          "tag": "TR",
+          "class": "border-b border-line",
+          "text": "birch@chimptek.comBirchviewermemberadminowner"
+        },
+        {
+          "tag": "TD",
+          "class": "py-3 pr-4",
+          "text": "Send password reset linkDisableDelete"
+        }
+      ],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/admin/spaces",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/404",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 404,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/evidence",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/admin/observability",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/admin/corrections",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/evidence/194131c0-d3d1-4838-833d-0c1647074fdb",
+      "themeRequested": "dark",
+      "width": 820,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/graph",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/graph?root=project:0afcc588-e722-45bd-8320-f486601b877c",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/projects",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/projects/new",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/projects/0afcc588-e722-45bd-8320-f486601b877c",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/documents",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/documents/87bcd621-5a73-4b5f-8cc6-d83912ed8d4a",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 200,
+      "overflow": [
+        {
+          "tag": "TABLE",
+          "class": "min-w-full border border-line rounded-lg",
+          "text": "FunctionSamplesStable withinSafe for post-loc"
+        },
+        {
+          "tag": "THEAD",
+          "class": "",
+          "text": "FunctionSamplesStable withinSafe for post-loc"
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "FunctionSamplesStable withinSafe for post-loc"
+        },
+        {
+          "tag": "TH",
+          "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+          "text": "Samples"
+        },
+        {
+          "tag": "TH",
+          "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+          "text": "Stable within"
+        },
+        {
+          "tag": "TH",
+          "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+          "text": "Safe for post-lock-wait lease check?"
+        },
+        {
+          "tag": "TBODY",
+          "class": "",
+          "text": "transaction_timestamp() = CURRENT_TIMESTAMP ="
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "transaction_timestamp() = CURRENT_TIMESTAMP ="
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "start of transaction [1]"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "whole transaction [1]"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "No \u2014 frozen before the wait [1]"
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "statement_timestamp()start of statement [1]wh"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "start of statement [1]"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "whole statement [1]"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "Partly \u2014 fixed at command receipt [1]"
+        }
+      ],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/documents/upload",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/collections",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/collections/new",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/collections/98e1d368-0d6d-4947-96ec-9c70ecd0ccc4",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/reports",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/reports/78b5bda7-6358-45db-8a00-800d60af68f5",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/missions",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/missions/7b847edd-5433-4237-a899-57b47e6edf0a?tab=results",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 200,
+      "overflow": [
+        {
+          "tag": "TABLE",
+          "class": "min-w-full border border-line rounded-lg",
+          "text": "ProductNavigation modelPrimary object hierarc"
+        },
+        {
+          "tag": "THEAD",
+          "class": "",
+          "text": "ProductNavigation modelPrimary object hierarc"
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "ProductNavigation modelPrimary object hierarc"
+        },
+        {
+          "tag": "TH",
+          "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+          "text": "Primary object hierarchy"
+        },
+        {
+          "tag": "TH",
+          "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+          "text": "Search placement"
+        },
+        {
+          "tag": "TH",
+          "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+          "text": "Home/dashboard design"
+        },
+        {
+          "tag": "TH",
+          "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+          "text": "Dark-mode strategy"
+        },
+        {
+          "tag": "TH",
+          "class": "px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal",
+          "text": "Agent/automation surfaces"
+        },
+        {
+          "tag": "TBODY",
+          "class": "",
+          "text": "DovetailSidebar \u2318K; Channels-vs-Projects spli"
+        },
+        {
+          "tag": "TR",
+          "class": "",
+          "text": "DovetailSidebar \u2318K; Channels-vs-Projects spli"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "Workspace \u2192 Folders \u2192 Projects / Channels \u2192 I"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "Global \u2318K + contextual Chat [8]"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "\u2014 (Data unavailable in primary sources)"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "\u2014 (Data unavailable in primary sources)"
+        },
+        {
+          "tag": "TD",
+          "class": "px-4 py-2 border-b border-line text-sm text-secondary break-normal",
+          "text": "Agents (5-part config), MCP server, API/CLI, "
+        }
+      ],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/missions/new",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/missions?status=completed&sort=updated_desc",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/search",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/librarian",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/librarian?q=Qdrant&project=0afcc588-e722-45bd-8320-f486601b877c",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/saved-searches",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/settings",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/device",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/admin/users",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 200,
+      "overflow": [
+        {
+          "tag": "TABLE",
+          "class": "w-full min-w-[52rem] text-sm",
+          "text": "EmailNameRoleStatusActionskneelinghorse@trace"
+        },
+        {
+          "tag": "THEAD",
+          "class": "",
+          "text": "EmailNameRoleStatusActions"
+        },
+        {
+          "tag": "TR",
+          "class": "text-left text-xs uppercase tracking-wide text-muted border-b border-line",
+          "text": "EmailNameRoleStatusActions"
+        },
+        {
+          "tag": "TH",
+          "class": "py-2 pr-4 font-medium",
+          "text": "Role"
+        },
+        {
+          "tag": "TH",
+          "class": "py-2 pr-4 font-medium",
+          "text": "Status"
+        },
+        {
+          "tag": "TH",
+          "class": "py-2 pr-4 font-medium",
+          "text": "Actions"
+        },
+        {
+          "tag": "TBODY",
+          "class": "",
+          "text": "kneelinghorse@tracelab.localkneelinghorse (le"
+        },
+        {
+          "tag": "TR",
+          "class": "border-b border-line",
+          "text": "kneelinghorse@tracelab.localkneelinghorse (le"
+        },
+        {
+          "tag": "TD",
+          "class": "py-3 pr-4",
+          "text": "viewermemberadminownerservice"
+        },
+        {
+          "tag": "SELECT",
+          "class": "rounded-md border border-line-strong bg-surface px-2 py-1 text-sm text-foreground disabled:opacity-50",
+          "text": "viewermemberadminownerservice"
+        },
+        {
+          "tag": "TD",
+          "class": "py-3 pr-4",
+          "text": "\u2713Active complete"
+        },
+        {
+          "tag": "SPAN",
+          "class": "inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium bg-success-surface text-success",
+          "text": "\u2713Active complete"
+        },
+        {
+          "tag": "SPAN",
+          "class": "",
+          "text": "\u2713"
+        },
+        {
+          "tag": "SPAN",
+          "class": "sr-only",
+          "text": " complete"
+        },
+        {
+          "tag": "TD",
+          "class": "py-3 pr-4",
+          "text": "Send password reset linkDisableDelete"
+        }
+      ],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/admin/spaces",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/404",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 404,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/evidence",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/admin/observability",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/admin/corrections",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    },
+    {
+      "route": "/evidence/194131c0-d3d1-4838-833d-0c1647074fdb",
+      "themeRequested": "dark",
+      "width": 390,
+      "status": 200,
+      "overflow": [],
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "navigationCancellations": []
+    }
+  ],
+  "limits": [
+    "Authenticated owner read-only route smoke; does not satisfy real zero-project first-use or inbox acceptance.",
+    "Axe gate checks serious/critical violations; two exact activity PUT paths were locally fulfilled."
+  ]
+}

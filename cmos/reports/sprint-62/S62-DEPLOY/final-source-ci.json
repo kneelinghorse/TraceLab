@@ -1,0 +1,71 @@
+{
+  "checked_at": "2026-10-01T01:41:32.425778+00:00",
+  "pr": "https://github.com/kneelinghorse/TraceLab/pull/408",
+  "tested_head": "f8cd77397c19c40e38e4942578da9080716818e1",
+  "merge_commit": "4317a75d6ba1518cd94226847257880b6609243b",
+  "required_checks": [
+    {
+      "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36801188643/job/110175740647",
+      "name": "backend-suite",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36801188592/job/110175674193",
+      "name": "backend-integration",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36801188602/job/110175674232",
+      "name": "ruff-diff",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36801188612/job/110175674474",
+      "name": "vitest",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36801188598/job/110175673888",
+      "name": "build-frontend-production",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36801188597/job/110175673802",
+      "name": "mcp-package",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36801188590/job/110175673867",
+      "name": "Secret Scan",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36801188612/job/110175674467",
+      "name": "type-check",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36801188612/job/110175674331",
+      "name": "lint",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/36801184262/job/110175660909",
+      "name": "Secret Scan",
+      "state": "SUCCESS"
+    }
+  ],
+  "backend": {
+    "passed": 3122,
+    "skipped": 4,
+    "quarantined": 12,
+    "warnings": 49,
+    "seconds": 627.39
+  },
+  "diagnostic_artifact": {
+    "id": 11135464214,
+    "name": "backend-suite-diagnostics",
+    "size_bytes": 113520
+  },
+  "app_source_tree_matches_tested_head": true
+}

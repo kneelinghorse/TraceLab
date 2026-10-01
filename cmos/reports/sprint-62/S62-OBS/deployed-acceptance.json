@@ -1,0 +1,76 @@
+{
+  "checked_at": "2026-10-01T01:49:47.659742+00:00",
+  "served_commit": "4317a75d6ba1518cd94226847257880b6609243b",
+  "diagnostic": {
+    "passed": true,
+    "fixture_cleaned_up": true,
+    "collection": "s62-cache-diagnostic-68c74848ffa646e48fe8bef80adcf2c0",
+    "points_written": 1,
+    "replay_hit": true,
+    "other_scope_missed": true,
+    "configured_collections_untouched": true,
+    "model_calls": 0,
+    "metrics": {
+      "scope": "process_local_since_start",
+      "status": "available",
+      "error_categories": {},
+      "hits": 1.0,
+      "misses": 1.0,
+      "errors": 0.0,
+      "evictions": 0.0,
+      "hit_rate": 0.5,
+      "avg_lookup_seconds": 0.026567035587504506
+    }
+  },
+  "authenticated_metrics": [
+    {
+      "path": "/auth/me",
+      "status": 200,
+      "role": "owner"
+    },
+    {
+      "path": "/admin/dashboard/data",
+      "status": 200,
+      "data_keys": [
+        "cache_performance",
+        "cost_overview",
+        "export_rows",
+        "generated_at",
+        "query_performance",
+        "system_health"
+      ],
+      "cache_performance": {
+        "scope": "process_local_since_start",
+        "ttl_status": "available",
+        "semantic_status": "available",
+        "ttl_caches": [],
+        "semantic_cache": {
+          "scope": "process_local_since_start",
+          "status": "available",
+          "error_categories": {},
+          "hits": 0.0,
+          "misses": 0.0,
+          "errors": 0.0,
+          "evictions": 0.0,
+          "hit_rate": 0.0,
+          "avg_lookup_seconds": 0.0
+        },
+        "aggregate": {
+          "ttl_cache_count": 0,
+          "ttl_average_hit_rate": 0.0,
+          "semantic_hit_rate": 0.0,
+          "semantic_evictions": 0.0
+        }
+      }
+    },
+    {
+      "path": "/admin/stats",
+      "status": 200
+    }
+  ],
+  "limits": [
+    "Diagnostic ran in its own backend process and a unique disposable collection; its counter hit does not assert an API-process cache hit.",
+    "Real SDK/Qdrant persistence and scope proof pass; historical empty-cache cause remains unproven.",
+    "No configured application/cache collection was mutated; no model request from diagnostic."
+  ]
+}

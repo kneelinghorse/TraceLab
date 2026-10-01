@@ -1,0 +1,33 @@
+{
+  "all_resource_addresses_preserved": [
+    "database.Postgres",
+    "service.Qdrant",
+    "service.TraceLab",
+    "service.frontend",
+    "service.worker-service deepSearch",
+    "volume.postgres-2025-12-07 -2025-12-09 19:15 UTC",
+    "volume.postgres-2025-12-07 -2025-12-09 19:36 UTC",
+    "volume.postgres-2025-12-07 22:24 UTC",
+    "volume.postgres-volume",
+    "volume.qdrant-volume"
+  ],
+  "unrelated_resources_exactly_unchanged": [
+    "service.worker-service deepSearch",
+    "service.Qdrant",
+    "database.Postgres",
+    "volume.postgres-2025-12-07 -2025-12-09 19:15 UTC",
+    "volume.qdrant-volume",
+    "volume.postgres-2025-12-07 22:24 UTC",
+    "volume.postgres-2025-12-07 -2025-12-09 19:36 UTC",
+    "volume.postgres-volume"
+  ],
+  "scoped_source_variables_networking_volumes_unchanged": true,
+  "variable_counts": {
+    "service.TraceLab": 33,
+    "service.frontend": 6
+  },
+  "secret_values_retrieved": false,
+  "comparison": "CLI imported graph uses preserve markers, not secret values. Reviewed/apply plan contains no variable updates.",
+  "rechecked_after_source_rollout_at": "2026-10-01T01:49:47.659262+00:00",
+  "served_commit": "4317a75d6ba1518cd94226847257880b6609243b"
+}

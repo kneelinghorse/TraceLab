@@ -2,7 +2,7 @@
   "mission": "S62-OBS",
   "checked_at": "2026-10-01T01:06:29.627096+00:00",
   "decision": 582,
-  "status": "locally_verified_deployed_acceptance_pending",
+  "status": "completed_deployed_acceptance_verified",
   "deployed_before": {
     "serving": {
       "backend": "4495119551c67a39b393b40f0e0d176ea84128ba",
@@ -44,12 +44,14 @@
   },
   "limits": [
     "The cause of the historical empty semantic-cache observation remains unknown. Current serialization success and injected failures are not evidence of its historical cause.",
-    "Deployed endpoint repair and isolated collection diagnostic must be exercised after rollout; no production cache has been cleared.",
+    "Deployed endpoint repair and isolated collection diagnostic passed on 4317a75; no production cache was cleared. See deployed-acceptance.json.",
     "API-process counters reset at restart and are not fleet-wide. Existing hit counts may include RAG application-TTL replays; only the explicit diagnostic proves persistence.",
     "Frozen-clock dashboard test passes explicitly; the existing 12-node quarantine ratchet remains unchanged and its comment records this distinction.",
     "Six pre-existing isinstance tuple lint violations in the now-touched aggregator were minimally updated because CI checks whole changed Python files."
   ],
-  "next_step_444": "pending live acceptance; historical explanation explicitly unresolved",
+  "next_step_444": "completed after deployed acceptance; historical explanation explicitly unresolved",
   "live_command": "python -m scripts.cache_diagnostic",
-  "receipts": "/tmp/s62-obs-suites.log; /tmp/s62-obs-integration.log"
+  "receipts": "/tmp/s62-obs-suites.log; /tmp/s62-obs-integration.log",
+  "deployed_acceptance_receipt": "deployed-acceptance.json",
+  "deployed_checked_at": "2026-10-01T01:56:21.929829+00:00"
 }

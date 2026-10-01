@@ -85,7 +85,7 @@ research-repository/
 ├── tests/
 ├── requirements.txt
 ├── .env
-├── railway.json  # Railway deployment config
+├── .railway/  # Supported scoped deployment configuration
 └── README.md
 ```
 
@@ -1019,25 +1019,11 @@ async def semantic_search(
 
 ### Step 15: Railway Configuration
 
-**railway.json:**
-```json
-{
-  "$schema": "https://railway.app/railway.schema.json",
-  "build": {
-    "builder": "NIXPACKS"
-  },
-  "deploy": {
-    "startCommand": "uvicorn app.main:app --host 0.0.0.0 --port $PORT",
-    "restartPolicyType": "ON_FAILURE",
-    "restartPolicyMaxRetries": 10
-  }
-}
-```
-
-**Procfile** (alternative):
-```
-web: uvicorn app.main:app --host 0.0.0.0 --port $PORT
-```
+Use the [current Railway configuration and rollback guide](../.railway/README.md)
+and `.railway/railway.ts`. This historical implementation guide's former
+`railway.json`/Procfile examples are retired. The supported configuration preserves
+the backend Dockerfile build and migration-before-start command; preview and
+apply it explicitly before rolling out source changes.
 
 **.railwayignore:**
 ```
@@ -1069,22 +1055,11 @@ alembic/versions/*.pyc
 
 ### Step 17: Database Migrations on Railway
 
-**Update Railway deployment to run migrations:**
-
-**railway.json** (add build step):
-```json
-{
-  "build": {
-    "builder": "NIXPACKS",
-    "buildCommand": "pip install -r requirements.txt && alembic upgrade head"
-  }
-}
-```
-
-Or add migration as a separate service:
-- Create new service: "Migration Runner"
-- Command: `alembic upgrade head`
-- Run on deploy
+The backend start command already runs `alembic upgrade head` before uvicorn.
+Follow the [configuration guide](../.railway/README.md) and
+[schema evolution requirements](schema-evolution-guide.md). Confirm the migration
+logs and serving revision after each rollout; do not move production migrations
+into an image build or introduce a second migration service for this configuration.
 
 ---
 

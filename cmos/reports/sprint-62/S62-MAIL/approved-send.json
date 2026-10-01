@@ -1,0 +1,56 @@
+{
+  "checked_at": "2026-10-01T02:48:40.842528+00:00",
+  "serving_commit": "4317a75d6ba1518cd94226847257880b6609243b",
+  "authorization": "User approved proceeding after reviewed single-message request",
+  "recipient": "hello@aquex.ai",
+  "subject": "TraceLab S62-MAIL delivery verification \u2014 4317a75",
+  "marker": "S62-MAIL-4317a75",
+  "attachments": 0,
+  "provider_http_status": 200,
+  "provider_accepted": true,
+  "destination_inbox_received": false,
+  "reply_to_verified_in_destination_inbox": false,
+  "provider_send_id": "01a0f55d-324a-759a-8c99-f6e7baeca3ca",
+  "provider_status_read_http": 404,
+  "readback_at": "2026-10-01T02:50:55.593624+00:00",
+  "provider_readback": [
+    {
+      "query": "sending_key",
+      "http_status": 401,
+      "error_name": "restricted_api_key"
+    },
+    {
+      "query": "inbound_key",
+      "http_status": 200,
+      "last_event": "delivered",
+      "reply_to_matches": true,
+      "subject_matches": true
+    },
+    {
+      "query": "received",
+      "http_status": 200,
+      "matching_received_messages": [
+        {
+          "id": "96ca595b-0c6c-4959-8fea-62553c3347dd",
+          "created_at": "2026-10-01T02:48:41.886Z",
+          "hello_in_to": true
+        }
+      ]
+    }
+  ],
+  "forward_readback": {
+    "checked_at": "2026-10-01T02:51:46.902384+00:00",
+    "list_http_status": 200,
+    "matching_forwards": [
+      {
+        "provider_forward_id": "01a0f55d-3b98-73ba-8e99-75436c03408b",
+        "detail_http_status": 200,
+        "last_event": "delivered",
+        "created_at": "2026-10-01 02:48:43.327000+00",
+        "recipient_matches_support_destination": true,
+        "reply_to_matches_controlled_address": true,
+        "verification_marker_present": true
+      }
+    ]
+  }
+}
