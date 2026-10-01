@@ -36,6 +36,12 @@ actually uses `/Dockerfile`, despite its legacy JSON saying Nixpacks; frontend
 actually uses Nixpacks and `/admin/users`, despite different dashboard defaults.
 Keep Alembic before uvicorn, frontend root `/frontend`, one replica per service,
 and the existing region, restart, networking and variable configuration.
+Railway normalizes empty watch patterns, sleep=false, and the ON_FAILURE/10 restart
+defaults out of its imported graph. These defaults remain verified in live service
+readback; replica count is represented once in `multiRegionConfig`. Omitting the
+redundant declarations makes the post-apply plan empty. The backend's legacy
+`serviceInstance.builder` field still reports RAILPACK; the IaC environment graph
+and actual deployment manifest carry DOCKERFILE and `/Dockerfile`.
 
 1. Capture active deployment manifests, dashboard settings, domains, volumes,
    source triggers and ownership. Both custom config path settings were already

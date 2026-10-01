@@ -1,0 +1,189 @@
+{
+  "changes": [
+    {
+      "kind": "resource.update",
+      "outputs": null,
+      "path": "service.0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7",
+      "status": "applied",
+      "summary": null
+    },
+    {
+      "kind": "resource.update",
+      "outputs": null,
+      "path": "service.bb03daef-7b08-4ef9-b0db-b7b5d49c0721",
+      "status": "applied",
+      "summary": null
+    }
+  ],
+  "deploymentId": "iac-change-set/4fb80245-6762-4438-ab94-6993c3568a92/15ff3a0ab190e42052e4194ac78e697a",
+  "diagnostics": [],
+  "id": "iac-change-set/4fb80245-6762-4438-ab94-6993c3568a92/15ff3a0ab190e42052e4194ac78e697a",
+  "stagedPatchId": "iac-change-set/4fb80245-6762-4438-ab94-6993c3568a92/15ff3a0ab190e42052e4194ac78e697a",
+  "status": "applied",
+  "pinned_plan": {
+    "kind": "railway.config.plan",
+    "version": 1,
+    "cliVersion": "5.63.1",
+    "sourceTree": "130dc4fcd08199d62c7e2d1daaaa6f89345c735c",
+    "environmentId": "4fb80245-6762-4438-ab94-6993c3568a92",
+    "configEtag": "13264de0e9634af21d366533a464b3bf3024ab73179fc5cfb3dd329ac894a8c5",
+    "changeSetHash": "sha256:1c9bb28781be04815d670487712fb4c0c2bed2f60cc652bf9e396574f1228120",
+    "changeSet": {
+      "changes": [
+        {
+          "address": "service.TraceLab",
+          "after": {
+            "buildEnvironment": "V3",
+            "builder": "DOCKERFILE",
+            "dockerfilePath": "/Dockerfile",
+            "watchPatterns": []
+          },
+          "before": {
+            "buildEnvironment": "V3",
+            "builder": "RAILPACK"
+          },
+          "deployEffect": "deploy",
+          "details": [
+            "build.builder (null \u2192 \"DOCKERFILE\")",
+            "build.dockerfilePath (null \u2192 \"/Dockerfile\")",
+            "build.watchPatterns (null \u2192 [])"
+          ],
+          "field": "build",
+          "kind": "resource.update",
+          "path": "resources.service.TraceLab.build",
+          "severity": "safe",
+          "summary": "Update TraceLab build.builder, build.dockerfilePath, build.watchPatterns"
+        },
+        {
+          "address": "service.TraceLab",
+          "after": {
+            "ipv6EgressEnabled": false,
+            "multiRegionConfig": {
+              "us-east4-eqdc4a": {
+                "numReplicas": 1
+              }
+            },
+            "numReplicas": 1,
+            "restartPolicyMaxRetries": 10,
+            "restartPolicyType": "ON_FAILURE",
+            "runtime": "V2",
+            "sleepApplication": false,
+            "startCommand": "bash -lc \"alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT\"",
+            "useLegacyStacker": false
+          },
+          "before": {
+            "ipv6EgressEnabled": false,
+            "multiRegionConfig": {
+              "us-east4-eqdc4a": {
+                "numReplicas": 1
+              }
+            },
+            "runtime": "V2",
+            "useLegacyStacker": false
+          },
+          "deployEffect": "deploy",
+          "details": [
+            "deploy.numReplicas (null \u2192 1)",
+            "deploy.restartPolicyMaxRetries (null \u2192 10)",
+            "deploy.restartPolicyType (null \u2192 \"ON_FAILURE\")",
+            "deploy.sleepApplication (null \u2192 false)",
+            "deploy.startCommand (null \u2192 \"bash -lc \\\"alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT\\\"\")"
+          ],
+          "field": "deploy",
+          "kind": "resource.update",
+          "path": "resources.service.TraceLab.deploy",
+          "severity": "safe",
+          "summary": "Update TraceLab deploy.numReplicas, deploy.restartPolicyMaxRetries, deploy.restartPolicyType and 2 more"
+        },
+        {
+          "address": "service.frontend",
+          "after": {
+            "buildCommand": "npm install && npm run build",
+            "buildEnvironment": "V3",
+            "builder": "NIXPACKS",
+            "watchPatterns": []
+          },
+          "before": {
+            "buildCommand": "npm install && npm run build",
+            "buildEnvironment": "V3",
+            "builder": "RAILPACK"
+          },
+          "deployEffect": "deploy",
+          "details": [
+            "build.builder (null \u2192 \"NIXPACKS\")",
+            "build.watchPatterns (null \u2192 [])"
+          ],
+          "field": "build",
+          "kind": "resource.update",
+          "path": "resources.service.frontend.build",
+          "severity": "safe",
+          "summary": "Update frontend build.builder, build.watchPatterns"
+        },
+        {
+          "address": "service.frontend",
+          "after": {
+            "healthcheckPath": "/admin/users",
+            "healthcheckTimeout": 30,
+            "ipv6EgressEnabled": false,
+            "multiRegionConfig": {
+              "us-east4-eqdc4a": {
+                "numReplicas": 1
+              }
+            },
+            "numReplicas": 1,
+            "restartPolicyMaxRetries": 10,
+            "restartPolicyType": "ON_FAILURE",
+            "runtime": "V2",
+            "sleepApplication": false,
+            "startCommand": "npm run start -- -H 0.0.0.0 -p $PORT",
+            "useLegacyStacker": false
+          },
+          "before": {
+            "healthcheckPath": "/missions",
+            "healthcheckTimeout": 30,
+            "ipv6EgressEnabled": false,
+            "multiRegionConfig": {
+              "us-east4-eqdc4a": {
+                "numReplicas": 1
+              }
+            },
+            "runtime": "V2",
+            "startCommand": "npm run start -- --hostname 0.0.0.0 --port $PORT",
+            "useLegacyStacker": false
+          },
+          "deployEffect": "deploy",
+          "details": [
+            "deploy.healthcheckPath (\"/missions\" \u2192 \"/admin/users\")",
+            "deploy.numReplicas (null \u2192 1)",
+            "deploy.restartPolicyMaxRetries (null \u2192 10)",
+            "deploy.restartPolicyType (null \u2192 \"ON_FAILURE\")",
+            "deploy.sleepApplication (null \u2192 false)",
+            "deploy.startCommand (\"npm run start -- --hostname 0.0.0.0 --port $PORT\" \u2192 \"npm run start -- -H 0.0.0.0 -p $PORT\")"
+          ],
+          "field": "deploy",
+          "kind": "resource.update",
+          "path": "resources.service.frontend.deploy",
+          "severity": "safe",
+          "summary": "Update frontend deploy.healthcheckPath, deploy.numReplicas, deploy.restartPolicyMaxRetries and 3 more"
+        }
+      ],
+      "declared": [
+        "service.TraceLab",
+        "service.frontend"
+      ],
+      "diagnostics": [],
+      "partial": "tracelab",
+      "telemetry": {
+        "language": "typescript"
+      },
+      "version": 1
+    },
+    "diff": "~ Update TraceLab build.builder, build.dockerfilePath, build.watchPatterns\n~ Update TraceLab deploy.numReplicas, deploy.restartPolicyMaxRetries, deploy.restartPolicyType and 2 more\n~ Update frontend build.builder, build.watchPatterns\n~ Update frontend deploy.healthcheckPath, deploy.numReplicas, deploy.restartPolicyMaxRetries and 3 more",
+    "destructive": false,
+    "claim": true
+  },
+  "post_apply_plan": {
+    "changes": [],
+    "note": "Omit Railway-normalized defaults (emptywatchPatterns, duplicate numReplicas, ON_FAILURE/10,false sleep) while preserving live effective values and region replica1."
+  }
+}

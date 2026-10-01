@@ -19,8 +19,7 @@ export default defineRailway((ctx) => {
     "build": {
         "buildEnvironment": "V3",
         "builder": "DOCKERFILE",
-        "dockerfilePath": "/Dockerfile",
-        "watchPatterns": []
+        "dockerfilePath": "/Dockerfile"
     },
     "deploy": {
         "ipv6EgressEnabled": false,
@@ -29,11 +28,7 @@ export default defineRailway((ctx) => {
                 "numReplicas": 1
             }
         },
-        "numReplicas": 1,
-        "restartPolicyMaxRetries": 10,
-        "restartPolicyType": "ON_FAILURE",
         "runtime": "V2",
-        "sleepApplication": false,
         "startCommand": "bash -lc \"alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT\"",
         "useLegacyStacker": false
     },
@@ -91,8 +86,7 @@ export default defineRailway((ctx) => {
     "build": {
         "buildCommand": "npm install && npm run build",
         "buildEnvironment": "V3",
-        "builder": "NIXPACKS",
-        "watchPatterns": []
+        "builder": "NIXPACKS"
     },
     "deploy": {
         "healthcheckPath": "/admin/users",
@@ -103,11 +97,7 @@ export default defineRailway((ctx) => {
                 "numReplicas": 1
             }
         },
-        "numReplicas": 1,
-        "restartPolicyMaxRetries": 10,
-        "restartPolicyType": "ON_FAILURE",
         "runtime": "V2",
-        "sleepApplication": false,
         "startCommand": "npm run start -- -H 0.0.0.0 -p $PORT",
         "useLegacyStacker": false
     },
