@@ -1,0 +1,60 @@
+{
+  "mission": "S62-MAIL",
+  "recorded_at": "2026-10-01T00:18:55.855945+00:00",
+  "status": "implementation verified; deployed inbox acceptance pending",
+  "validation": {
+    "webhook_and_related_tests": 93,
+    "test_command": "pytest tests/test_support_inbox.py tests/test_webhook_handler.py tests/test_notifications.py tests/unit/test_test_isolation.py -q --tb=short",
+    "ruff": "pass",
+    "foundational_references": "pass",
+    "credential_literal_scan": "pass",
+    "red_before_implementation": {
+      "failed": 14,
+      "passed": 14,
+      "mock_teardown_errors": 12,
+      "explanation": "Expected hello ignores, dual labels and substring false positives. Unused/unexpected mocked requests caused12 additional teardown errors."
+    }
+  },
+  "behavior": {
+    "mailboxes": [
+      "stage1@aquex.ai",
+      "hello@aquex.ai"
+    ],
+    "match": "Parsed case-insensitive exact mailbox from signed to/cc/bcc; labels sorted in fixed configuration order; one forward per received email.",
+    "idempotency_namespace": "stage1-support-<email_id>",
+    "stage1_regression": "Webhook tests preserve original Stage1 subject, text, original sender fallback, signature/config checks, attachment URLs and per-email key.",
+    "new_environment_variables": []
+  },
+  "live_acceptance": {
+    "deployed": false,
+    "provider_accepted": false,
+    "destination_inbox_received": false,
+    "reply_to_verified": false,
+    "required_before_complete": [
+      "Deploy tested commit and read serving SHA.",
+      "Send one controlled hello email after explicit send instruction.",
+      "Confirm actual destination inbox receipt plus Reply-To; provider acceptance alone is insufficient."
+    ],
+    "proposal": {
+      "from": "existing RESEND_FROM_ADDRESS",
+      "to": [
+        "hello@aquex.ai"
+      ],
+      "reply_to": "existing controlled SUPPORT_FORWARD_TO mailbox",
+      "subject": "TraceLab S62-MAIL delivery verification \u2014 <deployed SHA>",
+      "text": "Controlled delivery check for hello@aquex.ai forwarding. Verification marker: S62-MAIL-<deployed SHA>. No response or action is requested beyond confirming this message arrived and its Reply-To matches the controlled sender mailbox.",
+      "attachments": []
+    },
+    "operator_receipt_fields": [
+      "observed UTC time",
+      "deployed SHA",
+      "inbound and forward provider IDs if available",
+      "unique marker found in destination inbox",
+      "Reply-To matches controlled address (boolean; no private address in committed receipt)"
+    ]
+  },
+  "aquex_summary_draft": {
+    "status": "not sent; fill only after deployed inbox acceptance",
+    "text": "TraceLab now forwards hello@aquex.ai and stage1@aquex.ai to the existing support destination. Exact mailbox matching includes to/cc/bcc, dual recipients forward once, and existing retry deduplication is preserved. Deployed build: <SHA>. Controlled hello message received in destination inbox at <UTC>, with correct Reply-To. Stage1 regression verified by <receipt>. Aquex can make its separately owned S12-M04 contact-link update."
+  }
+}
