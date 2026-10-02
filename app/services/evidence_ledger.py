@@ -63,6 +63,7 @@ _DISPOSITION_GROUPS = (
     ("rejected", "Rejected"),
 )
 _DEEPSEARCH_LEDGER_MAX_ENTRIES = 1_000
+_DEEPSEARCH_LEDGER_STATUS_CODE_MAX = 999
 _DEEPSEARCH_LEDGER_OUTCOME_FIELDS = {
     "tool",
     "url",
@@ -339,9 +340,14 @@ def _parse_tool_failures(
         url = _canonical_url(raw_record.get("url"), path=f"{path}.url")
         status_code = raw_record.get("status_code")
         if status_code is not None and (
-            not isinstance(status_code, int) or isinstance(status_code, bool) or status_code < 0 or status_code > 599
+            not isinstance(status_code, int)
+            or isinstance(status_code, bool)
+            or status_code < 0
+            or status_code > _DEEPSEARCH_LEDGER_STATUS_CODE_MAX
         ):
-            raise _deepsearch_validation(f"{path}.status_code must be an integer from 0 through 599 or null")
+            raise _deepsearch_validation(
+                f"{path}.status_code must be an integer from 0 through 999 or null"
+            )
         error_category = raw_record.get("error_category")
         if error_category is not None and (not isinstance(error_category, str) or len(error_category) > 200):
             raise _deepsearch_validation(f"{path}.error_category must be a string of at most 200 characters or null")

@@ -349,6 +349,44 @@ def test_distinct_tool_failures_for_one_accepted_url_remain_distinct_claims():
     assert "status_code=404" in (by_tool["url_liveness"].summary or "")
 
 
+def test_nonstandard_three_digit_status_is_retained_as_rejected_evidence():
+    """A bot-wall 999 response is an observation, not a partial batch."""
+
+    url = "https://example.test/bot-wall"
+    projected = _project_deepsearch_items(
+        result_protocol={"sources_collected": [], "citations": []},
+        result_markdown="No cited claim.",
+        execution_metadata={
+            "synthesis_telemetry": {
+                "tool_outcomes": {
+                    "ledger_records": [
+                        {
+                            "tool": "source_fetch",
+                            "url": url,
+                            "status": "error",
+                            "status_code": 999,
+                            "error_category": "http_error",
+                        },
+                        {
+                            "tool": "url_liveness",
+                            "url": url,
+                            "status": "ok",
+                            "status_code": 999,
+                            "error_category": None,
+                            "alive": False,
+                        },
+                    ],
+                    "ledger_records_truncated": 0,
+                }
+            }
+        },
+    )
+
+    assert len(projected) == 2
+    assert all(item.disposition == "rejected" for item in projected)
+    assert all("status_code=999" in (item.summary or "") for item in projected)
+
+
 def test_canonical_equivalent_urls_converge_across_every_projection_input():
     """Source identity is one canonical HTTP URL across all DS envelopes."""
     claim = "A canonical source supports this claim."
@@ -1432,7 +1470,7 @@ class TestProjectionValidationAndAtomicity:
                 "tool": "source_fetch",
                 "url": "https://example.test/tool",
                 "status": "error",
-                "status_code": 600,
+                "status_code": 1000,
             },
             {
                 "tool": "source_fetch",
