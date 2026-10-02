@@ -1,0 +1,54 @@
+{
+  "location": "artifacts/releases/s64-production-ui",
+  "screenshots": {
+    "dark-1440-preview.png": {
+      "sha256": "80a663660e6e3d80983d9951d47bbc6697c1b55e1dbe3412f1ea405b32021997",
+      "bytes": 559541
+    },
+    "dark-1440-result.png": {
+      "sha256": "23d863d8a4c6781a5a0e78d2122c2f0a86bf86e2b975556d6e131cc432b83a90",
+      "bytes": 1534741
+    },
+    "dark-390-preview.png": {
+      "sha256": "ff2edc5f8b68c2c38db20b41ea24cdc8da84c74372571336591c406f1481fb69",
+      "bytes": 462117
+    },
+    "dark-390-result.png": {
+      "sha256": "39b00bda10276e6ebc7d69da8319dc2b67ba0d5b80f89928573f4ff671682a68",
+      "bytes": 1389846
+    },
+    "dark-820-preview.png": {
+      "sha256": "003a46ff121fbcde568d9eb9b12bfeaf04f579538a7f3185872ce6474be23f21",
+      "bytes": 523933
+    },
+    "dark-820-result.png": {
+      "sha256": "36aaf1cf994facf3f9b7711ae3811982ba9ada3b6a12d2e86ce5052054defdbd",
+      "bytes": 1556627
+    },
+    "light-1440-preview.png": {
+      "sha256": "3cd3be8d329fe2d3be18ba23d82453281907b00a28713b945bf47f8f1ac68c7a",
+      "bytes": 557809
+    },
+    "light-1440-result.png": {
+      "sha256": "acac9e3112d0bbd05d9113871766e2580fc9ef20fc1df45ccb3822f7d9c88bdd",
+      "bytes": 1530748
+    },
+    "light-390-preview.png": {
+      "sha256": "85d3e73ce4e7a321d5f5ba500eb99ffc44c2b1e7d41cc539899344ef9e29f849",
+      "bytes": 456538
+    },
+    "light-390-result.png": {
+      "sha256": "7326b8ecde722c9ef5fee65349b90968ec4409490fc11000c648eb22e5630757",
+      "bytes": 1375646
+    },
+    "light-820-preview.png": {
+      "sha256": "5ee87c9feae7e5059ef2e4c5dd3a480f2a2f35dd4c88ae4d6b7a550f6c14ddda",
+      "bytes": 519857
+    },
+    "light-820-result.png": {
+      "sha256": "b3da0d84cc5aa9e058cecedb826b758e3aada543a48a10a9721945f44c7862a8",
+      "bytes": 1550112
+    }
+  },
+  "note": "Authenticated UI captures retained locally; committed receipt contains hashes only."
+}

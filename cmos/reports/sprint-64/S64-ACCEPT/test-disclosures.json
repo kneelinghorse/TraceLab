@@ -1,0 +1,53 @@
+{
+  "backend_skips": [
+    {
+      "test": "tests.test_auto_ingest.TestAutoIngestIntegration::test_auto_ingest_full_pipeline",
+      "reason": "Full pipeline test requires embedding service and Qdrant \u2014 chunks not created in SQLite test env"
+    },
+    {
+      "test": "tests.test_live_log_cross_service::test_real_sender_receives_replay_ack_and_streams_before_terminal",
+      "reason": "Requires explicit DeepSearch checkout; run the LOG-2 cross-service command"
+    },
+    {
+      "test": "tests.test_pedr_unified_search.TestPEDRIntegration::test_create_orchestrator_factory",
+      "reason": "Requires OpenAI + Qdrant services (orchestrator init fails without them)"
+    },
+    {
+      "test": "tests.test_pedr_unified_search.TestPEDRIntegration::test_full_search_pipeline",
+      "reason": "Requires OpenAI + Qdrant services (orchestrator init fails without them)"
+    }
+  ],
+  "postgresql_skips": [
+    {
+      "test": "tests/integration/test_e2e_rbac_live.py::test_live_rbac_matrix",
+      "reason": "Opt-in live RBAC; not enabled in CI"
+    },
+    {
+      "test": "tests/integration/test_ingestion_flow.py::test_markdown_cli_flow",
+      "reason": "CLI subprocess requires running server with auth \u2014 not available in test environment"
+    },
+    {
+      "test": "tests/integration/test_qdrant_isolation.py::test_disposable_qdrant_cache_round_trip",
+      "reason": "Opt-in disposable Qdrant; not enabled in CI"
+    }
+  ],
+  "quarantine": [
+    "tests/sprint_03/test_api_stability.py::test_api_uptime_and_latency_meet_targets # Historical Sprint-03 evaluator reads unwrapped telemetry and finds no uptime data points.",
+    "tests/sprint_03/test_evidence_integrity.py::test_evidence_integrity_checks_detect_missing_chunks # Historical Sprint-03 evaluator reads unwrapped telemetry and reports zero relevance.",
+    "tests/sprint_03/test_quality_gate_effectiveness.py::test_quality_gate_failures_blocked_with_actionable_feedback # Historical Sprint-03 evaluator does not unwrap the preserved TelemetryEnvelope; actionable_ratio is zero.",
+    "tests/sprint_03/test_validation_coverage.py::test_validation_rate_exceeds_target # Historical Sprint-03 evaluator does not unwrap telemetry; mission_id and validation layers are missing.",
+    "tests/sprint_04/test_coverage_metric.py::test_coverage_threshold_exceeded # Historical Sprint-04 coverage evaluator finds no coverage event in its telemetry fixture.",
+    "tests/sprint_04/test_performance_metrics.py::test_latency_stays_under_two_seconds # Historical Sprint-04 evaluator raises Latency telemetry missing; it does not unwrap envelopes.",
+    "tests/sprint_04/test_performance_metrics.py::test_cost_profile_within_budget # Historical Sprint-04 evaluator raises Cost telemetry missing; it does not unwrap envelopes.",
+    "tests/sprint_04/test_quality_and_load.py::test_quality_checks_block_and_pass # Historical Sprint-04 evaluator cannot find the enveloped quality event in its fixture.",
+    "tests/sprint_04/test_quality_and_load.py::test_load_test_supports_target_concurrency # Historical Sprint-04 evaluator raises Load test telemetry missing; it does not unwrap envelopes.",
+    "tests/sprint_04/test_tech_debt.py::test_playwright_migration_eliminates_cypress_cost # Historical Sprint-04 evaluator cannot find the enveloped tech-debt event in its fixture.",
+    "tests/test_admin_dashboard.py::test_metrics_aggregator_generates_sections # S62-OBS freezes the 2025 fixture clock and this test passes explicitly; retain until the existing 12-node quarantine ratchet is deliberately revised.",
+    "tests/test_document_ingestion.py::test_upload_and_process_endpoints_record_statuses # Document detail fixture expects processing_events, which the current DocumentResponse does not expose (KeyError)."
+  ],
+  "legacy_cmos": {
+    "passed": 13,
+    "failed": 2,
+    "receipt": "../S64-RESULT/legacy-cmos.json"
+  }
+}

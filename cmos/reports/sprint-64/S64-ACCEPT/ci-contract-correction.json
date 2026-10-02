@@ -1,0 +1,21 @@
+{
+  "failed_run": "https://github.com/kneelinghorse/TraceLab/actions/runs/36940815456",
+  "failed_head": "59cd53dd5b09fb825d7824b430dbc9da54040110",
+  "result": {
+    "failed": 1,
+    "passed": 3157,
+    "skipped": 4,
+    "quarantine_deselected": 12
+  },
+  "failure": "test_every_api_model_field_requires_an_explicit_presentation_mapping[Mission] omitted six new preview fields",
+  "correction": "Add explicit read-only presentation mappings for six preview fields and all eight nested AuthoredScope fields; retain guard assertions unchanged. No runtime or package changes.",
+  "focused_validation": {
+    "passed": 19,
+    "skipped": 0,
+    "foundational_refs": "pass"
+  },
+  "source_sha256": {
+    "cmos/contracts/oods-object-model.json": "c6ef069f27a97773942c3038ca29586f17d3ff5fa81fa1565d4815af7f4337f4",
+    "cmos/contracts/oods-object-model.md": "bcc05d29598e296b5c089e060c423400e42b7ca580fe8447c25d61ffb1cff551"
+  }
+}

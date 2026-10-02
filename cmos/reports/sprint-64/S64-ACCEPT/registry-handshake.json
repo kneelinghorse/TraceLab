@@ -1,0 +1,107 @@
+{
+  "version": {
+    "name": "tracelab-mcp",
+    "version": "2.1.2"
+  },
+  "tools": 9,
+  "action_count": 50,
+  "actions": [
+    {
+      "name": "tracelab_search",
+      "actions": [
+        "knowledge",
+        "navigate",
+        "pedr",
+        "ask"
+      ]
+    },
+    {
+      "name": "tracelab_project",
+      "actions": [
+        "list",
+        "get",
+        "create",
+        "update",
+        "stats",
+        "neighborhood"
+      ]
+    },
+    {
+      "name": "tracelab_collection",
+      "actions": [
+        "list",
+        "get",
+        "export",
+        "create",
+        "add",
+        "synthesize",
+        "documents",
+        "mission_seed",
+        "update",
+        "add_document"
+      ]
+    },
+    {
+      "name": "tracelab_report",
+      "actions": [
+        "create",
+        "list",
+        "get",
+        "export",
+        "update"
+      ]
+    },
+    {
+      "name": "tracelab_document",
+      "actions": [
+        "upload",
+        "get_content",
+        "list",
+        "process"
+      ]
+    },
+    {
+      "name": "tracelab_mission",
+      "actions": [
+        "create",
+        "list",
+        "get",
+        "update"
+      ]
+    },
+    {
+      "name": "tracelab_mission_execution",
+      "actions": [
+        "submit",
+        "status",
+        "preview",
+        "logs",
+        "events",
+        "cancel",
+        "promote_report"
+      ]
+    },
+    {
+      "name": "tracelab_evidence",
+      "actions": [
+        "capture",
+        "note",
+        "list",
+        "search",
+        "promote",
+        "get"
+      ]
+    },
+    {
+      "name": "tracelab_home",
+      "actions": [
+        "snapshot",
+        "favorites",
+        "activity",
+        "activity_summary"
+      ]
+    }
+  ],
+  "api_reachable": false,
+  "provider_calls": 0
+}
