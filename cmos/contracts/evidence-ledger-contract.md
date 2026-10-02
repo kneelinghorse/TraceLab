@@ -135,7 +135,9 @@ rejected rather than silently stripped.
 
 Relevant `source_fetch` and `url_liveness` records require `status = ok|error`
 and a canonical URL. Optional `status_code` is null or a non-boolean integer
-from 0 through 599 (zero is an upstream timeout/connect sentinel), optional
+from 0 through 999 (zero is an upstream timeout/connect sentinel; 100–999
+preserves the three-digit response observed from standard and nonstandard
+servers), optional
 `error_category` is null or a string of at most 200 characters, and optional
 `alive` is null or boolean; `url_liveness` requires a non-null `alive` value.
 The exact allowed key subset is `tool`, `url`, `status`, `status_code`,
