@@ -289,7 +289,8 @@ export interface DocumentChunksResponse {
 
 // Mission types
 export interface MissionReference {
-  title: string;
+  title?: string;
+  url?: string;
   [key: string]: unknown;
 }
 
@@ -316,7 +317,7 @@ export interface Mission extends MissionAuthoringFields {
   objective: string;
   success_criteria: string[];
   project_id?: string;
-  context?: Record<string, unknown>;
+  context?: Record<string, unknown> | null;
   deliverables?: string[];
   research_phases?: Record<string, unknown>;
   tags?: string[];
@@ -343,7 +344,7 @@ export interface MissionCreate extends MissionAuthoringFields {
   objective: string;
   success_criteria: string[];
   project_id?: string;
-  context?: Record<string, unknown>;
+  context?: Record<string, unknown> | null;
   deliverables?: string[];
   research_phases?: Record<string, unknown>;
   tags?: string[];
@@ -357,7 +358,7 @@ export interface MissionUpdate extends MissionAuthoringFields {
   title?: string;
   objective?: string;
   success_criteria?: string[];
-  context?: Record<string, unknown>;
+  context?: Record<string, unknown> | null;
   deliverables?: string[];
   research_phases?: Record<string, unknown>;
   tags?: string[];
@@ -1165,7 +1166,25 @@ function evidenceQueryParams(data: EvidenceListRequest, query?: string): URLSear
   return params;
 }
 
+export interface AuthoredScope {
+  version: "authored-scope-v1";
+  reference_urls: string[];
+  restriction: "unrestricted" | "domains" | "exact_pages";
+  allowed_urls: string[];
+  allowed_domains: string[];
+  min_words: number | null;
+  max_words: number | null;
+  max_sources: number | null;
+}
+
 export interface MissionContractPreview {
+  contract_id?: string;
+  canonical_contract_id?: string;
+  canonical_contract_sha256?: string;
+  compiler_semantic_revision?: number;
+  compiler_source_revision?: string;
+  authored_scope?: AuthoredScope;
+
   mission_id: string;
   mission_uuid: string;
   project_id?: string | null;

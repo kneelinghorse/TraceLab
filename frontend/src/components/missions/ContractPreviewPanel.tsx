@@ -1,5 +1,7 @@
 import { useCallback, useState } from "react";
 
+import { PlannedScopeSummary } from "./AuthoredScope";
+
 import { missionsApi } from "@/lib/api/missions";
 import type { MissionContractPreview } from "@/types/mission";
 
@@ -68,6 +70,7 @@ export function ContractPreviewPanel({ missionId, initialPreview }: ContractPrev
             {[["Contract version", preview.contract_version], ["Compiler revision", preview.compiler_revision], ["Fidelity", preview.fidelity]].map(([label, value]) => <div key={label} className="min-w-0"><dt className="text-muted">{label}</dt><dd className="break-all font-mono">{value ?? "Unknown"}</dd></div>)}
           </dl>
           <p className="text-sm text-secondary">Preview reflects the saved draft. Structural validation does not guarantee research quality.</p>
+          <PlannedScopeSummary scope={preview.authored_scope} />
           <dl className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
             <PreviewStat label="Named entities" value={preview.named_entities.length} />
             <PreviewStat label="Objectives" value={preview.objectives.length} />
@@ -101,7 +104,7 @@ export function ContractPreviewPanel({ missionId, initialPreview }: ContractPrev
 
           {preview.deliverable_schemas.length > 0 && (
             <PreviewSection title="Deliverable schemas">
-              <pre className="p-3 bg-background rounded-lg text-xs overflow-x-auto">
+              <pre tabIndex={0} className="p-3 bg-background rounded-lg text-xs overflow-x-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent">
                 {JSON.stringify(preview.deliverable_schemas, null, 2)}
               </pre>
             </PreviewSection>
@@ -109,7 +112,7 @@ export function ContractPreviewPanel({ missionId, initialPreview }: ContractPrev
 
           {(preview.coverage_thresholds && Object.keys(preview.coverage_thresholds).length > 0) && (
             <PreviewSection title="Coverage thresholds">
-              <pre className="p-3 bg-background rounded-lg text-xs overflow-x-auto">
+              <pre tabIndex={0} className="p-3 bg-background rounded-lg text-xs overflow-x-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent">
                 {JSON.stringify(preview.coverage_thresholds, null, 2)}
               </pre>
             </PreviewSection>
@@ -117,7 +120,7 @@ export function ContractPreviewPanel({ missionId, initialPreview }: ContractPrev
 
           {(preview.validation_thresholds && Object.keys(preview.validation_thresholds).length > 0) && (
             <PreviewSection title="Validation thresholds">
-              <pre className="p-3 bg-background rounded-lg text-xs overflow-x-auto">
+              <pre tabIndex={0} className="p-3 bg-background rounded-lg text-xs overflow-x-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent">
                 {JSON.stringify(preview.validation_thresholds, null, 2)}
               </pre>
             </PreviewSection>
@@ -127,7 +130,7 @@ export function ContractPreviewPanel({ missionId, initialPreview }: ContractPrev
             <summary className="px-3 py-2 cursor-pointer text-sm text-secondary">
               Full compiled contract (raw JSON)
             </summary>
-            <pre className="p-3 bg-background text-xs overflow-x-auto">
+            <pre tabIndex={0} className="p-3 bg-background text-xs overflow-x-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent">
               {JSON.stringify(preview, null, 2)}
             </pre>
           </details>

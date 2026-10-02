@@ -1,0 +1,76 @@
+{
+  "accepted_at": "2026-10-01T14:28:25.552355+00:00",
+  "session": "PS-2026-10-01-009",
+  "mission": "S63-RELEASE",
+  "status": "passed",
+  "registry": {
+    "version": "2.1.1",
+    "dist-tags": {
+      "latest": "2.1.1"
+    },
+    "dist": {
+      "shasum": "ca37c89eeffa4ab18bb21835f0f1c06fe9a93ee6",
+      "tarball": "https://registry.npmjs.org/@aquex/tracelab-mcp/-/tracelab-mcp-2.1.1.tgz",
+      "fileCount": 24,
+      "integrity": "sha512-G9RMB+NXOm/so6fKOkfs9yBAUp5kLt8e74rW1rt095x4Nh471g33J/pQ8zHF3QiVQHzQGASsdbbR2gtwg4USAQ==",
+      "signatures": [
+        {
+          "sig": "MEUCIBacnrpXZ6PKKouD57FdD0qUn7gVQeTJpQ8+m1YQiTA/AiEA9miReoqH4aQudiwtVBqi56lOeAASIRBEvPT3cb/Fb/I=",
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+        },
+        {
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+          "sig": "MEUCIFt6oBQ9mqg0FwImIgxw7ZH99tAWiX/ywTJObDIYTLGFAiEAiEjbwvkA1d9MZdPYBD/riTozsjYzxnvHPjS9uLyow38="
+        }
+      ],
+      "unpackedSize": 367630
+    }
+  },
+  "fresh_directory": "/tmp/s63-registry.EErs17",
+  "fresh_cache": "/tmp/s63-registry.EErs17/cache",
+  "install_source": "registry, independent of retained local tarball; package-lock resolved URL/integrity checked",
+  "installation": {
+    "version": "2.1.1",
+    "resolved": "https://registry.npmjs.org/@aquex/tracelab-mcp/-/tracelab-mcp-2.1.1.tgz",
+    "integrity": "sha512-G9RMB+NXOm/so6fKOkfs9yBAUp5kLt8e74rW1rt095x4Nh471g33J/pQ8zHF3QiVQHzQGASsdbbR2gtwg4USAQ==",
+    "engines": {
+      "node": ">=18.0.0"
+    }
+  },
+  "inspection": {
+    "handshake": {
+      "name": "tracelab-mcp",
+      "version": "2.1.1"
+    },
+    "tools": 9,
+    "actions": 50,
+    "descriptor_validated_examples": 10,
+    "packed_files_match_source": [
+      "README.md",
+      "LICENSE",
+      "CHANGELOG.md",
+      "package.json"
+    ]
+  },
+  "stdio": {
+    "passed": 63,
+    "skipped": 0,
+    "failed": 0,
+    "httpRequests": 64,
+    "generatedLinks": 73,
+    "provider_calls": 0,
+    "fixture": "isolated loopback HTTP server"
+  },
+  "commands": [
+    "npm view @aquex/tracelab-mcp@2.1.1 version dist-tags dist --json --cache <fresh-cache> --prefer-online",
+    "npm install --prefix <fresh-dir>/install --cache <fresh-cache> --ignore-scripts --no-audit --no-fund --prefer-online @aquex/tracelab-mcp@2.1.1",
+    "node /tmp/s63-public/inspect.mjs <fresh-dir>/install/node_modules/@aquex/tracelab-mcp",
+    "node scripts/check-canonical-links.mjs <fresh-dir>/install/node_modules/@aquex/tracelab-mcp/dist/index.js"
+  ],
+  "publish_authentication": {
+    "method": "interactive PTY, --auth-type=web, owner browser approval",
+    "prior_attempt_correction": "Non-TTY npm immediately rethrows EOTP before attempting browser approval; numeric authenticator code was not necessary. Learning295 records correct workflow."
+  },
+  "accepted_source": "e716e34bcb1b60966ffcd8d67246f3c8e6026b40",
+  "release_tag": "tracelab-mcp-v2.1.1"
+}

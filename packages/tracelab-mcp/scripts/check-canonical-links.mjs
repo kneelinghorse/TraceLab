@@ -2,6 +2,8 @@
 import assert from 'node:assert/strict';
 import http from 'node:http';
 import path from 'node:path';
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
@@ -22,7 +24,9 @@ const report = { id: ids.report, title: 'Report', content: markdown, citations: 
 const mission = { id: ids.mission, mission_id: 'MIGRATION-1', title: 'Mission', objective: 'Preserve authored evidence', status: 'completed', project_id: ids.project, context: { references }, references, success_criteria: ['Canonical navigation'], result_report_id: ids.report, result_document_ids: [ids.document] };
 const evidence = { id: ids.evidence, project_id: ids.project, claim: 'Sourced claim', source_url: archivedUrl, disposition: 'supporting' };
 const note = { id: ids.note, project_id: ids.project, content: markdown };
-const preview = { mission_id: mission.mission_id, mission_uuid: ids.mission, objectives: [], evidence_slots: [], acceptance_checks: [], deliverable_schemas: [], references };
+const authoredScope = { version: 'authored-scope-v1', reference_urls: [archivedUrl], restriction: 'exact_pages', allowed_urls: [archivedUrl], allowed_domains: [], min_words: 300, max_words: 500, max_sources: 2 };
+mission.context.authored_scope = authoredScope;
+const preview = { contract_version: '1.2', contract_id: 'preview-fixture', canonical_contract_id: '8ca1ebfaa604dc7e', canonical_contract_sha256: '163e7af36080b8440afe55f501b023cb2e3aba84e1b8644298fc0784167b5cb6', compiler_revision: '79ef84842fb84259bafe59924b21fe2f5ad05d7d', compiler_source_revision: '79ef84842fb84259bafe59924b21fe2f5ad05d7d', compiler_semantic_revision: 3, fidelity: 'structural_only', authored_scope: authoredScope, mission_id: mission.mission_id, mission_uuid: ids.mission, objectives: [], evidence_slots: [], acceptance_checks: [], deliverable_schemas: [], references };
 const calls = [];
 const routes = new Map();
 const route = (method, pathname, payload) => routes.set(method + ' ' + pathname, payload);
@@ -158,11 +162,34 @@ try {
   await check('document', { action: 'upload', project_id: ids.project, name: 'Document', content: Buffer.from(markdown).toString('base64'), content_type: 'text/markdown' }, ['POST /documents/upload'], { 'document.url': url('document') });
   await check('mission', { action: 'list' }, ['GET /missions'], { 'missions.0.url': url('mission') }, value => assert.deepEqual(value.missions[0].references, references));
   await check('mission', { action: 'get', mission_id: ids.mission }, [`GET /missions/${ids.mission}`], { url: url('mission') }, value => { assert.deepEqual(value.references, references); assert.deepEqual(value.context, mission.context); });
-  await check('mission', { action: 'create', mission_id: 'MIGRATION-1', title: 'Mission', objective: mission.objective, success_criteria: mission.success_criteria, project_id: ids.project, references }, ['POST /missions'], { 'mission.url': url('mission') }, () => assert.deepEqual(calls.at(-1).body.references, references));
-  await check('mission', { action: 'update', mission_id: ids.mission, title: 'Mission', references }, [`PATCH /missions/${ids.mission}`], { 'mission.url': url('mission') }, () => assert.deepEqual(calls.at(-1).body.references, references));
+  await check('mission', { action: 'create', mission_id: 'MIGRATION-1', title: 'Mission', objective: mission.objective, success_criteria: mission.success_criteria, project_id: ids.project, context: mission.context, references }, ['POST /missions'], { 'mission.url': url('mission') }, () => { assert.deepEqual(calls.at(-1).body.references, references); if (calls.at(-1).key.startsWith('POST')) assert.deepEqual(calls.at(-1).body.context, mission.context); });
+  await check('mission', { action: 'update', mission_id: ids.mission, title: 'Mission', references }, [`PATCH /missions/${ids.mission}`], { 'mission.url': url('mission') }, () => { assert.deepEqual(calls.at(-1).body.references, references); if (calls.at(-1).key.startsWith('POST')) assert.deepEqual(calls.at(-1).body.context, mission.context); });
+  // S64: read each complete immutable worker artifact through the installed SDK.
+  const fixtureRoot = fileURLToPath(new URL('../../../tests/fixtures/authored_scope_v1/', import.meta.url));
+  const fixtureManifest = JSON.parse(readFileSync(path.join(fixtureRoot, 'manifest.json'), 'utf8'));
+  const priorMission = { ...mission };
+  for (const output of fixtureManifest.outputs) {
+    const audit = JSON.parse(readFileSync(path.join(fixtureRoot, output.expected), 'utf8'));
+    const fullText = readFileSync(path.join(fixtureRoot, output.persisted), 'utf8');
+    const original = readFileSync(path.join(fixtureRoot, output.pre_render), 'utf8');
+    Object.assign(mission, { status: output.mission_outcome === 'complete' ? 'completed' : 'validation_failed', result_markdown: fullText, result_protocol: { report_metadata: { forensic: { authored_scope_validation: audit, original_synthesis: { ...audit.pre_render, text: original } } } }, execution_metadata: { final_outcome: { authored_scope_validation: audit, delivery_quality: output.delivery_quality } } });
+    await check('mission', { action: 'get', mission_id: ids.mission, include_execution_metadata: true }, [`GET /missions/${ids.mission}`], {}, value => {
+      assert.equal(value.status, mission.status);
+      assert.equal(value.result_markdown, fullText);
+      assert.equal(createHash('sha256').update(value.result_markdown).digest('hex'), audit.persisted.sha256);
+      assert.deepEqual(value.result_protocol, mission.result_protocol);
+      assert.deepEqual(value.execution_metadata.final_outcome, mission.execution_metadata.final_outcome);
+    });
+  }
+  for (const key of Object.keys(mission)) if (!(key in priorMission)) delete mission[key];
+  Object.assign(mission, priorMission);
   await check('mission_execution', { action: 'submit', mission_id: ids.mission }, [`POST /missions/${ids.mission}/submit`], { url: url('mission') });
   await check('mission_execution', { action: 'status', mission_id: ids.mission }, [`GET /missions/${ids.mission}/status`], { url: url('mission') });
-  await check('mission_execution', { action: 'preview', mission_id: ids.mission }, [`GET /missions/${ids.mission}/contract-preview`], { 'preview.url': url('mission') }, value => assert.deepEqual(value.full, preview));
+  const exactReferences = [{ url: 'https://docs.example.test/page?scope=' + 'x'.repeat(600) }];
+  await check('mission', { action: 'create', mission_id: 'EXACT-1', title: 'Exact pages', objective: mission.objective, success_criteria: mission.success_criteria, project_id: ids.project, references: exactReferences, context: { authored_scope: authoredScope, unrelated: 'keep' } }, ['POST /missions'], {}, () => { assert.deepEqual(calls.at(-1).body.references, exactReferences); assert.equal(calls.at(-1).body.context.unrelated, 'keep'); assert.deepEqual(calls.at(-1).body.context.authored_scope, authoredScope); });
+  await check('mission', { action: 'update', mission_id: ids.mission, references: [], context: { authored_scope: {} } }, [`PATCH /missions/${ids.mission}`], {}, () => { assert.deepEqual(calls.at(-1).body.references, []); assert.deepEqual(calls.at(-1).body.context, { authored_scope: {} }); });
+  await check('mission', { action: 'update', mission_id: ids.mission, references: null, context: null }, [`PATCH /missions/${ids.mission}`], {}, () => { assert.equal(calls.at(-1).body.references, null); assert.equal(calls.at(-1).body.context, null); });
+  await check('mission_execution', { action: 'preview', mission_id: ids.mission }, [`GET /missions/${ids.mission}/contract-preview`], { 'preview.url': url('mission') }, value => { assert.deepEqual(value.full, preview); for (const key of ['authored_scope', 'canonical_contract_id', 'canonical_contract_sha256', 'compiler_semantic_revision', 'compiler_source_revision']) assert.deepEqual(value.preview[key], preview[key]); });
   await check('evidence', { action: 'list', project_id: ids.project }, ['GET /evidence'], { 'entries.0.url': url('evidence'), 'notes.0.project_url': url('project') }, value => assert.equal(value.entries[0].source_url, archivedUrl));
   await check('evidence', { action: 'search', project_id: ids.project, q: 'claim' }, ['GET /evidence/search'], { 'entries.0.url': url('evidence') }, value => assert.equal(value.entries[0].source_url, archivedUrl));
   await check('evidence', { action: 'capture', project_id: ids.project, session_key: 'test', entries: [{ claim: 'Claim', source_url: archivedUrl, disposition: 'supporting' }] }, ['POST /evidence/capture'], { 'entries.0.url': url('evidence') });

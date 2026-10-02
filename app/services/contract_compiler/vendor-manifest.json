@@ -1,0 +1,51 @@
+{
+  "source_revision": "79ef84842fb84259bafe59924b21fe2f5ad05d7d",
+  "schema_version": "1.2",
+  "compiler_revision": 3,
+  "files": [
+    {
+      "upstream_path": "deepsearch/mission/compiler_provenance.py",
+      "upstream_sha256": "85bb7a28f4b460576c4c1e47920819c09f08ae1a48b1cc061f2e21f4f1d4d0a2",
+      "file": "compiler_provenance.py",
+      "vendored_sha256": "09510f6a0dd7904a13b4a87199548832664ca2512e5b167e7145f88428b3b143"
+    },
+    {
+      "upstream_path": "deepsearch/mission/contract.py",
+      "upstream_sha256": "e28d1c602b421a334e66b595c87427dbd85b176c41c636a308646a7b83f3c817",
+      "file": "contract.py",
+      "vendored_sha256": "1088e2b87863f96af1ca541c988feda804652bafdbb320c00930e4442fede305"
+    },
+    {
+      "upstream_path": "deepsearch/mission/scope.py",
+      "upstream_sha256": "7d102ac57b68cc772c1c57d2fa21c9d4c9cfef7873bacb14549e341c234db540",
+      "file": "scope.py",
+      "vendored_sha256": "2611191fb57cd63e0463ce71e7c7e57e0711495def022e8a2f779e3bae32a907"
+    },
+    {
+      "upstream_path": "deepsearch/mission/title_utils.py",
+      "upstream_sha256": "791b90fce5dc0d0e71fc81b81acb57be6ae126edfe2f58d29c62958d42bd8114",
+      "file": "title_utils.py",
+      "vendored_sha256": "5bb6cf5f41c91a4eeaaafd1286b4ac57a02e2799e1234216e8235eababd2fbeb"
+    },
+    {
+      "upstream_path": "deepsearch/agent/deliverable_schemas.py",
+      "upstream_sha256": "84a39bc568ca324fd9e0d83492a7042979319ddcb1cf9c18bee110a89638817b",
+      "file": "deliverable_schemas.py",
+      "vendored_sha256": "05ebd856ad6326a545b9019f31e70f17417f9bd5368a55c13fff54b9ff1ff5f9"
+    },
+    {
+      "upstream_path": "deepsearch/domain_policy.py",
+      "upstream_sha256": "5a1b45e72db2c63f09548b97a1d073c32c37c8e9cb191e484aa6cff0d5c8b85b",
+      "file": "domain_policy.py",
+      "vendored_sha256": "d8cc3e7ea0d815af651bc07e66315857b39729801a23599646d84505db9680f2"
+    }
+  ],
+  "adaptations": [
+    "Vendor attribution in module docstrings.",
+    "Structural imports rewritten to local relative imports.",
+    "Contract entrypoint defaults to none and rejects configured enrichment; preview passes none explicitly. Dormant upstream runtime helpers are not exposed or invoked.",
+    "Provenance hashes local structural files and verifies vendor-manifest.json; immutable source pin replaces observability/git/environment identity. Configured provenance resolution is disabled.",
+    "Ruff import sorting and explicit zip(strict=False) preserve upstream behavior while meeting local lint."
+  ],
+  "fixture_manifest_sha256": "db256e5821393ca9750b704714b8e76803e3e8f7de86255a6f83d9d7cc0114cc"
+}

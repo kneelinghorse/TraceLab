@@ -13,6 +13,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from app.services.contract_compiler.scope import AuthoredScope
+
 # Valid mission statuses
 MissionStatus = Literal[
     "draft", "queued", "in_progress", "completed",
@@ -116,7 +118,7 @@ class MissionCreate(MissionBase):
     )
     references: list[dict[str, Any]] | None = Field(
         None,
-        description="Array of reference objects, each at minimum {title}.",
+        description="Structured reference seeds preserving exact URL, optional title and other author fields.",
     )
     required_entities: list[str] | None = Field(
         None,
@@ -229,7 +231,7 @@ class MissionUpdate(BaseModel):
     )
     references: list[dict[str, Any]] | None = Field(
         None,
-        description="Array of reference objects, each at minimum {title}.",
+        description="Structured reference seeds preserving exact URL, optional title and other author fields.",
     )
     required_entities: list[str] | None = Field(
         None,
@@ -537,6 +539,12 @@ class MissionContractPreviewResponse(BaseModel):
         ...,
         description="Schema version emitted by the pinned compiler.",
     )
+    contract_id: str = Field(..., description="Preview-origin contract identity; not an executed worker contract.")
+    canonical_contract_id: str = Field(..., description="Structural contract using canonical origin/time and no enrichment.")
+    canonical_contract_sha256: str
+    compiler_semantic_revision: int
+    compiler_source_revision: str
+    authored_scope: AuthoredScope
     compiler_revision: str = Field(
         ...,
         description="Exact DeepSearch source revision vendored by TraceLab.",

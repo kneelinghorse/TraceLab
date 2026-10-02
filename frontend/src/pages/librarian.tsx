@@ -1,3 +1,4 @@
+import { PlannedScopeSummary } from "@/components/missions/AuthoredScope";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -202,6 +203,7 @@ function DraftPanel({
         ) : (
           <p role="alert" className="mt-1 text-sm text-danger">The contract could not be compiled: {draft.preview_error ?? "unknown error"}</p>
         )}
+        {preview && <div className="mt-3"><PlannedScopeSummary scope={preview.authored_scope} /></div>}
         {preview && preview.named_entities.length > 0 && (
           <p className="mt-1 text-sm text-secondary">Named entities: {preview.named_entities.join(", ")}</p>
         )}

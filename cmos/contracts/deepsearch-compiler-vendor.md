@@ -1,211 +1,115 @@
 # DeepSearch Contract Compiler — Vendoring & Resync Ritual
 
-Sprint-41 mission **T41.1** vendored DeepSearch's mission-contract compiler
-into TraceLab so `preview_mission_contract` could compile locally instead
-of round-tripping over HTTPS to a service that isn't deployed (DS runs
-worker-only in production). This doc is the source of truth for the pinned
-revision, what files are vendored, why, and how to resync when DS lands a
-relevant compiler change.
+TraceLab compiles structural previews locally because DeepSearch runs a polling
+worker, not a deployed preview HTTP service. This is the vendor contract; the
+[field map](mission-authoring-contract.md) owns authoring/storage boundaries.
+Guiding template: [technical architecture](../foundational-docs/tech_arch_template.md).
 
-## Pinned source
+## Pinned source and fidelity
 
-| Field | Value |
+- Repository: DeepSearch.alpha; branch `codex/s94-authored-scope`.
+- Immutable implementation: `79ef84842fb84259bafe59924b21fe2f5ad05d7d`.
+- Schema **1.2**, semantic compiler revision **3**. A source commit and a
+  semantic revision are different identities.
+- Local adaptation/source hashes: `app/services/contract_compiler/vendor-manifest.json`.
+- Canonical fixtures: `tests/fixtures/authored_scope_v1/`, copied byte for byte
+  from that commit, including the upstream manifest. Manifest SHA-256:
+  `db256e5821393ca9750b704714b8e76803e3e8f7de86255a6f83d9d7cc0114cc`.
+- Canonical contract: `8ca1ebfaa604dc7e`; full canonical JSON SHA-256:
+  `163e7af36080b8440afe55f501b023cb2e3aba84e1b8644298fc0784167b5cb6`.
+
+Fidelity remains **structural_only**. This pin reproduces the immutable offline
+fixture, not an unverified deployed worker, configured model enrichment or the
+missing historical execution `bae1333274533285`. The separate historical preview
+`106cb8668a3efdb8` is not this canonical fixture. No paid run is needed for local
+parity; production byte identity requires a separately authorized required run.
+
+## Complete structural source set
+
+| Upstream path | Local module under `app/services/contract_compiler/` |
 | --- | --- |
-| Source repo | `~/portfolio/DeepSearch.alpha` |
-| Branch | `contract-driven-pipeline` |
-| Commit | `24e88100624e6221e5fa957508ab77c4b0f519f9` (2026-04-27, "S59.1 — Worker boundary fix (3 changes)") |
-| Vendored at | TraceLab sprint-41, mission T41.1 |
+| `deepsearch/mission/contract.py` | `contract.py` |
+| `deepsearch/mission/scope.py` | `scope.py` |
+| `deepsearch/mission/compiler_provenance.py` | `compiler_provenance.py` |
+| `deepsearch/mission/title_utils.py` | `title_utils.py` |
+| `deepsearch/agent/deliverable_schemas.py` | `deliverable_schemas.py` |
+| `deepsearch/domain_policy.py` | `domain_policy.py` |
 
-TraceLab preview responses also expose this full commit as
-`compiler_revision` and label their current fidelity `structural_only`. This is
-intentional: audited DeepSearch commit `b7009c6` is on contract schema `1.1`,
-while this self-contained vendor remains on `1.0`. Preview must not imply
-runtime parity while that pin is stale.
+The facade `__init__.py` and preview adapter are TraceLab-owned. Only pure
+structural dependencies are vendored; no worker, actor, model, telemetry or
+observability dependency tree is installed.
 
-## Files vendored
+Local adaptations, enumerated in the manifest:
 
-| Source path (DS) | Destination (TraceLab) | Edits made |
-| --- | --- | --- |
-| `deepsearch/mission/contract.py` | `app/services/contract_compiler/contract.py` | Module docstring updated to flag vendor + link this doc; `from deepsearch.agent.deliverable_schemas import ...` rewritten to `from .deliverable_schemas import ...`; `from deepsearch.mission.title_utils import ...` rewritten to `from .title_utils import ...`; the COMPILER-1 offline-preview guard described below is retained. |
-| `deepsearch/agent/deliverable_schemas.py` | `app/services/contract_compiler/deliverable_schemas.py` | Module docstring vendor banner only. |
-| `deepsearch/mission/title_utils.py` | `app/services/contract_compiler/title_utils.py` | Module docstring vendor banner only. |
+1. Preserve attribution in each module and rewrite structural imports locally.
+2. Every preview passes `enrichment_mode="none"` explicitly. The vendored
+   entrypoint also defaults to `none` and rejects `configured`; upstream defaults
+   to `configured`. Thus an accidentally installed DeepSearch cannot activate
+   providers. Dormant upstream execution/enrichment helpers are not exported by
+   the facade or invoked by preview. Empty entities use deterministic extraction;
+   declared entities remain authoritative without disambiguation calls.
+3. Provenance uses the immutable vendor pin, actual local source hashes and a
+   manifest comparison for source dirtiness. It never imports observability or
+   discovers host Git/environment build identity. Configured provenance is
+   unavailable. Its manifest describes the adapted local implementation, and
+   must not be advertised as the upstream runtime's manifest hash.
+4. Sort imports and supply `zip(strict=False)` for local lint without semantic
+   changes. Legacy upstream typing syntax retains the existing scoped Ruff
+   modernization exemptions; correctness rules remain enabled.
 
-`app/services/contract_compiler/__init__.py` is a TraceLab-authored facade
-(not vendored). It exposes the public API surface used by
-`deepsearch_preview_client.py` so internal compiler details remain
-swappable when DS reorganizes its own modules.
+## State and canonical identity
 
-### TraceLab-local clean-runtime fallback (COMPILER-1)
+Canonical comparison uses the upstream canonical origin/time and no enrichment.
+Compare the **entire** canonical JSON; never remove inconvenient fields.
+Ordinary preview metadata may identify a preview invocation; canonical identity
+is a separately labeled structural comparison, not an executed contract ID.
 
-The `deepsearch` runtime package is intentionally not a TraceLab dependency.
-When `required_entities` is empty, the vendored compiler always uses its local
-deterministic regex extractor without importing DeepSearch runtime code,
-constructing an LLM client, or making a provider/outbound call. An accidentally
-installed `deepsearch` package must not change preview behavior. Missions with
-non-empty `required_entities` retain the earlier authoritative bypass and never
-enter prose extraction. This guard is a TraceLab-owned runtime-boundary patch,
-not a claim of newer DeepSearch compiler parity; preserve and revalidate it on
-every resync.
+The pinned worker converter sets `project_id=None` (TraceLab owns association),
+`depth_config={}`, baseline depth, default maximum 3 and default minimum **2**.
+The adapter now uses minimum 2 instead of its old 0. Explicit author values
+remain intact, including 0: the worker currently coerces nonpositive minima to 2,
+so an explicitly authored 0 is a documented worker/preview difference, not a
+parity claim. Changing worker execution budgets or restoring depth authoring is
+outside this resync. The canonical fixture has no such override.
 
-The package also retains the pinned source revision's legacy typing syntax.
-`pyproject.toml` suppresses only the pinned CI Ruff version's `UP006`, `UP007`,
-`UP017`, `UP035`, and `UP038` modernization rules for this vendored directory;
-correctness rules remain enabled. This avoids mechanical whole-file churn when
-applying a surgical vendor patch.
+Structured scope belongs in `context.authored_scope`; references alone are
+seeds. Only the pinned typed compiler's supported grammar creates restrictions.
+Exact pages, domains and numeric bounds retain upstream semantics and validation.
 
-## Why vendor instead of HTTP-call
+## Resync procedure
 
-T40.4 (sprint-40) shipped a TL→DS HTTP proxy that POSTed signed payloads
-to `<DEEPSEARCH_API_URL>/api/v1/missions/preview`. Discovered 2026-04-27
-that **DeepSearch in production runs worker-only** — there is no HTTP
-service to receive that POST. Every production preview call returned 502
-via Cloudflare. DS confirmed Option A (vendor in TraceLab) over Option B
-(deploy a separate DS preview API) on the message thread initiated by
-`3cf143ee-8cb9-43ac-bc22-f0029fcdd3ae`.
+Resync when compiler schema/models, semantic inputs, worker row mapping or scope
+semantics change. Runtime scheduling/retrieval changes alone do not require it.
 
-Tradeoff accepted: TraceLab now tracks DS compiler changes via this
-ritual. The cost of one resync per DS schema-change is lower than the
-cost of running DS as a second service for one read-only endpoint.
-
-## Resync ritual (when to do it)
-
-Resync **whenever** any of these happens upstream in DeepSearch:
-
-1. `MissionContract` (or any of its nested models — `ObjectiveContract`,
-   `EvidenceSlot`, `AcceptanceCheck`, `DeliverableSchemaContract`,
-   `ExecutionBudget`) gains/loses/renames a field.
-2. `compile_contract_from_state` signature changes (new keyword args, new
-   required state keys, removed `origin` parameter, etc.).
-3. Worker SELECT in `deepsearch/worker/poller.py` learns to read a new
-   mission column — that means the compiler now expects it in
-   `mission_context`, and TraceLab's
-   `build_mission_context_from_mission` should forward it.
-4. DS publishes a contract-schema version bump
-   (`CONTRACT_SCHEMA_VERSION`).
-5. DS fixes a compilation bug we want to inherit (entity extraction,
-   schema inference, threshold defaults).
-
-If the change is purely internal to DS's own runtime (worker scheduling,
-LLM integration, retrieval logic) — **don't resync**. The compiler is
-the boundary; everything else is DS's business.
-
-## Resync ritual (steps)
+1. Read an immutable upstream commit, its docs, worker converter and compiler
+   provenance module. Inspect newer delivery evidence separately; never substitute
+   a moving HEAD silently. Verify all upstream manifest/fixture hashes first.
+2. Copy the six structural modules above using `git show <pin>:<path>` and copy
+   fixture bytes into root tests. Audit any new imports before expanding the set.
+3. Reapply the enumerated local adaptations. Regenerate upstream/local hashes in
+   `vendor-manifest.json`; update the pin here and in the facade. Do not include
+   runtime services or configured enrichment dependencies.
+4. Test complete canonical bytes, identity sensitivity, legacy missions, typed
+   errors before extraction, all eight admission cases, and fresh-process preview
+   isolation both without and with a hostile installed DeepSearch sentinel.
+5. Run preview/API regressions, changed-file lint and foundational references.
+   Preserve any explicit default mismatch in the receipt. Update the field map in
+   the same implementation commit when authoring boundaries change.
+6. Record a source-bound receipt and prepare any cross-project reply. Sending a
+   message and dispatching research each require their own user authorization.
 
 ```bash
-cd ~/portfolio/DeepSearch.alpha
-git fetch origin
-git log -p --since="<last_resync_date>" -- \
-    deepsearch/mission/contract.py \
-    deepsearch/agent/deliverable_schemas.py \
-    deepsearch/mission/title_utils.py \
-    deepsearch/api/routes/missions.py    # check the HTTP adapter for state-shape changes
-
-# Read the diff. Decide: are any of the resync triggers above met?
-# If yes:
-
-NEW_COMMIT=$(git rev-parse HEAD)
-cd ~/portfolio/TraceLab
-
-cp ~/portfolio/DeepSearch.alpha/deepsearch/mission/contract.py \
-   app/services/contract_compiler/contract.py
-cp ~/portfolio/DeepSearch.alpha/deepsearch/agent/deliverable_schemas.py \
-   app/services/contract_compiler/deliverable_schemas.py
-cp ~/portfolio/DeepSearch.alpha/deepsearch/mission/title_utils.py \
-   app/services/contract_compiler/title_utils.py
-
-# Re-apply the three patches the vendor needs:
-#   1. The vendor banner in each module docstring
-#   2. In contract.py only:
-#        from deepsearch.agent.deliverable_schemas import (...)  →  from .deliverable_schemas import (...)
-#        from deepsearch.mission.title_utils import normalize_mission_title  →  from .title_utils import normalize_mission_title
-#   3. In contract.py only: preserve the COMPILER-1 offline-preview guard that
-#      always routes empty required_entities to the local regex extractor and
-#      never imports DeepSearch runtime/provider code.
-
-# Run the validation checklist:
-source .venv/bin/activate
-pytest tests/test_mission_contract_preview.py -v
-pytest tests/test_missions_api.py -v   # contract-preview is invoked via the route
-python -c "from app.services.contract_compiler import compile_contract_from_state, MissionContract; print('OK')"
-
-# If preview-client adapter needs updating (compile_contract_from_state
-# signature change, MissionContract field set change), update
-# app/services/deepsearch_preview_client.py::_build_preview_state and/or
-# _shape_contract — these are TraceLab-authored, NOT vendored, so they
-# stay through resyncs unless the boundary itself shifted.
-
-# Update this doc:
-#   - Pinned commit row in the table above
-#   - Append a one-line entry to the Resync log section below
+python -m scripts.check_authored_scope_parity
+pytest tests/unit/test_authored_scope_compiler.py tests/test_mission_contract_preview.py tests/test_missions_api.py
+python cmos/scripts/validate_foundational_refs.py
 ```
-
-## Validation checklist (pass before committing a resync)
-
-- [ ] `pytest tests/test_mission_contract_preview.py` — all green
-- [ ] Clean-runtime route regression — a mission without `required_entities`
-      previews via the deterministic regex fallback and does not import or call
-      DeepSearch runtime/provider code
-- [ ] `pytest tests/test_missions_api.py` — all green (route contract still holds)
-- [ ] `python -c "from app.services.contract_compiler import compile_contract_from_state, MissionContract"` — imports clean
-- [ ] Live ping against canonical mission UUID `2a781109-6122-4576-b5c2-052e5450d22e` (OODS-FIGMA-HOST-01) — `named_entities` includes the 5 declared `required_entities` (AWS Lambda, Google Cloud Run, Vercel Functions, Fly.io, Railway)
-- [ ] Pinned commit row in this doc updated
-- [ ] Resync-log entry appended below
-- [ ] Status_update sent to `cmos://derek/deepsearch` so DS knows TraceLab is on a fresh compiler revision
 
 ## Resync log
 
-| Date | New commit | Reason | Author |
-| --- | --- | --- | --- |
-| 2026-04-27 | `24e8810` | Initial vendor (T41.1) — replaces broken HTTP proxy | sprint-41 build session |
+| Date | Source | Reason |
+| --- | --- | --- |
+| 2026-04-27 | `24e8810` | T41.1: replace unavailable HTTP proxy with schema 1.0 vendor |
+| 2026-10-01 | `79ef848` | S64-VENDOR: six-module schema 1.2/revision 3, authored scope, exact canonical fixture and offline guards |
 
-## Pending 1.1 resync gate (2026-08-14 audit)
-
-Do **not** copy DeepSearch HEAD with the old three-file ritual. The current
-compiler imports `deepsearch.domain_policy` plus runtime configuration and LLM
-entity-disambiguation modules, so the documented file set is no longer
-self-contained and a preview-safe compile is not guaranteed to be offline.
-
-DeepSearch must first publish a deterministic compiler manifest containing the
-source revision, schema version, required files, content hashes, input fields,
-and golden fixtures. Runtime enrichment must be injected or explicitly disabled
-for preview. TraceLab then resyncs the complete manifest, asserts canonical JSON
-parity on the shared fixtures, and changes `fidelity` only after those tests
-pass. Until then, retain `24e8810`/`1.0` and surface the stale pin rather than
-claiming execution parity.
-
-## Known boundary fields TraceLab forwards
-
-Documented here so a resync that adds new mission_context fields knows
-what TraceLab already sends. The authoritative list lives in
-`app/services/deepsearch_preview_client.py::build_mission_context_from_mission`
-and `app/services/deepsearch_preview_client.py::_OPTIONAL_AUTHORING_FIELDS`.
-
-Required keys: `mission_id`, `title`, `objective`, `success_criteria`,
-`deliverables`.
-
-Optional keys (forwarded only when the mission has them set): `background`,
-`focus`, `references`, `required_entities`, `excluded_entities`,
-`expected_output_schema`, `coverage_thresholds`, `validation_thresholds`,
-`deliverable_format`, `max_loops`, `min_loops`, `constraints`. The
-`constraints` slot has a fallback to legacy `context['constraints']`
-for pre-T40.1 missions.
-
-`research_depth` is NOT forwarded as of T42.2 (sprint-42). The vendored
-compiler still keys `depth_config` off the field internally, so
-TraceLab's `_build_preview_state` pins it to `"baseline"` inline. If a
-future resync exposes depth tiering through TraceLab again, restore the
-authoring path *and* add the field back to `_OPTIONAL_AUTHORING_FIELDS`.
-
-If DS's compiler starts reading a column TraceLab doesn't yet forward,
-add it to `_OPTIONAL_AUTHORING_FIELDS` during the resync (and mention
-the change in the log entry above).
-
-## Related
-
-- T41.3 boundary contract document at `cmos/contracts/mission-authoring-contract.md`
-  is the field-by-field MCP↔DB↔REST↔compiler map. This doc explains the
-  *implementation*; T41.3 explains the *contract*. Keep them in sync —
-  if you add a field here, also add it to the boundary doc's table.
-- Existing JSON-schema vendoring under `schemas/` (e.g.
-  `expected_output_schema.schema.json`) follows a similar pin-and-ritual
-  pattern; see `schemas/VERSIONS.md` for the precedent.
+The prior pending-1.1 gate and three-file recipe are superseded by this verified
+1.2 fixture and complete structural module set.

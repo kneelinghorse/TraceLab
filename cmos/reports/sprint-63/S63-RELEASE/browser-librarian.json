@@ -1,0 +1,14 @@
+{
+  "base": "https://tracelab.aquex.ai",
+  "timezoneId": "America/Chicago",
+  "checkedAt": "2026-10-01T14:11:34.958Z",
+  "checks": 6,
+  "routes": 1,
+  "failures": [],
+  "legacyInternalLinks": [],
+  "readOnly": true,
+  "suppressedWrites": 0,
+  "directProductionApi": true,
+  "readOnlyApiProxy": false,
+  "internal_link_count": 14
+}

@@ -1,0 +1,33 @@
+
+Running 20 tests using 2 workers
+
+(node:87713) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:87712) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:87712) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:87713) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   2 [chromium] › tests/e2e/authored-scope.spec.ts:20:7 › authored scope four outcomes, preview and retained exports light 820 (23.1s)
+  ✓   1 [chromium] › tests/e2e/authored-scope.spec.ts:20:7 › authored scope four outcomes, preview and retained exports light 390 (23.3s)
+  ✓   4 [chromium] › tests/e2e/authored-scope.spec.ts:20:7 › authored scope four outcomes, preview and retained exports dark 390 (17.8s)
+  ✓   3 [chromium] › tests/e2e/authored-scope.spec.ts:20:7 › authored scope four outcomes, preview and retained exports light 1440 (20.8s)
+  ✓   5 [chromium] › tests/e2e/authored-scope.spec.ts:20:7 › authored scope four outcomes, preview and retained exports dark 820 (23.4s)
+  ✓   6 [chromium] › tests/e2e/authored-scope.spec.ts:20:7 › authored scope four outcomes, preview and retained exports dark 1440 (23.8s)
+  ✓   7 [chromium] › tests/e2e/authored-scope.spec.ts:91:7 › reviewed Librarian scope save, retry and manual edit light 390 (11.2s)
+  ✓   8 [chromium] › tests/e2e/authored-scope.spec.ts:91:7 › reviewed Librarian scope save, retry and manual edit light 820 (10.3s)
+  ✓   9 [chromium] › tests/e2e/authored-scope.spec.ts:91:7 › reviewed Librarian scope save, retry and manual edit light 1440 (10.3s)
+  ✓  10 [chromium] › tests/e2e/authored-scope.spec.ts:91:7 › reviewed Librarian scope save, retry and manual edit dark 390 (8.6s)
+  ✓  11 [chromium] › tests/e2e/authored-scope.spec.ts:91:7 › reviewed Librarian scope save, retry and manual edit dark 820 (7.3s)
+  ✓  12 [chromium] › tests/e2e/authored-scope.spec.ts:91:7 › reviewed Librarian scope save, retry and manual edit dark 1440 (7.4s)
+  ✓  13 [chromium] › tests/e2e/mission-protocol.spec.ts:14:7 › author, inspect, audit and prepare a new run in light at 390 (12.2s)
+  ✓  14 [chromium] › tests/e2e/mission-protocol.spec.ts:14:7 › author, inspect, audit and prepare a new run in light at 820 (12.1s)
+  ✓  16 [chromium] › tests/e2e/mission-protocol.spec.ts:14:7 › author, inspect, audit and prepare a new run in dark at 390 (12.2s)
+  ✓  15 [chromium] › tests/e2e/mission-protocol.spec.ts:14:7 › author, inspect, audit and prepare a new run in light at 1440 (12.8s)
+  ✓  17 [chromium] › tests/e2e/mission-protocol.spec.ts:14:7 › author, inspect, audit and prepare a new run in dark at 820 (13.3s)
+  ✓  18 [chromium] › tests/e2e/mission-protocol.spec.ts:14:7 › author, inspect, audit and prepare a new run in dark at 1440 (13.8s)
+  ✓  20 [chromium] › tests/e2e/mission-protocol.spec.ts:135:5 › the retired /missions/queue alias is gone rather than silently redirecting (1.0s)
+  ✓  19 [chromium] › tests/e2e/mission-protocol.spec.ts:94:5 › the mission Results tab is addressable by URL so it can be linked and captured (4.0s)
+
+  20 passed (2.6m)

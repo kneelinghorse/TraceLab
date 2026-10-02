@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.1.2
+
+- Preserve `context.authored_scope` during mission creation, URL-only structured
+  references, and explicit context/reference clearing during updates.
+- Include typed planned scope and canonical/source/compiler identity in preview
+  summaries as well as full responses. Structural preview does not imply deployed
+  worker enforcement.
+
+
 All notable changes to `@aquex/tracelab-mcp` are documented here.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),

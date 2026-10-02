@@ -3,7 +3,7 @@
     "name": "TraceLab",
     "version": "0.0.0",
     "description": "Research knowledge management platform with PEDR search pipeline, mission orchestration, and DeepSearch integration.",
-    "status": "sprint-63-active",
+    "status": "sprint-63-complete",
     "start_date": "2025-01-01",
     "deployment": {
       "platform": "FastAPI + PostgreSQL + Qdrant",
@@ -28,7 +28,7 @@
       "Sprint 18 completed: PEDR Validation Sprint - 6 missions delivered (R18.0, B18.1-B18.6). PEDR SCOPED decision: Not for interactive search (1.5s P50 vs 200ms target), approved for deep research, MCP, and batch processing."
     ],
     "planning_overview": "See cmos/foundational-docs/roadmap-sprints-57-60-the-librarian.md for the current plan (intent); CMOS is authoritative for status",
-    "last_sync_at": "2026-10-01T13:48:18.331Z"
+    "last_sync_at": "2026-10-01T14:30:00.252Z"
   },
   "technical_foundation": {
     "critical_facts": [
@@ -265,7 +265,7 @@
     "last_condensation": "2026-03-08T22:28:45.820723Z",
     "condensation_note": "T31.5: Heavy manual pruning of stale fields, old sprint data, and planning text.",
     "current_sprint": "sprint-63",
-    "sprint_status": "Active"
+    "sprint_status": "Completed"
   },
   "working_memory": {
     "session_history": [
@@ -331,17 +331,14 @@
     ]
   },
   "context_health": {
-    "sessions_since_reset": 279,
-    "last_update": "2026-10-01T12:33:13.787Z",
-    "size_kb": 61.63,
+    "sessions_since_reset": 281,
+    "last_update": "2026-10-01T14:30:24.329Z",
+    "size_kb": 61.13,
     "size_limit_kb": 100,
     "warning_threshold_percent": 75,
     "retention_keep_sprints": 3
   },
   "context_notes": [
-    "AUTH-2 PR #403 merged at 2026-09-30T18:15:59Z as db153f89321439a9404833234589b1b80db12e70. All nine current branch-protection check contexts passed at exact head fa9e9e1 (backend-suite took 12m36s; integration, frontend build/unit/type/lint, Ruff, Secret Scan, MCP package passed). Production serving-hash verification now running; candidate still disabled, no admin mail yet. CMOS mission remains In Progress pending actual deployment and delivered-email acceptance.",
-    "AUTH-2 deployed serving hash db153f89321439a9404833234589b1b80db12e70 on both services; schema057 present. Real API negatives: anonymous401, service403, recipient override422, disabled agreed candidate400 with ineligible audit. Explicit setup re-enabled the same member fixture. Exactly one admin-triggered request accepted by Resend at 18:20:53.925317Z, HTTP200/no-store, audit df9fc08a-7815-412c-8681-c74164561739. Read-only after-send check: target still revision1/password unchanged, seven other credential fingerprints and service unchanged. Newest link expires18:50:53Z (13:50:53 CDT); user asked to confirm actual receipt/reset/new-login/old-denial, no response yet. Pending receipt cmos/reports/sprint-61/AUTH-2/deployed-acceptance.json is uncommitted on codex/sprint-61-admin-acceptance so it can be finalized after acceptance. Required CI backend3032passed/3skipped/12existingquarantine, all nine contexts green. Two harmless probe-ordering failures were preserved in receipt; no extra email. Candidate remains active for user acceptance and must be disabled afterward.",
-    "User said confirmed, looks good, but 18:26:22Z read-only probe still shows candidate credential_version1, password unchanged against AUTH2 baseline, and the 18:20:53Z accepted recovery token still present. This conflicts with assuming completed admin reset. Asked whether confirmation refers to copy or newest admin reset; keep AUTH2 Blocked and candidate active while clarification is pending. Do not disable fixture or mark acceptance until resolved. Continue independent LOG1.",
     "AUTH-2 completed after delayed production corroboration of user confirmation: revision2/password changed/token gone, other7/service unchanged, then candidate disabled. Receipt d0ffd02 cherry-picked e3f0815 into receiver branch. LOG-1 source ad2e4bd058255cd47558305040c82bace578c366 in PR404; final68 boundary tests,9 UI consumers, broad237pass/one explicit inventory correction rerun. CI nine gates pending. Controlled max-int32 unclaimable no-provider production fixture design decision569 and private harness prepared. No worker deploy/dispatch; inspect LOG-2 immediate consumers while CI runs.",
     "Receiver PR404 corrected at 1bf93a1 (only RBAC verifier/tests/receipt changed after ad2e4bd runtime). Full65 verifier/mutation tests passed, no skips; fullCI rerunning. Local68 boundary tests and CI169PG+82browser already passed on identical runtime. DeepSearch baseline prepared in isolated /Users/systemsystems/.codex/worktrees/sprint-61-worker-logs/DeepSearch.alpha on actual deployed origin/main8465fab0564a9847ded70593e7b9f59e99a1e29e, branch codex/sprint-61-live-logs. No changes yet. Clean baseline110selected:108pass and exactly2 documentedS87readinesspinsfail, no deselection, logs /tmp/log2-worker-baseline.log/.json. Production worker source hash6adab231174a3d7c20fce2aa3f31ea627a7a6070f980bae638e81b8ce6e603dd. Original DS user branch untouched; its extra changes are eval tooling. Worker deployment/dispatch still unauthorized.",
     "Baseline provenance clarification:8465fab is Railway deployment metadata's reported current worker commit, matched to fetched origin/main. 6adab231… is the EXPECTED hash computed from that clean checkout, not a newly observed runtime build hash; actual worker runtime identity remains a LOG-2 paid-run receipt gate (#416). Read-only config check shows LLM_BACKEND=deepseek and DEEPSEEK_MODEL=deepseek-flash; lease timing/attempt keys are absent and use deployed source defaults (max_attempts3, accepted1–20). No env changes, deploy or dispatch.",
@@ -378,14 +375,17 @@
     "Follow-up Sprint 62 review after completed session PS-2026-10-01-004. Bundled opener, sprint show and all 13 existing decisions reviewed; 10/10 missions remain Completed. Evidence lives in sprint-62-build worktree at 9caa93b, not the older original checkout. Fresh read-only hash audit verified all 23 source/evidence hashes plus 4 validation hashes; 60 path citations accounted for with no missing resolved paths. Acceptance/CI outcomes are retained receipts for tested 15571a6 and serving d7b8682, not new test runs or live probes. Current open follow-ups are exactly 1 pending (#479) plus 13 carried. No tracked files changed.",
     "Inbox triage: read both pending Aquex requests. 678bc33a (hello forwarding) is already satisfied by completed S62-MAIL and retained live destination-inbox/Reply-To acceptance; its existing completion reply draft in S62-MAIL/validation.json remains unsent. No new build, DNS change or test email is needed for that request. 397036b0 is new maintenance intake: local package README still points to missing root LICENSE (fresh GitHub contents read returned404), recommends pin1.2.0, and historical migration text stops at8 while current table has9 clusters/50actions. GitHub currently shows public repo, licenseInfo=null and privacy-compliant description. Existing packages/tracelab-mcp/LICENSE is MIT and live. Correct package link/wording and add login→project list→ask onboarding with empty-account expectations; do not infer a whole-service licensing grant. No outbound reply or implementation performed.",
     "Carry-forward assessment: 14 existing open items, not14 ready-to-build missions. P1 #479 is DeepSearch source/word-scope enforcement; TraceLab preview parity follows a versioned worker fixture. #449 stale frontend docs and #450 unused SaveSearchButton preset props are confirmed in S62 closeout source. #400/#403/#407 are one deferred sharing design/research workstream; later decision538 keeps sharing out unless user reselects it. #406 raw-table claims and optional #422 search-language preference belong in DeepSearch coordination. #415 usage pricing is policy-dependent; #431 denormalized Space columns need a bounded data-model decision; #448 dev-only theme bootstrap discrepancy is low-priority; #454 hub pin and #477 legacy connector routing require owning-integration rechecks. #452 context-size concern is below threshold now:61.31KB/100KB, nearLimit=false; no pruning needed. Recommend a small next maintenance sprint for public package onboarding/metadata plus confirmed frontend docs/dead-prop cleanup and acceptance; treat #479 as the top cross-project dependency, not as already fixed.",
-    "Planning handoff committed c838140 on codex/sprint-63-plan, based on final S62 receipts9caa93b. Three full mission definitions contain20 success criteria and2 Requires edges. All45 unique referenced files and19 handoff links resolve; foundational refs and git diff check pass; MCP118operations/9tools/50actions has0errors,125advertised arguments0gaps. Selected449/450/481 carried to S63 without closure;15 remain open total. Runtime tests/build/publish/deploy intentionally deferred to fresh build because this turn changes planning artifacts only. Handoff includes exact build prompt, package2.1.1 recheck, public description text, published-artifact gate, queue404/internal-draft preservation and separate DeepSearch479 ownership."
+    "Planning handoff committed c838140 on codex/sprint-63-plan, based on final S62 receipts9caa93b. Three full mission definitions contain20 success criteria and2 Requires edges. All45 unique referenced files and19 handoff links resolve; foundational refs and git diff check pass; MCP118operations/9tools/50actions has0errors,125advertised arguments0gaps. Selected449/450/481 carried to S63 without closure;15 remain open total. Runtime tests/build/publish/deploy intentionally deferred to fresh build because this turn changes planning artifacts only. Handoff includes exact build prompt, package2.1.1 recheck, public description text, published-artifact gate, queue404/internal-draft preservation and separate DeepSearch479 ownership.",
+    "PUBLIC committed3e3dad7 and CLEANa2ab149 completed with receipts. PR412 source07874dc includes canonical MCP context export and preserved S62 receipts; nine required checks running. Approved factual GitHub description applied and read back; twelve other repo settings unchanged. npm whoami returns401; user asked to restore login. Next: exact-head CI/merge/serving/read-only baseline; publish tested2.1.1 after auth then registry install. No paid research or outbound messages.",
+    "npm authentication recovered: whoami now succeeds as kneelinghorse. Tested tarball/dry-run shasum ca37c89eeffa4ab18bb21835f0f1c06fe9a93ee6, retained under artifacts/releases. Eight required checks passed, including371frontend units,82built-browser,169PG integration/3skips,160MCPunits/63packed checks. Serialized backend remains running. Proceed with release after final required CI passes; no extra authorization needed.",
+    "PR412 merged e716e34 (complete tree equals tested07874dc). All9requiredCI passed:3122backend/4skip/12quarantined,169PG/3skip,371frontendunit,82built-browser,160MCPunit/63installed checks. Both services servee716e34;42authenticated read-only browser checks and5public production tests passed. Approved GitHub description and mainREADME/license verified. Closed449/450;481+12otherrows remain. npm login recovered but publish EOTP; release blocked on ownerOTP then fresh registry install. No sprint close, paid run or outbound message."
   ],
   "current_focus": "Completed10/10on2026-10-01. Realgpt-5.1 zero-project member journey passed on bothservicesd7b8682: reviewed saved draft,no dispatch,disabled-session recovery,cleanup. Credits resolved480; transcript focus fix,MAIL/inbox,CSV/cache/config accepted. RequiredCI9/9green;3122backend/4skip/12unchangedquarantines,169PG/3skip,368frontend,82builtbrowser,12longreplycases;23hashes22same+1retested,60paths accounted. P1DeepSearch scope correction479 and13untouchedcarryovers remain14open. LegacyCMOS2baselinefail disclosed; noextra mail/research/cross-project work.",
   "current_sprint": {
     "id": "sprint-63",
     "name": "Sprint 63 — Clear onboarding and focused maintenance",
-    "status": "Active",
-    "focus": "Accurate adapter onboarding, unused saved-search preset cleanup, published and serving acceptance."
+    "status": "Completed",
+    "focus": "Published adapter2.1.1 onboarding, saved-search preset cleanup, exact-source CI/deployment and independent registry acceptance complete. Closed449/450/481;12outside rows preserved."
   },
   "strategic_context": {
     "sprint_13": {
@@ -616,7 +616,7 @@
     }
   },
   "sprint_tracking": {
-    "current_sprint": "sprint-63",
-    "last_completed_sprint": "sprint-62"
+    "current_sprint": null,
+    "last_completed_sprint": "sprint-63"
   }
 }

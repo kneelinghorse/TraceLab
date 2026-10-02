@@ -86,9 +86,9 @@ class TestContractPreviewRoute:
 
         # Preview must disclose that TraceLab is using a pinned structural
         # compiler, not imply byte-for-byte parity with the newer DS runtime.
-        assert body["contract_version"] == "1.0"
+        assert body["contract_version"] == "1.2"
         assert body["compiler_revision"] == (
-            "24e88100624e6221e5fa957508ab77c4b0f519f9"
+            "79ef84842fb84259bafe59924b21fe2f5ad05d7d"
         )
         assert body["fidelity"] == "structural_only"
 
@@ -185,7 +185,7 @@ class TestContractPreviewRoute:
 
         assert response.status_code == 200, response.text
         assert response.json()["named_entities"] == ["NASA", "PyTorch", "TensorFlow"]
-        assert regex_results == [["NASA", "PyTorch", "TensorFlow"]]
+        assert regex_results and all(result == ["NASA", "PyTorch", "TensorFlow"] for result in regex_results)
         assert blocked_imports == []
         assert outbound_attempts == []
 

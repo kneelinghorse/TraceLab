@@ -109,7 +109,7 @@ def _to_response(mission) -> MissionResponse:
     # with from_attributes mode — since we're constructing MissionResponse
     # explicitly here, resolve the fallback up-front.
     resolved_constraints = mission.constraints
-    if not resolved_constraints and isinstance(mission.context, dict):
+    if resolved_constraints is None and isinstance(mission.context, dict):
         legacy = mission.context.get("constraints")
         if legacy:
             resolved_constraints = legacy

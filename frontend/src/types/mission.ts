@@ -130,7 +130,8 @@ export interface EvidenceLinkPayload {
  * Mission entity from the API (B16.1+ schema)
  */
 export interface MissionReference {
-  title: string;
+  title?: string;
+  url?: string;
   [key: string]: unknown;
 }
 
@@ -299,7 +300,25 @@ export interface ReportPromotionResponse {
 }
 
 /** Compiled DeepSearch contract preview (T40.4). */
+export interface AuthoredScope {
+  version: "authored-scope-v1";
+  reference_urls: string[];
+  restriction: "unrestricted" | "domains" | "exact_pages";
+  allowed_urls: string[];
+  allowed_domains: string[];
+  min_words: number | null;
+  max_words: number | null;
+  max_sources: number | null;
+}
+
 export interface MissionContractPreview {
+  contract_id?: string;
+  canonical_contract_id?: string;
+  canonical_contract_sha256?: string;
+  compiler_semantic_revision?: number;
+  compiler_source_revision?: string;
+  authored_scope?: AuthoredScope;
+
   contract_version: string;
   compiler_revision: string;
   fidelity: string;

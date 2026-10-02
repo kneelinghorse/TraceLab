@@ -1,0 +1,208 @@
+{
+  "mission": "S64-RESULT",
+  "session": "PS-2026-10-01-013",
+  "status": "accepted",
+  "decision": 598,
+  "tests": {
+    "materialization_api_protocol": {
+      "passed": 49,
+      "skipped": 0
+    },
+    "targeted_frontend": {
+      "passed": 52,
+      "skipped": 0
+    },
+    "full_frontend": {
+      "passed": 383,
+      "skipped": 0
+    },
+    "final_copy_scope_units": {
+      "passed": 11,
+      "skipped": 0,
+      "subset_of_full_frontend": true
+    },
+    "built_browser": {
+      "passed": 20,
+      "skipped": 0,
+      "scope_cases": 12,
+      "existing_mission_cases": 8
+    },
+    "final_source_browser_recheck": {
+      "passed": 12,
+      "skipped": 0,
+      "subset_of_built_browser": true
+    },
+    "installed_tarball_stdio": {
+      "passed": 70,
+      "skipped": 0
+    }
+  },
+  "checks": {
+    "frontend_types": "pass",
+    "frontend_lint": "pass",
+    "production_build": "pass",
+    "changed_python_lint": "pass",
+    "foundational_refs": "pass",
+    "mcp_operation_parity": "118 operations, no errors",
+    "mcp_argument_parity": "9 tools, 50 actions, 125 arguments, no gaps"
+  },
+  "outcomes": [
+    {
+      "name": "compliant",
+      "pre_render": "compliant-pre-render.md",
+      "persisted": "compliant-persisted.md",
+      "expected": "compliant-expected.json",
+      "admitted_urls": [
+        "https://www.postgresql.org/docs/current/functions-datetime.html",
+        "https://www.postgresql.org/docs/current/explicit-locking.html"
+      ],
+      "observed_urls": [
+        "https://www.postgresql.org/docs/current/functions-datetime.html",
+        "https://www.postgresql.org/docs/current/explicit-locking.html"
+      ],
+      "cited_urls": [
+        "https://www.postgresql.org/docs/current/functions-datetime.html"
+      ],
+      "unavailable": {},
+      "mission_outcome": "complete",
+      "delivery_quality": "usable_with_warning"
+    },
+    {
+      "name": "partial",
+      "pre_render": "partial-pre-render.md",
+      "persisted": "partial-persisted.md",
+      "expected": "partial-expected.json",
+      "admitted_urls": [
+        "https://www.postgresql.org/docs/current/functions-datetime.html"
+      ],
+      "observed_urls": [
+        "https://www.postgresql.org/docs/current/functions-datetime.html"
+      ],
+      "cited_urls": [
+        "https://www.postgresql.org/docs/current/functions-datetime.html"
+      ],
+      "unavailable": {
+        "https://www.postgresql.org/docs/current/explicit-locking.html": "timeout"
+      },
+      "mission_outcome": "complete",
+      "delivery_quality": "degraded"
+    },
+    {
+      "name": "too_long",
+      "pre_render": "too_long-pre-render.md",
+      "persisted": "too_long-persisted.md",
+      "expected": "too_long-expected.json",
+      "admitted_urls": [
+        "https://www.postgresql.org/docs/current/functions-datetime.html",
+        "https://www.postgresql.org/docs/current/explicit-locking.html"
+      ],
+      "observed_urls": [
+        "https://www.postgresql.org/docs/current/functions-datetime.html",
+        "https://www.postgresql.org/docs/current/explicit-locking.html"
+      ],
+      "cited_urls": [
+        "https://www.postgresql.org/docs/current/functions-datetime.html"
+      ],
+      "unavailable": {},
+      "mission_outcome": "validation_failed",
+      "delivery_quality": "failed"
+    },
+    {
+      "name": "22_sources",
+      "pre_render": "22_sources-pre-render.md",
+      "persisted": "22_sources-persisted.md",
+      "expected": "22_sources-expected.json",
+      "admitted_urls": [
+        "https://www.postgresql.org/docs/current/functions-datetime.html",
+        "https://www.postgresql.org/docs/current/explicit-locking.html"
+      ],
+      "observed_urls": [
+        "https://www.postgresql.org/docs/current/functions-datetime.html",
+        "https://www.postgresql.org/docs/current/explicit-locking.html",
+        "https://postgrespro.com/page/0",
+        "https://postgrespro.com/page/1",
+        "https://postgrespro.com/page/2",
+        "https://postgrespro.com/page/3",
+        "https://postgrespro.com/page/4",
+        "https://postgrespro.com/page/5",
+        "https://postgrespro.com/page/6",
+        "https://postgrespro.com/page/7",
+        "https://postgrespro.com/page/8",
+        "https://postgrespro.com/page/9",
+        "https://postgrespro.com/page/10",
+        "https://postgrespro.com/page/11",
+        "https://postgrespro.com/page/12",
+        "https://postgrespro.com/page/13",
+        "https://postgrespro.com/page/14",
+        "https://postgrespro.com/page/15",
+        "https://postgrespro.com/page/16",
+        "https://postgrespro.com/page/17",
+        "https://postgrespro.com/page/18",
+        "https://postgrespro.com/page/19"
+      ],
+      "cited_urls": [
+        "https://www.postgresql.org/docs/current/functions-datetime.html"
+      ],
+      "unavailable": {},
+      "mission_outcome": "validation_failed",
+      "delivery_quality": "failed"
+    }
+  ],
+  "browser": {
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "widths": [
+      390,
+      820,
+      1440
+    ],
+    "serious_or_critical_axe_violations": 0,
+    "horizontal_overflow": false,
+    "keyboard_provenance_and_draft_focus": true,
+    "long_url_characters": 1221,
+    "save_and_preview_retry": true,
+    "full_markdown_and_protocol_exports_verified": true,
+    "provider_execution": 0,
+    "screenshots_index": "browser-screenshots-final.json",
+    "final_source_screenshots": 42
+  },
+  "replacement_validation": "S64-SCOPE source hashes for preview builder and MCP handler changed only in explanatory comments; final parity and package checks replace their earlier receipts. Package stdio coverage adds all four exact output cases. The final UI wording for absent artifacts was rebuilt and rechecked with 11 unit/12 browser cases. Existing mission 8 browser cases were run before that wording-only change.",
+  "legacy_cmos": {
+    "passed": 13,
+    "failed": 2,
+    "receipt": "legacy-cmos.json",
+    "disposition": "Known unchanged missing boomerang and obsolete agents headings checks; not passing."
+  },
+  "release": "S64-ACCEPT must still accept required CI, published package, exact serving revision and authenticated live journeys. Full local backend is in progress, not counted here.",
+  "source_sha256": {
+    "frontend/src/__tests__/authored-scope.test.tsx": "d270bcf2b1aefb1e926c6a38de0585f7a421f25ab9ea634114dc71f5221b1524",
+    "frontend/src/components/missions/AuthoredScope.tsx": "f263113dc4dc09f6eff3b7c967f2137f257703150878da55e79aa594f088e43a",
+    "frontend/tests/e2e/authored-scope.spec.ts": "47d00ece5464b07c5fa5b0195efa32b78d3573dae4acd30a20756dcae2a4d356",
+    "packages/tracelab-mcp/scripts/check-deployed-scope.mjs": "9220d8025d70a03d5437d872d1bca1b80cfbde0ab3b9b5958ea9a8c8f1f86bd6",
+    "tests/integration/test_authored_scope_roundtrip.py": "ecd16d0d5696f5793f2efbaf976343f52028c24c4273124b16fb93d0782dc269",
+    "tests/test_authored_scope_api.py": "af174bbed8c994e492eae92f688b7312880f9353691bd722652e2cc8557f7356",
+    "app/api/v1/missions.py": "09c3f51486ca5c5d1bf248522a12c4e48baa92dc768631915aff658480af3337",
+    "app/mcp_server/tools/missions.py": "0ba4bdbe0f921d823176658896017daecae575bd8a8cffb56232a7059d60f3ad",
+    "app/schemas/librarian.py": "211b29beebaed25b2f5d7b341a0f86ebbd36003883e07528b0265222c77abdd6",
+    "app/schemas/mission.py": "f35bdbc5c6f76a20373d6eb57550c7bcae41465e641994f41ee2e9afb20e5996",
+    "app/services/deepsearch_preview_client.py": "f877f448b613827e8e1f063571cc2fc1dafa8dc5acf18e7f86bc930e23e73e45",
+    "app/services/librarian.py": "2ee81ef34cec38e753fb1ef1224255f86887055aa59100c37581bc9cee4d4180",
+    "frontend/src/__tests__/mission-authoring.test.tsx": "672f2274dbb507063c6f83e62e373ae65e10e2205865409da443ec0a953c874e",
+    "frontend/src/components/missions/ContractPreviewPanel.tsx": "3820074e8b0bd4224fa60ec0709979c69abaa793816106d619f2e131f3fc5d8f",
+    "frontend/src/components/missions/MissionForm.tsx": "6a271df112b03c411e24c4730c49c0a6ff7af73a557e93dabee493774d93d9ed",
+    "frontend/src/lib/api/librarian.ts": "8c4601cb1027ab90017b108ac58936ba71f1d572d6890d423b070f31e1c68eb4",
+    "frontend/src/lib/schemas/apiMissionForm.ts": "8df9e2dbc323a07fc69d9df1e1f055b9f5bc5133a7454c044705fbcec5c06d08",
+    "frontend/src/pages/librarian.tsx": "da48865b616cd427632739c7fda2b2280ca1a2b9d544bbfcde5fd359f60f43f8",
+    "frontend/src/pages/missions/[id].tsx": "19b78e727f48c0e0135e7767426104d43651b0a78d1e955e2eeb13daffbd746c",
+    "frontend/src/types/mission.ts": "b81494ec12e65fadfad8dd43026797f20f352e5d547d834c24db246620ddae4f",
+    "packages/tracelab-mcp/scripts/check-canonical-links.mjs": "2c452b47f4dbe889fc072d4088c1aa71d4fc45d584e2be07df69b7d5cdd20068",
+    "packages/tracelab-mcp/src/api-client.ts": "6df82d6de1cd2ecce63001cff149b7df860a95e558bc7c6face253900734d0f6",
+    "packages/tracelab-mcp/src/index.ts": "2d774e782092547c500d25a2337e6fe491ae4c38fd4b8047875068f55bdd88aa",
+    "tests/mcp_tools/test_mcp_missions_unit.py": "2458f457ac42614fc8547fc70acc056bb171f998019983e83bad532debbfbab8",
+    "tests/test_librarian_api.py": "98217821e36ebf83e0daa32f4513d4db1971957155481abeb19e39ddba25cb5c",
+    "tests/test_mission_contract_preview.py": "9a864652d22f53bd327c7e7a23f2bdabdfd1886ee2b14720e139e0ff178e7534",
+    "tests/test_result_materialization.py": "656b75a0608de025903370d6f46ea9d3b253c5a56edfbd421b71ef888f409e0d"
+  }
+}

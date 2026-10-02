@@ -477,10 +477,10 @@ export const TOOLS: Tool[] = [
           minimum: 1,
           maximum: 100,
         },
-        // DEPRECATED back-compat shim (action="update" only)
+        // Durable authored scope and legacy context (create/update).
         context: {
-          type: 'object',
-          description: 'For action="update" only. DEPRECATED: kept for back-compat. Prefer the explicit authoring fields below (background, focus, references, required_entities, excluded_entities, expected_output_schema, coverage_thresholds, validation_thresholds, deliverable_format, max_loops, min_loops, constraints).',
+          type: ['object', 'null'],
+          description: 'For create/update: preserve context.authored_scope (restriction, allowed_urls, allowed_domains, min_words, max_words, max_sources) and unrelated context. References alone are seeds.',
         },
         // T40.1 mission-authoring fields (used by both create and update)
         background: {
@@ -492,9 +492,9 @@ export const TOOLS: Tool[] = [
           description: 'Narrow framing for the research question. Sharpens what counts as on-topic vs. off-topic. Example: "Only papers that benchmark CCS against at least one supervised probing baseline."',
         },
         references: {
-          type: 'array',
-          items: { type: 'object', properties: { title: { type: 'string' } }, required: ['title'] },
-          description: 'Seed references the author already trusts. Each entry at minimum {title}; optional URL/author/year fields are preserved. Example: [{"title": "Contrast-Consistent Search (Burns et al. 2022)"}]',
+          type: ['array', 'null'],
+          items: { type: 'object', properties: { title: { type: 'string' }, url: { type: 'string' } } },
+          description: 'Seed references the author already trusts. Exact url and optional title/author/year fields are preserved. Example: [{"title": "Contrast-Consistent Search (Burns et al. 2022)"}]',
         },
         required_entities: {
           type: 'array',
@@ -914,8 +914,8 @@ const MissionAuthoringFieldsSchema = {
   background: z.string().optional(),
   focus: z.string().optional(),
   references: z
-    .array(z.object({ title: z.string() }).passthrough())
-    .optional(),
+    .array(z.object({ title: z.string().optional(), url: z.string().optional() }).passthrough())
+    .nullable().optional(),
   required_entities: z.array(z.string()).optional(),
   excluded_entities: z.array(z.string()).optional(),
   expected_output_schema: z.record(z.unknown()).optional(),
@@ -928,6 +928,7 @@ const MissionAuthoringFieldsSchema = {
 } as const;
 
 const CreateMissionInput = z.object({
+  context: z.record(z.unknown()).nullable().optional(),
   mission_id: z.string().min(1),
   title: z.string().min(1),
   objective: z.string().min(1),
@@ -967,8 +968,8 @@ const UpdateMissionInput = z.object({
   success_criteria: z.array(z.string()).optional(),
   deliverables: z.array(z.string()).optional(),
   tags: z.array(z.string()).optional(),
-  // DEPRECATED: prefer explicit authoring fields below. Kept for back-compat.
-  context: z.record(z.unknown()).optional(),
+  // Typed scope and legacy context are preserved alongside explicit columns.
+  context: z.record(z.unknown()).nullable().optional(),
   ...MissionAuthoringFieldsSchema,
 });
 
@@ -1824,6 +1825,7 @@ async function handleGetDocumentContent(args: unknown) {
 
 // Mission-authoring field names — kept in one place so create/update stay in sync.
 const MISSION_AUTHORING_FIELD_NAMES = [
+  'context',
   'background',
   'focus',
   'references',
@@ -2132,6 +2134,12 @@ async function handlePreviewMissionContract(args: unknown) {
               project_id: preview.project_id ?? null,
               contract_version: preview.contract_version,
               compiler_revision: preview.compiler_revision,
+              compiler_source_revision: preview.compiler_source_revision,
+              compiler_semantic_revision: preview.compiler_semantic_revision,
+              contract_id: preview.contract_id,
+              canonical_contract_id: preview.canonical_contract_id,
+              canonical_contract_sha256: preview.canonical_contract_sha256,
+              authored_scope: preview.authored_scope,
               fidelity: preview.fidelity,
               named_entities: preview.named_entities,
               objectives_count: preview.objectives.length,

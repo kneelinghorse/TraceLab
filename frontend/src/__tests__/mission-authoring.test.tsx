@@ -13,7 +13,7 @@ const projectId = "10000000-0000-4000-8000-000000000001";
 const source = {
   id: "original", mission_id: "OLD-1", title: "Auditable research", objective: "Find evidence for the research question",
   success_criteria: ["Cite primary sources"], project_id: projectId, status: "completed", tags: ["science"],
-  deliverables: ["Report"], context: { instructions: "Keep scope" }, research_phases: { research: { name: "Research" } },
+  deliverables: ["Report"], context: { instructions: "Keep scope", authored_scope: { restriction: "exact_pages", allowed_urls: ["https://example.test/paper"], max_words: 500, max_sources: 1 } }, research_phases: { research: { name: "Research" } },
   metadata: { priority: "high", custom: true }, references: [{ title: "Paper", url: "https://example.test/paper" }],
   background: "Context", focus: "Question", required_entities: ["Entity"], excluded_entities: ["Excluded"], constraints: ["Primary sources"],
   deliverable_format: "markdown", min_loops: null, max_loops: null, expected_output_schema: { type: "object" },
@@ -159,4 +159,15 @@ it("preserves document identity when editing or removing references with duplica
   fireEvent.click(screen.getByRole("button", { name: "Save and preview" }));
   await screen.findByText("revision-1");
   expect(mocks.create.mock.calls[0][0].references).toEqual([{ ...refs[0], title: "Renamed source" }, refs[2]]);
+});
+
+it("preserves URL-only exact source references while editing a reviewed draft", async () => {
+  const url = "https://example.test/page?query=" + "a".repeat(600);
+  form({ source: { ...source, references: [{ url }], context: { authored_scope: { restriction: "exact_pages", allowed_urls: [url], max_words: 500 } } } });
+  await screen.findByRole("option", { name: "Research" });
+  fireEvent.change(screen.getByLabelText(/Mission ID/), { target: { value: "EXACT-PAGE" } });
+  fireEvent.click(screen.getByRole("button", { name: "Save and preview" }));
+  await waitFor(() => expect(mocks.create).toHaveBeenCalled());
+  expect(mocks.create.mock.calls[0][0].references).toEqual([{ url }]);
+  expect(mocks.create.mock.calls[0][0].context.authored_scope.allowed_urls).toEqual([url]);
 });

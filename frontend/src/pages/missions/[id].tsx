@@ -1,3 +1,4 @@
+import { ScopeOutcomePanel } from "@/components/missions/AuthoredScope";
 import { RelationshipLink } from "@/components/graph/RelationshipLink";
 import { parseApiTimestamp } from "@/lib/api/timestamps";
 import { StatusBadge } from "@/components/ui/StatusBadge";
@@ -350,7 +351,9 @@ function MissionDetailContent() {
               }
             }} onClick={() => setDetailTab(tab)} className={`rounded px-4 py-2 ${detailTab === tab ? "bg-accent text-on-accent" : "border border-line"}`}>{tab === "overview" ? "Run" : tab === "results" ? "Results" : "Evidence"}</button>)}
           </div>
+          {["completed", "validation_failed", "blocked", "cancelled"].includes(mission.status) && <div className="p-4"><ScopeOutcomePanel mission={mission} /></div>}
           <div role="tabpanel" id="mission-panel-results" aria-labelledby="mission-tab-results" hidden={detailTab !== "results"}>
+          {mission.result_protocol && <div className="flex justify-end px-6 py-3"><button type="button" className="rounded px-3 py-2 text-sm text-accent-text underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent" onClick={() => downloadFile(JSON.stringify(mission.result_protocol, null, 2), `${mission.mission_id}-protocol.json`, "application/json")}>Export full protocol</button></div>}
           {/* Results Markdown Section */}
           {mission.result_markdown && (
             <Section title="Results">

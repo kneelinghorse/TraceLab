@@ -1,0 +1,31 @@
+{
+  "mission": "S64-VENDOR",
+  "session": "PS-2026-10-01-013",
+  "status": "accepted",
+  "tests": {
+    "compiler_offline": {
+      "passed": 26,
+      "skipped": 0
+    },
+    "preview_and_missions_api": {
+      "passed": 91,
+      "skipped": 0
+    }
+  },
+  "lint": "pass",
+  "foundational_refs": "pass",
+  "canonical_receipt": "canonical-parity.json",
+  "state_notes": [
+    "Default min_loops aligned from 0 to worker default 2. Explicit 0 retained; pinned worker converts nonpositive to 2. No execution budget changed.",
+    "Worker project_id=None, baseline depth, empty depth_config; full canonical bytes compared."
+  ],
+  "worker_delivery_proven": false,
+  "source_sha256": {
+    "app/services/deepsearch_preview_client.py": "40fabc56c244b19ba581044681563e4d57126d2877a8d7b00d269b65ebeb7044",
+    "app/services/contract_compiler/__init__.py": "2c6266a18e8bc285262b9427a4fbae018d372611ff5f7a0414f13449616b9589",
+    "tests/unit/test_authored_scope_compiler.py": "c2428a0fb3142669753bf65f63e793c14e888d9a6d8d78992f0e4d8fc698da67",
+    "tests/test_mission_contract_preview.py": "be6a479d90666e9dc7838e05b214fb2aa3e4686de39b8b919cca3cba8b2798ad",
+    "scripts/check_authored_scope_parity.py": "90a7df5d7df2efa0285123fb900537ee79ad8ffb4f218698613c3c1775792d3c",
+    "cmos/contracts/deepsearch-compiler-vendor.md": "a3b73fcd8ae0b317551f674e7654089c4cf59099fa2510b103636bf1d255731b"
+  }
+}

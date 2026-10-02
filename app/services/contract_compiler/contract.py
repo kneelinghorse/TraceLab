@@ -1,13 +1,7 @@
-"""Mission contract compilation and persistence helpers.
+"""Vendored from DeepSearch 79ef84842fb84259bafe59924b21fe2f5ad05d7d.
+See cmos/contracts/deepsearch-compiler-vendor.md for local adaptations.
 
-VENDORED from DeepSearch.alpha — see cmos/contracts/deepsearch-compiler-vendor.md
-for the pinned commit, resync ritual, and rationale (T41.1, sprint-41).
-
-Do not hand-edit except for TraceLab-local patches explicitly listed in the
-vendor document. Regenerate via the resync ritual when DS publishes a new
-contract compiler revision, then reapply and revalidate those documented
-patches.
-"""
+Mission contract compilation and persistence helpers."""
 
 from __future__ import annotations
 
@@ -20,21 +14,30 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, MutableMapping, Optional, Sequence, cast
-from urllib.parse import urlparse
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
+from .compiler_provenance import (
+    CANONICAL_CONTRACT_COMPILED_AT,
+    CANONICAL_CONTRACT_ORIGIN,
+    CONFIGURED_ENRICHMENT_MODE,
+    CONTRACT_COMPILER_REVISION,
+    CONTRACT_SCHEMA_VERSION,
+    NO_ENRICHMENT_MODE,
+    CompilerEnrichmentMode,
+)
 from .deliverable_schemas import (
     OutputSchema,
     extract_deliverable_schemas,
     is_deliverable_attribute_list,
     is_deliverable_attribute_phrase,
 )
+from .domain_policy import normalize_domain
+from .scope import AuthoredScope, compile_authored_scope
 from .title_utils import normalize_mission_title
 
 CONTRACT_DIR_ENV = "DEEPSEARCH_CONTRACT_DIR"
 DEFAULT_CONTRACT_DIR = Path("checkpoints/contracts")
-CONTRACT_SCHEMA_VERSION = "1.0"
 logger = logging.getLogger(__name__)
 
 _AUTHOR_YEAR_PATTERN = re.compile(r"\b[A-Z][a-z]+(?:\s+et al\.)?\s+\d{4}\b")
@@ -335,6 +338,8 @@ class MissionContract(BaseModel):
     """Executable contract compiled from a mission definition."""
 
     contract_version: str = CONTRACT_SCHEMA_VERSION
+    contract_schema_version: str = CONTRACT_SCHEMA_VERSION
+    compiler_revision: int = 0
     contract_id: str
     compiled_at: str
     origin: str
@@ -342,11 +347,17 @@ class MissionContract(BaseModel):
     project_id: Optional[str] = None
     title: str
     objective: str
+    background: str = ""
+    focus: str = ""
     success_criteria: List[str] = Field(default_factory=list)
     deliverables: List[str] = Field(default_factory=list)
     constraints: List[str] = Field(default_factory=list)
     excluded_domains: List[str] = Field(default_factory=list)
     reference_titles: List[str] = Field(default_factory=list)
+    authored_scope: AuthoredScope = Field(default_factory=AuthoredScope)
+    authority_seed_domains: List[str] = Field(default_factory=list)
+    required_entities: List[str] = Field(default_factory=list)
+    excluded_entities: List[str] = Field(default_factory=list)
     named_entities: List[str] = Field(default_factory=list)
     named_entities_canonical: Dict[str, str] = Field(default_factory=dict)
     # S54.2 — populated when the LLM extractor returns at least one entity
@@ -378,6 +389,20 @@ class MissionContract(BaseModel):
     # surfaces byte-identical).
     objective_coverage_section_required: bool = False
 
+    @model_validator(mode="before")
+    @classmethod
+    def _preserve_legacy_provenance(cls, value: Any) -> Any:
+        """Keep old artifacts honest instead of attributing them to the new compiler."""
+
+        if not isinstance(value, Mapping):
+            return value
+        payload = dict(value)
+        payload.setdefault(
+            "contract_schema_version",
+            payload.get("contract_version", CONTRACT_SCHEMA_VERSION),
+        )
+        return payload
+
 
 @dataclass(slots=True)
 class PreparedExecutionContract:
@@ -401,10 +426,21 @@ def compile_contract_from_state(
     state: Mapping[str, Any],
     *,
     origin: str,
+    enrichment_mode: CompilerEnrichmentMode = NO_ENRICHMENT_MODE,
+    compiled_at: str | None = None,
 ) -> MissionContract:
-    """Compile a deterministic mission contract from an ``AgentState``-like payload."""
+    """Compile a mission contract from an ``AgentState``-like payload.
+
+    TraceLab permits only offline structural compilation; configured enrichment is rejected.
+    ``enrichment_mode="none"`` is the deterministic structural path used by
+    cross-service compiler parity tests and never constructs or invokes a model.
+    """
+
+    if enrichment_mode != NO_ENRICHMENT_MODE:
+        raise ValueError(f"Unsupported compiler enrichment mode: {enrichment_mode}")
 
     mission_context = _coerce_mapping(state.get("mission_context"))
+    authored_scope = compile_authored_scope(mission_context)
     mission_id = _coerce_text(state.get("mission_id"), fallback="unknown-mission")
     title = normalize_mission_title(
         _coerce_text(mission_context.get("title"), fallback=mission_id),
@@ -417,6 +453,8 @@ def compile_contract_from_state(
             default=title,
         ),
     )
+    background = _coerce_optional_text(mission_context.get("background")) or ""
+    focus = _coerce_optional_text(mission_context.get("focus")) or ""
     success_criteria = _normalize_string_list(mission_context.get("success_criteria"))
     if not success_criteria:
         success_criteria = _normalize_string_list(state.get("mission_objectives"))
@@ -436,7 +474,19 @@ def compile_contract_from_state(
         auxiliary_success_criteria,
         acceptance_gate_criteria,
     )
-    reference_titles = _extract_reference_titles(mission_context.get("references"))
+    references = mission_context.get("references")
+    reference_titles = _merge_unique_strings(
+        _normalize_string_list(mission_context.get("reference_titles")),
+        _extract_reference_titles(references),
+    )
+    authority_seed_domains = _merge_unique_strings(
+        _normalize_domain_list(
+            mission_context.get("authority_seed_domains")
+            or mission_context.get("primary_domains")
+            or mission_context.get("authority_domains")
+        ),
+        _extract_reference_domains(references),
+    )
     coverage_thresholds = _extract_threshold_overrides(
         mission_context.get("coverage_thresholds") or state.get("coverage_thresholds")
     )
@@ -445,37 +495,79 @@ def compile_contract_from_state(
     )
 
     objectives = _build_objective_contracts(objective, research_success_criteria)
-    authored_output_schemas = _extract_authored_output_schemas(
-        mission_context.get("expected_output_schema")
-    )
-    output_schemas = authored_output_schemas or extract_deliverable_schemas(
-        deliverables,
-        [objective, *success_criteria],
-    )
+    authored_output_schema = mission_context.get("expected_output_schema")
+    if authored_output_schema is not None:
+        # An explicit empty mapping/list clears both legacy context and
+        # prose-derived schema inference. Only SQL NULL/absence permits the
+        # older inference path.
+        output_schemas = _extract_authored_output_schemas(authored_output_schema)
+    else:
+        output_schemas = extract_deliverable_schemas(
+            deliverables,
+            [objective, *success_criteria],
+        )
     deliverable_schemas = _build_deliverable_schema_contracts(output_schemas)
     missing_registry_acronyms: set[str] = set()
     extraction_inputs = [
         title,
         objective,
-        _coerce_optional_text(mission_context.get("background")) or "",
-        _coerce_optional_text(mission_context.get("focus")) or "",
+        background,
+        focus,
         *research_success_criteria,
         *deliverables,
         *reference_titles,
     ]
-    (
-        extracted_named_entities,
-        named_entities_disambiguation,
-        named_entities_query_surfaces,
-        entity_extraction_path,
-        llm_extraction_records,
-    ) = _extract_entities_llm_first(
-        extraction_inputs=extraction_inputs,
-        objective=objective,
-        deliverables=deliverables,
-        required_entities=required_entities,
-        missing_registry_acronyms=missing_registry_acronyms,
-    )
+    compiler_model_diagnostics: List[Dict[str, Any]] = []
+    if enrichment_mode == NO_ENRICHMENT_MODE:
+        if required_entities:
+            extracted_named_entities = []
+            entity_extraction_path = "skipped_declared_authoritative"
+        else:
+            extracted_named_entities = _extract_named_entities(
+                extraction_inputs,
+                missing_registry_acronyms=missing_registry_acronyms,
+            )
+            entity_extraction_path = "regex_no_enrichment"
+        named_entities_disambiguation: Dict[str, str] = {}
+        named_entities_query_surfaces: Dict[str, List[str]] = {}
+        llm_extraction_records: List[Dict[str, str]] = []
+    else:
+        (
+            extracted_named_entities,
+            named_entities_disambiguation,
+            named_entities_query_surfaces,
+            entity_extraction_path,
+            llm_extraction_records,
+        ) = _extract_entities_llm_first(
+            extraction_inputs=extraction_inputs,
+            objective=objective,
+            deliverables=deliverables,
+            required_entities=required_entities,
+            missing_registry_acronyms=missing_registry_acronyms,
+            diagnostics=compiler_model_diagnostics,
+        )
+
+    # S60.1 — when the author declared ``required_entities``, the prose
+    # extractor short-circuits (S59.2) and leaves disambiguation /
+    # query_surfaces empty. Single-word brand entities with strong homonyms
+    # (Railway → railroad industry; Fly.io → ambiguous) get retrieval
+    # pollution because the entity-lane query is the bare entity name with
+    # no qualifier. Run a focused LLM disambiguation pass that populates the
+    # S54.3 + S56.3 surfaces from the declared list. Trust-the-LLM-first
+    # principle: no author-override hints field, the existing ``background``
+    # field is the author-side surface (planning-pass amendment §1).
+    if required_entities and enrichment_mode == CONFIGURED_ENRICHMENT_MODE:
+        (
+            named_entities_disambiguation,
+            named_entities_query_surfaces,
+            entity_extraction_path,
+        ) = _disambiguate_declared_entities(
+            declared_entities=required_entities,
+            objective=objective,
+            background="\n\n".join(value for value in (background, focus) if value),
+            deliverables=deliverables,
+            diagnostics=compiler_model_diagnostics,
+        )
     named_entities, entity_extraction_decisions = _classify_named_entity_candidates(
         required_entities,
         extracted_named_entities,
@@ -492,6 +584,15 @@ def compile_contract_from_state(
         entity_extraction_decisions.append(
             {"entity": "", "decision": "extraction_path", "reason": entity_extraction_path}
         )
+    entity_extraction_decisions.extend(
+        {
+            "entity": "", "decision": (
+                "provider_usage" if failure.get("kind") == "provider_usage" else "provider_failure"
+            ),
+            "reason": json.dumps(failure, sort_keys=True),
+        }
+        for failure in compiler_model_diagnostics
+    )
     named_entities_canonical = _build_named_entities_canonical(named_entities)
     # Drop disambiguation entries for entities that did not survive
     # classification (declared/excluded/dropped) — keep the contract's
@@ -518,6 +619,13 @@ def compile_contract_from_state(
         deliverable_schemas,
         acceptance_gate_criteria=acceptance_gate_criteria,
     )
+    if (authored_scope.restriction != "unrestricted" or authored_scope.max_sources is not None
+            or authored_scope.min_words is not None or authored_scope.max_words is not None):
+        acceptance_checks.append(AcceptanceCheck(
+            id="check-authored-scope", kind="authored_scope",
+            description="Persisted words and all consulted evidence must honor authored scope.",
+            target=authored_scope.model_dump(mode="json"), required=True,
+        ))
     execution_budget = _build_execution_budget(state)
 
     # S49.4 — enable the per-objective rendered-coverage validator
@@ -533,11 +641,17 @@ def compile_contract_from_state(
         "project_id": _coerce_optional_text(state.get("project_id")),
         "title": title,
         "objective": objective,
+        "background": background,
+        "focus": focus,
         "success_criteria": success_criteria,
         "deliverables": deliverables,
         "constraints": constraints,
         "excluded_domains": excluded_domains,
         "reference_titles": reference_titles,
+        "authored_scope": authored_scope.model_dump(mode="json"),
+        "authority_seed_domains": authority_seed_domains,
+        "required_entities": required_entities,
+        "excluded_entities": excluded_entities,
         "named_entities": named_entities,
         "named_entities_canonical": named_entities_canonical,
         "named_entities_disambiguation": named_entities_disambiguation,
@@ -557,10 +671,23 @@ def compile_contract_from_state(
 
     return MissionContract.model_validate(
         {
+            "contract_schema_version": CONTRACT_SCHEMA_VERSION,
+            "compiler_revision": CONTRACT_COMPILER_REVISION,
             "contract_id": contract_id,
-            "compiled_at": datetime.now(timezone.utc).isoformat(),
+            "compiled_at": _resolve_compiled_at(compiled_at),
             **contract_payload,
         }
+    )
+
+
+def compile_canonical_contract_from_state(state: Mapping[str, Any]) -> MissionContract:
+    """Compile stable canonical output without provider-backed enrichment."""
+
+    return compile_contract_from_state(
+        state,
+        origin=CANONICAL_CONTRACT_ORIGIN,
+        enrichment_mode=NO_ENRICHMENT_MODE,
+        compiled_at=CANONICAL_CONTRACT_COMPILED_AT,
     )
 
 
@@ -620,8 +747,13 @@ def prepare_execution_contract(
 ) -> PreparedExecutionContract:
     """Compile, persist, and attach a mission contract to a mutable execution state."""
 
+    from deepsearch.agent.execution_control import raise_if_execution_cancelled
+
+    raise_if_execution_cancelled()
     contract = compile_contract_from_state(state, origin=origin)
+    raise_if_execution_cancelled()
     path = persist_contract(contract, output_dir=output_dir)
+    raise_if_execution_cancelled()
 
     state["mission_contract"] = contract.model_dump(mode="json")
     state["mission_contract_id"] = contract.contract_id
@@ -634,6 +766,8 @@ def prepare_execution_contract(
     telemetry["contract_id"] = contract.contract_id
     telemetry["contract_path"] = str(path)
     telemetry["contract_version"] = contract.contract_version
+    telemetry["contract_schema_version"] = contract.contract_schema_version
+    telemetry["compiler_revision"] = contract.compiler_revision
     telemetry["contract_origin"] = origin
     state["telemetry"] = cast(Dict[str, Any], dict(telemetry))
 
@@ -765,6 +899,8 @@ def _extract_authored_output_schemas(raw_value: Any) -> List[OutputSchema]:
     if raw_value is None:
         return []
     if isinstance(raw_value, Mapping):
+        if not raw_value:
+            return []
         items: Sequence[Any] = [raw_value]
     elif isinstance(raw_value, Sequence) and not isinstance(raw_value, (str, bytes)):
         items = list(raw_value)
@@ -1274,6 +1410,18 @@ def is_acceptance_contract_payload(payload: Mapping[str, Any] | None) -> bool:
     )
 
 
+def _record_compiler_failure(
+    diagnostics: List[Dict[str, Any]] | None, exc: BaseException, settings: Any = None,
+) -> None:
+    from deepsearch.llm.runtime import request_failure
+
+    if diagnostics is not None:
+        provider = getattr(settings, "llm_backend", "")
+        model = (getattr(settings, f"{provider}_model", "")
+                 if provider in {"deepseek", "openai"} else "")
+        diagnostics.append(request_failure(exc, model=model, stage="compiler"))
+
+
 def _extract_entities_llm_first(
     *,
     extraction_inputs: Sequence[str],
@@ -1281,14 +1429,9 @@ def _extract_entities_llm_first(
     deliverables: Sequence[str],
     required_entities: Sequence[str],
     missing_registry_acronyms: set[str],
+    diagnostics: List[Dict[str, Any]] | None = None,
 ) -> tuple[List[str], Dict[str, str], Dict[str, List[str]], str, List[Dict[str, str]]]:
-    """Extract preview entities without importing DeepSearch runtime code.
-
-    TraceLab intentionally vendors only the deterministic compiler boundary;
-    the DeepSearch worker package and its provider-backed entity extractor are
-    not runtime dependencies of the API service. Declared entities remain
-    authoritative. When they are absent, preview uses the vendored regex
-    extractor so compilation stays local, deterministic, and offline.
+    """Run LLM-first entity extraction with regex fallback (S54.2 + S56.3).
 
     Returns a 5-tuple
     ``(entity_names, disambiguation, query_surfaces, path, llm_decisions)``:
@@ -1302,12 +1445,14 @@ def _extract_entities_llm_first(
     - ``query_surfaces`` — S56.3. Mapping entity → list of retrieval-friendly
       variants the LLM emitted alongside the canonical name. Empty dict on
       the regex fallback path.
-    - ``path`` — telemetry tag: ``"regex_fallback"`` (TraceLab-local
-      deterministic extraction), or
+    - ``path`` — telemetry tag: ``"llm_primary"`` (LLM call succeeded),
+      ``"regex_fallback"`` (LLM construction or call failed), or
       ``"skipped_declared_authoritative"`` (S59.2 — author declared
       ``required_entities`` so the prose-extraction path is bypassed).
-    - ``llm_decisions`` — retained for compiler-shape compatibility and always
-      empty in TraceLab's offline preview path.
+    - ``llm_decisions`` — extraction-decision rows for entities the LLM
+      explicitly rejected (e.g., participial fragments). Each row carries
+      ``decision="rejected_llm"`` and a ``reason`` from the model's
+      ``rejection_reason`` field. Empty list on the regex fallback path.
     """
 
     # S59.2 — when the author explicitly declares ``required_entities``, the
@@ -1319,11 +1464,136 @@ def _extract_entities_llm_first(
     if any(str(e or "").strip() for e in required_entities):
         return [], {}, {}, "skipped_declared_authoritative", []
 
-    regex_entities = _extract_named_entities(
-        extraction_inputs,
-        missing_registry_acronyms=missing_registry_acronyms,
+    from deepsearch.mission.entity_extractor_llm import (
+        LLMEntityExtractor,
+        run_llm_entity_extraction_sync,
     )
-    return regex_entities, {}, {}, "regex_fallback", []
+
+    try:
+        from deepsearch.config import DeepSearchSettings
+    except ImportError:  # pragma: no cover - defensive
+        regex_entities = _extract_named_entities(
+            extraction_inputs,
+            missing_registry_acronyms=missing_registry_acronyms,
+        )
+        return regex_entities, {}, {}, "regex_fallback", []
+
+    settings = None
+    try:
+        settings = DeepSearchSettings.load()
+        structured_extractor = settings.build_structured_extractor()
+    except Exception as exc:
+        _record_compiler_failure(diagnostics, exc, settings)
+        logger.warning("Compiler model construction failed; using deterministic fallback")
+        regex_entities = _extract_named_entities(
+            extraction_inputs,
+            missing_registry_acronyms=missing_registry_acronyms,
+        )
+        return regex_entities, {}, {}, "regex_fallback", []
+
+    extractor = LLMEntityExtractor(structured_extractor=structured_extractor)
+    objective_text = str(objective or "").strip()
+    objective_inputs = [objective_text] if objective_text else []
+    outcome = run_llm_entity_extraction_sync(
+        extractor,
+        objectives=objective_inputs or list(extraction_inputs),
+        deliverables=list(deliverables),
+        required_entities=list(required_entities),
+    )
+
+    if diagnostics is not None:
+        diagnostics.extend(getattr(structured_extractor, "diagnostics", []))
+    if outcome is None:
+        regex_entities = _extract_named_entities(
+            extraction_inputs,
+            missing_registry_acronyms=missing_registry_acronyms,
+        )
+        return regex_entities, {}, {}, "regex_fallback", []
+
+    # Surface explicit rejections in entity_extraction_decisions so the
+    # audit row makes the extractor's classification visible. Filter empty
+    # rejection_reason to a stable placeholder.
+    rejection_rows: List[Dict[str, str]] = []
+    for entry in outcome.rejected:
+        rejection_rows.append(
+            {
+                "entity": str(entry.name or "").strip(),
+                "decision": "rejected_llm",
+                "reason": (entry.rejection_reason or "").strip() or "llm_rejected",
+            }
+        )
+
+    return (
+        outcome.entity_names,
+        dict(outcome.disambiguation),
+        {entity: list(surfaces) for entity, surfaces in outcome.query_surfaces.items()},
+        outcome.path,
+        rejection_rows,
+    )
+
+
+def _disambiguate_declared_entities(
+    *,
+    declared_entities: Sequence[str],
+    objective: str,
+    background: str,
+    deliverables: Sequence[str],
+    diagnostics: List[Dict[str, Any]] | None = None,
+) -> tuple[Dict[str, str], Dict[str, List[str]], str]:
+    """S60.1 — focused LLM disambiguation pass for declared entities.
+
+    Returns ``(disambiguation, query_surfaces, path)``:
+    - ``disambiguation`` — entity → disambiguating-context phrase (≤120 chars).
+    - ``query_surfaces`` — entity → list of retrieval-friendly query variants.
+    - ``path`` — telemetry tag: ``"llm_declared"`` (LLM call succeeded),
+      ``"regex_fallback"`` (LLM build/call failed), or
+      ``"skipped_no_declared"`` (declared list empty).
+
+    The declared list is authoritative — the LLM does NOT add or remove
+    entities. Output is filtered to declared entities (case-insensitive).
+    """
+
+    if not any(str(e or "").strip() for e in declared_entities):
+        return {}, {}, "skipped_no_declared"
+
+    from deepsearch.mission.entity_extractor_llm import (
+        DeclaredEntityDisambiguator,
+        run_declared_entity_disambiguation_sync,
+    )
+
+    try:
+        from deepsearch.config import DeepSearchSettings
+    except ImportError:  # pragma: no cover - defensive
+        return {}, {}, "regex_fallback"
+
+    settings = None
+    try:
+        settings = DeepSearchSettings.load()
+        structured_extractor = settings.build_structured_extractor()
+    except Exception as exc:
+        _record_compiler_failure(diagnostics, exc, settings)
+        logger.warning("Compiler model construction failed; skipping disambiguation")
+        return {}, {}, "regex_fallback"
+
+    disambiguator = DeclaredEntityDisambiguator(structured_extractor=structured_extractor)
+    outcome = run_declared_entity_disambiguation_sync(
+        disambiguator,
+        declared_entities=declared_entities,
+        objective=objective,
+        background=background,
+        deliverables=deliverables,
+    )
+
+    if diagnostics is not None:
+        diagnostics.extend(getattr(structured_extractor, "diagnostics", []))
+    if outcome is None:
+        return {}, {}, "regex_fallback"
+
+    return (
+        dict(outcome.disambiguation),
+        {entity: list(surfaces) for entity, surfaces in outcome.query_surfaces.items()},
+        outcome.path,
+    )
 
 
 def _extract_named_entities(
@@ -1709,16 +1979,48 @@ def _extract_threshold_overrides(raw_value: Any) -> Dict[str, float]:
     return overrides
 
 
+def _reference_items(raw_references: Any) -> List[tuple[str, Any]]:
+    if isinstance(raw_references, Mapping):
+        return [(str(key), value) for key, value in raw_references.items()]
+    if isinstance(raw_references, Sequence) and not isinstance(
+        raw_references, (str, bytes)
+    ):
+        return [("", value) for value in raw_references]
+    return []
+
+
 def _extract_reference_titles(raw_references: Any) -> List[str]:
-    if not isinstance(raw_references, Sequence) or isinstance(raw_references, (str, bytes)):
-        return []
     titles: List[str] = []
-    for item in raw_references:
+    for label, item in _reference_items(raw_references):
         if isinstance(item, Mapping):
-            title = _coerce_optional_text(item.get("title"))
+            title = _coerce_optional_text(item.get("title") or item.get("name"))
             if title:
                 titles.append(title)
-    return titles
+        elif label and isinstance(item, str) and item.startswith(("http://", "https://")):
+            titles.append(label)
+    return _unique_strings(titles)
+
+
+def _extract_reference_domains(raw_references: Any) -> List[str]:
+    domains: List[str] = []
+    for _, item in _reference_items(raw_references):
+        candidates: List[Any]
+        if isinstance(item, Mapping):
+            candidates = [
+                item.get("url"),
+                item.get("href"),
+                item.get("source_url"),
+            ]
+        else:
+            candidates = [item]
+        for candidate in candidates:
+            text = str(candidate or "").strip()
+            if not text.startswith(("http://", "https://")):
+                continue
+            domain = normalize_domain(text)
+            if domain:
+                domains.append(domain)
+    return _unique_strings(domains)
 
 
 def _normalize_string_list(raw_value: Any) -> List[str]:
@@ -1734,22 +2036,7 @@ def _normalize_domain_list(raw_value: Any) -> List[str]:
 
 
 def _normalize_domain(raw_value: Any) -> str:
-    text = str(raw_value or "").strip().lower()
-    if not text:
-        return ""
-    candidate = text if text.startswith(("http://", "https://")) else f"https://{text}"
-    try:
-        parsed = urlparse(candidate)
-        domain = (parsed.netloc or parsed.path).lower()
-    except Exception:
-        domain = text
-    if domain.startswith("www."):
-        domain = domain[4:]
-    if "/" in domain:
-        domain = domain.split("/", 1)[0]
-    if ":" in domain:
-        domain = domain.split(":", 1)[0]
-    return domain.rstrip(".")
+    return normalize_domain(raw_value)
 
 
 def _merge_unique_strings(*values: Sequence[str]) -> List[str]:
@@ -1830,8 +2117,32 @@ def _resolve_contract_dir(output_dir: Path | str | None) -> Path:
 
 
 def _contract_id_for_payload(payload: Mapping[str, Any]) -> str:
-    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    # Usage timestamps/IDs describe execution, not the semantic contract. The
+    # existing audit channel carries them without changing legacy/canonical IDs.
+    semantic = dict(payload)
+    decisions = semantic.get("entity_extraction_decisions")
+    if isinstance(decisions, list):
+        semantic["entity_extraction_decisions"] = [
+            row for row in decisions
+            if not isinstance(row, Mapping) or row.get("decision") != "provider_usage"
+        ]
+    encoded = json.dumps(semantic, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
     return hashlib.sha256(encoded.encode("utf-8")).hexdigest()[:16]
+
+
+def _resolve_compiled_at(value: str | None) -> str:
+    if value is None:
+        return datetime.now(timezone.utc).isoformat()
+    normalized = str(value).strip()
+    if not normalized:
+        raise ValueError("compiled_at must be a non-empty ISO-8601 timestamp")
+    try:
+        parsed = datetime.fromisoformat(normalized.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ValueError("compiled_at must be an ISO-8601 timestamp") from exc
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc).isoformat()
 
 
 def _safe_filename(value: str) -> str:
@@ -1854,6 +2165,7 @@ def _default_max_tokens_per_loop(research_depth: str) -> int:
 
 __all__ = [
     "AcceptanceCheck",
+    "CONTRACT_COMPILER_REVISION",
     "CONTRACT_SCHEMA_VERSION",
     "DeliverableSchemaContract",
     "EvidenceSlot",
@@ -1863,6 +2175,7 @@ __all__ = [
     "PreparedExecutionContract",
     "RetrievalBudget",
     "build_retrieval_budget",
+    "compile_canonical_contract_from_state",
     "compile_contract_from_state",
     "is_acceptance_contract_payload",
     "persist_contract",

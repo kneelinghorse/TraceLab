@@ -22,6 +22,7 @@ DeepSearch's evolution.
 """
 from __future__ import annotations
 
+import hashlib
 import logging
 from dataclasses import dataclass
 from typing import Any
@@ -30,8 +31,10 @@ from app.services.contract_compiler import (
     VENDORED_COMPILER_FIDELITY,
     VENDORED_COMPILER_REVISION,
     MissionContract,
+    compile_canonical_contract_from_state,
     compile_contract_from_state,
 )
+from app.services.contract_compiler.compiler_provenance import canonical_json
 
 logger = logging.getLogger(__name__)
 
@@ -58,6 +61,11 @@ class ContractPreview:
     """Compiled-contract view returned to API/MCP callers."""
 
     contract_version: str
+    contract_id: str
+    canonical_contract_id: str
+    canonical_contract_sha256: str
+    compiler_semantic_revision: int
+    authored_scope: dict[str, Any]
     compiler_revision: str
     fidelity: str
     named_entities: list[str]
@@ -71,6 +79,12 @@ class ContractPreview:
     def to_dict(self) -> dict[str, Any]:
         return {
             "contract_version": self.contract_version,
+            "contract_id": self.contract_id,
+            "canonical_contract_id": self.canonical_contract_id,
+            "canonical_contract_sha256": self.canonical_contract_sha256,
+            "compiler_semantic_revision": self.compiler_semantic_revision,
+            "compiler_source_revision": self.compiler_revision,
+            "authored_scope": self.authored_scope,
             "compiler_revision": self.compiler_revision,
             "fidelity": self.fidelity,
             "named_entities": self.named_entities,
@@ -83,9 +97,7 @@ class ContractPreview:
         }
 
 
-# Authoring fields that are forwarded to the compiler when present. Lifted
-# verbatim from the prior outbound payload so the compiler sees an
-# identical mission_context shape.
+# Authoring columns override legacy context when present, including empty values.
 _OPTIONAL_AUTHORING_FIELDS = (
     "background",
     "focus",
@@ -104,11 +116,12 @@ _OPTIONAL_AUTHORING_FIELDS = (
 def build_mission_context_from_mission(mission) -> dict[str, Any]:
     """Assemble the mission_context payload the compiler expects.
 
-    Same shape the previous HTTP body produced — kept stable so any caller
-    that constructed payloads independently (tests, future tools) doesn't
-    need to change.
+    Preserve typed scope and unrelated context, then apply the current authoring
+    columns using the pinned worker's NULL-only fallback semantics.
     """
+    context = getattr(mission, "context", None)
     payload: dict[str, Any] = {
+        **(context if isinstance(context, dict) else {}),
         "mission_id": mission.mission_id,
         "title": mission.title,
         "objective": mission.objective,
@@ -118,19 +131,14 @@ def build_mission_context_from_mission(mission) -> dict[str, Any]:
 
     for field in _OPTIONAL_AUTHORING_FIELDS:
         value = getattr(mission, field, None)
-        if value in (None, "", [], {}):
+        if value is None:
             continue
         payload[field] = value
 
-    # Constraints fallback: if the column is empty but legacy
-    # context['constraints'] is populated, thread it through. Mirrors the
-    # REST `_to_response` resolver and the prior client behavior.
+    # Match the pinned worker: SQL NULL permits legacy context fallback;
+    # an explicit empty list clears it rather than reviving an old restriction.
     constraints = getattr(mission, "constraints", None)
-    if not constraints and isinstance(getattr(mission, "context", None), dict):
-        legacy = mission.context.get("constraints")
-        if legacy:
-            constraints = legacy
-    if constraints:
+    if constraints is not None:
         payload["constraints"] = constraints
 
     return payload
@@ -166,12 +174,13 @@ def _build_preview_state(mission_context: dict[str, Any]) -> dict[str, Any]:
         # that was ever the default.
         "research_depth": "baseline",
         "max_loops": mission_context.get("max_loops") or 3,
-        "min_loops": mission_context.get("min_loops") or 0,
+        "min_loops": mission_context.get("min_loops") if mission_context.get("min_loops") is not None else 2,
+        "project_id": None,  # Worker converter leaves association to TraceLab.
         "depth_config": {},
     }
 
 
-def _shape_contract(contract: MissionContract) -> ContractPreview:
+def _shape_contract(contract: MissionContract, canonical: MissionContract) -> ContractPreview:
     """Render a compiled MissionContract into the public ContractPreview view.
 
     Uses the same per-field JSON-mode dump DeepSearch applied at its HTTP
@@ -180,6 +189,11 @@ def _shape_contract(contract: MissionContract) -> ContractPreview:
     """
     return ContractPreview(
         contract_version=contract.contract_version,
+        contract_id=contract.contract_id,
+        canonical_contract_id=canonical.contract_id,
+        canonical_contract_sha256=hashlib.sha256(canonical_json(canonical).encode("utf-8")).hexdigest(),
+        compiler_semantic_revision=contract.compiler_revision,
+        authored_scope=contract.authored_scope.model_dump(mode="json"),
         compiler_revision=VENDORED_COMPILER_REVISION,
         fidelity=VENDORED_COMPILER_FIDELITY,
         named_entities=list(contract.named_entities),
@@ -228,7 +242,8 @@ def preview_mission_contract(
     state = _build_preview_state(mission_context)
 
     try:
-        contract = compile_contract_from_state(state, origin="api_preview")
+        contract = compile_contract_from_state(state, origin="api_preview", enrichment_mode="none")
+        canonical = compile_canonical_contract_from_state(state)
     except ValueError as exc:
         # Mirrors DS's HTTP layer mapping: ValueError → 422 compiler reject.
         raise ContractPreviewError(
@@ -247,4 +262,4 @@ def preview_mission_contract(
             detail=None,
         ) from exc
 
-    return _shape_contract(contract)
+    return _shape_contract(contract, canonical)

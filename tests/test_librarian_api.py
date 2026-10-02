@@ -706,3 +706,43 @@ class TestAnswer:
         self._rag(monkeypatch, answer, [source], cache_hit=True, attempts=escalated)
         assert self._ask(project, auth_headers, "What does it cost to self-host?").json()["usage"] is None
         assert db_session.query(UsageRecord).filter(UsageRecord.project_id == project.id).count() == 2
+
+
+def test_exact_page_draft_preview_survives_review_save_and_idempotent_retry(librarian, project, auth_headers):
+    """The reviewed plan must describe the saved mission, not a lossy namespace."""
+    url = "https://docs.example.test/version/page?query=" + "a" * 600
+    scope = {"restriction": "exact_pages", "allowed_urls": [url], "min_words": 300, "max_words": 500, "max_sources": 1}
+    draft = {**VALID_DRAFT, "references": [{"url": url, "title": "Exact source"}], "context": {"authored_scope": scope, "review_note": "keep"}}
+    model = librarian(ModelReply(content=json.dumps(draft), usage=_usage()))
+    client = TestClient(app)
+    response = client.post("/api/v1/librarian/drafts", json={"project_id": str(project.id), "messages": _messages("Plan exactly this page")}, headers=auth_headers)
+    assert response.status_code == 200, response.text
+    reviewed = response.json()
+    assert reviewed["preview_error"] is None
+    assert reviewed["draft"]["context"] == draft["context"]
+    assert reviewed["draft"]["references"] == draft["references"]
+    payload = {"project_id": str(project.id), "draft": reviewed["draft"]}
+    saved = client.post("/api/v1/librarian/missions", json=payload, headers=auth_headers)
+    assert saved.status_code == 201, saved.text
+    mission = saved.json()["mission"]
+    assert mission["status"] == "draft"
+    assert mission["context"] == draft["context"]
+    assert mission["references"] == draft["references"]
+    assert not mission["execution_metadata"]
+    preview = client.get(f"/api/v1/missions/{mission['id']}/contract-preview", headers=auth_headers).json()
+    for key in ("canonical_contract_id", "canonical_contract_sha256", "authored_scope", "compiler_semantic_revision", "compiler_source_revision"):
+        assert preview[key] == reviewed["preview"][key]
+    assert preview["authored_scope"]["allowed_urls"] == [url]
+    retry = client.post("/api/v1/librarian/missions", json=payload, headers=auth_headers)
+    assert retry.status_code == 200 and retry.json()["created"] is False
+    assert retry.json()["mission"]["id"] == mission["id"]
+    assert len(model.calls) == 1
+
+
+def test_invalid_draft_scope_is_an_actionable_preview_error(librarian, project, auth_headers):
+    draft = {**VALID_DRAFT, "context": {"authored_scope": {"restriction": "exact_pages", "allowed_urls": []}}}
+    librarian(ModelReply(content=json.dumps(draft), usage=_usage()))
+    response = TestClient(app).post("/api/v1/librarian/drafts", json={"project_id": str(project.id), "messages": _messages("Plan it")}, headers=auth_headers)
+    assert response.status_code == 200, response.text
+    assert response.json()["preview"] is None
+    assert "allowed_urls" in response.json()["preview_error"]

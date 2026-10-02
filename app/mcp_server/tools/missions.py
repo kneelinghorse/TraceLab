@@ -97,7 +97,7 @@ def _serialize_mission(mission, *, slim: bool = True) -> dict[str, Any]:
     # own column. Old missions only have it inside context; mirror the REST
     # behavior at app/api/v1/missions.py:64-68 so DS readers stay consistent.
     resolved_constraints = mission.constraints
-    if not resolved_constraints and isinstance(mission.context, dict):
+    if resolved_constraints is None and isinstance(mission.context, dict):
         legacy = mission.context.get("constraints")
         if legacy:
             resolved_constraints = legacy
@@ -225,6 +225,10 @@ MISSION_TOOLS: list[Tool] = [
                         "(no project) cannot be created. Use list_projects to "
                         "find a valid project_id if you don't have one."
                     ),
+                },
+                "references": {
+                    "type": "array", "items": {"type": "object"},
+                    "description": "Reference seeds with exact URL and optional title; scope lives in context.authored_scope.",
                 },
                 "context": {
                     "type": "object",
@@ -424,6 +428,7 @@ async def handle_create_mission(arguments: dict[str, Any]) -> list[TextContent]:
             success_criteria=arguments["success_criteria"],
             project_id=project_id,
             context=arguments.get("context", {}),
+            references=arguments.get("references"),
             deliverables=arguments.get("deliverables", []),
             research_phases=arguments.get("research_phases", {}),
             tags=arguments.get("tags", []),

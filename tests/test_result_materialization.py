@@ -1688,3 +1688,55 @@ def test_tombstone_evidence_surfaces_are_counts_only(
     persisted = json.dumps(mission.execution_metadata["result_materialization"])
     assert str(document.id) not in persisted
     assert "owner@example.com" not in persisted
+
+
+@pytest.mark.parametrize("case", ["compliant", "partial", "too_long", "22_sources"])
+def test_s94_scope_artifacts_survive_ingestion_receipt_and_full_read(case, db_session, project, auth_headers):
+    """Paid partial/failed output must remain byte-identical and never rerun."""
+    from pathlib import Path
+
+    from app.mcp_server.tools.missions import _serialize_mission
+
+    fixtures = Path(__file__).parent / "fixtures/authored_scope_v1"
+    manifest = json.loads((fixtures / "manifest.json").read_text())
+    output = next(item for item in manifest["outputs"] if item["name"] == case)
+    audit = json.loads((fixtures / output["expected"]).read_text())
+    markdown = (fixtures / output["persisted"]).read_text()
+    original = (fixtures / output["pre_render"]).read_text()
+    scope = json.loads((fixtures / "canonical-contract.json").read_text())["authored_scope"]
+    mission = _completed_mission(db_session, project, f"S64-{case}")
+    mission.status = "completed" if output["mission_outcome"] == "complete" else "validation_failed"
+    status = mission.status
+    mission.result_markdown = markdown
+    mission.result_protocol = {"synthesis": {"key_insights": [markdown]}, "report_metadata": {"forensic": {"authored_scope_validation": audit, "authored_scope": {"policy": scope, "policy_sha256": audit["policy_sha256"]}, "original_synthesis": {**audit["pre_render"], "text": original}}}}
+    protocol = mission.result_protocol
+    final_outcome = {"outcome": output["mission_outcome"], "delivery_quality": output["delivery_quality"], "authored_scope_validation": audit}
+    mission.execution_metadata = {"final_outcome": final_outcome}
+    db_session.commit()
+    handler = _handler()
+    signing_key = "s64-fixture-receipt"
+    body, signature = _signed_receipt(mission, signing_key)
+    app.dependency_overrides[get_webhook_handler] = lambda: handler
+    try:
+        with patch("app.services.webhook_handler.settings") as settings:
+            settings.effective_deepsearch_service_secret = signing_key
+            response = TestClient(app).post("/api/v1/webhooks/deepsearch", content=body, headers={"Content-Type": "application/json", "X-DeepSearch-Signature": signature})
+        assert response.status_code == 200, response.text
+    finally:
+        app.dependency_overrides.pop(get_webhook_handler, None)
+    db_session.refresh(mission)
+    assert mission.status == status
+    assert mission.result_markdown == markdown
+    assert mission.result_protocol == protocol
+    assert mission.execution_metadata["final_outcome"] == final_outcome
+    assert mission.result_report_id is not None
+    doc = db_session.get(Document, uuid.UUID(mission.result_document_ids[0]))
+    assert doc.content == markdown
+    rest = TestClient(app).get(f"/api/v1/missions/{mission.id}", headers=auth_headers)
+    assert rest.status_code == 200
+    for result in (rest.json(), _serialize_mission(mission, slim=False)):
+        assert result["status"] == status
+        assert hashlib.sha256(result["result_markdown"].encode()).hexdigest() == audit["persisted"]["sha256"]
+        assert result["result_protocol"] == protocol
+        assert result["execution_metadata"]["final_outcome"] == final_outcome
+    assert mission.deepsearch_attempt_count == 0

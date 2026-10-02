@@ -1,0 +1,118 @@
+{
+  "sessionId": "PS-2026-10-01-009",
+  "sessionStatus": "Completed",
+  "priorSessionId": "PS-2026-10-01-008",
+  "sprintStatus": "Completed",
+  "completedMissions": [
+    "S63-PUBLIC",
+    "S63-CLEAN",
+    "S63-RELEASE"
+  ],
+  "missionStatus": {
+    "activeCount": 0,
+    "queuedCount": 0,
+    "blockedCount": 0
+  },
+  "health": true,
+  "parity": {
+    "tables": [
+      {
+        "table": "sprints",
+        "sqliteCount": 64,
+        "pgCount": 64,
+        "match": true,
+        "delta": 0
+      },
+      {
+        "table": "missions",
+        "sqliteCount": 427,
+        "pgCount": 427,
+        "match": true,
+        "delta": 0
+      },
+      {
+        "table": "sessions",
+        "sqliteCount": 226,
+        "pgCount": 226,
+        "match": true,
+        "delta": 0
+      },
+      {
+        "table": "strategic_decisions",
+        "sqliteCount": 591,
+        "pgCount": 591,
+        "match": true,
+        "delta": 0
+      },
+      {
+        "table": "learnings",
+        "sqliteCount": 295,
+        "pgCount": 295,
+        "match": true,
+        "delta": 0
+      },
+      {
+        "table": "mission_dependencies",
+        "sqliteCount": 227,
+        "pgCount": 227,
+        "match": true,
+        "delta": 0
+      }
+    ],
+    "allMatch": true,
+    "totalSqlite": 1830,
+    "totalPg": 1830,
+    "projectScoped": true,
+    "projectSlug": "tracelab",
+    "syncLogEntries": 288,
+    "failedEntries": 0,
+    "lastSyncAt": "2026-10-01T14:30:58.619Z"
+  },
+  "openNextSteps": [
+    400,
+    403,
+    406,
+    407,
+    415,
+    422,
+    431,
+    448,
+    452,
+    454,
+    477,
+    479
+  ],
+  "outsideRowsUnchanged": true,
+  "closedNextSteps": [
+    449,
+    450,
+    481
+  ],
+  "masterSnapshotId": 1323,
+  "identity": {
+    "layer0": "sprint-63-complete",
+    "master": "sprint-63-complete",
+    "sprintTracking": {
+      "current_sprint": null,
+      "last_completed_sprint": "sprint-63"
+    }
+  },
+  "lifecycle": {
+    "archivedDecisionIds": [
+      589,
+      590,
+      591
+    ],
+    "archivedLearningIds": [
+      293,
+      294
+    ],
+    "evergreenLearningPreserved": 295
+  },
+  "release": {
+    "package": "@aquex/tracelab-mcp@2.1.1",
+    "registryLatest": "2.1.1",
+    "source": "e716e34bcb1b60966ffcd8d67246f3c8e6026b40",
+    "tag": "tracelab-mcp-v2.1.1"
+  }
+}

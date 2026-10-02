@@ -1,8 +1,7 @@
-"""Helpers for normalizing mission titles across execution paths.
+"""Vendored from DeepSearch 79ef84842fb84259bafe59924b21fe2f5ad05d7d.
+See cmos/contracts/deepsearch-compiler-vendor.md for local adaptations.
 
-VENDORED from DeepSearch.alpha — see cmos/contracts/deepsearch-compiler-vendor.md
-for the pinned commit and resync ritual (T41.1, sprint-41). Do not hand-edit.
-"""
+Helpers for normalizing mission titles across execution paths."""
 
 from __future__ import annotations
 

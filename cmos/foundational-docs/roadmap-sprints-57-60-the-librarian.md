@@ -315,7 +315,7 @@ still unknown. Aquex owns its separate site-contact change; its completion
 summary is ready but unsent. No additional mail, worker changes or paid research
 were performed.
 
-### Follow-on — Sprint 63: Clear onboarding and focused maintenance (Opened 2026-10-01)
+### Follow-on — Sprint 63: Clear onboarding and focused maintenance (Completed 2026-10-01)
 
 Derek approved the post-S62 maintenance recommendation and requested a locked
 handoff for a fresh build session. Decision **#589** and the
@@ -323,27 +323,71 @@ handoff for a fresh build session. Decision **#589** and the
 the detailed acceptance criteria. Build session **PS-2026-10-01-008** started
 S63-PUBLIC on 2026-10-01 from planning tip `c838140` in the isolated
 `codex/sprint-63-build` checkout. PUBLIC precedes CLEAN; RELEASE requires both.
-The sprint is active; release acceptance and the end date remain open:
+All three missions are complete. PUBLIC and CLEAN shipped in PR #412 (`e716e34`);
+RELEASE independently verified the published 2.1.1 artifact in session
+**PS-2026-10-01-009**, after browser approval through interactive npm publishing:
 
-| Mission | Planned outcome | Requires |
+| Mission | Outcome / remaining acceptance | Requires |
 | --- | --- | --- |
-| **S63-PUBLIC** | Accurate package license/version/tool guidance, first-run and empty-account path, factual repository description; documentation patch prepared | — |
-| **S63-CLEAN** | Remove unused saved-search preset inputs while preserving the working save flow; correct affected frontend route/palette documentation | — |
-| **S63-RELEASE** | Verify the published npm artifact, public metadata and frontend delivery; close accepted carryovers and record the outcome | PUBLIC, CLEAN |
+| **S63-PUBLIC** | Complete: corrected license/version/examples, numbered first run and empty-corpus path; tested 2.1.1 documentation patch prepared | — |
+| **S63-CLEAN** | Complete: unused preset/effect/suggested-name path removed; reviewed draft preserved; affected route/palette docs corrected. Save/keyboard/theme and route tests pass | — |
+| **S63-RELEASE** | Complete: nine required CI checks, metadata readback, exact serving revision, 42 authenticated read-only browser checks and five public tests; published 2.1.1 independently installed and passed 63 real stdio checks with zero skips | PUBLIC, CLEAN |
 
-The package is currently 2.1.0, with source matching its release tag; target a
-2.1.1 documentation patch after a fresh registry/source check. The existing MIT
+The registry's latest version is **2.1.1**, with SHA1
+`ca37c89eeffa4ab18bb21835f0f1c06fe9a93ee6`, matching the tested tarball.
+A fresh registry installation passed 63 stdio checks, 64 fixture HTTP requests
+and 73 generated links; handshake 2.1.1, nine tools, fifty actions and all ten
+README JSON tool examples were verified. The release tag
+`tracelab-mcp-v2.1.1` points to merged source `e716e34`.
+Source, checksum, published acceptance and closeout receipts are in
+`cmos/reports/sprint-63/S63-RELEASE/`. The existing MIT
 license applies to the adapter; this sprint does not select a service-wide license.
 Preserve the retired mission-queue 404 tombstone and the save form's internal
 draft snapshot. Acceptance includes the clean registry install required by DoD-1.
 
-Existing **#449/#450/#481** are assigned to S63 and stay open until acceptance.
+Existing **#449/#450/#481** are accepted and closed. The initial noninteractive
+npm invocation suppressed browser approval and returned EOTP; an interactive
+terminal with `--auth-type=web` resolved it without requesting a numeric code.
+Learning **#295** preserves that workflow. CI's four backend and three PostgreSQL
+skips, twelve quarantined tests and two known legacy CMOS runner failures remain
+explicitly recorded; none was repaired or counted as passing.
 The other twelve rows remain outside, including P1 DeepSearch scope correction
 **#479**, whose worker fixture must precede TraceLab vendor parity. Sharing remains
 deferred. Aquex's hello forwarding is already accepted; its completion reply is
 prepared but unsent. The build scope includes package publication, the approved
 factual metadata correction and frontend acceptance. Cross-project messages,
 worker changes and paid research remain outside this sprint.
+
+### Follow-on — Sprint 64: Authored scope preview and result alignment (Active 2026-10-01)
+
+Derek requested TraceLab integration planning after DeepSearch returned the
+authored-scope correction. Decision **#595**, session **PS-2026-10-01-012**, and
+the [Sprint 64 handoff](../planning/sprint-64-HANDOFF.md) define a focused four-mission
+plan. CMOS holds the detailed criteria and dependencies. **S64-VENDOR started in build session PS-2026-10-01-013** from planning tip
+`f1a854e` in isolated `codex/sprint-64-build`. Follow Requires order; release
+and worker acceptance remain separate gates.
+
+| Mission | Planned outcome | Requires |
+| --- | --- | --- |
+| **S64-VENDOR** | Offline schema 1.2/revision 3 compiler resync and exact canonical fixture parity | — |
+| **S64-SCOPE** | Preserve exact URLs and typed scope through manual/Librarian authoring, REST and MCP previews | VENDOR |
+| **S64-RESULT** | Show planned limits and retained partial/failure verdicts without losing complete artifacts | SCOPE |
+| **S64-ACCEPT** | Integrated fixture, package and TraceLab serving acceptance; record the worker delivery gate | All three |
+
+DeepSearch's handoff **ad16f01d** names implementation **79ef848** and closeout
+**1c5d352**: locally implemented and verified, explicitly **not pushed, merged or
+deployed**. Planning verified 17 fixture files and six structural source files
+against their pinned commit. The canonical fixture is **8ca1ebfaa604dc7e**,
+not the historical executed contract. The [intake receipt](../reports/sprint-64/planning/intake.json)
+preserves source identities, delivery limitations and test disclosures.
+
+Only existing **#479** moves into S64. The eleven other carryovers remain outside.
+TraceLab can accept its integration against the deterministic fixture; full #479
+closure additionally needs separately evidenced DeepSearch runtime delivery and
+authorized required-run acceptance. No paid rerun, worker deployment, or outgoing
+coordination reply is part of this planning turn. S63 remains the last completed
+sprint until the first S64 mission starts. The build handoff preserves the accepted
+S63 receipts and reconciles main without application changes.
 
 ### Running alongside: the guest expansion track
 
@@ -413,6 +457,10 @@ Add to this list rather than resolving items silently.
 
 ## Change Log
 
+- **2026-10-01 UTC, Sprint 64 opened.** Session PS-2026-10-01-013 started VENDOR from `f1a854e`; fetched main has no newer changes outside the plan. CMOS identity synchronized to sprint-64-active.
+- **2026-10-01 UTC, Sprint 64 planning.** Decision #595 queues VENDOR → SCOPE → RESULT → ACCEPT for DeepSearch authored-scope parity. Verified the S94 local handoff's 17 fixture and six source hashes; worker rollout remains unproved. #479 is carried into S64, eleven other rows retain their scope, and S63 completed identity is preserved. The isolated planning branch reconciles current main with the later S63 closeout receipts; runtime implementation remains for a fresh build session.
+- **2026-10-01 UTC, Sprint 63 completed.** All three missions accepted. Interactive npm browser approval published 2.1.1; a fresh registry install matched the tested integrity and passed 63 real stdio checks with zero skips. Tag `tracelab-mcp-v2.1.1` identifies deployed merge `e716e34`. #449/#450/#481 closed; the twelve excluded rows retain ownership. Learning #295 corrects the earlier numeric-OTP assumption. Final receipts distinguish source CI and deployment from subsequent closeout-only commits.
+- **2026-10-01 UTC, Sprint 63 build checkpoint.** PUBLIC and CLEAN shipped in PR #412 (`e716e34`) with nine required checks passing. Both services serve that source; 42 authenticated read-only checks and five public production tests pass. Approved metadata applied; #449/#450 closed. RELEASE is blocked on npm EOTP and fresh registry acceptance; #481 and the twelve excluded rows stay open. Sprint identity remains active; no close claimed.
 - **2026-10-01 UTC, Sprint 63 opened.** Session PS-2026-10-01-008 started S63-PUBLIC from planning tip `c838140`; freshly fetched main remains `d7b8682`, registry latest remains 2.1.0 and the package matches its tag. Identity pointers synchronized; original checkout and user notes preserved. Publication and serving acceptance remain required for closeout.
 - **2026-10-01 UTC, Sprint 63 planning locked.** Decision #589: three Queued missions for package onboarding/metadata, confirmed frontend cleanup and release acceptance. Selected carry-forwards #449/#450/#481 remain open; twelve others retain their ownership. Fresh build begins from `codex/sprint-63-plan`, based on S62 closeout receipts `9caa93b`; no implementation started.
 
