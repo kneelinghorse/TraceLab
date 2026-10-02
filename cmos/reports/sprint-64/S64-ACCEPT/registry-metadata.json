@@ -1,0 +1,22 @@
+{
+  "version": "2.1.2",
+  "latest": "2.1.2",
+  "published_at": "2026-10-01T23:50:42.083Z",
+  "dist": {
+    "shasum": "852b6e54092e0030433102d6b456962110a35a39",
+    "tarball": "https://registry.npmjs.org/@aquex/tracelab-mcp/-/tracelab-mcp-2.1.2.tgz",
+    "fileCount": 24,
+    "integrity": "sha512-rar3fJUIfszvZuN05cBw0M0Cz/8+8zCPdJ57NJfmElKCjRO17t1GIw8pm5cz94QpQAAFSSKblUXQLTcfpExtFg==",
+    "signatures": [
+      {
+        "sig": "MEUCIQDDO1kK0AA5aOXwdjd/RP4jLWYFEXgHoK56B1jaNpQCiAIgL1UFn6xWxlM83TtltONAp7+q2yEKaKuq4T5nACKvj+s=",
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+      },
+      {
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+        "sig": "MEYCIQCDYfCp0QMmXlHET21XoDl7ZX+XsdpWm01+lcxHFeDe7AIhALa8Sb5znqr4/+QPCJr/TJ19nMURaexFaTDVhuLTjkxr"
+      }
+    ],
+    "unpackedSize": 370739
+  }
+}

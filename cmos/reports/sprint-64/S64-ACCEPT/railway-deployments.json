@@ -1,0 +1,16 @@
+[
+  {
+    "service": "TraceLab",
+    "deployment_id": "64b3ef6c-1ffd-459b-8f90-8fbdc15bbe5c",
+    "status": "SUCCESS",
+    "commit": "566a15c6cc3551d25d69aea0d958e32236401a8d",
+    "created_at": "2026-10-02T00:04:28.424Z"
+  },
+  {
+    "service": "frontend",
+    "deployment_id": "45a21f1c-428f-4a78-9a59-8c842b0c5dcb",
+    "status": "SUCCESS",
+    "commit": "566a15c6cc3551d25d69aea0d958e32236401a8d",
+    "created_at": "2026-10-02T00:04:28.424Z"
+  }
+]

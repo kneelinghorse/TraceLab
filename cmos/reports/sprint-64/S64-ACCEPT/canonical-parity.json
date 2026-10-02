@@ -1,0 +1,79 @@
+{
+  "fixture_version": "authored-scope-parity-v1",
+  "contract_id": "8ca1ebfaa604dc7e",
+  "canonical_sha256": "163e7af36080b8440afe55f501b023cb2e3aba84e1b8644298fc0784167b5cb6",
+  "schema": "1.2",
+  "semantic_compiler_revision": 3,
+  "source_manifest": {
+    "source_revision": "79ef84842fb84259bafe59924b21fe2f5ad05d7d",
+    "schema_version": "1.2",
+    "compiler_revision": 3,
+    "files": [
+      {
+        "upstream_path": "deepsearch/mission/compiler_provenance.py",
+        "upstream_sha256": "85bb7a28f4b460576c4c1e47920819c09f08ae1a48b1cc061f2e21f4f1d4d0a2",
+        "file": "compiler_provenance.py",
+        "vendored_sha256": "09510f6a0dd7904a13b4a87199548832664ca2512e5b167e7145f88428b3b143"
+      },
+      {
+        "upstream_path": "deepsearch/mission/contract.py",
+        "upstream_sha256": "e28d1c602b421a334e66b595c87427dbd85b176c41c636a308646a7b83f3c817",
+        "file": "contract.py",
+        "vendored_sha256": "1088e2b87863f96af1ca541c988feda804652bafdbb320c00930e4442fede305"
+      },
+      {
+        "upstream_path": "deepsearch/mission/scope.py",
+        "upstream_sha256": "7d102ac57b68cc772c1c57d2fa21c9d4c9cfef7873bacb14549e341c234db540",
+        "file": "scope.py",
+        "vendored_sha256": "2611191fb57cd63e0463ce71e7c7e57e0711495def022e8a2f779e3bae32a907"
+      },
+      {
+        "upstream_path": "deepsearch/mission/title_utils.py",
+        "upstream_sha256": "791b90fce5dc0d0e71fc81b81acb57be6ae126edfe2f58d29c62958d42bd8114",
+        "file": "title_utils.py",
+        "vendored_sha256": "5bb6cf5f41c91a4eeaaafd1286b4ac57a02e2799e1234216e8235eababd2fbeb"
+      },
+      {
+        "upstream_path": "deepsearch/agent/deliverable_schemas.py",
+        "upstream_sha256": "84a39bc568ca324fd9e0d83492a7042979319ddcb1cf9c18bee110a89638817b",
+        "file": "deliverable_schemas.py",
+        "vendored_sha256": "05ebd856ad6326a545b9019f31e70f17417f9bd5368a55c13fff54b9ff1ff5f9"
+      },
+      {
+        "upstream_path": "deepsearch/domain_policy.py",
+        "upstream_sha256": "5a1b45e72db2c63f09548b97a1d073c32c37c8e9cb191e484aa6cff0d5c8b85b",
+        "file": "domain_policy.py",
+        "vendored_sha256": "d8cc3e7ea0d815af651bc07e66315857b39729801a23599646d84505db9680f2"
+      }
+    ],
+    "adaptations": [
+      "Vendor attribution in module docstrings.",
+      "Structural imports rewritten to local relative imports.",
+      "Contract entrypoint defaults to none and rejects configured enrichment; preview passes none explicitly. Dormant upstream runtime helpers are not exposed or invoked.",
+      "Provenance hashes local structural files and verifies vendor-manifest.json; immutable source pin replaces observability/git/environment identity. Configured provenance resolution is disabled.",
+      "Ruff import sorting and explicit zip(strict=False) preserve upstream behavior while meeting local lint."
+    ],
+    "fixture_manifest_sha256": "db256e5821393ca9750b704714b8e76803e3e8f7de86255a6f83d9d7cc0114cc"
+  },
+  "fixtures_sha256": {
+    "22_sources-expected.json": "261a6790793d2efd3c8249b0fa84df4f0b0db462a0da144c698edad516b33772",
+    "22_sources-persisted.md": "7ca225b9645230ea578f4e2ecd99807f280bb56c44286c43aece97c5d04de90e",
+    "22_sources-pre-render.md": "aae0f63096fa6cfb646d81f1c784ecfbf088d1948d820acac4447d238e683f37",
+    "actor-system.txt": "7af608fd09031d1c02e32d1c54af93e234b3f219e06322fd3e7c796733ce36f2",
+    "actor-user.txt": "57e8feb1ac834b63394e17dfe2098c775da309f160e912d79d24333b49d9ae60",
+    "canonical-contract.json": "163e7af36080b8440afe55f501b023cb2e3aba84e1b8644298fc0784167b5cb6",
+    "canonical-input.json": "c7644ceb7d0dc9b194a67a5b403a93606c8870515231581e07f77c123c8e2c28",
+    "compliant-expected.json": "5a1a5885de2e6dc82c8ccc9238604d051bade29d2e61a66a6f96de04b7920725",
+    "compliant-persisted.md": "29a4eee9e63efe0b2e9f6210ef5ed78d41abd08c211dbbdbe2db4410d90ab1be",
+    "compliant-pre-render.md": "aae0f63096fa6cfb646d81f1c784ecfbf088d1948d820acac4447d238e683f37",
+    "partial-expected.json": "3fd36c3e94c123c9a074d6d4ecf487a48ca5c1272fecd0d38457b14f87c88ed3",
+    "partial-persisted.md": "37c2a1d258f007c7a9d35e22434492967bc34d67c08c592ca18451330e625564",
+    "partial-pre-render.md": "0bc4f19f8951307827919834c258d7b49be458c36885d4514a4f77eaf6e89fd0",
+    "postgresql-authored.json": "310a0cdb38196e1ae1fc8e9ec0cee7eaef3206a98d0b51a8f176ef5927c05784",
+    "too_long-expected.json": "6d82a0a562b32fed266240ed8a3fc646797c7750fea455a34a9ab4b857c52437",
+    "too_long-persisted.md": "9d7d41e4a06b5ae2961ca3516154a8537af982a089f74cf41520ef5bf0dd9621",
+    "too_long-pre-render.md": "d81ac3ebb2a317c29cb24f4a2a919b49567c6fce2bef846025c3f23fc47e0434"
+  },
+  "fidelity": "structural_only",
+  "worker_delivery_proven": false
+}

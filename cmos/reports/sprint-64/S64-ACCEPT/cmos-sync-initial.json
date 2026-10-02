@@ -1,0 +1,82 @@
+{
+  "backfill": {
+    "success": true,
+    "data": {
+      "mode": "backfill",
+      "dryRun": false,
+      "totalEvents": 3695,
+      "pushed": 3695,
+      "failed": 0,
+      "skipped": 0,
+      "deduped": 0,
+      "breakdown": {
+        "sprints": 65,
+        "missions": 431,
+        "sessions": 230,
+        "decisions": 599,
+        "learnings": 299,
+        "dependencies": 232
+      },
+      "cursor": null,
+      "previousCursor": "2026-05-29T20:50:07.434Z",
+      "message": "File-based sync complete (10678ms): 3695 record(s) synced. Sprints: 65, missions: 431, sessions: 230, decisions: 599, learnings: 299."
+    }
+  },
+  "reconciliation": {
+    "success": true,
+    "data": {
+      "tables": [
+        {
+          "table": "sprints",
+          "sqliteCount": 65,
+          "pgCount": 65,
+          "match": true,
+          "delta": 0
+        },
+        {
+          "table": "missions",
+          "sqliteCount": 431,
+          "pgCount": 431,
+          "match": true,
+          "delta": 0
+        },
+        {
+          "table": "sessions",
+          "sqliteCount": 230,
+          "pgCount": 230,
+          "match": true,
+          "delta": 0
+        },
+        {
+          "table": "strategic_decisions",
+          "sqliteCount": 599,
+          "pgCount": 599,
+          "match": true,
+          "delta": 0
+        },
+        {
+          "table": "learnings",
+          "sqliteCount": 299,
+          "pgCount": 299,
+          "match": true,
+          "delta": 0
+        },
+        {
+          "table": "mission_dependencies",
+          "sqliteCount": 232,
+          "pgCount": 232,
+          "match": true,
+          "delta": 0
+        }
+      ],
+      "allMatch": true,
+      "totalSqlite": 1856,
+      "totalPg": 1856,
+      "projectScoped": true,
+      "projectSlug": "tracelab",
+      "syncLogEntries": 294,
+      "failedEntries": 0,
+      "lastSyncAt": "2026-10-01T23:30:29.142Z"
+    }
+  }
+}

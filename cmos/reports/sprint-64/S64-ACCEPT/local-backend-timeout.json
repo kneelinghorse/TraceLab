@@ -1,0 +1,10 @@
+{
+  "status": "timed_out_not_accepted",
+  "command": "scripts/run_pytest.py --timeout-seconds 2100 --grace-seconds 20 -- --ignore=tests/integration --junitxml=test-results/s64-backend.xml -q with the unchanged 12-node CI quarantine",
+  "passed_before_interruption": 1200,
+  "skipped_before_interruption": 2,
+  "quarantine_deselected": 12,
+  "elapsed_seconds": 2110.24,
+  "cleanup": "SIGINT then process-group kill after grace expired",
+  "disposition": "Incomplete local run; not counted as a passing full suite. The final required CI backend-suite must complete before release acceptance."
+}

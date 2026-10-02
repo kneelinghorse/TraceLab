@@ -1,0 +1,90 @@
+{
+  "tool": "playwright",
+  "generatedAt": "2026-10-02T00:13:54.886Z",
+  "completedAt": "2026-10-02T00:14:00.525Z",
+  "status": "passed",
+  "summary": {
+    "total": 5,
+    "expected": 5,
+    "passed": 5,
+    "failed": 0,
+    "skipped": 0,
+    "interrupted": 0,
+    "durationSeconds": 5.639,
+    "retries": 0
+  },
+  "environment": {
+    "node": "v24.6.0",
+    "ci": {
+      "provider": null
+    },
+    "projects": [
+      "chromium"
+    ],
+    "browsers": []
+  },
+  "tests": [
+    {
+      "title": "API health endpoint confirms production authorization and reconciler freshness",
+      "file": "frontend/tests/e2e/production-smoke.spec.ts",
+      "line": 33,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 460,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "/admin/users is deployed as its own Next page",
+      "file": "frontend/tests/e2e/production-smoke.spec.ts",
+      "line": 23,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 1342,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "/admin/spaces is deployed as its own Next page",
+      "file": "frontend/tests/e2e/production-smoke.spec.ts",
+      "line": 23,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 999,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "missions route responds at the public domain",
+      "file": "frontend/tests/e2e/production-smoke.spec.ts",
+      "line": 17,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 1437,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "every maintained migration preserves its destination and query parameters",
+      "file": "frontend/tests/e2e/route-migration.spec.ts",
+      "line": 5,
+      "column": 5,
+      "status": "passed",
+      "durationMs": 2357,
+      "annotations": [],
+      "attachments": [
+        {
+          "name": "route-migration-coverage",
+          "contentType": "application/json",
+          "path": "frontend/test-results/route-migration-every-main-a90a2-nation-and-query-parameters-chromium/attachments/route-migration-coverage-c04242037ac4f0478dd7a511f99fcf819a061574.json"
+        }
+      ],
+      "errors": []
+    }
+  ],
+  "artifactPath": "artifacts/releases/s64-production-smoke-telemetry.json"
+}

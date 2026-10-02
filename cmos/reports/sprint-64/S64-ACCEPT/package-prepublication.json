@@ -1,0 +1,14 @@
+{
+  "status": "prepublication_verified",
+  "version": "2.1.2",
+  "source_commit": "31e874b",
+  "tarball": "artifacts/releases/aquex-tracelab-mcp-2.1.2.tgz",
+  "sha256": "02423e9218f43a02f3b8381d6d2eee5937acc7050091982ba0408c92032911ed",
+  "shasum": "852b6e54092e0030433102d6b456962110a35a39",
+  "integrity": "sha512-rar3fJUIfszvZuN05cBw0M0Cz/8+8zCPdJ57NJfmElKCjRO17t1GIw8pm5cz94QpQAAFSSKblUXQLTcfpExtFg==",
+  "files": 24,
+  "dry_run_matches": true,
+  "installed_stdio_checks": 70,
+  "registry_published": false,
+  "provider_execution": 0
+}

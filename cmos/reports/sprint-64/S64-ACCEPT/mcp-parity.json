@@ -1,0 +1,23 @@
+{
+  "totals": {
+    "operations": 118,
+    "live": 113,
+    "dead": 5,
+    "tools": 9,
+    "actions": 50,
+    "classifications": {
+      "covered": 21,
+      "partial": 0,
+      "closed-MCP-1": 17,
+      "closed-MCP-2": 7,
+      "rest-only-by-design": 68,
+      "deferred-MCP-2": 0,
+      "needs-derek": 0,
+      "dead-client-code": 5
+    }
+  },
+  "errors": [],
+  "full_report_path": "artifacts/releases/s64-mcp-parity.json",
+  "full_report_sha256": "642f448202eb7b8a52ece023a87438cfa7b9b370ce2e5d53de5333e883c54393",
+  "manifest": "cmos/contracts/mcp-parity-manifest.json"
+}

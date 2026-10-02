@@ -1,0 +1,779 @@
+{
+  "passed": 70,
+  "generatedLinks": 73,
+  "httpRequests": 71,
+  "checks": [
+    {
+      "tool": "search",
+      "action": "knowledge",
+      "links": 1,
+      "http": [
+        "POST /retrieval/search"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "project",
+      "action": "list",
+      "links": 1,
+      "http": [
+        "GET /projects"
+      ],
+      "queries": [
+        "page=1&page_size=20"
+      ]
+    },
+    {
+      "tool": "project",
+      "action": "create",
+      "links": 1,
+      "http": [
+        "POST /projects"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "project",
+      "action": "update",
+      "links": 1,
+      "http": [
+        "PUT /projects/00000000-0000-4000-8000-000000000001"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "project",
+      "action": "stats",
+      "links": 1,
+      "http": [
+        "GET /projects/00000000-0000-4000-8000-000000000001/stats"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "collection",
+      "action": "list",
+      "links": 1,
+      "http": [
+        "GET /collections"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "collection",
+      "action": "get",
+      "links": 2,
+      "http": [
+        "GET /collections/00000000-0000-4000-8000-000000000005"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "collection",
+      "action": "create",
+      "links": 1,
+      "http": [
+        "POST /collections"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "collection",
+      "action": "add",
+      "links": 1,
+      "http": [
+        "POST /collections/00000000-0000-4000-8000-000000000005/chunks"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "collection",
+      "action": "synthesize",
+      "links": 2,
+      "http": [
+        "POST /synthesize"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "collection",
+      "action": "export",
+      "links": 0,
+      "http": [
+        "GET /collections/00000000-0000-4000-8000-000000000005/export"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "report",
+      "action": "list",
+      "links": 1,
+      "http": [
+        "GET /reports"
+      ],
+      "queries": [
+        "page=1&page_size=20"
+      ]
+    },
+    {
+      "tool": "report",
+      "action": "get",
+      "links": 1,
+      "http": [
+        "GET /reports/00000000-0000-4000-8000-000000000004"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "report",
+      "action": "create",
+      "links": 1,
+      "http": [
+        "POST /reports"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "report",
+      "action": "export",
+      "links": 0,
+      "http": [
+        "GET /reports/00000000-0000-4000-8000-000000000004"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "document",
+      "action": "get_content",
+      "links": 1,
+      "http": [
+        "GET /documents/00000000-0000-4000-8000-000000000002",
+        "GET /documents/00000000-0000-4000-8000-000000000002/chunks"
+      ],
+      "queries": [
+        "",
+        "page=1&page_size=20"
+      ]
+    },
+    {
+      "tool": "document",
+      "action": "upload",
+      "links": 1,
+      "http": [
+        "POST /documents/upload"
+      ],
+      "queries": [
+        "project_id=00000000-0000-4000-8000-000000000001"
+      ]
+    },
+    {
+      "tool": "mission",
+      "action": "list",
+      "links": 1,
+      "http": [
+        "GET /missions"
+      ],
+      "queries": [
+        "page=1&page_size=20"
+      ]
+    },
+    {
+      "tool": "mission",
+      "action": "get",
+      "links": 1,
+      "http": [
+        "GET /missions/00000000-0000-4000-8000-000000000003"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "mission",
+      "action": "create",
+      "links": 1,
+      "http": [
+        "POST /missions"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "mission",
+      "action": "update",
+      "links": 1,
+      "http": [
+        "PATCH /missions/00000000-0000-4000-8000-000000000003"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "mission",
+      "action": "get",
+      "links": 0,
+      "http": [
+        "GET /missions/00000000-0000-4000-8000-000000000003"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "mission",
+      "action": "get",
+      "links": 0,
+      "http": [
+        "GET /missions/00000000-0000-4000-8000-000000000003"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "mission",
+      "action": "get",
+      "links": 0,
+      "http": [
+        "GET /missions/00000000-0000-4000-8000-000000000003"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "mission",
+      "action": "get",
+      "links": 0,
+      "http": [
+        "GET /missions/00000000-0000-4000-8000-000000000003"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "mission_execution",
+      "action": "submit",
+      "links": 1,
+      "http": [
+        "POST /missions/00000000-0000-4000-8000-000000000003/submit"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "mission_execution",
+      "action": "status",
+      "links": 1,
+      "http": [
+        "GET /missions/00000000-0000-4000-8000-000000000003/status"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "mission",
+      "action": "create",
+      "links": 0,
+      "http": [
+        "POST /missions"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "mission",
+      "action": "update",
+      "links": 0,
+      "http": [
+        "PATCH /missions/00000000-0000-4000-8000-000000000003"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "mission",
+      "action": "update",
+      "links": 0,
+      "http": [
+        "PATCH /missions/00000000-0000-4000-8000-000000000003"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "mission_execution",
+      "action": "preview",
+      "links": 1,
+      "http": [
+        "GET /missions/00000000-0000-4000-8000-000000000003/contract-preview"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "evidence",
+      "action": "list",
+      "links": 2,
+      "http": [
+        "GET /evidence"
+      ],
+      "queries": [
+        "project_id=00000000-0000-4000-8000-000000000001&page=1&page_size=20"
+      ]
+    },
+    {
+      "tool": "evidence",
+      "action": "search",
+      "links": 1,
+      "http": [
+        "GET /evidence/search"
+      ],
+      "queries": [
+        "project_id=00000000-0000-4000-8000-000000000001&q=claim&page=1&page_size=20"
+      ]
+    },
+    {
+      "tool": "evidence",
+      "action": "capture",
+      "links": 1,
+      "http": [
+        "POST /evidence/capture"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "evidence",
+      "action": "note",
+      "links": 1,
+      "http": [
+        "PUT /evidence/notes/working"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "evidence",
+      "action": "promote",
+      "links": 2,
+      "http": [
+        "POST /evidence/promote"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "home",
+      "action": "snapshot",
+      "links": 7,
+      "http": [
+        "GET /home"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "home",
+      "action": "favorites",
+      "links": 1,
+      "http": [
+        "GET /home/favorites"
+      ],
+      "queries": [
+        "page=2&page_size=3&project_id=00000000-0000-4000-8000-000000000001"
+      ]
+    },
+    {
+      "tool": "search",
+      "action": "navigate",
+      "links": 1,
+      "http": [
+        "GET /navigation/search"
+      ],
+      "queries": [
+        "q=A+%26+B&entity_type=document&page=2&page_size=3"
+      ]
+    },
+    {
+      "tool": "evidence",
+      "action": "get",
+      "links": 2,
+      "http": [
+        "GET /evidence/00000000-0000-4000-8000-000000000006"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "document",
+      "action": "list",
+      "links": 1,
+      "http": [
+        "GET /documents"
+      ],
+      "queries": [
+        "project_id=00000000-0000-4000-8000-000000000001&processed=false&search=A+%26+B&page=2&page_size=3"
+      ]
+    },
+    {
+      "tool": "project",
+      "action": "get",
+      "links": 1,
+      "http": [
+        "GET /projects/00000000-0000-4000-8000-000000000001"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "collection",
+      "action": "documents",
+      "links": 2,
+      "http": [
+        "GET /collections/00000000-0000-4000-8000-000000000005/documents"
+      ],
+      "queries": [
+        "page=2&page_size=3"
+      ]
+    },
+    {
+      "tool": "collection",
+      "action": "mission_seed",
+      "links": 3,
+      "http": [
+        "GET /collections/00000000-0000-4000-8000-000000000005/mission-seed"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "mission_execution",
+      "action": "logs",
+      "links": 2,
+      "http": [
+        "GET /missions/00000000-0000-4000-8000-000000000003/logs"
+      ],
+      "queries": [
+        "limit=3"
+      ]
+    },
+    {
+      "tool": "mission_execution",
+      "action": "events",
+      "links": 1,
+      "http": [
+        "GET /missions/events/recent"
+      ],
+      "queries": [
+        "mission_id=00000000-0000-4000-8000-000000000003&limit=3"
+      ]
+    },
+    {
+      "tool": "mission",
+      "action": "list",
+      "links": 0,
+      "http": [
+        "GET /missions"
+      ],
+      "queries": [
+        "page=2&page_size=3&project_id=00000000-0000-4000-8000-000000000001&sort=updated_desc"
+      ]
+    },
+    {
+      "tool": "collection",
+      "action": "list",
+      "links": 0,
+      "http": [
+        "GET /collections"
+      ],
+      "queries": [
+        "project_id=00000000-0000-4000-8000-000000000001&page=2&page_size=3"
+      ]
+    },
+    {
+      "tool": "collection",
+      "action": "get",
+      "links": 0,
+      "http": [
+        "GET /collections/00000000-0000-4000-8000-000000000005"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "collection",
+      "action": "create",
+      "links": 0,
+      "http": [
+        "POST /collections"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "evidence",
+      "action": "list",
+      "links": 0,
+      "http": [
+        "GET /evidence"
+      ],
+      "queries": [
+        "project_id=00000000-0000-4000-8000-000000000001&tag=A+%26+B&created_from=2026-09-01&created_until=2026-09-14&source_id=00000000-0000-4000-8000-000000000006&report_id=00000000-0000-4000-8000-000000000004&page=1&page_size=20"
+      ]
+    },
+    {
+      "tool": "evidence",
+      "action": "search",
+      "links": 0,
+      "http": [
+        "GET /evidence/search"
+      ],
+      "queries": [
+        "project_id=00000000-0000-4000-8000-000000000001&q=A+%26+B&tag=A+%26+B&created_from=2026-09-01&created_until=2026-09-14&source_id=00000000-0000-4000-8000-000000000006&report_id=00000000-0000-4000-8000-000000000004&page=1&page_size=20"
+      ]
+    },
+    {
+      "tool": "evidence",
+      "action": "list",
+      "links": 0,
+      "http": [
+        "GET /evidence"
+      ],
+      "queries": [
+        "project_id=00000000-0000-4000-8000-000000000001&tag=A+%26+B&created_from=2026-09-01&created_until=2026-09-14&source_id=00000000-0000-4000-8000-000000000006&document_id=00000000-0000-4000-8000-000000000002&page=1&page_size=20"
+      ]
+    },
+    {
+      "tool": "evidence",
+      "action": "search",
+      "links": 0,
+      "http": [
+        "GET /evidence/search"
+      ],
+      "queries": [
+        "project_id=00000000-0000-4000-8000-000000000001&q=A+%26+B&tag=A+%26+B&created_from=2026-09-01&created_until=2026-09-14&source_id=00000000-0000-4000-8000-000000000006&document_id=00000000-0000-4000-8000-000000000002&page=1&page_size=20"
+      ]
+    },
+    {
+      "tool": "report",
+      "action": "export",
+      "links": 0,
+      "http": [
+        "GET /reports/00000000-0000-4000-8000-000000000004/export"
+      ],
+      "queries": [
+        "format=md"
+      ]
+    },
+    {
+      "tool": "report",
+      "action": "export",
+      "links": 0,
+      "http": [
+        "GET /reports/00000000-0000-4000-8000-000000000004/export"
+      ],
+      "queries": [
+        "format=json"
+      ]
+    },
+    {
+      "tool": "report",
+      "action": "export",
+      "links": 0,
+      "http": [
+        "GET /reports/00000000-0000-4000-8000-000000000004/export"
+      ],
+      "queries": [
+        "format=txt"
+      ]
+    },
+    {
+      "tool": "search",
+      "action": "pedr",
+      "links": 1,
+      "http": [
+        "POST /pedr/search"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "search",
+      "action": "pedr",
+      "links": 1,
+      "http": [
+        "POST /pedr/search"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "search",
+      "action": "knowledge",
+      "links": 0,
+      "http": [
+        "POST /retrieval/search"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "mission_execution",
+      "action": "cancel",
+      "links": 1,
+      "http": [
+        "PATCH /missions/00000000-0000-4000-8000-000000000003"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "mission_execution",
+      "action": "promote_report",
+      "links": 2,
+      "http": [
+        "POST /missions/00000000-0000-4000-8000-000000000003/promote-report"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "document",
+      "action": "process",
+      "links": 1,
+      "http": [
+        "POST /documents/00000000-0000-4000-8000-000000000002/process"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "collection",
+      "action": "update",
+      "links": 1,
+      "http": [
+        "PUT /collections/00000000-0000-4000-8000-000000000005"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "collection",
+      "action": "add_document",
+      "links": 2,
+      "http": [
+        "POST /collections/00000000-0000-4000-8000-000000000005/documents"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "report",
+      "action": "update",
+      "links": 1,
+      "http": [
+        "PUT /reports/00000000-0000-4000-8000-000000000004"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "project",
+      "action": "neighborhood",
+      "links": 6,
+      "http": [
+        "GET /graph/neighborhood"
+      ],
+      "queries": [
+        "root_type=project&root_id=00000000-0000-4000-8000-000000000001&depth=2&per_relation_limit=12&max_nodes=60"
+      ]
+    },
+    {
+      "tool": "home",
+      "action": "activity",
+      "links": 3,
+      "http": [
+        "GET /activity"
+      ],
+      "queries": [
+        "page=2&page_size=3"
+      ]
+    },
+    {
+      "tool": "home",
+      "action": "activity_summary",
+      "links": 0,
+      "http": [
+        "GET /activity/summary"
+      ],
+      "queries": [
+        ""
+      ]
+    },
+    {
+      "tool": "search",
+      "action": "ask",
+      "links": 2,
+      "http": [
+        "POST /search/ask"
+      ],
+      "queries": [
+        ""
+      ]
+    }
+  ]
+}
