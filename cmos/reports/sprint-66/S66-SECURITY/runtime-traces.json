@@ -1,0 +1,13 @@
+{
+  "traces": 35,
+  "external_build_dependency_matches": {
+    "braces": [],
+    "chokidar": [],
+    "fast-glob": [],
+    "micromatch": [],
+    "postcss-nested": [],
+    "postcss-selector-parser": [],
+    "tailwindcss": [],
+    "@oods/tw-variants": []
+  }
+}

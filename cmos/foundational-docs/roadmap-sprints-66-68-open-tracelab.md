@@ -174,6 +174,8 @@ Added with Derek's approval on 2026-10-13 after FRONT's clean install reported 3
 - A fresh production dependency install/build passes, and read-only production smoke on the merged commit verifies the deployed Next.js version and existing UI behavior.
 - The receipt and roadmap record actual versions, audit changes, validation and any bounded carry-forward.
 
+**Implementation and residual disposition (2026-10-13, decision #619):** Next.js 16.3.8, sharp 0.35.5, matching Next ESLint config, Vitest 4.1.11 and Vite 7.3.7, plus compatible transitive fixes. Full audit falls from 37 affected packages (3 critical) to 10 (7 high, 3 moderate); production-only falls from 15 to 7 (5 high, 2 moderate). The remaining entries all trace to two build-tool advisories: unpatched `braces` and selector-parser 6.x in Tailwind 3/typography. No affected external package appears in the 35 server traces, and source usage is confined to build configurations operating on repository input. These are documented build-only dispositions, **not a zero-finding audit**. Their removal is a bounded Sprint 68 follow-up below. No forced Tailwind migration, OODS replacement or audit suppression. Local validation: 383 unit tests, 97 browser tests, 78 mission API tests, lint, types and a clean production build passed. Merge and deployed-version verification belong in the Reasonbook completion record.
+
 ### S66-DECOUPLE — The app stops writing into the record folder
 
 Closes #380. It handles the application half of #487's part 3; the folder move itself is S68-RB4.
@@ -297,6 +299,7 @@ Sprint 67 takes Derek's direct UX and design feedback, plus #406: DeepSearch cla
     This list is a starting point. The mission is done when `git grep cmos/` finds only historical text kept on purpose.
   - Record counts must match before and after, and CI must stay green.
 - What people hit at the share-out.
+- Recheck the two build-tool advisories carried from S66-SECURITY: `braces` GHSA-vfj7-8cjw-p6xm has no published patch as of 2026-10-13; selector-parser GHSA-rj75-hqrm-r3gf is fixed in 7.1.6, outside Tailwind 3/typography's declared 6.x ranges. Prefer upstream compatible fixes; otherwise scope a deliberate toolchain migration with OODS compatibility and theme/browser verification. Revisit sooner if a feature would parse user-controlled CSS or glob patterns. The security receipt preserves the nonzero audit counts and dependency paths.
 - DeepSearch's opening, if it is not done by Monday. That work is owned by DeepSearch, as are the quality follow-ups named at the Sprint 64 and 65 closes.
 
 ---
@@ -360,6 +363,7 @@ Add to this list rather than resolving items silently. Questions 1–4 were answ
 
 ## Change Log
 
+- **2026-10-13 UTC, frontend security update validated locally.** Selected patched runtime and test-tooling versions; all existing local gates pass. Decision #619 records the two remaining build-only advisory dispositions and a bounded Sprint 68 follow-up. The npm audit remains nonzero; no findings are suppressed.
 - **2026-10-13 UTC, clean-install security findings added to Sprint 66.** Derek approved S66-SECURITY immediately after FRONT and before DECOUPLE, TESTS and MCP (decision #618). The clean install found 37 frontend dependency advisories, including critical Next.js and test-tooling findings. Version applicability was checked against maintainer advisories; exploitability on TraceLab was not established. FRONT's quickstart now explicitly isolates Compose containers and volumes, following an initial attempt that reused and migrated an existing local database (decision #617). The second clone passed from empty volumes through UI login and API health.
 - **2026-10-13 UTC, Derek's answers; Sprint 66 opened.**
   - Answers: merge (PR #416 merged as `7ee7c8c`); license MIT (decision #613, correcting #612's stored approval words); history kept, current tree cleaned; messages to any project allowed; Monday is an invite-only demo for 5–10 people (decision #614).

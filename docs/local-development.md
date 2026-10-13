@@ -7,7 +7,7 @@ local developer workflow so every contributor can bootstrap the stack with a sin
 
 - Docker Desktop 4.x (or Docker Engine + Compose v2)
 - Python 3.11 (only required if you plan to run FastAPI outside Docker)
-- Node.js 22+ and npm (for the frontend dev server)
+- Node.js 22.12+ and npm (for the frontend dev server)
 - 10 GB of free disk space for Docker volumes / node modules
 
 Verify requirements:
@@ -15,7 +15,7 @@ Verify requirements:
 ```bash
 docker --version
 docker compose version  # falls back to docker-compose if needed
-node --version          # >= 22.x
+node --version          # >= 22.12
 npm --version
 ```
 

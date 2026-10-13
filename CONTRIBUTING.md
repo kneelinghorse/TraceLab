@@ -29,7 +29,7 @@ The full serialized backend lane and its documented quarantine are defined in [b
 
 ## Frontend
 
-Use Node.js 22 or newer:
+Use Node.js 22.12 or newer:
 
 ```bash
 cd frontend
@@ -41,6 +41,8 @@ npm run build
 ```
 
 When changing dependencies, run `npm install` in `frontend/` and commit `package-lock.json` with `package.json`; deployment uses a locked install.
+
+If an older npm crashes with `Cannot read properties of null (reading 'edgesOut')` while resolving Vitest's optional peers, run `npx --yes npm@11 install` to regenerate the lockfile. This is an [npm resolver issue](https://github.com/npm/cli/issues/9787); do not bypass peer checks with `--legacy-peer-deps` or force unrelated upgrades. Fresh `npm install` and `npm ci` with the committed lockfile are verified on Node 22.23.3 / npm 10.9.9.
 
 Browser checks run against the production build. Start it in one terminal:
 

@@ -1,0 +1,606 @@
+{
+  "summary": {
+    "total": 97,
+    "expected": 97,
+    "passed": 97,
+    "failed": 0,
+    "skipped": 0,
+    "interrupted": 0,
+    "durationSeconds": 140.054,
+    "retries": 0
+  },
+  "environment": {
+    "node": "v22.23.3",
+    "ci": {
+      "provider": null
+    },
+    "projects": [
+      "chromium"
+    ],
+    "browsers": []
+  },
+  "tests": [
+    {
+      "title": "Home stays at the root and its search opens the shell palette",
+      "file": "frontend/tests/e2e/app-shell.spec.ts",
+      "status": "passed",
+      "durationMs": 688
+    },
+    {
+      "title": "Home keeps viewed activity rows at AA contrast in the light theme",
+      "file": "frontend/tests/e2e/app-shell.spec.ts",
+      "status": "passed",
+      "durationMs": 329
+    },
+    {
+      "title": "document tables scroll sideways on a phone instead of breaking words apart",
+      "file": "frontend/tests/e2e/app-shell.spec.ts",
+      "status": "passed",
+      "durationMs": 243
+    },
+    {
+      "title": "markdown table headers are exposed as column headers to assistive technology",
+      "file": "frontend/tests/e2e/app-shell.spec.ts",
+      "status": "passed",
+      "durationMs": 239
+    },
+    {
+      "title": "theme persists through hydration and OS changes without a wrong-color frame",
+      "file": "frontend/tests/e2e/app-shell.spec.ts",
+      "status": "passed",
+      "durationMs": 406
+    },
+    {
+      "title": "the head bootstrap resolves stored system to System dark before delayed hydration",
+      "file": "frontend/tests/e2e/app-shell.spec.ts",
+      "status": "passed",
+      "durationMs": 273
+    },
+    {
+      "title": "the head bootstrap resolves stored hc to System dark before delayed hydration",
+      "file": "frontend/tests/e2e/app-shell.spec.ts",
+      "status": "passed",
+      "durationMs": 271
+    },
+    {
+      "title": "Light persists across reload and OS changes with native keyboard focus",
+      "file": "frontend/tests/e2e/app-shell.spec.ts",
+      "status": "passed",
+      "durationMs": 209
+    },
+    {
+      "title": "mobile drawer traps focus, closes with Escape, and returns focus to its trigger",
+      "file": "frontend/tests/e2e/app-shell.spec.ts",
+      "status": "passed",
+      "durationMs": 347
+    },
+    {
+      "title": "command palette submits a real search request and supports keyboard dismissal",
+      "file": "frontend/tests/e2e/app-shell.spec.ts",
+      "status": "passed",
+      "durationMs": 547
+    },
+    {
+      "title": "open modal surfaces meet the same axe severity and landmark gates",
+      "file": "frontend/tests/e2e/app-shell.spec.ts",
+      "status": "passed",
+      "durationMs": 405
+    },
+    {
+      "title": "login and registration share accessible light surfaces at 390px",
+      "file": "frontend/tests/e2e/app-shell.spec.ts",
+      "status": "passed",
+      "durationMs": 328
+    },
+    {
+      "title": "login and registration share accessible light surfaces at 1440px",
+      "file": "frontend/tests/e2e/app-shell.spec.ts",
+      "status": "passed",
+      "durationMs": 350
+    },
+    {
+      "title": "login and registration share accessible dark surfaces at 390px",
+      "file": "frontend/tests/e2e/app-shell.spec.ts",
+      "status": "passed",
+      "durationMs": 324
+    },
+    {
+      "title": "login and registration share accessible dark surfaces at 1440px",
+      "file": "frontend/tests/e2e/app-shell.spec.ts",
+      "status": "passed",
+      "durationMs": 354
+    },
+    {
+      "title": "authored scope four outcomes, preview and retained exports light 390",
+      "file": "frontend/tests/e2e/authored-scope.spec.ts",
+      "status": "passed",
+      "durationMs": 2376
+    },
+    {
+      "title": "authored scope four outcomes, preview and retained exports light 820",
+      "file": "frontend/tests/e2e/authored-scope.spec.ts",
+      "status": "passed",
+      "durationMs": 2450
+    },
+    {
+      "title": "authored scope four outcomes, preview and retained exports light 1440",
+      "file": "frontend/tests/e2e/authored-scope.spec.ts",
+      "status": "passed",
+      "durationMs": 2502
+    },
+    {
+      "title": "authored scope four outcomes, preview and retained exports dark 390",
+      "file": "frontend/tests/e2e/authored-scope.spec.ts",
+      "status": "passed",
+      "durationMs": 2533
+    },
+    {
+      "title": "authored scope four outcomes, preview and retained exports dark 820",
+      "file": "frontend/tests/e2e/authored-scope.spec.ts",
+      "status": "passed",
+      "durationMs": 2647
+    },
+    {
+      "title": "authored scope four outcomes, preview and retained exports dark 1440",
+      "file": "frontend/tests/e2e/authored-scope.spec.ts",
+      "status": "passed",
+      "durationMs": 2483
+    },
+    {
+      "title": "reviewed Librarian scope save, retry and manual edit light 390",
+      "file": "frontend/tests/e2e/authored-scope.spec.ts",
+      "status": "passed",
+      "durationMs": 2700
+    },
+    {
+      "title": "reviewed Librarian scope save, retry and manual edit light 820",
+      "file": "frontend/tests/e2e/authored-scope.spec.ts",
+      "status": "passed",
+      "durationMs": 1711
+    },
+    {
+      "title": "reviewed Librarian scope save, retry and manual edit light 1440",
+      "file": "frontend/tests/e2e/authored-scope.spec.ts",
+      "status": "passed",
+      "durationMs": 1745
+    },
+    {
+      "title": "reviewed Librarian scope save, retry and manual edit dark 390",
+      "file": "frontend/tests/e2e/authored-scope.spec.ts",
+      "status": "passed",
+      "durationMs": 2711
+    },
+    {
+      "title": "reviewed Librarian scope save, retry and manual edit dark 820",
+      "file": "frontend/tests/e2e/authored-scope.spec.ts",
+      "status": "passed",
+      "durationMs": 1681
+    },
+    {
+      "title": "reviewed Librarian scope save, retry and manual edit dark 1440",
+      "file": "frontend/tests/e2e/authored-scope.spec.ts",
+      "status": "passed",
+      "durationMs": 1639
+    },
+    {
+      "title": "collection context, reviewed seed and evidence citations in light at 390",
+      "file": "frontend/tests/e2e/collection-context.spec.ts",
+      "status": "passed",
+      "durationMs": 2875
+    },
+    {
+      "title": "collection context, reviewed seed and evidence citations in light at 820",
+      "file": "frontend/tests/e2e/collection-context.spec.ts",
+      "status": "passed",
+      "durationMs": 2942
+    },
+    {
+      "title": "collection context, reviewed seed and evidence citations in light at 1440",
+      "file": "frontend/tests/e2e/collection-context.spec.ts",
+      "status": "passed",
+      "durationMs": 3074
+    },
+    {
+      "title": "collection context, reviewed seed and evidence citations in dark at 390",
+      "file": "frontend/tests/e2e/collection-context.spec.ts",
+      "status": "passed",
+      "durationMs": 2927
+    },
+    {
+      "title": "collection context, reviewed seed and evidence citations in dark at 820",
+      "file": "frontend/tests/e2e/collection-context.spec.ts",
+      "status": "passed",
+      "durationMs": 2937
+    },
+    {
+      "title": "collection context, reviewed seed and evidence citations in dark at 1440",
+      "file": "frontend/tests/e2e/collection-context.spec.ts",
+      "status": "passed",
+      "durationMs": 3098
+    },
+    {
+      "title": "keyboard root selection, depth, every list control and browser Back preserve the neighborhood",
+      "file": "frontend/tests/e2e/graph.spec.ts",
+      "status": "passed",
+      "durationMs": 728
+    },
+    {
+      "title": "the complete light graph and root picker remain accessible at 1440px",
+      "file": "frontend/tests/e2e/graph.spec.ts",
+      "status": "passed",
+      "durationMs": 773
+    },
+    {
+      "title": "the complete light graph and root picker remain accessible at 390px",
+      "file": "frontend/tests/e2e/graph.spec.ts",
+      "status": "passed",
+      "durationMs": 971
+    },
+    {
+      "title": "the complete dark graph and root picker remain accessible at 1440px",
+      "file": "frontend/tests/e2e/graph.spec.ts",
+      "status": "passed",
+      "durationMs": 774
+    },
+    {
+      "title": "the complete dark graph and root picker remain accessible at 390px",
+      "file": "frontend/tests/e2e/graph.spec.ts",
+      "status": "passed",
+      "durationMs": 941
+    },
+    {
+      "title": "all six URL root types reach the same graph endpoint and canonical object link",
+      "file": "frontend/tests/e2e/graph.spec.ts",
+      "status": "passed",
+      "durationMs": 391
+    },
+    {
+      "title": "loading, empty, forbidden, missing and retriable failures have distinct states",
+      "file": "frontend/tests/e2e/graph.spec.ts",
+      "status": "passed",
+      "durationMs": 960
+    },
+    {
+      "title": "reviewed collections light 390",
+      "file": "frontend/tests/e2e/librarian-collections.spec.ts",
+      "status": "passed",
+      "durationMs": 914
+    },
+    {
+      "title": "reviewed collections light 820",
+      "file": "frontend/tests/e2e/librarian-collections.spec.ts",
+      "status": "passed",
+      "durationMs": 921
+    },
+    {
+      "title": "reviewed collections light 1440",
+      "file": "frontend/tests/e2e/librarian-collections.spec.ts",
+      "status": "passed",
+      "durationMs": 1027
+    },
+    {
+      "title": "reviewed collections dark 390",
+      "file": "frontend/tests/e2e/librarian-collections.spec.ts",
+      "status": "passed",
+      "durationMs": 921
+    },
+    {
+      "title": "reviewed collections dark 820",
+      "file": "frontend/tests/e2e/librarian-collections.spec.ts",
+      "status": "passed",
+      "durationMs": 925
+    },
+    {
+      "title": "reviewed collections dark 1440",
+      "file": "frontend/tests/e2e/librarian-collections.spec.ts",
+      "status": "passed",
+      "durationMs": 972
+    },
+    {
+      "title": "reviewed project description light 390",
+      "file": "frontend/tests/e2e/librarian-description.spec.ts",
+      "status": "passed",
+      "durationMs": 922
+    },
+    {
+      "title": "reviewed project description light 820",
+      "file": "frontend/tests/e2e/librarian-description.spec.ts",
+      "status": "passed",
+      "durationMs": 926
+    },
+    {
+      "title": "reviewed project description light 1440",
+      "file": "frontend/tests/e2e/librarian-description.spec.ts",
+      "status": "passed",
+      "durationMs": 923
+    },
+    {
+      "title": "reviewed project description dark 390",
+      "file": "frontend/tests/e2e/librarian-description.spec.ts",
+      "status": "passed",
+      "durationMs": 929
+    },
+    {
+      "title": "reviewed project description dark 820",
+      "file": "frontend/tests/e2e/librarian-description.spec.ts",
+      "status": "passed",
+      "durationMs": 927
+    },
+    {
+      "title": "reviewed project description dark 1440",
+      "file": "frontend/tests/e2e/librarian-description.spec.ts",
+      "status": "passed",
+      "durationMs": 909
+    },
+    {
+      "title": "duplicate review light 390",
+      "file": "frontend/tests/e2e/librarian-duplicates.spec.ts",
+      "status": "passed",
+      "durationMs": 794
+    },
+    {
+      "title": "duplicate review light 820",
+      "file": "frontend/tests/e2e/librarian-duplicates.spec.ts",
+      "status": "passed",
+      "durationMs": 869
+    },
+    {
+      "title": "duplicate review light 1440",
+      "file": "frontend/tests/e2e/librarian-duplicates.spec.ts",
+      "status": "passed",
+      "durationMs": 1014
+    },
+    {
+      "title": "duplicate review dark 390",
+      "file": "frontend/tests/e2e/librarian-duplicates.spec.ts",
+      "status": "passed",
+      "durationMs": 722
+    },
+    {
+      "title": "duplicate review dark 820",
+      "file": "frontend/tests/e2e/librarian-duplicates.spec.ts",
+      "status": "passed",
+      "durationMs": 812
+    },
+    {
+      "title": "duplicate review dark 1440",
+      "file": "frontend/tests/e2e/librarian-duplicates.spec.ts",
+      "status": "passed",
+      "durationMs": 967
+    },
+    {
+      "title": "reviewed report light 390",
+      "file": "frontend/tests/e2e/librarian-reports.spec.ts",
+      "status": "passed",
+      "durationMs": 1286
+    },
+    {
+      "title": "reviewed report light 820",
+      "file": "frontend/tests/e2e/librarian-reports.spec.ts",
+      "status": "passed",
+      "durationMs": 1304
+    },
+    {
+      "title": "reviewed report light 1440",
+      "file": "frontend/tests/e2e/librarian-reports.spec.ts",
+      "status": "passed",
+      "durationMs": 1355
+    },
+    {
+      "title": "reviewed report dark 390",
+      "file": "frontend/tests/e2e/librarian-reports.spec.ts",
+      "status": "passed",
+      "durationMs": 1258
+    },
+    {
+      "title": "reviewed report dark 820",
+      "file": "frontend/tests/e2e/librarian-reports.spec.ts",
+      "status": "passed",
+      "durationMs": 1271
+    },
+    {
+      "title": "reviewed report dark 1440",
+      "file": "frontend/tests/e2e/librarian-reports.spec.ts",
+      "status": "passed",
+      "durationMs": 1257
+    },
+    {
+      "title": "author, inspect, audit and prepare a new run in light at 390",
+      "file": "frontend/tests/e2e/mission-protocol.spec.ts",
+      "status": "passed",
+      "durationMs": 1902
+    },
+    {
+      "title": "author, inspect, audit and prepare a new run in light at 820",
+      "file": "frontend/tests/e2e/mission-protocol.spec.ts",
+      "status": "passed",
+      "durationMs": 1979
+    },
+    {
+      "title": "author, inspect, audit and prepare a new run in light at 1440",
+      "file": "frontend/tests/e2e/mission-protocol.spec.ts",
+      "status": "passed",
+      "durationMs": 2162
+    },
+    {
+      "title": "author, inspect, audit and prepare a new run in dark at 390",
+      "file": "frontend/tests/e2e/mission-protocol.spec.ts",
+      "status": "passed",
+      "durationMs": 1860
+    },
+    {
+      "title": "author, inspect, audit and prepare a new run in dark at 820",
+      "file": "frontend/tests/e2e/mission-protocol.spec.ts",
+      "status": "passed",
+      "durationMs": 1947
+    },
+    {
+      "title": "author, inspect, audit and prepare a new run in dark at 1440",
+      "file": "frontend/tests/e2e/mission-protocol.spec.ts",
+      "status": "passed",
+      "durationMs": 2111
+    },
+    {
+      "title": "the mission Results tab is addressable by URL so it can be linked and captured",
+      "file": "frontend/tests/e2e/mission-protocol.spec.ts",
+      "status": "passed",
+      "durationMs": 359
+    },
+    {
+      "title": "the retired /missions/queue alias is gone rather than silently redirecting",
+      "file": "frontend/tests/e2e/mission-protocol.spec.ts",
+      "status": "passed",
+      "durationMs": 16
+    },
+    {
+      "title": "project tabs, independent uploads, chunks and personal favorites in light at 390",
+      "file": "frontend/tests/e2e/project-bundles.spec.ts",
+      "status": "passed",
+      "durationMs": 2449
+    },
+    {
+      "title": "project tabs, independent uploads, chunks and personal favorites in light at 820",
+      "file": "frontend/tests/e2e/project-bundles.spec.ts",
+      "status": "passed",
+      "durationMs": 2526
+    },
+    {
+      "title": "project tabs, independent uploads, chunks and personal favorites in light at 1440",
+      "file": "frontend/tests/e2e/project-bundles.spec.ts",
+      "status": "passed",
+      "durationMs": 2769
+    },
+    {
+      "title": "project tabs, independent uploads, chunks and personal favorites in dark at 390",
+      "file": "frontend/tests/e2e/project-bundles.spec.ts",
+      "status": "passed",
+      "durationMs": 2429
+    },
+    {
+      "title": "project tabs, independent uploads, chunks and personal favorites in dark at 820",
+      "file": "frontend/tests/e2e/project-bundles.spec.ts",
+      "status": "passed",
+      "durationMs": 2647
+    },
+    {
+      "title": "project tabs, independent uploads, chunks and personal favorites in dark at 1440",
+      "file": "frontend/tests/e2e/project-bundles.spec.ts",
+      "status": "passed",
+      "durationMs": 2626
+    },
+    {
+      "title": "every maintained migration preserves its destination and query parameters",
+      "file": "frontend/tests/e2e/route-migration.spec.ts",
+      "status": "passed",
+      "durationMs": 46
+    },
+    {
+      "title": "palette keyboard reach, paging and focus in light at 390px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "status": "passed",
+      "durationMs": 3778
+    },
+    {
+      "title": "the Librarian lists what /search found, keeps it as a collection and reruns a saved search in light at 390px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "status": "passed",
+      "durationMs": 955
+    },
+    {
+      "title": "palette keyboard reach, paging and focus in light at 820px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "status": "passed",
+      "durationMs": 3873
+    },
+    {
+      "title": "the Librarian lists what /search found, keeps it as a collection and reruns a saved search in light at 820px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "status": "passed",
+      "durationMs": 827
+    },
+    {
+      "title": "palette keyboard reach, paging and focus in light at 1440px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "status": "passed",
+      "durationMs": 3901
+    },
+    {
+      "title": "the Librarian lists what /search found, keeps it as a collection and reruns a saved search in light at 1440px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "status": "passed",
+      "durationMs": 969
+    },
+    {
+      "title": "palette keyboard reach, paging and focus in dark at 390px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "status": "passed",
+      "durationMs": 3838
+    },
+    {
+      "title": "the Librarian lists what /search found, keeps it as a collection and reruns a saved search in dark at 390px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "status": "passed",
+      "durationMs": 927
+    },
+    {
+      "title": "palette keyboard reach, paging and focus in dark at 820px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "status": "passed",
+      "durationMs": 3835
+    },
+    {
+      "title": "the Librarian lists what /search found, keeps it as a collection and reruns a saved search in dark at 820px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "status": "passed",
+      "durationMs": 938
+    },
+    {
+      "title": "palette keyboard reach, paging and focus in dark at 1440px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "status": "passed",
+      "durationMs": 3890
+    },
+    {
+      "title": "the Librarian lists what /search found, keeps it as a collection and reruns a saved search in dark at 1440px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "status": "passed",
+      "durationMs": 982
+    },
+    {
+      "title": "saved search times use UTC even outside the UTC timezone",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "status": "passed",
+      "durationMs": 128
+    },
+    {
+      "title": "the retired /search/results alias is gone rather than silently redirecting",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "status": "passed",
+      "durationMs": 4
+    },
+    {
+      "title": "loading, no matches, service failure and missing saved search stay distinct",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "status": "passed",
+      "durationMs": 419
+    },
+    {
+      "title": "Settings interprets legacy API timestamps as UTC before displaying local times",
+      "file": "frontend/tests/e2e/settings.spec.ts",
+      "status": "passed",
+      "durationMs": 134
+    },
+    {
+      "title": "Settings keeps phone action labels readable in light",
+      "file": "frontend/tests/e2e/settings.spec.ts",
+      "status": "passed",
+      "durationMs": 776
+    },
+    {
+      "title": "Settings keeps phone action labels readable in dark",
+      "file": "frontend/tests/e2e/settings.spec.ts",
+      "status": "passed",
+      "durationMs": 749
+    }
+  ]
+}
