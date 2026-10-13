@@ -16,6 +16,7 @@ from uuid import uuid4
 
 import pytest
 
+from app.core.config import settings
 from app.models.chunk import DocumentChunk
 from app.models.collection import Collection, CollectionItem
 from app.models.document import Document
@@ -400,17 +401,30 @@ class TestSemanticEdgeE2EValidation:
             f"Expected at least 4 impacted queries (Sprint 37 baseline), got {len(impacted_queries)}"
         )
 
-    def test_graph_latency_remains_acceptable(self, semantic_edge_env):
-        """Adding semantic edges should not significantly increase graph latency."""
+    def test_graph_latency_remains_acceptable(self, semantic_edge_env, monkeypatch):
+        """Keep the graph budget tight without measuring a single host interruption."""
         env = semantic_edge_env
-        latencies = []
+        # A warmed response cache reports graph_ms=0 without running the graph.
+        monkeypatch.setattr(settings, "pedr_cache_enabled", False)
+        # Warm each query, then retain one complete round with the lowest maximum.
+        # Like the aggregate budgets, contention can only add time. Three rounds
+        # tolerate transient load; a persistent graph slowdown still fails.
         for query in VALIDATION_QUERIES:
-            result = _run_search(env, query, enable_graph=True)
-            graph_ms = (
-                result.metadata.timings.graph_ms if result.metadata.timings else 0.0
-            )
-            latencies.append(graph_ms)
+            _run_search(env, query, enable_graph=True)
+        rounds = []
+        for _ in range(3):
+            latencies = []
+            for query in VALIDATION_QUERIES:
+                result = _run_search(env, query, enable_graph=True)
+                assert result.metadata.graph_enabled
+                assert not result.metadata.cache_hit
+                assert result.metadata.timings is not None
+                graph_ms = result.metadata.timings.graph_ms
+                assert graph_ms > 0, "Missing graph work must not pass a latency budget"
+                latencies.append(graph_ms)
+            rounds.append(latencies)
 
+        latencies = min(rounds, key=max)
         avg_latency = statistics.mean(latencies)
         max_latency = max(latencies)
 

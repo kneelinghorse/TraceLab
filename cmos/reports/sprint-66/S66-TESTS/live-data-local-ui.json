@@ -1,0 +1,40 @@
+{
+  "base": "http://127.0.0.1:3187",
+  "checkedAt": "2026-10-13T21:01:29.247Z",
+  "readOnly": true,
+  "providerExecution": false,
+  "results": [
+    {
+      "theme": "light",
+      "width": 390,
+      "reopenChecks": 10,
+      "clientErrors": 0,
+      "transportErrors": 0,
+      "writeAttempts": 0
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "reopenChecks": 10,
+      "clientErrors": 0,
+      "transportErrors": 0,
+      "writeAttempts": 0
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "reopenChecks": 10,
+      "clientErrors": 0,
+      "transportErrors": 0,
+      "writeAttempts": 0
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "reopenChecks": 10,
+      "clientErrors": 0,
+      "transportErrors": 0,
+      "writeAttempts": 0
+    }
+  ]
+}

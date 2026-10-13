@@ -242,6 +242,8 @@ Closes #485, #448 and #379. *Requires DECOUPLE and SETTINGS.*
 - Every failure found is fixed or reported as a product defect, never skipped silently.
 - For #379, under induced CPU load the old assertion fails and the new one passes, and an injected slowdown in the graph layer still fails the new one.
 
+**Local build verification (2026-10-13, S66-TESTS):** All 23 browser spec files are covered by the workflow union: 22 in the production-build lane, with public production smoke and route-migration checks in the deployed lane. The nine revived specs add 48 cases; all 145 local browser cases pass, plus 30 repeated admin-recovery checks. Their first run exposed a real queued native-dialog close race, now fixed with a failing-before/passing-after unit regression. Plain local app-shell passes 15 cases using automatic production build/start. Vitest excludes generated dependency tests after a build; 385 app unit tests pass. The graph gate warms queries and keeps the best complete round of three with response caching disabled: the same bounded CPU burst fails the old assertion and passes the new one, while an injected 30ms BFS slowdown still fails. Existing 5/20ms budgets remain; this does not promise immunity to sustained saturation. Receipts: `cmos/reports/sprint-66/S66-TESTS/`; merge/deploy closure is recorded in Reasonbook.
+
 ### S66-MCP — The documented mission schema works
 
 Closes #174 and #486.
