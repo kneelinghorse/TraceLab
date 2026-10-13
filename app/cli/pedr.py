@@ -32,15 +32,11 @@ def cmd_sync(args: argparse.Namespace) -> int:
     print("-" * 50)
 
     service = get_delta_sync_service(
-        telemetry_path=Path("cmos/telemetry/events/sprint-11-pedr-sync.jsonl"),
+        telemetry_path=Path("telemetry/runtime/sprint-11-pedr-sync.jsonl"),
     )
 
     # Sync based on entity type filter
-    entity_types = []
-    if args.entity_type:
-        entity_types = [args.entity_type]
-    else:
-        entity_types = ["mission", "document"]
+    entity_types = [args.entity_type] if args.entity_type else ["mission", "document"]
 
     exit_code = 0
 

@@ -80,7 +80,32 @@ if _TELEMETRY_PLUGIN_PATH.exists():
         _spec.loader.exec_module(_module)
         pytest_plugins = (*pytest_plugins, _TELEMETRY_PLUGIN_NAME)
 
-_COVERAGE_PATH = Path("cmos/reports/sprint-01/ingestion_format_coverage.json")
+_COVERAGE_PATH = Path("telemetry/runtime/ingestion_format_coverage.json")
+
+
+@pytest.fixture(autouse=True)
+def _isolate_live_telemetry_receipts(monkeypatch, tmp_path):
+    """Keep test events out of the three tracked, live dashboard inputs.
+
+    Their application defaults must stay stable because the metrics aggregator
+    reads them. Redirect only these default destinations; explicit test sinks
+    and the real telemetry serializer still run normally.
+    """
+    from app.core import telemetry
+
+    destinations = {
+        REPO_ROOT / "telemetry" / "events" / name: tmp_path / name
+        for name in (
+            "quality-gates.jsonl", "quality-automation.jsonl", "sprint-04-performance.jsonl"
+        )
+    }
+    emit = telemetry.emit_telemetry
+
+    def isolated_emit(*, path, **kwargs):
+        destination = destinations.get(path.resolve(), path) if isinstance(path, Path) else path
+        return emit(path=destination, **kwargs)
+
+    monkeypatch.setattr(telemetry, "emit_telemetry", isolated_emit)
 
 
 def _create_all_sqlite_safe(eng):

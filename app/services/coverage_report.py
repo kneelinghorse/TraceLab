@@ -21,7 +21,7 @@ class CoverageReportGenerator:
     def __init__(
         self,
         output_path: Path = Path(
-            "cmos/reports/sprint-01/ingestion_format_coverage.json"
+            "telemetry/runtime/ingestion_format_coverage.json"
         ),
     ):
         """

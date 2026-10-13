@@ -50,7 +50,7 @@ class PreflightService:
     """Execute pre-flight queries and generate reuse recommendations."""
 
     DEFAULT_THRESHOLDS = PreflightThresholds()
-    TELEMETRY_DIR = Path("cmos/telemetry/events")
+    TELEMETRY_DIR = Path("telemetry/runtime")
 
     def __init__(
         self,

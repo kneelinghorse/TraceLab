@@ -5,8 +5,6 @@ Covers:
 - Evidence validation (type/id normalization, invalid entry rejection)
 - Decision sync with evidence to strategic_decisions table
 - Rich decision entries in master context (dict with evidence vs plain string)
-- API endpoint schemas (LinkedDecision, EvidenceRef, AddEvidenceRequest)
-- CMOS database query/update helpers
 - Retroactive evidence linking
 """
 
@@ -14,15 +12,10 @@ from __future__ import annotations
 
 import json
 import sqlite3
-import tempfile
-from pathlib import Path
-from typing import Any, Dict, List
-from unittest.mock import MagicMock, patch
 
 import pytest
 
 from cmos.context.session_runtime import SessionCapture, SessionRuntime
-
 
 # -------------------------------------------------------------------------
 # SessionCapture evidence tests
@@ -425,160 +418,6 @@ class TestStrategicDecisionsSyncWithEvidence:
 
         result = SQLiteClient._parse_decision_entry(42)
         assert result is None
-
-
-# -------------------------------------------------------------------------
-# API schema tests
-# -------------------------------------------------------------------------
-
-
-class TestDecisionLinkSchemas:
-    """Pydantic models for the decision-linking API."""
-
-    def test_evidence_ref(self):
-        from app.api.v1.decision_links import EvidenceRef
-
-        ref = EvidenceRef(type="insight", id="abc-123")
-        assert ref.type == "insight"
-        assert ref.id == "abc-123"
-
-    def test_linked_decision_minimal(self):
-        from app.api.v1.decision_links import LinkedDecision
-
-        decision = LinkedDecision(
-            id=1,
-            decision_text="Test decision",
-            created_at="2026-03-12T12:00:00Z",
-        )
-        assert decision.evidence == []
-        assert decision.mission_id is None
-
-    def test_linked_decision_with_evidence(self):
-        from app.api.v1.decision_links import EvidenceRef, LinkedDecision
-
-        decision = LinkedDecision(
-            id=42,
-            decision_text="Link insights",
-            created_at="2026-03-12T12:00:00Z",
-            mission_id="T35.3",
-            sprint_id="sprint-35",
-            evidence=[
-                EvidenceRef(type="insight", id="ins-001"),
-                EvidenceRef(type="document", id="doc-002"),
-            ],
-        )
-        assert len(decision.evidence) == 2
-        assert decision.mission_id == "T35.3"
-
-    def test_add_evidence_request(self):
-        from app.api.v1.decision_links import AddEvidenceRequest, EvidenceRef
-
-        req = AddEvidenceRequest(
-            evidence=[EvidenceRef(type="insight", id="i1")],
-            mission_id="T35.3",
-        )
-        assert len(req.evidence) == 1
-        assert req.mission_id == "T35.3"
-
-    def test_add_evidence_request_no_mission(self):
-        from app.api.v1.decision_links import AddEvidenceRequest, EvidenceRef
-
-        req = AddEvidenceRequest(
-            evidence=[EvidenceRef(type="chunk", id="c1")],
-        )
-        assert req.mission_id is None
-
-
-# -------------------------------------------------------------------------
-# API helper tests
-# -------------------------------------------------------------------------
-
-
-class TestDecisionLinkHelpers:
-    """Helper functions for parsing and converting decision rows."""
-
-    def test_parse_evidence_none(self):
-        from app.api.v1.decision_links import _parse_evidence
-
-        assert _parse_evidence(None) == []
-
-    def test_parse_evidence_empty_string(self):
-        from app.api.v1.decision_links import _parse_evidence
-
-        assert _parse_evidence("") == []
-
-    def test_parse_evidence_json_string(self):
-        from app.api.v1.decision_links import _parse_evidence
-
-        raw = json.dumps([{"type": "insight", "id": "i1"}])
-        result = _parse_evidence(raw)
-        assert len(result) == 1
-        assert result[0]["type"] == "insight"
-
-    def test_parse_evidence_list(self):
-        from app.api.v1.decision_links import _parse_evidence
-
-        data = [{"type": "doc", "id": "d1"}]
-        assert _parse_evidence(data) == data
-
-    def test_parse_evidence_invalid_json(self):
-        from app.api.v1.decision_links import _parse_evidence
-
-        assert _parse_evidence("{invalid") == []
-
-    def test_row_to_linked_decision(self):
-        from app.api.v1.decision_links import _row_to_linked_decision
-
-        row = {
-            "id": 1,
-            "decision_text": "Test",
-            "created_at": "2026-03-12T12:00:00Z",
-            "sprint_id": "sprint-35",
-            "mission_id": "T35.3",
-            "project_domain": "general",
-            "evidence": json.dumps([{"type": "insight", "id": "i1"}]),
-        }
-        result = _row_to_linked_decision(row)
-        assert result.id == 1
-        assert len(result.evidence) == 1
-        assert result.evidence[0].type == "insight"
-
-    def test_row_to_linked_decision_no_evidence(self):
-        from app.api.v1.decision_links import _row_to_linked_decision
-
-        row = {
-            "id": 2,
-            "decision_text": "Plain",
-            "created_at": "2026-03-12T12:00:00Z",
-            "sprint_id": None,
-            "mission_id": None,
-            "project_domain": "general",
-            "evidence": None,
-        }
-        result = _row_to_linked_decision(row)
-        assert result.evidence == []
-
-    def test_row_to_linked_decision_malformed_evidence_entry(self):
-        from app.api.v1.decision_links import _row_to_linked_decision
-
-        row = {
-            "id": 3,
-            "decision_text": "Partial",
-            "created_at": "2026-03-12T12:00:00Z",
-            "sprint_id": None,
-            "mission_id": None,
-            "project_domain": None,
-            "evidence": json.dumps(
-                [
-                    {"type": "insight", "id": "valid"},
-                    {"bad": "entry"},
-                    "not-a-dict",
-                ]
-            ),
-        }
-        result = _row_to_linked_decision(row)
-        assert len(result.evidence) == 1
-        assert result.evidence[0].id == "valid"
 
 
 # -------------------------------------------------------------------------

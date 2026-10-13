@@ -90,3 +90,6 @@ cmos/context/project_context.json
 telemetry/events/*.jsonl
 cmos/telemetry/**
 tests/test_ingestion.db-journal
+
+# Generated application outputs; historical record receipts remain immutable.
+/telemetry/runtime/

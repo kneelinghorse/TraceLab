@@ -11,24 +11,20 @@ from __future__ import annotations
 
 import json
 import statistics
-from dataclasses import dataclass
-from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 from uuid import uuid4
 
 import pytest
 
-from app.core.database import engine, SessionLocal
-from app.models.document import Document
 from app.models.chunk import DocumentChunk
 from app.models.collection import Collection, CollectionItem
+from app.models.document import Document
 from app.models.graph_edge import GraphEdge
 from app.models.project import Project
 from app.services.pedr.edge_materialization import EdgeMaterializationService
-from app.services.pedr.graph_layer import GraphLayerConfig, GraphLayerService
+from app.services.pedr.graph_layer import GraphLayerService
 from app.services.pedr.search_orchestrator import PEDRSearchOrchestrator
-from app.services.pedr.semantic_protocol import EntityType, URNGenerator
-
+from app.services.pedr.semantic_protocol import URNGenerator
 
 # ---------------------------------------------------------------------------
 # Test data: same 3 projects, 6 documents, 18 chunks as Sprint 37
@@ -114,18 +110,18 @@ VALIDATION_QUERIES = [
 class _SearchProviderStub:
     """Stub lexical/semantic search returning chunks by keyword overlap."""
 
-    def __init__(self, chunks: List[Dict[str, Any]]):
+    def __init__(self, chunks: list[dict[str, Any]]):
         self.chunks = chunks
-        self._chunk_records: Dict[str, Dict[str, Any]] = {}
+        self._chunk_records: dict[str, dict[str, Any]] = {}
 
-    def set_chunk_records(self, records: Dict[str, Dict[str, Any]]) -> None:
+    def set_chunk_records(self, records: dict[str, dict[str, Any]]) -> None:
         self._chunk_records = records
 
     def search(
         self, query: str, top_k: int = 20, **kwargs: Any
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         query_terms = set(query.lower().split())
-        scored: List[tuple[float, Dict[str, Any]]] = []
+        scored: list[tuple[float, dict[str, Any]]] = []
         for chunk in self.chunks:
             content_terms = set(chunk["content"].lower().split())
             overlap = len(query_terms & content_terms)
@@ -179,8 +175,8 @@ def semantic_edge_env(db_session):
     db_session.commit()
 
     # Create chunks
-    chunk_records: Dict[str, Dict[str, Any]] = {}
-    chunk_objs: Dict[str, DocumentChunk] = {}
+    chunk_records: dict[str, dict[str, Any]] = {}
+    chunk_objs: dict[str, DocumentChunk] = {}
     for chunk_data in CHUNKS:
         chunk = DocumentChunk(
             document_id=chunk_data["doc_id"],
@@ -201,7 +197,7 @@ def semantic_edge_env(db_session):
 
     # --- Phase 1: FK edges only (Sprint 37 baseline) ---
     edge_service = EdgeMaterializationService(session_factory=lambda: db_session)
-    fk_result = edge_service.materialize_implicit_edges(session=db_session, mode="full")
+    edge_service.materialize_implicit_edges(session=db_session, mode="full")
 
     # Cross-document references (same as Sprint 37)
     cross_edges = [
@@ -260,7 +256,7 @@ def semantic_edge_env(db_session):
     db_session.commit()
 
     # Re-materialize to pick up co_occurs edges
-    semantic_result = edge_service.materialize_implicit_edges(
+    edge_service.materialize_implicit_edges(
         session=db_session, mode="full"
     )
 
@@ -527,9 +523,8 @@ class TestSemanticEdgeE2EValidation:
             "per_query": comparisons,
         }
 
-        report_dir = Path("cmos/reports/sprint-38")
-        report_dir.mkdir(parents=True, exist_ok=True)
-        report_path = report_dir / "semantic-edge-e2e-validation.json"
+        # Each test run owns its output; historical receipts must stay unchanged.
+        report_path = tmp_path / "semantic-edge-e2e-validation.json"
         report_path.write_text(json.dumps(report, indent=2))
 
         # Assertions

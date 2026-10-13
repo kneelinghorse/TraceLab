@@ -73,9 +73,8 @@ class CacheManager:
         self.registry = registry or DEFAULT_CACHE_REGISTRY
         default_path = (
             _repo_root()
-            / "cmos"
             / "telemetry"
-            / "events"
+            / "runtime"
             / "sprint-08-cache-metrics.jsonl"
         )
         self.telemetry_path = telemetry_path or default_path

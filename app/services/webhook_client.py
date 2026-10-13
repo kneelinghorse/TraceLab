@@ -72,7 +72,7 @@ class WebhookClient:
         self.stats = WebhookDeliveryStats()
         repo_root = Path(__file__).resolve().parents[2]
         default_path = (
-            repo_root / "cmos" / "telemetry" / "events" / "sprint-11-corrections.jsonl"
+            repo_root / "telemetry" / "runtime" / "sprint-11-corrections.jsonl"
         )
         self.telemetry_path = telemetry_path or default_path
         self._dead_letter_queue: list[dict[str, Any]] = []

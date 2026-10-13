@@ -79,7 +79,7 @@ from app.services.pedr.syntactic import (
 logger = logging.getLogger(__name__)
 
 GRAPH_TELEMETRY_ENV = "PEDR_GRAPH_TELEMETRY_ENABLED"
-GRAPH_TELEMETRY_PATH = Path("cmos/telemetry/events/sprint-26-graph-telemetry.jsonl")
+GRAPH_TELEMETRY_PATH = Path("telemetry/runtime/sprint-26-graph-telemetry.jsonl")
 
 BASE_LAYER_WEIGHTS = {
     "lexical": 0.25,

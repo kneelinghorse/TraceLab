@@ -55,13 +55,32 @@ def bus(monkeypatch):
     return bus
 
 
+@pytest.mark.parametrize("role", ["owner", "admin", "member", "viewer", "service"])
+def test_retired_decision_routes_cannot_access_the_project_record(client, caller, monkeypatch, role):
+    paths = [
+        "/api/v1/decisions/linked",
+        "/api/v1/decisions/linked/{decision_id}",
+        "/api/v1/decisions/linked/{decision_id}/evidence",
+    ]
+    assert all(path not in app.openapi()["paths"] for path in paths)
+    user = AuthenticatedUser(
+        user_id=caller.user_id, email=caller.email,
+        display_name=caller.display_name, role=role,
+    )
+    monkeypatch.setitem(app.dependency_overrides, require_authenticated_user, lambda: user)
+    assert client.get("/api/v1/decisions/linked").status_code == 404
+    assert client.get("/api/v1/decisions/linked/1").status_code == 404
+    assert client.post(
+        "/api/v1/decisions/linked/1/evidence",
+        json={"evidence": [{"type": "document", "id": str(uuid4())}]},
+    ).status_code == 404
+
+
 @pytest.mark.parametrize(
     "path",
     [
         "/api/v1/missions/events/recent",
         "/api/v1/missions/events/stream",
-        "/api/v1/decisions/linked",
-        "/api/v1/decisions/linked/1",
     ],
 )
 def test_recovered_read_routes_require_auth(client, path):
@@ -80,9 +99,6 @@ def test_openapi_registers_restored_verbs_once():
         ("/api/v1/missions/events/recent", "get"),
         ("/api/v1/missions/events/stream", "get"),
         ("/api/v1/missions/events/cmos", "post"),
-        ("/api/v1/decisions/linked", "get"),
-        ("/api/v1/decisions/linked/{decision_id}", "get"),
-        ("/api/v1/decisions/linked/{decision_id}/evidence", "post"),
     ]
     for path, verb in expected:
         assert verb in schema["paths"][path]
@@ -93,38 +109,6 @@ def test_openapi_registers_restored_verbs_once():
             )
             == 1
         )
-
-
-@pytest.mark.parametrize("role", ["member", "viewer", "service"])
-def test_global_cmos_decisions_deny_non_admin_before_read_or_write(
-    client, caller, monkeypatch, role
-):
-    import app.api.v1.decision_links as links
-
-    user = AuthenticatedUser(
-        user_id=caller.user_id,
-        email=caller.email,
-        display_name=caller.display_name,
-        role=role,
-    )
-    monkeypatch.setitem(
-        app.dependency_overrides, require_authenticated_user, lambda: user
-    )
-    monkeypatch.setattr(
-        links, "_query_cmos", lambda *_: pytest.fail("unauthorized CMOS read")
-    )
-    monkeypatch.setattr(
-        links, "_update_cmos", lambda *_: pytest.fail("unauthorized CMOS write")
-    )
-    assert client.get("/api/v1/decisions/linked").status_code == 403
-    assert client.get("/api/v1/decisions/linked/1").status_code == 403
-    assert (
-        client.post(
-            "/api/v1/decisions/linked/1/evidence",
-            json={"evidence": [{"type": "document", "id": str(uuid4())}]},
-        ).status_code
-        == 403
-    )
 
 
 def test_recent_events_filter_before_limit_and_deny_global_events(
@@ -302,42 +286,6 @@ async def test_sse_replay_and_live_events_recheck_mission_access(
     assert "system.heartbeat" in await anext(stream)
     await stream.aclose()
     assert bus.subscriber_count == 0
-
-
-def test_admin_decision_reads_and_evidence_write_use_protected_route(
-    client, caller, monkeypatch
-):
-    from unittest.mock import MagicMock
-
-    from app.api.v1 import decision_links
-
-    admin = AuthenticatedUser(
-        user_id=caller.user_id,
-        email=caller.email,
-        display_name=caller.display_name,
-        role="admin",
-    )
-    monkeypatch.setitem(
-        app.dependency_overrides, require_authenticated_user, lambda: admin
-    )
-    row = {
-        "id": 1,
-        "decision_text": "Recovery decision",
-        "created_at": "2026-09-12",
-        "evidence": "[]",
-    }
-    query = MagicMock(return_value=[row])
-    update = MagicMock(return_value=1)
-    monkeypatch.setattr(decision_links, "_query_cmos", query)
-    monkeypatch.setattr(decision_links, "_update_cmos", update)
-    assert client.get("/api/v1/decisions/linked").json()[0]["id"] == 1
-    assert client.get("/api/v1/decisions/linked/1").json()["id"] == 1
-    response = client.post(
-        "/api/v1/decisions/linked/1/evidence",
-        json={"evidence": [{"type": "document", "id": str(uuid4())}]},
-    )
-    assert response.status_code == 200
-    update.assert_called_once()
 
 
 def test_full_pedr_http_preserves_diagnostics_and_emits_layer_events(

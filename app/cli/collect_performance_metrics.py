@@ -99,7 +99,6 @@ def collect_metrics() -> dict[str, Any]:
 
         # Token usage (estimated based on collection size)
         # Approximate: each chunk is ~750 tokens on average
-        avg_chunks_per_doc = 10  # Rough estimate
         avg_tokens_per_chunk = 750
         if collection_info.points_count > 0:
             metrics["token_usage"] = {
@@ -126,7 +125,7 @@ def main():
     metrics = collect_metrics()
 
     # Save to reports directory
-    reports_dir = Path("cmos/reports/sprint-01")
+    reports_dir = Path("telemetry/runtime")
     reports_dir.mkdir(parents=True, exist_ok=True)
 
     output_file = reports_dir / "qdrant_performance.json"

@@ -360,8 +360,7 @@ to another mission. Unscoped CMOS/PEDR events are only visible to owner/admin
 principals under RBAC. The stream rechecks grants for each event, applies the
 limit after filtering replay history, and supports EventSource query-token auth.
 
-All `/decisions/linked` reads and evidence writes require owner/admin access
-unconditionally. CMOS decisions are global operational records with no TraceLab
-owner/Space field; ordinary users and service principals cannot read or alter
-them. Router-level authentication protects every restored route independently
-of the RBAC feature flag.
+The former `/decisions/linked` reads and evidence-write routes are retired and
+return 404 for every principal. Project operational decisions stay in Reasonbook;
+the application does not read or write its database. Router-level authentication
+continues to protect the mission-event routes independently of the RBAC feature flag.

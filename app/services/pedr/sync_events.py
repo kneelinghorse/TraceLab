@@ -356,7 +356,7 @@ def get_sync_event_emitter(
     if _sync_event_emitter is None:
         _sync_event_emitter = SyncEventEmitter(
             telemetry_path=telemetry_path
-            or Path("cmos/telemetry/events/sprint-11-pedr-sync.jsonl"),
+            or Path("telemetry/runtime/sprint-11-pedr-sync.jsonl"),
         )
     return _sync_event_emitter
 
