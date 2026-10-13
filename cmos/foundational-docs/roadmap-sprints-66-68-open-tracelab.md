@@ -345,6 +345,7 @@ Add to this list rather than resolving items silently. Questions 1–4 were answ
 - **2026-10-13 UTC, Derek's answers; Sprint 66 opened.**
   - Answers: merge (PR #416 merged as `7ee7c8c`); license MIT (decision #613, correcting #612's stored approval words); history kept, current tree cleaned; messages to any project allowed; Monday is an invite-only demo for 5–10 people (decision #614).
   - S66-DEPS started and opened the sprint, and the identity was synchronised to `sprint-66-active`.
+  - **S66-DEPS completed.** All 8 main runs on `7ee7c8c` passed: Backend Tests 3,160 passed / 4 skipped / 12 standing deselections, and the Post-Deploy Check, smoke included. Both Railway services serve `7ee7c8c`, and the live container reports pydantic 2.13.5. [Receipt](../reports/sprint-66/S66-DEPS/validation.json).
   - SETTINGS moved ahead of FRONT, because Monday is an app demo.
   - Sprint 67 will be scoped from Derek's UX doc at the next planning session.
 - **2026-10-13 UTC, created at Sprint 66 planning (session PS-2026-10-13-003).** Derek: "lets open a planning session and get sprint planning underway … make sure we're in good shape for next Mondays share out … lets get these carry forward and remaining items put to bed first."

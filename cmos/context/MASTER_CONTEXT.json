@@ -3,7 +3,7 @@
     "name": "TraceLab",
     "version": "0.0.0",
     "description": "Research knowledge management platform with PEDR search pipeline, mission orchestration, and DeepSearch integration.",
-    "status": "sprint-65-complete",
+    "status": "sprint-66-active",
     "start_date": "2025-01-01",
     "deployment": {
       "platform": "FastAPI + PostgreSQL + Qdrant",
@@ -28,7 +28,7 @@
       "Sprint 18 completed: PEDR Validation Sprint - 6 missions delivered (R18.0, B18.1-B18.6). PEDR SCOPED decision: Not for interactive search (1.5s P50 vs 200ms target), approved for deep research, MCP, and batch processing."
     ],
     "planning_overview": "See cmos/foundational-docs/roadmap-sprints-66-68-open-tracelab.md for the current plan (intent); the Reasonbook record is authoritative for status",
-    "last_sync_at": "2026-10-02T02:52:16.471Z"
+    "last_sync_at": "2026-10-13T16:03:35.394Z"
   },
   "technical_foundation": {
     "critical_facts": [
@@ -108,7 +108,8 @@
     "Keep T48.4, T48.8, and T48.6 In Progress until their remaining deployed acceptance criteria are exercised. Successful Alembic apply and health endpoints prove deployment recovery, not authenticated create-to-scoped-list parity or end-to-end live-log convergence.",
     "cmos/foundational-docs/roadmap-sprints-50-53-ux-overhaul.md is the authoritative statement of INTENT for the d592c92 recovery and the UX overhaul (vision, sprint plan S50–S53, UI definition of done, route migration map, design-system strategy); CMOS sprint/mission records remain authoritative for STATUS. It must be updated at every sprint open and close (alongside the Sprint-Boundary Identity Sync runbook): the closing sprint's section records what shipped and what moved, the next sprint's section is re-planned, and the change log gets a dated entry. A sprint may not be closed with the roadmap's section for it still describing plan rather than outcome. Registered in project_identity.foundational_docs.",
     "Production baseline RBAC matrix using existing MCP admin credential found no deny leaks and no teardown failures, but exited 1 with NO-DISPOSABLE-OWNER: POST /admin/users correctly denies an admin granting the owner role. Full rbac_verify requires a true owner credential to provision its mandatory second-owner fixture. Existing MCP admin credential is sufficient for RECOVER-1 deployment/ingestion/search/router smoke, not the entire matrix. Owner source request remains pending; do not alter role restrictions or omit this matrix cell to claim success.",
-    "Explicit user instruction, 2026-09-12 local: no cross-repository work without explicit permission. Stop Forge actions and let Forge own its implementation/review/merge/activation. UX-1's dependency, roadmap text, an unanswered backlog request, or a general request to resume TraceLab does not authorize editing/accessing Forge, managing its PR/CI, refreshing its workers, or sending new messages. Preserve existing work; no cleanup/revert requested. Current handoff authorizes TraceLab CMOS capture only. See decision #391 and cmos/reports/sprint-50/ux-1-session-handoff.md."
+    "Explicit user instruction, 2026-09-12 local: no cross-repository work without explicit permission. Stop Forge actions and let Forge own its implementation/review/merge/activation. UX-1's dependency, roadmap text, an unanswered backlog request, or a general request to resume TraceLab does not authorize editing/accessing Forge, managing its PR/CI, refreshing its workers, or sending new messages. Preserve existing work; no cleanup/revert requested. Current handoff authorizes TraceLab CMOS capture only. See decision #391 and cmos/reports/sprint-50/ux-1-session-handoff.md.",
+    "cmos/foundational-docs/roadmap-sprints-66-68-open-tracelab.md is the authoritative statement of INTENT from Sprint 66 on; the Reasonbook record is authoritative for STATUS. Update it at every sprint open and close: at close, rewrite the closing sprint's section as outcome; at open, re-plan the opening sprint's section from the record's missions; either way, append a dated change-log line. A sprint may not close while its section still reads as plan. Its predecessors are closed to new sprint sections: roadmap-sprints-57-60-the-librarian.md (Sprints 57–65) and roadmap-sprints-50-53-ux-overhaul.md (Sprints 50–56). Replaces constraint c:5, which still named the Sprint 50–53 document."
   ],
   "quality_standards": {
     "ai_instructions": {
@@ -150,7 +151,7 @@
   },
   "roadmap": {
     "status": "Sprint62 Completed; no next sprint opened.",
-    "current_focus": "Sprint 66 planned: DEPS, EXPOSURE, FRONT, DECOUPLE, SETTINGS, TESTS, MCP. Intent: cmos/foundational-docs/roadmap-sprints-66-68-open-tracelab.md.",
+    "current_focus": "Sprint 66 active. Intent: cmos/foundational-docs/roadmap-sprints-66-68-open-tracelab.md.",
     "next_checkpoint": "Sprint 19: PEDR latency optimization or alternative use cases",
     "research_completed": [
       {
@@ -264,8 +265,8 @@
   "metadata": {
     "last_condensation": "2026-03-08T22:28:45.820723Z",
     "condensation_note": "T31.5: Heavy manual pruning of stale fields, old sprint data, and planning text.",
-    "current_sprint": "sprint-65",
-    "sprint_status": "Completed"
+    "current_sprint": "sprint-66",
+    "sprint_status": "Active"
   },
   "working_memory": {
     "session_history": [
@@ -318,13 +319,14 @@
       "PS-2026-10-02-001: Run the deployed pure projector on the pinned 62-record candidate, then reconcile exactly one Ledger batch without paid research.",
       "PS-2026-10-13-001: Wire the nine Playwright specs that no CI workflow runs into a required lane, or delete them deliberately. On origin/main bb0b270, 22 specs exist under frontend/tests/e2e/, but frontend-production-build.yml:91 and production-smoke.yml:40 enumerate only 13. These never run: admin-password-recovery and password-recovery (AUTH-2/AUTH-1, 2026-09-30), mission-live-logs (LOG-2), report-citations (REPORT-1), session-code-accessibility (S62-UX), token-contrast (A11Y-1's contrast gate, 2026-09-16), plus console, evidence and hygiene (the last two are what dropped next-step #285 asked to wire). Decision #599 added authored-scope to the list the same way, so the enumerated list is the known mechanism. Per decision #498, a gate that never runs is not evidence. Run each one locally against the production build before wiring it, because any of them may have rotted unnoticed. Supersedes the still-open part of #285.",
       "PS-2026-10-13-002: At the next @aquex/tracelab-mcp publish, fix the README's global-install line. In the published 2.1.2 README (and packages/tracelab-mcp/README.md on main) it still reads `npm install -g @aquex/tracelab-mcp@2.1.1`, one patch behind latest. Use @latest like the other setup examples, or bump it in the release checklist. Aquex was told on 2026-10-12 that TraceLab would correct it at the next publish (reply to request 397036b0).",
-      "PS-2026-10-13-002: Sprint-planning start state (2026-10-12). (1) The main checkout at /Users/systemsystems/portfolio/TraceLab sits on stale local branch codex/sprint-61-admin-acceptance, 29 commits behind origin/main (bb0b270), so plan from origin/main. The branch carries two unpushed commits. d0ffd02, an AUTH-2 receipt, is superseded by main's own copy. afa8b39 (2026-10-10) removes the obsolete cmos/cli.py procedure from agents.md and cmos/agents.md; carry it into the planning PR. Leave the two untracked cmos/planning/conversation-2026-09-24*.md files alone, since they are Derek's. (2) The living roadmap cmos/foundational-docs/roadmap-sprints-57-60-the-librarian.md still reads Sprint 64 \"Active\" and has no Sprint 65 section or change-log lines for the 64/65 closes. Rewrite them as outcomes at planning open. (3) Two Reasonbook 4.0 messages stay pending for planning: 960040b8 (rename prep) and 9c5b4fc2 (install/migration). TraceLab app code reads cmos/ paths (app/api/v1/decision_links.py reads the record DB; PEDR telemetry writes cmos/telemetry), so the folder must not move before the app supports rbook/. This overlaps the open-source launch work Derek raised on 2026-10-12."
+      "PS-2026-10-13-002: Sprint-planning start state (2026-10-12). (1) The main checkout at /Users/systemsystems/portfolio/TraceLab sits on stale local branch codex/sprint-61-admin-acceptance, 29 commits behind origin/main (bb0b270), so plan from origin/main. The branch carries two unpushed commits. d0ffd02, an AUTH-2 receipt, is superseded by main's own copy. afa8b39 (2026-10-10) removes the obsolete cmos/cli.py procedure from agents.md and cmos/agents.md; carry it into the planning PR. Leave the two untracked cmos/planning/conversation-2026-09-24*.md files alone, since they are Derek's. (2) The living roadmap cmos/foundational-docs/roadmap-sprints-57-60-the-librarian.md still reads Sprint 64 \"Active\" and has no Sprint 65 section or change-log lines for the 64/65 closes. Rewrite them as outcomes at planning open. (3) Two Reasonbook 4.0 messages stay pending for planning: 960040b8 (rename prep) and 9c5b4fc2 (install/migration). TraceLab app code reads cmos/ paths (app/api/v1/decision_links.py reads the record DB; PEDR telemetry writes cmos/telemetry), so the folder must not move before the app supports rbook/. This overlaps the open-source launch work Derek raised on 2026-10-12.",
+      "PS-2026-10-13-003: On Derek's answers to the Sprint 66 open questions (roadmap-sprints-66-68-open-tracelab.md, Open Questions 1-4, asked 2026-10-13):\n(a) With his go, merge PR #416 (pydantic cap), then update PR #415 from main and merge it once required CI is green.\n(b) Record the license decision: draft P4 (MIT, with both vendored @oods packages kept PolyForm Noncommercial) or his amendment. S66-FRONT's LICENSE criterion cites it.\n(c) Act on his history choice for the third-party personal data. On a purge or a private-plus-clean-copy choice, extend S66-EXPOSURE before it starts.\n(d) If he permits it, send DeepSearch the open-source readiness request and answer Reasonbook's 960040b8 with the Sprint 66 and 68 plan.\n(e) Scope Sprint 67 from his UX feedback and his answer on who comes in Monday.\nDone when each answer is recorded as a decision and the matching action is taken or explicitly declined."
     ]
   },
   "context_health": {
-    "sessions_since_reset": 288,
-    "last_update": "2026-10-13T04:23:32.641Z",
-    "size_kb": 57.18,
+    "sessions_since_reset": 289,
+    "last_update": "2026-10-13T15:37:57.421Z",
+    "size_kb": 59.21,
     "size_limit_kb": 100,
     "warning_threshold_percent": 75,
     "retention_keep_sprints": 3
@@ -371,12 +373,12 @@
     "Sprint 63 review evidence: completed 3/3; release source e716e34, closeout receipts at 0a04e23 in sprint-63-build worktree. Rechecked all 30 unique source hashes (31 receipt entries): no mismatches. Recorded release evidence: nine required CI checks; registry 2.1.1 independent fresh install with 63 stdio checks/0 skips; 42 deployed read-only browser checks plus 5 public tests. CI reports 3,122 backend passes/4 skips/12 quarantine exclusions, 169 PostgreSQL passes/3 skips, 371 frontend units, 82 built-browser and 160 MCP units. Legacy CMOS runner remains 13 pass/2 known failures; neither is called passing. Review reused receipts without rerunning runtime/provider flows. CMOS health passed. Closed rows449/450/481; verified 12 open rows across pending+carried. Both pending Aquex messages correspond to previously delivered scope and are not new build blockers.",
     "Sprint64 planning committed f1a854e on codex/sprint-64-plan. Four Queued missions/28 criteria/5 Requires links read back exactly. Verified17 upstream fixture hashes and6structural source hashes against79ef848;45 local references and29 links resolve; foundational refs and both MCP audits pass (118operations/125arguments,0gaps). Current main e716e34 reconciled with accepted S63 receipts0a04e23; merge conflicts were only stale active/context/roadmap values and resolved to later accepted closeout. No application changes. Handoff:cmos/planning/sprint-64-HANDOFF.md; evidence:cmos/reports/sprint-64/planning/. #479 carried toS64 and stays open; other11rows untouched. DS local verification is not delivery; no runtime tests, paid runs, publishing/deployment or outbound messages in planning."
   ],
-  "current_focus": "Sprint 66 planning: disposition all 24 open follow-ups, record Sprint 64/65 outcomes in the roadmap, and plan open-source readiness for the 2026-10-19 share-out. Production serves bb0b270; no sprint open.",
+  "current_focus": "Sprint 66 active. S66-DEPS completed 2026-10-13: pydantic capped below 2.14 (PR #416, 7ee7c8c); all 8 main runs green; production serves 7ee7c8c with pydantic 2.13.5. Next: S66-EXPOSURE, then SETTINGS, FRONT, DECOUPLE, TESTS, MCP. License MIT (decision #613); history not rewritten (decision #614).",
   "current_sprint": {
-    "id": "sprint-65",
-    "name": "REL-01 Ledger Contract Repair and Reconciliation",
-    "status": "Completed",
-    "focus": "Accept observed nonstandard three-digit HTTP response codes without weakening the trusted Ledger envelope, deploy the paired consumer change, and reconcile the existing REL-01 dead-letter exactly once."
+    "id": "sprint-66",
+    "name": "Sprint 66 — Clear the deck",
+    "status": "Active",
+    "focus": "Every carried follow-up done, scheduled or closed with a reason, and TraceLab's public repository clean, licensed and ready to read and run before the 2026-10-19 share-out (an invite-only demo for 5-10 people). Plan: cmos/foundational-docs/roadmap-sprints-66-68-open-tracelab.md."
   },
   "strategic_context": {
     "sprint_13": {
@@ -467,7 +469,7 @@
       }
     }
   },
-  "current_phase": "Sprint 65 complete (closed 2026-10-02). Sprint 66 'Clear the deck' planned 2026-10-13 (session PS-2026-10-13-003) with Sprint 67 (UX pass) and Sprint 68 (after the share-out) as shells; the share-out is 2026-10-19. No Sprint 66 mission has started.",
+  "current_phase": "Sprint 66 'Clear the deck' opened 2026-10-13 when S66-DEPS started (merge of the pydantic cap, PR #416). Remaining order: EXPOSURE, SETTINGS, FRONT, DECOUPLE, TESTS, MCP. Sprint 67 (UX pass, scoped from Derek's UX doc) and Sprint 68 (Reasonbook folder move) are shells. Share-out 2026-10-19: invite-only demo.",
   "sprint_history": [
     {
       "sprint": "Sprint 19",
@@ -633,7 +635,12 @@
     }
   },
   "sprint_tracking": {
-    "current_sprint": null,
+    "current_sprint": {
+      "id": "sprint-66",
+      "title": "Sprint 66 — Clear the deck",
+      "status": "Active",
+      "focus": "Every carried follow-up done, scheduled or closed with a reason, and TraceLab's public repository clean, licensed and ready to read and run before the 2026-10-19 share-out. Plan: cmos/foundational-docs/roadmap-sprints-66-68-open-tracelab.md."
+    },
     "last_completed_sprint": "sprint-65"
   }
 }

@@ -1,0 +1,98 @@
+{
+  "mission": "S66-DEPS",
+  "sprint": "sprint-66",
+  "recorded_at": "2026-10-13",
+  "authorization": "Derek, 2026-10-13: \"yes, merge\" (decision #614)",
+  "root_cause": {
+    "summary": "pydantic 2.14.1 (published 2026-10-11) removed pydantic._internal._typing_extra.eval_type_backport, which mcp 1.6.0's FastMCP imports (mcp/server/fastmcp/utilities/func_metadata.py:11). pyproject.toml set only minimum versions, so fresh installs paired them and backend CI failed at test collection on every branch.",
+    "first_seen": "PR #415 (docs-only), run 38418352628",
+    "last_green_main_before": {
+      "commit": "bb0b270",
+      "date": "2026-10-02",
+      "pydantic": "2.13.5",
+      "mcp": "1.6.0",
+      "fastapi": "0.142.2",
+      "starlette": "1.7.0"
+    },
+    "failing_install": {
+      "pydantic": "2.14.1",
+      "mcp": "1.6.0",
+      "fastapi": "0.143.0",
+      "starlette": "1.8.0"
+    },
+    "reproduction": "clean Python 3.11.9 venv: mcp==1.6.0 + pydantic==2.14.1 -> ImportError on `import mcp.server`; + pydantic==2.13.5 -> imports cleanly"
+  },
+  "change": {
+    "file": "pyproject.toml",
+    "from": "pydantic>=2.10.0",
+    "to": "pydantic>=2.10.0,<2.14",
+    "pull_request": "https://github.com/kneelinghorse/TraceLab/pull/416",
+    "merge_commit": "7ee7c8cce58ec4844ed4b71c625659befb69e4d8"
+  },
+  "pr_ci": {
+    "backend_suite": "3160 passed, 4 skipped, 12 deselected",
+    "backend_integration": "171 passed, 3 skipped",
+    "installed": {
+      "pydantic": "2.13.5",
+      "mcp": "1.6.0"
+    }
+  },
+  "main_ci_on_merge_commit": [
+    {
+      "conclusion": "success",
+      "run_id": 38425170304,
+      "workflow": "Secret Scan"
+    },
+    {
+      "conclusion": "success",
+      "run_id": 38425169918,
+      "workflow": "Backend Lint"
+    },
+    {
+      "conclusion": "success",
+      "run_id": 38425170238,
+      "workflow": "Frontend Checks"
+    },
+    {
+      "conclusion": "success",
+      "run_id": 38425169909,
+      "workflow": "MCP Package"
+    },
+    {
+      "conclusion": "success",
+      "run_id": 38425170325,
+      "workflow": "Frontend Production Build"
+    },
+    {
+      "conclusion": "success",
+      "run_id": 38425170058,
+      "workflow": "Backend Tests"
+    },
+    {
+      "conclusion": "success",
+      "run_id": 38425170243,
+      "workflow": "Backend Integration"
+    },
+    {
+      "conclusion": "success",
+      "run_id": 38425170303,
+      "workflow": "Post-Deploy Check"
+    }
+  ],
+  "main_backend_suite": "3160 passed, 4 skipped, 12 deselected (standing quarantine)",
+  "deployment": {
+    "railway": {
+      "TraceLab": "SUCCESS 7ee7c8c",
+      "frontend": "SUCCESS 7ee7c8c"
+    },
+    "health": "GET https://api.tracelab.aquex.ai/api/v1/health -> status healthy, commit 7ee7c8cce58ec4844ed4b71c625659befb69e4d8",
+    "container_versions": "railway ssh --service TraceLab -- python3 -c ... -> pydantic 2.13.5 | mcp 1.6.0 | fastapi 0.143.0"
+  },
+  "criteria": {
+    "backend lanes pass on PR #416": "met",
+    "post-deploy check green on the merge commit": "met",
+    "deployed image reports pydantic 2.13.x": "met (2.13.5)"
+  },
+  "not_changed": "fastapi (0.143.0) and starlette (1.8.0) stay floating; CI passed with them",
+  "learning": 302
+}
