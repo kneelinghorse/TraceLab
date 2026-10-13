@@ -1,0 +1,215 @@
+Starting PostgreSQL, Qdrant, and FastAPI services...
+time="2026-10-13T13:26:47-05:00" level=warning msg="/private/tmp/tracelab-s66-front-clean-lzcwP4/TraceLab/docker-compose.dev.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+#1 [internal] load local bake definitions
+#1 reading from stdin 419B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 495B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/python:3.11-slim
+#3 ...
+
+#4 [auth] library/python:pull token for registry-1.docker.io
+#4 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/python:3.11-slim
+#3 DONE 0.4s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 2B done
+#5 DONE 0.0s
+
+#6 [1/6] FROM docker.io/library/python:3.11-slim@sha256:e88e9763f943ec1834f992a4b51e0f24500486803e8bc534e5767af9ea65f6ce
+#6 resolve docker.io/library/python:3.11-slim@sha256:e88e9763f943ec1834f992a4b51e0f24500486803e8bc534e5767af9ea65f6ce 0.0s done
+#6 DONE 0.0s
+
+#7 [internal] load build context
+#7 transferring context: 507.38MB 5.0s
+#7 transferring context: 1.04GB 10.0s
+#7 transferring context: 1.55GB 15.2s
+#7 transferring context: 1.68GB 16.5s done
+#7 DONE 16.6s
+
+#8 [2/6] WORKDIR /app
+#8 CACHED
+
+#9 [3/6] RUN apt-get update && apt-get install -y     gcc     postgresql-client     && rm -rf /var/lib/apt/lists/*
+#9 CACHED
+
+#10 [4/6] COPY pyproject.toml .
+#10 CACHED
+
+#11 [5/6] RUN pip install --no-cache-dir .
+#11 CACHED
+
+#12 [6/6] COPY . .
+#12 DONE 4.5s
+
+#13 exporting to image
+#13 exporting layers
+#13 exporting layers 36.3s done
+#13 exporting manifest sha256:e3c1dbf74acb91ae50d573ecd425de3aff266413aca897bb95d42c835a0262c4 done
+#13 exporting config sha256:f3ece554da756b675318f0200a21e32c34c0ea4d8dbeb6f065eaac68f6bb215a done
+#13 exporting attestation manifest sha256:cd125b9105cdf302c66b3b58174a896103e12b3d90515de4b07dd83fe8de33ed done
+#13 exporting manifest list sha256:ab22305ac204090fd4cb25653bd2d1363a22e47cee5a685e6bc7d0fc010da3e9 done
+#13 naming to docker.io/library/tracelab-local-backend:latest done
+#13 unpacking to docker.io/library/tracelab-local-backend:latest
+#13 unpacking to docker.io/library/tracelab-local-backend:latest 6.9s done
+#13 DONE 43.3s
+
+#14 resolving provenance for metadata file
+#14 DONE 0.0s
+ backend  Built
+ Network tracelab-local_default  Creating
+ Network tracelab-local_default  Created
+ Volume "tracelab-local_postgres_data"  Creating
+ Volume "tracelab-local_postgres_data"  Created
+ Volume "tracelab-local_qdrant_data"  Creating
+ Volume "tracelab-local_qdrant_data"  Created
+ Container tracelab-local_dev_postgres  Creating
+ Container tracelab-local_dev_qdrant  Creating
+ Container tracelab-local_dev_qdrant  Created
+ Container tracelab-local_dev_postgres  Created
+ Container tracelab-local_dev_backend  Creating
+ Container tracelab-local_dev_backend  Created
+ Container tracelab-local_dev_qdrant  Starting
+ Container tracelab-local_dev_postgres  Starting
+ Container tracelab-local_dev_qdrant  Started
+ Container tracelab-local_dev_postgres  Started
+ Container tracelab-local_dev_postgres  Waiting
+ Container tracelab-local_dev_postgres  Healthy
+ Container tracelab-local_dev_backend  Starting
+ Container tracelab-local_dev_backend  Started
+Applying database migrations...
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 001_initial, Initial schema
+INFO  [alembic.runtime.migration] Running upgrade 001_initial -> 002_processing_status, Add document processing status audit trail.
+INFO  [alembic.runtime.migration] Running upgrade 002_processing_status -> 003_onboarding, Add onboarding API support tables.
+INFO  [alembic.runtime.migration] Running upgrade 003_onboarding -> 004_mission_protocol_validation, Mission Protocol validation constraint and schema metadata.
+INFO  [alembic.runtime.migration] Running upgrade 004_mission_protocol_validation -> 005_performance_indexes, Add performance-focused indexes for high-traffic queries.
+INFO  [alembic.runtime.migration] Running upgrade 005_performance_indexes -> 006_add_fulltext_search, Add tsvector column and GIN index for keyword search.
+INFO  [alembic.runtime.migration] Running upgrade 006_add_fulltext_search -> 007_add_faceted_filter_indexes, Add indexes to support faceted search filters.
+INFO  [alembic.runtime.migration] Running upgrade 007_add_faceted_filter_indexes -> 008_add_search_history, Add search history table for query logging + replay.
+INFO  [alembic.runtime.migration] Running upgrade 008_add_search_history -> 009_add_saved_searches, Add saved searches table for reusable query bookmarks.
+INFO  [alembic.runtime.migration] Running upgrade 009_add_saved_searches -> 010_evidence_link_meta, Add evidence_linking_metadata column to missions.
+INFO  [alembic.runtime.migration] Running upgrade 010_evidence_link_meta -> 011_add_collections, Add collections and collection_items tables for chunk grouping.
+INFO  [alembic.runtime.migration] Running upgrade 011_add_collections -> 012_add_api_keys, Add api_keys table for API key authentication.
+INFO  [alembic.runtime.migration] Running upgrade 012_add_api_keys -> 013_add_reports, Add reports, report_sources, and synthesis_cache tables.
+INFO  [alembic.runtime.migration] Running upgrade 013_add_reports -> 014_missions_revamp, Revamp missions table with DeepSearch-compatible schema.
+INFO  [alembic.runtime.migration] Running upgrade 014_missions_revamp -> 015_add_document_metadata, Add document_metadata column to documents table.
+INFO  [alembic.runtime.migration] Running upgrade 015_add_document_metadata -> 016_repair_missions, Repair database schema - create all missing tables.
+INFO  [alembic.runtime.migration] Running upgrade 016_repair_missions -> 017_fix_reports_schema, Fix reports table schema - add missing columns.
+INFO  [alembic.runtime.migration] Running upgrade 017_fix_reports_schema -> 018_soft_delete, Add soft delete columns to projects and documents tables.
+INFO  [alembic.runtime.migration] Running upgrade 018_soft_delete -> 019_document_provenance, Add provenance columns to documents table for report promotion.
+INFO  [alembic.runtime.migration] Running upgrade 019_document_provenance -> 020_audit_metadata, Add audit metadata fields to documents, reports, tags, and missions.
+INFO  [alembic.runtime.migration] Running upgrade 020_audit_metadata -> 021_add_research_depth, Add research_depth column to missions table.
+INFO  [alembic.runtime.migration] Running upgrade 021_add_research_depth -> 022_graph_edges, Add graph_edges table for PEDR L6 layer.
+INFO  [alembic.runtime.migration] Running upgrade 022_graph_edges -> 023_add_users_table, Add users table for multi-user authentication.
+INFO  [alembic.runtime.migration] Running upgrade 023_add_users_table -> 024_add_invite_codes_table, Add invite_codes table for user registration.
+INFO  [alembic.runtime.migration] Running upgrade 024_add_invite_codes_table -> 025_add_mission_logs_table, Add mission_logs table for DeepSearch runner log ingestion.
+INFO  [alembic.runtime.migration] Running upgrade 025_add_mission_logs_table -> 026_add_validation_failed_status, Add validation_failed to valid_mission_status CHECK constraint.
+INFO  [alembic.runtime.migration] Running upgrade 026_add_validation_failed_status -> 027_add_mission_authoring_fields, Add mission authoring fields consumed by DeepSearch contract compiler.
+INFO  [alembic.runtime.migration] Running upgrade 027_add_mission_authoring_fields -> 028_drop_research_depth, Drop research_depth column from missions table.
+INFO  [alembic.runtime.migration] Running upgrade 028_drop_research_depth -> 029_device_authorization_grants, Create device_authorization_grants table for RFC 8628 device-code flow.
+INFO  [alembic.runtime.migration] Running upgrade 029_device_authorization_grants -> 030_add_owner_workspace_columns, Additive ownership + workspace columns (Sprint 43 T43.2).
+INFO  [alembic.runtime.migration] Running upgrade 030_add_owner_workspace_columns -> 031_backfill_ownership, Backfill ownership + bootstrap owner (Sprint 43 T43.3).
+INFO  [alembic.runtime.migration] Running upgrade 031_backfill_ownership -> 032_add_user_is_active, Add users.is_active for admin soft-disable (Sprint 43 T43.5).
+INFO  [alembic.runtime.migration] Running upgrade 032_add_user_is_active -> 033_add_space_members, Create space_members table: the access grant linking a user to a Space.
+INFO  [alembic.runtime.migration] Running upgrade 033_add_space_members -> 034_add_project_tags, Create project_tags junction: cross-cutting themes link projects to tags.
+INFO  [alembic.runtime.migration] Running upgrade 034_add_project_tags -> 035_add_sync_states_table, Create sync_states table to match the SyncState ORM model.
+INFO  [alembic.runtime.migration] Running upgrade 035_add_sync_states_table -> 036_drop_metadata_table, Drop the orphan ``metadata`` table (T45.3, sprint-45 Infra Hardening).
+INFO  [alembic.runtime.migration] Running upgrade 036_drop_metadata_table -> 037_backfill_doc_coll_owner, Backfill document/collection ownership minted NULL since 031 (Sprint 48 T48.4).
+INFO  [alembic.runtime.migration] Running upgrade 037_backfill_doc_coll_owner -> 038_backfill_mission_report, Backfill mission/report ownership from parent projects (Sprint 48 T48.8).
+INFO  [alembic.runtime.migration] Running upgrade 038_backfill_mission_report -> 039_deepsearch_lease_v1, Add the canonical DeepSearch fenced-lease boundary to missions.
+INFO  [alembic.runtime.migration] Running upgrade 039_deepsearch_lease_v1 -> 040_evidence_ledger_v1, Create the project-scoped evidence ledger.
+INFO  [alembic.runtime.migration] Running upgrade 040_evidence_ledger_v1 -> 041_search_artifact_owners, Add stable ownership to saved searches and search history.
+INFO  [alembic.runtime.migration] Running upgrade 041_search_artifact_owners -> 042_ledger_retrieval_v1, Normalize ledger sources and add PostgreSQL full-text retrieval.
+INFO  [alembic.runtime.migration] Running upgrade 042_ledger_retrieval_v1 -> 043_deepsearch_evidence, Add idempotent DeepSearch evidence-ledger batch ownership.
+INFO  [alembic.runtime.migration] Running upgrade 043_deepsearch_evidence -> 044_home_mission_reviews, Track explicit per-user review of a mission result.
+INFO  [alembic.runtime.migration] Running upgrade 044_home_mission_reviews -> 045_user_favorites, Persist per-user project favorites.
+INFO  [alembic.runtime.migration] Running upgrade 045_user_favorites -> 046_collection_context, Add collection instructions and direct document context.
+INFO  [alembic.runtime.migration] Running upgrade 046_collection_context -> 047_user_saved_views, Persist personal mission dashboards with user-delete cascade.
+INFO  [alembic.runtime.migration] Running upgrade 047_user_saved_views -> 048_user_inbox_state, Per-user inbox watermark: a timestamp only, so revocation leaks nothing.
+INFO  [alembic.runtime.migration] Running upgrade 048_user_inbox_state -> 049_recent_activity, Recent activity: per-item viewed marks replace the inbox watermark, mission reviews and saved views.
+INFO  [alembic.runtime.migration] Running upgrade 049_recent_activity -> 050_user_email_notifications, Per-user opt-out for mission completion and failure emails (NOTIFY-1, decision #455).
+INFO  [alembic.runtime.migration] Running upgrade 050_user_email_notifications -> 051_usage_records, Per-user usage records for DeepSearch runs and Librarian calls (METER-0, decision #522).
+INFO  [alembic.runtime.migration] Running upgrade 051_usage_records -> 052_personal_spaces, Personal Spaces: one per human user, and member projects leave Default (PERSONAL-1).
+INFO  [alembic.runtime.migration] Running upgrade 052_personal_spaces -> 053_report_citations, Persist validated citation identity without inventing mappings for legacy reports.
+INFO  [alembic.runtime.migration] Running upgrade 053_report_citations -> 054_description_provenance, Guard reviewed description writes and retain their human acceptance provenance.
+INFO  [alembic.runtime.migration] Running upgrade 054_description_provenance -> 055_collection_review, Retain explicitly accepted collection provenance and excerpt order.
+INFO  [alembic.runtime.migration] Running upgrade 055_collection_review -> 056_password_recovery, Add user credential revisions and a bounded, hashed password recovery slot.
+INFO  [alembic.runtime.migration] Running upgrade 056_password_recovery -> 057_password_recovery_audit, Retain secret-free admin recovery outcomes after account cleanup.
+INFO  [alembic.runtime.migration] Running upgrade 057_password_recovery_audit -> 058_mission_log_attempts, Add nullable attempt/event identity while retaining all legacy log history.
+Database repair complete!
+Reports schema fix complete!
+Added deleted_at column to projects table
+Added deleted_by column to projects table
+Added deleted_at column to documents table
+Added deleted_by column to documents table
+Soft delete migration complete!
+Added source_report_id column to documents table
+Added source_mission_id column to documents table
+Added source_origin column to documents table
+Created index idx_documents_source_origin
+Created partial index idx_documents_source_report_id
+Document provenance migration complete!
+Added documents.updated_at column and backfilled from uploaded_at
+Created auto-update trigger for documents.updated_at
+Added reports.created_by column
+Added tags.created_at column
+Added tags.updated_at column
+Created auto-update trigger for tags.updated_at
+Created index idx_missions_created_at on missions table
+Audit metadata migration complete!
+
+============================================================
+  BOOTSTRAP INVITE CODE: [redacted local fixture]
+  Share this code to allow the first user to register.
+============================================================
+
+Stack is running:
+  - API:       http://localhost:8000
+  - Postgres:  localhost:55433 (user: postgres / pass: postgres)
+  - Qdrant:    http://localhost:6333
+Installing frontend dependencies...
+npm warn deprecated whatwg-encoding@3.1.1: Use @exodus/bytes instead for a more spec-conformant and faster implementation
+
+added 733 packages, and audited 734 packages in 31s
+
+285 packages are looking for funding
+  run `npm fund` for details
+
+37 vulnerabilities (2 low, 7 moderate, 25 high, 3 critical)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+Starting Next.js dev server on http://localhost:3000 ...
+
+> frontend@0.1.0 dev
+> next dev
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   ▲ Next.js 16.0.10 (Turbopack)
+   - Local:         http://localhost:3000
+   - Network:       http://192.168.0.224:3000
+
+ ✓ Starting...
+ ✓ Ready in 2.6s
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Browserslist: browsers data (caniuse-lite) is 11 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ GET / 200 in 2.1s (compile: 2.1s, render: 21ms)
+ GET / 200 in 24ms (compile: 4ms, render: 20ms)
+ GET / 200 in 18ms (compile: 4ms, render: 14ms)
+
+Frontend dev server stopped. The Docker stack is still running.
+Run 'npm run dev:down' from the repository root to stop all services.

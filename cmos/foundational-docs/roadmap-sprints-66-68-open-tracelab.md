@@ -53,9 +53,10 @@ Three things must be true that day:
 
 Opened when S66-DEPS started on Derek's "yes, merge" (decision #614). PR #416 merged as `7ee7c8c`.
 
-**Order:** DEPS → EXPOSURE → SETTINGS → FRONT → DECOUPLE → TESTS → MCP. The share-out is an invite-only demo of the hosted app (decision #614), so the user-visible SETTINGS fixes run before the repository's front door. Requires edges:
+**Order:** DEPS → EXPOSURE → SETTINGS → FRONT → SECURITY → DECOUPLE → TESTS → MCP. The share-out is an invite-only demo of the hosted app (decision #614), so the user-visible SETTINGS fixes run before the repository's front door. Derek added SECURITY after the fresh install exposed dependency advisories (decision #618). Requires edges:
 - every mission requires DEPS, because nothing merges while backend CI is red;
 - FRONT requires EXPOSURE to merge, so visitors aren't invited into a tree that still holds other people's data. It can be drafted in parallel;
+- SECURITY requires FRONT; DECOUPLE requires SECURITY, so the dependency findings are addressed before the remaining work;
 - TESTS requires DECOUPLE and SETTINGS, because they share test files and the CI spec list.
 
 Each mission is merged, deployed and verified on production before the next starts, and it closes the follow-ups named in it.
@@ -155,6 +156,23 @@ Closes #280 and #275.
 - The receipt holds the fresh-clone transcript, ending in a 200 from the local UI and the API health route.
 - A grep for the stale README fragments returns nothing.
 - `git ls-files tracelab.egg-info` is empty.
+
+### S66-SECURITY — Patch the frontend dependency security findings
+
+Added with Derek's approval on 2026-10-13 after FRONT's clean install reported 37 dependency advisories: 3 critical, 25 high, 7 moderate and 2 low. This is a version-based audit result; exploitability on TraceLab has not been established.
+
+**Objective:** remove actionable runtime and critical test-tooling dependency findings, and disposition every remaining advisory before the share-out.
+
+- Capture full and production-only audit baselines with installed versions, dependency paths and maintainer advisory URLs.
+- Update Next.js and affected test tooling to supported patched versions, with necessary compatible dependencies. Run `npm install` in `frontend/` and commit its lockfile. Do not blindly use `npm audit fix --force`, which proposes framework downgrades and unrelated major changes.
+- Keep the vendored OODS versions unless a proven blocker needs an operator decision. No exploit probes or paid provider calls.
+- Distinguish version matches from demonstrated exposure. Record the applicability and fix disposition of any remaining development advisory, with a bounded follow-up when it cannot be resolved in this mission.
+
+**Done when:**
+- Production dependencies have no unresolved high or critical findings; every remaining development advisory has a disposition.
+- Frontend unit tests, lint, types, production build and the currently enumerated browser tests pass, with no new skips; required CI is green.
+- A fresh production dependency install/build passes, and read-only production smoke on the merged commit verifies the deployed Next.js version and existing UI behavior.
+- The receipt and roadmap record actual versions, audit changes, validation and any bounded carry-forward.
 
 ### S66-DECOUPLE — The app stops writing into the record folder
 
@@ -336,12 +354,13 @@ Add to this list rather than resolving items silently. Questions 1–4 were answ
 | Moving a telemetry writer silently changes an admin view | Only writers under `cmos/` move. The admin-dashboard data in root `telemetry/` is untouched, and no `app/` code reads the moved files |
 | Upstream releases break the build again | Learning #302: compare the last green run's installed versions with the failing run's; if it recurs, adopt a constraints file |
 | The 2.1.3 publish waits on Derek | Last in order; the README fix is low-stakes, and #174 stands on its own evidence before publication |
-| Seven missions in about two days | DEPS, EXPOSURE and SETTINGS run first. Any later mission that slips moves to Sprint 68 and does not block Monday |
+| Eight missions in about two days after the approved security addition | DEPS, EXPOSURE and SETTINGS run first. Any later mission that slips moves to Sprint 68; unresolved actionable security findings are surfaced before the share-out |
 
 ---
 
 ## Change Log
 
+- **2026-10-13 UTC, clean-install security findings added to Sprint 66.** Derek approved S66-SECURITY immediately after FRONT and before DECOUPLE, TESTS and MCP (decision #618). The clean install found 37 frontend dependency advisories, including critical Next.js and test-tooling findings. Version applicability was checked against maintainer advisories; exploitability on TraceLab was not established. FRONT's quickstart now explicitly isolates Compose containers and volumes, following an initial attempt that reused and migrated an existing local database (decision #617). The second clone passed from empty volumes through UI login and API health.
 - **2026-10-13 UTC, Derek's answers; Sprint 66 opened.**
   - Answers: merge (PR #416 merged as `7ee7c8c`); license MIT (decision #613, correcting #612's stored approval words); history kept, current tree cleaned; messages to any project allowed; Monday is an invite-only demo for 5–10 people (decision #614).
   - S66-DEPS started and opened the sprint, and the identity was synchronised to `sprint-66-active`.
