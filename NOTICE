@@ -1,0 +1,12 @@
+# Vendored components
+
+TraceLab's original code and its vendored DeepSearch contract compiler are licensed under MIT; see LICENSE. The following bundled components retain their own license:
+
+| Component | Version | License | Archive |
+| --- | --- | --- | --- |
+| @oods/tokens | 0.1.0 | PolyForm-Noncommercial-1.0.0 | frontend/vendor/oods-tokens-0.1.0.tgz |
+| @oods/tw-variants | 0.1.0 | PolyForm-Noncommercial-1.0.0 | frontend/vendor/oods-tw-variants-0.1.0.tgz |
+
+Both packages identify their author as Design System Team. Each archive contains its complete license at package/LICENSE. The root MIT license does not replace those terms.
+
+Source checkout and archive hashes are recorded in frontend/vendor/oods-provenance.json. See frontend/vendor/README.md for the packaging and verification procedure. Other installed dependencies retain the licenses distributed with their packages.

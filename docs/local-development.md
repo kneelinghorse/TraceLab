@@ -7,7 +7,7 @@ local developer workflow so every contributor can bootstrap the stack with a sin
 
 - Docker Desktop 4.x (or Docker Engine + Compose v2)
 - Python 3.11 (only required if you plan to run FastAPI outside Docker)
-- Node.js 18+ and npm (for the frontend dev server)
+- Node.js 22+ and npm (for the frontend dev server)
 - 10 GB of free disk space for Docker volumes / node modules
 
 Verify requirements:
@@ -15,7 +15,7 @@ Verify requirements:
 ```bash
 docker --version
 docker compose version  # falls back to docker-compose if needed
-node --version          # >= 18.x
+node --version          # >= 22.x
 npm --version
 ```
 
@@ -44,6 +44,8 @@ What the script does:
 2. Uses `docker-compose.dev.yml` to start PostgreSQL (5433), Qdrant (6333), and the FastAPI backend (8000).
 3. Runs `alembic upgrade head` inside the backend container.
 4. Installs frontend dependencies (if missing) and launches `npm run dev` from `frontend/`.
+
+If host port 5433 is occupied, run `export TRACELAB_POSTGRES_PORT=55433` (or another free port) before startup. This changes the Compose host mapping only; the backend still connects to `postgres:5432`. Host-side tools must use the selected port. See the [README quickstart](../README.md#run-locally) for first-login details.
 
 Use the optional flag when you only need backend services:
 
@@ -109,7 +111,7 @@ for both offline (`--offline`) and remote (`--base-url`) runs:
 
 ```bash
 # Reuse the service account that also powers automated tests
-export AUTH_USERNAME=tracelab-admin
+export AUTH_USERNAME=tracelab-admin@example.com
 export AUTH_PASSWORD=changeme
 
 # Optional overrides that only affect the ingestion CLI

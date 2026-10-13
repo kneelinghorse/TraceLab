@@ -1,293 +1,90 @@
-# TraceLab Research Repository
+# TraceLab
 
-Personal-scale research repository with RAG-powered semantic search, structured data organization, and quality-enforced workflows.+ mcp
+TraceLab is a research workspace for collecting evidence, running DeepSearch missions, and producing cited reports.
 
-## Tech Stack -dn
+Keep documents, claims, sources and research results together, then use the Librarian to work with that material through a web interface or an MCP client.
 
-- **Backend**: Python 3.11+ with FastAPI
-- **Database**: PostgreSQL 15
-- **Migrations**: Alembic
-- **Containerization**: Docker & Docker Compose
+## What it does
 
-## Quick Start
+- **Librarian:** ask questions of your research with citations, draft project descriptions, review duplicate documents, and propose collections and reports for human review.
+- **DeepSearch missions:** author research scope, preview the compiled contract, follow execution, and inspect the resulting evidence and reports. A separate DeepSearch worker executes the research.
+- **Evidence Ledger:** retain sourced claims, supporting snippets, dispositions and research-session context, including contradictory and rejected findings.
+- **Cited reports:** synthesize collections while keeping links back to source excerpts.
+- **MCP:** use the same research workflows from compatible AI clients through [`@aquex/tracelab-mcp`](packages/tracelab-mcp/README.md).
 
-### Prerequisites
+## Hosted access
 
-- Docker and Docker Compose
-- Python 3.11+ (for local development without Docker)
+The [hosted app](https://tracelab.aquex.ai) is invite-only. Use the invite code supplied by the person inviting you when you register. Existing users sign in with their email address and password. API keys and additional invite codes are available in Settings.
 
-### Development Setup
+## Run locally
 
-1. **Clone the repository and navigate to the project:**
+The quickstart runs PostgreSQL, Qdrant and the FastAPI API in Docker, with the Next.js UI on the host. It requires Docker with Compose v2, Node.js **22 or newer**, npm, and free ports **3000, 8000 and 6333**. PostgreSQL uses host port **5433**, with an alternate-port option below. Python 3.11 is supplied by the API container.
+
+**Research execution requires a DeepSearch worker.** That worker is a separate project and is not publicly available while its repository is private; cloning TraceLab alone does not provide an end-to-end autonomous research runner. Provider-backed Librarian answers, embeddings and report generation also need provider credentials. The startup and health checks below require no paid provider calls.
+
+1. Clone and create the local environment file:
+
    ```bash
+   git clone https://github.com/kneelinghorse/TraceLab.git
    cd TraceLab
-   ```
-
-2. **Copy environment file:**
-   ```bash
    cp .env.example .env
    ```
-   Edit `.env` with your configuration if needed.
 
-3. **Start services with Docker Compose:**
+2. If another application already uses PostgreSQL port 5433, choose a free host port before starting:
+
    ```bash
-   docker-compose up -d
+   export TRACELAB_POSTGRES_PORT=55433
    ```
 
-   This will:
-   - Start PostgreSQL on port 5432
-   - Build and start the FastAPI application on port 8000
+   This changes only the local Docker port mapping. The API still connects to PostgreSQL on port 5432 inside Docker. Host-side database tools must use the selected host port.
 
-4. **Run database migrations:**
+3. Start the stack and UI:
+
    ```bash
-   docker-compose exec app alembic upgrade head
+   bash scripts/dev-setup.sh
    ```
 
-5. **Access the API:**
-   - API docs: http://localhost:8000/docs
-   - Health check: http://localhost:8000/api/v1/health
-   - DB health check: http://localhost:8000/api/v1/health/db
+   The script builds and starts the Docker services, applies Alembic migrations, installs frontend dependencies and starts Next.js. Leave this terminal running. Open [localhost:3000](http://localhost:3000).
 
-### Dev Container (Recommended)
+   The example environment provisions `tracelab-admin@example.com` with password `changeme` on the first migration. These are local development defaults. Before deploying a real instance, set `AUTH_USERNAME` to the owner's full email address and configure `AUTH_PASSWORD` or `AUTH_PASSWORD_HASH`, `SECRET_KEY`, and the appropriate CORS origins in `.env`. Changing bootstrap credentials later does not reset an existing database user's password; use Settings or password recovery.
 
-If you use VS Code with the Dev Containers extension, open the repo and select "Reopen in Container". This builds from `.devcontainer/devcontainer.json`, spinning up PostgreSQL, Qdrant, and a preconfigured Python environment with all dev tooling installed.
+4. In another terminal, check both services:
 
-Ports forwarded automatically: `8000` (API), `3000` (frontend), `5433` (PostgreSQL), `6333` (Qdrant).
-
-### Local Development (Without Docker)
-
-1. **Create virtual environment:**
    ```bash
-   python3.11 -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   curl --fail --silent --show-error --write-out '\nAPI HTTP %{http_code}\n' http://localhost:8000/api/v1/health
+   curl --fail --silent --show-error --output /dev/null --write-out 'UI HTTP %{http_code}\n' http://localhost:3000
    ```
 
-2. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+   Both should report HTTP 200. API documentation is at [localhost:8000/docs](http://localhost:8000/docs).
 
-3. **Start PostgreSQL** (ensure PostgreSQL is running locally or via Docker):
-   ```bash
-   docker-compose up -d postgres
-   ```
-
-4. **Run migrations:**
-   ```bash
-   alembic upgrade head
-   ```
-
-5. **Start the development server:**
-   ```bash
-   uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-   ```
-
-> Need the full local stack (Docker, scripts, frontend) in one place? See `docs/local-development.md`.
-
-## Authentication & CORS
-
-- The FastAPI backend exposes `/api/v1/auth/login` and `/api/v1/auth/refresh` for JWT issuance. Configure credentials with `AUTH_USERNAME` plus either `AUTH_PASSWORD` (stored securely via passlib) or `AUTH_PASSWORD_HASH`.
-- Tokens are signed with `SECRET_KEY` and expire after `ACCESS_TOKEN_EXPIRE_MINUTES` (default: 60). Protected routes reject requests without the `Authorization: Bearer <token>` header.
-- Frontend clients (Next.js in `frontend/`) persist the token locally and automatically attach it to mission and quality API calls. Users must sign in before accessing `/missions` routes.
-- CORS settings are loaded from `CORS_ALLOWED_ORIGINS_DEV` and `CORS_ALLOWED_ORIGINS_PROD`, along with customizable headers/methods. See `docs/auth_and_cors_guidance.md` for deployment examples.
-
-## Authentication Quickstart
-
-1. **Configure credentials**
-   ```bash
-   cp .env.example .env
-   # update AUTH_USERNAME, AUTH_PASSWORD, SECRET_KEY as needed
-   ```
-2. **Obtain a token**
-   ```bash
-   curl -X POST http://localhost:8000/api/v1/auth/login \
-     -H "Content-Type: application/json" \
-     -d '{"username":"tracelab-admin","password":"changeme"}'
-   ```
-3. **Call a protected endpoint**
-   ```bash
-   TOKEN="<access-token>"
-   curl http://localhost:8000/api/v1/missions/ \
-     -H "Authorization: Bearer ${TOKEN}"
-   ```
-4. **Smoke-test with the helper script**
-   ```bash
-   python examples/auth_examples.py --base-url http://localhost:8000
-   ```
-5. **Manual + automated verification**
-   - Import `postman/TraceLab-Auth.json` and update the collection variables for quick demos.
-   - Run `pytest tests/test_auth_flow.py tests/test_auth_api.py` to cover login, refresh, and downstream access.
-
-See `docs/authentication.md` for a deeper walkthrough covering frontend usage, Postman workflows, and troubleshooting tips.
-
-## Production URLs & Health Checks
-
-- **UI (Cloudflare vanity domain):** `https://tracelab.aquex.ai/missions` points to the Railway Next.js frontend (`frontend-production-43c3.up.railway.app`). Verify availability with `curl -sS -o /dev/null -w "%{http_code}\n" https://tracelab.aquex.ai/missions` (expect `200`).
-- **API domain:** `https://api.tracelab.aquex.ai` proxies to the FastAPI service on Railway (`tracelab-production.up.railway.app`). Keep `NEXT_PUBLIC_API_BASE_URL` pointed at this host and tune `NEXT_PUBLIC_API_PATH_PREFIX` (`/api/v1` by default, set to `""` when the backend lives at `/`). Validate the health route with `curl https://api.tracelab.aquex.ai/api/v1/health` (adjust the `/api/v1` segment if your prefix differs; expect `{ "status": "healthy" }`).
-- **CORS origins:** Add both `https://tracelab.aquex.ai` and `https://www.tracelab.aquex.ai` to `CORS_ALLOWED_ORIGINS_PROD` in your `.env` when running the backend in production mode. Keep `Full (Strict)` TLS enabled within Cloudflare to preserve end-to-end encryption.
-- **Playwright smoke:** Run the production smoke suite from `frontend/` whenever DNS or env vars change:
-  ```bash
-  cd frontend
-  PLAYWRIGHT_BASE_URL=https://tracelab.aquex.ai \
-PLAYWRIGHT_API_BASE_URL=https://api.tracelab.aquex.ai \
-PLAYWRIGHT_API_PATH_PREFIX=/api/v1 \
-PLAYWRIGHT_SKIP_SERVER=1 \
-npx playwright test tests/e2e/production-smoke.spec.ts
-```
-  The suite loads `/missions` through Cloudflare and pings the configured `${PLAYWRIGHT_API_PATH_PREFIX}/health` endpoint to prove the path is wired correctly.
-
-## Project Structure
-
-```
-TraceLab/
-├── .devcontainer/     # Dev container configuration
-├── .github/           # CI workflows and the required-check baseline (.github/ci/)
-├── alembic/           # Database migrations (sole schema authority)
-├── app/
-│   ├── api/           # API endpoints
-│   │   └── v1/        # API v1 routes
-│   ├── adapters/      # Hexagonal adapter implementations
-│   ├── core/          # Config, database, security, authorization, rate limiting
-│   ├── mcp_server/    # Python MCP kept for local development (production-dark)
-│   ├── models/        # SQLAlchemy models
-│   ├── ports/         # Protocol interfaces (hexagonal ports)
-│   ├── schemas/       # Pydantic request/response contracts
-│   ├── services/      # Business logic services
-│   ├── dependencies.py # Composition root (DI wiring)
-│   └── main.py        # FastAPI app, router mounting, router-level auth
-├── cmos/              # Planning workbench: missions, sessions, receipts, foundational docs
-├── docs/              # Developer documentation (docs/adr/ holds the ADRs)
-├── frontend/          # Next.js web UI (see docs/frontend_architecture.md)
-├── packages/
-│   └── tracelab-mcp/  # @aquex/tracelab-mcp, the supported agent surface
-├── scripts/           # Operational and verification scripts
-├── tests/             # Test files
-│   ├── unit/          # Unit tests (mocked, no DB)
-│   ├── integration/   # Integration tests (real PostgreSQL)
-│   └── e2e/           # End-to-end tests
-├── docker-compose.yml  # Docker Compose configuration
-├── Dockerfile         # Application Dockerfile
-└── pyproject.toml     # Python project config (deps, tooling)
-```
-
-## Database Schema
-
-The application uses the following core tables:
-
-- `projects` - Research projects
-- `documents` - Uploaded research documents
-- `document_chunks` - Chunks for RAG embeddings
-- `tags` - Tag taxonomy
-- `document_tags` - Document-tag relationships
-- `insights` - Synthesized findings
-- `insight_sources` - Insight-source chunk relationships
-- `missions` - Mission Protocol integration (JSONB)
-- `quality_checks` - Quality audit trail
-
-See `cmos/foundational-docs/technical_architecture.md` for the as-built architecture and schema notes.
-
-## Migrations
-
-### Create a new migration:
-```bash
-alembic revision --autogenerate -m "description"
-```
-
-### Apply migrations:
-```bash
-alembic upgrade head
-```
-
-### Rollback:
-```bash
-alembic downgrade -1
-```
-
-## Testing
-
-Run health checks:
-```bash
-# Basic health
-curl http://localhost:8000/api/v1/health
-
-# Database health
-curl http://localhost:8000/api/v1/health/db
-```
-
-## PII Redaction Guardrail
-
-- Presidio dependencies have been removed. The `PresidioRedactionService` name now refers to a lightweight regex stub that only powers `/api/v1/redaction`.
-- `DocumentIngestionService` skips PII redaction entirely and records `"redaction_enabled": false` in its processing audit trail.
-- Run `pytest tests/test_presidio_redaction.py::test_redact_document_uses_pseudonymization_and_audit` and `pytest tests/test_rag_service.py::test_semantic_cache_hit_rate_reaches_target` whenever touching ingestion, cache metrics, or related guardrails.
-- See `app/services/README_redaction.md` for the full guardrail checklist and migration notes.
-
-## Synthetic Corpus Pipeline (B1.2)
-
-Regenerate the synthetic UX research corpus (Markdown, TXT, DOCX, PDF, CSV) populated with locale-aware Faker PII:
+Stop the UI with Ctrl-C. From the repository directory, stop the Docker services while retaining their data:
 
 ```bash
-python scripts/generate_corpus.py
+docker compose -f docker-compose.dev.yml down
 ```
 
-Evaluate Presidio against the corpus and capture the baseline metrics artifact:
+See the [local development guide](docs/local-development.md) for separate service startup and the [authentication guide](docs/authentication.md) for account and deployment configuration. Python dependencies come from `pyproject.toml`; contributor installation uses `pip install -e '.[dev,test]'`.
 
-```bash
-python scripts/evaluate_presidio.py
-```
+## Repository map
 
-Package the corpus for secure upload (creates archive, manifest, and baseline copy):
+| Path | Contents |
+| --- | --- |
+| [`app/`](app/) | FastAPI routes, services, models, ports and adapters |
+| [`frontend/`](frontend/) | Next.js web UI |
+| [`alembic/`](alembic/) | PostgreSQL schema migrations |
+| [`packages/tracelab-mcp/`](packages/tracelab-mcp/) | Supported MCP package |
+| [`tests/`](tests/) and [`frontend/tests/`](frontend/tests/) | Backend and browser tests |
+| [`docs/`](docs/) | Developer and operations documentation |
+| [`cmos/`](cmos/) | Reasonbook project record, planning documents and acceptance receipts |
 
-```bash
-python scripts/package_corpus.py
-python scripts/upload_corpus.py --destination /secure/presidio/upload
-```
+A full clone is about 1 GB because Git history and `cmos/` retain development history, including screenshot receipts. The record is a development workbench, separate from the research data stored by the application in PostgreSQL and Qdrant. Its local SQLite database is ignored by Git. Application code lives outside `cmos/`.
 
-Refer to `data/corpus/README.md` for detailed options (document counts, survey rows, research briefs) and storage guidance.
+Useful references: [frontend architecture](docs/frontend_architecture.md), [architecture decisions](docs/adr/), [MCP tool reference](docs/mcp-tools.md), and [mission-authoring contract](cmos/contracts/mission-authoring-contract.md).
 
-## Project & Document Read APIs
+## Contributing and security
 
-Authenticated callers now receive paginated envelopes when browsing the research library:
+Read [CONTRIBUTING.md](CONTRIBUTING.md) for setup, tests and CI expectations. Report vulnerabilities privately using the process in [SECURITY.md](SECURITY.md).
 
-```bash
-curl -H "Authorization: Bearer $TOKEN" \
-  "http://localhost:8000/api/v1/projects?page=1&page_size=10&search=field"
+## License
 
-curl -H "Authorization: Bearer $TOKEN" \
-  "http://localhost:8000/api/v1/documents?project_id=$PROJECT_ID&processed=true&page=1&page_size=20"
-```
-
-Responses share the same shape:
-
-```json
-{
-  "data": [ { "id": "…", "name": "…" } ],
-  "pagination": { "page": 1, "page_size": 10, "total": 27, "pages": 3 }
-}
-```
-
-- `GET /api/v1/projects` supports `page`, `page_size`, and `search`.
-- `GET /api/v1/documents` adds `project_id`, `processed`, and `search` filters.
-
-The CLI (`tracelab projects list`, `tracelab documents list --project-id …`) and the frontend
-SWR hooks consume the same payload, ensuring UI selectors and filters stay in sync with the
-underlying FastAPI service.
-
-## Development Notes
-
-- The application creates tables automatically in development mode
-- Use Alembic migrations for production deployments
-- Database connection settings are managed via environment variables
-- JWT authentication is enforced for every API route except `/api/v1/health`; obtain a token via `/api/v1/auth/login` and include it as a bearer token in the `Authorization` header.
-- Configure credentials with `AUTH_USERNAME` plus either `AUTH_PASSWORD` (auto-hashed at runtime) or `AUTH_PASSWORD_HASH`; override the signing key via `SECRET_KEY`.
-- Explicit CORS configuration is required—set `CORS_ALLOWED_ORIGINS_DEV` for localhost (default: `http://localhost:3000`) and `CORS_ALLOWED_ORIGINS_PROD` for deployed UI domains along with `CORS_ALLOWED_METHODS` / `CORS_ALLOWED_HEADERS` if you need to extend the defaults.
-
-## Next Steps
-
-This repo now includes:
-- B1.1: Core Service Bootstrap
-- B1.2: Synthetic Corpus Pipeline (corpus generator, annotations, evaluation harness)
-
-Upcoming missions:
-- B1.3: Presidio Redaction Service
-- B1.4: Document Ingestion Pipeline
-- B1.5: Embedding & Qdrant Bootstrap
+TraceLab's code, including the MCP package and vendored DeepSearch contract compiler, is available under the [MIT license](LICENSE). The bundled `@oods/tokens` and `@oods/tw-variants` packages retain **PolyForm Noncommercial 1.0.0**. Their separate license terms are identified in [NOTICE](NOTICE) and included in the vendored archives.
