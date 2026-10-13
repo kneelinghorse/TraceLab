@@ -1,0 +1,62 @@
+[
+  {
+    "route": "/admin/users",
+    "screenshot": "dark-1440-_admin_users.png",
+    "email_count": 0
+  },
+  {
+    "route": "/admin/users",
+    "screenshot": "light-820-_admin_users.png",
+    "email_count": 0
+  },
+  {
+    "route": "/admin/users",
+    "screenshot": "light-1440-_admin_users.png",
+    "email_count": 0
+  },
+  {
+    "route": "/admin/users",
+    "screenshot": "dark-390-_admin_users.png",
+    "email_count": 0
+  },
+  {
+    "route": "/admin/users",
+    "screenshot": "dark-820-_admin_users.png",
+    "email_count": 0
+  },
+  {
+    "route": "/admin/users",
+    "screenshot": "light-390-_admin_users.png",
+    "email_count": 0
+  },
+  {
+    "route": "/admin/spaces",
+    "screenshot": "dark-1440-_admin_spaces.png",
+    "email_count": 0
+  },
+  {
+    "route": "/admin/spaces",
+    "screenshot": "dark-390-_admin_spaces.png",
+    "email_count": 0
+  },
+  {
+    "route": "/admin/spaces",
+    "screenshot": "light-820-_admin_spaces.png",
+    "email_count": 0
+  },
+  {
+    "route": "/admin/spaces",
+    "screenshot": "light-390-_admin_spaces.png",
+    "email_count": 0
+  },
+  {
+    "route": "/admin/spaces",
+    "screenshot": "dark-820-_admin_spaces.png",
+    "email_count": 0
+  },
+  {
+    "route": "/admin/spaces",
+    "screenshot": "light-1440-_admin_spaces.png",
+    "email_count": 0
+  }
+]

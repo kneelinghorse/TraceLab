@@ -1,0 +1,1577 @@
+[
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/published-acceptance.json",
+    "start_line": 17,
+    "commit": "7c740a6e6e0f233ce920e1c070db540497d89161",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/published-acceptance.json",
+    "start_line": 19,
+    "commit": "7c740a6e6e0f233ce920e1c070db540497d89161",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/published-acceptance.json",
+    "start_line": 23,
+    "commit": "7c740a6e6e0f233ce920e1c070db540497d89161",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/published-acceptance.json",
+    "start_line": 24,
+    "commit": "7c740a6e6e0f233ce920e1c070db540497d89161",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/published-acceptance.json",
+    "start_line": 27,
+    "commit": "7c740a6e6e0f233ce920e1c070db540497d89161",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/published-acceptance.json",
+    "start_line": 28,
+    "commit": "7c740a6e6e0f233ce920e1c070db540497d89161",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/published-acceptance.json",
+    "start_line": 35,
+    "commit": "7c740a6e6e0f233ce920e1c070db540497d89161",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/published-acceptance.json",
+    "start_line": 37,
+    "commit": "7c740a6e6e0f233ce920e1c070db540497d89161",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/published-acceptance.json",
+    "start_line": 17,
+    "commit": "979387f58ac3019c2a513798248dbfc4939a11a4",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/published-acceptance.json",
+    "start_line": 19,
+    "commit": "979387f58ac3019c2a513798248dbfc4939a11a4",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/published-acceptance.json",
+    "start_line": 23,
+    "commit": "979387f58ac3019c2a513798248dbfc4939a11a4",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/published-acceptance.json",
+    "start_line": 24,
+    "commit": "979387f58ac3019c2a513798248dbfc4939a11a4",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/published-acceptance.json",
+    "start_line": 27,
+    "commit": "979387f58ac3019c2a513798248dbfc4939a11a4",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/published-acceptance.json",
+    "start_line": 28,
+    "commit": "979387f58ac3019c2a513798248dbfc4939a11a4",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/published-acceptance.json",
+    "start_line": 35,
+    "commit": "979387f58ac3019c2a513798248dbfc4939a11a4",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/published-acceptance.json",
+    "start_line": 37,
+    "commit": "979387f58ac3019c2a513798248dbfc4939a11a4",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/validation.json",
+    "start_line": 198,
+    "commit": "7c740a6e6e0f233ce920e1c070db540497d89161",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/validation.json",
+    "start_line": 209,
+    "commit": "7c740a6e6e0f233ce920e1c070db540497d89161",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/validation.json",
+    "start_line": 233,
+    "commit": "7c740a6e6e0f233ce920e1c070db540497d89161",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-SCOPE/validation.json",
+    "start_line": 59,
+    "commit": "566a15c6cc3551d25d69aea0d958e32236401a8d",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-SCOPE/validation.json",
+    "start_line": 66,
+    "commit": "566a15c6cc3551d25d69aea0d958e32236401a8d",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-SCOPE/validation.json",
+    "start_line": 69,
+    "commit": "566a15c6cc3551d25d69aea0d958e32236401a8d",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-RESULT/validation.json",
+    "start_line": 196,
+    "commit": "566a15c6cc3551d25d69aea0d958e32236401a8d",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-RESULT/validation.json",
+    "start_line": 201,
+    "commit": "566a15c6cc3551d25d69aea0d958e32236401a8d",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-RESULT/validation.json",
+    "start_line": 204,
+    "commit": "566a15c6cc3551d25d69aea0d958e32236401a8d",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "tests/test_result_materialization.py",
+    "start_line": 1717,
+    "commit": "566a15c6cc3551d25d69aea0d958e32236401a8d",
+    "disposition": "test_fixture",
+    "reason": "Literal used only by the isolated authentication/client/receipt-signing regression fixture in this test file."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/validation.json",
+    "start_line": 198,
+    "commit": "979387f58ac3019c2a513798248dbfc4939a11a4",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/validation.json",
+    "start_line": 209,
+    "commit": "979387f58ac3019c2a513798248dbfc4939a11a4",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/validation.json",
+    "start_line": 233,
+    "commit": "979387f58ac3019c2a513798248dbfc4939a11a4",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-SCOPE/validation.json",
+    "start_line": 59,
+    "commit": "31e874b3129d2e674f8c052729f16d8653034b55",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-SCOPE/validation.json",
+    "start_line": 66,
+    "commit": "31e874b3129d2e674f8c052729f16d8653034b55",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-SCOPE/validation.json",
+    "start_line": 69,
+    "commit": "31e874b3129d2e674f8c052729f16d8653034b55",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "tests/test_result_materialization.py",
+    "start_line": 1717,
+    "commit": "31e874b3129d2e674f8c052729f16d8653034b55",
+    "disposition": "test_fixture",
+    "reason": "Literal used only by the isolated authentication/client/receipt-signing regression fixture in this test file."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-RESULT/validation.json",
+    "start_line": 196,
+    "commit": "31e874b3129d2e674f8c052729f16d8653034b55",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-RESULT/validation.json",
+    "start_line": 201,
+    "commit": "31e874b3129d2e674f8c052729f16d8653034b55",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-RESULT/validation.json",
+    "start_line": 204,
+    "commit": "31e874b3129d2e674f8c052729f16d8653034b55",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-63/S63-PUBLIC/validation.json",
+    "start_line": 255,
+    "commit": "e716e34bcb1b60966ffcd8d67246f3c8e6026b40",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-63/S63-PUBLIC/validation.json",
+    "start_line": 255,
+    "commit": "3e3dad7e5a98112b3579480d8d22c162001ad444",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/LOG-1/local-validation.json",
+    "start_line": 26,
+    "commit": "1bf93a1407838e1bbc5151786977b01f6d828cc3",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/LOG-1/local-validation.json",
+    "start_line": 26,
+    "commit": "55b5da6a7cc2334350aa40a251d0c479a3c96914",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/LOG-1/local-validation.json",
+    "start_line": 26,
+    "commit": "ad2e4bd058255cd47558305040c82bace578c366",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-2/local-validation.json",
+    "start_line": 11,
+    "commit": "db153f89321439a9404833234589b1b80db12e70",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-2/local-validation.json",
+    "start_line": 12,
+    "commit": "db153f89321439a9404833234589b1b80db12e70",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-2/local-validation.json",
+    "start_line": 13,
+    "commit": "db153f89321439a9404833234589b1b80db12e70",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-2/local-validation.json",
+    "start_line": 18,
+    "commit": "db153f89321439a9404833234589b1b80db12e70",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-2/local-validation.json",
+    "start_line": 20,
+    "commit": "db153f89321439a9404833234589b1b80db12e70",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-2/local-validation.json",
+    "start_line": 21,
+    "commit": "db153f89321439a9404833234589b1b80db12e70",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-2/local-validation.json",
+    "start_line": 22,
+    "commit": "db153f89321439a9404833234589b1b80db12e70",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-2/local-validation.json",
+    "start_line": 11,
+    "commit": "fa9e9e1a2550d0de9e5780eeeccb187b7b3a1172",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-2/local-validation.json",
+    "start_line": 12,
+    "commit": "fa9e9e1a2550d0de9e5780eeeccb187b7b3a1172",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-2/local-validation.json",
+    "start_line": 13,
+    "commit": "fa9e9e1a2550d0de9e5780eeeccb187b7b3a1172",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-2/local-validation.json",
+    "start_line": 18,
+    "commit": "fa9e9e1a2550d0de9e5780eeeccb187b7b3a1172",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-2/local-validation.json",
+    "start_line": 20,
+    "commit": "fa9e9e1a2550d0de9e5780eeeccb187b7b3a1172",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-2/local-validation.json",
+    "start_line": 21,
+    "commit": "fa9e9e1a2550d0de9e5780eeeccb187b7b3a1172",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-2/local-validation.json",
+    "start_line": 22,
+    "commit": "fa9e9e1a2550d0de9e5780eeeccb187b7b3a1172",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 8,
+    "commit": "68f607c52d6590d93289b616d5c3d8c45c1bcf40",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 10,
+    "commit": "68f607c52d6590d93289b616d5c3d8c45c1bcf40",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 11,
+    "commit": "68f607c52d6590d93289b616d5c3d8c45c1bcf40",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 17,
+    "commit": "68f607c52d6590d93289b616d5c3d8c45c1bcf40",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 20,
+    "commit": "68f607c52d6590d93289b616d5c3d8c45c1bcf40",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 21,
+    "commit": "68f607c52d6590d93289b616d5c3d8c45c1bcf40",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 23,
+    "commit": "68f607c52d6590d93289b616d5c3d8c45c1bcf40",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 28,
+    "commit": "68f607c52d6590d93289b616d5c3d8c45c1bcf40",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 29,
+    "commit": "68f607c52d6590d93289b616d5c3d8c45c1bcf40",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 30,
+    "commit": "68f607c52d6590d93289b616d5c3d8c45c1bcf40",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 33,
+    "commit": "68f607c52d6590d93289b616d5c3d8c45c1bcf40",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 34,
+    "commit": "68f607c52d6590d93289b616d5c3d8c45c1bcf40",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 37,
+    "commit": "68f607c52d6590d93289b616d5c3d8c45c1bcf40",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 38,
+    "commit": "68f607c52d6590d93289b616d5c3d8c45c1bcf40",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 8,
+    "commit": "b21fb3b7dd2a41d1b71b0e5882f3e961408b3d4a",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 10,
+    "commit": "b21fb3b7dd2a41d1b71b0e5882f3e961408b3d4a",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 11,
+    "commit": "b21fb3b7dd2a41d1b71b0e5882f3e961408b3d4a",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 17,
+    "commit": "b21fb3b7dd2a41d1b71b0e5882f3e961408b3d4a",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 20,
+    "commit": "b21fb3b7dd2a41d1b71b0e5882f3e961408b3d4a",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 21,
+    "commit": "b21fb3b7dd2a41d1b71b0e5882f3e961408b3d4a",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 23,
+    "commit": "b21fb3b7dd2a41d1b71b0e5882f3e961408b3d4a",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 28,
+    "commit": "b21fb3b7dd2a41d1b71b0e5882f3e961408b3d4a",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 29,
+    "commit": "b21fb3b7dd2a41d1b71b0e5882f3e961408b3d4a",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 30,
+    "commit": "b21fb3b7dd2a41d1b71b0e5882f3e961408b3d4a",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 33,
+    "commit": "b21fb3b7dd2a41d1b71b0e5882f3e961408b3d4a",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 34,
+    "commit": "b21fb3b7dd2a41d1b71b0e5882f3e961408b3d4a",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 37,
+    "commit": "b21fb3b7dd2a41d1b71b0e5882f3e961408b3d4a",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 38,
+    "commit": "b21fb3b7dd2a41d1b71b0e5882f3e961408b3d4a",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-59/MCP-6/mutation-logs/M2.txt",
+    "start_line": 21,
+    "commit": "86ac8c676042e5ef9b2e1da47e9c526f47764b48",
+    "disposition": "test_fixture",
+    "reason": "Generated credential in local TestClient mutation-test output, not a production credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-59/QA-1/production_acceptance.mjs",
+    "start_line": 232,
+    "commit": "eb1de96d3667130e4ee02655d03ab666c189c3a1",
+    "disposition": "test_fixture",
+    "reason": "Browser placeholder; authenticated transport injects its real key at runtime."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-59/QA-1/mutation-logs/M8-backend.txt",
+    "start_line": 88,
+    "commit": "eb1de96d3667130e4ee02655d03ab666c189c3a1",
+    "disposition": "false_positive",
+    "reason": "Missing document UUID in a test traceback; not a key."
+  },
+  {
+    "scan": "git",
+    "rule": "jwt",
+    "path": "cmos/reports/sprint-59/QA-1/mutation-logs/M9-backend.txt",
+    "start_line": 9,
+    "commit": "eb1de96d3667130e4ee02655d03ab666c189c3a1",
+    "disposition": "test_fixture",
+    "reason": "Generated credential in local TestClient mutation-test output, not a production credential. JWT expiry precedes this 2026-10-13 scan."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-53/pal-2-local-smoke/receipt.json",
+    "start_line": 8,
+    "commit": "2d72cb3d70b896bcb68dd2aaa096338075d5fcb1",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-53/pal-2-local-smoke/receipt.json",
+    "start_line": 11,
+    "commit": "2d72cb3d70b896bcb68dd2aaa096338075d5fcb1",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "jwt",
+    "path": "cmos/reports/sprint-59/QA-1/mutation-logs/M10-backend.txt",
+    "start_line": 10,
+    "commit": "eb1de96d3667130e4ee02655d03ab666c189c3a1",
+    "disposition": "test_fixture",
+    "reason": "Generated credential in local TestClient mutation-test output, not a production credential. JWT expiry precedes this 2026-10-13 scan."
+  },
+  {
+    "scan": "git",
+    "rule": "jwt",
+    "path": "cmos/reports/sprint-59/QA-1/mutation-logs/M10-backend.txt",
+    "start_line": 2707,
+    "commit": "eb1de96d3667130e4ee02655d03ab666c189c3a1",
+    "disposition": "test_fixture",
+    "reason": "Generated credential in local TestClient mutation-test output, not a production credential. JWT expiry precedes this 2026-10-13 scan."
+  },
+  {
+    "scan": "git",
+    "rule": "jwt",
+    "path": "cmos/reports/sprint-59/QA-1/mutation-logs/M10-backend.txt",
+    "start_line": 5440,
+    "commit": "eb1de96d3667130e4ee02655d03ab666c189c3a1",
+    "disposition": "test_fixture",
+    "reason": "Generated credential in local TestClient mutation-test output, not a production credential. JWT expiry precedes this 2026-10-13 scan."
+  },
+  {
+    "scan": "git",
+    "rule": "jwt",
+    "path": "cmos/reports/sprint-59/QA-1/mutation-logs/M10-backend.txt",
+    "start_line": 8119,
+    "commit": "eb1de96d3667130e4ee02655d03ab666c189c3a1",
+    "disposition": "test_fixture",
+    "reason": "Generated credential in local TestClient mutation-test output, not a production credential. JWT expiry precedes this 2026-10-13 scan."
+  },
+  {
+    "scan": "git",
+    "rule": "jwt",
+    "path": "cmos/reports/sprint-59/QA-1/mutation-logs/M10-backend.txt",
+    "start_line": 10785,
+    "commit": "eb1de96d3667130e4ee02655d03ab666c189c3a1",
+    "disposition": "test_fixture",
+    "reason": "Generated credential in local TestClient mutation-test output, not a production credential. JWT expiry precedes this 2026-10-13 scan."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-51/theme-1-validation.json",
+    "start_line": 132,
+    "commit": "db69cb462fe53c2a54ce0eafd02e652f53370992",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-51/theme-1-validation.json",
+    "start_line": 174,
+    "commit": "db69cb462fe53c2a54ce0eafd02e652f53370992",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-51/theme-1-validation.json",
+    "start_line": 96,
+    "commit": "a4fe8ee372def8d0c54eabfaacffbf480abb637f",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-51/theme-1-validation.json",
+    "start_line": 138,
+    "commit": "a4fe8ee372def8d0c54eabfaacffbf480abb637f",
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "tests/unit/test_no_credential_literals.py",
+    "start_line": 25,
+    "commit": "3f3955fdd55107ed3f8ddcef1676cab899da4c6f",
+    "disposition": "test_fixture",
+    "reason": "Literal used only by the isolated authentication/client/receipt-signing regression fixture in this test file."
+  },
+  {
+    "scan": "git",
+    "rule": "curl-auth-header",
+    "path": "docs/environment-setup.md",
+    "start_line": 105,
+    "commit": "6ae443a9f3b6068b9f19ef12169c24eeee7e9670",
+    "disposition": "previously_invalidated",
+    "reason": "The local/production documentation example keys were independently verified invalid before redaction on 2026-08-14. Reasonbook T48.9 containment notes and learning 121; not exercised in this scan."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "tracelab.egg-info/PKG-INFO",
+    "start_line": 154,
+    "commit": "d592c923e7b18b038b9f62ec1441bdc063d8899c",
+    "disposition": "test_fixture",
+    "reason": "Truncated JWT-style documentation placeholder (contains literal ellipsis), not a complete token."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "tracelab.egg-info/PKG-INFO",
+    "start_line": 154,
+    "commit": "255d793628ec791d38b17ce4286b7cd9ffc39cd4",
+    "disposition": "test_fixture",
+    "reason": "Truncated JWT-style documentation placeholder (contains literal ellipsis), not a complete token."
+  },
+  {
+    "scan": "git",
+    "rule": "curl-auth-header",
+    "path": "docs/environment-setup.md",
+    "start_line": 102,
+    "commit": "d23e3f5ba3ae1a1e0e1f3067d21ef7dc83e4200f",
+    "disposition": "previously_invalidated",
+    "reason": "The local/production documentation example keys were independently verified invalid before redaction on 2026-08-14. Reasonbook T48.9 containment notes and learning 121; not exercised in this scan."
+  },
+  {
+    "scan": "git",
+    "rule": "curl-auth-header",
+    "path": "docs/environment-setup.md",
+    "start_line": 105,
+    "commit": "d23e3f5ba3ae1a1e0e1f3067d21ef7dc83e4200f",
+    "disposition": "previously_invalidated",
+    "reason": "The local/production documentation example keys were independently verified invalid before redaction on 2026-08-14. Reasonbook T48.9 containment notes and learning 121; not exercised in this scan."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "docs/environment-setup.md",
+    "start_line": 76,
+    "commit": "d23e3f5ba3ae1a1e0e1f3067d21ef7dc83e4200f",
+    "disposition": "previously_invalidated",
+    "reason": "The local/production documentation example keys were independently verified invalid before redaction on 2026-08-14. Reasonbook T48.9 containment notes and learning 121; not exercised in this scan."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "docs/environment-setup.md",
+    "start_line": 91,
+    "commit": "d23e3f5ba3ae1a1e0e1f3067d21ef7dc83e4200f",
+    "disposition": "previously_invalidated",
+    "reason": "The local/production documentation example keys were independently verified invalid before redaction on 2026-08-14. Reasonbook T48.9 containment notes and learning 121; not exercised in this scan."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "tests/test_deepsearch_client.py",
+    "start_line": 36,
+    "commit": "5a73f93c5e2eeba9c9208e8b197f609ed1f13f13",
+    "disposition": "test_fixture",
+    "reason": "Literal used only by the isolated authentication/client/receipt-signing regression fixture in this test file."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "tests/test_deepsearch_client.py",
+    "start_line": 142,
+    "commit": "5a73f93c5e2eeba9c9208e8b197f609ed1f13f13",
+    "disposition": "test_fixture",
+    "reason": "Literal used only by the isolated authentication/client/receipt-signing regression fixture in this test file."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "tests/test_api_key_auth.py",
+    "start_line": 177,
+    "commit": "6efd5fc6cc4c67abc932eb389063b51fe11916b2",
+    "disposition": "test_fixture",
+    "reason": "Literal used only by the isolated authentication/client/receipt-signing regression fixture in this test file."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "packages/tracelab-mcp/README.md",
+    "start_line": 63,
+    "commit": "6efd5fc6cc4c67abc932eb389063b51fe11916b2",
+    "disposition": "test_fixture",
+    "reason": "Documentation placeholder: the response key alternates sequential alphabet letters and digits; the curl header is an uppercase JWT placeholder."
+  },
+  {
+    "scan": "git",
+    "rule": "curl-auth-header",
+    "path": "packages/tracelab-mcp/README.md",
+    "start_line": 52,
+    "commit": "6efd5fc6cc4c67abc932eb389063b51fe11916b2",
+    "disposition": "test_fixture",
+    "reason": "Documentation placeholder: the response key alternates sequential alphabet letters and digits; the curl header is an uppercase JWT placeholder."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "README.md",
+    "start_line": 103,
+    "commit": "2176366af3c44a78f12f529c9fdea968e5c62da3",
+    "disposition": "test_fixture",
+    "reason": "Truncated JWT-style documentation placeholder (contains literal ellipsis), not a complete token."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "docs/authentication.md",
+    "start_line": 34,
+    "commit": "2176366af3c44a78f12f529c9fdea968e5c62da3",
+    "disposition": "test_fixture",
+    "reason": "Truncated JWT-style documentation placeholder (contains literal ellipsis), not a complete token."
+  },
+  {
+    "scan": "git",
+    "rule": "generic-api-key",
+    "path": "docs/authentication.md",
+    "start_line": 42,
+    "commit": "2176366af3c44a78f12f529c9fdea968e5c62da3",
+    "disposition": "test_fixture",
+    "reason": "Truncated JWT-style documentation placeholder (contains literal ellipsis), not a complete token."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-51/theme-1-validation.json",
+    "start_line": 95,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-51/theme-1-validation.json",
+    "start_line": 137,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-53/pal-2-local-smoke/receipt.json",
+    "start_line": 8,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-53/pal-2-local-smoke/receipt.json",
+    "start_line": 11,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-59/QA-1/production_acceptance.mjs",
+    "start_line": 232,
+    "commit": null,
+    "disposition": "test_fixture",
+    "reason": "Browser placeholder; authenticated transport injects its real key at runtime."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-59/MCP-6/mutation-logs/M2.txt",
+    "start_line": 21,
+    "commit": null,
+    "disposition": "test_fixture",
+    "reason": "Generated credential in local TestClient mutation-test output, not a production credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/LOG-1/local-validation.json",
+    "start_line": 26,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 7,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 9,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 10,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 16,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 19,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 20,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 22,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 27,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 28,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 29,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 32,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 33,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 36,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-1/local-validation.json",
+    "start_line": 37,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-2/local-validation.json",
+    "start_line": 10,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-2/local-validation.json",
+    "start_line": 11,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-2/local-validation.json",
+    "start_line": 12,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-2/local-validation.json",
+    "start_line": 17,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-2/local-validation.json",
+    "start_line": 19,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-2/local-validation.json",
+    "start_line": 20,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-61/AUTH-2/local-validation.json",
+    "start_line": 21,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-59/QA-1/mutation-logs/M8-backend.txt",
+    "start_line": 88,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "Missing document UUID in a test traceback; not a key."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/published-acceptance.json",
+    "start_line": 17,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/published-acceptance.json",
+    "start_line": 19,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/published-acceptance.json",
+    "start_line": 23,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/published-acceptance.json",
+    "start_line": 24,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/published-acceptance.json",
+    "start_line": 27,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/published-acceptance.json",
+    "start_line": 28,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/published-acceptance.json",
+    "start_line": 35,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/published-acceptance.json",
+    "start_line": 37,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-63/S63-PUBLIC/validation.json",
+    "start_line": 255,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-SCOPE/validation.json",
+    "start_line": 59,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-SCOPE/validation.json",
+    "start_line": 66,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-SCOPE/validation.json",
+    "start_line": 69,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-RESULT/validation.json",
+    "start_line": 196,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-RESULT/validation.json",
+    "start_line": 201,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-RESULT/validation.json",
+    "start_line": 204,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "jwt",
+    "path": "cmos/reports/sprint-59/QA-1/mutation-logs/M10-backend.txt",
+    "start_line": 10,
+    "commit": null,
+    "disposition": "test_fixture",
+    "reason": "Generated credential in local TestClient mutation-test output, not a production credential. JWT expiry precedes this 2026-10-13 scan."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/validation.json",
+    "start_line": 198,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/validation.json",
+    "start_line": 209,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "cmos/reports/sprint-64/S64-ACCEPT/validation.json",
+    "start_line": 233,
+    "commit": null,
+    "disposition": "false_positive",
+    "reason": "SHA-256 file checksum in an artifact/validation manifest, not an authentication credential."
+  },
+  {
+    "scan": "tree",
+    "rule": "jwt",
+    "path": "cmos/reports/sprint-59/QA-1/mutation-logs/M10-backend.txt",
+    "start_line": 2707,
+    "commit": null,
+    "disposition": "test_fixture",
+    "reason": "Generated credential in local TestClient mutation-test output, not a production credential. JWT expiry precedes this 2026-10-13 scan."
+  },
+  {
+    "scan": "tree",
+    "rule": "jwt",
+    "path": "cmos/reports/sprint-59/QA-1/mutation-logs/M9-backend.txt",
+    "start_line": 9,
+    "commit": null,
+    "disposition": "test_fixture",
+    "reason": "Generated credential in local TestClient mutation-test output, not a production credential. JWT expiry precedes this 2026-10-13 scan."
+  },
+  {
+    "scan": "tree",
+    "rule": "jwt",
+    "path": "cmos/reports/sprint-59/QA-1/mutation-logs/M10-backend.txt",
+    "start_line": 5440,
+    "commit": null,
+    "disposition": "test_fixture",
+    "reason": "Generated credential in local TestClient mutation-test output, not a production credential. JWT expiry precedes this 2026-10-13 scan."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "tests/unit/test_no_credential_literals.py",
+    "start_line": 25,
+    "commit": null,
+    "disposition": "test_fixture",
+    "reason": "Literal used only by the isolated authentication/client/receipt-signing regression fixture in this test file."
+  },
+  {
+    "scan": "tree",
+    "rule": "jwt",
+    "path": "cmos/reports/sprint-59/QA-1/mutation-logs/M10-backend.txt",
+    "start_line": 8119,
+    "commit": null,
+    "disposition": "test_fixture",
+    "reason": "Generated credential in local TestClient mutation-test output, not a production credential. JWT expiry precedes this 2026-10-13 scan."
+  },
+  {
+    "scan": "tree",
+    "rule": "generic-api-key",
+    "path": "tests/test_result_materialization.py",
+    "start_line": 1717,
+    "commit": null,
+    "disposition": "test_fixture",
+    "reason": "Literal used only by the isolated authentication/client/receipt-signing regression fixture in this test file."
+  },
+  {
+    "scan": "tree",
+    "rule": "jwt",
+    "path": "cmos/reports/sprint-59/QA-1/mutation-logs/M10-backend.txt",
+    "start_line": 10785,
+    "commit": null,
+    "disposition": "test_fixture",
+    "reason": "Generated credential in local TestClient mutation-test output, not a production credential. JWT expiry precedes this 2026-10-13 scan."
+  },
+  {
+    "scan": "binary",
+    "rule": "sourcegraph-access-token",
+    "path": "cmos/reports/sprint-51/ux-8-live-flow/dark-1440-collections.png",
+    "blob_oid": "08adf8d40a46ec0247d9900615b7771f204f1971",
+    "extracted_line": 5307473,
+    "disposition": "false_positive",
+    "reason": "Git object ID in an inserted BLOB inventory header, not credential material extracted from the blob."
+  },
+  {
+    "scan": "binary",
+    "rule": "sourcegraph-access-token",
+    "path": "cmos/reports/sprint-51/ux-8-pre-correction-smoke/dark/dark-390-_console.png",
+    "blob_oid": "dba18205ff2655d4e334c78a51bb054dc9390de6",
+    "extracted_line": 5699040,
+    "disposition": "false_positive",
+    "reason": "Git object ID in an inserted BLOB inventory header, not credential material extracted from the blob."
+  },
+  {
+    "scan": "binary",
+    "rule": "sourcegraph-access-token",
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_console_corrections.png",
+    "blob_oid": "45112a998853c4e275601fb884a37fcdfda74b76",
+    "extracted_line": 7805548,
+    "disposition": "false_positive",
+    "reason": "Git object ID in an inserted BLOB inventory header, not credential material extracted from the blob."
+  },
+  {
+    "scan": "binary",
+    "rule": "sourcegraph-access-token",
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_reports_7064c47e-c198-45d5-b887-b18a1f86d7ce.png",
+    "blob_oid": "1ed58bed696fb9de6b485ca9722987e5c3575dce",
+    "extracted_line": 8019774,
+    "disposition": "false_positive",
+    "reason": "Git object ID in an inserted BLOB inventory header, not credential material extracted from the blob."
+  },
+  {
+    "scan": "binary",
+    "rule": "sourcegraph-access-token",
+    "path": "cmos/reports/sprint-59/QA-1/production/run-1/Q2-sharing-options-synthesis-dark-1440.png",
+    "blob_oid": "3bfa696704be70723cef975e2ecc539384df35ae",
+    "extracted_line": 9550071,
+    "disposition": "false_positive",
+    "reason": "Git object ID in an inserted BLOB inventory header, not credential material extracted from the blob."
+  },
+  {
+    "scan": "binary",
+    "rule": "sourcegraph-access-token",
+    "path": "cmos/reports/sprint-59/QA-1/production/run-2/Q2-sharing-options-synthesis-dark-1440.png",
+    "blob_oid": "cb861f18621fd2d09e276c5994069455041f48fc",
+    "extracted_line": 9596750,
+    "disposition": "false_positive",
+    "reason": "Git object ID in an inserted BLOB inventory header, not credential material extracted from the blob."
+  }
+]

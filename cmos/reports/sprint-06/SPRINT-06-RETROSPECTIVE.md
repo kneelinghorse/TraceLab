@@ -72,7 +72,7 @@
 ## ⚠️ Challenges & Blockers
 | Area | Evidence | Impact |
 | --- | --- | --- |
-| Missing document/project list APIs | No `@router.get("/")` in `app/api/v1/documents.py`, and no `projects` router exists | Document Library UI, CLI `tracelab documents list`, and Mission UI cannot hydrate data; B6.3 remains effectively blocked. |
+| Missing document/project list APIs | No redacted-address-3@example.com("/")` in `app/api/v1/documents.py`, and no `projects` router exists | Document Library UI, CLI `tracelab documents list`, and Mission UI cannot hydrate data; B6.3 remains effectively blocked. |
 | Ingestion CLI 401s | `pytest tests/integration/test_ingestion_flow.py::test_markdown_cli_flow` fails because `scripts/ingest_cli.py` calls `http://testserver/api/v1/documents/upload` without auth context (401) | Prevents scripted ingest/evidence workflows end-to-end. |
 | Presidio test failure | `tests/test_presidio_redaction.py::test_redact_document_uses_pseudonymization_and_audit` fails at `app/services/presidio_redaction.py:375` (missing `analysis_explanation` attribute) | Local dev verification halts; agents can’t prove PII trimming works. |
 | Cache metrics duplication | `tests/test_rag_service.py::test_semantic_cache_hit_rate_reaches_target` raises duplicated Prometheus counter names from `app/services/cache_metrics.py:28` | Semantic cache validation cannot pass, leaving hit-rate targets unverified. |
