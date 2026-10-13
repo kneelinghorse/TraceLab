@@ -9,7 +9,8 @@ export function Dialog({ open, title, onClose, children }: { open: boolean; titl
     if (open && !dialog?.open) dialog?.showModal();
     if (!open && dialog?.open) dialog.close();
   }, [open]);
-  return <dialog ref={ref} tabIndex={-1} onKeyDown={keepDialogFocus} aria-label={title} onCancel={event => { event.preventDefault(); onClose(); }} onClose={onClose} className="m-auto w-[calc(100%-2rem)] max-w-lg rounded-xl border border-line bg-surface p-6 text-foreground shadow-xl backdrop:bg-background/70">
+  // A queued close event from the previous opening must not dismiss a reopened modal.
+  return <dialog ref={ref} tabIndex={-1} onKeyDown={keepDialogFocus} aria-label={title} onCancel={event => { event.preventDefault(); onClose(); }} onClose={event => { if (!event.currentTarget.open) onClose(); }} className="m-auto w-[calc(100%-2rem)] max-w-lg rounded-xl border border-line bg-surface p-6 text-foreground shadow-xl backdrop:bg-background/70">
     <h2 className="mb-4 text-xl font-semibold">{title}</h2>{children}
   </dialog>;
 }

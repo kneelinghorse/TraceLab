@@ -1,0 +1,74 @@
+{
+  "baseline_nine_specs": {
+    "total": 48,
+    "expected": 48,
+    "passed": 47,
+    "failed": 1,
+    "skipped": 0,
+    "interrupted": 0,
+    "durationSeconds": 49.567,
+    "retries": 0
+  },
+  "baseline_admin_repeats": {
+    "total": 30,
+    "expected": 30,
+    "passed": 15,
+    "failed": 15,
+    "skipped": 0,
+    "interrupted": 0,
+    "durationSeconds": 121.941,
+    "retries": 0
+  },
+  "all_22_specs": {
+    "total": 145,
+    "expected": 145,
+    "passed": 145,
+    "failed": 0,
+    "skipped": 0,
+    "interrupted": 0,
+    "durationSeconds": 182.478,
+    "retries": 0
+  },
+  "admin_repeats_after": {
+    "total": 30,
+    "expected": 30,
+    "passed": 30,
+    "failed": 0,
+    "skipped": 0,
+    "interrupted": 0,
+    "durationSeconds": 20.955,
+    "retries": 0
+  },
+  "counts_by_file": {
+    "frontend/tests/e2e/admin-password-recovery.spec.ts": 6,
+    "frontend/tests/e2e/app-shell.spec.ts": 15,
+    "frontend/tests/e2e/authored-scope.spec.ts": 12,
+    "frontend/tests/e2e/collection-context.spec.ts": 6,
+    "frontend/tests/e2e/console.spec.ts": 1,
+    "frontend/tests/e2e/evidence.spec.ts": 4,
+    "frontend/tests/e2e/graph.spec.ts": 7,
+    "frontend/tests/e2e/hygiene.spec.ts": 4,
+    "frontend/tests/e2e/librarian-collections.spec.ts": 6,
+    "frontend/tests/e2e/librarian-description.spec.ts": 6,
+    "frontend/tests/e2e/librarian-duplicates.spec.ts": 6,
+    "frontend/tests/e2e/librarian-reports.spec.ts": 6,
+    "frontend/tests/e2e/mission-live-logs.spec.ts": 6,
+    "frontend/tests/e2e/mission-protocol.spec.ts": 8,
+    "frontend/tests/e2e/password-recovery.spec.ts": 6,
+    "frontend/tests/e2e/project-bundles.spec.ts": 6,
+    "frontend/tests/e2e/report-citations.spec.ts": 6,
+    "frontend/tests/e2e/route-migration.spec.ts": 1,
+    "frontend/tests/e2e/search-command.spec.ts": 15,
+    "frontend/tests/e2e/session-code-accessibility.spec.ts": 12,
+    "frontend/tests/e2e/settings.spec.ts": 3,
+    "frontend/tests/e2e/token-contrast.spec.ts": 3
+  },
+  "plain_local_app_shell": {
+    "passed": 15,
+    "failed": 0,
+    "skipped": 0,
+    "command": "npx playwright test tests/e2e/app-shell.spec.ts --workers=1",
+    "server": "automatic next build and next start"
+  },
+  "retired_or_skipped_specs": []
+}

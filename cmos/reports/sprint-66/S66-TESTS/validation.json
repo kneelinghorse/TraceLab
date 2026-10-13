@@ -1,0 +1,28 @@
+{
+  "frontend_unit": {
+    "passed": 385,
+    "skipped": 0,
+    "new_dialog_regression_before": {
+      "failed": 1,
+      "passed": 1
+    },
+    "new_dialog_regression_after": {
+      "passed": 2
+    }
+  },
+  "backend_targeted": {
+    "passed": 6,
+    "skipped": 0
+  },
+  "lint": "pass",
+  "types": "pass",
+  "production_build": "pass",
+  "foundational_references": "pass",
+  "credential_guard": "pass",
+  "receipt_email_guard": "pass",
+  "dialog_defect": "Native close event from a previous opening arrived after showModal, with dialog.open=true, and onClose dismissed the reopened dialog. Ignore that stale event; actual native closes still notify the owner. Existing browser spec unchanged.",
+  "unit_discovery_defect": "Postbuild Vitest traversed .next/node_modules and ran bundled third-party tests: 192 files, 4 failed, 1 skipped; 1860 cases, 2 failed, 1 todo. Exclude generated .next and nested dependencies; accepted run is 46 files/385 TraceLab tests, no skips.",
+  "discarded_probe": "Initial latency load probe used an autouse fixture with incorrect ordering and produced a teardown error; replaced with a test-call hook. First best-of revision correctly failed positive-work assertion on warmed response cache; final budget disables it.",
+  "diagnostic_browser_probe": "Temporary instrumentation repeated 18 admin cases (9 passed/9 failed). Event capture then stopped at max-failures 2: 2 passed, 2 failed,2 not run. These are investigation runs, not acceptance suites.",
+  "provider_execution": false
+}

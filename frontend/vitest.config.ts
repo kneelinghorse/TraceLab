@@ -19,7 +19,7 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./vitest.setup.ts"],
     include: ["**/*.test.{ts,tsx}"],
-    exclude: ["node_modules", "e2e", "tests"],
+    exclude: ["**/node_modules/**", "**/.next/**", "e2e", "tests"],
     // Specs that render a full page through jsdom spend 50-120 ms on every accessible-name
     // lookup, so a heavy one legitimately needs seconds of CPU. Vitest runs files in parallel,
     // so under load the 5 s default was reporting slow-but-correct specs as failures

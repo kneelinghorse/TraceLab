@@ -46,16 +46,17 @@ The production-build gate runs after `npm ci --omit=dev`, so TypeScript, its dec
 
 If an older npm crashes with `Cannot read properties of null (reading 'edgesOut')` while resolving Vitest's optional peers, run `npx --yes npm@11 install` to regenerate the lockfile. This is an [npm resolver issue](https://github.com/npm/cli/issues/9787); do not bypass peer checks with `--legacy-peer-deps` or force unrelated upgrades. Fresh `npm install` and `npm ci` with the committed lockfile are verified on Node 22.23.3 / npm 10.9.9.
 
-Browser checks run against the production build. Start it in one terminal:
+Browser checks build and start the production frontend automatically:
 
 ```bash
 cd frontend
 npx playwright install chromium
-npm run build
-npm run start -- --hostname 127.0.0.1 --port 3100
+npx playwright test tests/e2e/app-shell.spec.ts
 ```
 
-Then, from `frontend/` in another terminal:
+The default owns port 3100 and refuses to reuse an existing server. Set
+`PLAYWRIGHT_PORT` to use another port. To test a production build you have already
+started, explicitly opt out of server management:
 
 ```bash
 PLAYWRIGHT_SKIP_SERVER=1 PLAYWRIGHT_BASE_URL=http://127.0.0.1:3100 npx playwright test tests/e2e/app-shell.spec.ts

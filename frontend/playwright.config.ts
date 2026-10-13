@@ -19,9 +19,9 @@ const reporters: ReporterDescription[] = [
 const webServer = skipServer
   ? undefined
   : {
-      command: `npm run dev -- --hostname 0.0.0.0 --port ${port}`,
+      command: `npm run build && npm run start -- --hostname 127.0.0.1 --port ${port}`,
       url: baseURL,
-      reuseExistingServer: !process.env.CI,
+      reuseExistingServer: false,
       timeout: 120_000,
     };
 
