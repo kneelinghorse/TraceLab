@@ -11,7 +11,7 @@ Two independent root causes, not one:
 
 | Endpoint | Symptom | Root cause | Scope of failure |
 |---|---|---|---|
-| `PATCH /api/v1/missions/{id}` (MCP `update_mission`) | 405 Method Not Allowed | FastAPI route registered as `@router.put`, MCP client sends `PATCH` | **Every environment** (local, staging, prod) — code bug |
+| `PATCH /api/v1/missions/{id}` (MCP `update_mission`) | 405 Method Not Allowed | FastAPI route registered as redacted-address-4@example.com`, MCP client sends `PATCH` | **Every environment** (local, staging, prod) — code bug |
 | `POST /api/v1/missions/{id}/submit` (MCP `submit_mission`) | 405 Method Not Allowed | Route does not exist on `main` branch; deployed code is ~267 commits stale | **Production only** — deploy lag |
 
 The DeepSearch paid smoke on `ACC-BIB-EVID-01` hit both at once, so the failures looked like a single problem.
@@ -29,7 +29,7 @@ The DeepSearch paid smoke on `ACC-BIB-EVID-01` hit both at once, so the failures
   @router.put("/{mission_id}", response_model=MissionResponse)
   def update_mission(...)
   ```
-- Zero `@router.patch(...)` registrations existed for `/missions/{id}` anywhere in `app/`.
+- Zero redacted-address-5@example.com(...)` registrations existed for `/missions/{id}` anywhere in `app/`.
 
 ### Why it was invisible
 
@@ -37,7 +37,7 @@ The API-level tests in `tests/test_missions_api.py::TestMissionUpdate` all used 
 
 ### Fix
 
-- `app/api/v1/missions.py:377` — `@router.put` → `@router.patch` (partial-update semantics match PATCH)
+- `app/api/v1/missions.py:377` — redacted-address-4@example.com` → redacted-address-5@example.com` (partial-update semantics match PATCH)
 - `app/api/v1/missions.py:123,133` and `app/mcp_server/tools/missions.py:421,437` — suggestion strings updated from `"Use PUT /api/v1/missions/..."` to `"Use PATCH ..."`
 - `tests/test_missions_api.py` — 11 existing `client.put(...)` calls flipped to `client.patch(...)`; class docstring updated
 - New class `TestMissionVerbContract` in `tests/test_missions_api.py` with three guards:

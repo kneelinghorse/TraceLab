@@ -59,15 +59,18 @@ for (const theme of (process.env.UI_THEME?[process.env.UI_THEME]:['light','dark'
      overflow:[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect();return r.width>0&&(r.right>innerWidth+1||r.left < -1)&&getComputedStyle(e).visibility!=='hidden'&&e.getClientRects().length}).slice(0,15).map(e=>({tag:e.tagName,class:e.className,text:e.textContent?.slice(0,45)})),
      violations:axe.violations.filter(v=>rules.includes(v.id)||['critical','serious'].includes(v.impact)).map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>({target:n.target,html:n.html.slice(0,400),summary:n.failureSummary}))}))};
    });
-   // Settings contains live invite codes and key prefixes. Preserve selectors
-   // and contrast measurements, but never retain its literal HTML or text.
-   if (page.url().includes('/settings')) {
-     for (const violation of measured.violations) for (const node of violation.nodes) node.html = '[settings content omitted]';
-     for (const node of measured.overflow) node.text = '[settings content omitted]';
+   // Settings and account administration contain credentials or personal data.
+   // Preserve selectors and measurements, but never retain literal HTML/text.
+   if (['/settings', '/admin/users', '/admin/spaces'].some(route => page.url().includes(route))) {
+     for (const violation of measured.violations) for (const node of violation.nodes) node.html = '[account content omitted]';
+     for (const node of measured.overflow) node.text = '[account content omitted]';
    }
    const shot=`${theme}-${width}-${slug}.png`;
    const links=inspectInternalLinks(await page.locator('a[href]').evaluateAll(nodes=>nodes.map(node=>node.href)),page.url());
-   await page.screenshot({path:path.join(out,shot),fullPage:true, mask:page.url().includes('/settings')?[page.locator('code')]:[]});
+   const masks = page.url().includes('/settings') ? [page.locator('code')] : [];
+   if (page.url().includes('/admin/users')) masks.push(page.locator('tbody td:nth-child(1), tbody td:nth-child(2)'));
+   if (page.url().includes('/admin/spaces')) masks.push(page.locator('main li > div, main li > span, main select'));
+   await page.screenshot({path:path.join(out,shot),fullPage:true,mask:masks});
    const result={route,themeRequested:theme,theme,width,status:response.status(),finalUrl:page.url(),...measured,...links,errors,transportErrors:[...transportErrors],navigationCancellations:[...navigationCancellations],suppressedWrites:[...suppressedWrites],screenshot:shot};
    results.push(result);
    await fs.writeFile(out+'/results.json',JSON.stringify(results,null,2));

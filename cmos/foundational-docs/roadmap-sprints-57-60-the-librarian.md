@@ -71,7 +71,7 @@ The UI renders the two differently, so a user always knows which they are readin
 | Users | 8 | |
 | Spaces | Default (35 projects), Derek-Private (17), Parts Town (2), Personal Archive (0) | |
 
-**Nobody but Derek has ever run a mission.** Syndy has had a Space and access since before this arc opened and has run zero. So the multi-user path is not being scaled — it is being used for the first time.
+**Nobody but Derek has ever run a mission.** Participant 3 has had a Space and access since before this arc opened and has run zero. So the multi-user path is not being scaled — it is being used for the first time.
 
 **A project lives in exactly one Space.** `projects.workspace_id` is a single FK and zero projects are unassigned. Two guests cannot share a seeded reference corpus without duplicating the project or placing them in the same Space — and only an admin can do either. **Resolved into Sprint 58** (decisions #514, #516); guest invitations are gated on it.
 
@@ -137,7 +137,7 @@ Derek described the model he believed existed:
 
 > "the idea should be the person who creates the project is owner, can add others, they can then use/see that folder and use it. I suppose we could have grants like view/edit but otherwise, yes, meant to be shared between n number of people."
 
-**It does not exist.** Verified against the tree: no `project_members` table, no `ProjectMember` model, and no "add people to this project" control anywhere in the frontend. The only membership table is `space_members`; the only sharing UI is `/admin/spaces`, behind `RequireAdmin`. What he did with Syndy was the admin Spaces flow — create a Space, assign two projects, add her as a member.
+**It does not exist.** Verified against the tree: no `project_members` table, no `ProjectMember` model, and no "add people to this project" control anywhere in the frontend. The only membership table is `space_members`; the only sharing UI is `/admin/spaces`, behind `RequireAdmin`. What he did with Participant 3 was the admin Spaces flow — create a Space, assign two projects, add her as a member.
 
 Three consequences, in order of severity:
 

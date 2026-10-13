@@ -1,0 +1,700 @@
+{
+  "mission": "S66-EXPOSURE",
+  "date": "2026-10-13",
+  "baseline_commit": "7c740a6e6e0f233ce920e1c070db540497d89161",
+  "status": "local acceptance complete; PR CI and merge/deploy verification pending",
+  "tools": {
+    "gitleaks": "8.30.1",
+    "tesseract": "5.5.3",
+    "pillow": "11.3.0",
+    "git": "git version 2.50.1 (Apple Git-155)",
+    "sqlite3": "3.51.0 2025-06-12 13:14:41 f0ca7bba1c5e232e5d279fad6338121ab55af0c8c68c84cdfb18ba5114dcaapl (64-bit)"
+  },
+  "scan": {
+    "refs": [
+      {
+        "ref": "refs/codex/turn-diffs/captures/1791909845128/4e8783af-4cc2-4bb8-aad9-34f64c545ce3/base",
+        "commit": "ca8358406906abea192d0a64b1aa45e314d2e1b0"
+      },
+      {
+        "ref": "refs/heads/backup/local-main-4c622c7",
+        "commit": "4c622c7ef7c06bdacf69a7a12aa2cceb465ea494"
+      },
+      {
+        "ref": "refs/heads/codex/dup-1-acceptance",
+        "commit": "2551f83d21381ffd446e658622aba92bedb1ff78"
+      },
+      {
+        "ref": "refs/heads/codex/dup-1-document-review",
+        "commit": "da107c78f7791e2199fdffcebd75a8669710623c"
+      },
+      {
+        "ref": "refs/heads/codex/lib-3-acceptance",
+        "commit": "2092c4100d663396806b9d3b836c632242494552"
+      },
+      {
+        "ref": "refs/heads/codex/lib-3-project-descriptions",
+        "commit": "a2017ec49d3984ac3c768ec1ac2030094921cc0f"
+      },
+      {
+        "ref": "refs/heads/codex/lib-4-acceptance",
+        "commit": "1a2ad678de7bb8868fcfd9f42b59ed7906e5a41d"
+      },
+      {
+        "ref": "refs/heads/codex/lib-4-reviewed-reports",
+        "commit": "1c9eccd08661245f5ebeb9e504869ddd4cd03d27"
+      },
+      {
+        "ref": "refs/heads/codex/org-1-acceptance",
+        "commit": "fa4d5355d7b71822c7e4c2810be2505d2c92f74c"
+      },
+      {
+        "ref": "refs/heads/codex/org-1-reviewed-collections",
+        "commit": "6552678564c7673b725d68ef64a4c8296fe0cbb5"
+      },
+      {
+        "ref": "refs/heads/codex/s52-ci-5-main-run-correction",
+        "commit": "1da6d7794b1e043963058521e5bb03a934d1a776"
+      },
+      {
+        "ref": "refs/heads/codex/s52-ci-5-required-checks",
+        "commit": "b3a97d30023d850a1ec94b5fa350274df846d77a"
+      },
+      {
+        "ref": "refs/heads/codex/s52-ci-5-validation",
+        "commit": "b4e81338c4a178a178a469906b96e5f8bded11de"
+      },
+      {
+        "ref": "refs/heads/codex/s52-graph-1",
+        "commit": "59d204aba6a237a35ca3e241fd15bd43bca6b2c3"
+      },
+      {
+        "ref": "refs/heads/codex/s52-graph-1-receipt",
+        "commit": "c5f0ccb0b1659cc77df104938099ed44eb64b5c7"
+      },
+      {
+        "ref": "refs/heads/codex/s52-mcp-1-evidence-contract",
+        "commit": "b071825d03f7e0028865fd7455ec445ffd9e9cd5"
+      },
+      {
+        "ref": "refs/heads/codex/s52-mcp-1-node18-query",
+        "commit": "e135a8a5c7250319e200dc49a7d387850cd0695c"
+      },
+      {
+        "ref": "refs/heads/codex/s52-mcp-1-read-parity",
+        "commit": "76e7b1ab7cbd69f8d68c2633543aa562676ebf3e"
+      },
+      {
+        "ref": "refs/heads/codex/s52-mcp-1-receipts",
+        "commit": "71867da3bc530ab80580257b7de4a2dfa82311ad"
+      },
+      {
+        "ref": "refs/heads/codex/s52-sec-1-authorization",
+        "commit": "e3dbf304d72176fe12bacd483ef318300c07f79b"
+      },
+      {
+        "ref": "refs/heads/codex/s52-sec-1-validation",
+        "commit": "c7a9b761f9eb450aa1c370dc67176cd21c263142"
+      },
+      {
+        "ref": "refs/heads/codex/s52-sec-2-document-read-policy",
+        "commit": "505f5a5f4bd75ef5c342374369d357c6bd8015c2"
+      },
+      {
+        "ref": "refs/heads/codex/s52-sec-2-validation",
+        "commit": "bfbfc618702cc23b24538ccb88282325bc84cf24"
+      },
+      {
+        "ref": "refs/heads/codex/s52-ux-11",
+        "commit": "48195bc19c8db02394ffbac4d9fac29c8323a30b"
+      },
+      {
+        "ref": "refs/heads/codex/s52-ux-11-receipt",
+        "commit": "0cee5bd9404d98d7e95ff896017f9e7549bc87a8"
+      },
+      {
+        "ref": "refs/heads/codex/s52-ux-12",
+        "commit": "00bd176a592a9e1dedf144ae663e89a305c5cddc"
+      },
+      {
+        "ref": "refs/heads/codex/s52-ux-12-validation",
+        "commit": "03a0550806b7b4a7d5db5d79ecff7aab454e86df"
+      },
+      {
+        "ref": "refs/heads/codex/s60-report-1",
+        "commit": "e19dde04f4965fb847017b631682661cac53d411"
+      },
+      {
+        "ref": "refs/heads/codex/s60-report-1-receipt",
+        "commit": "833b784597561e2e9945eec2682ff4215be49d43"
+      },
+      {
+        "ref": "refs/heads/codex/s66-exposure",
+        "commit": "7c740a6e6e0f233ce920e1c070db540497d89161"
+      },
+      {
+        "ref": "refs/heads/codex/s95-ledger-status-codes",
+        "commit": "0195f61e1aec5867d78ce152567b8ae7e587a4cb"
+      },
+      {
+        "ref": "refs/heads/codex/sprint-51-ci-2",
+        "commit": "8748f9f5042764585803110e7f63d320e0b12a47"
+      },
+      {
+        "ref": "refs/heads/codex/sprint-51-theme-1",
+        "commit": "68b39d40a003327f2cd0d296910fc62420aaad9e"
+      },
+      {
+        "ref": "refs/heads/codex/sprint-51-ux-6",
+        "commit": "24f018fd5ceabf06ab984aa769f0e6c4958fe529"
+      },
+      {
+        "ref": "refs/heads/codex/sprint-51-ux-7",
+        "commit": "56f67567a97120065fbcbdf8ddba2215d0549525"
+      },
+      {
+        "ref": "refs/heads/codex/sprint-51-ux-7-receipt",
+        "commit": "6b5201649598c1ff0f782520621304633c0704d8"
+      },
+      {
+        "ref": "refs/heads/codex/sprint-51-ux-8",
+        "commit": "440a509e45ae0b0d82f731524e1a04c272edbe4c"
+      },
+      {
+        "ref": "refs/heads/codex/sprint-51-ux-8-receipt",
+        "commit": "501268f40562b5c3c6994962a9e58df5b6f566a2"
+      },
+      {
+        "ref": "refs/heads/codex/sprint-51-ux-9",
+        "commit": "ed21f7c35ac2948fad0f52fd8aa989f50fdf7425"
+      },
+      {
+        "ref": "refs/heads/codex/sprint-60-closeout",
+        "commit": "778f6afa0a19bf7d01c077ad6e9e0b6ea951aaa7"
+      },
+      {
+        "ref": "refs/heads/codex/sprint-61-admin-acceptance",
+        "commit": "afa8b39d2262f3b6eb113370c2f72e8d01e1b8df"
+      },
+      {
+        "ref": "refs/heads/codex/sprint-61-admin-recovery",
+        "commit": "fa9e9e1a2550d0de9e5780eeeccb187b7b3a1172"
+      },
+      {
+        "ref": "refs/heads/codex/sprint-61-build",
+        "commit": "7a4901b70196a67d58ff8ce30b596e92024066e3"
+      },
+      {
+        "ref": "refs/heads/codex/sprint-61-closeout",
+        "commit": "09ae685ea6dce1d5874029aa7c61629f8dcd93cb"
+      },
+      {
+        "ref": "refs/heads/codex/sprint-61-live-log-ui",
+        "commit": "c32a42629be91bac931f41e38a137c0c5dffdaa8"
+      },
+      {
+        "ref": "refs/heads/codex/sprint-61-log-receiver",
+        "commit": "1bf93a1407838e1bbc5151786977b01f6d828cc3"
+      },
+      {
+        "ref": "refs/heads/codex/sprint-61-planning",
+        "commit": "cc0c194696f12967666b60db4a7ea1310261f9b2"
+      },
+      {
+        "ref": "refs/heads/codex/sprint-61-recovery-acceptance",
+        "commit": "36336bb37fbab963c3d65819c7302821fce7e9d4"
+      },
+      {
+        "ref": "refs/heads/codex/sprint-61-retire-legacy-logs",
+        "commit": "791462133c28361238242517985035bba458ea1d"
+      },
+      {
+        "ref": "refs/heads/codex/sprint-61-rollout-receipt",
+        "commit": "abe9d8089d58eb48c56f6359e2230ff5f619567b"
+      },
+      {
+        "ref": "refs/heads/codex/sprint-62-acceptance",
+        "commit": "bdc930f62206b1e82cb271da7d56fbe4c734e559"
+      },
+      {
+        "ref": "refs/heads/codex/sprint-62-build",
+        "commit": "f8cd77397c19c40e38e4942578da9080716818e1"
+      },
+      {
+        "ref": "refs/heads/codex/sprint-62-closeout",
+        "commit": "9caa93b8f6adbf11e4431c5616b380d478f67a37"
+      },
+      {
+        "ref": "refs/heads/codex/sprint-62-final-receipts",
+        "commit": "15571a625bf6bbbb968b97755bdc0ec0d2c700d1"
+      },
+      {
+        "ref": "refs/heads/codex/sprint-62-plan",
+        "commit": "2d353e6d3f2e1502f3825af8eb26d5b64af864d6"
+      },
+      {
+        "ref": "refs/heads/codex/sprint-63-build",
+        "commit": "0a04e23bee2031529e4f964bcaf8f355394f6521"
+      },
+      {
+        "ref": "refs/heads/codex/sprint-63-plan",
+        "commit": "c838140d6b2bb8ed78d01a4fb03aec7d39f24d2f"
+      },
+      {
+        "ref": "refs/heads/codex/sprint-64-build",
+        "commit": "979387f58ac3019c2a513798248dbfc4939a11a4"
+      },
+      {
+        "ref": "refs/heads/codex/sprint-64-plan",
+        "commit": "f1a854ed308825137454fb1c4587fb06da7c6e3c"
+      },
+      {
+        "ref": "refs/heads/codex/ux-10-acceptance",
+        "commit": "cb0cd8f999b2971c249e84dfbbaecb72c6b18daf"
+      },
+      {
+        "ref": "refs/heads/codex/ux-10-route-migration",
+        "commit": "54333f9c55a24e1e657df9796a06a8d79044a337"
+      },
+      {
+        "ref": "refs/heads/codex/ux-8-production-receipt",
+        "commit": "47a5936b7d8e9c1eef32f19b035714d8942d6d58"
+      },
+      {
+        "ref": "refs/heads/codex/ux-8-project-prefill",
+        "commit": "8a9240bcda9e643abf2eea7c5d4808e4f40114eb"
+      },
+      {
+        "ref": "refs/heads/codex/ux-9-final-receipt",
+        "commit": "d3521309a419700d3bed87f5afaaedc1125212e7"
+      },
+      {
+        "ref": "refs/heads/codex/ux-9-production-receipt",
+        "commit": "ed21f7c35ac2948fad0f52fd8aa989f50fdf7425"
+      },
+      {
+        "ref": "refs/heads/codex/ux-9-saved-search-cache-fix",
+        "commit": "6ae59dcc9d8df720014677b4e95d66d1c72bf0ff"
+      },
+      {
+        "ref": "refs/heads/codex/ux-9-search-visual-fix",
+        "commit": "a732d5eedaa75d7c0175255fec43d3643f354fa2"
+      },
+      {
+        "ref": "refs/heads/codex/walk-3-acceptance",
+        "commit": "bec91850f0cfb266fa3bcbb36443b5822f684448"
+      },
+      {
+        "ref": "refs/heads/main",
+        "commit": "7c740a6e6e0f233ce920e1c070db540497d89161"
+      },
+      {
+        "ref": "refs/heads/rip-out-rbac-cron",
+        "commit": "89504592ca2b6dfc9eeb0efbea0affde9c554f11"
+      },
+      {
+        "ref": "refs/remotes/origin/HEAD",
+        "commit": "7c740a6e6e0f233ce920e1c070db540497d89161"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/dup-1-acceptance",
+        "commit": "2551f83d21381ffd446e658622aba92bedb1ff78"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/dup-1-document-review",
+        "commit": "da107c78f7791e2199fdffcebd75a8669710623c"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/lib-3-acceptance",
+        "commit": "2092c4100d663396806b9d3b836c632242494552"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/lib-3-project-descriptions",
+        "commit": "a2017ec49d3984ac3c768ec1ac2030094921cc0f"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/lib-4-acceptance",
+        "commit": "1a2ad678de7bb8868fcfd9f42b59ed7906e5a41d"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/lib-4-reviewed-reports",
+        "commit": "1c9eccd08661245f5ebeb9e504869ddd4cd03d27"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/org-1-acceptance",
+        "commit": "fa4d5355d7b71822c7e4c2810be2505d2c92f74c"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/org-1-reviewed-collections",
+        "commit": "6552678564c7673b725d68ef64a4c8296fe0cbb5"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/s52-ci-5-main-run-correction",
+        "commit": "1da6d7794b1e043963058521e5bb03a934d1a776"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/s52-ci-5-required-checks",
+        "commit": "b3a97d30023d850a1ec94b5fa350274df846d77a"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/s52-ci-5-validation",
+        "commit": "b4e81338c4a178a178a469906b96e5f8bded11de"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/s52-graph-1",
+        "commit": "59d204aba6a237a35ca3e241fd15bd43bca6b2c3"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/s52-graph-1-receipt",
+        "commit": "c5f0ccb0b1659cc77df104938099ed44eb64b5c7"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/s52-mcp-1-evidence-contract",
+        "commit": "b071825d03f7e0028865fd7455ec445ffd9e9cd5"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/s52-mcp-1-node18-query",
+        "commit": "e135a8a5c7250319e200dc49a7d387850cd0695c"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/s52-mcp-1-read-parity",
+        "commit": "76e7b1ab7cbd69f8d68c2633543aa562676ebf3e"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/s52-mcp-1-receipts",
+        "commit": "71867da3bc530ab80580257b7de4a2dfa82311ad"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/s52-sec-1-authorization",
+        "commit": "e3dbf304d72176fe12bacd483ef318300c07f79b"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/s52-sec-1-validation",
+        "commit": "c7a9b761f9eb450aa1c370dc67176cd21c263142"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/s52-sec-2-document-read-policy",
+        "commit": "505f5a5f4bd75ef5c342374369d357c6bd8015c2"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/s52-sec-2-validation",
+        "commit": "bfbfc618702cc23b24538ccb88282325bc84cf24"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/s52-ux-11",
+        "commit": "48195bc19c8db02394ffbac4d9fac29c8323a30b"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/s52-ux-11-receipt",
+        "commit": "0cee5bd9404d98d7e95ff896017f9e7549bc87a8"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/s52-ux-12",
+        "commit": "00bd176a592a9e1dedf144ae663e89a305c5cddc"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/s52-ux-12-validation",
+        "commit": "03a0550806b7b4a7d5db5d79ecff7aab454e86df"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/s60-report-1",
+        "commit": "e19dde04f4965fb847017b631682661cac53d411"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/s60-report-1-receipt",
+        "commit": "833b784597561e2e9945eec2682ff4215be49d43"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/s95-ledger-status-codes",
+        "commit": "0195f61e1aec5867d78ce152567b8ae7e587a4cb"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/sprint-51-ci-2",
+        "commit": "8748f9f5042764585803110e7f63d320e0b12a47"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/sprint-51-theme-1",
+        "commit": "68b39d40a003327f2cd0d296910fc62420aaad9e"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/sprint-51-ux-6",
+        "commit": "24f018fd5ceabf06ab984aa769f0e6c4958fe529"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/sprint-51-ux-7",
+        "commit": "56f67567a97120065fbcbdf8ddba2215d0549525"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/sprint-51-ux-7-receipt",
+        "commit": "6b5201649598c1ff0f782520621304633c0704d8"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/sprint-51-ux-8",
+        "commit": "440a509e45ae0b0d82f731524e1a04c272edbe4c"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/sprint-51-ux-9",
+        "commit": "b30ce74e494e757dff3a3f52c09360c2bf26b76d"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/sprint-60-closeout",
+        "commit": "778f6afa0a19bf7d01c077ad6e9e0b6ea951aaa7"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/sprint-61-admin-recovery",
+        "commit": "fa9e9e1a2550d0de9e5780eeeccb187b7b3a1172"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/sprint-61-build",
+        "commit": "7a4901b70196a67d58ff8ce30b596e92024066e3"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/sprint-61-closeout",
+        "commit": "09ae685ea6dce1d5874029aa7c61629f8dcd93cb"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/sprint-61-live-log-ui",
+        "commit": "c32a42629be91bac931f41e38a137c0c5dffdaa8"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/sprint-61-log-receiver",
+        "commit": "1bf93a1407838e1bbc5151786977b01f6d828cc3"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/sprint-61-recovery-acceptance",
+        "commit": "36336bb37fbab963c3d65819c7302821fce7e9d4"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/sprint-61-retire-legacy-logs",
+        "commit": "791462133c28361238242517985035bba458ea1d"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/sprint-62-acceptance",
+        "commit": "bdc930f62206b1e82cb271da7d56fbe4c734e559"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/sprint-62-build",
+        "commit": "f8cd77397c19c40e38e4942578da9080716818e1"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/sprint-62-final-receipts",
+        "commit": "15571a625bf6bbbb968b97755bdc0ec0d2c700d1"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/sprint-63-build",
+        "commit": "07874dca41c632cddd5e22d79d682add88d93a12"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/sprint-64-build",
+        "commit": "979387f58ac3019c2a513798248dbfc4939a11a4"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/ux-10-acceptance",
+        "commit": "9171cbc301b9f6193575e2b6ff720edc3d604683"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/ux-10-route-migration",
+        "commit": "54333f9c55a24e1e657df9796a06a8d79044a337"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/ux-8-production-receipt",
+        "commit": "47a5936b7d8e9c1eef32f19b035714d8942d6d58"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/ux-8-project-prefill",
+        "commit": "8a9240bcda9e643abf2eea7c5d4808e4f40114eb"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/ux-9-final-receipt",
+        "commit": "d3521309a419700d3bed87f5afaaedc1125212e7"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/ux-9-saved-search-cache-fix",
+        "commit": "6ae59dcc9d8df720014677b4e95d66d1c72bf0ff"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/ux-9-search-visual-fix",
+        "commit": "a732d5eedaa75d7c0175255fec43d3643f354fa2"
+      },
+      {
+        "ref": "refs/remotes/origin/codex/walk-3-acceptance",
+        "commit": "bec91850f0cfb266fa3bcbb36443b5822f684448"
+      },
+      {
+        "ref": "refs/remotes/origin/fix/rag-synthesis-token-cap",
+        "commit": "c226b454424c838e38fe1aedad054722bbdc63ad"
+      },
+      {
+        "ref": "refs/remotes/origin/main",
+        "commit": "7c740a6e6e0f233ce920e1c070db540497d89161"
+      },
+      {
+        "ref": "refs/remotes/origin/rip-out-rbac-cron",
+        "commit": "89504592ca2b6dfc9eeb0efbea0affde9c554f11"
+      },
+      {
+        "ref": "refs/remotes/origin/setup_pass",
+        "commit": "813f3b8f8148e8a4cbb59593a079dabcd97733d3"
+      },
+      {
+        "ref": "refs/remotes/origin/sprint-55-disarm-rbac-verify-cron",
+        "commit": "0c345887ae3aa692f9ba8ee31f3a33a3de412ebe"
+      },
+      {
+        "ref": "refs/tags/tracelab-mcp-v1.0.0",
+        "commit": "bc879b65596e91dadde7c644e82208c7832fe3d5"
+      },
+      {
+        "ref": "refs/tags/tracelab-mcp-v1.0.1",
+        "commit": "11031da446715f4f0b981892b193233abaaa201f"
+      },
+      {
+        "ref": "refs/tags/tracelab-mcp-v1.2.0",
+        "commit": "a4b3b487b35ce4eb04d3f3f4e969d4158727cfc6"
+      },
+      {
+        "ref": "refs/tags/tracelab-mcp-v2.0.0",
+        "commit": "a9fb9d23fea6c20ebe995a44d222b0bdeb1fa162"
+      },
+      {
+        "ref": "refs/tags/tracelab-mcp-v2.1.0",
+        "commit": "2cb72d90cec1916e5ccefac211d205160401d534"
+      },
+      {
+        "ref": "refs/tags/tracelab-mcp-v2.1.1",
+        "commit": "0334757a5d76f0f2e7e9877a81d13369d9529330"
+      },
+      {
+        "ref": "refs/tags/tracelab-mcp-v2.1.2",
+        "commit": "4c267525b36c9aec3ec4f2deb1933567b839ed84"
+      }
+    ],
+    "total_blobs": 8106,
+    "binary_blobs": 1799,
+    "binary_extensions": {
+      ".backup-20251112-162503": 1,
+      ".png": 1767,
+      ".ico": 1,
+      ".tgz": 4,
+      ".sqlite-shm": 10,
+      ".sqlite-wal": 16
+    },
+    "findings": {
+      "git_all_refs": 114,
+      "tracked_working_tree_before_cleanup": 55,
+      "binary_extraction": 6
+    },
+    "dispositions": {
+      "false_positive": 139,
+      "test_or_documentation_fixture": 31,
+      "previously_invalidated": 5,
+      "unresolved": 0
+    },
+    "all_gitleaks_invocations_redacted": true,
+    "raw_results": "Private temporary directory outside the repository; not committed. No discovered credential was used."
+  },
+  "commands": [
+    "git fetch --all --tags",
+    "git for-each-ref --format=\"%(refname) %(objectname)\"",
+    "gitleaks git --log-opts=\"--all --full-history\" . --redact --no-banner --no-color --report-format json --report-path <private>/git.json",
+    "Copy the current bytes of git ls-files -z into a private snapshot (exclude untracked files, local secrets and dependencies).",
+    "gitleaks dir <private>/tracked-tree --redact --no-banner --no-color --report-format json --report-path <private>/tree.json",
+    "git rev-list --objects --all | git cat-file --batch; classify blobs containing NUL or failing UTF-8 decoding as binary.",
+    "For each binary blob: sqlite3 <private-blob> .dump if SQLite; otherwise strings -a <private-blob>. Concatenate with BLOB <oid> <path> inventory headers.",
+    "gitleaks stdin --redact --no-banner --no-color --report-format json --report-path <private>/binary.json < <private>/binary-text.txt",
+    "tesseract <each-distinct-account-screenshot> <private-output> tsv; recheck every masked image.",
+    "python3 scripts/check_no_credential_literals.py --tracked",
+    "python3 -m scripts.check_receipt_emails --tracked",
+    ".venv/bin/python -m pytest tests/unit/test_receipt_email_guard.py tests/unit/test_no_credential_literals.py tests/test_shared_space_create.py tests/integration/test_migration_052_personal_spaces.py -q --disable-warnings",
+    "cd frontend && npx vitest run src/__tests__/project-new.test.tsx scripts/ui-shell-transport.test.ts",
+    "python3 cmos/scripts/validate_foundational_refs.py"
+  ],
+  "credential_assessment": {
+    "prior_rotation_evidence": [
+      "Reasonbook learning 121",
+      "Reasonbook mission T48.9, 2026-08-14 containment notes"
+    ],
+    "documentation_examples": "The two formerly exposed environment-setup keys were already verified invalid in the cited record. The MCP README example is a sequential-letter/digit fixture. The expired JWTs and generated keys came from isolated TestClient mutation tests.",
+    "binary_matches": "All six were Git object IDs in inserted extraction headers, not credential text from the binary data.",
+    "github_secret_scanning": "enabled",
+    "github_push_protection": "enabled",
+    "github_alerts": 0,
+    "new_rotation_candidates": 0
+  },
+  "legacy_auth": {
+    "deployed_commit": "7c740a6e6e0f233ce920e1c070db540497d89161",
+    "assessment": "The legacy env-credential login is unreachable. app/api/v1/auth.py login queries User.email and verifies the stored hash. get_configured_credentials has no app caller. The deployed commit matches this source. Bootstrap provisioning remains distinct from login.",
+    "variable_names_observed": [
+      "AUTH_USERNAME",
+      "AUTH_PASSWORD",
+      "AUTH_PASSWORD_HASH "
+    ],
+    "variable_values_recorded": false,
+    "login_attempts": 0
+  },
+  "personal_data": {
+    "participant_count": 3,
+    "stable_placeholders": "Participant 1\u20133 and participant-1\u20133@example.com; unrelated non-allowlisted receipt addresses replaced with stable redacted-address-N@example.com placeholders.",
+    "tracked_text_identifier_matches_after_cleanup": 0,
+    "account_screenshot_paths_ocr_scanned": 389,
+    "distinct_account_images_ocr_scanned": 199,
+    "ocr_failures": 0,
+    "masked_user_screenshots": 54,
+    "masked_space_screenshots": 4,
+    "masked_ocr_email_matches": 0,
+    "masked_ocr_participant_matches": 0,
+    "mask_pixels_outside_rectangles_unchanged": true,
+    "history_rewritten": false,
+    "backup_scanned_then_removed": "cmos/db/cmos.sqlite.backup-20251112-162503",
+    "binary_extraction_known_participant_identifier_matches": 0
+  },
+  "recurrence": {
+    "required_job": "Secret Scan / Secret Scan",
+    "fixture": "The required job checks that a temporary unapproved-address receipt fails without echoing the address, then scans tracked receipts.",
+    "capture_harness": "Masks Users email/name cells and Spaces labels/member controls; suppresses personal HTML/text in stored account-page diagnostics."
+  },
+  "verification": {
+    "pytest": {
+      "passed": 48,
+      "skipped": 0,
+      "warnings": 14
+    },
+    "vitest": {
+      "passed": 25,
+      "files": 2,
+      "skipped": 0
+    },
+    "ruff": "passed",
+    "foundational_refs": "passed",
+    "diff_check": "passed",
+    "live_read_only_capture": {
+      "routes": [
+        "/admin/users",
+        "/admin/spaces"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        1440,
+        820,
+        390
+      ],
+      "checks": 12,
+      "failures": 0,
+      "mutating_api_calls": 0,
+      "ocr_email_matches": 0
+    },
+    "visual_inspection": [
+      "mobile Users",
+      "desktop dark Users",
+      "mobile Spaces"
+    ]
+  },
+  "limits": [
+    "Gitleaks and OCR are detection tools, not a proof that every conceivable secret or personal identifier is absent.",
+    "History remains reachable as authorized; this mission cleans the current tree.",
+    "GitHub CI and merge/deploy verification are recorded in the mission completion record after they actually run."
+  ]
+}

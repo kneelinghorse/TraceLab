@@ -18,7 +18,7 @@ vi.mock("@/contexts/AuthContext", () => ({
 vi.mock("@/components/AuthGate", () => ({ AuthGate: ({ children }: { children: React.ReactNode }) => <>{children}</> }));
 vi.mock("next/router", () => ({ useRouter: () => ({ query: {}, push: mocks.push, pathname: "/projects/new" }) }));
 
-const MINE = { id: "space-mine", name: "Syndy's Space", created_at: "", personal_owner_id: "self" };
+const MINE = { id: "space-mine", name: "Participant 3's Space", created_at: "", personal_owner_id: "self" };
 const PARTS = { id: "space-parts", name: "Parts Town", created_at: "", personal_owner_id: null };
 
 function page() {

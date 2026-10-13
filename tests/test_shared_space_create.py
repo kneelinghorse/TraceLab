@@ -100,28 +100,28 @@ def _seed_default(db) -> None:
 
 class TestListMySpaces:
     def test_a_member_sees_their_own_spaces_personal_first(self, client, db_session):
-        syndy = _user(db_session, "Syndy")
+        participant_3 = _user(db_session, "Participant 3")
         stranger = _user(db_session, "Stranger")
-        parts = _shared(db_session, "Parts Town", syndy)
+        parts = _shared(db_session, "Parts Town", participant_3)
         _shared(db_session, "Elsewhere", stranger)
 
-        resp = client.get(SPACES_URL, headers=_bearer(syndy))
+        resp = client.get(SPACES_URL, headers=_bearer(participant_3))
         assert resp.status_code == 200, resp.text
         rows = resp.json()
-        assert [row["id"] for row in rows] == [_personal_id(db_session, syndy), str(parts.id)]
-        assert rows[0]["personal_owner_id"] == str(syndy.id)
+        assert [row["id"] for row in rows] == [_personal_id(db_session, participant_3), str(parts.id)]
+        assert rows[0]["personal_owner_id"] == str(participant_3.id)
         assert rows[1]["personal_owner_id"] is None
 
     def test_owner_and_admin_see_every_space(self, client, db_session):
-        birch = _user(db_session, "Birch", ROLE_ADMIN)
+        participant_2 = _user(db_session, "Participant 2", ROLE_ADMIN)
         derek = _user(db_session, "Derek", ROLE_OWNER)
         guest = _user(db_session, "Guest")
         shared = _shared(db_session, "Parts Town", guest)
 
-        for caller in (birch, derek):
+        for caller in (participant_2, derek):
             rows = client.get(SPACES_URL, headers=_bearer(caller)).json()
             ids = [row["id"] for row in rows]
-            others = {_personal_id(db_session, u) for u in (birch, derek, guest) if u is not caller}
+            others = {_personal_id(db_session, u) for u in (participant_2, derek, guest) if u is not caller}
             assert ids[0] == _personal_id(db_session, caller)
             assert str(shared.id) in ids
             assert others <= set(ids)
@@ -138,19 +138,19 @@ class TestCreateInASpace:
         self, client, db_session, rbac_on
     ):
         """Derek's reason for PERSONAL-2: colleagues in the shared Space see the project."""
-        syndy = _user(db_session, "Syndy")
+        participant_3 = _user(db_session, "Participant 3")
         colleague = _user(db_session, "Colleague")
         outsider = _user(db_session, "Outsider")
-        parts = _shared(db_session, "Parts Town", syndy, colleague)
+        parts = _shared(db_session, "Parts Town", participant_3, colleague)
 
         created = client.post(
             PROJECTS_URL,
             json={"name": "Catalog audit", "workspace_id": str(parts.id)},
-            headers=_bearer(syndy),
+            headers=_bearer(participant_3),
         )
         assert created.status_code == 201, created.text
         assert created.json()["workspace_id"] == str(parts.id)
-        assert created.json()["owner_id"] == str(syndy.id)
+        assert created.json()["owner_id"] == str(participant_3.id)
 
         def listed(user):
             resp = client.get(f"{PROJECTS_URL}?page_size=100", headers=_bearer(user))
@@ -178,11 +178,11 @@ class TestCreateInASpace:
 
     def test_owner_and_admin_may_name_any_existing_space(self, client, db_session):
         derek = _user(db_session, "Derek", ROLE_OWNER)
-        birch = _user(db_session, "Birch", ROLE_ADMIN)
+        participant_2 = _user(db_session, "Participant 2", ROLE_ADMIN)
         guest = _user(db_session, "Guest")
         target = _personal_id(db_session, guest)
 
-        for caller in (derek, birch):
+        for caller in (derek, participant_2):
             resp = client.post(
                 PROJECTS_URL,
                 json={"name": "Handed over", "workspace_id": target},

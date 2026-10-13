@@ -16,6 +16,7 @@ ENV/
 # Database
 *.db
 *.sqlite
+*.sqlite.backup-*
 
 # Alembic
 alembic/versions/*.pyc

@@ -123,7 +123,7 @@ class TestPersonalSpacesMigration:
             command.upgrade(alembic_cfg, REV_051)
             with engine.begin() as conn:
                 derek = _user(conn, "kneelinghorse", "owner")
-                admin = _user(conn, "Birch", "admin")
+                admin = _user(conn, "Participant 2", "admin")
                 guest = _user(conn, "Walkthrough Guest", "member")
                 viewer = _user(conn, "Watcher", "viewer", active=False)
                 service = _user(conn, "DeepSearch", "service")

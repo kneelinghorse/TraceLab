@@ -25,7 +25,7 @@ Deploys of `fec1893`: TraceLab `a299f323-d286-4f22-ba4a-72c7e4685a88` and fronte
 - `alembic_version` is `052_personal_spaces`.
 - 8 personal Spaces, each with its owner as its only member:
   - Derek-Private, `081a5f9a`, designated for Derek (`007c8cb6`, owner).
-  - Seven created: James Jamerson's, Birch's, Test's, kneelinghorse's (the legacy `@tracelab.local` admin account), Walkthrough Guest's (`1dbbe76f`), Syndy's, and d's.
+  - Seven created: Participant 1's, Participant 2's, Test's, kneelinghorse's (the legacy `@tracelab.local` admin account), Walkthrough Guest's (`1dbbe76f`), Participant 3's, and d's.
 - No human is left without one, and the service principal has none.
 - `d2d6519c`, the only member-owned project in Default, is now in `1dbbe76f` with its 2 documents, 2 missions and 2 reports.
 - Default Workspace still holds the owner's 37 projects (36 live).

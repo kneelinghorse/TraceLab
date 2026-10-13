@@ -1,0 +1,1214 @@
+[
+  {
+    "path": "cmos/reports/sprint-50/ux-5-production-smoke/dark-1440-_admin_users.png",
+    "dimensions": [
+      1440,
+      1096
+    ],
+    "before_sha256": "53c8936bdddbdd6528e337df8418f9920015c0752fd97c6f6508cfcfad0c82e4",
+    "after_sha256": "13e9fc70a8e8e80cafed27c163c8b150a7c1895e7618fcef70343582e6f89b27",
+    "opaque_rectangles": [
+      [
+        385,
+        604,
+        851,
+        1040
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-50/ux-5-production-smoke/dark-390-_admin_users.png",
+    "dimensions": [
+      390,
+      3513
+    ],
+    "before_sha256": "882000a2697b2843f9cca92076eea7581ef0d7f732f821bf70f3a793cc261cdf",
+    "after_sha256": "84da70b61a8e19d84a98297d7bea0d6d81de2e38a39cc949726025e9ed01ed90",
+    "opaque_rectangles": [
+      [
+        32,
+        746,
+        101,
+        3480
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-50/ux-5-production-smoke/light-1440-_admin_users.png",
+    "dimensions": [
+      1440,
+      1096
+    ],
+    "before_sha256": "2e8da6a3f6b9ba0c346249d51e0f79432634eff8b81d68ffb899ed108377854e",
+    "after_sha256": "e1cbd400ccce57930134734949a518a1e2cf3884798ff932025cdb9513932eee",
+    "opaque_rectangles": [
+      [
+        385,
+        604,
+        851,
+        1040
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/theme-1-production-smoke/light/light-1440-_admin_users.png",
+    "dimensions": [
+      1440,
+      1096
+    ],
+    "before_sha256": "2e8da6a3f6b9ba0c346249d51e0f79432634eff8b81d68ffb899ed108377854e",
+    "after_sha256": "e1cbd400ccce57930134734949a518a1e2cf3884798ff932025cdb9513932eee",
+    "opaque_rectangles": [
+      [
+        385,
+        604,
+        851,
+        1040
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-50/ux-5-production-smoke/light-390-_admin_users.png",
+    "dimensions": [
+      390,
+      3513
+    ],
+    "before_sha256": "2cd032a4b2a816bad21171179de3e40282c4bfb6e338f58de4debc5714a2f5b9",
+    "after_sha256": "fc1c7841a1f1b807aabfb91d57c0c31a79b53e91b3d793f5b58b72b73b6ad931",
+    "opaque_rectangles": [
+      [
+        32,
+        746,
+        101,
+        3480
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/theme-1-local-smoke/light/light-390-_admin_users.png",
+    "dimensions": [
+      390,
+      3513
+    ],
+    "before_sha256": "2cd032a4b2a816bad21171179de3e40282c4bfb6e338f58de4debc5714a2f5b9",
+    "after_sha256": "fc1c7841a1f1b807aabfb91d57c0c31a79b53e91b3d793f5b58b72b73b6ad931",
+    "opaque_rectangles": [
+      [
+        32,
+        746,
+        101,
+        3480
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/theme-1-production-smoke/light/light-390-_admin_users.png",
+    "dimensions": [
+      390,
+      3513
+    ],
+    "before_sha256": "2cd032a4b2a816bad21171179de3e40282c4bfb6e338f58de4debc5714a2f5b9",
+    "after_sha256": "fc1c7841a1f1b807aabfb91d57c0c31a79b53e91b3d793f5b58b72b73b6ad931",
+    "opaque_rectangles": [
+      [
+        32,
+        746,
+        101,
+        3480
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/ux-10-production-smoke/light-390-_admin_users.png",
+    "dimensions": [
+      390,
+      3513
+    ],
+    "before_sha256": "2cd032a4b2a816bad21171179de3e40282c4bfb6e338f58de4debc5714a2f5b9",
+    "after_sha256": "fc1c7841a1f1b807aabfb91d57c0c31a79b53e91b3d793f5b58b72b73b6ad931",
+    "opaque_rectangles": [
+      [
+        32,
+        746,
+        101,
+        3480
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/ux-6-production-smoke/light/light-390-_admin_users.png",
+    "dimensions": [
+      390,
+      3513
+    ],
+    "before_sha256": "2cd032a4b2a816bad21171179de3e40282c4bfb6e338f58de4debc5714a2f5b9",
+    "after_sha256": "fc1c7841a1f1b807aabfb91d57c0c31a79b53e91b3d793f5b58b72b73b6ad931",
+    "opaque_rectangles": [
+      [
+        32,
+        746,
+        101,
+        3480
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/ux-7-production-smoke/light/light-390-_admin_users.png",
+    "dimensions": [
+      390,
+      3513
+    ],
+    "before_sha256": "2cd032a4b2a816bad21171179de3e40282c4bfb6e338f58de4debc5714a2f5b9",
+    "after_sha256": "fc1c7841a1f1b807aabfb91d57c0c31a79b53e91b3d793f5b58b72b73b6ad931",
+    "opaque_rectangles": [
+      [
+        32,
+        746,
+        101,
+        3480
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/ux-8-pre-correction-smoke/light/light-390-_admin_users.png",
+    "dimensions": [
+      390,
+      3513
+    ],
+    "before_sha256": "2cd032a4b2a816bad21171179de3e40282c4bfb6e338f58de4debc5714a2f5b9",
+    "after_sha256": "fc1c7841a1f1b807aabfb91d57c0c31a79b53e91b3d793f5b58b72b73b6ad931",
+    "opaque_rectangles": [
+      [
+        32,
+        746,
+        101,
+        3480
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/ux-8-production-smoke/light/light-390-_admin_users.png",
+    "dimensions": [
+      390,
+      3513
+    ],
+    "before_sha256": "2cd032a4b2a816bad21171179de3e40282c4bfb6e338f58de4debc5714a2f5b9",
+    "after_sha256": "fc1c7841a1f1b807aabfb91d57c0c31a79b53e91b3d793f5b58b72b73b6ad931",
+    "opaque_rectangles": [
+      [
+        32,
+        746,
+        101,
+        3480
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/ux-9-production-smoke-before-visual-fix/light/light-390-_admin_users.png",
+    "dimensions": [
+      390,
+      3513
+    ],
+    "before_sha256": "2cd032a4b2a816bad21171179de3e40282c4bfb6e338f58de4debc5714a2f5b9",
+    "after_sha256": "fc1c7841a1f1b807aabfb91d57c0c31a79b53e91b3d793f5b58b72b73b6ad931",
+    "opaque_rectangles": [
+      [
+        32,
+        746,
+        101,
+        3480
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/ux-9-production-smoke/light/light-390-_admin_users.png",
+    "dimensions": [
+      390,
+      3513
+    ],
+    "before_sha256": "2cd032a4b2a816bad21171179de3e40282c4bfb6e338f58de4debc5714a2f5b9",
+    "after_sha256": "fc1c7841a1f1b807aabfb91d57c0c31a79b53e91b3d793f5b58b72b73b6ad931",
+    "opaque_rectangles": [
+      [
+        32,
+        746,
+        101,
+        3480
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-11-production-smoke/light-390-_admin_users.png",
+    "dimensions": [
+      390,
+      3513
+    ],
+    "before_sha256": "2cd032a4b2a816bad21171179de3e40282c4bfb6e338f58de4debc5714a2f5b9",
+    "after_sha256": "fc1c7841a1f1b807aabfb91d57c0c31a79b53e91b3d793f5b58b72b73b6ad931",
+    "opaque_rectangles": [
+      [
+        32,
+        746,
+        101,
+        3480
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_admin_users.png",
+    "dimensions": [
+      390,
+      3513
+    ],
+    "before_sha256": "2cd032a4b2a816bad21171179de3e40282c4bfb6e338f58de4debc5714a2f5b9",
+    "after_sha256": "fc1c7841a1f1b807aabfb91d57c0c31a79b53e91b3d793f5b58b72b73b6ad931",
+    "opaque_rectangles": [
+      [
+        32,
+        746,
+        101,
+        3480
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/theme-1-local-smoke/dark/dark-1440-_admin_users.png",
+    "dimensions": [
+      1440,
+      1096
+    ],
+    "before_sha256": "abf2699c8bc1056aa454dfacc047890c5518d93f12dc545245339e7d49fa7387",
+    "after_sha256": "34210ed16cf30b5ababb92c8d52be3b04e8affa1ffb8d8382a2ca20b9c4b32e9",
+    "opaque_rectangles": [
+      [
+        385,
+        604,
+        851,
+        1040
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/theme-1-local-smoke/dark/dark-390-_admin_users.png",
+    "dimensions": [
+      390,
+      3513
+    ],
+    "before_sha256": "acf90782c84aab8097ffd8cc4efcfb051d427b34f166f560eb02a7721e02a78f",
+    "after_sha256": "03afea38c063a90f090ced60afd55f20ae2c3d8725ecf354024ef08ea628800b",
+    "opaque_rectangles": [
+      [
+        32,
+        746,
+        101,
+        3480
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/theme-1-production-smoke/dark/dark-390-_admin_users.png",
+    "dimensions": [
+      390,
+      3513
+    ],
+    "before_sha256": "acf90782c84aab8097ffd8cc4efcfb051d427b34f166f560eb02a7721e02a78f",
+    "after_sha256": "03afea38c063a90f090ced60afd55f20ae2c3d8725ecf354024ef08ea628800b",
+    "opaque_rectangles": [
+      [
+        32,
+        746,
+        101,
+        3480
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/ux-10-production-smoke/dark-390-_admin_users.png",
+    "dimensions": [
+      390,
+      3513
+    ],
+    "before_sha256": "acf90782c84aab8097ffd8cc4efcfb051d427b34f166f560eb02a7721e02a78f",
+    "after_sha256": "03afea38c063a90f090ced60afd55f20ae2c3d8725ecf354024ef08ea628800b",
+    "opaque_rectangles": [
+      [
+        32,
+        746,
+        101,
+        3480
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/ux-6-production-smoke/dark/dark-390-_admin_users.png",
+    "dimensions": [
+      390,
+      3513
+    ],
+    "before_sha256": "acf90782c84aab8097ffd8cc4efcfb051d427b34f166f560eb02a7721e02a78f",
+    "after_sha256": "03afea38c063a90f090ced60afd55f20ae2c3d8725ecf354024ef08ea628800b",
+    "opaque_rectangles": [
+      [
+        32,
+        746,
+        101,
+        3480
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/ux-7-production-smoke/dark/dark-390-_admin_users.png",
+    "dimensions": [
+      390,
+      3513
+    ],
+    "before_sha256": "acf90782c84aab8097ffd8cc4efcfb051d427b34f166f560eb02a7721e02a78f",
+    "after_sha256": "03afea38c063a90f090ced60afd55f20ae2c3d8725ecf354024ef08ea628800b",
+    "opaque_rectangles": [
+      [
+        32,
+        746,
+        101,
+        3480
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/ux-8-pre-correction-smoke/dark/dark-390-_admin_users.png",
+    "dimensions": [
+      390,
+      3513
+    ],
+    "before_sha256": "acf90782c84aab8097ffd8cc4efcfb051d427b34f166f560eb02a7721e02a78f",
+    "after_sha256": "03afea38c063a90f090ced60afd55f20ae2c3d8725ecf354024ef08ea628800b",
+    "opaque_rectangles": [
+      [
+        32,
+        746,
+        101,
+        3480
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/ux-8-production-smoke/dark/dark-390-_admin_users.png",
+    "dimensions": [
+      390,
+      3513
+    ],
+    "before_sha256": "acf90782c84aab8097ffd8cc4efcfb051d427b34f166f560eb02a7721e02a78f",
+    "after_sha256": "03afea38c063a90f090ced60afd55f20ae2c3d8725ecf354024ef08ea628800b",
+    "opaque_rectangles": [
+      [
+        32,
+        746,
+        101,
+        3480
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/ux-9-production-smoke-before-visual-fix/dark/dark-390-_admin_users.png",
+    "dimensions": [
+      390,
+      3513
+    ],
+    "before_sha256": "acf90782c84aab8097ffd8cc4efcfb051d427b34f166f560eb02a7721e02a78f",
+    "after_sha256": "03afea38c063a90f090ced60afd55f20ae2c3d8725ecf354024ef08ea628800b",
+    "opaque_rectangles": [
+      [
+        32,
+        746,
+        101,
+        3480
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/ux-9-production-smoke/dark/dark-390-_admin_users.png",
+    "dimensions": [
+      390,
+      3513
+    ],
+    "before_sha256": "acf90782c84aab8097ffd8cc4efcfb051d427b34f166f560eb02a7721e02a78f",
+    "after_sha256": "03afea38c063a90f090ced60afd55f20ae2c3d8725ecf354024ef08ea628800b",
+    "opaque_rectangles": [
+      [
+        32,
+        746,
+        101,
+        3480
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-11-production-smoke/dark-390-_admin_users.png",
+    "dimensions": [
+      390,
+      3513
+    ],
+    "before_sha256": "acf90782c84aab8097ffd8cc4efcfb051d427b34f166f560eb02a7721e02a78f",
+    "after_sha256": "03afea38c063a90f090ced60afd55f20ae2c3d8725ecf354024ef08ea628800b",
+    "opaque_rectangles": [
+      [
+        32,
+        746,
+        101,
+        3480
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_admin_users.png",
+    "dimensions": [
+      390,
+      3513
+    ],
+    "before_sha256": "acf90782c84aab8097ffd8cc4efcfb051d427b34f166f560eb02a7721e02a78f",
+    "after_sha256": "03afea38c063a90f090ced60afd55f20ae2c3d8725ecf354024ef08ea628800b",
+    "opaque_rectangles": [
+      [
+        32,
+        746,
+        101,
+        3480
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/theme-1-local-smoke/hc/hc-1440-_admin_users.png",
+    "dimensions": [
+      1440,
+      1096
+    ],
+    "before_sha256": "2b6a5ae40f237367148b1d7bdbb701c27861937b93e108d623cfc66e1d324fce",
+    "after_sha256": "391ea67f5c26c75d6dda94d4a8acbc5e110e3b5146e9f50d30b9bb3d32af3063",
+    "opaque_rectangles": [
+      [
+        385,
+        604,
+        851,
+        1040
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/theme-1-local-smoke/hc/hc-390-_admin_users.png",
+    "dimensions": [
+      390,
+      3513
+    ],
+    "before_sha256": "7b91bd0e161a8ad1db8df62b52b15ebba48c80327d4e23d3f1c1a375c065fae5",
+    "after_sha256": "04f00e900af422b996d7a07c79d0b3f3c33e7a68772b54ca58e0e2f41ee67450",
+    "opaque_rectangles": [
+      [
+        32,
+        746,
+        101,
+        3480
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/theme-1-local-smoke/light/light-1440-_admin_users.png",
+    "dimensions": [
+      1440,
+      1096
+    ],
+    "before_sha256": "833dabde2fd9f77f06529f0e11da2ffe61062320a602f9b43544111354d4b6aa",
+    "after_sha256": "dd3f57bbd8c1ddfd30e58c35c91c7d3500462010f1740f5e600c13a83821c110",
+    "opaque_rectangles": [
+      [
+        385,
+        604,
+        851,
+        1040
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/theme-1-production-smoke/dark/dark-1440-_admin_users.png",
+    "dimensions": [
+      1440,
+      1096
+    ],
+    "before_sha256": "b5882d0824054bb825e487601799fa80f27849c470a6d54ea622a66738876ace",
+    "after_sha256": "ad391018a92f92ab3c41f409ef417e806e05e29c336ef566d2e77ae23be23b1c",
+    "opaque_rectangles": [
+      [
+        385,
+        604,
+        851,
+        1040
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/ux-10-production-smoke/dark-1440-_admin_users.png",
+    "dimensions": [
+      1440,
+      1096
+    ],
+    "before_sha256": "f006a5eec67a95e418d557412e7fb78a00fd087f60bf758c163abc0d280172e2",
+    "after_sha256": "f5037242cd6b8b1e935367ec47e69d3678881e09f121de1b596039e60339c298",
+    "opaque_rectangles": [
+      [
+        385,
+        604,
+        851,
+        1040
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/ux-6-production-smoke/dark/dark-1440-_admin_users.png",
+    "dimensions": [
+      1440,
+      1096
+    ],
+    "before_sha256": "f006a5eec67a95e418d557412e7fb78a00fd087f60bf758c163abc0d280172e2",
+    "after_sha256": "f5037242cd6b8b1e935367ec47e69d3678881e09f121de1b596039e60339c298",
+    "opaque_rectangles": [
+      [
+        385,
+        604,
+        851,
+        1040
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/ux-7-production-smoke/dark/dark-1440-_admin_users.png",
+    "dimensions": [
+      1440,
+      1096
+    ],
+    "before_sha256": "f006a5eec67a95e418d557412e7fb78a00fd087f60bf758c163abc0d280172e2",
+    "after_sha256": "f5037242cd6b8b1e935367ec47e69d3678881e09f121de1b596039e60339c298",
+    "opaque_rectangles": [
+      [
+        385,
+        604,
+        851,
+        1040
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/ux-8-pre-correction-smoke/dark/dark-1440-_admin_users.png",
+    "dimensions": [
+      1440,
+      1096
+    ],
+    "before_sha256": "f006a5eec67a95e418d557412e7fb78a00fd087f60bf758c163abc0d280172e2",
+    "after_sha256": "f5037242cd6b8b1e935367ec47e69d3678881e09f121de1b596039e60339c298",
+    "opaque_rectangles": [
+      [
+        385,
+        604,
+        851,
+        1040
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/ux-8-production-smoke/dark/dark-1440-_admin_users.png",
+    "dimensions": [
+      1440,
+      1096
+    ],
+    "before_sha256": "f006a5eec67a95e418d557412e7fb78a00fd087f60bf758c163abc0d280172e2",
+    "after_sha256": "f5037242cd6b8b1e935367ec47e69d3678881e09f121de1b596039e60339c298",
+    "opaque_rectangles": [
+      [
+        385,
+        604,
+        851,
+        1040
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/ux-9-production-smoke-before-visual-fix/dark/dark-1440-_admin_users.png",
+    "dimensions": [
+      1440,
+      1096
+    ],
+    "before_sha256": "f006a5eec67a95e418d557412e7fb78a00fd087f60bf758c163abc0d280172e2",
+    "after_sha256": "f5037242cd6b8b1e935367ec47e69d3678881e09f121de1b596039e60339c298",
+    "opaque_rectangles": [
+      [
+        385,
+        604,
+        851,
+        1040
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/ux-9-production-smoke/dark/dark-1440-_admin_users.png",
+    "dimensions": [
+      1440,
+      1096
+    ],
+    "before_sha256": "f006a5eec67a95e418d557412e7fb78a00fd087f60bf758c163abc0d280172e2",
+    "after_sha256": "f5037242cd6b8b1e935367ec47e69d3678881e09f121de1b596039e60339c298",
+    "opaque_rectangles": [
+      [
+        385,
+        604,
+        851,
+        1040
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/ux-10-production-smoke/light-1440-_admin_users.png",
+    "dimensions": [
+      1440,
+      1096
+    ],
+    "before_sha256": "0e3295b1860c20aab20f43950df648b6de5086a1eaa416cd8d4bf0e6761c3410",
+    "after_sha256": "03eb0d92be70f3e769aaed78884090ae49d7512174235b8c803b0020157af2d6",
+    "opaque_rectangles": [
+      [
+        385,
+        604,
+        851,
+        1040
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/ux-6-production-smoke/light/light-1440-_admin_users.png",
+    "dimensions": [
+      1440,
+      1096
+    ],
+    "before_sha256": "0e3295b1860c20aab20f43950df648b6de5086a1eaa416cd8d4bf0e6761c3410",
+    "after_sha256": "03eb0d92be70f3e769aaed78884090ae49d7512174235b8c803b0020157af2d6",
+    "opaque_rectangles": [
+      [
+        385,
+        604,
+        851,
+        1040
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/ux-7-production-smoke/light/light-1440-_admin_users.png",
+    "dimensions": [
+      1440,
+      1096
+    ],
+    "before_sha256": "0e3295b1860c20aab20f43950df648b6de5086a1eaa416cd8d4bf0e6761c3410",
+    "after_sha256": "03eb0d92be70f3e769aaed78884090ae49d7512174235b8c803b0020157af2d6",
+    "opaque_rectangles": [
+      [
+        385,
+        604,
+        851,
+        1040
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/ux-8-pre-correction-smoke/light/light-1440-_admin_users.png",
+    "dimensions": [
+      1440,
+      1096
+    ],
+    "before_sha256": "0e3295b1860c20aab20f43950df648b6de5086a1eaa416cd8d4bf0e6761c3410",
+    "after_sha256": "03eb0d92be70f3e769aaed78884090ae49d7512174235b8c803b0020157af2d6",
+    "opaque_rectangles": [
+      [
+        385,
+        604,
+        851,
+        1040
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/ux-8-production-smoke/light/light-1440-_admin_users.png",
+    "dimensions": [
+      1440,
+      1096
+    ],
+    "before_sha256": "0e3295b1860c20aab20f43950df648b6de5086a1eaa416cd8d4bf0e6761c3410",
+    "after_sha256": "03eb0d92be70f3e769aaed78884090ae49d7512174235b8c803b0020157af2d6",
+    "opaque_rectangles": [
+      [
+        385,
+        604,
+        851,
+        1040
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/ux-9-production-smoke-before-visual-fix/light/light-1440-_admin_users.png",
+    "dimensions": [
+      1440,
+      1096
+    ],
+    "before_sha256": "0e3295b1860c20aab20f43950df648b6de5086a1eaa416cd8d4bf0e6761c3410",
+    "after_sha256": "03eb0d92be70f3e769aaed78884090ae49d7512174235b8c803b0020157af2d6",
+    "opaque_rectangles": [
+      [
+        385,
+        604,
+        851,
+        1040
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-51/ux-9-production-smoke/light/light-1440-_admin_users.png",
+    "dimensions": [
+      1440,
+      1096
+    ],
+    "before_sha256": "0e3295b1860c20aab20f43950df648b6de5086a1eaa416cd8d4bf0e6761c3410",
+    "after_sha256": "03eb0d92be70f3e769aaed78884090ae49d7512174235b8c803b0020157af2d6",
+    "opaque_rectangles": [
+      [
+        385,
+        604,
+        851,
+        1040
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-11-production-smoke/dark-1440-_admin_users.png",
+    "dimensions": [
+      1440,
+      1096
+    ],
+    "before_sha256": "574ae628b86bcf222512bf8e41ac17e78e1ca5d85879db9325767677aac6ee84",
+    "after_sha256": "ae6c8346ced227b0fc9c93d78998026b7a15244259598a631c7eb895bef755b2",
+    "opaque_rectangles": [
+      [
+        385,
+        604,
+        851,
+        1040
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_admin_users.png",
+    "dimensions": [
+      1440,
+      1096
+    ],
+    "before_sha256": "574ae628b86bcf222512bf8e41ac17e78e1ca5d85879db9325767677aac6ee84",
+    "after_sha256": "ae6c8346ced227b0fc9c93d78998026b7a15244259598a631c7eb895bef755b2",
+    "opaque_rectangles": [
+      [
+        385,
+        604,
+        851,
+        1040
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-11-production-smoke/light-1440-_admin_users.png",
+    "dimensions": [
+      1440,
+      1096
+    ],
+    "before_sha256": "705ad0742777ead6d5e43b1ccd988b0c0ec28ebcf9b4171ed0bec1759dd47962",
+    "after_sha256": "350ae578651e75c186e56b6d05bdf2a38177e1b25273a789dc1124c3d9b149b0",
+    "opaque_rectangles": [
+      [
+        385,
+        604,
+        851,
+        1040
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_admin_users.png",
+    "dimensions": [
+      1440,
+      1096
+    ],
+    "before_sha256": "705ad0742777ead6d5e43b1ccd988b0c0ec28ebcf9b4171ed0bec1759dd47962",
+    "after_sha256": "350ae578651e75c186e56b6d05bdf2a38177e1b25273a789dc1124c3d9b149b0",
+    "opaque_rectangles": [
+      [
+        385,
+        604,
+        851,
+        1040
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-13-production-smoke/dark-1440-_admin_users.png",
+    "dimensions": [
+      1440,
+      1096
+    ],
+    "before_sha256": "48bd587cc7e735907ef594f68015eddf2cb2bcc98542f72dd1cf835b6c58ad0e",
+    "after_sha256": "0af7181279e774a24001c7e9b8c3484768eb6908d1e6c2a37352d5ca5cc9cbbb",
+    "opaque_rectangles": [
+      [
+        385,
+        604,
+        851,
+        1040
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-13-production-smoke/dark-390-_admin_users.png",
+    "dimensions": [
+      390,
+      3513
+    ],
+    "before_sha256": "c8a69e147035a5f32a854e003fb5ecca2d4d6c5672c789fdb7b3b2464c452222",
+    "after_sha256": "7c6c09a7709ac81cbaac220a7f0768e2aa0a2a0b4f5e1d495215b90fc44949a1",
+    "opaque_rectangles": [
+      [
+        32,
+        746,
+        101,
+        3480
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-13-production-smoke/light-1440-_admin_users.png",
+    "dimensions": [
+      1440,
+      1096
+    ],
+    "before_sha256": "3e3edead6b3f3719c326604bb79b0201fb22d6eac9adc966831d486fd541dc93",
+    "after_sha256": "523e3093c443010abcfd4c21f8ec2f9640a771918e9318d41c9fefee6168214d",
+    "opaque_rectangles": [
+      [
+        385,
+        604,
+        851,
+        1040
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-13-production-smoke/light-390-_admin_users.png",
+    "dimensions": [
+      390,
+      3513
+    ],
+    "before_sha256": "5e3caa77902cbd956ec780a056ad65183121e961f6b2aa1397ef0247106ca2e1",
+    "after_sha256": "e6237a672c9dabdafc1057a19f3ce982ba5a39539d9b026b478682b2391409a5",
+    "opaque_rectangles": [
+      [
+        32,
+        746,
+        101,
+        3480
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-58/PERSONAL-1/dark-1440-_admin_spaces.png",
+    "dimensions": [
+      1440,
+      4198
+    ],
+    "before_sha256": "71281792a5ba4c64103db677eb6a0817224175868ca15f3ae9a41395568ef2d7",
+    "after_sha256": "0db82c3b9c02e7a2b45399280ff3fc64faee61a2ecf38f0e7a1edbdb41dba42a",
+    "opaque_rectangles": [
+      [
+        387,
+        714,
+        452,
+        735
+      ],
+      [
+        567,
+        715,
+        608,
+        732
+      ],
+      [
+        387,
+        861,
+        441,
+        879
+      ],
+      [
+        441,
+        861,
+        534,
+        879
+      ],
+      [
+        649,
+        862,
+        691,
+        877
+      ],
+      [
+        690,
+        862,
+        750,
+        877
+      ],
+      [
+        387,
+        910,
+        443,
+        928
+      ],
+      [
+        559,
+        911,
+        592,
+        926
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-58/PERSONAL-1/dark-390-_admin_spaces.png",
+    "dimensions": [
+      390,
+      4828
+    ],
+    "before_sha256": "766210556b5e59c043c0301b2234e0329776c86d84fb6d29ce77f4a5c69b19ac",
+    "after_sha256": "1d22bf118e34d18cde90383d5dd5acd7280d26e1516ff4b8d4f6deed8ea438f5",
+    "opaque_rectangles": [
+      [
+        39,
+        778,
+        104,
+        799
+      ],
+      [
+        98,
+        799,
+        139,
+        816
+      ],
+      [
+        39,
+        973,
+        93,
+        991
+      ],
+      [
+        93,
+        973,
+        186,
+        991
+      ],
+      [
+        98,
+        994,
+        140,
+        1009
+      ],
+      [
+        139,
+        994,
+        200,
+        1009
+      ],
+      [
+        39,
+        1038,
+        95,
+        1056
+      ],
+      [
+        99,
+        1059,
+        132,
+        1074
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-58/PERSONAL-1/light-1440-_admin_spaces.png",
+    "dimensions": [
+      1440,
+      4198
+    ],
+    "before_sha256": "5eb32d459ae60ea4a1c1148b562b85a9c088fcc1cda7c95c509cf654c1050706",
+    "after_sha256": "20fa7c812058bd63cdb7d25e05ab5aec7dd174029d57d285ba1a55e6ae40806d",
+    "opaque_rectangles": [
+      [
+        387,
+        714,
+        452,
+        735
+      ],
+      [
+        567,
+        715,
+        608,
+        732
+      ],
+      [
+        387,
+        861,
+        441,
+        879
+      ],
+      [
+        441,
+        861,
+        534,
+        879
+      ],
+      [
+        649,
+        862,
+        691,
+        877
+      ],
+      [
+        690,
+        862,
+        750,
+        877
+      ],
+      [
+        387,
+        910,
+        443,
+        928
+      ],
+      [
+        559,
+        911,
+        592,
+        926
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  },
+  {
+    "path": "cmos/reports/sprint-58/PERSONAL-1/light-390-_admin_spaces.png",
+    "dimensions": [
+      390,
+      4828
+    ],
+    "before_sha256": "86b4155fdaf7a689748fdb398cb3f7a232001f1638e2829b5f8c35f619cec9fa",
+    "after_sha256": "d87b9c3b86902ad49b1b7d428f58d19089b0779b35060bf6e75c7cc324354fb1",
+    "opaque_rectangles": [
+      [
+        39,
+        778,
+        104,
+        799
+      ],
+      [
+        98,
+        799,
+        139,
+        816
+      ],
+      [
+        39,
+        973,
+        93,
+        991
+      ],
+      [
+        93,
+        973,
+        186,
+        991
+      ],
+      [
+        98,
+        994,
+        140,
+        1009
+      ],
+      [
+        139,
+        994,
+        200,
+        1009
+      ],
+      [
+        39,
+        1038,
+        95,
+        1056
+      ],
+      [
+        99,
+        1059,
+        132,
+        1074
+      ]
+    ],
+    "pixels_outside_masks_unchanged": true
+  }
+]
