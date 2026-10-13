@@ -1,3 +1,4 @@
+import { parseApiTimestamp } from "@/lib/api/timestamps";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import useSWR from "swr";
@@ -103,7 +104,7 @@ export function ProjectDescription({ userId, projectId, projectName }: { userId:
     <div>
       <h3 className="text-sm font-semibold">Current description</h3>
       <p className="whitespace-pre-wrap break-words text-secondary">{state.isLoading ? "Loading…" : state.data?.description || "No description yet."}</p>
-      {provenance?.current && <p className="mt-2 text-sm text-secondary">Machine drafted · Human accepted{provenance.edited ? " with edits" : ""} · {new Date(provenance.accepted_at).toLocaleString()} · {provenance.model}</p>}
+      {provenance?.current && <p className="mt-2 text-sm text-secondary">Machine drafted · Human accepted{provenance.edited ? " with edits" : ""} · {parseApiTimestamp(provenance.accepted_at).toLocaleString()} · {provenance.model}</p>}
       {provenance?.current && provenance.basis === "planning_brief" && <p className="text-sm text-secondary">Based on the planning brief; no corpus evidence was supplied.</p>}
       {provenance?.current && <Sources citations={provenance.citations} />}
       {provenance && !provenance.current && <p className="mt-2 text-sm text-secondary">{provenance.restored_at ? "Previous description restored." : "The description was edited after acceptance."}</p>}

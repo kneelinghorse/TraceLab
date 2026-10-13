@@ -1,3 +1,4 @@
+import { parseApiTimestamp } from "@/lib/api/timestamps";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
@@ -86,7 +87,7 @@ export function DuplicateReview({ userId, projectId, projectName }: { userId: st
     </details>
     {result && coverage && <section ref={resultRef} tabIndex={-1} className="space-y-3 focus-visible:ring-2 focus-visible:ring-focus" aria-label="Duplicate results">
       <p className="text-sm text-secondary">Examined {coverage.examined_documents} of {coverage.readable_documents} readable documents. {coverage.empty_documents} without usable text and {coverage.overlong_documents} over the text limit were excluded from {coverage.scanned_documents} scanned documents. {coverage.exact_only_documents} were checked for exact text only. {coverage.limited && "The document limit was reached; this is a partial scan."}</p>
-      <p className="text-xs text-secondary">Last requested {new Date(result.scanned_at).toLocaleString()}. Compare sources to refresh access and text before acting.</p>
+      <p className="text-xs text-secondary">Last requested {parseApiTimestamp(result.scanned_at).toLocaleString()}. Compare sources to refresh access and text before acting.</p>
       {coverage.candidates_limited && <p className="text-sm text-secondary">Showing the first {coverage.pair_limit} of {coverage.candidate_count} matching pairs, with exact matches first.</p>}
       {result.candidates.length === 0 && <p>No possible duplicates found within the examined scope.</p>}
       {visible.map(pair => <article key={pair.candidate_id} className="space-y-3 rounded-lg border border-line p-4">

@@ -1,0 +1,90 @@
+{
+  "mission": "S66-SETTINGS",
+  "base_commit": "dffbf7d05b78c37c3d4e496d4877058432b25c5a",
+  "verification_date": "2026-10-13",
+  "changes": [
+    "All remaining API string timestamps use parseApiTimestamp, including queue durations, device expiry, evidence, Librarian, correction status, Home and Observability.",
+    "Settings key and invite rows stack on phones; metadata wraps and action labels remain whole.",
+    "Three regression cases added to the required production-artifact Playwright list."
+  ],
+  "regression": {
+    "timezone": "America/Chicago",
+    "locale": "en-US",
+    "clock": "2026-10-13T05:30:00Z",
+    "before": {
+      "failed": 3,
+      "passed": 0,
+      "observed": "Created in about 2 hours and Last used in about 4 hours; Revoke text spans 3 lines in both themes."
+    },
+    "after": {
+      "passed": 3,
+      "skipped": 0,
+      "observed": "Created about 3 hours ago; Last used about 1 hour ago; invite date 10/12/2026; all four labels span one line."
+    }
+  },
+  "screenshots": {
+    "viewport": {
+      "width": 390,
+      "height": 1000
+    },
+    "files": [
+      "settings-light-390.png",
+      "settings-dark-390.png"
+    ],
+    "data": "Synthetic fixtures only.",
+    "visually_reviewed": true,
+    "horizontal_overflow": false,
+    "serious_or_critical_axe_findings": 0
+  },
+  "new_date_audit": {
+    "command": "rg -n \"new Date\\(\" frontend/src",
+    "matches": [
+      "frontend/src/__tests__/mission-run.test.tsx:45:  logged_at: new Date(Date.now() - 1000).toISOString(), created_at: new Date().toISOString(),",
+      "frontend/src/__tests__/mission-run.test.tsx:58:  mocks.get.mockImplementation(async path => path.endsWith(\"/logs\") ? [{ ...line(\"Retain this observation\"), created_at: new Date(Date.now() - 35000).toISOString() }] : []);",
+      "frontend/src/lib/api/timestamps.ts:3:  return new Date(/(?:Z|[+-]\\d{2}:?\\d{2})$/i.test(value) ? value : `${value}Z`);",
+      "frontend/src/components/console/CorrectionStatusCard.tsx:38:    const now = new Date();",
+      "frontend/src/components/missions/MissionRunActivity.tsx:127:        {received !== null && <p className=\"text-sm text-muted\">Last received <time dateTime={new Date(received).toISOString()}>{new Date(received).toLocaleString()}</time></p>}"
+    ],
+    "remaining_constructors": {
+      "timestamps.ts": "Central UTC parser.",
+      "CorrectionStatusCard.tsx": "new Date() is the local current clock, not API data.",
+      "MissionRunActivity.tsx": "received is already normalized epoch milliseconds: entry.created_at passes through parseApiTimestamp at line 81.",
+      "mission-run.test.tsx": "Fixture clock values created from Date.now(), not parsed API strings."
+    }
+  },
+  "checks": [
+    {
+      "command": "NEXT_TELEMETRY_DISABLED=1 npm run build",
+      "result": "passed"
+    },
+    {
+      "command": "PLAYWRIGHT_SKIP_SERVER=1 PLAYWRIGHT_BASE_URL=http://127.0.0.1:3166 npx playwright test tests/e2e/settings.spec.ts --workers=1",
+      "result": "3 passed, 0 skipped; served via next start"
+    },
+    {
+      "command": "npm run test:unit -- --run",
+      "result": "383 passed across 45 files, 0 skipped"
+    },
+    {
+      "command": "npm run lint",
+      "result": "passed"
+    },
+    {
+      "command": "npm run type-check",
+      "result": "passed"
+    },
+    {
+      "command": ".venv/bin/python scripts/run_pytest.py --timeout-seconds 240 -- --quiet tests/test_api_key_auth.py tests/test_auth_device.py tests/test_auth_api.py",
+      "result": "43 passed, 0 skipped, 14 warnings"
+    },
+    {
+      "command": "python3 cmos/scripts/validate_foundational_refs.py",
+      "result": "passed"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  ],
+  "deployment": "Final CI, merge and read-only production verification are recorded in the Reasonbook mission completion notes after merge."
+}

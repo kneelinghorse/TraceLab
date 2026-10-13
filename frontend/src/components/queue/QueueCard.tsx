@@ -1,3 +1,4 @@
+import { parseApiTimestamp } from "@/lib/api/timestamps";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 
@@ -49,7 +50,7 @@ export function RunningMissionCard({ mission }: RunningMissionCardProps) {
 
       {mission.started_at && (
         <p className="mt-4 text-xs text-muted">
-          Started {formatDistanceToNow(new Date(mission.started_at), { addSuffix: true })}
+          Started {formatDistanceToNow(parseApiTimestamp(mission.started_at), { addSuffix: true })}
         </p>
       )}
     </div>
@@ -113,7 +114,7 @@ export function QueuedMissionCard({
 
       {mission.queued_at && (
         <p className="mt-2 text-xs text-muted pl-13">
-          Queued {formatDistanceToNow(new Date(mission.queued_at), { addSuffix: true })}
+          Queued {formatDistanceToNow(parseApiTimestamp(mission.queued_at), { addSuffix: true })}
         </p>
       )}
     </div>

@@ -1,3 +1,4 @@
+import { parseApiTimestamp } from "@/lib/api/timestamps";
 import Link from "next/link";
 import { evidenceHref, sourceDomain, type LedgerEntry } from "@/lib/api/evidence";
 
@@ -6,7 +7,7 @@ export function EntryCard({ entry }: { entry: LedgerEntry }) {
     <div className="flex flex-wrap items-center gap-2 text-xs text-secondary">
       <span className="rounded-full bg-surface-alt px-2 py-1">{entry.disposition}</span>
       <span>{sourceDomain(entry.source_url)}</span>
-      <time dateTime={entry.created_at}>{new Date(entry.created_at).toLocaleDateString()}</time>
+      <time dateTime={entry.created_at}>{parseApiTimestamp(entry.created_at).toLocaleDateString()}</time>
     </div>
     <h2 className="break-words text-lg font-medium"><Link className="text-accent-text underline underline-offset-4" href={`/evidence/${entry.id}`}>{entry.claim}</Link></h2>
     {entry.summary && <p className="break-words text-secondary">{entry.summary}</p>}

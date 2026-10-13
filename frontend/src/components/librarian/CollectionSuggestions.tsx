@@ -1,3 +1,4 @@
+import { parseApiTimestamp } from "@/lib/api/timestamps";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import useSWR from "swr";
@@ -153,7 +154,7 @@ export function CollectionOrigin({ userId, collectionId }: { userId: string; col
   if (!provenance) return null;
   return <section className="panel space-y-3 p-5" aria-label="Collection origin">
     <h2 className="font-semibold">Machine suggested · Human accepted</h2>
-    <p className="text-sm text-secondary">{new Date(provenance.accepted_at).toLocaleString()} · {provenance.model} · {provenance.destination.space_name}</p>
+    <p className="text-sm text-secondary">{parseApiTimestamp(provenance.accepted_at).toLocaleString()} · {provenance.model} · {provenance.destination.space_name}</p>
     {!provenance.completed_at && <p className="text-sm text-secondary">The original save was incomplete. The collection shows its current members.</p>}
     {provenance.prompt && <p className="whitespace-pre-wrap break-words text-sm">Goal: {provenance.prompt}</p>}
     <details className="text-sm"><summary className="cursor-pointer">Originally accepted sources</summary>

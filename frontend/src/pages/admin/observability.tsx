@@ -1,3 +1,4 @@
+import { parseApiTimestamp } from "@/lib/api/timestamps";
 import Head from "next/head";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -12,7 +13,7 @@ import { adminStatsApi } from "@/lib/api/admin-stats";
 const button = "rounded-lg border border-line-strong px-4 py-2 text-sm text-secondary hover:bg-surface-alt disabled:opacity-50";
 function timestamp(value: string | null | undefined) {
   if (!value) return "Not observed";
-  return new Date(/(?:Z|[+-]\d\d:\d\d)$/.test(value) ? value : `${value}Z`).toLocaleString();
+  return parseApiTimestamp(value).toLocaleString();
 }
 function Panel({ title, children }: { title: string; children: ReactNode }) {
   return <section aria-label={title} className="panel min-w-0 p-5"><h2 className="mb-4 text-lg font-semibold">{title}</h2>{children}</section>;

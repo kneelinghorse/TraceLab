@@ -1,3 +1,4 @@
+import { parseApiTimestamp } from "@/lib/api/timestamps";
 import Head from "next/head";
 import Link from "next/link";
 import { useState } from "react";
@@ -18,7 +19,7 @@ import { openCommandPalette } from "@/lib/command-palette";
 
 function updated(value: string) {
   // API timestamps are UTC, including older offset-free SQL timestamps.
-  return new Date(/(?:Z|[+-]\d\d:\d\d)$/.test(value) ? value : `${value}Z`).toLocaleString(undefined, {
+  return parseApiTimestamp(value).toLocaleString(undefined, {
     month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
   });
 }

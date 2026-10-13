@@ -1,3 +1,4 @@
+import { parseApiTimestamp } from "@/lib/api/timestamps";
 interface ExecutionProgressProps {
   executionMetadata: Record<string, unknown>;
   startedAt: string | null;
@@ -5,7 +6,7 @@ interface ExecutionProgressProps {
 }
 
 function formatDuration(startedAt: string): string {
-  const start = new Date(startedAt).getTime();
+  const start = parseApiTimestamp(startedAt).getTime();
   const now = Date.now();
   const diffMs = now - start;
 

@@ -2,6 +2,7 @@
  * Console Corrections Queue - View and manage pending corrections.
  */
 
+import { parseApiTimestamp } from "@/lib/api/timestamps";
 import { useState } from "react";
 import useSWR from "swr";
 import Head from "next/head";
@@ -132,7 +133,7 @@ export function CorrectionsContent() {
         )}
 
         {notice && <p role="status" className="mb-4 rounded-lg bg-success-surface p-4 text-success">{notice}</p>}
-        <p className="mb-4 text-sm text-muted">Refreshes every 30s{status ? ` · Updated ${new Date(status.last_updated).toLocaleString()}` : ""}</p>
+        <p className="mb-4 text-sm text-muted">Refreshes every 30s{status ? ` · Updated ${parseApiTimestamp(status.last_updated).toLocaleString()}` : ""}</p>
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <div className="text-muted">Loading corrections...</div>
@@ -255,7 +256,7 @@ export function CorrectionsContent() {
                 <div className="mt-4 pt-4 border-t border-line">
                   <p className="text-sm text-muted">
                     Success Rate: {Math.round(telemetry.success_rate * 100)}% |
-                    Last Updated: {new Date(telemetry.last_updated).toLocaleString()}
+                    Last Updated: {parseApiTimestamp(telemetry.last_updated).toLocaleString()}
                   </p>
                 </div>
               </div>
@@ -303,7 +304,7 @@ export function CorrectionsContent() {
                           </pre>
                         </details>
                         <p className="text-xs text-muted mt-2">
-                          Last attempt: {new Date(item.last_attempt).toLocaleString()}
+                          Last attempt: {parseApiTimestamp(item.last_attempt).toLocaleString()}
                         </p>
                       </div>
                     ))}

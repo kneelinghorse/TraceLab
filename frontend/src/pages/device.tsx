@@ -10,6 +10,7 @@
  * The page accepts a ?code=ABCD-EFGH query-param prefill so the MCP client's
  * terminal output can deep-link directly to a populated form.
  */
+import { parseApiTimestamp } from "@/lib/api/timestamps";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
@@ -237,7 +238,7 @@ function PreviewPanel({
 }: PreviewPanelProps) {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => { const timer = setInterval(() => setNow(Date.now()), 15000); return () => clearInterval(timer); }, []);
-  const expiresAt = new Date(grant.expires_at);
+  const expiresAt = parseApiTimestamp(grant.expires_at);
   const minutesLeft = Math.max(0, Math.round((expiresAt.getTime() - now) / 60_000));
 
   if (grant.status !== "pending") {
