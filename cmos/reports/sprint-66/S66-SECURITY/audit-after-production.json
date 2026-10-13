@@ -1,6 +1,24 @@
 {
   "auditReportVersion": 2,
   "vulnerabilities": {
+    "@tailwindcss/typography": {
+      "name": "@tailwindcss/typography",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "postcss-selector-parser"
+      ],
+      "effects": [],
+      "range": "<=0.0.0-insiders.fda8ce5 || >=0.5.5",
+      "nodes": [
+        "node_modules/@tailwindcss/typography"
+      ],
+      "fixAvailable": {
+        "name": "@tailwindcss/typography",
+        "version": "0.5.4",
+        "isSemVerMajor": true
+      }
+    },
     "braces": {
       "name": "braces",
       "severity": "high",
@@ -130,16 +148,18 @@
         }
       ],
       "effects": [
+        "@tailwindcss/typography",
         "postcss-nested",
         "tailwindcss"
       ],
       "range": "<7.1.6",
       "nodes": [
+        "node_modules/@tailwindcss/typography/node_modules/postcss-selector-parser",
         "node_modules/postcss-selector-parser"
       ],
       "fixAvailable": {
-        "name": "tailwindcss",
-        "version": "4.3.3",
+        "name": "@tailwindcss/typography",
+        "version": "0.5.4",
         "isSemVerMajor": true
       }
     },
@@ -170,14 +190,14 @@
     "vulnerabilities": {
       "info": 0,
       "low": 0,
-      "moderate": 2,
+      "moderate": 3,
       "high": 5,
       "critical": 0,
-      "total": 7
+      "total": 8
     },
     "dependencies": {
-      "prod": 237,
-      "dev": 450,
+      "prod": 251,
+      "dev": 436,
       "optional": 116,
       "peer": 9,
       "peerOptional": 0,

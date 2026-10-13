@@ -82,7 +82,7 @@
       "advisory_urls_after": [
         "https://github.com/advisories/GHSA-rj75-hqrm-r3gf"
       ],
-      "production_audit_after": false,
+      "production_audit_after": true,
       "disposition": "Retained build-tool dependency; see shared residual reachability analysis and Sprint 68 follow-up.",
       "dependency_paths_after": [
         "node_modules/@tailwindcss/typography"
@@ -942,5 +942,6 @@
     "No source configuration changes or dynamic user CSS/glob feature were introduced."
   ],
   "limitations": "A file trace and source review establish the current build boundary; they are not a blanket claim that the repository or all bundled third-party code is vulnerability-free. npm audit still exits 1 and findings remain visible.",
-  "follow_up": "Captured in Reasonbook S66-SECURITY session next-step and Sprint 68 roadmap: recheck upstream at Sprint 68 planning, then compatible fix or deliberate toolchain migration with OODS/theme verification; revisit immediately before untrusted CSS/glob input is introduced."
+  "follow_up": "Captured in Reasonbook S66-SECURITY session next-step and Sprint 68 roadmap: recheck upstream at Sprint 68 planning, then compatible fix or deliberate toolchain migration with OODS/theme verification; revisit immediately before untrusted CSS/glob input is introduced.",
+  "build_dependency_decision": 620
 }

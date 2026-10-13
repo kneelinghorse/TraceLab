@@ -47,10 +47,10 @@
     "after_production": {
       "info": 0,
       "low": 0,
-      "moderate": 2,
+      "moderate": 3,
       "high": 5,
       "critical": 0,
-      "total": 7
+      "total": 8
     },
     "counts_are": "Affected packages, not unique advisories.",
     "exit_code_after": 1,
@@ -68,8 +68,8 @@
       "result": "passed; package.json and package-lock.json byte-identical before/after."
     },
     {
-      "command": "NODE_ENV=production npm ci --omit=dev && npm run build in a separate clean source tree",
-      "result": "passed on Node22.23.3/npm10.9.9. Next auto-installs omitted TypeScript dev declarations. Only dependency-node drift was @types/node20.19.24\u219220.19.43 and its root spec pinned exact; runtime dependency graph unchanged. This is recorded, not claimed to be an unchanged build lock."
+      "command": "CI=1 NODE_ENV=production npm ci --omit=dev && npm run build in a separate clean source tree",
+      "result": "Passed on Node22.23.3/npm10.9.9 with explicit build dependencies. No auto-install; package.json and lockfile byte-identical. Initial non-CI proof allowed a type-only auto-install and is superseded by this CI-equivalent run."
     },
     {
       "command": "npm run test:unit -- --run",
@@ -80,8 +80,8 @@
       "result": "passed"
     },
     {
-      "command": "Exact13 specs enumerated by frontend-production-build.yml, served by next start from clean build, workers1",
-      "result": "97 passed,0 skipped,0 retries; browser-checks.json"
+      "command": "Exact 13 specs enumerated by frontend-production-build.yml, served by next start from CI=1 clean production-only build, workers=1",
+      "result": "97 passed, 0 skipped, 0 retries in 141.663 seconds; browser-checks.json. Repeated after declaring build dependencies explicitly."
     },
     {
       "command": ".venv/bin/python scripts/run_pytest.py --timeout-seconds240 -- --quiet tests/test_missions_api.py",
@@ -110,7 +110,16 @@
     "No application or test implementation changed",
     "Node requirement documents22.12 minimum required by Vite",
     "No provider calls or exploit probes",
-    "No new server environment variable"
+    "No new server environment variable",
+    "Explicit compiler/declaration/CSS build dependencies preserve production-only CI install; test/lint dependencies remain dev-only."
   ],
-  "deployment": "Exact merged commit, required CI, production smoke and live Next/sharp version verification recorded in Reasonbook mission completion notes after merge."
+  "deployment": "Exact merged commit, required CI, production smoke and live Next/sharp version verification recorded in Reasonbook mission completion notes after merge.",
+  "build_dependency_decision": 620,
+  "ci_regression": {
+    "before_commit": "5445215ed108bc5c907133a07c5cc9d410d8cd4b",
+    "failed_run": "https://github.com/kneelinghorse/TraceLab/actions/runs/38456049408",
+    "failure": "Production-only install omitted TypeScript and CSS build tools. Next refuses its local auto-install fallback under CI.",
+    "fix": "Move existing compiler/declaration/CSS build requirements to dependencies; no package version changes. Preserve omit-dev build gate.",
+    "after_local": "CI=1 NODE_ENV=production npm ci --omit=dev && npm run build passed; both manifests byte-identical;35 server traces still exclude audited CSS/glob dependencies."
+  }
 }
