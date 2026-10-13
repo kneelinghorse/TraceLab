@@ -17,7 +17,8 @@ dependencies = [
     # Web Framework
     "fastapi>=0.115.0",
     "uvicorn[standard]>=0.32.0",
-    "pydantic>=2.10.0",
+    # <2.14: pydantic 2.14 removed the internal eval_type_backport that mcp 1.6.0 imports
+    "pydantic>=2.10.0,<2.14",
     "pydantic-settings>=2.6.0",
 
     # Database
