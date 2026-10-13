@@ -402,6 +402,52 @@ preview `106cb8668a3efdb8`, and canonical fixture identities remain distinct;
 the 2,285-versus-2,240 word discrepancy is unresolved. Full receipts and test
 disclosures: [S64 acceptance](../reports/sprint-64/S64-ACCEPT/validation.json).
 
+*Added 2026-10-13:* this section and its `S64-ACCEPT` receipts were committed on
+the build branch after PR #413 merged, and reached main only with the Sprint 66
+planning commit.
+
+### Sprint 65: REL-01 Ledger contract repair and reconciliation (Completed 2026-10-02 UTC)
+
+A one-mission repair sprint, opened and closed on 2026-10-02 with no separate
+handoff; decision **#602** records the contract choice made before the change.
+DeepSearch run REL-01 had finished with its report intact, but its Ledger batch
+was dead-lettered. One source fetch and two liveness checks had returned HTTP
+status 999, an unregistered code some sites send to bots, and both services
+capped the status field at 599.
+
+| Mission | Accepted outcome |
+| --- | --- |
+| **s65-m01** | The trusted Ledger outcome contract accepts observed non-boolean status codes 0–999; four-digit and malformed values stay rejected. REL-01's batch was rebuilt from retained evidence and replayed exactly once after both deployments, with no paid rerun |
+
+TraceLab's consumer change merged as
+[PR #414](https://github.com/kneelinghorse/TraceLab/pull/414) (`bb0b270`), which
+both services still serve; DeepSearch shipped the paired producer change as its
+PR #186. Before any write, a dry run of the deployed projector rebuilt REL-01's
+canonical 62-record envelope and predicted 440 Ledger entries. The outbox then
+delivered exactly one 440-entry batch
+(`357991cd-a0bf-4c90-96d5-164e568df4aa`, attempt 2, HTTP 201), and a replay
+answered `already_processed` with all 484 source-sighting counters unchanged.
+The evidence projection suite (110 tests) and Ruff passed. This sprint has no
+receipt folder under `cmos/reports/`: the mission record holds the run
+identities, and the paired closeout lives in DeepSearch's repository.
+
+**#479 closed.** The same day, decision **#603** closed the carried DeepSearch
+authored-scope follow-up on new controlled release evidence. DeepSearch's
+PR #185 and #186 code is deployed, and one controlled run, S95-SCOPE-ACCEPT-01,
+persisted 490 words, consulted exactly its two permitted pages with zero scope
+violations, and landed one idempotent two-entry Ledger batch. The historical
+run's original executed prompt remains permanently missing. A structural
+coverage false negative and a preview/runtime entity-extraction difference are
+separate quality follow-ups, not scope failures.
+
+**The close dropped ten carried follow-ups by mistake.** The next-step lease
+counted closed sprints that still carried future planned end dates, so ten rows
+decision #593 had preserved were dropped at the close. Reasonbook fixed the
+cause at the source in cmos-mcp 3.2.0 (2026-10-08). The ten were restored on
+2026-10-12 (decision #604), with ten still-real rows the Sprint 57 close had
+dropped the same way (decision #605). Sprint 66 planning takes up all 24 open
+rows.
+
 ### Running alongside: the guest expansion track
 
 > "tracelab has a few friends i've given access to but i think i want to expand that, so it will be for other software design pros to try it out."
@@ -470,6 +516,9 @@ Add to this list rather than resolving items silently.
 
 ## Change Log
 
+- **2026-10-13 UTC, Sprint 64 and 65 outcomes recorded at Sprint 66 planning (session PS-2026-10-13-003).** Sprint 64's outcome section and its `S64-ACCEPT` receipts had been committed after PR #413 merged and never reached main; they are carried unchanged. Sprint 65 is written up as outcome. The project identity was resynchronised from `sprint-64-complete` to `sprint-65-complete`, the exported context from `sprint-63-complete`, and Sprint 65's end date corrected from its planned 2026-10-08 to its 2026-10-02 close.
+- **2026-10-12 UTC, carry-forward recovery.** The ten follow-ups the Sprint 65 close dropped through the lease defect were restored (decision #604). The 23 the Sprint 57 close had dropped were triaged: ten restored, seven completed as delivered, six left closed (decision #605). Aquex received completion replies for hello@ forwarding (Sprint 62) and the MCP README fixes (Sprint 63) (decision #607).
+- **2026-10-02 UTC, Sprint 65 opened and closed, one of one.** REL-01's Ledger batch now accepts observed status 999 and was replayed exactly once (PR #414, `bb0b270`, decision #602); #479 closed on controlled DeepSearch release evidence (decision #603). The close dropped ten carried rows through the lease defect; they were restored on 2026-10-12.
 - **2026-10-02 UTC, Sprint 64 closed four of four.** PR #413 / `566a15c` serves both TraceLab services; MCP 2.1.2 passed independent registry and live installed-client acceptance. Canonical schema 1.2/revision 3 parity, lossless authoring and retained scope outcomes shipped. Nine required CI gates and six live UI journeys passed, with baseline skips/quarantine and two legacy CMOS failures disclosed. DeepSearch PR #185 is merged, but #479 remains open for worker runtime/required-run proof; eleven unrelated carryovers unchanged. Reply prepared, unsent; no paid research.
 - **2026-10-01 UTC, Sprint 64 opened.** Session PS-2026-10-01-013 started VENDOR from `f1a854e`; fetched main has no newer changes outside the plan. CMOS identity synchronized to sprint-64-active.
 - **2026-10-01 UTC, Sprint 64 planning.** Decision #595 queues VENDOR → SCOPE → RESULT → ACCEPT for DeepSearch authored-scope parity. Verified the S94 local handoff's 17 fixture and six source hashes; worker rollout remains unproved. #479 is carried into S64, eleven other rows retain their scope, and S63 completed identity is preserved. The isolated planning branch reconciles current main with the later S63 closeout receipts; runtime implementation remains for a fresh build session.
