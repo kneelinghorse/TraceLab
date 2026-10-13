@@ -1,0 +1,239 @@
+{
+  "runtime_filesystem_paths": 0,
+  "matches": [
+    {
+      "file": "app/api/v1/auth_device.py",
+      "line": 17,
+      "classification": "comment_or_docstring",
+      "text": "Wire shape mirrors the cmos-mcp client contract verbatim so the"
+    },
+    {
+      "file": "app/api/v1/auth_device.py",
+      "line": 58,
+      "classification": "comment_or_docstring",
+      "text": "# in lockstep \u2014 the cmos-mcp port reads these via the /device/code response."
+    },
+    {
+      "file": "app/api/v1/auth_device.py",
+      "line": 167,
+      "classification": "comment_or_docstring",
+      "text": "on the ``error`` field alone \u2014 matches the cmos-mcp client's existing"
+    },
+    {
+      "file": "app/api/v1/auth_device.py",
+      "line": 198,
+      "classification": "comment_or_docstring",
+      "text": "# extends its sleep \u2014 matches RFC 8628 + cmos-mcp's test expectations."
+    },
+    {
+      "file": "app/api/v1/mission_events.py",
+      "line": 9,
+      "classification": "event_or_route_identifier",
+      "text": "POST /api/v1/missions/events/cmos"
+    },
+    {
+      "file": "app/api/v1/mission_events.py",
+      "line": 33,
+      "classification": "event_or_route_identifier",
+      "text": "emit_cmos_mission_event,"
+    },
+    {
+      "file": "app/api/v1/mission_events.py",
+      "line": 129,
+      "classification": "event_or_route_identifier",
+      "text": "@service_router.post(\"/events/cmos\")"
+    },
+    {
+      "file": "app/api/v1/mission_events.py",
+      "line": 130,
+      "classification": "event_or_route_identifier",
+      "text": "def ingest_cmos_mission_event("
+    },
+    {
+      "file": "app/api/v1/mission_events.py",
+      "line": 143,
+      "classification": "event_or_route_identifier",
+      "text": "emitted = emit_cmos_mission_event("
+    },
+    {
+      "file": "app/api/v1/mission_events.py",
+      "line": 182,
+      "classification": "event_or_route_identifier",
+      "text": "events = [event for event in events if event.mission_id in references and not event.event_type.startswith(\"cmos.\")]"
+    },
+    {
+      "file": "app/api/v1/mission_events.py",
+      "line": 199,
+      "classification": "event_or_route_identifier",
+      "text": "if event.event_type.startswith(\"cmos.\") or not event.mission_id:"
+    },
+    {
+      "file": "app/api/v1/mission_events.py",
+      "line": 226,
+      "classification": "event_or_route_identifier",
+      "text": "or (not event.event_type.startswith(\"cmos.\") and event.mission_id in readable)"
+    },
+    {
+      "file": "app/core/mission_events.py",
+      "line": 48,
+      "classification": "event_or_route_identifier",
+      "text": "CMOS_MISSION_STARTED = \"cmos.mission.started\""
+    },
+    {
+      "file": "app/core/mission_events.py",
+      "line": 49,
+      "classification": "event_or_route_identifier",
+      "text": "CMOS_MISSION_COMPLETED = \"cmos.mission.completed\""
+    },
+    {
+      "file": "app/core/mission_events.py",
+      "line": 50,
+      "classification": "event_or_route_identifier",
+      "text": "CMOS_MISSION_BLOCKED = \"cmos.mission.blocked\""
+    },
+    {
+      "file": "app/core/mission_events.py",
+      "line": 51,
+      "classification": "event_or_route_identifier",
+      "text": "CMOS_MISSION_UNBLOCKED = \"cmos.mission.unblocked\""
+    },
+    {
+      "file": "app/core/mission_events.py",
+      "line": 52,
+      "classification": "event_or_route_identifier",
+      "text": "CMOS_MISSION_STATUS_CHANGED = \"cmos.mission.status_changed\""
+    },
+    {
+      "file": "app/core/mission_events.py",
+      "line": 269,
+      "classification": "event_or_route_identifier",
+      "text": "def emit_cmos_mission_event("
+    },
+    {
+      "file": "app/core/mission_events.py",
+      "line": 289,
+      "classification": "event_or_route_identifier",
+      "text": "details: dict[str, Any] = {\"source\": \"cmos\"}"
+    },
+    {
+      "file": "app/core/mission_events.py",
+      "line": 336,
+      "classification": "event_or_route_identifier",
+      "text": "\"emit_cmos_mission_event\","
+    },
+    {
+      "file": "app/core/telemetry.py",
+      "line": 10,
+      "classification": "comment_or_docstring",
+      "text": "\"source\":     \"tracelab\" | \"cmos\" | \"pedr\" | \"quality\" | \"script\","
+    },
+    {
+      "file": "app/core/telemetry.py",
+      "line": 39,
+      "classification": "telemetry_source_identifier",
+      "text": "VALID_SOURCES = frozenset({\"tracelab\", \"cmos\", \"pedr\", \"quality\", \"script\"})"
+    },
+    {
+      "file": "app/core/telemetry.py",
+      "line": 52,
+      "classification": "comment_or_docstring",
+      "text": "consistent downstream parsing by cmos-dashboard, analytics, and"
+    },
+    {
+      "file": "app/mcp_server/tools/missions.py",
+      "line": 13,
+      "classification": "comment_or_docstring",
+      "text": "the TS cluster shape here. See ``cmos/contracts/mission-authoring-contract.md``"
+    },
+    {
+      "file": "app/schemas/device_auth.py",
+      "line": 3,
+      "classification": "comment_or_docstring",
+      "text": "Wire shape mirrors the cmos-mcp contract verbatim so the MCP-client device-"
+    },
+    {
+      "file": "app/schemas/device_auth.py",
+      "line": 5,
+      "classification": "comment_or_docstring",
+      "text": "``cmos/contracts/`` (companion doc) and ``app/api/v1/auth/device.py``."
+    },
+    {
+      "file": "app/schemas/device_auth.py",
+      "line": 72,
+      "classification": "schema_description",
+      "text": "\"Duplicate of access_token under the cmos-mcp-compatible name so \""
+    },
+    {
+      "file": "app/services/contract_compiler/__init__.py",
+      "line": 13,
+      "classification": "comment_or_docstring",
+      "text": "`cmos/contracts/deepsearch-compiler-vendor.md`."
+    },
+    {
+      "file": "app/services/contract_compiler/compiler_provenance.py",
+      "line": 2,
+      "classification": "comment_or_docstring",
+      "text": "See cmos/contracts/deepsearch-compiler-vendor.md for local adaptations."
+    },
+    {
+      "file": "app/services/contract_compiler/contract.py",
+      "line": 2,
+      "classification": "comment_or_docstring",
+      "text": "See cmos/contracts/deepsearch-compiler-vendor.md for local adaptations."
+    },
+    {
+      "file": "app/services/contract_compiler/deliverable_schemas.py",
+      "line": 2,
+      "classification": "comment_or_docstring",
+      "text": "See cmos/contracts/deepsearch-compiler-vendor.md for local adaptations."
+    },
+    {
+      "file": "app/services/contract_compiler/domain_policy.py",
+      "line": 2,
+      "classification": "comment_or_docstring",
+      "text": "See cmos/contracts/deepsearch-compiler-vendor.md for local adaptations."
+    },
+    {
+      "file": "app/services/contract_compiler/scope.py",
+      "line": 2,
+      "classification": "comment_or_docstring",
+      "text": "See cmos/contracts/deepsearch-compiler-vendor.md for local adaptations."
+    },
+    {
+      "file": "app/services/contract_compiler/title_utils.py",
+      "line": 2,
+      "classification": "comment_or_docstring",
+      "text": "See cmos/contracts/deepsearch-compiler-vendor.md for local adaptations."
+    },
+    {
+      "file": "app/services/deepsearch_preview_client.py",
+      "line": 19,
+      "classification": "comment_or_docstring",
+      "text": "See ``cmos/contracts/deepsearch-compiler-vendor.md`` for the pinned commit"
+    },
+    {
+      "file": "app/services/pedr/delta_sync.py",
+      "line": 4,
+      "classification": "comment_or_docstring",
+      "text": "Reference: cmos/planning/PEDR-docs/tracelab-to-pedr-mapping.md"
+    },
+    {
+      "file": "app/services/pedr/hybrid_rerank.py",
+      "line": 20,
+      "classification": "comment_or_docstring",
+      "text": "Reference: R19.0 Qdrant Optimization Research (cmos/reports/sprint-19/)"
+    },
+    {
+      "file": "app/services/pedr/manifest_transformer.py",
+      "line": 3,
+      "classification": "comment_or_docstring",
+      "text": "Reference: cmos/planning/PEDR-docs/tracelab-to-pedr-mapping.md"
+    },
+    {
+      "file": "app/services/pedr/semantic_protocol.py",
+      "line": 12,
+      "classification": "comment_or_docstring",
+      "text": "Reference: cmos/planning/PEDR-docs/protocol-enhanced-deep-research/PROTOCOL_ARCHITECTURE_GUIDE.md"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "path_defaults": {
+    "before": "11 failed; all default outputs still targeted historical record paths",
+    "after": "11 passed within the 92-test targeted run"
+  },
+  "retired_routes": {
+    "before": "5 role cases failed because routes remained in OpenAPI",
+    "after": "5 role cases passed; GET list, GET detail and POST evidence return 404 for owner/admin/member/viewer/service"
+  },
+  "targeted_suite": {
+    "passed": 92,
+    "skipped": 0,
+    "deselected": 1,
+    "quarantine": "tests/test_document_ingestion.py::test_upload_and_process_endpoints_record_statuses",
+    "warnings": 14
+  },
+  "retired_test_cases": {
+    "count": 19,
+    "reason": "13 schema/helper cases and 6 route cases described the explicitly retired decision-links API; replaced by 5 role cases proving all three routes absent. Reasonbook/session evidence tests remain."
+  },
+  "added_test_cases": 16,
+  "lint": {
+    "preexisting_findings_in_touched_files": 52,
+    "after_findings": 0,
+    "scope": "Only CI-required lint repairs in files changed by this mission; optional-dependency import guards retained with explicit E402 annotations."
+  }
+}

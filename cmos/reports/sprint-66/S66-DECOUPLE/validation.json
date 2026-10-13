@@ -1,0 +1,48 @@
+{
+  "mission": "S66-DECOUPLE",
+  "date": "2026-10-13",
+  "base_commit": "381a3aa5520bd017fc5479265eb09b6c742dcf5f",
+  "tested_implementation_commit": "a8163d062c2b290726d814ae1f46b766cc5e24c9",
+  "decisions": [
+    609,
+    621
+  ],
+  "full_backend_suite": {
+    "before": {
+      "passed": 3178,
+      "skipped": 4,
+      "deselected": 12,
+      "modified_tracked_files": 6
+    },
+    "after": {
+      "passed": 3175,
+      "skipped": 4,
+      "deselected": 12,
+      "warnings": 49,
+      "modified_tracked_files": 0
+    },
+    "exact_same_ci_command": true,
+    "clean_checkout_at_start_of_both": true,
+    "git_status_porcelain_empty_after": true,
+    "no_new_skips_or_quarantine": true
+  },
+  "regressions": "regressions.json",
+  "coverage_http": "coverage-http-parity.json",
+  "remaining_record_references": "app-record-references.json",
+  "checks": {
+    "changed_file_ruff": "passed",
+    "format_only_guard": "passed",
+    "foundational_references": "passed",
+    "credential_literal_guard": "passed",
+    "receipt_email_guard": "passed"
+  },
+  "scope": [
+    "No new setting or environment variable",
+    "No MCP surface change",
+    "No application reads or writes under cmos; comments and historical identifiers retained",
+    "Only the three deliberately retired decision routes change API behavior",
+    "Root dashboard telemetry defaults stay unchanged",
+    "No paid provider calls"
+  ],
+  "deployment": "Required CI, merged commit, production smoke and authenticated administrative 404 verification are recorded in the Reasonbook completion notes after merge."
+}
