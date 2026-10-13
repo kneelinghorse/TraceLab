@@ -1,0 +1,171 @@
+{
+  "mode": "after",
+  "server": {
+    "name": "tracelab-mcp",
+    "version": "2.1.3"
+  },
+  "checkedAt": "2026-10-13T21:49:22.674Z",
+  "checks": [
+    {
+      "source": "installed tool description",
+      "mission": "787c4482-3e85-4c36-996b-3fd7a3e98c95",
+      "input": {
+        "kind": "report",
+        "title": "Research summary",
+        "format": "markdown",
+        "required_sections": [
+          "Executive summary",
+          "Evidence",
+          "Limitations"
+        ]
+      },
+      "previewError": false,
+      "status": "draft",
+      "attempts": 0
+    },
+    {
+      "source": "UI placeholder",
+      "mission": "fa75e5e9-5f67-4563-a299-d3a047442a06",
+      "input": {
+        "kind": "report",
+        "title": "Research summary",
+        "format": "markdown",
+        "required_sections": [
+          "Executive summary",
+          "Evidence",
+          "Limitations"
+        ]
+      },
+      "previewError": false,
+      "status": "draft",
+      "attempts": 0
+    },
+    {
+      "source": "installed README",
+      "mission": "e1b53a40-e401-45ca-8ab2-da3b1ced46fa",
+      "input": {
+        "kind": "report",
+        "title": "Research summary",
+        "format": "markdown",
+        "required_sections": [
+          "Executive summary",
+          "Evidence",
+          "Limitations"
+        ]
+      },
+      "previewError": false,
+      "status": "draft",
+      "attempts": 0
+    }
+  ],
+  "calls": [
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/3f5c2641-7a47-45ed-a092-feebe9143ed1",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/missions",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/787c4482-3e85-4c36-996b-3fd7a3e98c95",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/787c4482-3e85-4c36-996b-3fd7a3e98c95/contract-preview",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/787c4482-3e85-4c36-996b-3fd7a3e98c95",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/missions",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/fa75e5e9-5f67-4563-a299-d3a047442a06",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/fa75e5e9-5f67-4563-a299-d3a047442a06/contract-preview",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/fa75e5e9-5f67-4563-a299-d3a047442a06",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/missions",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/e1b53a40-e401-45ca-8ab2-da3b1ced46fa",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/e1b53a40-e401-45ca-8ab2-da3b1ced46fa/contract-preview",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/e1b53a40-e401-45ca-8ab2-da3b1ced46fa",
+      "status": 200
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/missions/787c4482-3e85-4c36-996b-3fd7a3e98c95",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/787c4482-3e85-4c36-996b-3fd7a3e98c95",
+      "status": 404
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/missions/fa75e5e9-5f67-4563-a299-d3a047442a06",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/fa75e5e9-5f67-4563-a299-d3a047442a06",
+      "status": 404
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/missions/e1b53a40-e401-45ca-8ab2-da3b1ced46fa",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/e1b53a40-e401-45ca-8ab2-da3b1ced46fa",
+      "status": 404
+    }
+  ],
+  "created": [
+    "787c4482-3e85-4c36-996b-3fd7a3e98c95",
+    "fa75e5e9-5f67-4563-a299-d3a047442a06",
+    "e1b53a40-e401-45ca-8ab2-da3b1ced46fa"
+  ],
+  "deleted": [
+    "787c4482-3e85-4c36-996b-3fd7a3e98c95",
+    "fa75e5e9-5f67-4563-a299-d3a047442a06",
+    "e1b53a40-e401-45ca-8ab2-da3b1ced46fa"
+  ],
+  "researchDispatched": false,
+  "providerExecution": false,
+  "passed": true
+}

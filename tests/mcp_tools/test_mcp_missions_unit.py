@@ -119,6 +119,46 @@ class TestT41_6CreateMissionRequiresProjectId:
 class TestMissionToolDefinitions:
     """Tests for MCP tool definitions - no database required."""
 
+    def test_create_preserves_the_authored_output_descriptor(self):
+        from mcp.server import Server
+        from mcp.shared.memory import create_connected_server_and_client_session
+
+        from app.mcp_server.tools import missions
+
+        descriptor = {
+            "kind": "report",
+            "title": "Research summary",
+            "format": "markdown",
+            "required_sections": ["Executive summary", "Evidence", "Limitations"],
+        }
+        database = MagicMock()
+        server = Server("output-descriptor-contract")
+        missions.register_mission_tools(server)
+
+        async def exercise():
+            async with create_connected_server_and_client_session(server) as client:
+                tool = next(t for t in (await client.list_tools()).tools if t.name == "create_mission")
+                assert tool.inputSchema["properties"]["expected_output_schema"]["type"] == "object"
+                result = await client.call_tool("create_mission", {
+                    "mission_id": "OUTPUT-PYTHON",
+                    "title": "Output descriptor",
+                    "objective": "Preserve the author supplied output descriptor",
+                    "success_criteria": ["Descriptor survives creation"],
+                    "project_id": "00000000-0000-4000-8000-000000000001",
+                    "expected_output_schema": descriptor,
+                })
+                assert not result.isError
+                assert json.loads(result.content[0].text)["expected_output_schema"] == descriptor
+
+        with (
+            patch.object(missions, "get_db", return_value=iter([database])),
+            patch.object(missions._mission_service, "create_mission") as create,
+        ):
+            create.side_effect = lambda _db, data: _make_mission_mock(
+                expected_output_schema=data.expected_output_schema
+            )
+            asyncio.run(exercise())
+
     def test_mission_tools_defined(self):
         """All mission tools are defined."""
         from app.mcp_server.tools.missions import MISSION_TOOLS

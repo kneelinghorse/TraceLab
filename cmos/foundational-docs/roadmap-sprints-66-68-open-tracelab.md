@@ -262,6 +262,8 @@ Closes #174 and #486.
 - Registry 2.1.3, installed fresh, passes the stdio check suite, and its tarball matches the tested pack.
 - If reproduction shows no defect, #174 closes on that evidence, and 2.1.3 carries only the README fix.
 
+**Local build verification (2026-10-13, S66-MCP):** The installed registry 2.1.2 example reproduced a deployed preview 422 for missing `kind`; its draft was deleted. Corrected tool, README and UI examples now compile through a fresh installed 2.1.3 tarball against deployed preview, with three drafts deleted and no provider execution. The public boundary remains one object; draft flexibility and compiler validation remain unchanged (decision #623). The legacy Python create tool now preserves the descriptor, with a registered-client regression. Checks pass: 137 targeted backend tests, 160 MCP unit tests, 385 frontend unit tests, eight mission browser cases, and 70 installed stdio checks covering 71 HTTP requests. The contract is updated in this commit. Receipts: `cmos/reports/sprint-66/S66-MCP/`; registry release and owner browser approval remain pending until recorded at mission completion.
+
 **Out of Sprint 66:**
 - new product features;
 - UX redesign (Sprint 67);

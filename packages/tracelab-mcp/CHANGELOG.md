@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.1.3
+
+- Replace the mission tool's incomplete output-schema example with a compilable
+  output descriptor containing `kind`, `title` and `format`.
+- Document the object-only authoring boundary and structural preview workflow,
+  and use `@latest` in the global-install command.
+- Verify the installed tool's own example and output-descriptor preservation
+  through actual stdio create, update, get, list and preview calls.
+
 ## 2.1.2
 
 - Preserve `context.authored_scope` during mission creation, URL-only structured

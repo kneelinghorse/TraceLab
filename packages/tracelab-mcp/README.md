@@ -25,10 +25,10 @@ Configure your stdio MCP client to launch the current published adapter with
 npx -y @aquex/tracelab-mcp@latest
 ```
 
-For a reproducible install, pin the current documentation patch, **2.1.1**:
+To install the current release globally:
 
 ```bash
-npm install -g @aquex/tracelab-mcp@2.1.1
+npm install -g @aquex/tracelab-mcp@latest
 tracelab-mcp
 ```
 
@@ -92,6 +92,30 @@ are not shell commands for individual tool calls.
    as your usage.
 
 The JSON above describes MCP tool calls made by your client, not terminal input.
+
+### Authoring an output descriptor
+
+For `tracelab_mission` create/update, `expected_output_schema` is one output
+descriptor object. Set nonempty `kind`, `title` and `format`; this is not a raw
+JSON Schema with `type` and `properties`. For example:
+
+<!-- expected-output-schema-example -->
+```json
+{
+  "kind": "report",
+  "title": "Research summary",
+  "format": "markdown",
+  "required_sections": ["Executive summary", "Evidence", "Limitations"]
+}
+```
+
+TraceLab's MCP, REST and UI accept an object, not an array of descriptors, even
+though the underlying compiler also supports sequences internally. Omit this
+optional field to use inferred deliverables. Drafts preserve the object as
+authored; contract preview validates it. After creating a draft, call
+`tracelab_mission_execution` with `action="preview"` and its returned UUID.
+Preview is structural and does not dispatch research or execute a provider.
+Submitting research is a separate action.
 
 ---
 
