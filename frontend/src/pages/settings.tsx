@@ -1,3 +1,4 @@
+import { parseApiTimestamp } from "@/lib/api/timestamps";
 import { useFeedback } from "@/components/ui/useFeedback";
 /**
  * User settings page — profile, API keys, invite codes
@@ -349,12 +350,12 @@ function APIKeysSection() {
           value={newKeyName}
           onChange={(e) => setNewKeyName(e.target.value)}
           placeholder="Key name (e.g. MCP local)"
-          className="flex-1 px-3 py-2 border border-line-strong rounded-lg bg-surface text-foreground text-sm"
+          className="min-w-0 flex-1 px-3 py-2 border border-line-strong rounded-lg bg-surface text-foreground text-sm"
         />
         <button
           type="submit"
           disabled={isCreating || !newKeyName.trim()}
-          className="px-4 py-2 bg-accent text-on-accent rounded-lg hover:bg-accent disabled:opacity-50 transition-colors text-sm font-medium"
+          className="shrink-0 whitespace-nowrap px-4 py-2 bg-accent text-on-accent rounded-lg hover:bg-accent disabled:opacity-50 transition-colors text-sm font-medium"
         >
           {isCreating ? "Creating..." : "Create key"}
         </button>
@@ -370,25 +371,25 @@ function APIKeysSection() {
           {keys.map((key) => (
             <li
               key={key.id}
-              className="flex items-center justify-between py-3 px-4 bg-background rounded-lg"
+              className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between py-3 px-4 bg-background rounded-lg"
             >
               <div className="min-w-0">
-                <p className="text-sm font-medium text-foreground">{key.name}</p>
-                <div className="flex items-center gap-3 mt-0.5">
+                <p className="break-words text-sm font-medium text-foreground">{key.name}</p>
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-0.5">
                   <code className="text-xs text-muted font-mono">{key.key_prefix}…</code>
                   <span className="text-xs text-muted">
-                    Created {formatDistanceToNow(new Date(key.created_at), { addSuffix: true })}
+                    Created {formatDistanceToNow(parseApiTimestamp(key.created_at), { addSuffix: true })}
                   </span>
                   {key.last_used_at && (
                     <span className="text-xs text-muted">
-                      Last used {formatDistanceToNow(new Date(key.last_used_at), { addSuffix: true })}
+                      Last used {formatDistanceToNow(parseApiTimestamp(key.last_used_at), { addSuffix: true })}
                     </span>
                   )}
                 </div>
               </div>
               <button
                 onClick={() => handleDelete(key.id, key.name)}
-                className="ml-4 px-3 py-1 text-xs text-danger hover:bg-danger-surface rounded transition-colors"
+                className="shrink-0 whitespace-nowrap px-3 py-1 text-xs text-danger hover:bg-danger-surface rounded transition-colors"
               >
                 Revoke
               </button>
@@ -464,12 +465,12 @@ function InviteCodesSection() {
 
   return (
     <section id="invites" className="scroll-mt-20 bg-surface rounded-lg border border-line p-6">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <h2 className="text-lg font-semibold text-foreground">Invite Codes</h2>
         <button
           onClick={handleGenerate}
           disabled={isCreating}
-          className="px-3 py-1.5 text-sm bg-accent text-on-accent rounded-lg hover:bg-accent disabled:opacity-50 transition-colors font-medium"
+          className="shrink-0 whitespace-nowrap px-3 py-1.5 text-sm bg-accent text-on-accent rounded-lg hover:bg-accent disabled:opacity-50 transition-colors font-medium"
         >
           {isCreating ? "Generating..." : "Generate code"}
         </button>
@@ -505,14 +506,14 @@ function InviteCodesSection() {
           {codes.map((code) => (
             <li
               key={code.id}
-              className="flex items-center justify-between py-2.5 px-4 bg-background rounded-lg"
+              className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between py-2.5 px-4 bg-background rounded-lg"
             >
-              <div className="flex items-center gap-4">
+              <div className="flex flex-wrap items-center gap-4">
                 <code className="font-mono text-base tracking-widest text-foreground">
                   {code.code}
                 </code>
                 <span
-                  className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                  className={`shrink-0 whitespace-nowrap px-2 py-0.5 rounded-full text-xs font-medium ${
                     code.status === "unused"
                       ? "bg-success-surface text-success"
                       : code.status === "used"
@@ -523,21 +524,21 @@ function InviteCodesSection() {
                   {code.status}
                 </span>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 <span className="text-xs text-muted">
-                  {new Date(code.created_at).toLocaleDateString()}
+                  {parseApiTimestamp(code.created_at).toLocaleDateString()}
                 </span>
                 {code.status === "unused" && (
                   <>
                     <button
                       onClick={() => handleCopy(code.code)}
-                      className="text-xs text-accent-text underline underline-offset-4"
+                      className="shrink-0 whitespace-nowrap text-xs text-accent-text underline underline-offset-4"
                     >
                       Copy
                     </button>
                     <button
                       onClick={() => handleDelete(code.id)}
-                      className="text-xs text-danger underline underline-offset-4"
+                      className="shrink-0 whitespace-nowrap text-xs text-danger underline underline-offset-4"
                     >
                       Delete
                     </button>

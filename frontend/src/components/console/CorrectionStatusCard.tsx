@@ -1,3 +1,4 @@
+import { parseApiTimestamp } from "@/lib/api/timestamps";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 /**
  * CorrectionStatusCard - Displays correction queue statistics and recent items.
@@ -33,7 +34,7 @@ function StatBox({ label, value, color }: { label: string; value: number | strin
 
 function CorrectionItemRow({ item }: { item: CorrectionItem }) {
   const timeSince = (dateStr: string) => {
-    const date = new Date(dateStr);
+    const date = parseApiTimestamp(dateStr);
     const now = new Date();
     const diff = now.getTime() - date.getTime();
     const minutes = Math.floor(diff / 60000);
@@ -174,7 +175,7 @@ export function CorrectionStatusCard({
 
       {/* Last Updated */}
       <div className="mt-4 pt-4 border-t border-line text-xs text-muted">
-        Last updated: {new Date(status.last_updated).toLocaleString()}
+        Last updated: {parseApiTimestamp(status.last_updated).toLocaleString()}
       </div>
     </div>
   );
