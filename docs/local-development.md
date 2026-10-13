@@ -45,6 +45,8 @@ What the script does:
 3. Runs `alembic upgrade head` inside the backend container.
 4. Installs frontend dependencies (if missing) and launches `npm run dev` from `frontend/`.
 
+For a separate stack, set `COMPOSE_PROJECT_NAME` to an unused name before startup (for example, `export COMPOSE_PROJECT_NAME=tracelab-local`). Container and volume names follow that project; reusing a name retains its database. Keep that variable set for later Compose commands, including shutdown.
+
 If host port 5433 is occupied, run `export TRACELAB_POSTGRES_PORT=55433` (or another free port) before startup. This changes the Compose host mapping only; the backend still connects to `postgres:5432`. Host-side tools must use the selected port. See the [README quickstart](../README.md#run-locally) for first-login details.
 
 Use the optional flag when you only need backend services:
@@ -67,6 +69,8 @@ Auxiliary scripts:
 | Qdrant    | 6333 | `tracelab_dev_qdrant`   | Vector DB for RAG runs. |
 | FastAPI   | 8000 | `tracelab_dev_backend`  | Hot reload enabled via volume mount. |
 | Frontend  | 3000 | Host process            | Started by `npm run dev:all` unless skipped. |
+
+The container names above are the defaults; a custom `COMPOSE_PROJECT_NAME` replaces the `tracelab` prefix.
 
 ## Verification Checklist
 

@@ -30,7 +30,13 @@ The quickstart runs PostgreSQL, Qdrant and the FastAPI API in Docker, with the N
    cp .env.example .env
    ```
 
-2. If another application already uses PostgreSQL port 5433, choose a free host port before starting:
+2. Choose a Compose project name for this checkout. It gives its containers and data volumes a separate namespace; use an unused name for a fresh database. Reusing a name intentionally retains that stack's data.
+
+   ```bash
+   export COMPOSE_PROJECT_NAME=tracelab-local
+   ```
+
+3. If another application already uses PostgreSQL port 5433, choose a free host port before starting:
 
    ```bash
    export TRACELAB_POSTGRES_PORT=55433
@@ -38,7 +44,7 @@ The quickstart runs PostgreSQL, Qdrant and the FastAPI API in Docker, with the N
 
    This changes only the local Docker port mapping. The API still connects to PostgreSQL on port 5432 inside Docker. Host-side database tools must use the selected host port.
 
-3. Start the stack and UI:
+4. Start the stack and UI:
 
    ```bash
    bash scripts/dev-setup.sh
@@ -48,7 +54,7 @@ The quickstart runs PostgreSQL, Qdrant and the FastAPI API in Docker, with the N
 
    The example environment provisions `tracelab-admin@example.com` with password `changeme` on the first migration. These are local development defaults. Before deploying a real instance, set `AUTH_USERNAME` to the owner's full email address and configure `AUTH_PASSWORD` or `AUTH_PASSWORD_HASH`, `SECRET_KEY`, and the appropriate CORS origins in `.env`. Changing bootstrap credentials later does not reset an existing database user's password; use Settings or password recovery.
 
-4. In another terminal, check both services:
+5. In another terminal, check both services:
 
    ```bash
    curl --fail --silent --show-error --write-out '\nAPI HTTP %{http_code}\n' http://localhost:8000/api/v1/health
@@ -57,7 +63,7 @@ The quickstart runs PostgreSQL, Qdrant and the FastAPI API in Docker, with the N
 
    Both should report HTTP 200. API documentation is at [localhost:8000/docs](http://localhost:8000/docs).
 
-Stop the UI with Ctrl-C. From the repository directory, stop the Docker services while retaining their data:
+Stop the UI with Ctrl-C. In that same terminal (where `COMPOSE_PROJECT_NAME` is still set), stop the Docker services while retaining their data:
 
 ```bash
 docker compose -f docker-compose.dev.yml down
@@ -77,7 +83,7 @@ See the [local development guide](docs/local-development.md) for separate servic
 | [`docs/`](docs/) | Developer and operations documentation |
 | [`cmos/`](cmos/) | Reasonbook project record, planning documents and acceptance receipts |
 
-A full clone is about 1 GB because Git history and `cmos/` retain development history, including screenshot receipts. The record is a development workbench, separate from the research data stored by the application in PostgreSQL and Qdrant. Its local SQLite database is ignored by Git. Application code lives outside `cmos/`.
+The tracked checkout alone is about 1 GB, mostly development history and screenshot receipts under `cmos/`; a full clone also includes Git history. The record is a development workbench, separate from the research data stored by the application in PostgreSQL and Qdrant. Its local SQLite database is ignored by Git. Application code lives outside `cmos/`.
 
 Useful references: [frontend architecture](docs/frontend_architecture.md), [architecture decisions](docs/adr/), [MCP tool reference](docs/mcp-tools.md), and [mission-authoring contract](cmos/contracts/mission-authoring-contract.md).
 
