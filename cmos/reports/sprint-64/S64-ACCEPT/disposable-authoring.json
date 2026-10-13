@@ -1,0 +1,69 @@
+{
+  "accepted": true,
+  "calls": [
+    {
+      "method": "POST",
+      "path": "/api/v1/missions",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/2684ed8d-00b4-436f-a446-7985527d0e45",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/2684ed8d-00b4-436f-a446-7985527d0e45/contract-preview",
+      "status": 200
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/missions/2684ed8d-00b4-436f-a446-7985527d0e45",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/2684ed8d-00b4-436f-a446-7985527d0e45",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/2684ed8d-00b4-436f-a446-7985527d0e45/contract-preview",
+      "status": 422,
+      "error": {
+        "detail": {
+          "message": "DeepSearch preview rejected the mission.",
+          "upstream_status": 422,
+          "upstream_detail": {
+            "message": "structured exact pages conflict with requested references"
+          }
+        }
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/missions/2684ed8d-00b4-436f-a446-7985527d0e45",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/2684ed8d-00b4-436f-a446-7985527d0e45/contract-preview",
+      "status": 200
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/missions/2684ed8d-00b4-436f-a446-7985527d0e45",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/2684ed8d-00b4-436f-a446-7985527d0e45",
+      "status": 200
+    }
+  ],
+  "blocked": [],
+  "disposable_mission_id": "2684ed8d-00b4-436f-a446-7985527d0e45",
+  "human_id": "S64-TEST-f2d279ea-0bb7-4257-8e06-6bfe483905ae",
+  "cleanup_status": 204,
+  "research_dispatched": false
+}

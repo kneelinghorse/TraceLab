@@ -1,0 +1,327 @@
+{
+  "session": {
+    "sessionId": "PS-2026-10-01-013",
+    "type": "custom",
+    "title": "Sprint 64 build — authored scope integration",
+    "summary": "Completed S64 VENDOR→SCOPE→RESULT→ACCEPT. PR413 merged/serving566a15c; npm2.1.2 independent registry70checks/24file identity, live installed MCP and6theme-width UI journeys+5smokes accepted. All9requiredCI green with disclosed4backend/3PGskips,12quarantines and2legacyCMOSfailures. Canonical8ca1ebfaa604dc7e/schema1.2/rev3 exact; decision601. #479 stays open for DS runtime/authorized required run; PR185 merge observed34ccc4f. Eleven unrelated carryovers unchanged; no paid research/DS writes; evidence reply prepared unsent. Receipts cmos/reports/sprint-64/S64-ACCEPT.",
+    "completedAt": "2026-10-02T00:21:37.549Z",
+    "durationMinutes": 113,
+    "captureCount": 2,
+    "capturesByCategory": {
+      "learning": 2
+    },
+    "nextSteps": null,
+    "nextStepsExtracted": 0,
+    "decisionsExtracted": 0,
+    "constraintsExtracted": 0,
+    "aggregation": {
+      "capturesRouted": {
+        "learning": 2
+      },
+      "contextsUpdated": true,
+      "projectSnapshotId": 1335,
+      "masterSnapshotId": 1336,
+      "condensation": {
+        "projectArchivedSprints": [],
+        "masterArchivedSprints": [],
+        "projectArchiveSnapshotId": null,
+        "masterArchiveSnapshotId": null
+      }
+    },
+    "message": "Session 'PS-2026-10-01-013' completed (2 captures, 113min, 0 next-steps extracted, 0 decisions extracted, 0 constraints extracted)",
+    "writeFailures": []
+  },
+  "sprint": {
+    "sprintId": "sprint-64",
+    "previousStatus": "Active",
+    "currentStatus": "Completed",
+    "summary": "4/4 delivered. TraceLab566a15c and npm2.1.2 accepted by canonical fixtures,9required CI gates, independent registry/install/live MCP,6live UI journeys and5smokes. Existing skips/quarantine/2legacyCMOS failures disclosed. DS merged34ccc4f; #479 remains open for worker runtime and separately authorized required dispatch. No duplicate successor, paid research, DS operations or outbound reply; other11carryovers untouched. Decision601; cmos/reports/sprint-64/S64-ACCEPT/validation.json.",
+    "completedAt": "2026-10-02T00:21:39.120Z",
+    "activeSessionsAtClose": [],
+    "startupBuildTime": "2026-09-18T14:35:02.829Z",
+    "driftMinutes": 0,
+    "readiness": {
+      "totalMissions": 4,
+      "completedMissions": 4,
+      "blockedMissions": 0,
+      "skippedMissions": 0,
+      "openMissions": 0,
+      "parkedMissions": 0,
+      "completedMissionIds": [
+        "S64-ACCEPT",
+        "S64-RESULT",
+        "S64-SCOPE",
+        "S64-VENDOR"
+      ],
+      "blockedMissionIds": [],
+      "skippedMissionIds": [],
+      "openMissionIds": []
+    },
+    "contexts": {
+      "masterContext": {
+        "snapshotId": 1336,
+        "beforeSize": {
+          "sizeBytes": 62794,
+          "sizeKb": 61.32,
+          "limitKb": 100,
+          "warningThresholdPercent": 75,
+          "usagePercent": 61.32,
+          "nearLimit": false
+        },
+        "afterSize": {
+          "sizeBytes": 62787,
+          "sizeKb": 61.32,
+          "limitKb": 100,
+          "warningThresholdPercent": 75,
+          "usagePercent": 61.32,
+          "nearLimit": false
+        },
+        "nextStepsCleared": 0
+      },
+      "projectContext": {
+        "snapshotId": 1335,
+        "beforeSize": {
+          "sizeBytes": 18582,
+          "sizeKb": 18.15,
+          "limitKb": 100,
+          "warningThresholdPercent": 75,
+          "usagePercent": 18.15,
+          "nearLimit": false
+        },
+        "afterSize": {
+          "sizeBytes": 9133,
+          "sizeKb": 8.92,
+          "limitKb": 100,
+          "warningThresholdPercent": 75,
+          "usagePercent": 8.92,
+          "nearLimit": false
+        },
+        "nextStepsCleared": 0
+      },
+      "totalBeforeSizeKb": 79.47,
+      "totalAfterSizeKb": 70.24
+    },
+    "lifecycle": {
+      "decisionsArchived": 7,
+      "learningsArchived": 3,
+      "archivedDecisionIds": [
+        595,
+        596,
+        597,
+        598,
+        599,
+        600,
+        601
+      ],
+      "learningIds": [
+        298,
+        299,
+        300
+      ],
+      "kpis": {
+        "completionRate": 1,
+        "avgCycleTimeDays": 0.02,
+        "decisionCount": 7,
+        "learningCount": 3,
+        "blockedCount": 0
+      },
+      "preCloseSnapshotId": "snapshot-20261002T002138566Z-8cbf",
+      "dbSnapshotId": "snapshot-20261002T002139248Z-6666"
+    },
+    "lapsedDroppedIds": [],
+    "writeFailures": [],
+    "message": "Sprint 'sprint-64' closed successfully"
+  },
+  "mission_completion": {
+    "missionId": "S64-ACCEPT",
+    "previousStatus": "In Progress",
+    "currentStatus": "Completed",
+    "message": "Mission 'S64-ACCEPT' has been completed",
+    "completedAt": "2026-10-02T00:21:02.165Z",
+    "contextAggregated": true,
+    "sprintSummaryAdded": false,
+    "contextSnapshotId": 1334,
+    "decisionCount": 0,
+    "sprintDecisionCount": 7,
+    "learningCount": 1,
+    "feedbackId": 101
+  },
+  "context": {
+    "status": "sprint-64-complete",
+    "metadata": {
+      "last_condensation": "2026-03-08T22:28:45.820723Z",
+      "condensation_note": "T31.5: Heavy manual pruning of stale fields, old sprint data, and planning text.",
+      "current_sprint": "sprint-64",
+      "sprint_status": "Completed"
+    },
+    "current_sprint": {
+      "id": "sprint-64",
+      "name": "Sprint 64 — Authored scope preview and result alignment",
+      "status": "Completed",
+      "focus": "4/4 delivered: TraceLab566a15c / MCP2.1.2 accepted. Canonical source79ef848/schema1.2/rev3; #479 external worker runtime/required-run gate remains open. Eleven other carryovers unchanged; no paid research; reply prepared unsent."
+    },
+    "sprint_tracking": {
+      "current_sprint": "sprint-64",
+      "last_completed_sprint": "sprint-64"
+    },
+    "snapshot": {
+      "snapshotId": 1338,
+      "contextId": "master_context",
+      "source": "Sprint64 completed4/4; accepted566a15c/npm2.1.2; #479 remains open; decision601",
+      "contentHash": "a5828d3987bf0ecf",
+      "createdAt": "2026-10-02T00:22:15.464Z",
+      "isNew": false,
+      "message": "Duplicate snapshot detected. Content unchanged since 2026-10-02T00:22:15.464Z. No new snapshot created."
+    }
+  },
+  "health": {
+    "connected": true,
+    "version": "3.51.2",
+    "path": "/Users/systemsystems/portfolio/TraceLab/cmos/db/cmos.sqlite",
+    "tables": [
+      "agent_feedback",
+      "constraints",
+      "context_snapshots",
+      "contexts",
+      "decisions_fts",
+      "decisions_fts_config",
+      "decisions_fts_data",
+      "decisions_fts_docsize",
+      "decisions_fts_idx",
+      "decisions_vec",
+      "decisions_vec_chunks",
+      "decisions_vec_info",
+      "decisions_vec_rowids",
+      "decisions_vec_vector_chunks00",
+      "learnings",
+      "learnings_fts",
+      "learnings_fts_config",
+      "learnings_fts_data",
+      "learnings_fts_docsize",
+      "learnings_fts_idx",
+      "learnings_vec",
+      "learnings_vec_chunks",
+      "learnings_vec_info",
+      "learnings_vec_rowids",
+      "learnings_vec_vector_chunks00",
+      "metadata",
+      "mission_dependencies",
+      "missions",
+      "missions_fts",
+      "missions_fts_config",
+      "missions_fts_data",
+      "missions_fts_docsize",
+      "missions_fts_idx",
+      "missions_vec",
+      "missions_vec_chunks",
+      "missions_vec_info",
+      "missions_vec_rowids",
+      "missions_vec_vector_chunks00",
+      "next_steps",
+      "prompt_mappings",
+      "session_events",
+      "session_missions",
+      "sessions",
+      "sprints",
+      "strategic_decisions",
+      "telemetry_events"
+    ],
+    "missionCount": 431,
+    "sessionCount": 230,
+    "contextCount": 3,
+    "lastMissionActivity": "2026-10-02T00:21:02.165Z",
+    "lastSessionActivity": "2026-10-02T00:21:37.549Z",
+    "lastContextUpdate": "2026-10-02T00:22:15.463Z",
+    "fileSizeBytes": 87740416,
+    "walModeEnabled": true
+  },
+  "reconciliation": {
+    "tables": [
+      {
+        "table": "sprints",
+        "sqliteCount": 65,
+        "pgCount": 65,
+        "match": true,
+        "delta": 0
+      },
+      {
+        "table": "missions",
+        "sqliteCount": 431,
+        "pgCount": 431,
+        "match": true,
+        "delta": 0
+      },
+      {
+        "table": "sessions",
+        "sqliteCount": 230,
+        "pgCount": 230,
+        "match": true,
+        "delta": 0
+      },
+      {
+        "table": "strategic_decisions",
+        "sqliteCount": 601,
+        "pgCount": 601,
+        "match": true,
+        "delta": 0
+      },
+      {
+        "table": "learnings",
+        "sqliteCount": 300,
+        "pgCount": 300,
+        "match": true,
+        "delta": 0
+      },
+      {
+        "table": "mission_dependencies",
+        "sqliteCount": 232,
+        "pgCount": 232,
+        "match": true,
+        "delta": 0
+      }
+    ],
+    "allMatch": true,
+    "totalSqlite": 1859,
+    "totalPg": 1859,
+    "projectScoped": true,
+    "projectSlug": "tracelab",
+    "syncLogEntries": 297,
+    "failedEntries": 0,
+    "lastSyncAt": "2026-10-02T00:22:28.818Z"
+  },
+  "queue": {
+    "activeCount": 0,
+    "queuedCount": 0,
+    "blockedCount": 0,
+    "nextAction": "Sprint sprint-64 complete. Sprint review recommended before starting next sprint."
+  },
+  "carryovers": {
+    "unchanged": true,
+    "ids": [
+      400,
+      403,
+      406,
+      407,
+      415,
+      422,
+      431,
+      448,
+      452,
+      454,
+      477,
+      479
+    ],
+    "content_status_and_carry_metadata_compared": true,
+    "existing_worker_gate": 479,
+    "worker_gate_open": true
+  },
+  "decisions": [
+    596,
+    597,
+    598,
+    599,
+    600,
+    601
+  ],
+  "reply_sent": false
+}

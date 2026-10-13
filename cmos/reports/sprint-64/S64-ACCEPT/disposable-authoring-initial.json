@@ -1,0 +1,15 @@
+{
+  "accepted": false,
+  "calls": [
+    {
+      "method": "POST",
+      "path": "/api/v1/missions"
+    }
+  ],
+  "blocked": [],
+  "disposable_mission_id": null,
+  "human_id": "S64-DISPOSABLE-3c35bdad-1405-472c-82a7-2bbb32984583",
+  "cleanup_status": null,
+  "research_dispatched": false,
+  "test_harness_correction": "Generated acceptance human_id was 51 characters; MissionCreate has an existing max_length=50. No mission was created. Retry shortens only the disposable test name."
+}

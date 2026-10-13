@@ -1,0 +1,381 @@
+{
+  "accepted_at": "2026-10-02T00:14:36.054Z",
+  "serving_commit": "566a15c6cc3551d25d69aea0d958e32236401a8d",
+  "mission_id": "3f5c2641-7a47-45ed-a092-feebe9143ed1",
+  "results": [
+    {
+      "theme": "light",
+      "width": 390,
+      "preview": {
+        "overflow": false,
+        "theme": "light",
+        "violations": []
+      },
+      "result": {
+        "overflow": false,
+        "theme": "light",
+        "violations": []
+      },
+      "calls": [
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/me"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/activity/summary"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/3f5c2641-7a47-45ed-a092-feebe9143ed1"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/events/recent"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/3f5c2641-7a47-45ed-a092-feebe9143ed1/logs"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/3f5c2641-7a47-45ed-a092-feebe9143ed1/logs"
+        },
+        {
+          "method": "PUT",
+          "path": "/api/v1/activity/viewed"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/activity/summary"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/3f5c2641-7a47-45ed-a092-feebe9143ed1/contract-preview"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/3f5c2641-7a47-45ed-a092-feebe9143ed1/logs"
+        }
+      ],
+      "suppressedWrites": [
+        {
+          "method": "PUT",
+          "path": "/api/v1/activity/viewed"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "theme": "light",
+      "width": 820,
+      "preview": {
+        "overflow": false,
+        "theme": "light",
+        "violations": []
+      },
+      "result": {
+        "overflow": false,
+        "theme": "light",
+        "violations": []
+      },
+      "calls": [
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/me"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/activity/summary"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/3f5c2641-7a47-45ed-a092-feebe9143ed1"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/events/recent"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/3f5c2641-7a47-45ed-a092-feebe9143ed1/logs"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/3f5c2641-7a47-45ed-a092-feebe9143ed1/logs"
+        },
+        {
+          "method": "PUT",
+          "path": "/api/v1/activity/viewed"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/activity/summary"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/3f5c2641-7a47-45ed-a092-feebe9143ed1/contract-preview"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/3f5c2641-7a47-45ed-a092-feebe9143ed1/logs"
+        }
+      ],
+      "suppressedWrites": [
+        {
+          "method": "PUT",
+          "path": "/api/v1/activity/viewed"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "preview": {
+        "overflow": false,
+        "theme": "light",
+        "violations": []
+      },
+      "result": {
+        "overflow": false,
+        "theme": "light",
+        "violations": []
+      },
+      "calls": [
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/me"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/activity/summary"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/3f5c2641-7a47-45ed-a092-feebe9143ed1"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/events/recent"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/3f5c2641-7a47-45ed-a092-feebe9143ed1/logs"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/3f5c2641-7a47-45ed-a092-feebe9143ed1/logs"
+        },
+        {
+          "method": "PUT",
+          "path": "/api/v1/activity/viewed"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/activity/summary"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/3f5c2641-7a47-45ed-a092-feebe9143ed1/contract-preview"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/3f5c2641-7a47-45ed-a092-feebe9143ed1/logs"
+        }
+      ],
+      "suppressedWrites": [
+        {
+          "method": "PUT",
+          "path": "/api/v1/activity/viewed"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "preview": {
+        "overflow": false,
+        "theme": "dark",
+        "violations": []
+      },
+      "result": {
+        "overflow": false,
+        "theme": "dark",
+        "violations": []
+      },
+      "calls": [
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/me"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/activity/summary"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/3f5c2641-7a47-45ed-a092-feebe9143ed1"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/events/recent"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/3f5c2641-7a47-45ed-a092-feebe9143ed1/logs"
+        },
+        {
+          "method": "PUT",
+          "path": "/api/v1/activity/viewed"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/3f5c2641-7a47-45ed-a092-feebe9143ed1/logs"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/activity/summary"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/3f5c2641-7a47-45ed-a092-feebe9143ed1/contract-preview"
+        }
+      ],
+      "suppressedWrites": [
+        {
+          "method": "PUT",
+          "path": "/api/v1/activity/viewed"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "theme": "dark",
+      "width": 820,
+      "preview": {
+        "overflow": false,
+        "theme": "dark",
+        "violations": []
+      },
+      "result": {
+        "overflow": false,
+        "theme": "dark",
+        "violations": []
+      },
+      "calls": [
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/me"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/activity/summary"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/3f5c2641-7a47-45ed-a092-feebe9143ed1"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/events/recent"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/3f5c2641-7a47-45ed-a092-feebe9143ed1/logs"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/3f5c2641-7a47-45ed-a092-feebe9143ed1/logs"
+        },
+        {
+          "method": "PUT",
+          "path": "/api/v1/activity/viewed"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/activity/summary"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/3f5c2641-7a47-45ed-a092-feebe9143ed1/contract-preview"
+        }
+      ],
+      "suppressedWrites": [
+        {
+          "method": "PUT",
+          "path": "/api/v1/activity/viewed"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "preview": {
+        "overflow": false,
+        "theme": "dark",
+        "violations": []
+      },
+      "result": {
+        "overflow": false,
+        "theme": "dark",
+        "violations": []
+      },
+      "calls": [
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/me"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/activity/summary"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/3f5c2641-7a47-45ed-a092-feebe9143ed1"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/events/recent"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/3f5c2641-7a47-45ed-a092-feebe9143ed1/logs"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/3f5c2641-7a47-45ed-a092-feebe9143ed1/logs"
+        },
+        {
+          "method": "PUT",
+          "path": "/api/v1/activity/viewed"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/activity/summary"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/3f5c2641-7a47-45ed-a092-feebe9143ed1/contract-preview"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/missions/3f5c2641-7a47-45ed-a092-feebe9143ed1/logs"
+        }
+      ],
+      "suppressedWrites": [
+        {
+          "method": "PUT",
+          "path": "/api/v1/activity/viewed"
+        }
+      ],
+      "errors": []
+    }
+  ],
+  "markdown_sha256": "7a9ebff50a2f7c2dae7e8ce72480f1b06236980e8fab6ff979c544c6a96c2255",
+  "protocol_sha256": "b5b3669abfc4897dbedb4e79300670246a14bc0dde5d3dae5091b9ea31a7cd99",
+  "read_only": true,
+  "worker_delivery_proven": false
+}

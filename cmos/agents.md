@@ -1,7 +1,9 @@
-# ABOUTME: CMOS v2 context for AI agents working in the TraceLab repo.
+# ABOUTME: Project context for AI agents working in the TraceLab repo.
 # ABOUTME: Use this alongside the root agents.md / CLAUDE.md for application code guidance.
 
 # TraceLab — CMOS Agent Context
+
+CMOS keeps this project's record at the **Builder** level: decisions, lessons, sprints and missions. Its tools and hooks say when to use it; `cmos-mcp ambient off` turns the hooks off here.
 
 ## Project
 
@@ -44,42 +46,13 @@ cd frontend && npx playwright test
 ## What to Avoid
 
 - Do not place application code inside `cmos/` — it is a planning workbench only
-- Do not use the v1 Python CLI (`./cmos/cli.py`) or `cmos/context/mission_runtime.py` — use MCP tools below
-- Do not edit `cmos/db/cmos.sqlite` directly — use MCP tools
-- Do not edit `cmos/context/master_context.json` or `project_context.json` by hand
 - Do not bypass hexagonal boundaries: routers call services, services call ports, adapters implement ports
 - Do not commit `cmos/db/cmos.sqlite` — it is gitignored
 
 ---
 
-## CMOS v2 Operations (MCP Tools)
+### Historical sprint-47 note
 
-This instance uses **cmos-mcp v2** (SQLite schema 2.0). All mission and session operations go
-through MCP tools — not the Python CLI from the old v1 setup.
-
-**Project root**: `/home/birch/Code/TraceLab`
-
-### Key tools
-
-```
-cmos_project action=list                          # list registered instances
-cmos_mission_list projectRoot=<root>              # list missions (filter by status/sprint)
-cmos_mission_show missionId=<id> projectRoot=...  # show a single mission
-cmos_mission_start missionId=<id> projectRoot=... # Queued → In Progress
-cmos_mission_complete missionId=<id> notes=...    # In Progress → Completed
-cmos_mission_block missionId=<id> reason=...      # → Blocked
-cmos_session_start type=<build|research|...>      # open a session
-cmos_session_capture content=... type=...         # log a decision/finding
-cmos_session_complete summary=...                 # close the session
-cmos_sprint_list projectRoot=...                  # list sprints
-cmos_context_view projectRoot=...                 # current project context
-cmos_context_snapshot projectRoot=...             # take a context snapshot
-```
-
-### Current sprint
-
-> Authoritative live source: run `cmos_review()`. This hardcoded note has gone stale before
-> (it sat at `sprint-tl-01` for many sprints) — trust `cmos_review()` over this line.
 
 **sprint-47** — Sprint D: RBAC Verifiability & Live-Gap Closure
 Focus: make deny-by-default RBAC enforcement OBSERVABLE and PROVABLE — a runnable live
@@ -114,7 +87,6 @@ Planning and architecture changes must stay aligned with the canonical
 
 ## Boundary
 
-CMOS manages: missions, sprints, sessions, context snapshots
 CMOS does NOT contain: application code, migrations, routers, services, tests for the app
 
 Last updated: 2026-03-29

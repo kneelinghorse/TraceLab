@@ -1,0 +1,50 @@
+{
+  "accepted": false,
+  "calls": [
+    {
+      "method": "POST",
+      "path": "/api/v1/missions",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/c93ce4a5-cfac-496c-b607-a8ff0cb78491",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/c93ce4a5-cfac-496c-b607-a8ff0cb78491/contract-preview",
+      "status": 200
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/missions/c93ce4a5-cfac-496c-b607-a8ff0cb78491",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/c93ce4a5-cfac-496c-b607-a8ff0cb78491",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/c93ce4a5-cfac-496c-b607-a8ff0cb78491/contract-preview",
+      "status": 422,
+      "error": {
+        "detail": {
+          "message": "DeepSearch preview rejected the mission.",
+          "upstream_status": 422,
+          "upstream_detail": {
+            "message": "structured exact pages conflict with requested references"
+          }
+        }
+      }
+    }
+  ],
+  "blocked": [],
+  "disposable_mission_id": "c93ce4a5-cfac-496c-b607-a8ff0cb78491",
+  "human_id": "S64-TEST-f0d3f0c1-f8ad-4334-afa0-19156d366102",
+  "cleanup_status": 204,
+  "research_dispatched": false,
+  "test_harness_correction": "Long-URL edit retained old exact-page allowlist. Preview correctly rejected conflicting exact pages with HTTP422; created draft was deleted. Final acceptance will explicitly verify this rejection, then align authored allowed_urls before preview."
+}
