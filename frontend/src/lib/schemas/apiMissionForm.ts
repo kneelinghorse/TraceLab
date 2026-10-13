@@ -53,6 +53,7 @@ export const apiMissionFormSchema = z.object({
   references: z.array(missionReferenceSchema).optional(),
   required_entities: z.array(z.string()).optional(),
   excluded_entities: z.array(z.string()).optional(),
+  // One output descriptor object; preview validates nonempty kind/title/format.
   expected_output_schema: z.record(z.string(), z.unknown()).optional(),
   coverage_thresholds: z.record(z.string(), z.unknown()).optional(),
   validation_thresholds: z.record(z.string(), z.unknown()).optional(),

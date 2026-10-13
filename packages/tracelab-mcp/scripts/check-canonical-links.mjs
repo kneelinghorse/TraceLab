@@ -141,6 +141,15 @@ async function check(tool, args, expectedCalls, links, verify, expectedQueries) 
 try {
   await client.connect(transport);
   const tools = (await client.listTools()).tools;
+  // Exercise the example exposed by the installed tool, not a hand-copied fixture.
+  const outputField = tools.find(tool => tool.name === 'tracelab_mission').inputSchema.properties.expected_output_schema;
+  assert.equal(outputField.type, 'object');
+  const outputDescriptor = JSON.parse(outputField.description.split('Example: ')[1]);
+  for (const field of ['kind', 'title', 'format']) {
+    assert.ok(typeof outputDescriptor[field] === 'string' && outputDescriptor[field].trim(), `Documented output descriptor requires ${field} for compilation`);
+  }
+  mission.expected_output_schema = outputDescriptor;
+  preview.deliverable_schemas = [outputDescriptor];
   assert.equal(tools.length, 9);
   assert.equal(tools.reduce((count, tool) => count + tool.inputSchema.properties.action.enum.length, 0), 50, 'MCP-6 action count (the 49 ACT-1 actions plus tracelab_search ask)');
   await check('search', { action: 'knowledge', query: 'provenance' }, ['POST /retrieval/search'], { 'results.0.document_url': url('document') });
@@ -160,10 +169,10 @@ try {
   await check('report', { action: 'export', report_id: ids.report }, [`GET /reports/${ids.report}`], {}, value => assert.equal(value, markdown));
   await check('document', { action: 'get_content', document_id: ids.document }, [`GET /documents/${ids.document}`, `GET /documents/${ids.document}/chunks`], { url: url('document') }, value => assert.equal(value.content, markdown));
   await check('document', { action: 'upload', project_id: ids.project, name: 'Document', content: Buffer.from(markdown).toString('base64'), content_type: 'text/markdown' }, ['POST /documents/upload'], { 'document.url': url('document') });
-  await check('mission', { action: 'list' }, ['GET /missions'], { 'missions.0.url': url('mission') }, value => assert.deepEqual(value.missions[0].references, references));
-  await check('mission', { action: 'get', mission_id: ids.mission }, [`GET /missions/${ids.mission}`], { url: url('mission') }, value => { assert.deepEqual(value.references, references); assert.deepEqual(value.context, mission.context); });
-  await check('mission', { action: 'create', mission_id: 'MIGRATION-1', title: 'Mission', objective: mission.objective, success_criteria: mission.success_criteria, project_id: ids.project, context: mission.context, references }, ['POST /missions'], { 'mission.url': url('mission') }, () => { assert.deepEqual(calls.at(-1).body.references, references); if (calls.at(-1).key.startsWith('POST')) assert.deepEqual(calls.at(-1).body.context, mission.context); });
-  await check('mission', { action: 'update', mission_id: ids.mission, title: 'Mission', references }, [`PATCH /missions/${ids.mission}`], { 'mission.url': url('mission') }, () => { assert.deepEqual(calls.at(-1).body.references, references); if (calls.at(-1).key.startsWith('POST')) assert.deepEqual(calls.at(-1).body.context, mission.context); });
+  await check('mission', { action: 'list' }, ['GET /missions'], { 'missions.0.url': url('mission') }, value => { assert.deepEqual(value.missions[0].references, references); assert.deepEqual(value.missions[0].expected_output_schema, outputDescriptor); });
+  await check('mission', { action: 'get', mission_id: ids.mission }, [`GET /missions/${ids.mission}`], { url: url('mission') }, value => { assert.deepEqual(value.references, references); assert.deepEqual(value.context, mission.context); assert.deepEqual(value.expected_output_schema, outputDescriptor); });
+  await check('mission', { action: 'create', mission_id: 'MIGRATION-1', title: 'Mission', objective: mission.objective, success_criteria: mission.success_criteria, project_id: ids.project, context: mission.context, references, expected_output_schema: outputDescriptor }, ['POST /missions'], { 'mission.url': url('mission') }, () => { assert.deepEqual(calls.at(-1).body.expected_output_schema, outputDescriptor); assert.deepEqual(calls.at(-1).body.references, references); if (calls.at(-1).key.startsWith('POST')) assert.deepEqual(calls.at(-1).body.context, mission.context); });
+  await check('mission', { action: 'update', mission_id: ids.mission, title: 'Mission', references, expected_output_schema: outputDescriptor }, [`PATCH /missions/${ids.mission}`], { 'mission.url': url('mission') }, () => { assert.deepEqual(calls.at(-1).body.expected_output_schema, outputDescriptor); assert.deepEqual(calls.at(-1).body.references, references); if (calls.at(-1).key.startsWith('POST')) assert.deepEqual(calls.at(-1).body.context, mission.context); });
   // S64: read each complete immutable worker artifact through the installed SDK.
   const fixtureRoot = fileURLToPath(new URL('../../../tests/fixtures/authored_scope_v1/', import.meta.url));
   const fixtureManifest = JSON.parse(readFileSync(path.join(fixtureRoot, 'manifest.json'), 'utf8'));

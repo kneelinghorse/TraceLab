@@ -1,0 +1,75 @@
+{
+  "mode": "before",
+  "server": {
+    "name": "tracelab-mcp",
+    "version": "2.1.2"
+  },
+  "checkedAt": "2026-10-13T21:42:28.342Z",
+  "checks": [
+    {
+      "source": "installed tool description",
+      "mission": "904bc44c-f00b-4316-a045-f1e2bd6a1b60",
+      "input": {
+        "type": "object",
+        "properties": {
+          "executive_summary": {
+            "type": "string"
+          },
+          "comparison_table": {
+            "type": "array"
+          }
+        }
+      },
+      "previewError": true,
+      "errorText": "API Error (422): API request failed: 422 Unprocessable Entity\nDetails: {\"detail\":{\"message\":\"DeepSearch preview rejected the mission.\",\"upstream_status\":422,\"upstream_detail\":{\"message\":\"mission_context.expected_output_schema[1].kind is required\"}}}",
+      "status": "draft",
+      "attempts": 0
+    }
+  ],
+  "calls": [
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/3f5c2641-7a47-45ed-a092-feebe9143ed1",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/missions",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/904bc44c-f00b-4316-a045-f1e2bd6a1b60",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/904bc44c-f00b-4316-a045-f1e2bd6a1b60/contract-preview",
+      "status": 422
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/904bc44c-f00b-4316-a045-f1e2bd6a1b60",
+      "status": 200
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/missions/904bc44c-f00b-4316-a045-f1e2bd6a1b60",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/904bc44c-f00b-4316-a045-f1e2bd6a1b60",
+      "status": 404
+    }
+  ],
+  "created": [
+    "904bc44c-f00b-4316-a045-f1e2bd6a1b60"
+  ],
+  "deleted": [
+    "904bc44c-f00b-4316-a045-f1e2bd6a1b60"
+  ],
+  "researchDispatched": false,
+  "providerExecution": false,
+  "passed": true
+}

@@ -239,6 +239,15 @@ MISSION_TOOLS: list[Tool] = [
                     "items": {"type": "string"},
                     "description": "Expected deliverables (optional)",
                 },
+                "expected_output_schema": {
+                    "type": "object",
+                    "description": (
+                        "One output descriptor, not raw JSON Schema. Preview requires "
+                        "nonempty kind, title and format. Example: "
+                        '{"kind":"report","title":"Research summary","format":"markdown",'
+                        '"required_sections":["Executive summary","Evidence","Limitations"]}'
+                    ),
+                },
                 "research_phases": {
                     "type": "object",
                     "description": "Research phase configuration (optional)",
@@ -430,6 +439,7 @@ async def handle_create_mission(arguments: dict[str, Any]) -> list[TextContent]:
             context=arguments.get("context", {}),
             references=arguments.get("references"),
             deliverables=arguments.get("deliverables", []),
+            expected_output_schema=arguments.get("expected_output_schema"),
             research_phases=arguments.get("research_phases", {}),
             tags=arguments.get("tags", []),
             metadata=metadata,

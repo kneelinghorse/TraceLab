@@ -1,0 +1,48 @@
+{
+  "mission": "S66-MCP",
+  "date": "2026-10-13",
+  "baseline": "registry @aquex/tracelab-mcp@2.1.2",
+  "regressions": {
+    "installed_stdio_before": "fails: documented output descriptor requires kind",
+    "python_examples_before": "3 fail: tool/UI preview422 missing kind; README example absent",
+    "python_create_before": "fails: descriptor dropped; registered-client regression also fails on missing schema property",
+    "after": "all pass"
+  },
+  "verification": {
+    "backend_targeted": {
+      "passed": 137,
+      "skipped": 0
+    },
+    "mcp_unit": {
+      "passed": 160,
+      "skipped": 0
+    },
+    "frontend_unit": {
+      "passed": 385,
+      "skipped": 0
+    },
+    "mission_browser": {
+      "passed": 8,
+      "skipped": 0
+    },
+    "installed_stdio": {
+      "passed": 70,
+      "generatedLinks": 73,
+      "httpRequests": 71
+    },
+    "ruff": "pass",
+    "frontend_types": "pass",
+    "foundational_refs": "pass",
+    "mcp_parity": "9 tools / 50 actions; no errors",
+    "mcp_argument_parity": "125 advertised arguments; no gaps"
+  },
+  "pack": {
+    "name": "@aquex/tracelab-mcp",
+    "version": "2.1.3",
+    "filename": "aquex-tracelab-mcp-2.1.3.tgz",
+    "integrity": "sha512-bJQDcOhyp4a0+fZDmj2U1ZB1YfdZ3CA89ne6yoMYe9pqYift7MFc8NXN+q2so9Rny+8YMoPEeeZxFrOTula6KQ==",
+    "shasum": "2310693bb9248f77fac200bc02f8c1b5deef3127",
+    "size": 76669
+  },
+  "release": "Prepared and installed from retained tarball; registry publication and owner approval pending. Completion lives in Reasonbook."
+}

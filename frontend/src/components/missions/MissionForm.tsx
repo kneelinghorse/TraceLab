@@ -47,7 +47,7 @@ const JSON_FIELD_LABELS: Record<JsonFieldName, string> = {
 
 const JSON_FIELD_PLACEHOLDERS: Record<JsonFieldName, string> = {
   expected_output_schema:
-    '{\n  "type": "object",\n  "properties": {\n    "summary": {"type": "string"}\n  }\n}',
+    '{\n  "kind": "report",\n  "title": "Research summary",\n  "format": "markdown",\n  "required_sections": ["Executive summary", "Evidence", "Limitations"]\n}',
   coverage_thresholds: '{\n  "min_sources": 12,\n  "min_per_required_entity": 2\n}',
   validation_thresholds: '{\n  "structural": 0.85,\n  "coverage": 0.70\n}',
 };

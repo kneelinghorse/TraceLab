@@ -508,7 +508,7 @@ export const TOOLS: Tool[] = [
         },
         expected_output_schema: {
           type: 'object',
-          description: 'DeepSearch OutputSchema describing the deliverable shape. Used by the contract compiler to steer synthesis. Example: {"type": "object", "properties": {"executive_summary": {"type": "string"}, "comparison_table": {"type": "array"}}}',
+          description: 'One output descriptor object, not raw JSON Schema. Preview requires nonempty kind, title and format. Example: {"kind":"report","title":"Research summary","format":"markdown","required_sections":["Executive summary","Evidence","Limitations"]}',
         },
         coverage_thresholds: {
           type: 'object',

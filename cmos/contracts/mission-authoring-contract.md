@@ -269,7 +269,7 @@ both create and update flows unless noted.
 | `references` | array of structured `{url?, title?, ...}` seeds | `MissionCreate.references` | `"references"` | `CrossDBJSON` nullable | `references` | ✓ (S94 pin) |
 | `required_entities` | array of strings | `MissionCreate.required_entities` | `required_entities` | `CrossDBJSON` nullable | `required_entities` | **✓** (added in DS S59.1) |
 | `excluded_entities` | array of strings | `MissionCreate.excluded_entities` | `excluded_entities` | `CrossDBJSON` nullable | `excluded_entities` | **✓** (added in DS S59.1) |
-| `expected_output_schema` | object (DS OutputSchema) | `MissionCreate.expected_output_schema` | `expected_output_schema` | `CrossDBJSON` nullable | `expected_output_schema` | ✓ (S94 pin) |
+| `expected_output_schema` | one object (DS OutputSchema descriptor; see boundary below) | `MissionCreate.expected_output_schema` | `expected_output_schema` | `CrossDBJSON` nullable | `expected_output_schema` | ✓ (S94 pin) |
 | `coverage_thresholds` | object (string→number) | `MissionCreate.coverage_thresholds` | `coverage_thresholds` | `CrossDBJSON` nullable | `coverage_thresholds` | ✓ (S94 pin) |
 | `validation_thresholds` | object (string→number) | `MissionCreate.validation_thresholds` | `validation_thresholds` | `CrossDBJSON` nullable | `validation_thresholds` | ✓ (S94 pin) |
 | `deliverable_format` | string | `MissionCreate.deliverable_format` | `deliverable_format` | `Text` nullable | `deliverable_format` | ✓ (S94 pin) |
@@ -279,6 +279,26 @@ both create and update flows unless noted.
 
 **Constraints fallback:** only a null column permits `context.constraints`.
 An explicit empty list clears it in REST, Python MCP, preview and the pinned worker.
+
+**Output descriptor boundary (S66-MCP):** TraceLab's REST create/update, TypeScript
+MCP create/update and UI accept one `expected_output_schema` object. The vendored
+compiler internally accepts either a mapping or a sequence of mappings; that
+does not expose arrays through TraceLab's authoring API. Draft storage remains
+flexible, with descriptor validation at contract preview/compilation. A nonempty
+descriptor requires nonempty string `kind`, `title` and `format`, such as
+`{"kind":"report","title":"Research summary","format":"markdown","required_sections":["Executive summary","Evidence","Limitations"]}`.
+It is not a raw JSON Schema with `type`/`properties`. Omission or an empty object
+leaves deliverable inference to the compiler. The canonical user-facing example
+is in `packages/tracelab-mcp/README.md` under **Authoring an output descriptor**;
+tests compile that example and the tool/UI examples without dispatch.
+
+Both MCP serialization surfaces retain the authored descriptor in get/list
+responses. The legacy Python `create_mission` tool now declares the object and
+passes it to `MissionCreate` rather than silently dropping it; its create
+response also retains it. TypeScript's create/update acknowledgments remain slim;
+read the mission to inspect stored fields. The compiler and worker SELECT are
+unchanged. Installed-client regression checks exercise POST/PATCH and both read
+serializers, and deployed acceptance checks create only disposable drafts.
 
 | Authored nested field | Pydantic | DB storage | REST | DS worker |
 | --- | --- | --- | --- | --- |
