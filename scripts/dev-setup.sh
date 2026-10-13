@@ -81,7 +81,7 @@ echo "Applying database migrations..."
 
 echo "Stack is running:"
 echo "  - API:       http://localhost:8000"
-echo "  - Postgres:  localhost:5433 (user: postgres / pass: postgres)"
+echo "  - Postgres:  localhost:${TRACELAB_POSTGRES_PORT:-5433} (user: postgres / pass: postgres)"
 echo "  - Qdrant:    http://localhost:6333"
 
 if [[ "${SKIP_FRONTEND}" -eq 1 ]]; then

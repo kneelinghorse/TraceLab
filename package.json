@@ -1,7 +1,7 @@
 {
   "name": "tracelab",
   "version": "1.0.0",
-  "description": "Personal-scale research repository with RAG-powered semantic search, structured data organization, and quality-enforced workflows.",
+  "description": "TraceLab is a research workspace for collecting evidence, running DeepSearch missions, and producing cited reports.",
   "main": "index.js",
   "directories": {
     "doc": "docs",
@@ -20,7 +20,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "type": "commonjs",
   "bugs": {
     "url": "https://github.com/kneelinghorse/TraceLab/issues"

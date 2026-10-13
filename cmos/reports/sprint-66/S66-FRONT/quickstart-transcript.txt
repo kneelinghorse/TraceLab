@@ -1,0 +1,44 @@
+S66-FRONT — GitHub clone quickstart verification, 2026-10-13 UTC
+
+$ git clone https://github.com/kneelinghorse/TraceLab.git
+Cloned into a new empty temporary directory.
+$ cd TraceLab
+$ git checkout codex/s66-front
+Review-ref selection only; no source files copied from the working checkout.
+$ git rev-parse HEAD
+b0bfbe0b732e5dc11c4606daec2a79a2ea745c16
+$ git status --porcelain
+(empty)
+
+Preflight: no containers, including stopped containers, or volumes existed for
+Compose project tracelab-local. Ports 3000, 8000, 6333 and 55433 were available.
+Docker 28.3.2; Compose v2.38.2; Node v24.6.0. Docker image layer cache was available;
+no database, node_modules, .env or local source was copied into the clone.
+
+$ cp .env.example .env
+$ export COMPOSE_PROJECT_NAME=tracelab-local
+$ export TRACELAB_POSTGRES_PORT=55433
+$ bash scripts/dev-setup.sh
+See quickstart-output.txt. Generated local bootstrap invite is redacted.
+Fresh volumes were created at 2026-10-13T18:27:53Z. Migrations began at
+empty -> 001_initial and completed at 058_mission_log_attempts.
+
+Browser verification: opened http://localhost:3000, entered the documented
+example email/password, selected Sign in. Home and the empty activity state
+were visible; zero client errors. home.png was visually reviewed.
+API login returned 200; /auth/me returned 200 and the example owner account.
+Tokens were checked in memory and not recorded. No research or provider calls.
+
+$ git status --porcelain
+(empty after npm install and startup)
+$ curl --fail --silent --show-error --write-out '\nAPI HTTP %{http_code}\n' http://localhost:8000/api/v1/health
+{"status":"healthy","commit":null,"rbac_enabled":false,"deepsearch_receipt_receiver_configured":false,"reconciler":{"enabled":true,"interval_seconds":900,"last_run_at":"2026-10-13T18:28:04.133245+00:00","last_status":"ok","last_counts":{"scanned":0,"eligible":0,"repaired":0,"failed":0,"skipped_soft_deleted":0,"usage_recorded":0},"runs":1}}
+API HTTP 200
+$ curl --fail --silent --show-error --output /dev/null --write-out 'UI HTTP %{http_code}\n' http://localhost:3000
+UI HTTP 200
+
+Cleanup after acceptance: Ctrl-C stopped this verification's UI process.
+COMPOSE_PROJECT_NAME=tracelab-local TRACELAB_POSTGRES_PORT=55433
+  docker compose -f docker-compose.dev.yml down --volumes
+removed only the newly created verification containers and volumes. The earlier
+tracelab volumes remain. Existing unrelated running containers were not changed.
