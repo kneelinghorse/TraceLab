@@ -4,6 +4,7 @@
 **Opened:** 2026-09-17, at Sprint 57 planning.
 **Predecessor:** `roadmap-sprints-50-53-ux-overhaul.md`, which carried Sprints 50–56 and is now closed to new sprint sections.
 **Guiding template:** [roadmap_template.md](roadmap_template.md). Follow-on product work is recorded below the Librarian sprint plan; CMOS holds its acceptance criteria and status.
+**Closed to new sprint sections after Sprint 65 (2026-10-13).** The living roadmap from Sprint 66 on is [roadmap-sprints-66-68-open-tracelab.md](roadmap-sprints-66-68-open-tracelab.md).
 
 Revisit this document at **every sprint open and every sprint close**, the same way its predecessor was maintained: at close, rewrite the closing sprint's section as outcome; at open, re-plan the opening sprint's section from the CMOS missions; append a dated line to the Change Log either way. A sprint is not closed while its section here still reads as a plan.
 

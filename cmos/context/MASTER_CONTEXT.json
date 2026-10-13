@@ -27,7 +27,7 @@
       "Sprint 18 planned: PEDR Validation Sprint - prove 6-layer search delivers measurably better results.",
       "Sprint 18 completed: PEDR Validation Sprint - 6 missions delivered (R18.0, B18.1-B18.6). PEDR SCOPED decision: Not for interactive search (1.5s P50 vs 200ms target), approved for deep research, MCP, and batch processing."
     ],
-    "planning_overview": "See cmos/foundational-docs/roadmap-sprints-57-60-the-librarian.md for the current plan (intent); CMOS is authoritative for status",
+    "planning_overview": "See cmos/foundational-docs/roadmap-sprints-66-68-open-tracelab.md for the current plan (intent); the Reasonbook record is authoritative for status",
     "last_sync_at": "2026-10-02T02:52:16.471Z"
   },
   "technical_foundation": {
@@ -150,7 +150,7 @@
   },
   "roadmap": {
     "status": "Sprint62 Completed; no next sprint opened.",
-    "current_focus": "Sprint 65 complete; Sprint 66 in planning (PS-2026-10-13-003). Intent: cmos/foundational-docs/roadmap-sprints-57-60-the-librarian.md until the Sprint 66 arc document lands.",
+    "current_focus": "Sprint 66 planned: DEPS, EXPOSURE, FRONT, DECOUPLE, SETTINGS, TESTS, MCP. Intent: cmos/foundational-docs/roadmap-sprints-66-68-open-tracelab.md.",
     "next_checkpoint": "Sprint 19: PEDR latency optimization or alternative use cases",
     "research_completed": [
       {
@@ -324,7 +324,7 @@
   "context_health": {
     "sessions_since_reset": 288,
     "last_update": "2026-10-13T04:23:32.641Z",
-    "size_kb": 57.11,
+    "size_kb": 57.18,
     "size_limit_kb": 100,
     "warning_threshold_percent": 75,
     "retention_keep_sprints": 3
@@ -467,7 +467,7 @@
       }
     }
   },
-  "current_phase": "Sprint 65 complete (closed 2026-10-02). Sprint 66 planning opened 2026-10-13 in session PS-2026-10-13-003: clear the carry-forward and prepare the 2026-10-19 share-out.",
+  "current_phase": "Sprint 65 complete (closed 2026-10-02). Sprint 66 'Clear the deck' planned 2026-10-13 (session PS-2026-10-13-003) with Sprint 67 (UX pass) and Sprint 68 (after the share-out) as shells; the share-out is 2026-10-19. No Sprint 66 mission has started.",
   "sprint_history": [
     {
       "sprint": "Sprint 19",

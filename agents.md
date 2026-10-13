@@ -274,7 +274,7 @@ def get_doc(doc_id: UUID, repo: DocumentRepository = Depends(get_document_reposi
 ## Reference Guides
 - `README.md` – core TraceLab architecture and developer workflow.
 - `docs/frontend_architecture.md` and `cmos/foundational-docs/technical_architecture.md` – the frontend and platform as built (rewritten in Sprint 52, DOC-1).
-- `cmos/foundational-docs/roadmap-sprints-50-53-ux-overhaul.md` – **the living vision and roadmap** for the d592c92 recovery and the UX overhaul (Sprints 50–53): intent, sprint plan, UI definition of done, route migration map. Authoritative for intent; CMOS is authoritative for status. Update at every sprint open and close.
+- `cmos/foundational-docs/roadmap-sprints-66-68-open-tracelab.md` – **the living vision and roadmap** (Sprint 66 onward: carry-forward clearance, open-source readiness, the 2026-10-19 share-out). Authoritative for intent; the Reasonbook record is authoritative for status. Update at every sprint open and close. Its predecessors, closed to new sprint sections, are `roadmap-sprints-57-60-the-librarian.md` (Sprints 57–65) and `roadmap-sprints-50-53-ux-overhaul.md` (Sprints 50–56).
 - `cmos/foundational-docs/roadmap_template.md` – canonical backlog + milestone template used for every sprint.
 - `cmos/foundational-docs/tech_arch_template.md` – authoritative technical architecture template for Mission Protocol deliverables.
 - `cmos/contracts/mission-authoring-contract.md` – single source of truth for the MCP param ↔ DB column ↔ REST ↔ DS worker mapping (T41.3).
