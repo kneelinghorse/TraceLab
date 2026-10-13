@@ -47,11 +47,13 @@ Three things must be true that day:
 
 ---
 
-## Sprint 66 — Clear the deck (planned 2026-10-13; target close 2026-10-15)
+## Sprint 66 — Clear the deck (opened 2026-10-13; target close 2026-10-15)
 
 **Goal:** every carried follow-up is done, scheduled or closed with a reason, and TraceLab's public repository is clean, licensed and ready to be read and run.
 
-**Order:** DEPS → EXPOSURE → FRONT → DECOUPLE → SETTINGS → TESTS → MCP. Requires edges:
+Opened when S66-DEPS started on Derek's "yes, merge" (decision #614). PR #416 merged as `7ee7c8c`.
+
+**Order:** DEPS → EXPOSURE → SETTINGS → FRONT → DECOUPLE → TESTS → MCP. The share-out is an invite-only demo of the hosted app (decision #614), so the user-visible SETTINGS fixes run before the repository's front door. Requires edges:
 - every mission requires DEPS, because nothing merges while backend CI is red;
 - FRONT requires EXPOSURE to merge, so visitors aren't invited into a tree that still holds other people's data. It can be drafted in parallel;
 - TESTS requires DECOUPLE and SETTINGS, because they share test files and the CI spec list.
@@ -85,7 +87,7 @@ Each mission is merged, deployed and verified on production before the next star
   - Redact the three JSON receipts in place, keeping their structure and replacing each third-party address and display name with a stable placeholder.
   - Mask the user-list screenshots rather than delete them, because 31 `results.json` receipts reference them by path.
 - The production `AUTH_USERNAME` appears in 17 tracked files (13 receipts, 2 docs, 2 tests). It is a username, not a secret, so don't redact it file by file. Instead, work out from the code and the names of Railway's variables (never their values, and never by attempting a login) whether the legacy username/password login it belongs to is still reachable in production. If it is, report that to Derek.
-- What happens to **history** is Open Question 2.
+- **History is not rewritten** (decision #614). A live credential found in history is rotated, not purged.
 - Prevent recurrence.
   - The capture script `frontend/scripts/ui-shell-smoke.mjs:70` masks only `code` elements on /settings today. It also masks email cells on admin user pages.
   - Inside the required Secret Scan job (`.github/workflows/secret-scan.yml`), a check fails when a tracked receipt contains an email address outside an allowlist of owner and example domains, proven with a fixture. A separate new check would not block merges until branch protection requires it.
@@ -99,13 +101,38 @@ Each mission is merged, deployed and verified on production before the next star
 - The new CI check fails on its fixture and passes on the tree.
 - The backup file is gone.
 
+### S66-SETTINGS — Times are local everywhere, and Settings fits a phone
+
+Closes #280 and #275.
+
+- `frontend/src/pages/settings.tsx:380`, `:384` and `:528` parse offset-free UTC API times with `new Date()`. So API-key "Created" and "Last used" times, and invite dates, shift for anyone outside UTC.
+- The same pattern appears at:
+  - `components/evidence/EntryCard.tsx:9`
+  - `components/librarian/CollectionSuggestions.tsx:156`
+  - `components/librarian/DuplicateReview.tsx:89`
+  - `components/librarian/ProjectDescription.tsx:106`
+  - `components/queue/QueueCard.tsx:52` and `:116`
+  - `components/queue/ExecutionProgress.tsx:8`, where durations are off by the UTC offset
+  - `components/console/CorrectionStatusCard.tsx:36` and `:177`
+  - `pages/admin/corrections.tsx:135`, `:258` and `:306`
+  - `pages/device.tsx:240`
+
+  Every one that parses an API time goes through `parseApiTimestamp` (`frontend/src/lib/api/timestamps.ts:2`). `pages/index.tsx:21` and `pages/admin/observability.tsx:15` already add a missing offset themselves. Switch them to `parseApiTimestamp` too, so the grep below has no exceptions.
+- At 390 px, the Revoke, Copy and Delete actions and the "unused" badge wrap one character per line (`cmos/reports/sprint-51/ux-10-production-smoke/dark-390-_invites.png`). Fix the row layout and check it with a realistic long key name.
+
+**Done when:**
+- A grep for `new Date(` over `frontend/src`, recorded in the receipt, shows no API time parsed outside `parseApiTimestamp`.
+- A browser test with a fixed clock in America/Chicago fails on the old Settings parsing, passes on the new, and is in the enumerated CI list.
+- Captures at 390 px in both themes show whole-word labels, no horizontal overflow and no serious or critical axe findings.
+- A read-only check on production confirms them.
+
 ### S66-FRONT — The repository's front door
 
 *Requires EXPOSURE to merge. It may be drafted in parallel on a branch; the record notes the dependency but does not enforce it.*
 
 **Objective:** a person landing on github.com/kneelinghorse/TraceLab on 2026-10-19 can tell what TraceLab is, knows how they may use it, knows how to report a vulnerability, and can run it by following the README from a fresh clone.
 
-- **`LICENSE`** at the root under Derek's choice (Open Question 1). `packages/tracelab-mcp` keeps MIT. The vendored DeepSearch compiler (`app/services/contract_compiler/`) is Derek's code and takes the same license as DeepSearch's repository. A `NOTICE` (or a README section) names every vendored component under another license, including both `@oods/tokens` and `@oods/tw-variants` (PolyForm-Noncommercial-1.0.0).
+- **`LICENSE`** at the root: MIT (decision #613). `packages/tracelab-mcp` keeps MIT. The vendored DeepSearch compiler (`app/services/contract_compiler/`) is Derek's code and takes the same license as DeepSearch's repository. A `NOTICE` (or a README section) names every vendored component under another license, including both `@oods/tokens` and `@oods/tw-variants` (PolyForm-Noncommercial-1.0.0).
 - **`README.md`** rewritten for a newcomer:
   - what TraceLab does today: the Librarian, missions run by DeepSearch, the Evidence Ledger, cited reports and the MCP;
   - the hosted app and how access works (invite codes);
@@ -175,31 +202,6 @@ Verified on `bb0b270`:
 - On production, `https://api.tracelab.aquex.ai/api/v1/decisions/linked` answers 404 to an authenticated admin request. Today it answers 401 unauthenticated.
 - Required CI and the post-deploy check are green.
 
-### S66-SETTINGS — Times are local everywhere, and Settings fits a phone
-
-Closes #280 and #275.
-
-- `frontend/src/pages/settings.tsx:380`, `:384` and `:528` parse offset-free UTC API times with `new Date()`. So API-key "Created" and "Last used" times, and invite dates, shift for anyone outside UTC.
-- The same pattern appears at:
-  - `components/evidence/EntryCard.tsx:9`
-  - `components/librarian/CollectionSuggestions.tsx:156`
-  - `components/librarian/DuplicateReview.tsx:89`
-  - `components/librarian/ProjectDescription.tsx:106`
-  - `components/queue/QueueCard.tsx:52` and `:116`
-  - `components/queue/ExecutionProgress.tsx:8`, where durations are off by the UTC offset
-  - `components/console/CorrectionStatusCard.tsx:36` and `:177`
-  - `pages/admin/corrections.tsx:135`, `:258` and `:306`
-  - `pages/device.tsx:240`
-
-  Every one that parses an API time goes through `parseApiTimestamp` (`frontend/src/lib/api/timestamps.ts:2`). `pages/index.tsx:21` and `pages/admin/observability.tsx:15` already add a missing offset themselves. Switch them to `parseApiTimestamp` too, so the grep below has no exceptions.
-- At 390 px, the Revoke, Copy and Delete actions and the "unused" badge wrap one character per line (`cmos/reports/sprint-51/ux-10-production-smoke/dark-390-_invites.png`). Fix the row layout and check it with a realistic long key name.
-
-**Done when:**
-- A grep for `new Date(` over `frontend/src`, recorded in the receipt, shows no API time parsed outside `parseApiTimestamp`.
-- A browser test with a fixed clock in America/Chicago fails on the old Settings parsing, passes on the new, and is in the enumerated CI list.
-- Captures at 390 px in both themes show whole-word labels, no horizontal overflow and no serious or critical axe findings.
-- A read-only check on production confirms them.
-
 ### S66-TESTS — Every browser spec runs, and the suite stops flaking
 
 Closes #485, #448 and #379. *Requires DECOUPLE and SETTINGS.*
@@ -241,7 +243,7 @@ Closes #174 and #486.
 - UX redesign (Sprint 67);
 - project sharing (deferred; Open Question 5);
 - the Reasonbook folder move (Sprint 68);
-- any history rewrite, unless Derek chooses one (Open Question 2);
+- any history rewrite (decision #614);
 - paid research runs;
 - any work in the DeepSearch repository from TraceLab sessions.
 
@@ -255,7 +257,7 @@ Closes #174 and #486.
 
 ## Sprint 67 — The UX pass (planned shell; scoped with Derek)
 
-Sprint 67 takes Derek's direct UX and design feedback, plus #406: DeepSearch claims stored as raw Markdown table rows show verbatim in evidence and in the Librarian's provenance display. It ends with the share-out acceptance on production, on the final build. Its shape depends on Open Question 4, but it always covers the public repository page, the README quickstart, production smoke and the path an invited person actually takes.
+Sprint 67 takes Derek's direct UX and design feedback, plus #406: DeepSearch claims stored as raw Markdown table rows show verbatim in evidence and in the Librarian's provenance display. Derek is writing a full UX doc while Sprint 66 runs, and Sprint 67 is scoped from it at the next planning session. The share-out is an invite-only demo for 5–10 people (decision #614), so the sprint ends by walking that path on production on the final build: invite code, sign-up, the Librarian, a mission and its evidence. It also covers production smoke and the public repository page.
 
 ## Monday 2026-10-19 — the share-out
 
@@ -314,17 +316,12 @@ Sprint 67 takes Derek's direct UX and design feedback, plus #406: DeepSearch cla
 
 ## Open Questions for Derek
 
-Add to this list rather than resolving items silently.
+Add to this list rather than resolving items silently. Questions 1–4 were answered on 2026-10-13.
 
-1. **Which license?** The recommendation is MIT, matching the MCP adapter. The exception: if Derek would mind someone running a closed, modified copy as a hosted service, AGPL-3.0. The same answer covers DeepSearch and the compiler TraceLab vendors from it. Either way, the two vendored Forge packages, `@oods/tokens` and `@oods/tw-variants`, stay PolyForm Noncommercial unless Derek relicenses both. Until then, anyone using TraceLab commercially would need replacements for both.
-2. **Other people's personal data in history.** S66-EXPOSURE removes it from the current tree, but every past commit still holds it. Derek has three options:
-   - **Keep history.** Anyone who digs through old commits can still find it.
-   - **Purge history.** Follow GitHub's sensitive-data process: rewrite, force-push, and ask GitHub Support to clear cached views and pull-request references. Every commit hash from the first affected commit onward changes (December 2025, if the committed record files go too); `git filter-repo`'s commit map keeps the record's citations resolvable. The same rewrite could also drop the screenshots that make the clone 1 GB.
-   - **Make this repository private and publish a clean snapshot as the public one.** Actions would bill on the private repository unless development moves too.
-
-   It is time-sensitive: once people fork after Monday, copies are out of reach. A purge also cannot recall copies already cloned. GitHub counts 1,350 clones by 202 unique cloners in the 14 days to 2026-10-13, likely mostly CI, and 0 forks.
-3. **May TraceLab ask DeepSearch to prepare its repository for opening** (license, a history scan, a README) so DeepSearch's own session does that work this week, and answer Reasonbook's rename request (`960040b8`) with this plan? Rule c:7 needs Derek's go for cross-repository messages. Making DeepSearch public stays his action.
-4. **Who comes in on Monday, and how?** If Derek hands invite codes to specific people, sign-up stays as it is, and Sprint 67 ends by walking that path. If anyone reading the repository should be able to try the hosted app, invite-only sign-up has to change, and that is new scope.
+1. **Which license?** *Answered: MIT* (decision #613). Derek: "good with MIT unless you feel AGPL is better? i don't have a strong opinion open to your recommendation". The recommendation stayed MIT. DeepSearch and the compiler TraceLab vendors from it take the same license. Both vendored Forge packages, `@oods/tokens` and `@oods/tw-variants`, keep PolyForm Noncommercial unless Derek relicenses them.
+2. **Other people's personal data in history.** *Answered: clean the current tree and leave history* (decision #614). Derek was open to the recommendation. The data is three people's emails, names and roles, plus admin-users screenshots: low sensitivity, but not Derek's. A purge would change every commit hash the record cites, needs GitHub Support, and cannot reach the 1,350 clones already made in the 14 days to 2026-10-13. The repository has 0 forks.
+3. **Cross-project messages.** *Answered:* "yes you can message as needed to any project" (decision #614; it replaces constraint c:7's ban on messages, while working in another repository still needs permission). DeepSearch was asked to prepare its repository for opening (message `51ad080b`), and Reasonbook's rename request `960040b8` was accepted with this plan.
+4. **Who comes in on Monday, and how?** *Answered:* an invite-only demo. Derek will send 5–10 invite codes to people he wants to see the app and how it works. Sign-up stays as it is (decision #614).
 5. **Carried from the predecessor document (deferred):** should project grants be genuinely per-project, or sugar over Space membership? Revisit when Derek wants sharing. Start from report TRACE-SHARE-58 (document `04ffc800-85cf-4a49-bcec-a856644796a8`), which recommends a hybrid project-bounded model.
 
 ---
@@ -339,12 +336,17 @@ Add to this list rather than resolving items silently.
 | Moving a telemetry writer silently changes an admin view | Only writers under `cmos/` move. The admin-dashboard data in root `telemetry/` is untouched, and no `app/` code reads the moved files |
 | Upstream releases break the build again | Learning #302: compare the last green run's installed versions with the failing run's; if it recurs, adopt a constraints file |
 | The 2.1.3 publish waits on Derek | Last in order; the README fix is low-stakes, and #174 stands on its own evidence before publication |
-| Seven missions in about two days | DEPS, EXPOSURE and FRONT run first. Any later mission that slips moves to Sprint 68 and does not block Monday |
+| Seven missions in about two days | DEPS, EXPOSURE and SETTINGS run first. Any later mission that slips moves to Sprint 68 and does not block Monday |
 
 ---
 
 ## Change Log
 
+- **2026-10-13 UTC, Derek's answers; Sprint 66 opened.**
+  - Answers: merge (PR #416 merged as `7ee7c8c`); license MIT (decision #613, correcting #612's stored approval words); history kept, current tree cleaned; messages to any project allowed; Monday is an invite-only demo for 5–10 people (decision #614).
+  - S66-DEPS started and opened the sprint, and the identity was synchronised to `sprint-66-active`.
+  - SETTINGS moved ahead of FRONT, because Monday is an app demo.
+  - Sprint 67 will be scoped from Derek's UX doc at the next planning session.
 - **2026-10-13 UTC, created at Sprint 66 planning (session PS-2026-10-13-003).** Derek: "lets open a planning session and get sprint planning underway … make sure we're in good shape for next Mondays share out … lets get these carry forward and remaining items put to bed first."
   - All 24 open follow-ups are dispositioned: 8 into Sprint 66 missions, 1 to Sprint 67, 4 done and 11 closed with reasons.
   - Sprint 66 is drafted as seven missions.
