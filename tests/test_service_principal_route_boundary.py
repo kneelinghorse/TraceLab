@@ -155,7 +155,6 @@ def test_service_credential_is_machine_only_in_every_rbac_state(
     # Human reads and writes are denied even though the service owns both rows.
     ordinary_requests = (
         client.get(f"{API}/missions/events/recent", headers=headers),
-        client.get(f"{API}/decisions/linked", headers=headers),
         client.get(f"{API}/projects", headers=headers),
         client.get(f"{API}/projects/{project.id}", headers=headers),
         client.get(f"{API}/missions/{mission.id}", headers=headers),

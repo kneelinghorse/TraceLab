@@ -602,7 +602,7 @@ def get_delta_sync_service(
     if _delta_sync_service is None:
         _delta_sync_service = DeltaSyncService(
             telemetry_path=telemetry_path
-            or Path("cmos/telemetry/events/sprint-11-pedr-sync.jsonl"),
+            or Path("telemetry/runtime/sprint-11-pedr-sync.jsonl"),
         )
     return _delta_sync_service
 

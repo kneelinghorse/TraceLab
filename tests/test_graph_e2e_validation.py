@@ -12,7 +12,6 @@ from __future__ import annotations
 import json
 import statistics
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
@@ -490,15 +489,9 @@ class TestGraphSearchE2EValidation:
             ],
         }
 
-        # Write report to cmos reports directory
-        report_dir = Path("cmos/reports/sprint-37")
-        report_dir.mkdir(parents=True, exist_ok=True)
-        report_path = report_dir / "graph-search-e2e-validation.json"
+        # Each test run owns its output; historical receipts must stay unchanged.
+        report_path = tmp_path / "graph-search-e2e-validation.json"
         report_path.write_text(json.dumps(report, indent=2))
-
-        # Also write to tmp for test artifact
-        tmp_report = tmp_path / "report.json"
-        tmp_report.write_text(json.dumps(report, indent=2))
 
         # Validate report structure
         assert report["summary"]["total_queries"] == 12

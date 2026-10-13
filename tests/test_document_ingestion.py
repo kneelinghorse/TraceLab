@@ -13,28 +13,29 @@ pytest.importorskip("pptx")
 pytest.importorskip("pandas")
 pytest.importorskip("reportlab")
 
-import pandas as pd
-from docx import Document as DocxDocument
-from httpx import ASGITransport, AsyncClient
-from pptx import Presentation
-from pptx.util import Inches, Pt
-from reportlab.pdfgen import canvas
+# Optional dependency guards must run before the imports below.
+import pandas as pd  # noqa: E402
+from docx import Document as DocxDocument  # noqa: E402
+from httpx import ASGITransport, AsyncClient  # noqa: E402
+from pptx import Presentation  # noqa: E402
+from pptx.util import Inches, Pt  # noqa: E402
+from reportlab.pdfgen import canvas  # noqa: E402
 
-import app.api.v1.documents as documents_api
-from app.core.database import get_db
-from app.main import app
-from app.models.chunk import DocumentChunk
-from app.models.document import Document
-from app.models.processing_status import DocumentProcessingStatus
-from app.services.chunking import ChunkingService
-from app.services.coverage_report import CoverageReportGenerator
-from app.services.document_ingestion import DocumentIngestionService
-from app.services.processing_status import ProcessingStatusRecorder
+import app.api.v1.documents as documents_api  # noqa: E402
+from app.core.database import get_db  # noqa: E402
+from app.main import app  # noqa: E402
+from app.models.chunk import DocumentChunk  # noqa: E402
+from app.models.document import Document  # noqa: E402
+from app.models.processing_status import DocumentProcessingStatus  # noqa: E402
+from app.services.chunking import ChunkingService  # noqa: E402
+from app.services.coverage_report import CoverageReportGenerator  # noqa: E402
+from app.services.document_ingestion import DocumentIngestionService  # noqa: E402
+from app.services.processing_status import ProcessingStatusRecorder  # noqa: E402
 
 LONG_TEXT = (
     "The quick brown fox jumps over the lazy dog near the UX research lab. " * 60
 ).strip()
-COVERAGE_PATH = Path("cmos/reports/sprint-01/ingestion_format_coverage.json")
+COVERAGE_PATH = Path("telemetry/runtime/ingestion_format_coverage.json")
 
 
 class StubRedactionService:

@@ -21,7 +21,6 @@ from app.api.v1 import (
     collection_context,
     collections,
     corrections,
-    decision_links,
     deepsearch,
     documents,
     evidence,
@@ -234,12 +233,6 @@ app.include_router(
     prefix=f"{settings.api_v1_prefix}/missions",
     tags=["mission-events"],
     dependencies=[Depends(require_authenticated_user_sse)],
-)
-app.include_router(
-    decision_links.router,
-    prefix=settings.api_v1_prefix,
-    tags=["decision-links"],
-    dependencies=protected_dependencies,
 )
 app.include_router(health.router, prefix=settings.api_v1_prefix, tags=["health"])
 app.include_router(

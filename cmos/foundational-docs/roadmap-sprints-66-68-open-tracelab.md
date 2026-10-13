@@ -222,6 +222,8 @@ Verified on `bb0b270`:
 - On production, `https://api.tracelab.aquex.ai/api/v1/decisions/linked` answers 404 to an authenticated admin request. Today it answers 401 unauthenticated.
 - Required CI and the post-deploy check are green.
 
+**Implementation and local proof (2026-10-13):** All eleven agreed output defaults now use ignored `telemetry/runtime/`; historical filenames and payloads are preserved. The unused decision-links router is removed under decision #609, with five role cases proving all three routes absent. Test reports use temporary paths; a narrow fixture redirects only the three tracked live telemetry sinks, preserving dashboard runtime defaults (decision #621). The identical CI backend command began with a clean checkout both times: before, 3,178 passed with four existing skips and 12 documented deselections but six tracked files changed; after, 3,175 passed with the same skips/deselections and `git status --porcelain` empty. The count change replaces 19 retired API cases with 16 regression cases. Coverage HTTP responses match apart from `generated_at`. All 39 surviving application `cmos` references are documented comments, descriptions or protocol identifiers. Receipts: `cmos/reports/sprint-66/S66-DECOUPLE/`; merge and live verification are recorded at mission completion.
+
 ### S66-TESTS — Every browser spec runs, and the suite stops flaking
 
 Closes #485, #448 and #379. *Requires DECOUPLE and SETTINGS.*
@@ -362,6 +364,8 @@ Add to this list rather than resolving items silently. Questions 1–4 were answ
 ---
 
 ## Change Log
+
+- **2026-10-13 UTC, runtime storage isolation validated locally.** The identical CI backend run previously changed six tracked files; after S66-DECOUPLE it leaves the checkout clean, with no new skips or quarantines. Coverage HTTP payloads are unchanged apart from generation time. S66-SECURITY is also merged as `381a3aa`, verified live at Next 16.3.8/sharp 0.35.5, with every main workflow and all five production smoke checks green.
 
 - **2026-10-13 UTC, frontend security update validated locally.** Selected patched runtime and test-tooling versions; all existing local gates pass. Decision #619 records the two remaining build-only advisory dispositions and a bounded Sprint 68 follow-up. The npm audit remains nonzero; no findings are suppressed.
 - **2026-10-13 UTC, clean-install security findings added to Sprint 66.** Derek approved S66-SECURITY immediately after FRONT and before DECOUPLE, TESTS and MCP (decision #618). The clean install found 37 frontend dependency advisories, including critical Next.js and test-tooling findings. Version applicability was checked against maintainer advisories; exploitability on TraceLab was not established. FRONT's quickstart now explicitly isolates Compose containers and volumes, following an initial attempt that reused and migrated an existing local database (decision #617). The second clone passed from empty volumes through UI login and API health.

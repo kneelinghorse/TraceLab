@@ -1,0 +1,44 @@
+{
+  "phase": "after",
+  "commit": "a8163d062c2b290726d814ae1f46b766cc5e24c9",
+  "start_status": "",
+  "after_status": "",
+  "exit_code": 0,
+  "seconds": 465.53,
+  "command": [
+    "scripts/run_pytest.py",
+    "--timeout-seconds",
+    "2100",
+    "--grace-seconds",
+    "20",
+    "--",
+    "--ignore=tests/integration",
+    "--durations=25",
+    "--junitxml=test-results/backend-suite.xml",
+    "--deselect=tests/sprint_03/test_api_stability.py::test_api_uptime_and_latency_meet_targets",
+    "--deselect=tests/sprint_03/test_evidence_integrity.py::test_evidence_integrity_checks_detect_missing_chunks",
+    "--deselect=tests/sprint_03/test_quality_gate_effectiveness.py::test_quality_gate_failures_blocked_with_actionable_feedback",
+    "--deselect=tests/sprint_03/test_validation_coverage.py::test_validation_rate_exceeds_target",
+    "--deselect=tests/sprint_04/test_coverage_metric.py::test_coverage_threshold_exceeded",
+    "--deselect=tests/sprint_04/test_performance_metrics.py::test_latency_stays_under_two_seconds",
+    "--deselect=tests/sprint_04/test_performance_metrics.py::test_cost_profile_within_budget",
+    "--deselect=tests/sprint_04/test_quality_and_load.py::test_quality_checks_block_and_pass",
+    "--deselect=tests/sprint_04/test_quality_and_load.py::test_load_test_supports_target_concurrency",
+    "--deselect=tests/sprint_04/test_tech_debt.py::test_playwright_migration_eliminates_cypress_cost",
+    "--deselect=tests/test_admin_dashboard.py::test_metrics_aggregator_generates_sections",
+    "--deselect=tests/test_document_ingestion.py::test_upload_and_process_endpoints_record_statuses"
+  ],
+  "environment": {
+    "PEDR_GRAPH_TELEMETRY_ENABLED": "0",
+    "PIP_DISABLE_PIP_VERSION_CHECK": "1",
+    "PYTHONUNBUFFERED": "1"
+  },
+  "app_import_from_worktree": true,
+  "test_counts": {
+    "passed": 3175,
+    "skipped": 4,
+    "deselected": 12,
+    "warnings": 49
+  },
+  "tracked_files_modified": 0
+}

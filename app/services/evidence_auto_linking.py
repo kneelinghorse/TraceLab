@@ -156,9 +156,8 @@ class EvidenceAutoLinkingService:
         repo_root = Path(__file__).resolve().parents[2]
         default_path = (
             repo_root
-            / "cmos"
             / "telemetry"
-            / "events"
+            / "runtime"
             / "sprint-10-deepsearch-ingestion.jsonl"
         )
         self.telemetry_path = telemetry_path or default_path
