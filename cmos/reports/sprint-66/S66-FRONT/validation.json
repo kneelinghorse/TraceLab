@@ -89,7 +89,14 @@
       "research"
     ],
     "private_vulnerability_reporting": true,
-    "license_recognition": "Verify MIT after merge; pending while LICENSE exists only on PR branch."
+    "license_recognition": "MIT: GitHub's license API reports spdx_id MIT for LICENSE after merge.",
+    "license_recognition_original_claim": "Verify MIT after merge; pending while LICENSE exists only on PR branch.",
+    "license_recognition_corrected_at_sprint_close": {
+      "date": "2026-10-13",
+      "session": "Sprint 66 close, 2026-10-13 (Claude Code closeout on branch sprint-66-close)",
+      "superseded_by": "PR #419 merge (b58345b)",
+      "why": "Recognition was pending while LICENSE existed only on the PR branch."
+    }
   },
   "deployment": "Final CI, merge, GitHub license recognition and production verification are recorded in Reasonbook mission completion notes after merge."
 }

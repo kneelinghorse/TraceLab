@@ -47,237 +47,36 @@ Three things must be true that day:
 
 ---
 
-## Sprint 66 — Clear the deck (opened 2026-10-13; target close 2026-10-15)
+## Sprint 66 — Clear the deck (opened and finished 2026-10-13 UTC, eight of eight; closed 2026-10-13)
 
 **Goal:** every carried follow-up is done, scheduled or closed with a reason, and TraceLab's public repository is clean, licensed and ready to be read and run.
 
-Opened when S66-DEPS started on Derek's "yes, merge" (decision #614). PR #416 merged as `7ee7c8c`.
+**Outcome:** met, two days ahead of the 2026-10-15 target. All eight missions merged one at a time, each deployed and verified on production before the next started. The sprint opened on Derek's "yes, merge" (decision #614). Derek added S66-SECURITY mid-sprint, after FRONT's clean install surfaced dependency advisories (decision #618). Final state: `main` and both Railway services serve `7204961` (PR #423). All eight main workflows and Production Smoke are green on it. Backend: 3,179 passed, 4 existing skips, 12 documented deselections. PostgreSQL integration: 171 passed, 3 skips. Frontend: 385 unit tests. Browser: 145 cases, no skips or retries.
 
-**Order:** DEPS → EXPOSURE → SETTINGS → FRONT → SECURITY → DECOUPLE → TESTS → MCP. The share-out is an invite-only demo of the hosted app (decision #614), so the user-visible SETTINGS fixes run before the repository's front door. Derek added SECURITY after the fresh install exposed dependency advisories (decision #618). Requires edges:
-- every mission requires DEPS, because nothing merges while backend CI is red;
-- FRONT requires EXPOSURE to merge, so visitors aren't invited into a tree that still holds other people's data. It can be drafted in parallel;
-- SECURITY requires FRONT; DECOUPLE requires SECURITY, so the dependency findings are addressed before the remaining work;
-- TESTS requires DECOUPLE and SETTINGS, because they share test files and the CI spec list.
+| Mission | PR / merge | Accepted outcome |
+| --- | --- | --- |
+| **S66-DEPS** — Restore the backend build | #416, `7ee7c8c` | pydantic is capped below 2.14, so mcp 1.6.0 imports again. The deployed container reports pydantic 2.13.5. fastapi and starlette stay floating (learning #302). |
+| **S66-EXPOSURE** — What the public repository exposes | #417, `dffbf7d` | gitleaks (always `--redact`) covered every ref, the working tree and the text of all 1,799 binary blobs in history. All 175 findings are dispositioned, and none is a credential that is not provably dead: the historical keys were invalidated per learning #121. The legacy password login behind `AUTH_USERNAME` is unreachable in production, decided from code and variable names only. Third-party personal data is gone from the current tree. Decision #615 widened the scope to fixtures, personal-space labels and smoke diagnostics. 58 screenshots are masked (54 Users and 4 Spaces) and OCR-clean. The smoke harness now masks email cells, and the required Secret Scan job has a fixture-proven email guard. The stray record backup is removed, and history is kept (decision #614). |
+| **S66-SETTINGS** — Local times, phone-width Settings | #418, `67c7dee` | Every API time in `frontend/src` goes through `parseApiTimestamp`. A fixed-clock America/Chicago browser test fails on the old build, passes on the new and runs in CI. Settings rows hold whole-word labels at 390 px in both themes. Read-only production check: 13 timestamps, no overflow, no serious or critical axe findings. |
+| **S66-FRONT** — The repository's front door | #419, `b58345b` | MIT `LICENSE` (decision #613), a `NOTICE` naming the PolyForm-Noncommercial OODS packages, a rewritten `README.md`, `SECURITY.md` and `CONTRIBUTING.md`. GitHub shows MIT, the description, the homepage and topics, and private vulnerability reporting is on. `tracelab.egg-info/` is gone. A fresh GitHub clone followed the README to UI and API 200s. The first attempt silently reused an existing local database; that was disclosed, and the proof was rerun in an isolated Compose project (decision #617, learning #306). |
+| **S66-SECURITY** — Frontend dependency findings | #420, `381a3aa` | Next 16.3.8, sharp 0.35.5, Vitest 4.1.11 and Vite 7.3.7 (decision #619). The full audit fell from 37 affected packages to 10, and production-only from 15 to 8. Every critical finding is removed. The remaining entries trace to two build-only advisories, `braces` and selector-parser 6.x under Tailwind 3; they are dispositioned, not suppressed, and carried to Sprint 68. Build tools are declared for the production-only install (decision #620, learning #307). Production serves Next 16.3.8. |
+| **S66-DECOUPLE** — The app stops writing into the record folder | #421, `e04d3df` | Eleven output defaults moved to the gitignored `telemetry/runtime/`. The admin dashboard's live telemetry is unchanged (decision #621). The decision-links router is retired (decision #609), and production answers 404 to an authenticated owner. The CI backend run now leaves `git status` empty; before, it changed six tracked files. The 39 surviving `cmos` references in `app/` are documented comments or identifiers. |
+| **S66-TESTS** — Every browser spec runs | #422, `87d2313` | All 23 spec files are covered by the CI workflows. The nine revived specs add 48 cases. Their first run exposed a real queued native-dialog close race, now fixed with a regression test (learning #309). A plain local Playwright run now builds and starts production, as CI does. The graph timing gate keeps the best of three warmed rounds, with response caching disabled (decision #622, learning #308). |
+| **S66-MCP** — The documented mission schema works | #423, `7204961` | Registry 2.1.2's own example reproduced a 422 on the deployed preview route. The corrected README, tool and UI examples compile there, with no research run, and every draft is deleted. The public boundary stays a single object (decision #623, learning #310), and the README installs `@latest`. Derek approved the publish of `@aquex/tracelab-mcp` 2.1.3. The registry tarball is byte-identical to the tested pack, and a fresh install passes all 70 stdio checks ([receipt](../reports/sprint-66/S66-MCP/registry-verification.json)). |
 
-Each mission is merged, deployed and verified on production before the next starts, and it closes the follow-ups named in it.
+**Follow-ups:** eight carried rows were closed by this sprint's missions: #174, #275, #280, #379, #380, #448, #485 and #486. Three stay open, all scheduled:
+- #406 (raw Markdown table rows shown as claim text) is in Sprint 67;
+- #489 (scope Sprint 67 from Derek's UX doc) is the next planning session;
+- #490 (the two residual build-tool advisories) is in Sprint 68.
 
-### S66-DEPS — Restore the backend build
+**What went wrong, and was caught:**
+- FRONT's first quickstart proof migrated an existing local database instead of starting fresh. It was disclosed and repeated in isolation.
+- SECURITY's first CI build failed because a local production-only build had silently auto-installed TypeScript. CI's refusal was correct.
+- MCP's publish waited on Derek's npm browser sign-in. It is the one step an agent cannot take.
 
-**Objective:** backend CI passes again on fresh installs, and the next production image installs a pydantic that mcp 1.6.0 can import.
+Receipts: `cmos/reports/sprint-66/`. The mission completion records hold the run IDs and live-check details.
 
-- `pyproject.toml` caps pydantic below 2.14 (PR #416). Reproduced in a clean venv: mcp 1.6.0 with pydantic 2.14.1 fails to import `mcp.server`, and with 2.13.5 it imports. fastapi (0.142.2 → 0.143.0) and starlette (1.7.0 → 1.8.0) also moved since the last green run. They stay floating unless CI fails on them.
-
-**Done when:** backend-suite and backend-integration pass on PR #416; after merge, the post-deploy check is green; and `railway ssh --service TraceLab -- python3 -c "import pydantic; print(pydantic.VERSION)"` reports 2.13.x.
-
-### S66-EXPOSURE — Know what the public repository exposes, and remove what it shouldn't
-
-**Objective:** establish, reproducibly, whether TraceLab's public history holds any credential or third-party personal data, get every live credential in front of Derek, and remove personal data from the current tree before the share-out.
-
-*Credentials:*
-
-- Scan full history on every ref and the working tree with gitleaks (record the version), **always with `--redact`**, and run `scripts/check_no_credential_literals.py` on tracked files.
-- `git log -p` shows binary files only as "differ", so list every binary blob in history: the WAL/SHM revisions, the backup database and any others. Extract their text with `sqlite3 .dump` where it opens, otherwise `strings`, and pipe it through `gitleaks stdin --redact`.
-- Raw scanner output stays outside the repository. Receipts carry only redacted findings and their dispositions.
-- Each finding is a false positive (say why), a dead or test credential, or possibly live. "Dead" is shown from the record: rotation evidence, or a known fixture. **A found credential is never used to test it.** Anything not provably dead is reported to Derek by name and location, never value. Rotation is his call.
-- Cite GitHub's own secret scanning (on, push protection on, no alerts) as a second source, not a substitute.
-
-*Personal data:*
-
-- Inventory email addresses and names across tracked text, the extracted binary text, and screenshots of user, admin, settings, invite and auth pages. Use OCR, and send its text through the same redaction rule.
-- Remove third-party personal data **from the current tree**.
-  - Redact the three JSON receipts in place, keeping their structure and replacing each third-party address and display name with a stable placeholder.
-  - Mask the user-list screenshots rather than delete them, because 31 `results.json` receipts reference them by path.
-- The production `AUTH_USERNAME` appears in 17 tracked files (13 receipts, 2 docs, 2 tests). It is a username, not a secret, so don't redact it file by file. Instead, work out from the code and the names of Railway's variables (never their values, and never by attempting a login) whether the legacy username/password login it belongs to is still reachable in production. If it is, report that to Derek.
-- **History is not rewritten** (decision #614). A live credential found in history is rotated, not purged.
-- Prevent recurrence.
-  - The capture script `frontend/scripts/ui-shell-smoke.mjs:70` masks only `code` elements on /settings today. It also masks email cells on admin user pages.
-  - Inside the required Secret Scan job (`.github/workflows/secret-scan.yml`), a check fails when a tracked receipt contains an email address outside an allowlist of owner and example domains, proven with a fixture. A separate new check would not block merges until branch protection requires it.
-- `cmos/db/cmos.sqlite.backup-20251112-162503` leaves the tree after it is scanned.
-
-**Done when:**
-- The receipt in `cmos/reports/sprint-66/S66-EXPOSURE/` records tool versions, commands, refs, blob counts and finding counts, with a disposition for each finding and no secret value or third-party address anywhere in it.
-- Every credential not provably dead has been reported to Derek.
-- A grep of the tree for the three third-party domains and display names returns nothing.
-- An OCR re-check of every `*_admin_users.png` after masking finds no email address.
-- The new CI check fails on its fixture and passes on the tree.
-- The backup file is gone.
-
-### S66-SETTINGS — Times are local everywhere, and Settings fits a phone
-
-Closes #280 and #275.
-
-- `frontend/src/pages/settings.tsx:380`, `:384` and `:528` parse offset-free UTC API times with `new Date()`. So API-key "Created" and "Last used" times, and invite dates, shift for anyone outside UTC.
-- The same pattern appears at:
-  - `components/evidence/EntryCard.tsx:9`
-  - `components/librarian/CollectionSuggestions.tsx:156`
-  - `components/librarian/DuplicateReview.tsx:89`
-  - `components/librarian/ProjectDescription.tsx:106`
-  - `components/queue/QueueCard.tsx:52` and `:116`
-  - `components/queue/ExecutionProgress.tsx:8`, where durations are off by the UTC offset
-  - `components/console/CorrectionStatusCard.tsx:36` and `:177`
-  - `pages/admin/corrections.tsx:135`, `:258` and `:306`
-  - `pages/device.tsx:240`
-
-  Every one that parses an API time goes through `parseApiTimestamp` (`frontend/src/lib/api/timestamps.ts:2`). `pages/index.tsx:21` and `pages/admin/observability.tsx:15` already add a missing offset themselves. Switch them to `parseApiTimestamp` too, so the grep below has no exceptions.
-- At 390 px, the Revoke, Copy and Delete actions and the "unused" badge wrap one character per line (`cmos/reports/sprint-51/ux-10-production-smoke/dark-390-_invites.png`). Fix the row layout and check it with a realistic long key name.
-
-**Done when:**
-- A grep for `new Date(` over `frontend/src`, recorded in the receipt, shows no API time parsed outside `parseApiTimestamp`.
-- A browser test with a fixed clock in America/Chicago fails on the old Settings parsing, passes on the new, and is in the enumerated CI list.
-- Captures at 390 px in both themes show whole-word labels, no horizontal overflow and no serious or critical axe findings.
-- A read-only check on production confirms them.
-
-### S66-FRONT — The repository's front door
-
-*Requires EXPOSURE to merge. It may be drafted in parallel on a branch; the record notes the dependency but does not enforce it.*
-
-**Objective:** a person landing on github.com/kneelinghorse/TraceLab on 2026-10-19 can tell what TraceLab is, knows how they may use it, knows how to report a vulnerability, and can run it by following the README from a fresh clone.
-
-- **`LICENSE`** at the root: MIT (decision #613). `packages/tracelab-mcp` keeps MIT. The vendored DeepSearch compiler (`app/services/contract_compiler/`) is Derek's code and takes the same license as DeepSearch's repository. A `NOTICE` (or a README section) names every vendored component under another license, including both `@oods/tokens` and `@oods/tw-variants` (PolyForm-Noncommercial-1.0.0).
-- **`README.md`** rewritten for a newcomer:
-  - what TraceLab does today: the Librarian, missions run by DeepSearch, the Evidence Ledger, cited reports and the MCP;
-  - the hosted app and how access works (invite codes);
-  - the self-host quickstart, saying plainly that research runs need a DeepSearch worker, which is not public while DeepSearch is private. Today's step `pip install -r requirements.txt` (README.md:67) installs nothing, because that file is intentionally empty;
-  - pointers into `docs/`;
-  - what `cmos/` is (the project's Reasonbook record and acceptance receipts, which is why a clone is about 1 GB);
-  - the license.
-- **`SECURITY.md`** points at GitHub private vulnerability reporting, which gets turned on.
-- **A short `CONTRIBUTING.md`:**
-  - how to run the tests;
-  - that CI lints with `ruff check` and does not enforce `ruff format`;
-  - that a new Playwright spec must be added to the enumerated CI list.
-- **GitHub metadata:** a description matching the README's first sentence, homepage `https://tracelab.aquex.ai`, and topics. `tracelab.egg-info/` leaves the tree and is ignored.
-- **The quickstart is proven, not assumed.** In an empty directory, clone from GitHub and follow the README verbatim to a running UI and API with Docker, which is available on this machine. Every deviation is fixed in the README, not worked around.
-
-**Done when:**
-- `gh repo view` reports the license, description, homepage and topics.
-- Private vulnerability reporting reads enabled.
-- Every relative link in new and changed Markdown resolves.
-- The receipt holds the fresh-clone transcript, ending in a 200 from the local UI and the API health route.
-- A grep for the stale README fragments returns nothing.
-- `git ls-files tracelab.egg-info` is empty.
-
-### S66-SECURITY — Patch the frontend dependency security findings
-
-Added with Derek's approval on 2026-10-13 after FRONT's clean install reported 37 dependency advisories: 3 critical, 25 high, 7 moderate and 2 low. This is a version-based audit result; exploitability on TraceLab has not been established.
-
-**Objective:** remove actionable runtime and critical test-tooling dependency findings, and disposition every remaining advisory before the share-out.
-
-- Capture full and production-only audit baselines with installed versions, dependency paths and maintainer advisory URLs.
-- Update Next.js and affected test tooling to supported patched versions, with necessary compatible dependencies. Run `npm install` in `frontend/` and commit its lockfile. Do not blindly use `npm audit fix --force`, which proposes framework downgrades and unrelated major changes.
-- Keep the vendored OODS versions unless a proven blocker needs an operator decision. No exploit probes or paid provider calls.
-- Distinguish version matches from demonstrated exposure. Record the applicability and fix disposition of any remaining development advisory, with a bounded follow-up when it cannot be resolved in this mission.
-
-**Done when:**
-- Production dependencies have no unresolved high or critical findings; every remaining development advisory has a disposition.
-- Frontend unit tests, lint, types, production build and the currently enumerated browser tests pass, with no new skips; required CI is green.
-- A fresh production dependency install/build passes, and read-only production smoke on the merged commit verifies the deployed Next.js version and existing UI behavior.
-- The receipt and roadmap record actual versions, audit changes, validation and any bounded carry-forward.
-
-**Implementation and residual disposition (2026-10-13, decision #619):** Next.js 16.3.8, sharp 0.35.5, matching Next ESLint config, Vitest 4.1.11 and Vite 7.3.7, plus compatible transitive fixes. Full audit falls from 37 affected packages (3 critical) to 10 (7 high, 3 moderate); production-only falls from 15 to 8 (5 high, 3 moderate). The remaining entries all trace to two build-tool advisories: unpatched `braces` and selector-parser 6.x in Tailwind 3/typography. No affected external package appears in the 35 server traces, and source usage is confined to build configurations operating on repository input. These are documented build-only dispositions, **not a zero-finding audit**. Their removal is a bounded Sprint 68 follow-up below. No forced Tailwind migration, OODS replacement or audit suppression. Decision #620 declares existing compiler/types/CSS build requirements explicitly so the production-only install builds under `CI=1` without Next auto-installing missing tools. Local validation: 383 unit tests, 97 browser tests, 78 mission API tests, lint, types and a clean production build passed. Merge and deployed-version verification belong in the Reasonbook completion record.
-
-### S66-DECOUPLE — The app stops writing into the record folder
-
-Closes #380. It handles the application half of #487's part 3; the folder move itself is S68-RB4.
-
-**Objective:**
-- no code under `app/` reads or writes files under `cmos/`;
-- running the test suite leaves the tracked tree unchanged;
-- no API response changes, except the retired decision-links routes.
-
-Verified on `bb0b270`:
-
-- **Telemetry writers.** Nine writers default to `cmos/telemetry/events/`:
-  - `app/services/cache_manager.py:74-80`
-  - `app/services/evidence_auto_linking.py:157-163`
-  - `app/services/correction_queue.py:89`
-  - `app/services/webhook_client.py:75`
-  - `app/services/pedr/delta_sync.py:605`
-  - `app/services/pedr/sync_events.py:359`
-  - `app/services/pedr/preflight.py:53`
-  - `app/services/pedr/search_orchestrator.py:82`
-  - `app/cli/pedr.py:35`
-
-  Their defaults move to one new gitignored directory, `telemetry/runtime/`, keeping their file names. Nothing in `app/` reads these files. Their readers are scripts, such as `scripts/pedr_graph_quality_validation.py:44` and the telemetry migrate/validate scripts. They keep reading the historical files, which stay where they are as evidence. The developer CLI `app/cli/collect_performance_metrics.py:129` writes into `cmos/reports/sprint-01` and moves the same way.
-- **The coverage report is a writer, not a reader.** `app/services/coverage_report.py:23-24,120-122` computes the report from the database and overwrites `cmos/reports/sprint-01/ingestion_format_coverage.json` on every GET (`app/api/v1/documents.py:573-578`) and on every successful ingestion (`app/services/document_ingestion.py:410`). Its write target moves to `telemetry/runtime/`. The test scaffolding that saves and restores that receipt moves with it: `tests/conftest.py:83` and `:193-200`, and `tests/test_document_ingestion.py:37`.
-- **Tests that write tracked files** write to temporary paths instead:
-  - `tests/test_semantic_edge_e2e_validation.py:530-533` and `tests/test_graph_e2e_validation.py:494-497` rewrite receipts under `cmos/reports/`;
-  - other tests append to root `telemetry/events/quality-gates.jsonl` (`app/services/quality_gate_service.py:64`), `quality-automation.jsonl` (`app/services/quality_checks.py:110`) and `sprint-04-performance.jsonl` (`app/services/cost_monitor.py:33`).
-
-  Root `telemetry/` is outside `cmos/` and is live data: `app/services/metrics_aggregator.py:245` reads `sprint-04-performance.jsonl` for the admin dashboard, so those runtime defaults do not change.
-- **Retire the decision-links router** (`app/api/v1/decision_links.py`): GET `/decisions/linked`, GET `/decisions/linked/{id}` and POST `/decisions/linked/{id}/evidence`. It is admin-only and reads and writes the Reasonbook database with raw SQL. Nothing in the frontend, the MCP package or `cmos/contracts/mcp-parity-manifest.json` calls it. The deployed image has no record database (`cmos/db/cmos.sqlite` is gitignored), so in production it can only fail.
-  - Remove its registration in `app/main.py`.
-  - Update `tests/test_recovery_routes.py:58-125,312-336`, `tests/test_service_principal_route_boundary.py:158`, `tests/test_decision_insight_linking.py:435-588` and `docs/authentication.md:363`.
-  - This supersedes the decision-links half of RECOVER-1's restore (decision #381). Its other parts stand.
-- **Unchanged:**
-  - historical identifiers: `cmos.mission.*` event names, the `cmos` telemetry source value, cmos-mcp contract comments and docstring references, as Reasonbook's own guidance asks;
-  - every reference outside `app/` (tests, scripts, frontend, CI), which S68-RB4 updates with the folder move.
-- No new environment variable or setting.
-
-**Done when:**
-- `git grep` over `app/` finds no filesystem path under `cmos/`, and the receipt lists each surviving match as a comment or identifier.
-- CI's backend pytest invocation, run from a clean checkout, leaves `git status --porcelain` empty. Before the change, it modifies the files #380 names.
-- Each moved writer has a test that proves its new location and fails when pointed back at `cmos/`.
-- The coverage report's response is identical before and after, apart from `generated_at`.
-- On production, `https://api.tracelab.aquex.ai/api/v1/decisions/linked` answers 404 to an authenticated admin request. Today it answers 401 unauthenticated.
-- Required CI and the post-deploy check are green.
-
-**Implementation and local proof (2026-10-13):** All eleven agreed output defaults now use ignored `telemetry/runtime/`; historical filenames and payloads are preserved. The unused decision-links router is removed under decision #609, with five role cases proving all three routes absent. Test reports use temporary paths; a narrow fixture redirects only the three tracked live telemetry sinks, preserving dashboard runtime defaults (decision #621). The identical CI backend command began with a clean checkout both times: before, 3,178 passed with four existing skips and 12 documented deselections but six tracked files changed; after, 3,175 passed with the same skips/deselections and `git status --porcelain` empty. The count change replaces 19 retired API cases with 16 regression cases. Coverage HTTP responses match apart from `generated_at`. All 39 surviving application `cmos` references are documented comments, descriptions or protocol identifiers. Receipts: `cmos/reports/sprint-66/S66-DECOUPLE/`; merge and live verification are recorded at mission completion.
-
-### S66-TESTS — Every browser spec runs, and the suite stops flaking
-
-Closes #485, #448 and #379. *Requires DECOUPLE and SETTINGS.*
-
-- **The nine specs no workflow runs:** `admin-password-recovery`, `password-recovery`, `mission-live-logs`, `report-citations`, `session-code-accessibility`, `token-contrast`, `console`, `evidence` and `hygiene`.
-  - Run each locally against a production build (`next build` then `next start`, as CI does) before wiring it in, because any may have rotted. Fix what fails.
-  - Add each survivor to the list at `.github/workflows/frontend-production-build.yml:91`, or to `production-smoke.yml` if it needs production.
-  - Delete a spec only with a recorded reason.
-- **#448:** two app-shell theme-bootstrap tests fail under `next dev` and pass under `next start`. `frontend/playwright.config.ts:22` starts `next dev` by default, so a plain local run fails. Make the default match CI, or make the tests pass under dev.
-- **#379:** `tests/test_semantic_edge_e2e_validation.py:407` asserts an average under 5 ms and a maximum under 20 ms (lines 421-422) on a server-side timing. Convert it to best-of-rounds or a baseline-relative bound, following `tests/integration/test_aggregate_perf_budgets.py`.
-
-**Done when:**
-- The specs on disk and the enumerated lists match exactly, or each exception has a reason in the receipt.
-- The PR's CI run shows each revived spec executing, with test counts.
-- A plain local `npx playwright test` of the app-shell spec passes.
-- Every failure found is fixed or reported as a product defect, never skipped silently.
-- For #379, under induced CPU load the old assertion fails and the new one passes, and an injected slowdown in the graph layer still fails the new one.
-
-**Local build verification (2026-10-13, S66-TESTS):** All 23 browser spec files are covered by the workflow union: 22 in the production-build lane, with public production smoke and route-migration checks in the deployed lane. The nine revived specs add 48 cases; all 145 local browser cases pass, plus 30 repeated admin-recovery checks. Their first run exposed a real queued native-dialog close race, now fixed with a failing-before/passing-after unit regression. Plain local app-shell passes 15 cases using automatic production build/start. Vitest excludes generated dependency tests after a build; 385 app unit tests pass. The graph gate warms queries and keeps the best complete round of three with response caching disabled: the same bounded CPU burst fails the old assertion and passes the new one, while an injected 30ms BFS slowdown still fails. Existing 5/20ms budgets remain; this does not promise immunity to sustained saturation. Receipts: `cmos/reports/sprint-66/S66-TESTS/`; merge/deploy closure is recorded in Reasonbook.
-
-### S66-MCP — The documented mission schema works
-
-Closes #174 and #486.
-
-- **#174:** the MCP (`packages/tracelab-mcp/src/index.ts:921`, `z.record(z.unknown())`) and REST (`app/schemas/mission.py:131`) accept `expected_output_schema` only as an object.
-  - The vendored compiler requires `kind`, `title` and `format` on each deliverable (`app/services/contract_compiler/contract.py:898-919`).
-  - The MCP's own example (`index.ts:509`) omits them, and so do the UI's examples (`frontend/src/components/missions/MissionForm.tsx:49-50`, `frontend/src/lib/schemas/apiMissionForm.ts:56`).
-  - Reproduce first, through the installed MCP client against the deployed preview route, with no research dispatched. Delete any draft mission the reproduction creates.
-  - Then make the documented examples, the accepted shapes and the compiler agree on both serialization surfaces. Update `cmos/contracts/mission-authoring-contract.md` in the same commit (agents.md: Mission-Authoring Boundary Contract).
-- **#486:** `packages/tracelab-mcp/README.md:31` installs `@2.1.1`. Use `@latest`, like the other setup examples.
-- **Publish 2.1.3** under DoD-1, using learning #295's interactive browser approval, which Derek gives. Derek's Aquex hub pins exactly 2.1.0 and won't pick up 2.1.3 unless he moves it to `@latest`.
-
-**Done when:**
-- A regression test through the MCP client (the MCP Contract Guard pattern, `TestMissionVerbContract`) fails before the fix and passes after.
-- The README, tool-description and UI examples compile on the deployed preview route with zero provider execution, and no reproduction draft remains.
-- Registry 2.1.3, installed fresh, passes the stdio check suite, and its tarball matches the tested pack.
-- If reproduction shows no defect, #174 closes on that evidence, and 2.1.3 carries only the README fix.
-
-**Local build verification (2026-10-13, S66-MCP):** The installed registry 2.1.2 example reproduced a deployed preview 422 for missing `kind`; its draft was deleted. Corrected tool, README and UI examples now compile through a fresh installed 2.1.3 tarball against deployed preview, with three drafts deleted and no provider execution. The public boundary remains one object; draft flexibility and compiler validation remain unchanged (decision #623). The legacy Python create tool now preserves the descriptor, with a registered-client regression. Checks pass: 137 targeted backend tests, 160 MCP unit tests, 385 frontend unit tests, eight mission browser cases, and 70 installed stdio checks covering 71 HTTP requests. The contract is updated in this commit. Receipts: `cmos/reports/sprint-66/S66-MCP/`; registry release and owner browser approval remain pending until recorded at mission completion.
-
-**Out of Sprint 66:**
-- new product features;
-- UX redesign (Sprint 67);
-- project sharing (deferred; Open Question 5);
-- the Reasonbook folder move (Sprint 68);
-- any history rewrite (decision #614);
-- paid research runs;
-- any work in the DeepSearch repository from TraceLab sessions.
-
-**Alternatives considered:**
-
-- *Move the record to Reasonbook 4.0's folder this sprint.* Deferred to Sprint 68. It renames 4,049 tracked files and must update test tooling, scripts, frontend configuration and CI references in the same change. That is a lot of churn in launch week for no user-visible gain. DECOUPLE takes the application out of the folder now, so the move touches only tooling.
-- *Treat the clone size as a reason to rewrite history.* Not on its own. A rewrite changes every commit hash the record, receipts and Railway history cite. Only the personal-data question (Open Question 2) could justify one.
-- *One combined open-source mission.* Split so that the exposure work runs first: it may need Derek to rotate a credential or decide about history. The README is then proven against a fresh clone as its own deliverable.
+**Out of Sprint 66, as planned:** new product features, UX redesign (Sprint 67), project sharing (Open Question 5), the Reasonbook folder move (Sprint 68), any history rewrite, paid research runs, and any work in the DeepSearch repository.
 
 ---
 
@@ -368,6 +167,8 @@ Add to this list rather than resolving items silently. Questions 1–4 were answ
 ---
 
 ## Change Log
+
+- **2026-10-13 UTC, Sprint 66 closed (eight of eight).** The section above is rewritten as outcome. Every mission is merged, deployed and verified on production; `main` and both services serve `7204961` with all main workflows and Production Smoke green. Eight carried follow-ups closed; #406 and #489 go to Sprint 67, #490 to Sprint 68. Two post-merge proofs that lived only in temporary files are now committed receipts: the MCP 2.1.3 registry verification and the S66-SECURITY live production check. Sprint 67 is scoped next from Derek's UX feedback.
 
 - **2026-10-13 UTC, runtime storage isolation validated locally.** The identical CI backend run previously changed six tracked files; after S66-DECOUPLE it leaves the checkout clean, with no new skips or quarantines. Coverage HTTP payloads are unchanged apart from generation time. S66-SECURITY is also merged as `381a3aa`, verified live at Next 16.3.8/sharp 0.35.5, with every main workflow and all five production smoke checks green.
 

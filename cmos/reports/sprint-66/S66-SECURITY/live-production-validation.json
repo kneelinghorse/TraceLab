@@ -1,0 +1,34 @@
+{
+  "base": "https://tracelab.aquex.ai",
+  "checkedAt": "2026-10-13T20:04:21.536Z",
+  "timezone": "America/Chicago",
+  "readOnly": true,
+  "results": [
+    {
+      "theme": "light",
+      "width": 390,
+      "verifiedTimes": 13,
+      "keyRows": 6,
+      "inviteRows": 3,
+      "actionLabels": 9,
+      "overflow": false,
+      "seriousOrCritical": [],
+      "clientErrors": 0,
+      "transportErrors": 0,
+      "suppressedWrites": 0
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "verifiedTimes": 13,
+      "keyRows": 6,
+      "inviteRows": 3,
+      "actionLabels": 9,
+      "overflow": false,
+      "seriousOrCritical": [],
+      "clientErrors": 0,
+      "transportErrors": 0,
+      "suppressedWrites": 0
+    }
+  ]
+}
