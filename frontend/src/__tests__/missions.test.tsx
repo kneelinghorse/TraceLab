@@ -4,9 +4,9 @@ import type { ReactNode } from "react";
 import { beforeEach, expect, it, vi } from "vitest";
 import { SWRConfig } from "swr";
 import type { ApiMission, MissionStatus } from "@/types/mission";
-const mocks = vi.hoisted(() => ({ list: vi.fn(), get: vi.fn(), update: vi.fn(), markViewed: vi.fn(), markEvidenceViewed: vi.fn(), projects: vi.fn(), httpGet: vi.fn(), push: vi.fn(), replace: vi.fn(), query: {} as Record<string, string | string[]> }));
+const mocks = vi.hoisted(() => ({ list: vi.fn(), get: vi.fn(), update: vi.fn(), state: vi.fn(), markViewed: vi.fn(), markEvidenceViewed: vi.fn(), projects: vi.fn(), httpGet: vi.fn(), push: vi.fn(), replace: vi.fn(), query: {} as Record<string, string | string[]> }));
 vi.mock("@/lib/api/missions", () => ({ missionsApi: mocks }));
-vi.mock("@/lib/api/activity", async original => ({ ...await original<object>(), activityApi: { markViewed: mocks.markViewed, markEvidenceViewed: mocks.markEvidenceViewed, summary: vi.fn().mockResolvedValue({ new_total: 0, by_type: {} }) } }));
+vi.mock("@/lib/api/activity", async original => ({ ...await original<object>(), activityApi: { state: mocks.state, markViewed: mocks.markViewed, markEvidenceViewed: mocks.markEvidenceViewed, summary: vi.fn().mockResolvedValue({ new_total: 0, by_type: {} }) } }));
 vi.mock("@/lib/api/projects", () => ({ projectsApi: { listAllProjects: mocks.projects } }));
 vi.mock("@/lib/api/http", async importOriginal => ({ ...await importOriginal<object>(), httpClient: { get: mocks.httpGet } }));
 vi.mock("@/components/AuthGate", () => ({ AuthGate: ({ children }: { children: ReactNode }) => children }));
@@ -28,6 +28,7 @@ function mount(page: ReactNode) { return render(<SWRConfig value={{ provider: ()
 beforeEach(() => {
   vi.resetAllMocks(); mocks.query = {};
   mocks.projects.mockResolvedValue([]); mocks.httpGet.mockResolvedValue([]);
+  mocks.state.mockResolvedValue({ items: [{ type: "mission", id: "run-1", viewed: false, new: false }] });
   mocks.markViewed.mockResolvedValue({ viewed: 1, new_total: 0 });
   mocks.list.mockResolvedValue({ data: [mission("queued")], pagination: { total: 143, pages: 8, page: 1, page_size: 20 } });
   mocks.get.mockResolvedValue(mission());
@@ -113,4 +114,19 @@ it("marks the run's evidence group seen when its Evidence tab opens, and only th
   expect(mocks.markEvidenceViewed).not.toHaveBeenCalled();
   fireEvent.click(screen.getByRole("tab", { name: "Evidence" }));
   await waitFor(() => expect(mocks.markEvidenceViewed).toHaveBeenCalledWith({ project_id: "project-1", mission_id: "run-1" }));
+});
+
+it.each([
+  { viewed: true, new: false, weight: "font-normal" },
+  { viewed: false, new: false, weight: "font-semibold" },
+  { viewed: false, new: true, weight: "font-semibold" },
+])("shows page state without modifying mission response ($viewed / $new)", async state => {
+  mocks.state.mockResolvedValue({ items: [{ type: "mission", id: "run-1", ...state }] });
+  mount(<MissionsPage />);
+  const title = await screen.findByRole("heading", { name: "Inspect research" });
+  await waitFor(() => expect(title.closest("li")).toHaveAttribute("data-viewed", String(state.viewed)));
+  expect(title).toHaveClass(state.weight);
+  expect(within(title).queryAllByTestId("new-activity-dot")).toHaveLength(state.new ? 1 : 0);
+  expect(mocks.state).toHaveBeenCalledWith([{ type: "mission", id: "run-1" }]);
+  expect(mocks.markViewed).not.toHaveBeenCalled();
 });

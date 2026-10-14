@@ -87,6 +87,25 @@
     "operations": 118
   },
   "secret_scan": "passed",
-  "production_verification": "pending merge and both Railway deployments",
-  "intermediate_failures": "verification-history.json"
+  "production_verification": {
+    "status": "passed",
+    "merge_commit": "9ffdfe5697186e0c9930a51d0b1b762cff350436",
+    "railway": "Both services SUCCESS at the merge commit; deployment.json",
+    "post_deploy_check": "38503574231 success",
+    "captures": 40,
+    "live_mcp_checks": 17,
+    "reports_before": 512,
+    "reports_after": 512,
+    "missing_report_ids": 0,
+    "origin_counts": {
+      "mission": 451,
+      "written": 47,
+      "agent_brief": 12,
+      "librarian": 2
+    },
+    "default_reports": 49,
+    "read_only": true
+  },
+  "intermediate_failures": "verification-history.json",
+  "updated_at": "2026-10-14T03:05:14.420381+00:00"
 }

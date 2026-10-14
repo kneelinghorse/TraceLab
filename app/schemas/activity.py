@@ -18,6 +18,7 @@ class ActivityItem(BaseModel):
     occurred_at: datetime
     href: str
     new: bool
+    viewed: bool
 
 
 class ActivityPage(BaseModel):
@@ -34,6 +35,25 @@ class ActivitySummary(BaseModel):
     generated_at: datetime
     new_total: int
     by_type: dict[str, int]
+    completed_missions_new: int
+
+
+class ActivityStateItem(BaseModel):
+    type: Literal["mission", "report"]
+    id: UUID
+
+
+class ActivityStateRequest(BaseModel):
+    items: list[ActivityStateItem] = Field(min_length=1, max_length=200)
+
+
+class ActivityItemState(ActivityStateItem):
+    viewed: bool
+    new: bool
+
+
+class ActivityStateResponse(BaseModel):
+    items: list[ActivityItemState]
 
 
 class ViewedItem(BaseModel):

@@ -1,0 +1,8 @@
+{
+  "reviewed_at": "2026-10-14T03:05:14.420381+00:00",
+  "captures": 40,
+  "method": "Above-fold contact sheets in both themes and widths; all four loaded project Reports captures; source sections for written, librarian, agent brief and mission reports inspected separately.",
+  "findings": "Origin labels readable, header actions wrap on phones, project report rows loaded, content precedes citations and named source records. No horizontal overflow or serious/critical axe findings.",
+  "capture_correction": "Initial project capture caught loading state; strengthened the read-only script to wait for expected total and actual first report row, then reran all 40 captures successfully.",
+  "read_only": true
+}

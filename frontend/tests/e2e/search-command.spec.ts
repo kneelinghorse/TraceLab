@@ -29,7 +29,7 @@ async function fixture(page: Page) {
     else if (pathname.endsWith("/projects")) response = { data: [{ id: projectId, name: "Accessible project" }], pagination: { page: 1, page_size: 100, total: 1, pages: 1 } };
     else if (pathname.endsWith("/spaces")) response = [{ id: "space-mine", name: "Member's Space", created_at: "2026-09-13T00:00:00Z", personal_owner_id: "member" }];
     else if (pathname.endsWith(`/documents/${documentId}`)) response = { id: documentId, name: "Field notes.md", project_id: projectId };
-    else if (pathname.endsWith("/activity/summary")) response = { generated_at: "2026-09-13T00:00:00Z", new_total: 0, by_type: { mission: 0, report: 0, evidence: 0 } };
+    else if (pathname.endsWith("/activity/summary")) response = { generated_at: "2026-09-13T00:00:00Z", completed_missions_new: 0, new_total: 0, by_type: { mission: 0, report: 0, evidence: 0 } };
     else if (pathname.endsWith("/saved-searches")) {
       if (method === "POST") { const created = { ...entry, ...body, id: documentId }; saved = [...saved, created]; response = created; }
       else response = { items: saved, limit_per_user: 50 };

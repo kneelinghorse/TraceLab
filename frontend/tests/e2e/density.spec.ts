@@ -34,12 +34,12 @@ for (const theme of ["light", "dark"] as const) for (const width of [1440, 390])
       const endpoint = new URL(route.request().url()).pathname;
       let body: unknown = {};
       if (endpoint.endsWith("/auth/me")) body = { user_id: "density-reader", email: "reader@example.test", display_name: "Researcher", role: "admin" };
-      else if (endpoint.endsWith("/activity/summary")) body = { new_total: 0, by_type: { mission: 0, report: 0, evidence: 0 } };
+      else if (endpoint.endsWith("/activity/summary")) body = { completed_missions_new: 0, new_total: 0, by_type: { mission: 0, report: 0, evidence: 0 } };
       else if (endpoint.endsWith("/home/favorites")) body = { total: 0, items: [] };
       else if (endpoint.endsWith("/home")) body = {
         generated_at: stamp, refresh_seconds: 30, missions: { total: 20, by_status: { completed: 20 } },
         favorites: { total: 0, items: [] },
-        activity: { total: 20, new_total: 0, page: 1, page_size: 20, items: Array.from({ length: 20 }, (_, i) => ({ type: "mission", id: `activity-${i}`, title: `Research result ${i + 1}`, subtitle: "Research workspace", status: "completed", href: `/missions/activity-${i}`, occurred_at: stamp, new: false })) },
+        activity: { total: 20, new_total: 0, page: 1, page_size: 20, items: Array.from({ length: 20 }, (_, i) => ({ type: "mission", id: `activity-${i}`, title: `Research result ${i + 1}`, subtitle: "Research workspace", status: "completed", href: `/missions/activity-${i}`, occurred_at: stamp, new: false, viewed: true })) },
         active_runs: { total: 0, items: [] }, recent_reports: { total: 0, items: [] }, recent_projects: { total: 0, items: [] }, evidence_activity: { total: 0, items: [] },
       };
       else if (endpoint.endsWith(`/projects/${project.id}/stats`)) body = { document_count: 12, chunk_count: 36, report_count: 4, total_tokens: 2400 };

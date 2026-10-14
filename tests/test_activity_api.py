@@ -1,4 +1,4 @@
-"""Recent activity is one recency-ordered stream; new until opened, never floated by status."""
+"""Recent activity is one recency-ordered stream; new for three days until opened, never floated by status."""
 
 from datetime import datetime, timedelta
 from uuid import uuid4
@@ -73,21 +73,21 @@ def test_stream_orders_by_when_things_happened_and_status_is_only_a_label(client
     db_session.commit()
 
     body = client.get(API, headers=headers).json()
-    assert body["total"] == 5 and body["new_total"] == 5
+    assert body["total"] == 5 and body["new_total"] == 4
     assert [(i["type"], i["id"]) for i in body["items"]] == [
         ("report", str(report.id)), ("mission", str(running.id)), ("evidence", body["items"][2]["id"]),
         ("mission", str(done.id)), ("mission", str(old_failure.id)),
     ]
-    assert body["items"][-1]["status"] == "validation_failed" and body["items"][-1]["new"] is True
+    assert body["items"][-1]["status"] == "validation_failed" and body["items"][-1]["new"] is False
     assert body["items"][2]["title"] == "3 evidence entries · DeepSearch"
     assert body["items"][2]["href"].startswith("/evidence?project_id=")
     home = client.get(HOME, headers=headers).json()
     assert "attention" not in home
     assert [i["id"] for i in home["activity"]["items"]] == [i["id"] for i in body["items"]]
-    assert home["activity"]["new_total"] == 5
+    assert home["activity"]["new_total"] == 4
 
 
-def test_items_stay_new_until_viewed_per_user_and_return_when_they_change(client, db_session):
+def test_recent_items_are_new_until_viewed_per_user_and_return_when_they_change(client, db_session):
     _, first = actor(db_session)
     _, second = actor(db_session)
     now = datetime.utcnow()
@@ -213,3 +213,97 @@ def test_marking_a_group_seen_is_scoped_to_what_the_caller_can_read(client, db_s
     assert response.status_code == 200, response.text
     assert response.json() == {"viewed": 0, "new_total": 0}
     assert db_session.query(UserItemView).count() == 0
+
+
+def test_three_day_window_expires_new_without_pretending_old_results_were_seen(client, db_session, monkeypatch):
+    """The dot must clear by age or opening, never reappear after an unrelated write."""
+    from app.services import activity
+
+    now = datetime(2026, 10, 14, 12)
+    monkeypatch.setattr(activity, "_now", lambda: now)
+    _, headers = actor(db_session)
+    old = mission(db_session, "completed", completed_at=now - timedelta(days=4))
+    recent = mission(db_session, "completed", completed_at=now - timedelta(days=1))
+    boundary = mission(db_session, "completed", completed_at=now - timedelta(days=3))
+    blocked = mission(db_session, "blocked", updated_at=now - timedelta(hours=1))
+    cancelled = mission(db_session, "cancelled", updated_at=now - timedelta(hours=1))
+    failed = mission(db_session, "validation_failed", updated_at=now - timedelta(hours=1))
+    missing_completion = mission(db_session, "completed", updated_at=now - timedelta(hours=1))
+    db_session.commit()
+    summary = client.get(f"{API}/summary", headers=headers).json()
+    assert summary["by_type"]["mission"] == 6
+    assert summary["completed_missions_new"] == 2
+    items = {i["id"]: i for i in client.get(API, headers=headers).json()["items"]}
+    assert items[str(old.id)]["viewed"] is False and items[str(old.id)]["new"] is False
+    assert all(items[str(row.id)]["new"] for row in [recent, boundary, blocked, cancelled, failed, missing_completion])
+    client.put(f"{API}/viewed", headers=headers, json={"items": [
+        {"type": "mission", "id": str(row.id), "occurred_at": row.completed_at.isoformat()}
+        for row in [recent, boundary]
+    ]})
+    assert client.get(f"{API}/summary", headers=headers).json()["completed_missions_new"] == 0
+    recent.updated_at = now
+    db_session.commit()
+    assert client.get(f"{API}/summary", headers=headers).json()["completed_missions_new"] == 0
+    items = {i["id"]: i for i in client.get(API, headers=headers).json()["items"]}
+    assert items[str(recent.id)]["viewed"] is True and items[str(recent.id)]["new"] is False
+    monkeypatch.setattr(activity, "_now", lambda: now + timedelta(days=4))
+    assert client.get(f"{API}/summary", headers=headers).json()["new_total"] == 0
+
+
+def test_page_state_is_a_read_only_access_checked_batch_including_mission_copies(client, db_session, monkeypatch):
+    from app.services import activity
+
+    now = datetime(2026, 10, 14, 12)
+    monkeypatch.setattr(activity, "_now", lambda: now)
+    monkeypatch.setattr(settings, "rbac_enabled", True)
+    member, headers = actor(db_session, role="member")
+    outsider, _ = actor(db_session, role="member")
+    mine = mission(db_session, "completed", owner_id=member.id, completed_at=now - timedelta(days=1))
+    hidden = mission(db_session, "completed", owner_id=outsider.id, completed_at=now)
+    seen = Report(title="Viewed document", content="x", owner_id=member.id, updated_at=now)
+    copy = Report(title="Older mission copy", content="x", origin="mission", owner_id=member.id, updated_at=now - timedelta(days=4))
+    secret = Report(title="Private document", content="x", owner_id=outsider.id, updated_at=now)
+    db_session.add_all([seen, copy, secret])
+    db_session.flush()
+    db_session.add(UserItemView(user_id=member.id, item_type="report", item_id=seen.id, occurred_at=now, viewed_at=now))
+    db_session.commit()
+    payload = {"items": [
+        {"type": "mission", "id": str(mine.id)}, {"type": "report", "id": str(seen.id)},
+        {"type": "report", "id": str(copy.id)}, {"type": "mission", "id": str(hidden.id)},
+        {"type": "report", "id": str(secret.id)}, {"type": "report", "id": str(uuid4())},
+    ]}
+    response = client.post(f"{API}/state", headers=headers, json=payload)
+    assert response.status_code == 200, response.text
+    assert response.headers["cache-control"] == "private, no-store"
+    assert response.json() == {"items": [
+        {"type": "mission", "id": str(mine.id), "viewed": False, "new": True},
+        {"type": "report", "id": str(seen.id), "viewed": True, "new": False},
+        {"type": "report", "id": str(copy.id), "viewed": False, "new": False},
+    ]}
+    assert db_session.query(UserItemView).count() == 1, "Reading page state must not mark anything seen"
+    mine.owner_id = outsider.id
+    db_session.commit()
+    assert str(mine.id) not in str(client.post(f"{API}/state", headers=headers, json=payload).json())
+    assert client.post(f"{API}/state", json=payload).status_code == 401
+    assert client.post(f"{API}/state", headers=headers, json={"items": [{"type": "evidence", "id": str(copy.id)}]}).status_code == 422
+    assert client.post(f"{API}/state", headers=headers, json={"items": []}).status_code == 422
+    assert client.post(f"{API}/state", headers=headers, json={"items": payload['items'] * 34}).status_code == 422
+
+
+def test_old_evidence_is_unseen_but_only_recent_groups_count_as_new(client, db_session, monkeypatch):
+    from app.services import activity
+
+    now = datetime(2026, 10, 14, 12)
+    monkeypatch.setattr(activity, "_now", lambda: now)
+    _, headers = actor(db_session)
+    project, other = Project(name="Old evidence"), Project(name="Recent evidence")
+    db_session.add_all([project, other])
+    db_session.flush()
+    old = mission(db_session, "completed", completed_at=now - timedelta(days=4))
+    recent = mission(db_session, "completed", completed_at=now - timedelta(days=1))
+    evidence(db_session, project, old, when=now - timedelta(days=4))
+    evidence(db_session, other, recent, when=now - timedelta(days=1))
+    db_session.commit()
+    assert client.get(f"{API}/summary", headers=headers).json()["by_type"]["evidence"] == 1
+    groups = [i for i in client.get(API, headers=headers).json()["items"] if i['type'] == 'evidence']
+    assert [(g['viewed'], g['new']) for g in groups] == [(False, True), (False, False)]

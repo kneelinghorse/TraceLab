@@ -1,4 +1,4 @@
-"""Recent activity orchestration: newest first, new until opened or marked viewed."""
+"""Recent activity orchestration: newest first, with recency and per-user seen-state."""
 
 from datetime import UTC, datetime
 
@@ -8,6 +8,8 @@ from app.core.security import AuthenticatedUser
 from app.ports.activity import ActivityRepository
 from app.schemas.activity import (
     ActivityPage,
+    ActivityStateItem,
+    ActivityStateResponse,
     ActivitySummary,
     EvidenceGroupViewedRequest,
     MarkViewedResponse,
@@ -32,6 +34,9 @@ class ActivityService:
 
     def summary(self, db: Session, user: AuthenticatedUser) -> ActivitySummary:
         return self.repository.summary(db, user, now=_now())
+
+    def state(self, db: Session, user: AuthenticatedUser, items: list[ActivityStateItem]) -> ActivityStateResponse:
+        return self.repository.state(db, user, items, now=_now())
 
     def mark_viewed(self, db: Session, user: AuthenticatedUser, items: list[ViewedItem]) -> MarkViewedResponse:
         now = _now()

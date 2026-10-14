@@ -1,3 +1,6 @@
+import { activityTitleClass, ActivityDot } from "@/components/activity/ActivityState";
+import { useActivityState } from "@/lib/hooks/useActivitySummary";
+import type { ActivityItemState } from "@/lib/api/activity";
 import { PageContainer, PageHeader } from "@/components/ui/PageHeader";
 import { parseApiTimestamp } from "@/lib/api/timestamps";
 import Link from "next/link";
@@ -20,11 +23,11 @@ const SORTS: { value: MissionSort; label: string }[] = [
   { value: "created_asc", label: "Oldest first" },
   { value: "updated_asc", label: "Least recently updated" },
 ];
-function MissionCard({ mission }: { mission: ApiMission }) {
-  return <li className="panel flex min-w-0 flex-col hover:border-line-strong">
+function MissionCard({ mission, state }: { mission: ApiMission; state?: ActivityItemState }) {
+  return <li className="panel flex min-w-0 flex-col hover:border-line-strong" data-viewed={state?.viewed} data-new={state?.new || undefined}>
     <Link href={`/missions/${mission.id}`} className="flex h-full flex-col gap-3 rounded-2xl p-4 focus-visible:outline-focus">
       <div className="flex items-start justify-between gap-3">
-        <h2 className="line-clamp-2 min-w-0 break-words text-base font-semibold leading-snug">{mission.title}</h2>
+        <h2 className={`line-clamp-2 min-w-0 break-words text-base leading-snug ${activityTitleClass(state)}`}><ActivityDot isNew={state?.new} />{mission.title}</h2>
         <StatusBadge status={mission.status} />
       </div>
       <p className="break-all font-mono text-xs text-muted">{mission.mission_id}</p>
@@ -48,6 +51,7 @@ function MissionsContent() {
   const page = Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
   const projects = useSWR(["mission-project-options", user?.user_id], () => projectsApi.listAllProjects());
   const { missions, pagination, isLoading, error, refresh } = useApiMissions({ page, pageSize: 20, status, projectId, sort });
+  const state = useActivityState(missions.map(mission => ({ type: "mission", id: mission.id })));
   function change(values: Record<string, string | string[] | number | undefined>) {
     const query = { ...router.query, ...values };
     Object.keys(query).forEach(key => { if (query[key] === undefined || query[key] === "") delete query[key]; });
@@ -59,13 +63,14 @@ function MissionsContent() {
       <div><label htmlFor="status-filter" className="form-label">Status</label><select id="status-filter" className="form-input" value={status ?? ""} onChange={event => change({ status: event.target.value, page: 1 })}><option value="">All statuses</option>{STATUSES.map(value => <option key={value} value={value}>{value.replaceAll("_", " ")}</option>)}</select></div>
       <div className="min-w-0 max-w-full"><label htmlFor="project-filter" className="form-label">Project</label><select id="project-filter" className="form-input max-w-full sm:max-w-72" value={projectId ?? ""} onChange={event => change({ project_id: event.target.value, page: 1 })}><option value="">All projects</option>{projects.data?.map(project => <option key={project.id} value={project.id}>{project.name}</option>)}</select></div>
       <div><label htmlFor="sort-order" className="form-label">Sort</label><select id="sort-order" className="form-input" value={sort} onChange={event => change({ sort: event.target.value === "created_desc" ? undefined : event.target.value, page: 1 })}>{SORTS.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select></div>
-      <button className="rounded-lg border border-line px-4 py-2.5 text-sm" onClick={() => void refresh()}>Refresh</button>
+      <button className="rounded-lg border border-line px-4 py-2.5 text-sm" onClick={() => { void refresh(); void state.mutate(); }}>Refresh</button>
       {!isLoading && !error && <p className="ml-auto text-sm text-secondary" aria-live="polite">{pagination?.total ?? 0} matching missions</p>}
     </section>
     {projects.error && <PageState state="error" title="Project filters unavailable." onRetry={() => void projects.mutate()} />}
+    {state.error && <p role="alert" className="text-sm text-secondary">Seen-state could not load. <button className="underline" onClick={() => void state.mutate()}>Retry seen-state</button></p>}
     <section aria-label="Mission list">
       {error ? <PageState state="error" title="Missions could not load." onRetry={() => void refresh()} /> : isLoading ? <PageState state="loading" title="Loading missions…" /> : <>
-        {!missions.length ? <PageState state="empty" title="No missions match these filters." /> : <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{missions.map(mission => <MissionCard key={mission.id} mission={mission} />)}</ul>}
+        {!missions.length ? <PageState state="empty" title="No missions match these filters." /> : <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{missions.map(mission => <MissionCard key={mission.id} mission={mission} state={state.data?.items?.find(item => item.id === mission.id)} />)}</ul>}
         <PaginationBar page={page} pages={pagination?.pages ?? 0} onChange={next => change({ page: next })} />
       </>}
     </section>

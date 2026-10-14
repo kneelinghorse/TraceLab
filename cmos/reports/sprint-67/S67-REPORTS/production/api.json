@@ -1,0 +1,18 @@
+{
+  "checkedAt": "2026-10-14T03:03:09.952Z",
+  "readOnly": true,
+  "counts": {
+    "written": 47,
+    "librarian": 2,
+    "agent_brief": 12,
+    "mission": 451
+  },
+  "defaultTotal": 49,
+  "homeReportsChecked": 6,
+  "chosen": {
+    "written": "cb0ae24f-b28d-4b1c-839e-9a7172d66154",
+    "librarian": "18545204-bdc7-43ec-8799-c3b6726c9d35",
+    "agent_brief": "5149feae-d1e5-4bf2-960d-4f5da69c0f0e",
+    "mission": "a482ef32-0f80-41e3-b316-13c89f80abc3"
+  }
+}

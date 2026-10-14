@@ -37,7 +37,7 @@ def test_postgres_home_counts_and_per_item_viewed_marks(db_session, monkeypatch)
             objective="Count all missions",
             success_criteria=["No page truncation"],
             status="completed",
-            completed_at=now - timedelta(minutes=index),
+            completed_at=now - (timedelta(minutes=index) if index < 140 else timedelta(days=4)),
             owner_id=user.id,
         )
         for index in range(143)
@@ -60,16 +60,17 @@ def test_postgres_home_counts_and_per_item_viewed_marks(db_session, monkeypatch)
     activity = SQLAlchemyActivityRepository()
     body = repository.snapshot(db_session, principal, now=datetime.utcnow())
     assert body.missions.total == 143
-    assert body.activity.total == 143 and body.activity.new_total == 143
+    # Older unopened results remain in the stream, but expire from the three-day new window.
+    assert body.activity.total == 143 and body.activity.new_total == 140
     assert len(body.activity.items) == 10 and body.activity.items[0].id == rows[0].id
     row = rows[0]
     for _ in range(2):
         activity.mark_viewed(db_session, principal, [ViewedItem(type="mission", id=row.id, occurred_at=row.completed_at)], now=now)
     assert db_session.query(UserItemView).filter(UserItemView.user_id == user.id).count() == 1
-    assert activity.summary(db_session, principal, now=datetime.utcnow()).new_total == 142
+    assert activity.summary(db_session, principal, now=datetime.utcnow()).new_total == 139
     row.completed_at += timedelta(seconds=1)
     db_session.commit()
-    assert activity.summary(db_session, principal, now=datetime.utcnow()).new_total == 143
+    assert activity.summary(db_session, principal, now=datetime.utcnow()).new_total == 140
 
     # The job list is recency-sorted over the full scope and ignores status for order.
     rows[1].status = "validation_failed"

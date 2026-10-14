@@ -16,9 +16,9 @@ vi.mock("next/head", () => ({ default: () => null }));
 import HomePage from "@/pages/index";
 import { OPEN_COMMAND_PALETTE_EVENT } from "@/lib/command-palette";
 
-const failure: ActivityItem = { type: "mission", id: "mission-1", title: "Old failed research", subtitle: "RESEARCH-1", status: "validation_failed", occurred_at: "2026-08-20T02:00:00", href: "/missions/mission-1", new: true };
-const report: ActivityItem = { type: "report", id: "report-1", title: "Fresh report", subtitle: null, status: "draft", occurred_at: "2026-09-13T02:00:00", href: "/reports/report-1", new: true };
-const evidence: ActivityItem = { type: "evidence", id: "evidence-1", title: "12 evidence entries · DeepSearch", subtitle: "worker-run", status: null, occurred_at: "2026-09-12T02:00:00", href: "/evidence?project_id=p", new: false };
+const failure: ActivityItem = { type: "mission", id: "mission-1", title: "Old failed research", subtitle: "RESEARCH-1", status: "validation_failed", occurred_at: "2026-08-20T02:00:00", href: "/missions/mission-1", new: false, viewed: false };
+const report: ActivityItem = { type: "report", id: "report-1", title: "Fresh report", subtitle: null, status: "draft", occurred_at: "2026-09-13T02:00:00", href: "/reports/report-1", new: true, viewed: false };
+const evidence: ActivityItem = { type: "evidence", id: "evidence-1", title: "12 evidence entries · DeepSearch", subtitle: "worker-run", status: null, occurred_at: "2026-09-12T02:00:00", href: "/evidence?project_id=p", new: false, viewed: true };
 
 function snapshot(): HomeSnapshot {
   const running = {
@@ -30,7 +30,7 @@ function snapshot(): HomeSnapshot {
   return {
     generated_at: "2026-09-13T02:01:00", refresh_seconds: 30,
     missions: { total: 433, by_status: { completed: 401 } },
-    activity: { generated_at: "2026-09-13T02:01:00", refresh_seconds: 30, page: 1, page_size: 10, total: 12, new_total: 2, items: [report, evidence, failure] },
+    activity: { generated_at: "2026-09-13T02:01:00", refresh_seconds: 30, page: 1, page_size: 10, total: 12, new_total: 1, items: [report, evidence, failure] },
     active_runs: { total: 1, items: [running] },
     recent_reports: { total: 201, items: [{ id: "report-1", title: "Research report", href: "/reports/report-1", updated_at: report.occurred_at }] },
     recent_projects: { total: 0, items: [] }, favorites: { total: 0, items: [] }, evidence_activity: { total: 0, items: [] },
@@ -48,9 +48,13 @@ describe("Home's recent activity", () => {
     expect(await screen.findByRole("link", { name: "433 missions" })).toHaveAttribute("href", "/missions");
     const region = screen.getByRole("region", { name: "Recent activity" });
     expect(within(region).getByText("12")).toBeVisible();
-    expect(within(region).getByText("Newest first. 2 new since you last looked.")).toBeVisible();
+    expect(within(region).getByText("Newest first. 1 new since you last looked.")).toBeVisible();
     const rows = within(region).getAllByRole("listitem");
     expect(rows.map(row => within(row).getByRole("link").textContent)).toEqual(["Fresh report", "12 evidence entries · DeepSearch", "Old failed research"]);
+    expect(within(rows[0]).getByRole("link")).toHaveClass("font-semibold");
+    expect(within(rows[1]).getByRole("link")).toHaveClass("font-normal", "text-secondary");
+    expect(within(rows[2]).getByRole("link")).toHaveClass("font-semibold");
+    expect(within(rows[2]).queryByText("New")).toBeNull();
     expect(within(rows[2]).getByText(/validation.failed/i)).toBeVisible();
     expect(within(rows[2]).getByRole("button", { name: "Mark viewed" })).toBeVisible();
     expect(within(rows[1]).queryByRole("button", { name: "Mark viewed" })).toBeNull();
@@ -75,6 +79,8 @@ describe("Home's recent activity", () => {
     fireEvent.click(screen.getByRole("button", { name: "Try again" }));
     expect(await screen.findByText("Nothing has happened yet.")).toBeVisible();
     expect(screen.queryByRole("alert")).toBeNull();
+    expect(screen.queryByRole("region", { name: "Active missions" })).toBeNull();
+    expect(screen.getByRole("region", { name: "Recent activity" }).parentElement?.className).not.toContain("xl:grid-cols");
   });
 
   it("marks an item viewed explicitly or by opening it, then refreshes from the server", async () => {
@@ -83,11 +89,11 @@ describe("Home's recent activity", () => {
     mocks.markViewed.mockResolvedValue({ viewed: 1, new_total: 1 });
     home();
     const region = await screen.findByRole("region", { name: "Recent activity" });
-    const viewedSnapshot = { ...initial, activity: { ...initial.activity, new_total: 1, items: [{ ...report, new: false }, evidence, failure] } };
+    const viewedSnapshot = { ...initial, activity: { ...initial.activity, new_total: 0, items: [{ ...report, new: false, viewed: true }, evidence, failure] } };
     mocks.get.mockResolvedValue(viewedSnapshot);
     fireEvent.click(within(region).getAllByRole("button", { name: "Mark viewed" })[0]);
     await waitFor(() => expect(mocks.markViewed).toHaveBeenCalledWith([{ type: "report", id: "report-1", occurred_at: report.occurred_at }]));
-    expect(await within(region).findByText("Newest first. 1 new since you last looked.")).toBeVisible();
+    expect(await within(region).findByText("Newest first. Nothing new since you last looked.")).toBeVisible();
     fireEvent.click(within(region).getByRole("link", { name: "Old failed research" }));
     await waitFor(() => expect(mocks.markViewed).toHaveBeenLastCalledWith([{ type: "mission", id: "mission-1", occurred_at: failure.occurred_at }]));
   });
@@ -120,3 +126,18 @@ describe("Home's recent activity", () => {
   });
 });
 import "@testing-library/jest-dom/vitest";
+
+it("marks an older unseen item from a loaded activity page seen without hiding it", async () => {
+  const data = snapshot();
+  mocks.get.mockResolvedValue(data);
+  mocks.list.mockResolvedValue({ ...data.activity, page: 2, items: [{ ...failure, id: "older", title: "Older unseen result" }] });
+  mocks.markViewed.mockResolvedValue({ viewed: 1, new_total: 1 });
+  home();
+  fireEvent.click(await screen.findByRole("button", { name: "Show more" }));
+  const title = await screen.findByRole("link", { name: "Older unseen result" });
+  const row = title.closest("li")!;
+  fireEvent.click(within(row).getByRole("button", { name: "Mark viewed" }));
+  await waitFor(() => expect(title).toHaveClass("font-normal", "text-secondary"));
+  expect(within(row).queryByRole("button", { name: "Mark viewed" })).toBeNull();
+  expect(title).toBeVisible();
+});

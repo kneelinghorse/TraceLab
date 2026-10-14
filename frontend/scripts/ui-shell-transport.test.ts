@@ -43,7 +43,7 @@ describe.each([false, true])("read-only smoke, directProduction=%s", directProdu
     expect(t.suppressedWrites).toEqual([]);
   });
 
-  it.each([["GET", "/api/v1/evidence"], ["POST", "/api/v1/pedr/search"]])("retains the existing %s read", async (method, path) => {
+  it.each([["GET", "/api/v1/evidence"], ["POST", "/api/v1/pedr/search"], ["POST", "/api/v1/activity/state"]])("allows the %s read", async (method, path) => {
     const t = setup(method, path);
     await t.handle(t.route);
     expect(t.transportErrors).toEqual([]);

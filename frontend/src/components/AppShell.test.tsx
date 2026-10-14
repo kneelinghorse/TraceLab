@@ -12,7 +12,7 @@ vi.mock("@/contexts/AuthContext", () => ({ useAuth: () => mocks.auth }));
 vi.mock("@/contexts/RoleContext", () => ({ useRole: () => mocks.role }));
 vi.mock("@/lib/api/navigation", () => ({ navigationApi: { search: async () => ({ groups: [] }) } }));
 vi.mock("@/lib/api/savedSearches", () => ({ savedSearchesApi: { list: async () => ({ items: [] }) } }));
-vi.mock("@/lib/api/activity", async original => ({ ...await original<object>(), activityApi: { summary: async () => ({ generated_at: "2026-09-13T00:00:00", new_total: mocks.activity.mission + mocks.activity.evidence + mocks.activity.report, by_type: { ...mocks.activity } }), markViewed: async () => ({ viewed: 0, new_total: 0 }) } }));
+vi.mock("@/lib/api/activity", async original => ({ ...await original<object>(), activityApi: { summary: async () => ({ generated_at: "2026-09-13T00:00:00", new_total: mocks.activity.mission + mocks.activity.evidence + mocks.activity.report, by_type: { ...mocks.activity }, completed_missions_new: mocks.activity.mission }), markViewed: async () => ({ viewed: 0, new_total: 0 }) } }));
 vi.mock("@/components/LoginPanel", () => ({ LoginPanel: () => <p>Sign in form</p> }));
 vi.mock("@/components/RegisterPanel", () => ({ RegisterPanel: () => <p>Registration form</p> }));
 
@@ -67,17 +67,19 @@ describe("the shared shell", () => {
     expect(within(nav).getAllByRole("link").map((link) => link.getAttribute("href")).filter((href) => aliases.includes(href ?? ""))).toEqual([]);
   });
 
-  it("shows new-item counts on the Missions, Evidence and Reports entries in the sidebar and the drawer, hidden at zero", async () => {
+  it("shows only the Missions completion dot in the sidebar and drawer, never counts", async () => {
     mocks.activity.mission = 2; mocks.activity.evidence = 1;
     shell();
     const nav = screen.getByRole("navigation", { name: "Main navigation" });
-    expect((await within(nav).findByRole("link", { name: "Missions, 2 new" })).getAttribute("href")).toBe("/missions");
-    expect(within(nav).getByRole("link", { name: "Evidence, 1 new" }).getAttribute("href")).toBe("/evidence");
+    expect((await within(nav).findByRole("link", { name: "Missions, new results" })).getAttribute("href")).toBe("/missions");
+    expect(within(nav).getByRole("link", { name: "Evidence" }).getAttribute("href")).toBe("/evidence");
     expect(within(nav).getByRole("link", { name: "Reports", exact: true })).toBeTruthy();
     expect(within(screen.getByRole("banner")).queryByRole("link", { name: /Inbox/ })).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Open navigation" }));
-    expect(within(screen.getByRole("dialog", { name: "Navigation" })).getByRole("link", { name: "Missions, 2 new" })).toBeTruthy();
-    expect(screen.getAllByTestId("new-count").map((badge) => badge.textContent)).toEqual(["1", "2", "1", "2"]);
+    expect(within(screen.getByRole("dialog", { name: "Navigation" })).getByRole("link", { name: "Missions, new results" })).toBeTruthy();
+    expect(screen.queryAllByTestId("new-count")).toHaveLength(0);
+    expect(screen.getAllByTestId("new-results-dot")).toHaveLength(2);
+    expect(nav.textContent).not.toMatch(/\d/);
     expect(within(nav).queryByRole("link", { name: "Inbox", exact: true })).toBeNull();
   });
 

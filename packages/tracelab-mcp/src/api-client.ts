@@ -570,6 +570,7 @@ export interface ActivityItem extends HrefEntity {
   status: string | null;
   occurred_at: string;
   new: boolean;
+  viewed: boolean;
 }
 export interface ActivityPage {
   generated_at: string;
@@ -580,7 +581,7 @@ export interface ActivityPage {
   new_total: number;
   items: ActivityItem[];
 }
-export interface ActivitySummary { generated_at: string; new_total: number; by_type: Record<string, number> }
+export interface ActivitySummary { generated_at: string; new_total: number; by_type: Record<string, number>; completed_missions_new: number }
 export type MissionSort = 'created_desc' | 'created_asc' | 'updated_desc' | 'updated_asc';
 export interface HomeSnapshot {
   missions: { total: number; by_status: Record<string, number> };
