@@ -36,5 +36,6 @@
   "backend_final": "3188 passed, 4 skipped, 12 documented deselections, 49 warnings; 493.69 seconds. Exact workflow command with isolated Qdrant.",
   "report_copy_acknowledgement": "New regression test failed before the fix: opening a mission-result copy title navigates to the mission without acknowledging the report. Added title acknowledgement; final frontend 392 tests across 47 files pass, with typecheck, ESLint, color gate and production build all passed.",
   "parity_final": "Added Reports list to the viewed-watermark consumer inventory after the acknowledgement fix.",
-  "browser_final": "All 205 workflow-enumerated cases passed after the report-copy acknowledgement fix; no skips or retries; 3.7 minutes."
+  "browser_final": "All 205 workflow-enumerated cases passed after the report-copy acknowledgement fix; no skips or retries; 3.7 minutes.",
+  "ci_receipt_correction": "Initial Secret Scan rejected four email-like values in pytest parameter names retained in backend-tests.txt. Redacted email values in the transcript and ran the complete credential and tracked-receipt email guards; application code unchanged."
 }
