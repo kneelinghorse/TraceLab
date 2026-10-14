@@ -95,7 +95,7 @@ export function ProjectDescription({ userId, projectId, projectName }: { userId:
   }
 
   const provenance = state.data?.provenance;
-  return <section className="panel space-y-4 p-5" aria-label="Project description">
+  return <section className="panel space-y-4 p-4" aria-label="Project description">
     <header>
       <h2 className="text-lg font-semibold">Describe {projectName}</h2>
       <p className="text-sm text-secondary">Draft from this project&apos;s readable material or your planning brief. You review every change.</p>

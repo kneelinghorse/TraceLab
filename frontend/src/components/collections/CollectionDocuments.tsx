@@ -23,7 +23,7 @@ export function CollectionDocuments({ collectionId, onChange }: { collectionId: 
     } catch (error) { notify(error instanceof Error ? error.message : "The document could not be removed."); }
     finally { setRemoving(null); }
   }
-  return <section className="panel mb-6 space-y-4 p-6" aria-label="Collection documents">
+  return <section className="panel mb-4 space-y-4 p-4" aria-label="Collection documents">
     {feedback}
     <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-lg font-semibold">Documents{documents.data && ` (${documents.data.total.toLocaleString()})`}</h2><Link href="/documents" className="text-sm text-accent-text underline">Browse documents to add</Link></div>
     <p className="text-sm text-secondary">Documents added here and documents with saved excerpts form the context for a seeded mission.</p>

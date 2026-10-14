@@ -89,7 +89,7 @@ export function ReportDraft({ userId, projectId, projectName }: { userId: string
   const preview = state.preview;
   const changed = Boolean(preview && (preview.title !== state.title.trim() || preview.prompt !== state.prompt.trim() || preview.format !== state.format || JSON.stringify(preview.input_chunk_ids) !== JSON.stringify(state.selected)));
 
-  return <section aria-label="Draft a report" className="panel min-w-0 space-y-4 p-5">
+  return <section aria-label="Draft a report" className="panel min-w-0 space-y-4 p-4">
     <header><h2 className="break-words text-lg font-semibold">Report from {projectName}</h2>
       <p className="text-sm text-secondary">Choose existing excerpts, review a cited draft, then save it as a Report.</p></header>
     <div className="space-y-2">

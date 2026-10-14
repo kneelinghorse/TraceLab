@@ -85,7 +85,7 @@ export function CollectionSuggestions({ userId, projectId, projectName }: { user
   }
 
   const coverage = draft?.proposal.coverage;
-  return <section className="panel min-w-0 space-y-4 p-5" aria-label="Organise research">
+  return <section className="panel min-w-0 space-y-4 p-4" aria-label="Organise research">
     <header>
       <h2 className="break-words text-lg font-semibold">Organise {projectName}</h2>
       <p className="text-sm text-secondary">Suggest collections of existing excerpts. Review exact members and save each group you choose.</p>
@@ -152,7 +152,7 @@ export function CollectionOrigin({ userId, collectionId }: { userId: string; col
   if (state.error) return <p className="text-sm text-danger" role="alert">Collection origin could not load. <button className="underline" onClick={() => void state.mutate()}>Retry</button></p>;
   const provenance = state.data?.provenance;
   if (!provenance) return null;
-  return <section className="panel space-y-3 p-5" aria-label="Collection origin">
+  return <section className="panel space-y-3 p-4" aria-label="Collection origin">
     <h2 className="font-semibold">Machine suggested · Human accepted</h2>
     <p className="text-sm text-secondary">{parseApiTimestamp(provenance.accepted_at).toLocaleString()} · {provenance.model} · {provenance.destination.space_name}</p>
     {!provenance.completed_at && <p className="text-sm text-secondary">The original save was incomplete. The collection shows its current members.</p>}

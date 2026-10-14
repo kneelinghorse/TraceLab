@@ -3,7 +3,7 @@ import Link from "next/link";
 import { evidenceHref, sourceDomain, type LedgerEntry } from "@/lib/api/evidence";
 
 export function EntryCard({ entry }: { entry: LedgerEntry }) {
-  return <article className="panel min-w-0 space-y-3 p-5">
+  return <article className="panel min-w-0 space-y-3 p-4">
     <div className="flex flex-wrap items-center gap-2 text-xs text-secondary">
       <span className="rounded-full bg-surface-alt px-2 py-1">{entry.disposition}</span>
       <span>{sourceDomain(entry.source_url)}</span>

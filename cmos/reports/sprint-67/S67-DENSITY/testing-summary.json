@@ -1,0 +1,108 @@
+{
+  "mission": "S67-DENSITY",
+  "recorded_at": "2026-10-14T01:36:08.078233+00:00",
+  "scope": "Shared page density on nine pages; no backend, API, MCP, schema, setting or server environment changes.",
+  "baseline_commit": "be9283ae322d9670cc449d253a45656a8195417f",
+  "base_after_sprint_open_merge": "b4c8d88d6d1b446035e82b7bf1bd894d3e754a74",
+  "backend": {
+    "result": "passed",
+    "passed": 3179,
+    "skipped": [
+      {
+        "test": "tests.test_auto_ingest.TestAutoIngestIntegration::test_auto_ingest_full_pipeline",
+        "reason": "Full pipeline test requires embedding service and Qdrant \u2014 chunks not created in SQLite test env"
+      },
+      {
+        "test": "tests.test_live_log_cross_service::test_real_sender_receives_replay_ack_and_streams_before_terminal",
+        "reason": "Requires explicit DeepSearch checkout; run the LOG-2 cross-service command"
+      },
+      {
+        "test": "tests.test_pedr_unified_search.TestPEDRIntegration::test_create_orchestrator_factory",
+        "reason": "Requires OpenAI + Qdrant services (orchestrator init fails without them)"
+      },
+      {
+        "test": "tests.test_pedr_unified_search.TestPEDRIntegration::test_full_search_pipeline",
+        "reason": "Requires OpenAI + Qdrant services (orchestrator init fails without them)"
+      }
+    ],
+    "deselected": 12,
+    "quarantine": ".github/ci/backend-quarantine.txt",
+    "command": "Exact Run serialized backend suite shell from .github/workflows/backend-tests.yml, run with the .venv on PATH",
+    "environment": {
+      "QDRANT_URL": "http://127.0.0.1:9",
+      "PEDR_GRAPH_TELEMETRY_ENABLED": "0"
+    },
+    "warnings": 49
+  },
+  "frontend": {
+    "unit": {
+      "passed": 385,
+      "files": 46,
+      "skipped": 0,
+      "command": "frontend/node_modules/.bin/vitest run"
+    },
+    "browser": {
+      "passed": 181,
+      "skipped": 0,
+      "retries": 0,
+      "command": "The enumerated spec list in .github/workflows/frontend-production-build.yml, using frontend/node_modules/.bin/playwright, one worker and the production artifact",
+      "density_cases": 36
+    },
+    "lint": "frontend/node_modules/.bin/eslint . --max-warnings=0; exit 0",
+    "types": "frontend/node_modules/.bin/tsc --noEmit --pretty false; exit 0",
+    "build": "npm run build (local binaries via package scripts); exit 0"
+  },
+  "guards": {
+    "foundational_refs": "passed",
+    "ruff": "No changed Python files; installed ruff is 0.8.0",
+    "reference_layouts": "No diff in mission or report detail pages",
+    "styles": "No diff in globals.css or tailwind.config.ts"
+  },
+  "visual_review": {
+    "surfaces": 9,
+    "widths": [
+      1440,
+      390
+    ],
+    "height": 900,
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "before_cases": 36,
+    "after_cases": 36,
+    "serious_or_critical_axe_findings": 0,
+    "horizontal_overflow_cases": 0,
+    "desktop_gain_range_px": [
+      56,
+      136
+    ],
+    "home_fully_visible_activity_rows": {
+      "before": 2,
+      "after": 5
+    },
+    "body_px": 16,
+    "small_text_floor_px": 14,
+    "inspected": "All nine final above-fold captures in both themes and widths, plus full-size Home, Librarian and Collection images. Phone header actions were moved below copy after visual review."
+  },
+  "postgres_integration": {
+    "passed": 171,
+    "skipped": [
+      {
+        "test": "tests.integration.test_e2e_rbac_live::test_live_rbac_matrix",
+        "reason": "set RBAC_VERIFY_BASE_URL to run against a live deploy"
+      },
+      {
+        "test": "tests.integration.test_ingestion_flow::test_markdown_cli_flow",
+        "reason": "CLI subprocess requires running server with auth \u2014 not available in test environment"
+      },
+      {
+        "test": "tests.integration.test_qdrant_isolation::test_disposable_qdrant_cache_round_trip",
+        "reason": "Requires --disposable-qdrant and local Docker"
+      }
+    ],
+    "warnings": 16,
+    "command": "QDRANT_URL=http://127.0.0.1:9 PEDR_GRAPH_TELEMETRY_ENABLED=0 .venv/bin/pytest tests/integration -v --junitxml=/tmp/tracelab-s67-integration.xml",
+    "database": "Real PostgreSQL through testcontainers"
+  }
+}

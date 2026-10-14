@@ -11,7 +11,7 @@ export function FavoriteProjects({ initial }: { initial: HomeSection<HomeRecent>
   const activePage = Math.min(page, Math.max(1, Math.ceil(initial.total / 6)));
   const response = useSWR(activePage > 1 ? ["favorites", user?.user_id, activePage] : null, () => homeApi.favorites({ page: activePage }));
   const data = activePage === 1 ? initial : response.data;
-  return <section className="panel space-y-4 p-5" aria-label="Favorite projects">
+  return <section className="panel space-y-4 p-4" aria-label="Favorite projects">
     <h2 className="text-lg font-semibold">Favorite projects <span className="text-sm text-secondary">({initial.total.toLocaleString()})</span></h2>
     {response.isLoading && <p role="status">Loading favorites…</p>}
     {response.error && <p role="alert">Favorites could not load. <button className="underline" onClick={() => void response.mutate()}>Retry favorites</button></p>}

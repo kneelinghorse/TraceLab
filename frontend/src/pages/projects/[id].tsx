@@ -1,3 +1,4 @@
+import { PageContainer, PageHeader } from "@/components/ui/PageHeader";
 import { RelationshipLink } from "@/components/graph/RelationshipLink";
 import { HttpError } from "@/lib/api/http";
 import { StatusBadge } from "@/components/ui/StatusBadge";
@@ -149,9 +150,9 @@ function ProjectDetail() {
     <AuthGate>
       {feedback}
       <div className="min-h-screen bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <PageContainer>
           {/* Breadcrumb */}
-          <nav className="mb-6">
+          <nav className="mb-4">
             <Link href="/projects" className="text-accent-text underline underline-offset-4">
               Projects
             </Link>
@@ -160,7 +161,7 @@ function ProjectDetail() {
           </nav>
 
           {/* Project Header */}
-          <div className="bg-surface border border-line rounded-lg p-6 mb-6">
+          <div className="bg-surface border border-line rounded-lg p-4 mb-4">
             {editing ? (
               <div className="space-y-4">
                 <div>
@@ -202,23 +203,7 @@ function ProjectDetail() {
               </div>
             ) : (
               <div>
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <h1 className="break-words text-2xl font-bold text-foreground">{project.name}</h1>
-                    {project.description && (
-                      <p className="mt-2 break-words text-secondary">{project.description}</p>
-                    )}
-                    <Link href={`/librarian?project=${projectId}`} className="mt-2 inline-block text-sm text-accent-text underline">
-                      Review description and its drafting history
-                    </Link>
-                    <div className="mt-4 flex flex-wrap gap-4 text-sm text-muted">
-                      <StatusBadge status={project.status || "unknown"} />
-                      {project.created_at && (
-                        <span>Created {formatDistanceToNow(parseApiTimestamp(project.created_at), { addSuffix: true })}</span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
+                <PageHeader title={project.name} description={project.description} actions={<>
                     <ProjectFavorite projectId={projectId} />
                     <button
                       onClick={startEditing}
@@ -232,8 +217,17 @@ function ProjectDetail() {
                     >
                       Delete
                     </button>
-                  </div>
-                </div>
+                  </>}>
+                    <Link href={`/librarian?project=${projectId}`} className="mt-2 inline-block text-sm text-accent-text underline">
+                      Review description and its drafting history
+                    </Link>
+                    <div className="mt-2 flex flex-wrap gap-4 text-sm text-muted">
+                      <StatusBadge status={project.status || "unknown"} />
+                      {project.created_at && (
+                        <span>Created {formatDistanceToNow(parseApiTimestamp(project.created_at), { addSuffix: true })}</span>
+                      )}
+                    </div>
+                </PageHeader>
 
               </div>
             )}
@@ -263,8 +257,8 @@ function ProjectDetail() {
           </Dialog>
 
           <TabList id="project" label="Project sections" tabs={PROJECT_TABS} value={tab} disabled={uploadBusy} onChange={next => void router.replace({ pathname: router.pathname, query: { ...router.query, tab: next } }, undefined, { shallow: true })} />
-          <div id="project-panel" role="tabpanel" aria-labelledby={`project-${tab}`} className="mt-6">
-            {tab === "Overview" ? <section className="panel space-y-5 p-5">
+          <div id="project-panel" role="tabpanel" aria-labelledby={`project-${tab}`} className="mt-4">
+            {tab === "Overview" ? <section className="panel space-y-5 p-4">
               <h2 className="text-xl font-semibold">Overview</h2>
               <p className="text-secondary">Sources, context and research outputs in one project.</p>
               {statsError ? <PageState state="error" title="Project totals could not load." onRetry={() => void mutateStats()} /> : statsLoading ? <PageState state="loading" title="Loading project totals…" /> : stats && <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -277,7 +271,7 @@ function ProjectDetail() {
               {project.methodology && <p className="break-words text-secondary">Methodology: {project.methodology}</p>}
             </section> : <ProjectResources key={`${projectId}-${tab}`} projectId={projectId} tab={tab} refreshStats={mutateStats} onBusyChange={setUploadBusy} />}
           </div>
-        </div>
+        </PageContainer>
       </div>
     </AuthGate>
   );

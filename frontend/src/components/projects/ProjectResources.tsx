@@ -55,13 +55,13 @@ export function ProjectResources({ projectId, tab, refreshStats, onBusyChange }:
   const data = response.data;
   return <div className="space-y-6">
     {feedback}
-    <section className="panel p-5">
+    <section className="panel p-4">
       <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-xl font-semibold">{tab}</h2>{data && <p className="text-sm text-secondary">{data.total.toLocaleString()} {tab.toLowerCase()}</p>}<button className="rounded border border-line px-3 py-2 text-sm" onClick={() => void refresh().catch(() => {})}>Refresh {tab.toLowerCase()}</button></div>
       {tab === "Collections" && <p className="mt-2 text-sm text-secondary">Collections containing readable documents or excerpts from this project.</p>}
       {response.error ? <PageState state="error" title={`${tab} could not load.`} onRetry={() => void response.mutate()} /> : response.isLoading ? <PageState state="loading" title={`Loading ${tab.toLowerCase()}…`} /> : data?.total === 0 ? <PageState state="empty" title={`No accessible ${tab.toLowerCase()} in this project.`} /> : data && <>
         {data.documents && <DocumentRows documents={data.documents} onDelete={id => void remove(id)} />}
         {data.evidence && <div className="mt-4 space-y-4">{data.evidence.map(entry => <EntryCard key={entry.id} entry={entry} />)}</div>}
-        {data.rows && <ul className="divide-y divide-line">{data.rows.map(row => <li key={row.id} className="flex flex-wrap items-start justify-between gap-3 py-5"><div className="min-w-0 flex-1"><Link className="block break-words font-semibold hover:text-accent-text" href={row.href}>{row.title}</Link>{row.summary && <p className="mt-2 line-clamp-3 break-words text-sm text-secondary">{row.summary}</p>}</div>{row.status && <StatusBadge status={row.status} />}</li>)}</ul>}
+        {data.rows && <ul className="divide-y divide-line">{data.rows.map(row => <li key={row.id} className="flex flex-wrap items-start justify-between gap-3 py-3"><div className="min-w-0 flex-1"><Link className="block break-words font-semibold hover:text-accent-text" href={row.href}>{row.title}</Link>{row.summary && <p className="mt-2 line-clamp-3 break-words text-sm text-secondary">{row.summary}</p>}</div>{row.status && <StatusBadge status={row.status} />}</li>)}</ul>}
         <PaginationBar label={`Project ${tab.toLowerCase()} pages`} page={page} pages={Math.ceil(data.total / PAGE_SIZE)} onChange={setPage} />
       </>}
     </section>
