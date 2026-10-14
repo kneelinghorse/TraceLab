@@ -1,0 +1,45 @@
+{
+  "mission": "S67-REPORTS",
+  "pr": "https://github.com/kneelinghorse/TraceLab/pull/428",
+  "tested_head": "e551c5789aaca2a11cd5a28462a4664ecb91c74d",
+  "merge_commit": "9ffdfe5697186e0c9930a51d0b1b762cff350436",
+  "merged_at": "2026-10-14T02:55:21Z",
+  "merged_without_admin": true,
+  "required_checks": "All nine required checks green; duplicate Secret Scan also green",
+  "ci_backend": {
+    "passed": 3185,
+    "skipped": 4,
+    "deselected": 12
+  },
+  "ci_integration": {
+    "passed": 172,
+    "skipped": 3
+  },
+  "ci_browser": {
+    "passed": 201,
+    "skipped": 0
+  },
+  "feature_commit_staged_files": 82,
+  "feature_commit_receipts": 44,
+  "deployment": "Both Railway services SUCCESS at merge SHA; deployment.json",
+  "production_verification": {
+    "status": "passed",
+    "merge_commit": "9ffdfe5697186e0c9930a51d0b1b762cff350436",
+    "railway": "Both services SUCCESS at the merge commit; deployment.json",
+    "post_deploy_check": "38503574231 success",
+    "captures": 40,
+    "live_mcp_checks": 17,
+    "reports_before": 512,
+    "reports_after": 512,
+    "missing_report_ids": 0,
+    "origin_counts": {
+      "mission": 451,
+      "written": 47,
+      "agent_brief": 12,
+      "librarian": 2
+    },
+    "default_reports": 49,
+    "read_only": true
+  },
+  "recorded_at": "2026-10-14T03:05:14.420381+00:00"
+}

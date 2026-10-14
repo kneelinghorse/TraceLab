@@ -1,0 +1,7 @@
+{
+  "completedAt": "2026-10-14T03:04:46.788Z",
+  "passed": true,
+  "captures": 40,
+  "readOnly": true,
+  "checks": "40 captures, all origin details, default and alternate lists, loaded project reports, mission-result evidence link and selected Results destination, zero serious/critical axe violations, overflow, client or transport errors"
+}

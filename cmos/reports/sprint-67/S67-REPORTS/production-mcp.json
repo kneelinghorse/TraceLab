@@ -1,0 +1,123 @@
+{
+  "checkedAt": "2026-10-14T02:58:51.483Z",
+  "readOnly": true,
+  "entry": "/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/s67-reports-package-rdh_d6aw/install/node_modules/@aquex/tracelab-mcp/dist/index.js",
+  "toolCount": 9,
+  "allReports": 512,
+  "defaultReports": 49,
+  "checks": [
+    {
+      "tool": "tracelab_report",
+      "action": "list",
+      "origin": [
+        "written"
+      ],
+      "ok": true
+    },
+    {
+      "tool": "tracelab_report",
+      "action": "get",
+      "origin": null,
+      "ok": true
+    },
+    {
+      "tool": "tracelab_report",
+      "action": "list",
+      "origin": [
+        "librarian"
+      ],
+      "ok": true
+    },
+    {
+      "tool": "tracelab_report",
+      "action": "get",
+      "origin": null,
+      "ok": true
+    },
+    {
+      "tool": "tracelab_report",
+      "action": "list",
+      "origin": [
+        "mission"
+      ],
+      "ok": true
+    },
+    {
+      "tool": "tracelab_report",
+      "action": "get",
+      "origin": null,
+      "ok": true
+    },
+    {
+      "tool": "tracelab_report",
+      "action": "list",
+      "origin": [
+        "agent_brief"
+      ],
+      "ok": true
+    },
+    {
+      "tool": "tracelab_report",
+      "action": "get",
+      "origin": null,
+      "ok": true
+    },
+    {
+      "tool": "tracelab_report",
+      "action": "list",
+      "origin": [
+        "written",
+        "librarian"
+      ],
+      "ok": true
+    },
+    {
+      "tool": "tracelab_report",
+      "action": "list",
+      "origin": null,
+      "ok": true
+    },
+    {
+      "tool": "tracelab_home",
+      "action": "snapshot",
+      "origin": null,
+      "ok": true
+    },
+    {
+      "tool": "tracelab_report",
+      "action": "get",
+      "origin": null,
+      "ok": true
+    },
+    {
+      "tool": "tracelab_report",
+      "action": "get",
+      "origin": null,
+      "ok": true
+    },
+    {
+      "tool": "tracelab_report",
+      "action": "get",
+      "origin": null,
+      "ok": true
+    },
+    {
+      "tool": "tracelab_report",
+      "action": "get",
+      "origin": null,
+      "ok": true
+    },
+    {
+      "tool": "tracelab_report",
+      "action": "get",
+      "origin": null,
+      "ok": true
+    },
+    {
+      "tool": "tracelab_report",
+      "action": "get",
+      "origin": null,
+      "ok": true
+    }
+  ]
+}
