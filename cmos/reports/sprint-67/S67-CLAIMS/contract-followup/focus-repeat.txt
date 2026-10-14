@@ -1,0 +1,54 @@
+Run 1
+
+ RUN  v4.1.11 /Users/systemsystems/portfolio/TraceLab/frontend
+
+·······
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  03:24:56
+   Duration  765ms (transform 52ms, setup 105ms, import 93ms, tests 203ms, environment 282ms)
+
+Run 2
+
+ RUN  v4.1.11 /Users/systemsystems/portfolio/TraceLab/frontend
+
+·······
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  03:24:57
+   Duration  686ms (transform 46ms, setup 63ms, import 61ms, tests 212ms, environment 175ms)
+
+Run 3
+
+ RUN  v4.1.11 /Users/systemsystems/portfolio/TraceLab/frontend
+
+·······
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  03:24:58
+   Duration  683ms (transform 49ms, setup 66ms, import 64ms, tests 196ms, environment 179ms)
+
+Run 4
+
+ RUN  v4.1.11 /Users/systemsystems/portfolio/TraceLab/frontend
+
+·······
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  03:24:59
+   Duration  603ms (transform 50ms, setup 67ms, import 66ms, tests 202ms, environment 192ms)
+
+Run 5
+
+ RUN  v4.1.11 /Users/systemsystems/portfolio/TraceLab/frontend
+
+·······
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  03:25:00
+   Duration  587ms (transform 48ms, setup 70ms, import 72ms, tests 198ms, environment 170ms)
