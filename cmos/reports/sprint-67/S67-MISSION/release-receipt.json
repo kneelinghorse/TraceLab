@@ -1,0 +1,30 @@
+{
+  "mission": "S67-MISSION",
+  "pr": "https://github.com/kneelinghorse/TraceLab/pull/430",
+  "head": "b6d4436483c03ac5fad33f045bd84be2a3cb1391",
+  "merge": "70fe74ea73fee300dec0736bc2ba5c8a0bd4ee0f",
+  "mergedAt": "2026-10-14T04:51:44Z",
+  "requiredCheckNames": 9,
+  "allRequiredPassed": true,
+  "mergeMethod": "normal squash, no admin override",
+  "ci": {
+    "backend": {
+      "passed": 3188,
+      "skipped": 4,
+      "deselected": 12,
+      "warnings": 49,
+      "seconds": 681.12
+    },
+    "postgres": {
+      "passed": 172,
+      "skipped": 3,
+      "warnings": 17,
+      "seconds": 147.06
+    },
+    "browser": {
+      "passed": 205,
+      "skipped": 0,
+      "minutes": 5.7
+    }
+  }
+}
