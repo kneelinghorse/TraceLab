@@ -59,6 +59,13 @@ import {
 
 type Mode = "converse" | "answer" | "list";
 
+const PROJECT_TOOLS = [
+  { id: "describe", name: "Describe this project", description: "Draft or update its description; you review every change" },
+  { id: "duplicates", name: "Find duplicates", description: "Review documents that look like copies" },
+  { id: "collections", name: "Suggest collections", description: "Group documents into collections" },
+  { id: "report", name: "Write a report", description: "A cited report from this project's documents" },
+] as const;
+
 function toTranscript(turns: Turn[]): TranscriptMessage[] {
   return turns.map((turn) =>
     turn.role === "user"
@@ -262,6 +269,8 @@ function LibrarianContent() {
       ? { kind: "query", query: queryText, projectId: queryProject }
       : null;
   const [projectId, setProjectId] = useState(queryProject);
+  const [projectControl, setProjectControl] = useState<"choose" | "new" | null>(null);
+  const chooserRef = useRef<HTMLDetailsElement>(null);
   const [newProjectName, setNewProjectName] = useState("");
   const [newProjectSpace, setNewProjectSpace] = useState("");
   const [creatingProject, setCreatingProject] = useState(false);
@@ -288,6 +297,7 @@ function LibrarianContent() {
   const changeProject = useCallback((id: string) => {
     requestScope.current += 1;
     setProjectId(id);
+    setProjectControl(null);
     setDraft(null);
     setDrafting(false);
     setSending(false);
@@ -305,8 +315,10 @@ function LibrarianContent() {
   }
 
   useEffect(() => {
-    if (queryProject) changeProject(queryProject);
-  }, [queryProject, changeProject]);
+    // A tool link may put the current project into the URL for the first time.
+    // Only a different URL project resets the draft; local selection stays independent.
+    if (queryProject && queryProject !== projectId) changeProject(queryProject);
+  }, [queryProject, changeProject]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => () => { requestScope.current += 1; }, []);
   useEffect(() => {
     // A list named in the URL (a link, a saved search, the /search redirect) opens in list mode.
@@ -347,6 +359,9 @@ function LibrarianContent() {
       setProjectUnavailable(true);
     }
   }, [projectId, projects.data, projects.error, project, changeProject]);
+  const tool = !focusedPlanning && !queryText && !savedId && projectReady
+    ? PROJECT_TOOLS.find(item => item.id === router.query.tool)?.id : undefined;
+  const conversationHref = { pathname: "/librarian", query: projectId ? { project: projectId } : {} };
   // Asking needs a project: an answer comes from one project's documents.
   const answering = !focusedPlanning && mode === "answer" && projectReady;
   const listing = !focusedPlanning && mode === "list";
@@ -480,7 +495,7 @@ function LibrarianContent() {
   const projectPanel = (
       <section className="panel space-y-3 p-4" aria-label="Project">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
-          <div className="flex-1">
+          {(focusedPlanning || projectControl === "choose") && <div className="min-w-0 flex-1">
             <label htmlFor="librarian-project" className="form-label">Project</label>
             <select
               id="librarian-project"
@@ -494,8 +509,8 @@ function LibrarianContent() {
                 <option key={item.id} value={item.id}>{item.name}</option>
               ))}
             </select>
-          </div>
-          <form onSubmit={createProject} className="flex flex-1 flex-col gap-2">
+          </div>}
+          {(focusedPlanning || projectControl === "new") && <form onSubmit={createProject} className="flex flex-1 flex-col gap-2">
             <div className="flex items-end gap-2">
               <div className="flex-1">
                 <label htmlFor="librarian-new-project" className="form-label">New project</label>
@@ -512,7 +527,7 @@ function LibrarianContent() {
               </button>
             </div>
             <SpacePicker value={newProjectSpace} onChange={setNewProjectSpace} />
-          </form>
+          </form>}
         </div>
         {projectUnavailable && <p role="alert" className="text-sm text-warning">The selected project is no longer available. Choose or create a project to continue; your conversation is still here.</p>}
         {projects.error && <p role="alert" className="text-sm text-danger">Projects could not load. <button type="button" className="underline" onClick={() => void projects.mutate()}>Retry</button></p>}
@@ -530,26 +545,49 @@ function LibrarianContent() {
       <Head>
         <title>{focusedPlanning ? "Plan a mission" : "Librarian"} · TraceLab</title>
       </Head>
-      <PageHeader title={focusedPlanning ? "Plan a mission" : "Librarian"} description={focusedPlanning ? "Describe your question, choose or create a project, then review the proposed mission. It stays a draft until you submit it to run." : <>Describe what you want to learn. The Librarian helps shape it into a research question, then drafts a DeepSearch mission you review and run. Or ask a question about a project&apos;s documents and get an answer that cites them, or list the chunks that match a phrase.</>}>
-        <p className="text-sm text-muted">
+      <PageHeader title={focusedPlanning ? "Plan a mission" : "Librarian"} description={focusedPlanning ? "Describe your question, choose or create a project, then review the proposed mission. It stays a draft until you submit it to run." : "Ask a question, explore your documents, or shape a research mission."}>
+        {focusedPlanning && <p className="text-sm text-muted">
           Plain text is the Librarian speaking from general knowledge. A highlighted passage is a claim about this project&apos;s documents or evidence and links to what it cites.
-        </p>
+        </p>}
         {focusedPlanning && <p className="flex flex-wrap gap-4 text-sm"><Link href="/missions/new" className="text-accent-text underline">Create manually</Link><Link href="/librarian" className="text-accent-text underline">All Librarian tools</Link></p>}
       </PageHeader>
 
-      {!orientationHidden && <LibrarianSteps current={draft ? 2 : 1} onDismiss={dismissOrientation} />}
+      {focusedPlanning && !orientationHidden && <LibrarianSteps current={draft ? 2 : 1} onDismiss={dismissOrientation} />}
 
-      {!focusedPlanning && projectPanel}
+      {!focusedPlanning && <div className="space-y-3">
+        <div className="flex min-w-0 items-center gap-3 text-sm">
+          <button type="button" aria-expanded={projectControl === "choose"} aria-label={project ? `About: ${project.name}` : "No project chosen"} title={project?.name} onClick={() => setProjectControl(current => current === "choose" ? null : "choose")} className="min-w-0 rounded-lg border border-line px-3 py-2 text-left">
+            <span className="block truncate">{project ? `About: ${project.name}` : "No project chosen"} ▾</span>
+          </button>
+          <button type="button" aria-expanded={projectControl === "new"} onClick={() => setProjectControl(current => current === "new" ? null : "new")} className="shrink-0 text-accent-text underline">New project</button>
+        </div>
+        {projectControl && projectPanel}
+        {!projectControl && projectUnavailable && <p role="alert" className="text-sm text-warning">The selected project is no longer available. Choose or create a project to continue; your conversation is still here.</p>}
+        {!projectControl && projects.error && <p role="alert" className="text-sm text-danger">Projects could not load. <button type="button" className="underline" onClick={() => void projects.mutate()}>Retry</button></p>}
+        {projectReady && <details ref={chooserRef} className="rounded-lg border border-line p-3 text-sm">
+          <summary className="cursor-pointer rounded font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent">More with this project</summary>
+          <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+            {PROJECT_TOOLS.map(item => <li key={item.id}>
+              <Link href={{ pathname: "/librarian", query: { project: projectId, tool: item.id } }} shallow scroll={false} onClick={() => { if (chooserRef.current) chooserRef.current.open = false; }} className="block rounded-lg border border-line p-3 hover:bg-surface-alt">
+                <span className="font-semibold text-accent-text">{item.name}</span><span className="mt-1 block text-secondary">{item.description}</span>
+              </Link>
+            </li>)}
+          </ul>
+        </details>}
+      </div>}
 
-      {!focusedPlanning && project && <ProjectDescription key={`description:${storageUser}:${project.id}`} userId={storageUser} projectId={project.id} projectName={project.name} />}
-      {!focusedPlanning && project && <DuplicateReview key={`duplicates:${storageUser}:${project.id}`} userId={storageUser} projectId={project.id} projectName={project.name} />}
-      {!focusedPlanning && project && <CollectionSuggestions key={`collections:${storageUser}:${project.id}`} userId={storageUser} projectId={project.id} projectName={project.name} />}
-      {!focusedPlanning && project && <ReportDraft key={`reports:${storageUser}:${project.id}`} userId={storageUser} projectId={project.id} projectName={project.name} />}
+      {tool && project && <div className="space-y-3">
+        <Link href={conversationHref} shallow scroll={false} className="text-sm text-accent-text underline">Back to conversation</Link>
+        {tool === "describe" && <ProjectDescription key={`description:${storageUser}:${project.id}`} userId={storageUser} projectId={project.id} projectName={project.name} />}
+        {tool === "duplicates" && <DuplicateReview key={`duplicates:${storageUser}:${project.id}`} userId={storageUser} projectId={project.id} projectName={project.name} />}
+        {tool === "collections" && <CollectionSuggestions key={`collections:${storageUser}:${project.id}`} userId={storageUser} projectId={project.id} projectName={project.name} />}
+        {tool === "report" && <ReportDraft key={`reports:${storageUser}:${project.id}`} userId={storageUser} projectId={project.id} projectName={project.name} />}
+      </div>}
 
-      <section className="panel p-4" aria-label="Conversation with the Librarian">
+      {!tool && <section className="panel p-4" aria-label="Conversation with the Librarian">
         {started && (
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-            <p className="text-sm text-secondary">{draft ? "Step 2 of 3 · Review the draft below" : "Step 1 of 3 · Shape it"}</p>
+            <p className="text-sm text-secondary">{focusedPlanning ? draft ? "Step 2 of 3 · Review the draft below" : "Step 1 of 3 · Shape it" : "Conversation"}</p>
             <div className="flex gap-2">
               <button type="button" onClick={() => setExpanded((value) => !value)} aria-pressed={expanded} className="rounded-lg border border-line px-3 py-1 text-xs text-secondary hover:text-foreground">
                 {expanded ? "Compact view" : "Expand transcript"}
@@ -566,7 +604,7 @@ function LibrarianContent() {
           tabIndex={0}
           aria-live="polite"
           aria-label="Transcript"
-          className={`space-y-4 overflow-y-auto pr-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus ${expanded ? "" : started ? focusedPlanning ? "min-h-32 max-h-[50vh]" : "min-h-[50vh] max-h-[75vh]" : "max-h-[60vh]"}`}
+          className={`space-y-4 overflow-y-auto pr-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus ${expanded ? "" : focusedPlanning ? started ? "min-h-32 max-h-[50vh]" : "max-h-[60vh]" : started ? "min-h-24 max-h-[24vh]" : "max-h-[24vh]"}`}
         >
           {turns.length === 0 && answering && (
             <p className="text-secondary">
@@ -580,8 +618,10 @@ function LibrarianContent() {
           )}
           {turns.length === 0 && !answering && !listing && (
             <div className="space-y-3">
-              <p className="text-secondary">Start with the question you cannot quite phrase yet. For example:</p>
-              <ul className="space-y-2">
+              <p className="text-secondary">{focusedPlanning ? "Start with the question you cannot quite phrase yet. For example:" : "Start with the question you cannot quite phrase yet."}</p>
+              <details open={focusedPlanning || undefined}>
+                <summary className={focusedPlanning ? "hidden" : "cursor-pointer text-sm text-accent-text"}>Try an example</summary>
+                <ul className="mt-2 space-y-2">
                 {STARTERS.map((starter) => (
                   <li key={starter}>
                     <button type="button" onClick={() => void send(starter)} className="w-full rounded-lg border border-line px-3 py-2 text-left text-sm text-secondary hover:border-line-strong hover:text-foreground">
@@ -589,7 +629,8 @@ function LibrarianContent() {
                     </button>
                   </li>
                 ))}
-              </ul>
+                </ul>
+              </details>
             </div>
           )}
           {turns.map((turn, index) => {
@@ -623,19 +664,11 @@ function LibrarianContent() {
         </div>
 
         {!focusedPlanning && <div className="mt-4 space-y-2 text-sm">
-          <div role="radiogroup" aria-label="How the Librarian replies" className="flex flex-wrap items-center gap-x-4 gap-y-1">
-            <label className="flex items-center gap-2">
-              <input type="radio" name="librarian-mode" value="converse" checked={!answering && !listing} onChange={() => setMode("converse")} />
-              Talk it through
-            </label>
-            <label className={`flex items-center gap-2 ${projectId ? "" : "text-muted"}`} title={projectId ? undefined : "Choose a project to ask about its documents"}>
-              <input type="radio" name="librarian-mode" value="answer" checked={answering} disabled={!projectId} onChange={() => setMode("answer")} />
-              Ask the documents
-            </label>
-            <label className="flex items-center gap-2">
-              <input type="radio" name="librarian-mode" value="list" checked={listing} onChange={() => setMode("list")} />
-              List the chunks
-            </label>
+          <div role="radiogroup" aria-label="How the Librarian replies" className="flex flex-wrap gap-1">
+            {([ ["converse", "Talk"], ["answer", "Ask the documents"], ["list", "List chunks"] ] as const).map(([value, label]) => <label key={value} className="cursor-pointer" title={value === "answer" && !projectId ? "Choose a project to ask about its documents" : undefined}>
+              <input className="peer sr-only" type="radio" name="librarian-mode" value={value} checked={value === "answer" ? answering : value === "list" ? listing : !answering && !listing} disabled={value === "answer" && !projectId} onChange={() => setMode(value)} />
+              <span className="block rounded-lg border border-line px-2 py-2 text-xs peer-checked:border-accent peer-checked:bg-accent peer-checked:text-on-accent peer-disabled:opacity-60 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-accent">{label}</span>
+            </label>)}
           </div>
           {answering && (
             <div role="radiogroup" aria-label="Answer length" className="flex flex-wrap items-center gap-x-4 gap-y-1">
@@ -689,13 +722,13 @@ function LibrarianContent() {
           </div>
         </form>
         {suggested && !draft && <p className="mt-2 text-sm text-accent-text">The Librarian thinks there is enough here for a mission.</p>}
-      </section>
+      </section>}
 
       {focusedPlanning && projectPanel}
-      {listing && listRequest && (
+      {!tool && listing && listRequest && (
         <ChunkList key={listRequest.kind === "saved" ? listRequest.savedId : `${listRequest.projectId}:${listRequest.query}`} request={listRequest} projects={projects.data ?? []} />
       )}
-      {draft && projectReady && <DraftPanel draft={draft} creating={creating} disabled={sending || drafting} onCreate={() => void createMission()} onDismiss={() => setDraft(null)} panelRef={draftPanelRef} />}
+      {!tool && draft && projectReady && <DraftPanel draft={draft} creating={creating} disabled={sending || drafting} onCreate={() => void createMission()} onDismiss={() => setDraft(null)} panelRef={draftPanelRef} />}
       {feedback}
     </PageContainer>
   );

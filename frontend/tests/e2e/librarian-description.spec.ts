@@ -34,12 +34,17 @@ for (const theme of ["light", "dark"]) for (const width of [390, 820, 1440]) {
       }
       await route.fulfill({ json });
     });
-    await page.goto("/librarian?project=project");
+    await page.goto("/librarian?project=project&tool=describe");
     await expect(page.getByText(original)).toBeVisible();
     expect(generations).toBe(0);
     await page.getByLabel("What should the description explain?").fill("Describe the onboarding study");
     await page.getByRole("button", { name: "Draft description", exact: true }).click();
     await expect(page.getByRole("region", { name: "Review description" })).toBeFocused();
+    // The reviewed proposal survives a trip to the conversation without another generation.
+    await page.getByRole("link", { name: "Back to conversation" }).click();
+    await expect(page.getByRole("textbox", { name: "Message the Librarian" })).toBeVisible();
+    await page.getByText("More with this project", { exact: true }).click();
+    await page.getByRole("link", { name: /^Describe this project/ }).click();
     await page.reload();
     await expect(page.getByLabel("Proposed description (editable)")).toHaveValue(/onboarding steps/);
     expect(generations).toBe(1);

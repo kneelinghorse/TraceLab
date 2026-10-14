@@ -11,7 +11,8 @@ const report = { id: "density-report", title: "Research findings", report_type: 
 const entry = { id: "density-entry", project_id: project.id, session_key: "research-session", source_id: "source", source_url: "https://example.test/source", claim: "A finding supported by primary evidence.", disposition: "supporting", tags: [], created_at: stamp };
 const surfaces = [
   { name: "home", url: "/", row: 'ol[aria-label="Activity items"] > li' },
-  { name: "librarian", url: `/librarian?project=${project.id}`, row: 'section[aria-label="Project"]' },
+  // S67-LIBRARIAN makes the conversation the first working surface; project controls are collapsed.
+  { name: "librarian", url: `/librarian?project=${project.id}`, row: 'section[aria-label="Conversation with the Librarian"]' },
   { name: "projects", url: "/projects", row: `main a.group[href="/projects/${project.id}"]` },
   { name: "project", url: `/projects/${project.id}`, row: '#project-panel section' },
   { name: "missions", url: "/missions", row: 'section[aria-label="Mission list"] li' },

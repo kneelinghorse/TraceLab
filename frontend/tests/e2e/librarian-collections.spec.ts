@@ -36,7 +36,7 @@ for (const theme of ["light", "dark"]) for (const width of [390, 820, 1440]) {
       }
       await route.fulfill({ json });
     });
-    await page.goto("/librarian?project=project");
+    await page.goto("/librarian?project=project&tool=collections");
     await page.getByLabel("How should the research be organised?").fill("Group feedback by pain point");
     expect(drafts).toBe(0); expect(accepts).toEqual([]);
     await page.getByRole("button", { name: "Suggest collections" }).click();
@@ -47,6 +47,11 @@ for (const theme of ["light", "dark"]) for (const width of [390, 820, 1440]) {
     await page.getByRole("checkbox", { name: "Include excerpt 2 in collection 1", exact: true }).uncheck();
     await second.getByRole("button", { name: "Dismiss group" }).click();
     expect(accepts).toEqual([]);
+    // The reviewed proposal survives a trip to the conversation without another generation.
+    await page.getByRole("link", { name: "Back to conversation" }).click();
+    await expect(page.getByRole("textbox", { name: "Message the Librarian" })).toBeVisible();
+    await page.getByText("More with this project", { exact: true }).click();
+    await page.getByRole("link", { name: /^Suggest collections/ }).click();
     await page.reload();
     await expect(page.getByLabel("Collection name 1", { exact: true })).toHaveValue("Reviewed onboarding feedback");
     expect(drafts).toBe(1);
