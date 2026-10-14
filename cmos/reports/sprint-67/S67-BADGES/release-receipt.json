@@ -1,0 +1,52 @@
+{
+  "mission": "S67-BADGES",
+  "pr": "https://github.com/kneelinghorse/TraceLab/pull/429",
+  "tested_head": "98f74a56860bd76652d013f2b05e5faba39dda0e",
+  "merge_commit": "5a7a69f6ac9c404ef8dcfe8e25d4084ff3090154",
+  "merged_at": "2026-10-14T04:01:01Z",
+  "merged_without_admin": true,
+  "required_checks": "All nine required checks green; duplicate Secret Scan also green",
+  "ci_backend": {
+    "passed": 3188,
+    "skipped": 4,
+    "deselected": 12,
+    "warnings": 49,
+    "seconds": 713.34
+  },
+  "ci_integration": {
+    "passed": 172,
+    "skipped": 3,
+    "warnings": 17,
+    "seconds": 129.86
+  },
+  "ci_browser": {
+    "passed": 205,
+    "skipped": 0
+  },
+  "feature_commit_staged_files": 78,
+  "feature_commit_receipts": 38,
+  "receipt_correction_commit": "98f74a56860bd76652d013f2b05e5faba39dda0e",
+  "deployment": "Both Railway services SUCCESS at exact merge commit; deployment.json",
+  "production_verification": {
+    "status": "passed",
+    "post_deploy_check": 38509222558,
+    "captures": 16,
+    "live_mcp_checks": 19,
+    "read_only": true,
+    "sampled_row_states": {
+      "seen": 21,
+      "unseen": 19,
+      "new": 0
+    }
+  },
+  "registry_publication": {
+    "version": "2.2.0",
+    "status": "published and verified",
+    "fresh_stdio_checks": 71,
+    "byte_identical": true,
+    "verified_at": "2026-10-14T04:13:10.904544+00:00"
+  },
+  "recorded_at": "2026-10-14T04:01:35.146682+00:00",
+  "post_deploy_receipt_commit": "1b88a86",
+  "post_deploy_staged_files": 26
+}

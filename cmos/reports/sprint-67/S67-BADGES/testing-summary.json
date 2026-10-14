@@ -87,7 +87,7 @@
     "empty_directory": true,
     "empty_cache": true,
     "version": "2.2.0",
-    "registry_publish": "pending merge,deploy and npm browser sign-in"
+    "registry_publish": "Published 2.2.0 after Derek browser approval; empty-directory/empty-cache registry install passed 71 stdio checks and registry tarball is byte-identical to tested pack."
   },
   "ruff": {
     "version": "0.8.0",
@@ -102,5 +102,16 @@
     "actions": 50,
     "operations": 119
   },
-  "production": "pending merge and both Railway deployments"
+  "production": {
+    "status": "passed",
+    "post_deploy_check": 38509222558,
+    "captures": 16,
+    "live_mcp_checks": 19,
+    "read_only": true,
+    "sampled_row_states": {
+      "seen": 21,
+      "unseen": 19,
+      "new": 0
+    }
+  }
 }

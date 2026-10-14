@@ -72,9 +72,11 @@ for (const theme of ["light", "dark"] as const) for (const width of [390, 820, 1
     state.status = "completed"; state.completed_at = state.updated_at; state.result_markdown = "# Research result\nA measured finding with a primary source.";
     await page.getByRole("button", { name: "Refresh", exact: true }).click();
     await expect(page.getByRole("button", { name: "Re-run", exact: true })).toBeVisible();
-    await page.getByRole("tab", { name: "Results", exact: true }).click();
+    await expect(page.getByRole("tab", { name: "Details", exact: true })).toHaveAttribute("aria-selected", "true");
+    await page.getByRole("link", { name: "Results ready", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Research result", exact: true })).toBeVisible();
     await accessible(page);
+    await page.screenshot({ path: info.outputPath("results.png"), fullPage: true });
     await page.getByRole("tab", { name: "Evidence", exact: true }).click();
     await page.getByRole("link", { name: entry.claim, exact: true }).click();
     await expect(page).toHaveURL(/\/evidence\/evidence-1$/);
@@ -91,9 +93,8 @@ for (const theme of ["light", "dark"] as const) for (const width of [390, 820, 1
     expect(writes.some(write => write.body?.status === "completed")).toBe(false);
   });
 }
-test("the mission Results tab is addressable by URL so it can be linked and captured", async ({ page }) => {
-  // The tab was local component state, so /missions/{id} always rendered the Run tab and the
-  // route baseline could never photograph rendered results at all (next-step #340).
+test("mission status defaults, explicit links and browser history preserve the chosen tab", async ({ page }, info) => {
+  // Completed missions default to Results while explicit tabs remain shareable and navigable.
   const state = {
     id: "run-2", mission_id: "UX6-RESULTS", title: "Completed research", objective: "Find primary evidence",
     success_criteria: ["Cite primary sources"], project_id: project, project_name: "Research", status: "completed",
@@ -125,11 +126,41 @@ test("the mission Results tab is addressable by URL so it can be linked and capt
   await page.reload();
   await expect(page.getByRole("tab", { name: "Results" })).toHaveAttribute("aria-selected", "true");
 
-  // Selecting a tab writes the URL, and returning to the default cleans it up again.
-  await page.getByRole("tab", { name: "Run" }).click();
-  await expect(page).toHaveURL(/\/missions\/run-2$/);
+  // Each tab adds history; the completed default has a clean URL.
+  await page.getByRole("tab", { name: "Details" }).click();
+  await expect(page).toHaveURL(/\/missions\/run-2\?tab=overview$/);
+  await expect(page.getByRole("region", { name: "Scope outcome" })).toBeVisible();
   await page.getByRole("tab", { name: "Results" }).click();
-  await expect(page).toHaveURL(/\/missions\/run-2\?tab=results$/);
+  await expect(page).toHaveURL(/\/missions\/run-2$/);
+  await expect(page.getByRole("region", { name: "Scope outcome" })).toBeHidden();
+  await page.goBack();
+  await expect(page).toHaveURL(/\/missions\/run-2\?tab=overview$/);
+  await expect(page.getByRole("tab", { name: "Details" })).toHaveAttribute("aria-selected", "true");
+  await page.goForward();
+  await expect(page.getByRole("tab", { name: "Results" })).toHaveAttribute("aria-selected", "true");
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/missions/run-2");
+  const firstLine = page.getByRole("heading", { name: "Findings", exact: true });
+  await expect(firstLine).toBeVisible();
+  const box = await firstLine.boundingBox();
+  expect(box!.y).toBeGreaterThan(0);
+  expect(box!.y + box!.height).toBeLessThan(900);
+  await page.screenshot({ path: info.outputPath("completed-above-fold.png"), fullPage: true });
+  await page.getByRole("link", { name: "View Details", exact: true }).click();
+  await expect(page.getByRole("region", { name: "Scope outcome" })).toBeVisible();
+  for (const status of ["draft", "queued", "in_progress", "completed", "blocked", "cancelled", "validation_failed"]) {
+    state.status = status;
+    await page.goto("/missions/run-2");
+    const first = status === "draft" ? "Plan" : ["queued", "in_progress"].includes(status) ? "Progress" : "Details";
+    await expect(page.getByRole("tab", { name: first, exact: true })).toHaveAttribute("aria-selected", String(status !== "completed"));
+    await expect(page.getByRole("tab", { name: "Results", exact: true })).toHaveAttribute("aria-selected", String(status === "completed"));
+    if (status === "draft") await expect(page.getByText("Ready to run", { exact: true })).toBeVisible();
+    await page.screenshot({ path: info.outputPath(`${status}-default.png`), fullPage: true });
+    await page.getByRole("tab", { name: "Results", exact: true }).click();
+    await expect(page).toHaveURL(status === "completed" ? /\/missions\/run-2$/ : /\/missions\/run-2\?tab=results$/);
+    await page.getByRole("tab", { name: first, exact: true }).click();
+    await expect(page).toHaveURL(status === "completed" ? /\/missions\/run-2\?tab=overview$/ : /\/missions\/run-2$/);
+  }
 });
 
 test("the retired /missions/queue alias is gone rather than silently redirecting", async ({ request }) => {

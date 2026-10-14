@@ -8,5 +8,6 @@
   "sha512": "f5599aeb09b743336c3eaccd043345d592fc7e531ed589eb2b7c8707361140f56dc6ed91674f93a986b4ab278314003713c4249c6831d49f6d6a47d236a48801",
   "integrity": "sha512-9Vma6wm3QzNsPqzNBDNF1ZL8flMe1YnrK3yHBzYRQPVtxu2RZ0+TqYa0qyeDFAA3E8QknGgx1J9takfSNqSIAQ==",
   "stdio_checks": 71,
-  "registry_publish": "pending merged deployment and Derek npm browser sign-in"
+  "registry_publish": "Published and verified; registry-verification.json",
+  "registry_verified_at": "2026-10-14T04:13:10.904544+00:00"
 }

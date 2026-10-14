@@ -1,0 +1,52 @@
+[
+  {
+    "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/38507893301/job/115669834088",
+    "name": "backend-suite",
+    "state": "SUCCESS"
+  },
+  {
+    "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/38507893312/job/115669822903",
+    "name": "backend-integration",
+    "state": "SUCCESS"
+  },
+  {
+    "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/38507893308/job/115669475845",
+    "name": "build-frontend-production",
+    "state": "SUCCESS"
+  },
+  {
+    "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/38507893303/job/115669475787",
+    "name": "Secret Scan",
+    "state": "SUCCESS"
+  },
+  {
+    "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/38507893300/job/115669476278",
+    "name": "lint",
+    "state": "SUCCESS"
+  },
+  {
+    "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/38507893304/job/115669475837",
+    "name": "ruff-diff",
+    "state": "SUCCESS"
+  },
+  {
+    "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/38507893300/job/115669476005",
+    "name": "vitest",
+    "state": "SUCCESS"
+  },
+  {
+    "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/38507893302/job/115669475624",
+    "name": "mcp-package",
+    "state": "SUCCESS"
+  },
+  {
+    "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/38507893300/job/115669476280",
+    "name": "type-check",
+    "state": "SUCCESS"
+  },
+  {
+    "link": "https://github.com/kneelinghorse/TraceLab/actions/runs/38507888680/job/115669462019",
+    "name": "Secret Scan",
+    "state": "SUCCESS"
+  }
+]

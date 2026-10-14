@@ -50,6 +50,7 @@ for (const theme of ["light", "dark"]) for (const width of [390, 820, 1440]) {
       const protocol = { report_metadata: { references: 2, forensic: { authored_scope: { policy: contract.authored_scope, policy_sha256: audit.policy_sha256 }, authored_scope_validation: audit, original_synthesis: { ...audit.pre_render, text: read(output.pre_render) } } } };
       current = { id: "scope", mission_id: "S64-FIXTURE", title: "Authored scope acceptance", objective: contract.objective, success_criteria: contract.success_criteria, project_id: project, status: output.mission_outcome === "complete" ? "completed" : "validation_failed", tags: [], deliverables: [], context: {}, metadata: {}, research_phases: {}, execution_metadata: { quality_record: { report_word_count: 9999 }, final_outcome: { authored_scope_validation: audit, delivery_quality: output.delivery_quality, quality_gate_failures: ["independent_quality_warning"] } }, result_protocol: protocol, result_markdown: markdown, result_document_ids: [], result_report_id: null, created_at: "2026-10-01T00:00:00Z", updated_at: "2026-10-01T00:00:00Z" };
       await page.goto("/missions/scope");
+      await page.getByRole("tab", { name: "Details", exact: true }).click();
       const panel = page.getByRole("region", { name: "Scope outcome" });
       await expect(panel.getByText(`${audit.persisted.words} words · 300–500 words requested`)).toBeVisible();
       await expect(panel.getByText(`${audit.consulted_count} · maximum 2`)).toBeVisible();
@@ -71,7 +72,7 @@ for (const theme of ["light", "dark"]) for (const width of [390, 820, 1440]) {
       await accessible(page);
       await page.screenshot({ path: info.outputPath(`${output.name}.png`), fullPage: true });
     }
-    await page.getByRole("tab", { name: "Run", exact: true }).click();
+    await page.getByRole("tab", { name: "Details", exact: true }).click();
     await page.getByRole("button", { name: "Preview contract", exact: true }).click();
     await expect(page.getByText(/Preview temporarily unavailable/)).toBeVisible();
     await page.getByRole("button", { name: "Preview contract", exact: true }).click();
