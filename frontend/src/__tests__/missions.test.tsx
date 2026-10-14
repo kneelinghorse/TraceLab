@@ -12,7 +12,7 @@ vi.mock("@/lib/api/http", async importOriginal => ({ ...await importOriginal<obj
 vi.mock("@/components/AuthGate", () => ({ AuthGate: ({ children }: { children: ReactNode }) => children }));
 vi.mock("@/components/evidence/EvidencePanel", () => ({ EvidencePanel: () => <p>Linked evidence entries</p> }));
 vi.mock("@/contexts/AuthContext", () => ({ useAuth: () => ({ user: { user_id: "reader" } }) }));
-// The mission detail tab is URL-addressable, so the page calls router.replace (next-step #340).
+// Mission tab navigation keeps the URL and browser history in sync.
 vi.mock("next/router", () => ({ useRouter: () => ({ query: mocks.query, pathname: "/missions/[id]", push: mocks.push, replace: mocks.replace }) }));
 import MissionsPage from "@/pages/missions";
 import MissionDetailPage from "@/pages/missions/[id]";
@@ -49,6 +49,10 @@ it.each(["draft", "queued", "in_progress", "completed", "blocked", "cancelled", 
   mocks.query = { id: "run-1" }; mocks.get.mockResolvedValue(mission(status));
   mount(<MissionDetailPage />);
   expect(await screen.findByRole("heading", { name: "Inspect research" })).toBeVisible();
+  const first = status === "draft" ? "Plan" : ["queued", "in_progress"].includes(status) ? "Progress" : "Details";
+  expect(screen.getByRole("tab", { name: first })).toHaveAttribute("aria-selected", String(status !== "completed"));
+  expect(screen.getByRole("tab", { name: "Results" })).toHaveAttribute("aria-selected", String(status === "completed"));
+  if (status === "draft") expect(screen.getByText("Ready to run")).toBeVisible();
   expect(Boolean(screen.queryByRole("button", { name: "Submit to DeepSearch" }))).toBe(status === "draft");
   expect(Boolean(screen.queryByRole("button", { name: "Edit Mission" }))).toBe(status === "draft");
   expect(Boolean(screen.queryByRole("button", { name: "Cancel run" }))).toBe(["queued", "in_progress"].includes(status));
@@ -129,4 +133,27 @@ it.each([
   expect(within(title).queryAllByTestId("new-activity-dot")).toHaveLength(state.new ? 1 : 0);
   expect(mocks.state).toHaveBeenCalledWith([{ type: "mission", id: "run-1" }]);
   expect(mocks.markViewed).not.toHaveBeenCalled();
+});
+
+it("keeps explicit tabs and uses the status default for clean URLs without replacing history", async () => {
+  mocks.query = { id: "run-1", tab: "overview", from: "home" }; mocks.get.mockResolvedValue(mission("completed"));
+  mount(<MissionDetailPage />);
+  expect(await screen.findByRole("tab", { name: "Details" })).toHaveAttribute("aria-selected", "true");
+  fireEvent.click(screen.getByRole("tab", { name: "Results" }));
+  expect(screen.getByText("A sourced result")).toBeVisible();
+  expect(mocks.push).toHaveBeenLastCalledWith({ pathname: "/missions/[id]", query: { id: "run-1", from: "home" } }, undefined, { shallow: true });
+  fireEvent.click(screen.getByRole("tab", { name: "Details" }));
+  expect(mocks.push).toHaveBeenLastCalledWith({ pathname: "/missions/[id]", query: { id: "run-1", from: "home", tab: "overview" } }, undefined, { shallow: true });
+  expect(mocks.replace).not.toHaveBeenCalled();
+});
+it("keeps the live view when a mission finishes and offers Results ready without jumping", async () => {
+  mocks.query = { id: "run-1" }; mocks.get.mockResolvedValue(mission("in_progress"));
+  mount(<MissionDetailPage />);
+  expect(await screen.findByRole("tab", { name: "Progress" })).toHaveAttribute("aria-selected", "true");
+  mocks.get.mockResolvedValue(mission("completed"));
+  fireEvent.click(screen.getByRole("button", { name: "Refresh", exact: true }));
+  expect(await screen.findByRole("link", { name: "Results ready" })).toBeVisible();
+  expect(screen.getByRole("tab", { name: "Details" })).toHaveAttribute("aria-selected", "true");
+  expect(screen.getByText("A sourced result")).not.toBeVisible();
+  expect(mocks.push).not.toHaveBeenCalled();
 });

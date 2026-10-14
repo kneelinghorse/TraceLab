@@ -1,0 +1,11 @@
+{
+  "mission": "S67-MISSION",
+  "recorded_at": "2026-10-14T04:34:07.730845+00:00",
+  "red": "Nine of eighteen mission unit tests failed against the old implementation: status labels/defaults, URL history and live completion.",
+  "targeted": "All eighteen mission unit tests passed after implementation.",
+  "frontend_invocation_correction": "The first full Vitest run used repository-root cwd with --root frontend. Fixture files and subprocess scripts use process.cwd(), so four files failed. Re-ran from frontend cwd: 395 tests across 47 files passed; types, lint, token gate and production build passed.",
+  "frontend_warning": "The report title click unit test emitted jsdom navigation-not-implemented output; assertions passed. Browser navigation is checked with Playwright.",
+  "decision": "Decision633 supersedes632: mission-keyed local selection, browser current URL reconciles history; live completion does not jump.",
+  "backend": "Exact CI invocation passed3188,4 existing skips,12 quarantine deselections; real PostgreSQL sequentially passed172,3 existing skips.",
+  "browser": "Initial full205 passed, but capture rerun exposed fast Back race. URL correct, selected tab stale. Repeated regression failed3/3; route-completion-only repair failed3/5. Browser-current-URL reconciliation on popstate and route completion passed5/5 without sleeps. Full205 final enumeration running. Final full enumeration passed205,0 skips,0 retries in228.592seconds."
+}

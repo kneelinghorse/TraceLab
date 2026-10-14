@@ -1,0 +1,102 @@
+{
+  "mission": "S67-MISSION",
+  "generated_at": "2026-10-14T04:37:53.182404+00:00",
+  "backend": {
+    "status": "passed",
+    "invocation_source": ".github/workflows/backend-tests.yml",
+    "invocation": "set -euo pipefail\n\ndeselect_args=()\nquarantine_count=0\nwhile IFS= read -r line; do\n  [[ -z \"$line\" || \"$line\" == \\#* ]] && continue\n  node_id=\"${line%% \\#*}\"\n  if [[ \"$node_id\" == \"$line\" ]]; then\n    echo \"Quarantine row is missing its reason: $line\" >&2\n    exit 1\n  fi\n  deselect_args+=(\"--deselect=$node_id\")\n  ((quarantine_count += 1))\ndone < .github/ci/backend-quarantine.txt\n\nif [[ \"$quarantine_count\" -ne 12 ]]; then\n  echo \"Expected 12 quarantined nodes, found $quarantine_count\" >&2\n  exit 1\nfi\n\nmkdir -p test-results\npytest_output=\"test-results/backend-suite.log\"\npython scripts/run_pytest.py --timeout-seconds 2100 --grace-seconds 20 -- --ignore=tests/integration --durations=25 --junitxml=test-results/backend-suite.xml \"${deselect_args[@]}\" 2>&1 | tee \"$pytest_output\"\n\nif ! grep -Eq '(^|, )12 deselected(,| in )' \"$pytest_output\"; then\n  echo \"Pytest did not report exactly 12 deselected tests.\" >&2\n  exit 1\nfi\n",
+    "environment": {
+      "QDRANT_URL": "http://127.0.0.1:9",
+      "PEDR_GRAPH_TELEMETRY_ENABLED": "0"
+    },
+    "quarantine": "# CI-1 backend quarantine: 12 exact node IDs after RECOVER-2.\n# Format is NODE_ID # one-line reason. The backend workflow requires a reason on every row.\n# Tests remain collected and tracked; this list is a temporary ratchet, never a deletion list.\n# SQLite foreign-key enforcement remains off in the shared non-integration harness (out of CI-1 scope).\n# Baseline evidence and promotion policy: .github/ci/README.md.\n\ntests/sprint_03/test_api_stability.py::test_api_uptime_and_latency_meet_targets # Historical Sprint-03 evaluator reads unwrapped telemetry and finds no uptime data points.\ntests/sprint_03/test_evidence_integrity.py::test_evidence_integrity_checks_detect_missing_chunks # Historical Sprint-03 evaluator reads unwrapped telemetry and reports zero relevance.\ntests/sprint_03/test_quality_gate_effectiveness.py::test_quality_gate_failures_blocked_with_actionable_feedback # Historical Sprint-03 evaluator does not unwrap the preserved TelemetryEnvelope; actionable_ratio is zero.\ntests/sprint_03/test_validation_coverage.py::test_validation_rate_exceeds_target # Historical Sprint-03 evaluator does not unwrap telemetry; mission_id and validation layers are missing.\ntests/sprint_04/test_coverage_metric.py::test_coverage_threshold_exceeded # Historical Sprint-04 coverage evaluator finds no coverage event in its telemetry fixture.\ntests/sprint_04/test_performance_metrics.py::test_latency_stays_under_two_seconds # Historical Sprint-04 evaluator raises Latency telemetry missing; it does not unwrap envelopes.\ntests/sprint_04/test_performance_metrics.py::test_cost_profile_within_budget # Historical Sprint-04 evaluator raises Cost telemetry missing; it does not unwrap envelopes.\ntests/sprint_04/test_quality_and_load.py::test_quality_checks_block_and_pass # Historical Sprint-04 evaluator cannot find the enveloped quality event in its fixture.\ntests/sprint_04/test_quality_and_load.py::test_load_test_supports_target_concurrency # Historical Sprint-04 evaluator raises Load test telemetry missing; it does not unwrap envelopes.\ntests/sprint_04/test_tech_debt.py::test_playwright_migration_eliminates_cypress_cost # Historical Sprint-04 evaluator cannot find the enveloped tech-debt event in its fixture.\ntests/test_admin_dashboard.py::test_metrics_aggregator_generates_sections # S62-OBS freezes the 2025 fixture clock and this test passes explicitly; retain until the existing 12-node quarantine ratchet is deliberately revised.\ntests/test_document_ingestion.py::test_upload_and_process_endpoints_record_statuses # Document detail fixture expects processing_events, which the current DocumentResponse does not expose (KeyError).\n",
+    "passed": 3188,
+    "skipped": 4,
+    "deselected": 12,
+    "failures": 0,
+    "errors": 0,
+    "warnings": 49,
+    "seconds": 504.43,
+    "skipped_tests": [
+      {
+        "test": "tests.test_auto_ingest.TestAutoIngestIntegration.test_auto_ingest_full_pipeline",
+        "reason": "Full pipeline test requires embedding service and Qdrant \u2014 chunks not created in SQLite test env"
+      },
+      {
+        "test": "tests.test_live_log_cross_service.test_real_sender_receives_replay_ack_and_streams_before_terminal",
+        "reason": "Requires explicit DeepSearch checkout; run the LOG-2 cross-service command"
+      },
+      {
+        "test": "tests.test_pedr_unified_search.TestPEDRIntegration.test_create_orchestrator_factory",
+        "reason": "Requires OpenAI + Qdrant services (orchestrator init fails without them)"
+      },
+      {
+        "test": "tests.test_pedr_unified_search.TestPEDRIntegration.test_full_search_pipeline",
+        "reason": "Requires OpenAI + Qdrant services (orchestrator init fails without them)"
+      }
+    ],
+    "final_verification": "Exact CI invocation passed; no backend code changed in this mission."
+  },
+  "integration": {
+    "status": "passed",
+    "passed": 172,
+    "skipped": 3,
+    "failed": 0,
+    "warnings": 16,
+    "seconds": 101.27,
+    "skipped_tests": [
+      {
+        "test": "tests.integration.test_e2e_rbac_live.test_live_rbac_matrix",
+        "reason": "set RBAC_VERIFY_BASE_URL to run against a live deploy"
+      },
+      {
+        "test": "tests.integration.test_ingestion_flow.test_markdown_cli_flow",
+        "reason": "CLI subprocess requires running server with auth \u2014 not available in test environment"
+      },
+      {
+        "test": "tests.integration.test_qdrant_isolation.test_disposable_qdrant_cache_round_trip",
+        "reason": "Requires --disposable-qdrant and local Docker"
+      }
+    ]
+  },
+  "frontend": {
+    "unit": {
+      "passed": 395,
+      "files": 47,
+      "skipped": 0
+    },
+    "playwright": {
+      "total": 205,
+      "expected": 205,
+      "passed": 205,
+      "failed": 0,
+      "skipped": 0,
+      "interrupted": 0,
+      "durationSeconds": 228.592,
+      "retries": 0
+    },
+    "history_regression": {
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0,
+      "repeat_each": 5
+    },
+    "production_build": "passed",
+    "types": "passed",
+    "lint": "passed",
+    "token_gate": "passed"
+  },
+  "ruff": {
+    "version": "0.8.0",
+    "changed_python_files": 0,
+    "status": "No Python changes; not applicable"
+  },
+  "foundational_references": "passed",
+  "secret_scan": "Passed credential and receipt-email guards after staging.",
+  "mcp_parity": {
+    "status": "passed",
+    "tools": 9,
+    "actions": 50,
+    "operations": 119
+  }
+}

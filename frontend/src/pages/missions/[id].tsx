@@ -1,4 +1,4 @@
-import { ScopeOutcomePanel } from "@/components/missions/AuthoredScope";
+import { ScopeOutcomeNotice, ScopeOutcomePanel } from "@/components/missions/AuthoredScope";
 import { RelationshipLink } from "@/components/graph/RelationshipLink";
 import { parseApiTimestamp } from "@/lib/api/timestamps";
 import { StatusBadge } from "@/components/ui/StatusBadge";
@@ -39,23 +39,44 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function MissionDetailContent() {
   const router = useRouter();
   const missionId = typeof router.query.id === "string" ? router.query.id : undefined;
-  // The tab lives in the URL so a Results view can be linked, reloaded and captured by the
-  // route baseline, which previously could only ever photograph the Run tab (next-step #340).
-  // The URL is the entry point and local state is the interaction state: router.replace is
-  // async, so deriving the tab from the query alone would lag visibly on every click.
-  const urlTab = MISSION_TABS.includes(router.query.tab as MissionTab) ? (router.query.tab as MissionTab) : "overview";
-  const [detailTab, setTab] = useState<MissionTab>(urlTab);
-  useEffect(() => { setTab(urlTab); }, [urlTab]);
-  const setDetailTab = useCallback((tab: string) => {
-    setTab(tab as MissionTab);
-    // Keep the default view's URL clean; other params (filters, anchors) survive. Setting
-    // tab to undefined is not enough: Next keeps the key and emits a bare "?tab=".
-    const query: typeof router.query = Object.fromEntries(
-      Object.entries(router.query).filter(([key]) => key !== "tab"),
-    );
-    if (tab !== "overview") query.tab = tab;
-    void router.replace?.({ pathname: router.pathname, query }, undefined, { shallow: true });
-  }, [router]);
+  const { mission, isLoading, error, refresh } = useApiMission(missionId);
+  const urlTab = MISSION_TABS.includes(router.query.tab as MissionTab) ? router.query.tab as MissionTab : undefined;
+  const defaultTab: MissionTab = mission?.status === "completed" ? "results" : "overview";
+  const [selection, setSelection] = useState<{ missionId: string; tab: MissionTab } | null>(null);
+  // Local selection makes clicks immediate and preserves the view on live completion.
+  const detailTab = selection?.missionId === missionId && selection ? selection.tab : urlTab ?? defaultTab;
+  useEffect(() => {
+    if (!mission?.id || !missionId) return;
+    setSelection(current => current?.missionId === missionId ? current : { missionId, tab: urlTab ?? defaultTab });
+  }, [mission?.id, missionId, urlTab, defaultTab]);
+  useEffect(() => {
+    if (!mission?.id || !missionId) return;
+    // Back can arrive before a shallow push finishes. Read the browser's current URL,
+    // not the completing navigation's stale URL, and handle popstate immediately.
+    const restoreTab = () => {
+      const value = new URL(window.location.href).searchParams.get("tab");
+      const nextTab = MISSION_TABS.includes(value as MissionTab) ? value as MissionTab : defaultTab;
+      setSelection({ missionId, tab: nextTab });
+    };
+    router.events?.on("routeChangeComplete", restoreTab);
+    window.addEventListener("popstate", restoreTab);
+    return () => {
+      router.events?.off("routeChangeComplete", restoreTab);
+      window.removeEventListener("popstate", restoreTab);
+    };
+  }, [router.events, mission?.id, missionId, defaultTab]);
+  const rememberTab = useCallback((tab: MissionTab) => {
+    if (missionId) setSelection({ missionId, tab });
+  }, [missionId]);
+  const tabHref = useCallback((tab: MissionTab) => {
+    const query: typeof router.query = Object.fromEntries(Object.entries(router.query).filter(([key]) => key !== "tab"));
+    if (tab !== defaultTab) query.tab = tab;
+    return { pathname: router.pathname, query };
+  }, [router, defaultTab]);
+  const setDetailTab = useCallback((tab: MissionTab) => {
+    rememberTab(tab);
+    void router.push?.(tabHref(tab), undefined, { shallow: true });
+  }, [rememberTab, router, tabHref]);
   const [actionError, setActionError] = useState<string | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -68,7 +89,6 @@ function MissionDetailContent() {
   const [isEditing, setIsEditing] = useState(false);
   const [acting, setActing] = useState(false);
   const { askConfirmation, notify, feedback } = useFeedback();
-  const { mission, isLoading, error, refresh } = useApiMission(missionId);
   // A draft reached from the Librarian gets one orienting notice (LIB-2, decision #527):
   // the create-then-submit shape is deliberate, so it is explained rather than removed.
   const { user } = useAuth();
@@ -157,7 +177,7 @@ function MissionDetailContent() {
 
   if (!missionId) {
     return (
-      <div className="min-h-screen bg-background py-8">
+      <div className="min-h-screen bg-background py-4">
         <div className="max-w-4xl mx-auto px-4">
           <p className="text-secondary">Select a mission to view details.</p>
         </div>
@@ -174,10 +194,12 @@ function MissionDetailContent() {
     ? formatDistanceToNow(parseApiTimestamp(mission.created_at), { addSuffix: true })
     : null;
   const isDraft = mission.status === "draft";
+  const firstTabLabel = isDraft ? "Plan" : ["queued", "in_progress"].includes(mission.status) ? "Progress" : "Details";
+  const isFinished = ["completed", "validation_failed", "blocked", "cancelled"].includes(mission.status);
   const hasResearchPhases = Object.keys(mission.research_phases).length > 0;
 
   return (
-    <div className="min-h-screen bg-background py-8">
+    <div className="min-h-screen bg-background py-4">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {feedback}
           {isDraft && fromLibrarian && !orientationHidden && (
@@ -194,7 +216,7 @@ function MissionDetailContent() {
             {actionError && <p role="alert" className="mb-4 break-words text-danger">{actionError}</p>}
             <div className="flex gap-3"><button disabled={deleting} className="rounded border border-line px-3 py-2" onClick={() => setDeleteOpen(false)}>Cancel</button><button disabled={deleting} className="rounded bg-danger-surface px-3 py-2 text-danger" onClick={() => void handleDelete()}>{deleting ? "Deleting…" : "Delete mission"}</button></div>
           </Dialog>
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-3 flex items-center justify-between">
           <Link
             href="/missions"
             className="inline-flex items-center text-sm text-accent-text hover:text-accent-text"
@@ -213,7 +235,7 @@ function MissionDetailContent() {
 
         <div className="bg-surface border border-line rounded-lg overflow-hidden">
           {/* Header Section */}
-          <div className="p-6 border-b border-line">
+          <div className="p-4 border-b border-line">
             {isEditing ? (
               <div><h1 className="mb-4 text-2xl font-semibold">Edit mission</h1><MissionForm source={mission} mode="edit" onCancel={() => { setIsEditing(false); void refresh(); }} onSuccess={() => { setIsEditing(false); void refresh(); }} /></div>
             ) : (
@@ -223,6 +245,8 @@ function MissionDetailContent() {
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-3 mb-2">
                       <StatusBadge status={mission.status} />
+                      {isDraft && <span className="font-semibold text-foreground">Ready to run</span>}
+                      {mission.status === "completed" && detailTab !== "results" && <Link href={tabHref("results")} shallow onClick={() => rememberTab("results")} className="font-medium text-accent-text underline">Results ready</Link>}
                       <span className="break-all text-sm font-mono text-muted">
                         {mission.mission_id}
                       </span>
@@ -230,8 +254,8 @@ function MissionDetailContent() {
                     <h1 className="break-words text-2xl font-bold text-foreground">
                       {mission.title}
                     </h1>
-                    <div className="mt-3"><RelationshipLink type="mission" id={mission.id} /></div>
-                    <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-muted">
+                    <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-muted">
+                      <RelationshipLink type="mission" id={mission.id} />
                       {mission.project_id && mission.project_name ? (
                         <Link
                           href={`/projects/${mission.project_id}`}
@@ -260,7 +284,7 @@ function MissionDetailContent() {
                 </div>
 
                 {/* Tags */}
-                <div className="mt-4 flex flex-wrap items-center gap-2">
+                {mission.tags.length > 0 && <div className="mt-3 flex flex-wrap items-center gap-2">
                   {mission.tags.map((tag) => (
                     <span
                       key={tag}
@@ -269,10 +293,10 @@ function MissionDetailContent() {
                       {tag}
                     </span>
                   ))}
-                </div>
+                </div>}
 
                 {/* Action Buttons */}
-                <div className="mt-6 flex flex-wrap gap-3">
+                <div className="mt-3 flex flex-wrap gap-2">
                   {["queued", "in_progress"].includes(mission.status) && <button disabled={acting} className="rounded-lg border border-danger-line px-4 py-2 text-sm text-danger" onClick={() => void handleCancelRun()}>Cancel run</button>}
                   {["completed", "blocked", "cancelled", "validation_failed"].includes(mission.status) && <button disabled={acting} className="rounded-lg border border-line px-4 py-2 text-sm" onClick={() => void handleRerun()}>Re-run</button>}
 
@@ -349,31 +373,21 @@ function MissionDetailContent() {
                 const next = event.key === "Home" ? tabs[0] : event.key === "End" ? tabs[tabs.length - 1] : tabs[(index + (event.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length];
                 setDetailTab(next); document.getElementById(`mission-tab-${next}`)?.focus();
               }
-            }} onClick={() => setDetailTab(tab)} className={`rounded px-4 py-2 ${detailTab === tab ? "bg-accent text-on-accent" : "border border-line"}`}>{tab === "overview" ? "Run" : tab === "results" ? "Results" : "Evidence"}</button>)}
+            }} onClick={() => setDetailTab(tab)} className={`rounded px-4 py-2 ${detailTab === tab ? "bg-accent text-on-accent" : "border border-line"}`}>{tab === "overview" ? firstTabLabel : tab === "results" ? "Results" : "Evidence"}</button>)}
           </div>
-          {["completed", "validation_failed", "blocked", "cancelled"].includes(mission.status) && <div className="p-4"><ScopeOutcomePanel mission={mission} /></div>}
           <div role="tabpanel" id="mission-panel-results" aria-labelledby="mission-tab-results" hidden={detailTab !== "results"}>
-          {mission.result_protocol && <div className="flex justify-end px-6 py-3"><button type="button" className="rounded px-3 py-2 text-sm text-accent-text underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent" onClick={() => downloadFile(JSON.stringify(mission.result_protocol, null, 2), `${mission.mission_id}-protocol.json`, "application/json")}>Export full protocol</button></div>}
+          {isFinished && <ScopeOutcomeNotice mission={mission}><Link href={tabHref("overview")} shallow onClick={() => rememberTab("overview")} className="text-accent-text underline">View Details</Link></ScopeOutcomeNotice>}
+          <div className="flex flex-wrap items-center justify-between gap-2 px-4 pt-4 sm:px-6">
+            <h2 className="text-lg font-semibold">Results</h2>
+            <div className="flex flex-wrap gap-2">
+              {mission.result_markdown && <button type="button" onClick={() => downloadFile(mission.result_markdown!, `${mission.mission_id}-results.md`, "text/markdown")} className="rounded px-3 py-1.5 text-sm text-accent-text hover:bg-info-surface">Export as .md</button>}
+              {mission.result_protocol && <button type="button" className="rounded px-3 py-1.5 text-sm text-accent-text underline" onClick={() => downloadFile(JSON.stringify(mission.result_protocol, null, 2), `${mission.mission_id}-protocol.json`, "application/json")}>Export full protocol</button>}
+            </div>
+          </div>
           {/* Results Markdown Section */}
-          {mission.result_markdown && (
-            <Section title="Results">
-              <div className="flex justify-end mb-2">
-                <button
-                  onClick={() => downloadFile(
-                    mission.result_markdown!,
-                    `${mission.mission_id}-results.md`,
-                    "text/markdown"
-                  )}
-                  className="px-3 py-1.5 text-xs font-medium text-accent-text hover:bg-info-surface rounded transition-colors"
-                >
-                  Export as .md
-                </button>
-              </div>
-              <div className="bg-background rounded-lg p-4 overflow-x-auto">
-                <MarkdownRenderer content={mission.result_markdown} />
-              </div>
-            </Section>
-          )}
+          {mission.result_markdown && <div className="p-4 sm:p-6">
+            <div className="bg-background rounded-lg p-4 overflow-x-auto"><MarkdownRenderer content={mission.result_markdown} /></div>
+          </div>}
 
           {/* Result Links Section */}
           {(mission.result_document_ids.length > 0 || mission.result_report_id) && (
@@ -390,6 +404,7 @@ function MissionDetailContent() {
           </div>
           {detailTab === 'evidence' && <div role="tabpanel" id="mission-panel-evidence" aria-labelledby="mission-tab-evidence" className="px-4"><EvidencePanel projectId={mission.project_id} filters={{ mission_id: mission.id }} /></div>}
           <div role="tabpanel" id="mission-panel-overview" aria-labelledby="mission-tab-overview" hidden={detailTab !== 'overview'}>
+          {isFinished && <div className="p-4"><ScopeOutcomePanel mission={mission} /></div>}
           <MissionRunActivity mission={mission} />
           {/* Objective Section */}
           <Section title="Objective">

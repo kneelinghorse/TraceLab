@@ -3,7 +3,7 @@ import { render, screen, cleanup } from "@testing-library/react";
 import { afterEach, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { PlannedScopeSummary, ScopeOutcomePanel } from "@/components/missions/AuthoredScope";
+import { PlannedScopeSummary, ScopeOutcomeNotice, ScopeOutcomePanel } from "@/components/missions/AuthoredScope";
 import type { ApiMission } from "@/types/mission";
 
 const fixture = path.resolve("../tests/fixtures/authored_scope_v1");
@@ -53,4 +53,15 @@ it("distinguishes exact pages from reference seeds without implying deployed enf
   render(<PlannedScopeSummary scope={{ ...contract.authored_scope, restriction: "unrestricted", allowed_urls: [], allowed_domains: [] }} />);
   expect(screen.getByText("Sources are unrestricted.")).toBeVisible();
   expect(screen.queryByText(/Only these exact pages/)).not.toBeInTheDocument();
+});
+
+it("omits the compact notice only for a readable clean audit without scope or quality warnings", () => {
+  const item = mission("compliant");
+  item.execution_metadata = { final_outcome: { authored_scope_validation: auditFor("compliant"), delivery_quality: "clean" } };
+  const { rerender } = render(<ScopeOutcomeNotice mission={item}><a href="?tab=overview">View Details</a></ScopeOutcomeNotice>);
+  expect(screen.queryByRole("link", { name: "View Details" })).toBeNull();
+  for (const value of [mission("partial"), mission("compliant"), { ...item, execution_metadata: {} }]) {
+    rerender(<ScopeOutcomeNotice mission={value}><a href="?tab=overview">View Details</a></ScopeOutcomeNotice>);
+    expect(screen.getByRole("link", { name: "View Details" })).toBeVisible();
+  }
 });
