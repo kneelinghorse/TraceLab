@@ -1,6 +1,6 @@
 {
   "sprint": "sprint-67",
-  "status": "Record closed; closeout PR release verification follows",
+  "status": "Completed and released; closeout PR merged and deployed",
   "record_closed_at": "2026-10-14T10:04:22.138Z",
   "missions": {
     "total": 8,
@@ -26,7 +26,7 @@
     },
     "currentSprint": {
       "id": "sprint-67",
-      "name": "Sprint 67 — The UX pass",
+      "name": "Sprint 67 \u2014 The UX pass",
       "status": "Completed",
       "focus": "Eight UX missions shipped and verified before the October 19 share-out; final invited-member run, email, access isolation and cleanup accepted. Two explicit follow-ups carried to Sprint 68."
     }
@@ -64,5 +64,6 @@
     "runtime_unchanged_against": "origin/main at b3d09eac893fb0e999b3d00cec32e0c1346bdaf6",
     "test_count_source": "Final complete local WALK suites and exact-head PR436 CI; closeout CI will independently rerun required gates."
   },
-  "warnings": "Sprint close returned advisory context-snapshot size and untagged historical-session warnings, preserved verbatim in reasonbook-close.json; no pruning or unrelated record changes performed."
+  "warnings": "Sprint close returned advisory context-snapshot size and untagged historical-session warnings, preserved verbatim in reasonbook-close.json; no pruning or unrelated record changes performed.",
+  "release_verification": "release-receipt.json"
 }

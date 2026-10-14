@@ -1,0 +1,83 @@
+{
+  "sprint": "sprint-67",
+  "status": "Completed and released",
+  "missions_completed": 8,
+  "missions_total": 8,
+  "pr": "https://github.com/kneelinghorse/TraceLab/pull/437",
+  "tested_head": "f771d36217a2d6b8c2bb2d04071b4272d78aa767",
+  "merge_commit": "e921de24f6da90dfd703c0e277d59f9623c5a91a",
+  "merged_at": "2026-10-14T10:23:04Z",
+  "merge_method": "Normal squash with --match-head-commit; no admin override",
+  "all_required_checks_passed": true,
+  "required_checks": "required-checks.json",
+  "strict_branch_protection": true,
+  "ci": {
+    "postgresql": {
+      "run": 38547600813,
+      "passed": 172,
+      "skipped": 3,
+      "warnings": 17,
+      "seconds": 129.92
+    },
+    "frontend": {
+      "run": 38547601303,
+      "units": 451,
+      "files": 49,
+      "types": "passed",
+      "lint": "passed"
+    },
+    "browser": {
+      "run": 38547601235,
+      "passed": 218,
+      "skipped": 0,
+      "duration_reported": "6.6 minutes"
+    },
+    "mcp": {
+      "run": 38547600933,
+      "unit_tests": 160,
+      "stdio_checks": 71,
+      "tools": 9,
+      "actions": 50,
+      "ui_operations": 119,
+      "parity_errors": 0
+    },
+    "backend": {
+      "run": 38547600937,
+      "passed": 3212,
+      "skipped": 4,
+      "deselected": 12,
+      "warnings": 49,
+      "seconds": 668.46
+    }
+  },
+  "deployment": "deployment.json",
+  "public_serving_commit_proof": "serving.json",
+  "post_deploy_check": {
+    "run": 38549189954,
+    "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/38549189954",
+    "status": "success",
+    "live_browser_checks_passed": 5,
+    "seconds": 7.0,
+    "receipt": "post-deploy-check.json"
+  },
+  "record_close": "reasonbook-close.json",
+  "identity_and_carry_forwards": "closeout-receipt.json",
+  "citation_reverification": "receipt-audit.json",
+  "published_mcp": "../S67-BADGES/registry-verification.json",
+  "invited_member_acceptance": "../S67-WALK/release-receipt.json",
+  "retained_limitations": [
+    "Existing backend skips and documented quarantines remain explicit in CI counts.",
+    "Existing build-tool advisory maintenance carried to Sprint 68.",
+    "Cosmetic Reports singular count (1 mission results) disclosed and carried to Sprint 68.",
+    "Reasonbook snapshot-size advisory and intentionally untagged historical-session warning retained in the close receipt; no pruning performed."
+  ],
+  "source_log_sha256": {
+    "backend-ci": "b053872e2b3058d43926ebcef15a2bf86f95444d3fab7c7321218c7fb3ef3362",
+    "postgres-ci": "fc9147ae9cba5724cf6c0d0a3d245c61c4a2a5555e6625a262bd861288f56d1d",
+    "frontend-ci": "fa77922c3d852b79c6e5bf53051e12e4938d228bf1e6be4e5cabf58ec5061d21",
+    "browser-ci": "228aee934dfb985ebdb6bc2f57b28c4d8cfc7be0f1b6b6f7226ecb458f4976ba",
+    "mcp-ci": "870cbc6d0525d93f739e7aa13a91229edbc4838149bb4e3aada0c5ef4c8f6f8a",
+    "post-deploy": "312b4ec60be1b2f772f6248eb3436035dfea061b0090702c871395c30ad016bc"
+  },
+  "verified_at": "2026-10-14T10:29:02.537867+00:00"
+}
