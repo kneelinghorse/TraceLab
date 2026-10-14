@@ -1,0 +1,126 @@
+{
+  "checkedAt": "2026-10-14T06:00:37.705Z",
+  "readOnly": true,
+  "results": [
+    {
+      "name": "results",
+      "theme": "light",
+      "width": 390,
+      "firstLineY": 961,
+      "firstLineBottom": 993,
+      "qualityText": "Usable with warnings\n\nSampled verification; report-wide accuracy unknown\n\n3 claims were not assessed.",
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "suppressedWrites": [
+        {
+          "method": "PUT",
+          "path": "/api/v1/activity/viewed"
+        }
+      ],
+      "screenshot": "results-light-390.png"
+    },
+    {
+      "name": "details",
+      "theme": "light",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "suppressedWrites": [],
+      "screenshot": "details-light-390.png"
+    },
+    {
+      "name": "results",
+      "theme": "light",
+      "width": 1440,
+      "firstLineY": 655,
+      "firstLineBottom": 687,
+      "qualityText": "Usable with warnings\n\nSampled verification; report-wide accuracy unknown\n\n3 claims were not assessed.",
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "suppressedWrites": [
+        {
+          "method": "PUT",
+          "path": "/api/v1/activity/viewed"
+        }
+      ],
+      "screenshot": "results-light-1440.png"
+    },
+    {
+      "name": "details",
+      "theme": "light",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "suppressedWrites": [],
+      "screenshot": "details-light-1440.png"
+    },
+    {
+      "name": "results",
+      "theme": "dark",
+      "width": 390,
+      "firstLineY": 961,
+      "firstLineBottom": 993,
+      "qualityText": "Usable with warnings\n\nSampled verification; report-wide accuracy unknown\n\n3 claims were not assessed.",
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "suppressedWrites": [
+        {
+          "method": "PUT",
+          "path": "/api/v1/activity/viewed"
+        }
+      ],
+      "screenshot": "results-dark-390.png"
+    },
+    {
+      "name": "details",
+      "theme": "dark",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "suppressedWrites": [],
+      "screenshot": "details-dark-390.png"
+    },
+    {
+      "name": "results",
+      "theme": "dark",
+      "width": 1440,
+      "firstLineY": 655,
+      "firstLineBottom": 687,
+      "qualityText": "Usable with warnings\n\nSampled verification; report-wide accuracy unknown\n\n3 claims were not assessed.",
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "suppressedWrites": [
+        {
+          "method": "PUT",
+          "path": "/api/v1/activity/viewed"
+        }
+      ],
+      "screenshot": "results-dark-1440.png"
+    },
+    {
+      "name": "details",
+      "theme": "dark",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "suppressedWrites": [],
+      "screenshot": "details-dark-1440.png"
+    }
+  ]
+}

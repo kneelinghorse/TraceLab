@@ -1,0 +1,30 @@
+{
+  "mission": "S67-QUALITY",
+  "pr": "https://github.com/kneelinghorse/TraceLab/pull/431",
+  "head": "42858157ade6f076232b16e9241c80c08d955451",
+  "merge": "6a823862d1082fc1bdb1cf97e4e215b3c92d3c0e",
+  "mergedAt": "2026-10-14T05:54:45Z",
+  "requiredCheckNames": 9,
+  "allRequiredPassed": true,
+  "mergeMethod": "normal squash, no admin override",
+  "ci": {
+    "backend": {
+      "passed": 3188,
+      "skipped": 4,
+      "deselected": 12,
+      "warnings": 49,
+      "seconds": 932.62
+    },
+    "postgres": {
+      "passed": 172,
+      "skipped": 3,
+      "warnings": 17,
+      "seconds": 118.7
+    },
+    "browser": {
+      "passed": 209,
+      "skipped": 0,
+      "minutes": 5.2
+    }
+  }
+}

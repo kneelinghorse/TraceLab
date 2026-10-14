@@ -1,0 +1,13 @@
+{
+  "checked_at": "2026-10-14T06:01:40.584736+00:00",
+  "captures_reviewed": 8,
+  "method": "All eight full-page captures viewed in a contact sheet, plus phone top-page crops at readable scale.",
+  "findings": "Results shows the warning, sampled-verification disclosure and three-unassessed-claims reason in both themes and widths. Text wraps on phones without overlap. Details preserves scope audit and opens bounded raw quality JSON by keyboard, with focus on its scroll region. Browser Back returns to Results.",
+  "desktop_first_line_bottom": 687,
+  "phone_first_line_bottom": 993,
+  "phone_note": "First-line-above-fold requirement applies to 1440x900; this long-titled real report begins below the phone fold.",
+  "read_only": true,
+  "axe_serious_critical": 0,
+  "overflow": false,
+  "client_or_transport_errors": 0
+}
