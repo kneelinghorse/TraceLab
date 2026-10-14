@@ -1,0 +1,20 @@
+{
+  "checkedAt": "2026-10-14T08:19:57.391344+00:00",
+  "firstAttempt": {
+    "status": "failed",
+    "reason": "Verification harness requested page_size100 for tracelab_search.navigate, whose input schema allows at most50. The tool rejected it before the HTTP request.",
+    "scope": "Harness argument error; no product failure."
+  },
+  "correction": {
+    "file": "scripts/check_claim_display_contract.mjs",
+    "page_size": 50
+  },
+  "rerun": {
+    "status": "passed",
+    "checks": 13,
+    "raw_claims_unchanged": 11,
+    "readable_graph": true,
+    "raw_query_readable_navigation": true,
+    "package": "@aquex/tracelab-mcp2.2.0 installed from registry"
+  }
+}

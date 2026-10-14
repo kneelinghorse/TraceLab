@@ -1,0 +1,93 @@
+{
+  "conclusion": "failure",
+  "databaseId": 38528812144,
+  "headSha": "a295a6b1e17dc2ecbd644dbc605c42b157260a1e",
+  "jobs": [
+    {
+      "completedAt": "2026-10-14T07:51:23Z",
+      "conclusion": "failure",
+      "databaseId": 115735451749,
+      "name": "wait-for-deploy",
+      "startedAt": "2026-10-14T07:30:55Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-14T07:30:56Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-14T07:30:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T07:31:20Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-10-14T07:30:56Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T07:31:20Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-python@v5",
+          "number": 3,
+          "startedAt": "2026-10-14T07:31:20Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T07:51:21Z",
+          "conclusion": "failure",
+          "name": "Wait until both services serve the merged commit",
+          "number": 4,
+          "startedAt": "2026-10-14T07:31:20Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T07:51:22Z",
+          "conclusion": "success",
+          "name": "Archive the wait summary",
+          "number": 5,
+          "startedAt": "2026-10-14T07:51:21Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T07:51:22Z",
+          "conclusion": "skipped",
+          "name": "Post Run actions/setup-python@v5",
+          "number": 9,
+          "startedAt": "2026-10-14T07:51:22Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T07:51:22Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 10,
+          "startedAt": "2026-10-14T07:51:22Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-14T07:51:22Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 11,
+          "startedAt": "2026-10-14T07:51:22Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/38528812144/job/115735451749"
+    },
+    {
+      "completedAt": "2026-10-14T07:51:24Z",
+      "conclusion": "skipped",
+      "databaseId": 115742885266,
+      "name": "production-smoke",
+      "startedAt": "2026-10-14T07:51:24Z",
+      "status": "completed",
+      "steps": [],
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/38528812144/job/115742885266"
+    }
+  ],
+  "status": "completed"
+}

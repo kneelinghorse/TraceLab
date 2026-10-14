@@ -1,0 +1,11 @@
+{
+  "completedAt": "2026-10-14T08:18:31.636Z",
+  "passed": true,
+  "captures": 16,
+  "readOnly": true,
+  "servingCommit": "3e86bba99acb7ef6929daa4274d6fe9fa81b64f5",
+  "visuallyReviewed": 16,
+  "visualFindings": "Known claim reads Throughput \u00b7 Up to 3M documents/day \u00b7 Vendor on card, detail heading, graph root and palette. Phone wrapping remains within the viewport in both themes. Exact source snippet remains verbatim.",
+  "mcpChecks": 13,
+  "publishedMcpVersion": "2.2.0"
+}
