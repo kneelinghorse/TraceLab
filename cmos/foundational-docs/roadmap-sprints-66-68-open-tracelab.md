@@ -102,7 +102,7 @@ Derek's answers at planning:
 
 The email part of his notification ask already exists. Settings → Notifications switches mission emails on and off (`frontend/src/pages/settings.tsx:177-219`, `users.email_notifications_enabled`, default on). Only a text-message channel is left out, and it needs a provider and phone numbers.
 
-**Order:** DENSITY → REPORTS → BADGES → MISSION → LIBRARIAN → CLAIMS → WALK. Each mission is merged, deployed and verified on production before the next starts, as in Sprint 66.
+**Order:** DENSITY → REPORTS → BADGES → MISSION → QUALITY → LIBRARIAN → CLAIMS → WALK. QUALITY was added at planning from DeepSearch's request and follows MISSION, because both change the Results tab. Each mission is merged, deployed and verified on production before the next starts, as in Sprint 66.
 - **DENSITY first.** It adds the shared page header and container that later pages use, so later screenshots show the final spacing.
 - **REPORTS before BADGES.** Both change `app/adapters/repositories/sqlalchemy_activity_repo.py` and the MCP. BADGES adds seen-state to a Reports list that REPORTS has already cleaned. BADGES carries the sprint's single MCP publish, 2.2.0, which includes REPORTS' changes.
 
@@ -339,6 +339,47 @@ Why the copies stay: the mission page renders results from `mission.result_markd
 - A test proves the "Results ready" link appears on a live completion.
 - On production, a real completed mission opens on its results.
 
+### S67-QUALITY — Results say how far to trust them, and failures say why
+
+**Source:** DeepSearch's request of 2026-10-13 (message `9706116c`), added to Sprint 67 at planning. DeepSearch's own run, S96, has been live since 2026-10-08. Every mission now carries quality and failure details that TraceLab receives but doesn't show. DeepSearch says no migration, API change or citation-schema change is needed.
+
+**Where the data lives today:**
+- **Quality:** `execution_metadata.quality_record`. An identical copy sits at `result_protocol.report_metadata.forensic.quality_record`. It is schema version 5, with `verification`, `evidence_dependencies`, `citation_surface` and `claim_assessment`.
+- **Failures:**
+  - `execution_metadata.synthesis_telemetry.provider_attempts[].failure.rejection`;
+  - `.request_shape`;
+  - `generation_recovery_result`.
+- **What reads it:** only `components/missions/AuthoredScope.tsx:62`, which reads `delivery_quality` for the scope panel's warning. `ExecutionTimeline.tsx` reads the older forensic metrics.
+
+**Change:**
+1. **Quality line.** The Results tab shows one quality line under the header:
+   - `delivery_quality` "clean" reads "No detected material issue", with a separate note: "Sampled verification; report-wide accuracy unknown".
+   - `usable_with_warning`, `degraded` and `failed` are named plainly.
+   - Legacy runs without the fields read "Quality not assessed for this run".
+   - The page never shows an accuracy percentage built from source or sample counts.
+2. **Actionable reasons** show as plain sentences under that line. Examples: `critique_unassessed_claims_N`, `missing_cited_sources_N`, `cited_without_readable_body_N`. Operational retrieval counts and bibliography accounting go in an expandable "Raw quality data" section on the Details tab.
+3. **Failed runs** show:
+   - the rejection subtype: `context_limit`, `unsupported_parameter`, `unsupported_value`, `content_rejection`, `invalid_json`, `invalid_message_structure` or `unknown`;
+   - its `subtype_source`;
+   - whether the request shape was available.
+
+   They distinguish `provider_failed`, a second provider failure during the one retained-memory finalization, from `unknown_finish`, a response with no proven finish reason. Existing `error_message` sanitisation is unchanged.
+4. **Unknown reason strings and subtypes** render generically and never drop the report or hide the raw data.
+
+**Decisions made at plan time:**
+- **Build from TraceLab's own data.** DeepSearch's contract (`docs/s96_quality_and_diagnostics_contract.md`) and fixtures (`tests/fixtures/s96_consumer_contract.json`) live in its repository. Reading another repository needs Derek's permission (constraint c:10). So the build uses two sources:
+  - the field list in DeepSearch's message;
+  - the real production mission S96-MEMORY-ACCEPT-02, which carries `critique_unassessed_claims_3` and is read through TraceLab's own API.
+
+  It writes four TraceLab test fixtures mirroring DeepSearch's four cases: a supported sample, a missing cited body, legacy uncertainty, and a failed retained-memory request. If a field's exact shape can't be established that way, ask Derek for read access to those two files.
+- **Check the API passes the fields through.** First, confirm that `MissionResponse` and the frontend types really carry these fields. If any are dropped, adding them is a contract change under the MCP and OODS guards.
+
+**Done when:**
+- Unit tests render all four fixture cases, plus an unknown-reason case and an unknown-subtype case.
+- No rendered state shows a percentage.
+- On production, S96-MEMORY-ACCEPT-02 shows its quality line and its unassessed-claims reason.
+- DeepSearch's message gets a reply with the result.
+
 ### S67-LIBRARIAN — Conversation first, tools in a chooser
 
 > "all of these are possible use cases, but kind of laying them all out like this is just kind of overwhelming … each of these should be a sort of route or path unto themselves … maybe it's a dropdown menu."
@@ -540,7 +581,7 @@ Add to this list rather than resolving items silently. Questions 1–4 were answ
 
 ## Change Log
 
-- **2026-10-14 UTC, Sprint 67 opened for a fresh build session.** Derek approved the scope (decision #627) and paid DeepSearch runs as needed (decision #628): "yes, we can run as many paid deepseek runs as needed, all approved." The identity was synchronised to `sprint-67-active`. S67-DENSITY reads In Progress from planning: a promotion to Current started it instead (learning #311). Its notes record that no build work has begun. Build in roadmap order. The record's work queue lists missions alphabetically.
+- **2026-10-14 UTC, Sprint 67 opened for a fresh build session.** Derek approved the scope (decision #627) and paid DeepSearch runs as needed (decision #628): "yes, we can run as many paid deepseek runs as needed, all approved." The identity was synchronised to `sprint-67-active`. S67-DENSITY reads In Progress from planning: a promotion to Current started it instead (learning #311). Its notes record that no build work has begun. Build in roadmap order. The record's work queue lists missions alphabetically. S67-QUALITY was added from DeepSearch's request for the mission page to show its quality and failure details (message `9706116c`).
 
 - **2026-10-13 UTC, Sprint 67 planned from Derek's UX feedback.** Seven missions, in order: DENSITY, REPORTS, BADGES, MISSION, LIBRARIAN, CLAIMS and WALK. Derek's answers: a dot on Missions only; "new" lasts 3 days; the Librarian is conversation-first, with tools in a chooser; Reports is cleaned up now. His last answer overrode a proposed deferral ("STOP DEFERRING"). A read-only production count found 451 of 512 reports are automatic copies of mission results. An independent critic returned NEEDS-REVISION with five blocking findings, all fixed before the plan was recorded.
 
