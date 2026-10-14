@@ -337,6 +337,16 @@ the web UI by decision #426; the MCP never performs them on the user's behalf.
 | `tracelab_report.update` | `PUT /reports/{id}`. Required `report_id` plus `title` and/or `status` (`draft` or `final`). |
 | `tracelab_project.neighborhood` | `GET /graph/neighborhood`. Required `root_type` (project/document/mission/report/collection/evidence) and `root_id`. Optional `depth` (1, max 2), `per_relation_limit` (12, max 50), `max_nodes` (60, max 150). Nodes carry canonical links; groups carry server totals. |
 
+### Report origins (Sprint 67; scheduled for 2.2.0)
+
+`tracelab_report.list` accepts an optional `origin` array with `mission`, `written`,
+`librarian` and `agent_brief`. Omit it to keep all artifacts, or use
+`["written", "librarian"]` for the Reports UI's default. List/get return `origin`,
+`origin_label`, `origin_href` and a readable `project_name`. Get preserves source
+`name` and `href`; an inaccessible or deleted source has no source identity or
+link and displays “Source unavailable”. Mission copies remain stored; Home's
+recent reports and report activity omit them because the mission already appears.
+
 ### Recent activity (ACT-1, 2.0.0)
 
 Decision #459 replaced the inbox, "needs attention", mission reviews and saved

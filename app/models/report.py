@@ -5,7 +5,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, ForeignKey, Index, Integer, String, Text
+from sqlalchemy import CheckConstraint, Column, DateTime, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base
@@ -23,6 +23,7 @@ class Report(Base):
     )
     title = Column(String(255), nullable=False)
     report_type = Column(String(50), nullable=False, default="summary")
+    origin = Column(String(20), nullable=False, default="written", server_default="written")
     prompt = Column(Text, nullable=True)
     content = Column(Text, nullable=False)
     content_hash = Column(String(64), nullable=True)
@@ -60,6 +61,7 @@ class Report(Base):
     )
 
     __table_args__ = (
+        CheckConstraint("origin IN ('mission', 'written', 'librarian', 'agent_brief')", name="ck_reports_origin"),
         Index("ix_reports_project_id", "project_id"),
         Index("ix_reports_status", "status"),
         Index("ix_reports_created_at", "created_at"),

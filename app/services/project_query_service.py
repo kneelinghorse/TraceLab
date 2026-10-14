@@ -250,7 +250,7 @@ class ProjectQueryService:
         total_tokens = chunk_stats.total_tokens if chunk_stats else 0
 
         # Count reports
-        report_count = reports.with_entities(func.count(Report.id)).scalar() or 0
+        report_count = reports.filter(Report.origin.in_(["written", "librarian"])).with_entities(func.count(Report.id)).scalar() or 0
 
         # Get last updated timestamp (most recent non-deleted document or report)
         last_doc_update = (

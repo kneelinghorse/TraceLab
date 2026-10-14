@@ -1,0 +1,9 @@
+{
+  "tarball": "/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/s67-reports-package-rdh_d6aw/aquex-tracelab-mcp-2.1.3.tgz",
+  "sha256": "f5cfaedec041542db08ffc2b647feeaf44bf384cdc9df192ff1758b3d1025a54",
+  "entrypoint": "/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/s67-reports-package-rdh_d6aw/install/node_modules/@aquex/tracelab-mcp/dist/index.js",
+  "published": false,
+  "publication": "Deferred to S67-BADGES 2.2.0 per plan",
+  "fresh_install": true,
+  "empty_cache": true
+}

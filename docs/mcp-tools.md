@@ -58,6 +58,8 @@ Version 2.1.0 exposes nine action-clustered tools / 50 actions:
 | `tracelab_home` | `snapshot`, `favorites`, `activity`, `activity_summary` |
 
 
+Sprint 67's report changes are scheduled for the single **2.2.0** publish at the end of S67-BADGES. `tracelab_report.list` accepts an optional `origin` array (`mission`, `written`, `librarian`, `agent_brief`); omitting it keeps all reports. List/get return the stored origin and caller-scoped origin labels. Source records include readable names and links, with unavailable source identities redacted. The UI requests `["written", "librarian"]` by default. Home's recent reports and report activity exclude mission copies, whose missions already appear in activity.
+
 Sprint 52 additions ship in **1.2.0**, the single publish that decision #425
 called for after every Sprint 52 MCP change landed. Installing 1.1.1 from npm
 does not provide these actions.

@@ -1,0 +1,24 @@
+{
+  "derived_origins": [
+    {
+      "origin": "agent_brief",
+      "count": 12
+    },
+    {
+      "origin": "librarian",
+      "count": 2
+    },
+    {
+      "origin": "mission",
+      "count": 451
+    },
+    {
+      "origin": "written",
+      "count": 47
+    }
+  ],
+  "total": 512,
+  "checked_at": "2026-10-14T02:05:11.421317+00:00",
+  "read_only": true,
+  "phase": "before migration"
+}

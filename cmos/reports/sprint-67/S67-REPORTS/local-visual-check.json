@@ -1,0 +1,13 @@
+{
+  "checked_at": "2026-10-14T02:29:15.869140+00:00",
+  "screenshots_saved": 24,
+  "browser_cases_passed": 201,
+  "visual_inspection": [
+    "Reports default list: light phone",
+    "Written detail: light desktop",
+    "Mission detail: dark desktop",
+    "Agent brief detail: light phone",
+    "Librarian detail: dark phone"
+  ],
+  "findings": "Origin labels wrap legibly; content precedes Evidence/source citations; records use names and links or a redacted unavailable placeholder; actions follow metadata in phone layout."
+}

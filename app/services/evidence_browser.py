@@ -154,7 +154,7 @@ def entry_links(db: Session, user: AuthenticatedUser, entry: LedgerEntry) -> lis
                 "kind": "report",
                 "id": str(report.id),
                 "title": report.title,
-                "href": f"/reports/{report.id}",
+                "href": f"/missions/{mission.id}?tab=results" if is_result else f"/reports/{report.id}",
                 "relationship": "Result of the capturing mission" if is_result else "Recorded source",
                 # Lets the page offer "Open report" for the result, not for every report citing the entry (DOCV-1).
                 "mission_result": is_result,

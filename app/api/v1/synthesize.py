@@ -78,6 +78,7 @@ def _create_report_from_synthesis(
             accessible_project_ids=project_scope, source_user=source_user,
         )
         report = Report(
+            origin="written",
             project_id=str(project_id) if project_id else None,
             title=title,
             report_type=output_format,

@@ -2966,12 +2966,20 @@
             "mapping": "Report.sources[].source_type"
           },
           "source_id": {
-            "annotation": "<class 'uuid.UUID'>",
+            "annotation": "uuid.UUID | None",
             "mapping": "Report.sources[].source_id"
           },
           "added_at": {
             "annotation": "<class 'datetime.datetime'>",
             "mapping": "Report.sources[].added_at"
+          },
+          "name": {
+            "annotation": "<class 'str'>",
+            "mapping": "Report.sources[].name"
+          },
+          "href": {
+            "annotation": "str | None",
+            "mapping": "Report.sources[].href"
           }
         },
         "ReportBase": {
@@ -3056,6 +3064,22 @@
           "original_documents": {
             "annotation": "list[dict]",
             "mapping": "Report.original_documents"
+          },
+          "origin": {
+            "annotation": "typing.Literal['mission', 'written', 'librarian', 'agent_brief']",
+            "mapping": "Report.origin"
+          },
+          "origin_label": {
+            "annotation": "str | None",
+            "mapping": "Report.origin_label"
+          },
+          "origin_href": {
+            "annotation": "str | None",
+            "mapping": "Report.origin_href"
+          },
+          "project_name": {
+            "annotation": "str | None",
+            "mapping": "Report.project_name"
           }
         },
         "ReportDetailResponse": {
@@ -3122,6 +3146,22 @@
           "original_documents": {
             "annotation": "list[dict]",
             "mapping": "Report.original_documents"
+          },
+          "origin": {
+            "annotation": "typing.Literal['mission', 'written', 'librarian', 'agent_brief']",
+            "mapping": "Report.origin"
+          },
+          "origin_label": {
+            "annotation": "str | None",
+            "mapping": "Report.origin_label"
+          },
+          "origin_href": {
+            "annotation": "str | None",
+            "mapping": "Report.origin_href"
+          },
+          "project_name": {
+            "annotation": "str | None",
+            "mapping": "Report.project_name"
           }
         },
         "ReportListItem": {
@@ -3160,6 +3200,22 @@
           "updated_at": {
             "annotation": "<class 'datetime.datetime'>",
             "mapping": "Report.updated_at \u2192 Timestampable.updated_at"
+          },
+          "origin": {
+            "annotation": "typing.Literal['mission', 'written', 'librarian', 'agent_brief']",
+            "mapping": "Report.origin"
+          },
+          "origin_label": {
+            "annotation": "<class 'str'>",
+            "mapping": "Report.origin_label"
+          },
+          "origin_href": {
+            "annotation": "str | None",
+            "mapping": "Report.origin_href"
+          },
+          "project_name": {
+            "annotation": "str | None",
+            "mapping": "Report.project_name"
           }
         },
         "ReportListResponse": {

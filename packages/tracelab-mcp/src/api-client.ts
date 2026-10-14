@@ -178,6 +178,10 @@ export interface ReportCitation {
 }
 
 export interface Report {
+  origin: 'mission' | 'written' | 'librarian' | 'agent_brief';
+  origin_label?: string | null;
+  origin_href?: string | null;
+  project_name?: string | null;
   id: string;
   title: string;
   content: string;
@@ -191,7 +195,9 @@ export interface ReportSource {
   id: string;
   report_id: string;
   source_type: string;
-  source_id: string;
+  source_id: string | null;
+  name?: string;
+  href?: string | null;
   added_at: string;
 }
 
@@ -205,6 +211,10 @@ export interface ReportDetail extends Report {
 }
 
 export interface ReportListItem {
+  origin: Report['origin'];
+  origin_label?: string | null;
+  origin_href?: string | null;
+  project_name?: string | null;
   id: string;
   title: string;
   status: string;
@@ -872,7 +882,8 @@ export class TraceLabClient {
     page = 1,
     pageSize = 20,
     projectId?: string,
-    status?: string
+    status?: string,
+    origins?: Report['origin'][]
   ): Promise<ReportListResponse> {
     const params = new URLSearchParams({
       page: String(page),
@@ -884,6 +895,7 @@ export class TraceLabClient {
     if (status) {
       params.set('status', status);
     }
+    origins?.forEach(origin => params.append('origin', origin));
     return this.request<ReportListResponse>(
       'GET',
       `/api/v1/reports?${params}`

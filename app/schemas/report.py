@@ -8,6 +8,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+ReportOrigin = Literal["mission", "written", "librarian", "agent_brief"]
+
 
 class CitationSchema(BaseModel):
     """A citation to a source chunk."""
@@ -25,8 +27,10 @@ class ReportSourceSchema(BaseModel):
 
     id: UUID
     report_id: UUID
-    source_type: str = Field(description="'collection' or 'chunk'")
-    source_id: UUID
+    source_type: str = Field(description="collection, chunk, ledger_entry or ledger_note")
+    source_id: UUID | None
+    name: str = "Source unavailable"
+    href: str | None = None
     added_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
@@ -85,6 +89,10 @@ class ReportResponse(BaseModel):
     id: UUID
     title: str
     content: str
+    origin: ReportOrigin = "written"
+    origin_label: str | None = None
+    origin_href: str | None = None
+    project_name: str | None = None
     citations: list[CitationSchema] = Field(default_factory=list)
     citation_status: Literal["validated", "legacy_unavailable"] = "legacy_unavailable"
     generation_provenance: dict | None = None
@@ -114,6 +122,10 @@ class ReportListItem(BaseModel):
 
     id: UUID
     title: str
+    origin: ReportOrigin = "written"
+    origin_label: str
+    origin_href: str | None = None
+    project_name: str | None = None
     status: str
     report_type: str
     tokens_used: int

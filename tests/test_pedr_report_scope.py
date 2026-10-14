@@ -68,6 +68,7 @@ def _report_model(*, title: str = "Scoped report") -> SimpleNamespace:
     return SimpleNamespace(
         id=uuid4(),
         title=title,
+        origin="written",
         content="Scoped content",
         tokens_used=0,
         status="draft",

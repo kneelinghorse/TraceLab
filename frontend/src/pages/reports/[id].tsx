@@ -1,3 +1,4 @@
+import { ReportOrigin } from "@/components/reports/ReportOrigin";
 import { RelationshipLink } from "@/components/graph/RelationshipLink";
 import { HttpError } from "@/lib/api/http";
 import { StatusBadge } from "@/components/ui/StatusBadge";
@@ -188,6 +189,7 @@ export default function ReportDetailPage() {
                     autoFocus
                   />
                 </div>
+                <button type="button" onClick={handleToggleStatus} className="text-sm text-accent-text underline">{report.status === "final" ? "Mark as draft" : "Mark as final"}</button>
                 {editError && (
                   <p className="text-sm text-danger">{editError}</p>
                 )}
@@ -212,13 +214,27 @@ export default function ReportDetailPage() {
             ) : (
               <>
                 <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-                  <div className="flex flex-wrap items-center gap-3">
+                  <div className="min-w-0 flex-1 space-y-3">
                     <h1 className="break-words text-2xl font-bold text-foreground">
                       {report.title}
                     </h1>
-                    <button type="button" onClick={handleToggleStatus} title={report.status === "final" ? "Click to change to draft" : "Click to finalize"}><StatusBadge status={report.status} /></button>
+
+                    {/* Metadata */}
+                    <div className="mt-4 flex flex-wrap gap-4 text-sm text-secondary">
+                      <ReportOrigin report={report} />
+                      {report.project_name && <Link href={`/projects/${report.project_id}`} className="underline">{report.project_name}</Link>}
+                      <span>
+                        Created {formatDistanceToNow(parseApiTimestamp(report.created_at), { addSuffix: true })}
+                      </span>
+                      {report.updated_at !== report.created_at && (
+                        <span>
+                          Updated {formatDistanceToNow(parseApiTimestamp(report.updated_at), { addSuffix: true })}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex max-w-full flex-wrap gap-2">
+                  <div className="flex max-w-full flex-wrap items-center gap-2">
+                    {report.status === "final" && <StatusBadge status="final" />}
                     <RelationshipLink type="report" id={report.id} />
                     <div className="relative" ref={exportRef}>
                       <button
@@ -272,31 +288,10 @@ export default function ReportDetailPage() {
                   </div>
                 </div>
 
-                {/* Metadata */}
-                <div className="mt-4 flex flex-wrap gap-4 text-sm text-secondary">
-                  <span>
-                    Type: <span className="font-medium">{report.report_type}</span>
-                  </span>
-                  <span>
-                    Chunks: <span className="font-medium text-accent-text">{report.chunk_count}</span>
-                  </span>
-                  <span>
-                    Tokens: <span className="font-medium">{report.tokens_used.toLocaleString()}</span>
-                  </span>
-                  <span>
-                    Created {formatDistanceToNow(parseApiTimestamp(report.created_at), { addSuffix: true })}
-                  </span>
-                  {report.updated_at !== report.created_at && (
-                    <span>
-                      Updated {formatDistanceToNow(parseApiTimestamp(report.updated_at), { addSuffix: true })}
-                    </span>
-                  )}
-                </div>
-
-                {report.prompt && (
+                {report.prompt && (report.origin === "written" || report.origin === "librarian") && (
                   <div className="mt-4 p-3 bg-background rounded-lg">
                     <span className="text-xs text-muted uppercase tracking-wider">
-                      Custom Prompt
+                      Instructions
                     </span>
                     <p className="mt-1 text-sm text-secondary italic">
                       {report.prompt}
@@ -307,8 +302,6 @@ export default function ReportDetailPage() {
             )}
           </div>
 
-          <ReportCitations key={report.id} projectId={report.project_id} reportId={report.id} />
-
           {/* Report Content */}
           <div className="bg-surface rounded-lg border border-line p-6 mb-6">
             <h2 className="text-lg font-semibold text-foreground mb-4">
@@ -316,6 +309,8 @@ export default function ReportDetailPage() {
             </h2>
             <MarkdownRenderer content={report.content} />
           </div>
+
+          <ReportCitations key={report.id} projectId={report.project_id} reportId={report.id} />
 
           <section aria-label="Report source citations" className="bg-surface rounded-lg border border-line p-6 mb-6">
             <h2 className="text-lg font-semibold text-foreground mb-4">Source citations</h2>
@@ -357,17 +352,8 @@ export default function ReportDetailPage() {
                     key={source.id}
                     className="flex items-center justify-between py-2 border-b border-line last:border-0"
                   >
-                    <div className="flex items-center gap-3">
-                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                        source.source_type === "collection"
-                          ? "bg-info-surface text-accent-text"
-                          : "bg-info-surface text-accent-text"
-                      }`}>
-                        {source.source_type}
-                      </span>
-                      <code className="text-sm text-secondary">
-                        {source.source_id.slice(0, 8)}...
-                      </code>
+                    <div className="min-w-0 break-words text-sm">
+                      {source.href ? <Link href={source.href} className="text-accent-text underline">{source.name}</Link> : <span className="text-secondary">Source unavailable</span>}
                     </div>
                     <span className="text-xs text-muted">
                       {formatDistanceToNow(parseApiTimestamp(source.added_at), { addSuffix: true })}

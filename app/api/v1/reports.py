@@ -26,6 +26,7 @@ from app.schemas.report import (
     ReportDetailResponse,
     ReportListItem,
     ReportListResponse,
+    ReportOrigin,
     ReportResponse,
     ReportSourceSchema,
     ReportUpdate,
@@ -33,6 +34,7 @@ from app.schemas.report import (
 from app.services.document_policy import document_read_policy
 from app.services.ownership import default_workspace_id
 from app.services.report_citations import original_documents, readable_citations, readable_source_records
+from app.services.report_presentation import report_labels
 from app.services.report_service import ReportService, get_report_service
 
 router = APIRouter()
@@ -50,6 +52,7 @@ def _build_report_response(report, citations: list) -> ReportResponse:
     return ReportResponse(
         id=report.id,
         title=report.title,
+        origin=report.origin,
         content=report.content,
         citations=[CitationSchema(**c) for c in citations],
         citation_status="validated" if getattr(report, "citation_manifest", None) is not None else "legacy_unavailable",
@@ -62,17 +65,9 @@ def _build_report_response(report, citations: list) -> ReportResponse:
 
 def _build_report_detail(report, db: Session, user: AuthenticatedUser) -> ReportDetailResponse:
     """Build detailed report response with sources."""
-    sources = [
-        ReportSourceSchema(
-            id=s.id,
-            report_id=s.report_id,
-            source_type=s.source_type,
-            source_id=s.source_id,
-            added_at=s.added_at,
-        )
-        for s in readable_source_records(db, user, report)
-    ]
+    sources = [ReportSourceSchema(**s) for s in readable_source_records(db, user, report)]
     return ReportDetailResponse(
+        **report_labels(db, user, [report])[report.id],
         id=report.id,
         title=report.title,
         content=report.content,
@@ -92,9 +87,10 @@ def _build_report_detail(report, db: Session, user: AuthenticatedUser) -> Report
     )
 
 
-def _build_list_item(report) -> ReportListItem:
+def _build_list_item(report, label: dict) -> ReportListItem:
     """Build list item from report model."""
     return ReportListItem(
+        **label,
         id=report.id,
         title=report.title,
         status=report.status,
@@ -181,6 +177,7 @@ def create_report(
 @router.get("", response_model=ReportListResponse)
 def list_reports(
     project_id: UUID | None = Query(default=None, description="Filter by project"),
+    origin: list[ReportOrigin] | None = Query(default=None, description="Filter by one or more origins; omitted includes all"),
     report_status: str | None = Query(
         default=None,
         alias="status",
@@ -202,11 +199,13 @@ def list_reports(
     reports, total = service.list_reports(
         project_id=project_id,
         status=report_status,
+        origins=origin,
         page=page,
         page_size=page_size,
         access_filter=accessible_filter(current_user, Report, db),
     )
-    items = [_build_list_item(r) for r in reports]
+    labels = report_labels(db, current_user, reports)
+    items = [_build_list_item(r, labels[r.id]) for r in reports]
     return ReportListResponse(
         items=items,
         total=total,

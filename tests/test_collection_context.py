@@ -231,7 +231,7 @@ def test_report_export_bytes_remain_stable_with_citation_ui(context_fixture, db_
     expected = {
         "md": "# Cafe / findings\n\nA café claim.\n\n[source](https://example.test/primary)\n",
         "txt": "Cafe / findings\n===============\n\nA café claim.\n\n[source](https://example.test/primary)\n",
-        "json": json.dumps({"id": str(report.id), "title": "Cafe / findings", "content": "A café claim.\n\n[source](https://example.test/primary)\n", "citations": [], "citation_status": "legacy_unavailable", "generation_provenance": None, "original_documents": [], "tokens_used": 12, "status": "final", "created_at": "2026-09-13T12:00:00", "project_id": None, "report_type": "markdown", "prompt": None, "chunk_count": 1, "sources": [], "updated_at": "2026-09-13T12:00:00"}, indent=2),
+        "json": json.dumps({"id": str(report.id), "title": "Cafe / findings", "content": "A café claim.\n\n[source](https://example.test/primary)\n", "origin": "written", "origin_label": "Written from 1 excerpt", "origin_href": None, "project_name": None, "citations": [], "citation_status": "legacy_unavailable", "generation_provenance": None, "original_documents": [], "tokens_used": 12, "status": "final", "created_at": "2026-09-13T12:00:00", "project_id": None, "report_type": "markdown", "prompt": None, "chunk_count": 1, "sources": [], "updated_at": "2026-09-13T12:00:00"}, indent=2),
     }
     response = client.get(f"{API}/reports/{report.id}/export", params={"format": format}, headers=headers)
     assert response.status_code == 200
@@ -294,7 +294,9 @@ def test_report_reader_rechecks_source_policy_and_original_documents(context_fix
     body = response.json()
     assert body["content"] == "Authored claim [3]."
     assert body["citations"][0]["available"] is False
-    assert body["sources"] == []
+    assert len(body["sources"]) == 1
+    assert body["sources"][0]["name"] == "Source unavailable"
+    assert body["sources"][0]["source_id"] is None and body["sources"][0]["href"] is None
     assert [doc["document_id"] for doc in body["original_documents"]] == [str(readable.id)]
     for secret in (str(hidden.id), str(chunk.id), "Secret original", "Revoked support"):
         assert secret not in response.text

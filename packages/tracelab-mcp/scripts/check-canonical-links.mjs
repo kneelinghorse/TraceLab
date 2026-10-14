@@ -20,7 +20,7 @@ const project = { id: ids.project, project_id: ids.project, name: 'Project', sta
 const document = { id: ids.document, name: 'Document', project_id: ids.project, file_type: 'md' };
 const chunk = { chunk_id: ids.chunk, document_id: ids.document, content: markdown, score: 0.9, chunk_index: 0 };
 const collection = { instructions: markdown, id: ids.collection, name: 'Collection', item_count: 1, items: [{ id: ids.chunk, chunk_id: ids.chunk, document_id: ids.document, chunk_content: markdown }] };
-const report = { id: ids.report, title: 'Report', content: markdown, citations: references, sources: [] };
+const report = { origin: 'written', origin_label: 'Written from collection Collection', origin_href: `/collections/${ids.collection}`, project_name: 'Project', id: ids.report, title: 'Report', content: markdown, citations: references, sources: [{ id: ids.chunk, source_type: 'chunk', source_id: ids.chunk, name: 'Document', href: `/documents/${ids.document}#chunk-${ids.chunk}` }] };
 const mission = { id: ids.mission, mission_id: 'MIGRATION-1', title: 'Mission', objective: 'Preserve authored evidence', status: 'completed', project_id: ids.project, context: { references }, references, success_criteria: ['Canonical navigation'], result_report_id: ids.report, result_document_ids: [ids.document] };
 const evidence = { id: ids.evidence, project_id: ids.project, claim: 'Sourced claim', source_url: archivedUrl, disposition: 'supporting' };
 const note = { id: ids.note, project_id: ids.project, content: markdown };
@@ -163,8 +163,9 @@ try {
   await check('collection', { action: 'add', collection_id: ids.collection, chunk_id: ids.chunk }, [`POST /collections/${ids.collection}/chunks`], { collection_url: url('collection') });
   await check('collection', { action: 'synthesize', collection_id: ids.collection, save_as_report: true, report_title: 'Report' }, ['POST /synthesize'], { collection_url: url('collection'), report_url: url('report') }, value => assert.equal(value.synthesis, markdown));
   await check('collection', { action: 'export', collection_id: ids.collection }, [`GET /collections/${ids.collection}/export`], {}, value => assert.equal(value, markdown));
-  await check('report', { action: 'list' }, ['GET /reports'], { 'reports.0.url': url('report') });
-  await check('report', { action: 'get', report_id: ids.report }, [`GET /reports/${ids.report}`], { url: url('report') }, value => { assert.equal(value.content, markdown); assert.deepEqual(value.citations, references); });
+  await check('report', { action: 'list' }, ['GET /reports'], { 'reports.0.url': url('report') }, value => assert.equal(value.reports[0].origin, 'written'), ['page=1&page_size=20']);
+  await check('report', { action: 'list', origin: ['written', 'librarian'] }, ['GET /reports'], {}, value => assert.equal(value.reports[0].origin, 'written'), ['page=1&page_size=20&origin=written&origin=librarian']);
+  await check('report', { action: 'get', report_id: ids.report }, [`GET /reports/${ids.report}`], { url: url('report') }, value => { assert.equal(value.content, markdown); assert.deepEqual(value.citations, references); assert.equal(value.origin, 'written'); assert.equal(value.origin_label, report.origin_label); assert.equal(value.sources[0].name, 'Document'); assert.equal(value.sources[0].href, report.sources[0].href); });
   await check('report', { action: 'create', title: 'Report', collection_id: ids.collection }, ['POST /reports'], { 'report.url': url('report') });
   await check('report', { action: 'export', report_id: ids.report }, [`GET /reports/${ids.report}`], {}, value => assert.equal(value, markdown));
   await check('document', { action: 'get_content', document_id: ids.document }, [`GET /documents/${ids.document}`, `GET /documents/${ids.document}/chunks`], { url: url('document') }, value => assert.equal(value.content, markdown));

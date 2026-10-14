@@ -1,0 +1,31 @@
+{
+  "checked_at": "2026-10-14T02:33:30.709272+00:00",
+  "version": "ruff 0.8.0",
+  "files": [
+    "alembic/versions/059_report_origin.py",
+    "app/adapters/repositories/sqlalchemy_activity_repo.py",
+    "app/adapters/repositories/sqlalchemy_home_repo.py",
+    "app/api/v1/reports.py",
+    "app/api/v1/synthesize.py",
+    "app/models/report.py",
+    "app/schemas/report.py",
+    "app/services/auto_report.py",
+    "app/services/evidence_browser.py",
+    "app/services/evidence_ledger.py",
+    "app/services/librarian_reports.py",
+    "app/services/project_query_service.py",
+    "app/services/report_citations.py",
+    "app/services/report_presentation.py",
+    "app/services/report_service.py",
+    "tests/integration/test_report_origin_migration.py",
+    "tests/test_auto_report.py",
+    "tests/test_collection_context.py",
+    "tests/test_evidence_ledger_api.py",
+    "tests/test_librarian_reports.py",
+    "tests/test_pedr_report_scope.py",
+    "tests/test_report_citations.py",
+    "tests/test_report_origins.py"
+  ],
+  "exit_code": 0,
+  "result": "All checks passed!"
+}

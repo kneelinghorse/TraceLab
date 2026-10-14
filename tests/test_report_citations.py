@@ -115,6 +115,7 @@ def test_both_writers_reload_update_export_exact_sparse_citations(writer, report
     assert [(c["marker"], c["chunk_id"]) for c in replay["citations"]] == [(c["marker"], c["chunk_id"]) for c in data["citations"]]
     assert completion.call_count == 1
     saved = db_session.get(Report, report_id)
+    assert saved.origin == "written"
     assert {str(s.source_id) for s in db_session.query(ReportSource).filter_by(report_id=saved.id, source_type="chunk")} == {str(c.id) for c in chunks}
 
 
