@@ -1,4 +1,5 @@
 import { ScopeOutcomeNotice, ScopeOutcomePanel } from "@/components/missions/AuthoredScope";
+import { MissionFailureDetails, MissionQualitySummary, RawQualityData } from "@/components/missions/MissionQuality";
 import { RelationshipLink } from "@/components/graph/RelationshipLink";
 import { parseApiTimestamp } from "@/lib/api/timestamps";
 import { StatusBadge } from "@/components/ui/StatusBadge";
@@ -375,7 +376,9 @@ function MissionDetailContent() {
               }
             }} onClick={() => setDetailTab(tab)} className={`rounded px-4 py-2 ${detailTab === tab ? "bg-accent text-on-accent" : "border border-line"}`}>{tab === "overview" ? firstTabLabel : tab === "results" ? "Results" : "Evidence"}</button>)}
           </div>
+          <MissionFailureDetails mission={mission} />
           <div role="tabpanel" id="mission-panel-results" aria-labelledby="mission-tab-results" hidden={detailTab !== "results"}>
+          {isFinished && <MissionQualitySummary mission={mission} />}
           {isFinished && <ScopeOutcomeNotice mission={mission}><Link href={tabHref("overview")} shallow onClick={() => rememberTab("overview")} className="text-accent-text underline">View Details</Link></ScopeOutcomeNotice>}
           <div className="flex flex-wrap items-center justify-between gap-2 px-4 pt-4 sm:px-6">
             <h2 className="text-lg font-semibold">Results</h2>
@@ -405,6 +408,7 @@ function MissionDetailContent() {
           {detailTab === 'evidence' && <div role="tabpanel" id="mission-panel-evidence" aria-labelledby="mission-tab-evidence" className="px-4"><EvidencePanel projectId={mission.project_id} filters={{ mission_id: mission.id }} /></div>}
           <div role="tabpanel" id="mission-panel-overview" aria-labelledby="mission-tab-overview" hidden={detailTab !== 'overview'}>
           {isFinished && <div className="p-4"><ScopeOutcomePanel mission={mission} /></div>}
+          {isFinished && <RawQualityData mission={mission} />}
           <MissionRunActivity mission={mission} />
           {/* Objective Section */}
           <Section title="Objective">
