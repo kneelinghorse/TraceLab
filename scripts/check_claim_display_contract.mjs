@@ -37,7 +37,7 @@ try {
   assert.equal(graph.root.title, fixture.display);
   assert.equal(graph.nodes.find(node => node.id === fixture.id).title, fixture.display);
   checks.push({ action: 'tracelab_project.neighborhood', readableRootAndNode: true });
-  const navigation = await call('tracelab_search', { action: 'navigate', q: fixture.claim, entity_type: 'evidence', page_size: 100 });
+  const navigation = await call('tracelab_search', { action: 'navigate', q: fixture.claim, entity_type: 'evidence', page_size: 50 });
   assert.equal(navigation.groups[0].items.find(item => item.id === fixture.id).title, fixture.display);
   checks.push({ action: 'tracelab_search.navigate', rawQueryMatched: true, readableTitle: true });
   console.log(JSON.stringify({ checkedAt: new Date().toISOString(), api, entrypoint, readOnly: true, checks }, null, 2));

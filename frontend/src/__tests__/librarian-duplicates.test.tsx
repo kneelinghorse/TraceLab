@@ -52,7 +52,7 @@ it("rechecks sources before displaying full text and returns keyboard focus on c
   expect(screen.queryByRole("link", { name: "Interview A" })).toBeNull();
   const compare = screen.getByRole("button", { name: "Compare sources" });
   fireEvent.click(compare);
-  expect(await screen.findByRole("region", { name: "Compare documents" })).toHaveFocus();
+  await waitFor(() => expect(screen.getByRole("region", { name: "Compare documents" })).toHaveFocus());
   expect(duplicateApi.compare).toHaveBeenCalledWith("project", result.candidates[0]);
   expect(screen.getByRole("link", { name: "Interview A" })).toHaveAttribute("href", "/documents/a");
   expect(screen.getByRole("region", { name: "Source text: Interview A" })).toHaveTextContent("Current source text");

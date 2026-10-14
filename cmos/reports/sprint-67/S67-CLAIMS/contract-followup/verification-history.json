@@ -1,0 +1,22 @@
+{
+  "checkedAt": "2026-10-14T08:25:21.570254+00:00",
+  "original_ci": {
+    "run": 38534411595,
+    "head": "39b46748064b28d6b97b3ebc1a727b123854b957",
+    "passed": 448,
+    "failed": 1,
+    "test": "rechecks sources before displaying full text and returns keyboard focus on close",
+    "file": "frontend/src/__tests__/librarian-duplicates.test.tsx",
+    "reason": "Comparison region existed, but focus was still on Duplicate results; the assertion ran before the comparison passive effect."
+  },
+  "correction": "Wait for Compare documents toHaveFocus, matching the neighboring results focus test. No timeout increase, skip, retry or product change.",
+  "local_verification": {
+    "unit_passed": 449,
+    "unit_files": 49,
+    "types": "passed",
+    "lint": "passed",
+    "focus_file_repeat_runs": 5,
+    "tests_per_repeat": 7,
+    "runtime_changes": false
+  }
+}

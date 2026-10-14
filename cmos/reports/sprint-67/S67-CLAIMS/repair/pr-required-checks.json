@@ -1,0 +1,161 @@
+{
+  "required": {
+    "url": "https://api.github.com/repos/kneelinghorse/TraceLab/branches/main/protection/required_status_checks",
+    "strict": true,
+    "contexts": [
+      "backend-suite",
+      "vitest",
+      "type-check",
+      "ruff-diff",
+      "build-frontend-production",
+      "Secret Scan",
+      "backend-integration",
+      "lint",
+      "mcp-package"
+    ],
+    "contexts_url": "https://api.github.com/repos/kneelinghorse/TraceLab/branches/main/protection/required_status_checks/contexts",
+    "checks": [
+      {
+        "context": "backend-suite",
+        "app_id": 15368
+      },
+      {
+        "context": "vitest",
+        "app_id": 15368
+      },
+      {
+        "context": "type-check",
+        "app_id": 15368
+      },
+      {
+        "context": "ruff-diff",
+        "app_id": 15368
+      },
+      {
+        "context": "build-frontend-production",
+        "app_id": 15368
+      },
+      {
+        "context": "Secret Scan",
+        "app_id": 15368
+      },
+      {
+        "context": "backend-integration",
+        "app_id": 15368
+      },
+      {
+        "context": "lint",
+        "app_id": 15368
+      },
+      {
+        "context": "mcp-package",
+        "app_id": 15368
+      }
+    ]
+  },
+  "pr": {
+    "headRefOid": "820b23e88ba22e2f4683bf17ef42dd7566e03b68",
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-14T08:03:14Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/kneelinghorse/TraceLab/actions/runs/38532038510/job/115745954461",
+        "name": "backend-integration",
+        "startedAt": "2026-10-14T07:59:58Z",
+        "status": "COMPLETED",
+        "workflowName": "Backend Integration"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-14T08:00:26Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/kneelinghorse/TraceLab/actions/runs/38532038442/job/115745953753",
+        "name": "ruff-diff",
+        "startedAt": "2026-10-14T07:59:58Z",
+        "status": "COMPLETED",
+        "workflowName": "Backend Lint"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-14T08:12:16Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/kneelinghorse/TraceLab/actions/runs/38532038469/job/115745953866",
+        "name": "backend-suite",
+        "startedAt": "2026-10-14T07:59:58Z",
+        "status": "COMPLETED",
+        "workflowName": "Backend Tests"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-14T08:01:15Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/kneelinghorse/TraceLab/actions/runs/38532038498/job/115745954371",
+        "name": "vitest",
+        "startedAt": "2026-10-14T07:59:58Z",
+        "status": "COMPLETED",
+        "workflowName": "Frontend Checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-14T08:06:44Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/kneelinghorse/TraceLab/actions/runs/38532038589/job/115745954840",
+        "name": "build-frontend-production",
+        "startedAt": "2026-10-14T07:59:57Z",
+        "status": "COMPLETED",
+        "workflowName": "Frontend Production Build"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-14T08:00:40Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/kneelinghorse/TraceLab/actions/runs/38532038666/job/115745954220",
+        "name": "mcp-package",
+        "startedAt": "2026-10-14T07:59:57Z",
+        "status": "COMPLETED",
+        "workflowName": "MCP Package"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-14T08:00:27Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/kneelinghorse/TraceLab/actions/runs/38532038499/job/115745953462",
+        "name": "Secret Scan",
+        "startedAt": "2026-10-14T07:59:57Z",
+        "status": "COMPLETED",
+        "workflowName": "Secret Scan"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-14T08:00:25Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/kneelinghorse/TraceLab/actions/runs/38532031556/job/115745931276",
+        "name": "Secret Scan",
+        "startedAt": "2026-10-14T07:59:54Z",
+        "status": "COMPLETED",
+        "workflowName": "Secret Scan"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-14T08:00:54Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/kneelinghorse/TraceLab/actions/runs/38532038498/job/115745954494",
+        "name": "type-check",
+        "startedAt": "2026-10-14T07:59:57Z",
+        "status": "COMPLETED",
+        "workflowName": "Frontend Checks"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-14T08:00:58Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/kneelinghorse/TraceLab/actions/runs/38532038498/job/115745954281",
+        "name": "lint",
+        "startedAt": "2026-10-14T07:59:58Z",
+        "status": "COMPLETED",
+        "workflowName": "Frontend Checks"
+      }
+    ]
+  }
+}

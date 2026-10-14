@@ -1,0 +1,204 @@
+{
+  "checkedAt": "2026-10-14T08:18:31.609Z",
+  "readOnly": true,
+  "entryId": "69d92a7d-3ece-49eb-a4e9-483ce8bbb5fe",
+  "rawClaimUnchanged": true,
+  "results": [
+    {
+      "name": "card",
+      "theme": "light",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "suppressedWrites": [
+        {
+          "method": "PUT",
+          "path": "/api/v1/activity/viewed/evidence"
+        }
+      ],
+      "screenshot": "card-light-390.png"
+    },
+    {
+      "name": "detail",
+      "theme": "light",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "suppressedWrites": [],
+      "screenshot": "detail-light-390.png"
+    },
+    {
+      "name": "graph",
+      "theme": "light",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "suppressedWrites": [],
+      "screenshot": "graph-light-390.png"
+    },
+    {
+      "name": "palette",
+      "theme": "light",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "suppressedWrites": [],
+      "screenshot": "palette-light-390.png"
+    },
+    {
+      "name": "card",
+      "theme": "light",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "suppressedWrites": [
+        {
+          "method": "PUT",
+          "path": "/api/v1/activity/viewed/evidence"
+        }
+      ],
+      "screenshot": "card-light-1440.png"
+    },
+    {
+      "name": "detail",
+      "theme": "light",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "suppressedWrites": [],
+      "screenshot": "detail-light-1440.png"
+    },
+    {
+      "name": "graph",
+      "theme": "light",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "suppressedWrites": [],
+      "screenshot": "graph-light-1440.png"
+    },
+    {
+      "name": "palette",
+      "theme": "light",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "suppressedWrites": [],
+      "screenshot": "palette-light-1440.png"
+    },
+    {
+      "name": "card",
+      "theme": "dark",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "suppressedWrites": [
+        {
+          "method": "PUT",
+          "path": "/api/v1/activity/viewed/evidence"
+        }
+      ],
+      "screenshot": "card-dark-390.png"
+    },
+    {
+      "name": "detail",
+      "theme": "dark",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "suppressedWrites": [],
+      "screenshot": "detail-dark-390.png"
+    },
+    {
+      "name": "graph",
+      "theme": "dark",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "suppressedWrites": [],
+      "screenshot": "graph-dark-390.png"
+    },
+    {
+      "name": "palette",
+      "theme": "dark",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "suppressedWrites": [],
+      "screenshot": "palette-dark-390.png"
+    },
+    {
+      "name": "card",
+      "theme": "dark",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "suppressedWrites": [
+        {
+          "method": "PUT",
+          "path": "/api/v1/activity/viewed/evidence"
+        }
+      ],
+      "screenshot": "card-dark-1440.png"
+    },
+    {
+      "name": "detail",
+      "theme": "dark",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "suppressedWrites": [],
+      "screenshot": "detail-dark-1440.png"
+    },
+    {
+      "name": "graph",
+      "theme": "dark",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "suppressedWrites": [],
+      "screenshot": "graph-dark-1440.png"
+    },
+    {
+      "name": "palette",
+      "theme": "dark",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "transportErrors": [],
+      "suppressedWrites": [],
+      "screenshot": "palette-dark-1440.png"
+    }
+  ]
+}
