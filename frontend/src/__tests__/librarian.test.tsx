@@ -53,6 +53,8 @@ function page(swr: Record<string, unknown> = {}) {
 }
 
 async function chooseProject() {
+  const scope = screen.queryByRole("button", { name: /^(No project chosen|About:)/ });
+  if (scope) fireEvent.click(scope);
   await screen.findByRole("option", { name: "Onboarding" });
   fireEvent.change(screen.getByRole("combobox", { name: "Project" }), { target: { value: projectId } });
 }
@@ -108,7 +110,7 @@ describe("Librarian page", () => {
       model: "fake",
     });
     page();
-    await screen.findByRole("option", { name: "Onboarding" });
+    fireEvent.click(screen.getByText("Try an example"));
     fireEvent.click(screen.getByRole("button", { name: /abandon onboarding/ }));
     expect(await screen.findByRole("note")).toHaveTextContent("was withheld");
     expect(mocks.turn.mock.calls[0][1]).toBeNull();
@@ -187,18 +189,18 @@ describe("Librarian page", () => {
     mocks.listAllProjects.mockResolvedValueOnce([]).mockResolvedValue([{ id: projectId, name: "Fresh start" }]);
     mocks.createProject.mockResolvedValue({ id: projectId, name: "Fresh start" });
     page();
+    fireEvent.click(screen.getByRole("button", { name: "New project", exact: true }));
     expect(await screen.findByText(/Without a project the Librarian can only plan/)).toBeVisible();
     fireEvent.change(screen.getByLabelText("New project"), { target: { value: "Fresh start" } });
     fireEvent.click(screen.getByRole("button", { name: "Create" }));
     await waitFor(() => expect(mocks.createProject).toHaveBeenCalledWith({ name: "Fresh start" }));
-    await waitFor(() => expect((screen.getByRole("combobox", { name: "Project" }) as HTMLSelectElement).value).toBe(projectId));
-    expect(await screen.findByText(/Missions will be created in/)).toBeVisible();
+    expect(await screen.findByRole("button", { name: "About: Fresh start" })).toBeVisible();
   });
 
   // PERSONAL-2 (decision #533): the picker appears only for someone in more than one Space.
   it("shows no Space picker to someone whose only Space is their own", async () => {
     page();
-    await screen.findByRole("option", { name: "Onboarding" });
+    fireEvent.click(screen.getByRole("button", { name: "New project", exact: true }));
     await waitFor(() => expect(mocks.listSpaces).toHaveBeenCalled());
     expect(screen.queryByRole("combobox", { name: "Space" })).toBeNull();
   });
@@ -210,6 +212,7 @@ describe("Librarian page", () => {
     ]);
     mocks.createProject.mockResolvedValue({ id: projectId, name: "Catalog audit" });
     page();
+    fireEvent.click(screen.getByRole("button", { name: "New project", exact: true }));
     const picker = (await screen.findByRole("combobox", { name: "Space" })) as HTMLSelectElement;
     expect(picker.value).toBe("");
     expect(within(picker).getByRole("option", { name: "My Space" })).toBeInTheDocument();
@@ -238,7 +241,7 @@ describe("Librarian page", () => {
     const log = await screen.findByRole("log");
     expect(await within(log).findByText("Start with who abandons and when.")).toBeVisible();
     expect(within(log).getByText("Why do users abandon onboarding?")).toBeVisible();
-    await waitFor(() => expect((screen.getByRole("combobox", { name: "Project" }) as HTMLSelectElement).value).toBe(projectId));
+    expect(await screen.findByRole("button", { name: "About: Onboarding" })).toBeVisible();
     expect(mocks.turn).toHaveBeenCalledTimes(1);
 
     fireEvent.click(screen.getByRole("button", { name: "Start over" }));
@@ -246,7 +249,8 @@ describe("Librarian page", () => {
     expect(window.localStorage.getItem("tracelab.librarian.v1:reader")).toBeNull();
   });
 
-  it("explains the three steps until the user asks it not to", async () => {
+  it("keeps the focused mission flow and its stored step dismissal", async () => {
+    mocks.query = { intent: "mission" };
     // WALK-1 finding 6 and Derek's "dont show me this anymore".
     const first = page();
     await screen.findByRole("option", { name: "Onboarding" });
@@ -358,9 +362,9 @@ describe("Librarian page, asking the documents", () => {
 
   it("cannot ask the documents without a project", async () => {
     page();
-    await screen.findByRole("option", { name: "Onboarding" });
+    expect(await screen.findByRole("button", { name: "No project chosen" })).toBeVisible();
     expect(screen.getByRole("radio", { name: "Ask the documents" })).toBeDisabled();
-    expect(screen.getByRole("radio", { name: "Talk it through" })).toBeChecked();
+    expect(screen.getByRole("radio", { name: "Talk" })).toBeChecked();
     expect(screen.queryByRole("radio", { name: "Full synthesis" })).toBeNull();
   });
 });
@@ -392,7 +396,7 @@ describe("Librarian page, listing the chunks", () => {
     // The URL is what /search?q= redirects to and what a reload reruns.
     page();
     await chooseProject();
-    fireEvent.click(screen.getByRole("radio", { name: "List the chunks" }));
+    fireEvent.click(screen.getByRole("radio", { name: "List chunks" }));
     fireEvent.change(screen.getByLabelText("Message the Librarian"), { target: { value: "onboarding friction" } });
     fireEvent.click(screen.getByRole("button", { name: "List" }));
     expect(mocks.push).toHaveBeenCalledWith({ pathname: "/librarian", query: { q: "onboarding friction", project: projectId } }, undefined, { shallow: true });
@@ -404,7 +408,7 @@ describe("Librarian page, listing the chunks", () => {
     mocks.query = { q: "onboarding friction", project: projectId, intent: "mission" };
     page();
     const list = await screen.findByRole("region", { name: "Matching chunks" });
-    expect(screen.getByRole("radio", { name: "List the chunks" })).toBeChecked();
+    expect(screen.getByRole("radio", { name: "List chunks" })).toBeChecked();
     expect(mocks.pedrSearch).toHaveBeenCalledWith({ query: "onboarding friction", top_k: 20, project_id: projectId });
     expect(await within(list).findByRole("heading", { name: "3 chunks match “onboarding friction”" })).toBeVisible();
     expect(within(list).getByText(/^In Onboarding, best match first/)).toBeVisible();
@@ -635,4 +639,52 @@ describe("focused mission planning", () => {
     await waitFor(() => expect(screen.getByRole("button", { name: "Draft a mission" })).toBeEnabled());
     expect(screen.queryByRole("region", { name: "Mission draft" })).toBeNull(); expect(mocks.createMission).not.toHaveBeenCalled();
   });
+});
+
+describe("S67 conversation-first navigation", () => {
+  it("keeps tools and repeated steps off the initial conversation", async () => {
+    mocks.query = { project: projectId };
+    page();
+    expect(await screen.findByRole("button", { name: "About: Onboarding" })).toBeVisible();
+    expect(screen.getByRole("textbox", { name: "Message the Librarian" })).toBeVisible();
+    expect(screen.queryByRole("navigation", { name: "Where you are" })).toBeNull();
+    expect(screen.queryByRole("region", { name: "Project description tool" })).toBeNull();
+    expect(screen.getByText("More with this project")).toBeVisible();
+  });
+
+  it("keeps the no-project conversation usable without a tool chooser", async () => {
+    page();
+    expect(await screen.findByRole("button", { name: "No project chosen" })).toBeVisible();
+    expect(screen.queryByText("More with this project")).toBeNull();
+    expect(screen.getByRole("radio", { name: "Talk", exact: true })).toBeChecked();
+  });
+
+  it("uses the tool URL without discarding the transcript or unsent message", async () => {
+    localStorage.setItem("tracelab.librarian.v1:reader", JSON.stringify({ projectId, turns: [{ role: "user", text: "Keep this research question" }], draft: null }));
+    mocks.query = { project: projectId };
+    const view = page();
+    expect(await screen.findByText("Keep this research question")).toBeVisible();
+    fireEvent.change(screen.getByLabelText("Message the Librarian"), { target: { value: "Still composing" } });
+    mocks.query = { project: projectId, tool: "describe" };
+    view.rerender(<SWRConfig value={{ shouldRetryOnError: false }}><LibrarianPage /></SWRConfig>);
+    expect(await screen.findByRole("region", { name: "Project description tool" })).toBeVisible();
+    expect(screen.queryByRole("region", { name: "Conversation with the Librarian" })).toBeNull();
+    expect(screen.getByRole("link", { name: "Back to conversation" })).toHaveAttribute("href", `/librarian?project=${projectId}`);
+    mocks.query = { project: projectId };
+    view.rerender(<SWRConfig value={{ shouldRetryOnError: false }}><LibrarianPage /></SWRConfig>);
+    expect(await screen.findByText("Keep this research question")).toBeVisible();
+    expect(screen.getByLabelText("Message the Librarian")).toHaveValue("Still composing");
+  });
+});
+
+it("S67 keeps a reviewed mission draft when a tool URL adds the already selected project", async () => {
+  localStorage.setItem("tracelab.librarian.v1:reader", JSON.stringify(storedPlan()));
+  const view = page();
+  expect(await screen.findByRole("heading", { name: "Reviewed plan" })).toBeVisible();
+  mocks.query = { project: projectId, tool: "describe" };
+  view.rerender(<SWRConfig value={{ shouldRetryOnError: false }}><LibrarianPage /></SWRConfig>);
+  expect(await screen.findByRole("region", { name: "Project description tool" })).toBeVisible();
+  mocks.query = { project: projectId };
+  view.rerender(<SWRConfig value={{ shouldRetryOnError: false }}><LibrarianPage /></SWRConfig>);
+  expect(await screen.findByRole("heading", { name: "Reviewed plan" })).toBeVisible();
 });

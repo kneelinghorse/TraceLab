@@ -1,0 +1,8 @@
+{
+  "mission": "S67-LIBRARIAN",
+  "red": "Three conversation-first tests failed against the old stacked layout. A later regression test proved that adding the already-selected project to a tool URL cleared a restored reviewed mission draft.",
+  "correction": "Only an actual URL project change now resets the mission draft; local project selection stays independent.",
+  "iterations": "The first targeted browser attempt was stopped to correct a fixture endpoint typo (/turns). All 43 targeted cases then passed. The first full browser run was stopped after the reviewed-draft edge case was found; final runtime was rebuilt. That full run passed 209 cases and found four density tests still expecting the old always-visible Project panel. Their first-working-surface selector now measures Conversation while retaining every density/accessibility assertion; all four passed, then the complete 213 cases passed again. No new tests are skipped.",
+  "final": "423 frontend unit tests/48 files; types, zero-warning lint, token gate and production build pass. Backend and sequential PostgreSQL counts and existing skips are recorded separately.",
+  "scope": "Frontend only; no API, schema, MCP, package or environment changes. Existing tool stores preserve review state; Plan a mission and its stored dismissal remain."
+}

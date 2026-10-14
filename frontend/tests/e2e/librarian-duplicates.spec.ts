@@ -36,11 +36,16 @@ for (const theme of ["light", "dark"]) for (const width of [390, 820, 1440]) {
       }
       await route.fulfill({ json });
     });
-    await page.goto("/librarian?project=project");
+    await page.goto("/librarian?project=project&tool=duplicates");
     await page.getByRole("button", { name: "Find possible duplicates" }).waitFor();
     expect(scans).toBe(0);
     await page.getByRole("button", { name: "Find possible duplicates" }).click();
     await expect(page.getByRole("region", { name: "Duplicate results" })).toBeFocused();
+    // The reviewed proposal survives a trip to the conversation without another generation.
+    await page.getByRole("link", { name: "Back to conversation" }).click();
+    await expect(page.getByRole("textbox", { name: "Message the Librarian" })).toBeVisible();
+    await page.getByText("More with this project", { exact: true }).click();
+    await page.getByRole("link", { name: /^Find duplicates/ }).click();
     await page.reload();
     await expect(page.getByText("Probable text overlap", { exact: true })).toBeVisible();
     expect(scans).toBe(1);

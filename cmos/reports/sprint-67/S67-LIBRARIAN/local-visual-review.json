@@ -1,0 +1,34 @@
+{
+  "reviewed_at": "2026-10-14T06:29:06.354203+00:00",
+  "captures": 56,
+  "themes": [
+    "light",
+    "dark"
+  ],
+  "navigation_widths": [
+    390,
+    1440
+  ],
+  "review_widths": [
+    390,
+    820,
+    1440
+  ],
+  "findings": "Conversation and composer are visible without scrolling at 390x900 and 1440x900. Scope controls and the four described choices wrap clearly. Each chosen panel has a visible Back to conversation link; the other tool panels are absent. Existing review forms remain readable in both themes with no horizontal overflow or serious/critical axe findings.",
+  "review_method": "Viewed initial conversation, all initial tools and all four review flows in contact sheets. Compared the final 56 captures with those reviewed files: 47 are byte-identical; directly viewed the nine new or changed captures, including the expanded chooser.",
+  "comparison": {
+    "total": 56,
+    "byte_identical_to_reviewed": 47,
+    "new_or_changed": [
+      "librarian-navigation-conve-4bc68-nd-tool-navigation-dark-390-chromium/chooser.png",
+      "librarian-navigation-conve-4bc68-nd-tool-navigation-dark-390-chromium/describe.png",
+      "librarian-navigation-conve-d53ac--tool-navigation-light-1440-chromium/chooser.png",
+      "librarian-navigation-conve-e019e-d-tool-navigation-light-390-chromium/chooser.png",
+      "librarian-navigation-conve-e019e-d-tool-navigation-light-390-chromium/conversation-empty.png",
+      "librarian-navigation-conve-e019e-d-tool-navigation-light-390-chromium/describe.png",
+      "librarian-navigation-conve-f2638-d-tool-navigation-dark-1440-chromium/chooser.png",
+      "librarian-navigation-conve-f2638-d-tool-navigation-dark-1440-chromium/conversation-empty.png",
+      "librarian-navigation-conve-f2638-d-tool-navigation-dark-1440-chromium/conversation-restored.png"
+    ]
+  }
+}

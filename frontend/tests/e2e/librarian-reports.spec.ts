@@ -42,7 +42,7 @@ for (const theme of ["light", "dark"]) for (const width of [390, 820, 1440]) {
       }
       await route.fulfill({ status, json });
     });
-    await page.goto("/librarian?project=project");
+    await page.goto("/librarian?project=project&tool=report");
     const panel = page.getByRole("region", { name: "Draft a report", exact: true });
     await panel.getByLabel("Report title", { exact: true }).fill("Navigation report");
     await panel.getByLabel("What should the report explain?").fill("Summarise navigation feedback");
@@ -61,6 +61,11 @@ for (const theme of ["light", "dark"]) for (const width of [390, 820, 1440]) {
     await expect(panel.getByRole("button", { name: "Save reviewed report" })).toBeDisabled();
     await panel.getByRole("button", { name: "Draft report again" }).click();
     await expect(preview.getByRole("heading", { name: "Reviewed navigation report" })).toBeVisible();
+    // The reviewed proposal survives a trip to the conversation without another generation.
+    await page.getByRole("link", { name: "Back to conversation" }).click();
+    await expect(page.getByRole("textbox", { name: "Message the Librarian" })).toBeVisible();
+    await page.getByText("More with this project", { exact: true }).click();
+    await page.getByRole("link", { name: /^Write a report/ }).click();
     await page.reload();
     await expect(preview.getByRole("heading", { name: "Reviewed navigation report" })).toBeVisible();
     expect(drafts).toBe(2); expect(accepts).toEqual([]);

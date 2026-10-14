@@ -118,7 +118,7 @@ for (const theme of ["light", "dark"] as const) {
       // The retired Search page's URL lands on the Librarian with its query (QA-2).
       await page.goto("/search?q=scope%20%26%20provenance");
       await expect(page).toHaveURL(/\/librarian\?q=scope(\+|%20)%26(\+|%20)provenance$/);
-      await expect(page.getByRole("radio", { name: "List the chunks" })).toBeChecked();
+      await expect(page.getByRole("radio", { name: "List chunks" })).toBeChecked();
       const list = page.getByRole("region", { name: "Matching chunks", exact: true });
       await expect(list.getByRole("heading", { name: "2 chunks match “scope & provenance”" })).toBeVisible();
       expect(requests.find(item => item.pathname.endsWith("/pedr/search"))?.body).toEqual({ query: "scope & provenance", top_k: 20 });
