@@ -1,0 +1,20 @@
+{
+  "checkedAt": "2026-10-14T04:04:35.725Z",
+  "readOnly": true,
+  "summary": {
+    "generated_at": "2026-10-14T04:04:33.483350",
+    "new_total": 0,
+    "by_type": {
+      "mission": 0,
+      "report": 0,
+      "evidence": 0
+    },
+    "completed_missions_new": 0
+  },
+  "homeActivityCount": 10,
+  "activeRuns": 0,
+  "stateItems": 40,
+  "seen": 21,
+  "new": 0,
+  "unseen": 19
+}

@@ -1,0 +1,15 @@
+{
+  "reviewed_at": "2026-10-14T04:06:17.583679+00:00",
+  "captures": 16,
+  "review": "Viewed live Home, navigation, Missions and Reports captures in both themes at 390px and 1440px. Sidebar shows no numbers and correctly no dot for the current account; recent completed unseen count is zero. Home has full-width Recent activity and no Active missions section. Seen titles use regular secondary text; older unseen titles remain semibold. All three states and the dot appearing/clearing were independently exercised by the deterministic 205-case browser suite.",
+  "sampled_row_states": {
+    "seen": 21,
+    "unseen": 19,
+    "new": 0
+  },
+  "serious_or_critical_axe_violations": 0,
+  "horizontal_overflow": 0,
+  "client_exceptions": 0,
+  "transport_errors": 0,
+  "read_only": true
+}

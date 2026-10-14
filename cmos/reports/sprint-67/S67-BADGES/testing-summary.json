@@ -102,5 +102,16 @@
     "actions": 50,
     "operations": 119
   },
-  "production": "pending merge and both Railway deployments"
+  "production": {
+    "status": "passed",
+    "post_deploy_check": 38509222558,
+    "captures": 16,
+    "live_mcp_checks": 19,
+    "read_only": true,
+    "sampled_row_states": {
+      "seen": 21,
+      "unseen": 19,
+      "new": 0
+    }
+  }
 }

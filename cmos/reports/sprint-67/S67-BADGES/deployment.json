@@ -1,0 +1,18 @@
+{
+  "checked_at": "2026-10-14T04:04:10.691538+00:00",
+  "expected_commit": "5a7a69f6ac9c404ef8dcfe8e25d4084ff3090154",
+  "services": [
+    {
+      "service": "TraceLab",
+      "status": "SUCCESS",
+      "commit": "5a7a69f6ac9c404ef8dcfe8e25d4084ff3090154",
+      "deployment_id": "f8fed7fb-1abc-4f9e-9bf0-b56dfc3be11f"
+    },
+    {
+      "service": "frontend",
+      "status": "SUCCESS",
+      "commit": "5a7a69f6ac9c404ef8dcfe8e25d4084ff3090154",
+      "deployment_id": "e3bdf265-7ca4-4fdd-b13d-2623142adc0e"
+    }
+  ]
+}
