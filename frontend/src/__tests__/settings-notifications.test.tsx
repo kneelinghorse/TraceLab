@@ -2,10 +2,11 @@ import "@testing-library/jest-dom/vitest";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-const mocks = vi.hoisted(() => ({ get: vi.fn(), update: vi.fn() }));
+const mocks = vi.hoisted(() => ({ get: vi.fn(), update: vi.fn(), isAdmin: false }));
 vi.mock("@/components/AuthGate", () => ({ AuthGate: ({ children }: { children: ReactNode }) => <>{children}</> }));
 vi.mock("@/components/ThemeSelect", () => ({ ThemeSelect: () => null }));
 vi.mock("@/contexts/AuthContext", () => ({ useAuth: () => ({ isReady: true, isAuthenticated: true, user: { user_id: "owner", email: "owner@example.test", display_name: "Owner" } }) }));
+vi.mock("@/contexts/RoleContext", () => ({ useRole: () => ({ isAdmin: mocks.isAdmin }) }));
 vi.mock("@/lib/api/settings", () => ({
   profileApi: { get: mocks.get, update: mocks.update },
   apiKeysApi: { list: vi.fn().mockResolvedValue({ keys: [] }), create: vi.fn(), delete: vi.fn() },
@@ -23,6 +24,22 @@ describe("mission email preference on Settings", () => {
   beforeEach(() => {
     mocks.get.mockReset();
     mocks.update.mockReset();
+    mocks.isAdmin = false;
+  });
+
+  it("does not offer members an invite action the server will deny", async () => {
+    mocks.get.mockResolvedValue(profile(true));
+    await openSettings();
+    expect(screen.queryByRole("button", { name: "Generate code" })).toBeNull();
+    expect(screen.getByText("Ask an admin for an invite code.")).toBeVisible();
+  });
+
+  it("preserves invite creation for the resolved admin role", async () => {
+    mocks.isAdmin = true;
+    mocks.get.mockResolvedValue(profile(true));
+    await openSettings();
+    expect(screen.getByRole("button", { name: "Generate code" })).toBeEnabled();
+    expect(screen.queryByText("Ask an admin for an invite code.")).toBeNull();
   });
 
   it("shows the stored preference and then whatever the server saved", async () => {

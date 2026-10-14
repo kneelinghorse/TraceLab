@@ -14,7 +14,7 @@ Keep documents, claims, sources and research results together, then use the Libr
 
 ## Hosted access
 
-The [hosted app](https://tracelab.aquex.ai) is invite-only. Use the invite code supplied by the person inviting you when you register. Existing users sign in with their email address and password. API keys and additional invite codes are available in Settings.
+The [hosted app](https://tracelab.aquex.ai) is invite-only. Use the invite code supplied by the person inviting you when you register. Existing users sign in with their email address and password. API keys are available in Settings; admins can also generate invite codes there.
 
 ## Run locally
 

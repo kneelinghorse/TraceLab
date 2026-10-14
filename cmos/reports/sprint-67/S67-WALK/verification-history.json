@@ -1,0 +1,7 @@
+{
+  "settings_regression_red": "New member test failed against the old Generate code control (1 failed, 4 passed).",
+  "settings_regression_green": "451 frontend unit tests passed, including member denial UI and retained admin control.",
+  "browser": "218 passed, no failures/skips/retries; 27 workflow-enumerated specs.",
+  "precopy_baseline": "449 units and 217 browser cases passed before the two WALK fixes; final counts above include their regression coverage.",
+  "harness_notes": "See progress.json; corrected URL selection, report-link strict locator and local skip-server flag. No harness correction changed production data or required another paid run."
+}

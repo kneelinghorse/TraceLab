@@ -1,0 +1,49 @@
+{
+  "mission": "S67-CLAIMS",
+  "pr": "https://github.com/kneelinghorse/TraceLab/pull/435",
+  "head": "bb34feec422b067b9becea9fe8953adbe7d9c3ce",
+  "merge": "707b08b3f5cf426232f49f17dd3d549ef2f2f2cd",
+  "mergedAt": "2026-10-14T08:41:37Z",
+  "requiredCheckNames": 9,
+  "allRequiredPassed": true,
+  "mergeMethod": "normal squash, no admin override",
+  "ci": {
+    "backend": {
+      "passed": 3212,
+      "skipped": 4,
+      "deselected": 12,
+      "warnings": 49,
+      "seconds": 706.27
+    },
+    "postgres": {
+      "passed": 172,
+      "skipped": 3,
+      "warnings": 17,
+      "seconds": 143.48
+    },
+    "browser": {
+      "passed": 217,
+      "skipped": 0,
+      "minutes": 6.5
+    },
+    "frontend_unit": {
+      "passed": 449,
+      "files": 49
+    }
+  },
+  "local": {
+    "frontend_unit": 449,
+    "types": "passed",
+    "lint": "passed",
+    "focus_file_repeat_runs": 5,
+    "tests_per_repeat": 7,
+    "installed_mcp_contract_checks": 13
+  },
+  "final_production": {
+    "captures": 16,
+    "commit": "707b08b3f5cf426232f49f17dd3d549ef2f2f2cd",
+    "installed_published_mcp": "2.2.0",
+    "mcp_checks": 13,
+    "read_only": true
+  }
+}

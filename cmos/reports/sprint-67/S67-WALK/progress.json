@@ -1,0 +1,450 @@
+{
+  "checks": {
+    "invite": {
+      "id": "5373f5c4-106f-4832-8a36-55c7466f39a2",
+      "adminCreated": true,
+      "credentialsOutsideRepository": true
+    },
+    "signup": {
+      "userId": "445333fa-464b-492f-9157-fb95d9f6ad9e",
+      "role": "member",
+      "viaRealBrowser": true,
+      "at": "2026-10-14T08:50:43.744Z"
+    },
+    "initialProjectsEmpty": true,
+    "project": {
+      "id": "43ce8e09-b14a-4518-8f4e-6dd232ce21e4",
+      "ownerId": "445333fa-464b-492f-9157-fb95d9f6ad9e",
+      "viaRealBrowser": true
+    },
+    "conversation": {
+      "realProviderResponse": true,
+      "model": "gpt-5.1",
+      "projectSelectedViaProjectLink": true,
+      "restoredActualConversation": true
+    },
+    "harnessCorrection": {
+      "initial": "Harness used unsupported project_id URL query; planning worked but no project selected, so drafting was correctly disabled.",
+      "correction": "Use actual Ask the Librarian project link, which supplies project=. Reuse the actual retained conversation; no second generation."
+    },
+    "draft": {
+      "title": "Keyboard Focus Visibility Requirements in WCAG 2.2",
+      "objective": "Investigate how WCAG 2.2 defines and scopes keyboard focus requirements by examining Success Criteria 2.4.7 Focus Visible, 2.4.11 Focus Not Obscured (Minimum), and 2.4.13 Focus Appearance, using only W3C primary sources. The mission aims to clarify each criterion\u2019s normative requirement and conformance level, and how they relate and build on one another, to support accessibility practitioners and designers who need a precise, standards-grounded understanding of focus visibility in WCAG 2.2.",
+      "successCriteria": [
+        "Retrieve the WCAG 2.2 normative text for SC 2.4.7, 2.4.11, and 2.4.13 with exact conformance levels.",
+        "Summarize each SC\u2019s requirement for keyboard focus visibility using only W3C primary sources.",
+        "Identify any key definitions, conditions, or exceptions relevant to these SCs from Understanding docs.",
+        "Explain how 2.4.11 and 2.4.13 refine or extend the baseline established by 2.4.7.",
+        "Produce a concise cited summary plus a three-item comparison limited to these three SCs."
+      ],
+      "lintErrors": [],
+      "lintWarnings": [],
+      "previewCompiled": true,
+      "realProviderDraft": true
+    },
+    "createdMission": {
+      "id": "a9526db2-ece6-4655-9d17-6991b12c49c7",
+      "missionId": "S67-KBD-FOCUS",
+      "status": "draft",
+      "viaRealBrowser": true,
+      "created": true,
+      "reviewedBeforeSave": true
+    },
+    "submitted": {
+      "at": "2026-10-14T08:54:44.265Z",
+      "missionId": "a9526db2-ece6-4655-9d17-6991b12c49c7",
+      "viaRealBrowser": true,
+      "status": "queued",
+      "paidRunApproved": true
+    },
+    "latestStatus": {
+      "id": "a9526db2-ece6-4655-9d17-6991b12c49c7",
+      "missionId": "S67-KBD-FOCUS",
+      "status": "completed",
+      "startedAt": "2026-10-14T08:54:45.477209",
+      "completedAt": "2026-10-14T08:58:10.226562",
+      "resultLength": 21961,
+      "resultReportId": "c3f119a9-56d7-4896-a5d3-89cd19b1f3ae",
+      "notificationSent": true
+    },
+    "access": {
+      "onlyOwnProjectListed": true,
+      "totalReadableProjects": 1,
+      "foreignProjectDenied": 403,
+      "adminDenied": 403
+    },
+    "evidenceLink": "Browse evidence (113)",
+    "completed": {
+      "id": "a9526db2-ece6-4655-9d17-6991b12c49c7",
+      "missionId": "S67-KBD-FOCUS",
+      "title": "Keyboard Focus Visibility Requirements in WCAG 2.2",
+      "status": "completed",
+      "startedAt": "2026-10-14T08:54:45.477209",
+      "completedAt": "2026-10-14T08:58:10.226562",
+      "durationSeconds": 204.749,
+      "resultReportId": "c3f119a9-56d7-4896-a5d3-89cd19b1f3ae",
+      "resultLength": 21961,
+      "resultsDefault": true,
+      "evidenceVisible": true,
+      "reportUnderMissionResults": true,
+      "reportReturnsToResults": true
+    },
+    "emailReceipt": "completion-email.json",
+    "researchQuality": {
+      "observed": "Degraded result; sampled verification; report-wide accuracy unknown; one assessed claim contradicted and two claims unassessed.",
+      "disposition": "Expected honest presentation of upstream findings, not a claim that the research is fully validated."
+    }
+  },
+  "captures": [
+    {
+      "name": "signup",
+      "theme": "light",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "signup-light-390.png",
+      "checkedAt": "2026-10-14T08:50:42.961Z"
+    },
+    {
+      "name": "signup",
+      "theme": "light",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "signup-light-1440.png",
+      "checkedAt": "2026-10-14T08:50:43.037Z"
+    },
+    {
+      "name": "signup",
+      "theme": "dark",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "signup-dark-390.png",
+      "checkedAt": "2026-10-14T08:50:43.108Z"
+    },
+    {
+      "name": "signup",
+      "theme": "dark",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "signup-dark-1440.png",
+      "checkedAt": "2026-10-14T08:50:43.221Z"
+    },
+    {
+      "name": "home-empty",
+      "theme": "light",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "home-empty-light-390.png",
+      "checkedAt": "2026-10-14T08:50:45.167Z"
+    },
+    {
+      "name": "home-empty",
+      "theme": "light",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "home-empty-light-1440.png",
+      "checkedAt": "2026-10-14T08:50:46.396Z"
+    },
+    {
+      "name": "home-empty",
+      "theme": "dark",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "home-empty-dark-390.png",
+      "checkedAt": "2026-10-14T08:50:47.683Z"
+    },
+    {
+      "name": "home-empty",
+      "theme": "dark",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "home-empty-dark-1440.png",
+      "checkedAt": "2026-10-14T08:50:48.929Z"
+    },
+    {
+      "name": "project-created",
+      "theme": "light",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "project-created-light-1440.png",
+      "checkedAt": "2026-10-14T08:51:32.670Z"
+    },
+    {
+      "name": "librarian-conversation",
+      "theme": "light",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "librarian-conversation-light-390.png",
+      "checkedAt": "2026-10-14T08:53:02.044Z"
+    },
+    {
+      "name": "librarian-conversation",
+      "theme": "light",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "librarian-conversation-light-1440.png",
+      "checkedAt": "2026-10-14T08:53:03.373Z"
+    },
+    {
+      "name": "librarian-conversation",
+      "theme": "dark",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "librarian-conversation-dark-390.png",
+      "checkedAt": "2026-10-14T08:53:04.972Z"
+    },
+    {
+      "name": "librarian-conversation",
+      "theme": "dark",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "librarian-conversation-dark-1440.png",
+      "checkedAt": "2026-10-14T08:53:06.542Z"
+    },
+    {
+      "name": "mission-draft",
+      "theme": "light",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "mission-draft-light-1440.png",
+      "checkedAt": "2026-10-14T08:54:38.463Z"
+    },
+    {
+      "name": "mission-draft",
+      "theme": "light",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "mission-draft-light-390.png",
+      "checkedAt": "2026-10-14T08:54:37.189Z"
+    },
+    {
+      "name": "mission-draft",
+      "theme": "dark",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "mission-draft-dark-390.png",
+      "checkedAt": "2026-10-14T08:54:39.589Z"
+    },
+    {
+      "name": "mission-draft",
+      "theme": "dark",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "mission-draft-dark-1440.png",
+      "checkedAt": "2026-10-14T08:54:40.786Z"
+    },
+    {
+      "name": "saved-mission",
+      "theme": "light",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "saved-mission-light-1440.png",
+      "checkedAt": "2026-10-14T08:54:42.334Z"
+    },
+    {
+      "name": "settings-member-before",
+      "theme": "light",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "settings-member-before-light-1440.png",
+      "checkedAt": "2026-10-14T09:04:05.214Z"
+    },
+    {
+      "name": "completed-results",
+      "theme": "light",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "completed-results-light-390.png",
+      "checkedAt": "2026-10-14T09:05:28.579Z"
+    },
+    {
+      "name": "completed-evidence",
+      "theme": "light",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "completed-evidence-light-390.png",
+      "checkedAt": "2026-10-14T09:05:28.984Z"
+    },
+    {
+      "name": "mission-report",
+      "theme": "light",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "mission-report-light-390.png",
+      "checkedAt": "2026-10-14T09:05:30.346Z"
+    },
+    {
+      "name": "completed-results",
+      "theme": "light",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "completed-results-light-1440.png",
+      "checkedAt": "2026-10-14T09:05:32.405Z"
+    },
+    {
+      "name": "completed-evidence",
+      "theme": "light",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "completed-evidence-light-1440.png",
+      "checkedAt": "2026-10-14T09:05:32.816Z"
+    },
+    {
+      "name": "mission-report",
+      "theme": "light",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "mission-report-light-1440.png",
+      "checkedAt": "2026-10-14T09:05:34.111Z"
+    },
+    {
+      "name": "completed-results",
+      "theme": "dark",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "completed-results-dark-390.png",
+      "checkedAt": "2026-10-14T09:05:36.106Z"
+    },
+    {
+      "name": "completed-evidence",
+      "theme": "dark",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "completed-evidence-dark-390.png",
+      "checkedAt": "2026-10-14T09:05:36.483Z"
+    },
+    {
+      "name": "mission-report",
+      "theme": "dark",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "mission-report-dark-390.png",
+      "checkedAt": "2026-10-14T09:05:37.794Z"
+    },
+    {
+      "name": "completed-results",
+      "theme": "dark",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "completed-results-dark-1440.png",
+      "checkedAt": "2026-10-14T09:05:40.088Z"
+    },
+    {
+      "name": "completed-evidence",
+      "theme": "dark",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "completed-evidence-dark-1440.png",
+      "checkedAt": "2026-10-14T09:05:40.499Z"
+    },
+    {
+      "name": "mission-report",
+      "theme": "dark",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "mission-report-dark-1440.png",
+      "checkedAt": "2026-10-14T09:05:41.844Z"
+    }
+  ],
+  "defects": [
+    {
+      "name": "Signup uses the old Mission Protocol product name",
+      "observed": "Rendered signup screen at1440/390 in both themes identifies access as Mission Protocol despite TraceLab branding.",
+      "disposition": "Replace helper copy with Create your TraceLab account with an invite code.",
+      "file": "frontend/src/components/RegisterPanel.tsx",
+      "verification": "Fresh 451-unit suite, types, lint, token gate and production build passed; deployed capture follows merge."
+    },
+    {
+      "name": "Member Settings offers an admin-only invite action",
+      "observed": "Generate code is visible to an invited member; the real POST correctly returns 403.",
+      "disposition": "Fix the control using the existing authoritative role context; clarify the hosted-access README."
+    }
+  ],
+  "servingCommit": "707b08b3f5cf426232f49f17dd3d549ef2f2f2cd",
+  "visualReview": {
+    "reviewedAt": "2026-10-14T09:08:00Z",
+    "screens": [
+      "signup",
+      "home-empty",
+      "librarian-conversation",
+      "mission-draft",
+      "completed-results",
+      "completed-evidence",
+      "mission-report"
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "widths": [
+      1440,
+      390
+    ],
+    "result": "No clipped controls, page overflow, serious/critical axe violations or client exceptions in the captured views. Report body is scrollable; Results exposes the real degraded-quality warning."
+  },
+  "verificationHarnessCorrections": [
+    "Reports exposes both the title and origin links. Narrowed the strict locator to the actual Research: title link; both hrefs already correctly pointed to mission Results.",
+    "Local browser runner uses PLAYWRIGHT_SKIP_SERVER, not PLAYWRIGHT_SKIP_WEBSERVER. Corrected before running any tests."
+  ]
+}

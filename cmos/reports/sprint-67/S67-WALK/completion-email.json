@@ -1,0 +1,12 @@
+{
+  "missionId": "a9526db2-ece6-4655-9d17-6991b12c49c7",
+  "outboundId": "01a139a2-3759-7b9e-9fa1-30ada5d987fe",
+  "outboundLastEvent": "delivered",
+  "receivedId": "16e4278d-79c0-4e85-9a94-b222c5ebf1c7",
+  "receivedAt": "2026-10-14T08:58:16.011Z",
+  "subject": "Mission completed: Keyboard Focus Visibility Requirements in WCAG 2.2",
+  "expectedRecipientMatched": true,
+  "missionLinkPresent": true,
+  "missionTitlePresent": true,
+  "bodySha256": "1f1d93359d306733193ec2d1890418afd28b7e715ecccfe03d976330ae22bfa8"
+}
