@@ -10,7 +10,7 @@ from app.services.evidence_display import display_claim
 from app.services.evidence_ledger import _render_markdown
 
 FIXTURES = json.loads(
-    (Path(__file__).parents[1] / "fixtures/evidence_display_claims.json").read_text()
+    (Path(__file__).parents[2] / "frontend/tests/fixtures/evidence_display_claims.json").read_text()
 )
 CASES = FIXTURES["cases"]
 

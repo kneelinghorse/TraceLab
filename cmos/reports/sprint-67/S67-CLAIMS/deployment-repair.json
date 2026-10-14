@@ -1,0 +1,20 @@
+{
+  "recorded_at": "2026-10-14T07:37:46.784573+00:00",
+  "initial_merge": "a295a6b1e17dc2ecbd644dbc605c42b157260a1e",
+  "initial_pr": 433,
+  "failed_service": "frontend",
+  "failed_deployment": "032572fb-d0dc-4e94-9b12-8060bb8a4d3a",
+  "error": "tests/e2e/evidence.spec.ts(2,27): TS2307 Cannot find module '../../../tests/fixtures/evidence_display_claims.json'",
+  "cause": "Railway builds only frontend/. The whole-repository local/CI checks resolved the parent fixture, masking this deployment boundary.",
+  "repair": "Move the single shared fixture to frontend/tests/fixtures; update Python, frontend unit/browser and deployed MCP consumers. Fixture bytes and runtime helpers unchanged.",
+  "reproduction": "Archived initial-merge frontend subtree into a throwaway directory with no repository parent; tsc failed with the identical TS2307. Copied only corrected fixture and imports into it; npm run build passed. Dependencies were a local APFS clone of installed frontend/node_modules; this verifies source boundary, not a fresh dependency install.",
+  "isolated_production_build": "passed",
+  "required_repair_gates": "Repeat local suites, requiredCI, normal squashmerge, both Railway exact repair SHA, PostDeploy and live UI/MCP checks before mission completion.",
+  "fixture_reference_correction": {
+    "original": "tests/fixtures/evidence_display_claims.json",
+    "current": "frontend/tests/fixtures/evidence_display_claims.json",
+    "reason": "Single fixture relocated to the Railway frontend build subtree; content unchanged.",
+    "byte_identical": true,
+    "sha256": "6edb4f58cbd9b4448bf7d71234441a7c9a5d9f3f275677781055170bd95ffdf8"
+  }
+}

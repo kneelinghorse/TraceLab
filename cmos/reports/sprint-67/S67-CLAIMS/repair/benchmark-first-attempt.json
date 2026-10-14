@@ -1,0 +1,50 @@
+{
+  "generated_at": "2026-10-14T07:36:24Z",
+  "collection": "research_chunks",
+  "points_count": 500000,
+  "vectors_count": 500000,
+  "memory_estimate_gb": 0.7,
+  "trials": 12,
+  "top_k": 5,
+  "ef_values": [
+    64,
+    96,
+    128
+  ],
+  "target_latency_ms": 10.0,
+  "recall_threshold": 0.99,
+  "results": [
+    {
+      "hnsw_ef": 64,
+      "avg_latency_ms": 3.3816841702597835,
+      "p95_latency_ms": 3.7051249528303742,
+      "p99_latency_ms": 3.8107919972389936,
+      "recall": 0.6,
+      "trials": 12
+    },
+    {
+      "hnsw_ef": 96,
+      "avg_latency_ms": 5.626552156172693,
+      "p95_latency_ms": 8.932249969802797,
+      "p99_latency_ms": 10.636124992743134,
+      "recall": 1.0,
+      "trials": 12
+    },
+    {
+      "hnsw_ef": 128,
+      "avg_latency_ms": 5.866552072499569,
+      "p95_latency_ms": 7.716499967500567,
+      "p99_latency_ms": 11.52329205069691,
+      "recall": 1.0,
+      "trials": 12
+    }
+  ],
+  "recommendation": {
+    "hnsw_ef": 128,
+    "avg_latency_ms": 5.866552072499569,
+    "p95_latency_ms": 7.716499967500567,
+    "p99_latency_ms": 11.52329205069691,
+    "recall": 1.0,
+    "trials": 12
+  }
+}

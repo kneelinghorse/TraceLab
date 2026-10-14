@@ -12,7 +12,7 @@ vi.mock("@/lib/api/evidence", async importOriginal => ({ ...await importOriginal
 import EvidencePage from "@/pages/evidence";
 import EvidenceDetailPage from "@/pages/evidence/[id]";
 import { EvidencePanel } from "@/components/evidence/EvidencePanel";
-import claimFixtures from "../../../tests/fixtures/evidence_display_claims.json";
+import claimFixtures from "../../tests/fixtures/evidence_display_claims.json";
 const entry = (id: string) => ({ id, project_id: "alpha", mission_id: null, claim: `Claim ${id}`, summary: "Research summary", snippet: "Verbatim source passage", query: "original research", tags: ["ux"], source_url: "https://example.com/source", source_id: "source-1", source_sighting_count: 43, session_key: "research-session", origin: "mcp-agent", disposition: "supporting", created_at: "2026-09-12T00:00:00Z" });
 beforeEach(() => {
   mocks.router.query = {};

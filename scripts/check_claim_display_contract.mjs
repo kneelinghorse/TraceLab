@@ -11,7 +11,7 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 const require = createRequire(path.join(root, 'packages/tracelab-mcp/package.json'));
 const { Client } = await import(require.resolve('@modelcontextprotocol/sdk/client/index.js'));
 const { StdioClientTransport } = await import(require.resolve('@modelcontextprotocol/sdk/client/stdio.js'));
-const fixtures = JSON.parse(await fs.readFile(path.join(root, 'tests/fixtures/evidence_display_claims.json'), 'utf8'));
+const fixtures = JSON.parse(await fs.readFile(path.join(root, 'frontend/tests/fixtures/evidence_display_claims.json'), 'utf8'));
 const credentials = JSON.parse(await fs.readFile(path.join(os.homedir(), '.config/tracelab-mcp/credentials.json'), 'utf8'));
 const api = 'https://api.tracelab.aquex.ai';
 assert.equal(credentials.apiBaseUrl.replace(/\/$/, ''), api);

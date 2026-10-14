@@ -1,0 +1,38 @@
+{
+  "checked_at": "2026-10-14T07:58:48.094168+00:00",
+  "first_backend_attempt": {
+    "passed": 3211,
+    "failed": 1,
+    "skipped": 4,
+    "deselected": 12,
+    "seconds": 529.22,
+    "test": "tests/performance/test_qdrant_performance.py::test_parameter_sweep_finds_configuration_with_latency_headroom",
+    "failure": "hnsw_ef recommendation128 instead of96. The real-time stub p99 at96 was10.636ms, exceeding10ms headroom; both candidates exceeded the target during concurrent frontend builds.",
+    "scope": "This benchmark uses time.sleep and perf_counter; neither benchmark code nor Qdrant runtime changed in the repair."
+  },
+  "targeted_recheck": {
+    "passed": 1,
+    "seconds": 0.64,
+    "changes": "none; frontend work had finished"
+  },
+  "final_backend_attempt": {
+    "status": "passed",
+    "passed": 3212,
+    "skipped": 4,
+    "deselected": 12,
+    "seconds": 472.33,
+    "changes": "none; full exact CI invocation rerun without concurrent frontend builds"
+  },
+  "local_visual_review": {
+    "captures": 12,
+    "byte_identical_to_previously_reviewed": 8,
+    "reinspected": 4,
+    "finding": "Only relative creation time changed in brief captures; same readable text and no table/overflow/serious-critical axe findings."
+  },
+  "sequential_postgresql": {
+    "status": "passed",
+    "passed": 172,
+    "skipped": 3,
+    "seconds": 99.4
+  }
+}

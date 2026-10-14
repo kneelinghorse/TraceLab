@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 import { displayClaim } from "@/lib/api/evidence";
-import fixtures from "../../../tests/fixtures/evidence_display_claims.json";
+import fixtures from "../../tests/fixtures/evidence_display_claims.json";
 
 describe("readable claims with exact provenance", () => {
   it.each(fixtures.cases)("cleans production claim $id", ({ claim, display }) => {

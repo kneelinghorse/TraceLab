@@ -1,0 +1,1 @@
+tests/e2e/evidence.spec.ts(2,27): error TS2307: Cannot find module '../../../tests/fixtures/evidence_display_claims.json' or its corresponding type declarations.
