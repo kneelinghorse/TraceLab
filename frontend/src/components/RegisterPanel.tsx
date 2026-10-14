@@ -55,7 +55,7 @@ export function RegisterPanel({ onSwitchToLogin }: RegisterPanelProps) {
         <p className="text-xs uppercase tracking-[0.4em] text-muted">TraceLab</p>
         <h1 className="text-3xl text-foreground font-semibold mt-2">Create account</h1>
         <p className="text-sm text-secondary mt-3">
-          Register for access to Mission Protocol.
+          Create your TraceLab account with an invite code.
         </p>
       </div>
 

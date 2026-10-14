@@ -7,6 +7,7 @@ import { useFeedback } from "@/components/ui/useFeedback";
 import { AuthGate } from "@/components/AuthGate";
 import { ThemeSelect } from "@/components/ThemeSelect";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRole } from "@/contexts/RoleContext";
 import { apiKeysApi, inviteCodesApi, profileApi } from "@/lib/api/settings";
 import type { APIKeyInfo, APIKeyResponse, InviteCode } from "@/lib/api/settings";
 import { formatDistanceToNow } from "date-fns";
@@ -406,6 +407,7 @@ function APIKeysSection() {
 // ---------------------------------------------------------------------------
 
 function InviteCodesSection() {
+  const { isAdmin } = useRole();
   const [codes, setCodes] = useState<InviteCode[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
@@ -467,14 +469,16 @@ function InviteCodesSection() {
     <section id="invites" className="scroll-mt-20 bg-surface rounded-lg border border-line p-6">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <h2 className="text-lg font-semibold text-foreground">Invite Codes</h2>
-        <button
+        {isAdmin && <button
           onClick={handleGenerate}
           disabled={isCreating}
           className="shrink-0 whitespace-nowrap px-3 py-1.5 text-sm bg-accent text-on-accent rounded-lg hover:bg-accent disabled:opacity-50 transition-colors font-medium"
         >
           {isCreating ? "Generating..." : "Generate code"}
-        </button>
+        </button>}
       </div>
+
+      {!isAdmin && <p className="mb-4 text-sm text-muted">Ask an admin for an invite code.</p>}
 
       {error && (
         <p className="mb-4 text-sm text-danger">{error}</p>

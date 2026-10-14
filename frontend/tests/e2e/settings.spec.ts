@@ -31,6 +31,17 @@ test("Settings interprets legacy API timestamps as UTC before displaying local t
   await expect(key).toContainText("Created about 3 hours ago");
   await expect(key).toContainText("Last used about 1 hour ago");
   await expect(page.locator("#invites li")).toContainText("10/12/2026");
+  await expect(page.getByRole("button", { name: "Generate code", exact: true })).toBeEnabled();
+});
+
+test("member Settings explains how to get an invite without offering an admin-only action", async ({ page }) => {
+  await page.route("**/api/v1/auth/me", route => route.fulfill({ json: {
+    user_id: "settings-user", email: "researcher@example.test", display_name: "Researcher", role: "member", email_notifications_enabled: true,
+  } }));
+  await page.goto("/settings");
+  await expect(page.getByRole("checkbox", { name: "Mission emails" })).toBeChecked();
+  await expect(page.getByText("Ask an admin for an invite code.", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Generate code", exact: true })).toHaveCount(0);
 });
 
 for (const theme of ["light", "dark"] as const) {

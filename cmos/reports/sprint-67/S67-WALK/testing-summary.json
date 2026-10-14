@@ -1,0 +1,93 @@
+{
+  "mission": "S67-WALK",
+  "backend": {
+    "invocation": "Exact .github/workflows/backend-tests.yml invocation via scripts/run_pytest.py and the 12 documented quarantine nodes",
+    "environment": {
+      "QDRANT_URL": "http://127.0.0.1:9",
+      "PEDR_GRAPH_TELEMETRY_ENABLED": "0"
+    },
+    "passed": 3212,
+    "skipped": 4,
+    "deselected": 12,
+    "failures": 0,
+    "errors": 0,
+    "warnings": 49,
+    "seconds": 484.48,
+    "skipped_tests": [
+      {
+        "test": "tests.test_auto_ingest.TestAutoIngestIntegration.test_auto_ingest_full_pipeline",
+        "reason": "Full pipeline test requires embedding service and Qdrant \u2014 chunks not created in SQLite test env"
+      },
+      {
+        "test": "tests.test_live_log_cross_service.test_real_sender_receives_replay_ack_and_streams_before_terminal",
+        "reason": "Requires explicit DeepSearch checkout; run the LOG-2 cross-service command"
+      },
+      {
+        "test": "tests.test_pedr_unified_search.TestPEDRIntegration.test_create_orchestrator_factory",
+        "reason": "Requires OpenAI + Qdrant services (orchestrator init fails without them)"
+      },
+      {
+        "test": "tests.test_pedr_unified_search.TestPEDRIntegration.test_full_search_pipeline",
+        "reason": "Requires OpenAI + Qdrant services (orchestrator init fails without them)"
+      }
+    ],
+    "output_sha256": "fdf5fc1bed19324c91eb03d61ffecceff1f253e0addfb4ff3fc762690b3c7ed1"
+  },
+  "frontend": {
+    "unit": {
+      "passed": 451,
+      "files": 49,
+      "skipped": 0
+    },
+    "types": "passed",
+    "lint": "passed, zero warnings",
+    "token_gate": "passed",
+    "production_build": "passed",
+    "playwright": {
+      "passed": 218,
+      "failed": 0,
+      "skipped": 0,
+      "retries": 0,
+      "specs": 27,
+      "telemetry": "browser-telemetry.json"
+    }
+  },
+  "ruff": {
+    "changed_python_files": 0,
+    "status": "not applicable; no Python edits"
+  },
+  "foundational_references": "passed",
+  "mcp_parity": {
+    "tools": 9,
+    "actions": 50,
+    "operations": 119,
+    "errors": []
+  },
+  "integration": {
+    "command": "pytest tests/integration -v (sequential after backend)",
+    "passed": 172,
+    "skipped": 3,
+    "failures": 0,
+    "errors": 0,
+    "seconds": 102.35,
+    "warnings": 16,
+    "skipped_tests": [
+      {
+        "test": "tests.integration.test_e2e_rbac_live.test_live_rbac_matrix",
+        "reason": "set RBAC_VERIFY_BASE_URL to run against a live deploy"
+      },
+      {
+        "test": "tests.integration.test_ingestion_flow.test_markdown_cli_flow",
+        "reason": "CLI subprocess requires running server with auth \u2014 not available in test environment"
+      },
+      {
+        "test": "tests.integration.test_qdrant_isolation.test_disposable_qdrant_cache_round_trip",
+        "reason": "Requires --disposable-qdrant and local Docker"
+      }
+    ],
+    "output_sha256": "d7ca5213a1bc3ab3f74dd4dbdbffb4273ffa494c219d27fc41d7fc7a725a6856"
+  },
+  "secret_scan": "passed after staging",
+  "receipt_email_scan": "passed after staging",
+  "feature_commit_staged_files": 53
+}

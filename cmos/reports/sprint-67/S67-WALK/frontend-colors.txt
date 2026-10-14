@@ -1,0 +1,1 @@
+OODS color gate passed: no fixed palette colors or dark variants in rendered source.
