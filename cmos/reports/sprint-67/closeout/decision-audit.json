@@ -1,0 +1,115 @@
+[
+  {
+    "decisions": [
+      624,
+      630
+    ],
+    "mechanism": "Stored report origins; scoped labels; mission Results links; retained rows",
+    "files": [
+      "app/models/report.py",
+      "app/services/report_presentation.py",
+      "app/services/report_service.py",
+      "tests/test_report_origins.py",
+      "tests/integration/test_report_origin_migration.py"
+    ]
+  },
+  {
+    "decisions": [
+      625,
+      631
+    ],
+    "mechanism": "Separate activity state read, three-day window, completed_at recency, readable-only state",
+    "files": [
+      "app/api/v1/activity.py",
+      "app/adapters/repositories/sqlalchemy_activity_repo.py",
+      "app/schemas/activity.py",
+      "frontend/src/lib/hooks/useActivitySummary.ts"
+    ]
+  },
+  {
+    "decisions": [
+      626,
+      637
+    ],
+    "mechanism": "Display-only partial/table-row cleanup, raw storage and protocol values retained",
+    "files": [
+      "frontend/src/lib/api/evidence.ts",
+      "app/services/evidence_display.py",
+      "app/adapters/repositories/sqlalchemy_graph_neighborhood_repo.py",
+      "app/adapters/repositories/sqlalchemy_navigation_search_repo.py",
+      "frontend/tests/fixtures/evidence_display_claims.json",
+      "scripts/check_claim_display_contract.mjs"
+    ],
+    "correction": "Decision640 restates the retained principle with the current frontend-root fixture path.",
+    "superseding_decision": 640
+  },
+  {
+    "decisions": [
+      627,
+      628
+    ],
+    "mechanism": "Approved sprint scope and paid production walkthrough",
+    "files": [
+      "cmos/foundational-docs/roadmap-sprints-66-68-open-tracelab.md",
+      "cmos/reports/sprint-67/S67-WALK/progress.json"
+    ]
+  },
+  {
+    "decisions": [
+      629
+    ],
+    "mechanism": "Shared page container/header, scoped text sizing, unchanged panel/contrast tokens",
+    "files": [
+      "frontend/src/components/ui/PageHeader.tsx",
+      "frontend/src/styles/globals.css",
+      "frontend/tests/e2e/density.spec.ts"
+    ]
+  },
+  {
+    "decisions": [
+      633
+    ],
+    "mechanism": "Mission-keyed tab state plus current-URL popstate/route-completion reconciliation",
+    "files": [
+      "frontend/src/pages/missions/[id].tsx",
+      "frontend/tests/e2e/mission-protocol.spec.ts"
+    ]
+  },
+  {
+    "decisions": [
+      634,
+      635
+    ],
+    "mechanism": "Authorized historical producer contract reads; guarded quality/recovery display and raw details",
+    "files": [
+      "frontend/src/components/missions/MissionQuality.tsx",
+      "frontend/tests/fixtures/mission-quality.json",
+      "cmos/reports/sprint-67/S67-QUALITY/contract-reference.json"
+    ]
+  },
+  {
+    "decisions": [
+      636
+    ],
+    "mechanism": "Shallow tool URL and retained conversation/review state",
+    "files": [
+      "frontend/src/pages/librarian.tsx",
+      "frontend/tests/e2e/librarian-navigation.spec.ts"
+    ]
+  },
+  {
+    "decisions": [
+      638,
+      639
+    ],
+    "mechanism": "Dedicated invited member; inbound email; disable/reuse checks; live role-based invite control",
+    "files": [
+      "app/api/v1/auth.py",
+      "app/api/v1/admin_users.py",
+      "app/services/notifications.py",
+      "frontend/src/pages/settings.tsx",
+      "frontend/src/contexts/RoleContext.tsx",
+      "frontend/tests/e2e/settings.spec.ts"
+    ]
+  }
+]

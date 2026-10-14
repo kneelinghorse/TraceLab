@@ -1,0 +1,790 @@
+[
+  {
+    "citation": ".github/ci/README.md",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": ".github/workflows/backend-tests.yml",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-DENSITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-WALK/testing-summary.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": ".github/workflows/frontend-production-build.yml",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-DENSITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "app/adapters/repositories/sqlalchemy_activity_repo.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-REPORTS/ruff.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "app/adapters/repositories/sqlalchemy_home_repo.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-REPORTS/ruff.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "app/api/v1/reports.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-REPORTS/ruff.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "app/api/v1/synthesize.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-REPORTS/ruff.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "app/models/report.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-REPORTS/ruff.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "app/schemas/report.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-REPORTS/ruff.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "app/services/auto_report.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-REPORTS/ruff.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "app/services/evidence_browser.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-REPORTS/ruff.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "app/services/evidence_ledger.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-REPORTS/ruff.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "app/services/librarian_reports.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-REPORTS/ruff.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "app/services/project_query_service.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-REPORTS/ruff.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "app/services/report_citations.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-REPORTS/ruff.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "app/services/report_presentation.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-REPORTS/ruff.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "app/services/report_service.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-REPORTS/ruff.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "frontend/src/__tests__/librarian-duplicates.test.tsx",
+    "sources": [
+      "cmos/reports/sprint-67/S67-CLAIMS/contract-followup/verification-history.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "frontend/src/components/RegisterPanel.tsx",
+    "sources": [
+      "cmos/reports/sprint-67/S67-WALK/progress.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "frontend/src/pages/reports/index.tsx",
+    "sources": [
+      "cmos/reports/sprint-67/S67-WALK/progress.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "frontend/tests/e2e/activity-state.spec.ts",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/browser-capture-telemetry.json",
+      "cmos/reports/sprint-67/S67-BADGES/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-MISSION/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-QUALITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-WALK/browser-telemetry.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "frontend/tests/e2e/admin-password-recovery.spec.ts",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-DENSITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-MISSION/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-QUALITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-REPORTS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-WALK/browser-telemetry.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "frontend/tests/e2e/app-shell.spec.ts",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-DENSITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-MISSION/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-QUALITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-REPORTS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-WALK/browser-telemetry.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "frontend/tests/e2e/authored-scope.spec.ts",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-DENSITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-MISSION/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-QUALITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-REPORTS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-WALK/browser-telemetry.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "frontend/tests/e2e/collection-context.spec.ts",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-DENSITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-MISSION/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-QUALITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-REPORTS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-WALK/browser-telemetry.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "frontend/tests/e2e/console.spec.ts",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-DENSITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-MISSION/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-QUALITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-REPORTS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-WALK/browser-telemetry.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "frontend/tests/e2e/density.spec.ts",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-DENSITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-DENSITY/density-comparison.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-MISSION/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-QUALITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-REPORTS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-WALK/browser-telemetry.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "frontend/tests/e2e/evidence.spec.ts",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/deployment-repair.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-DENSITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-MISSION/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-QUALITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-REPORTS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-WALK/browser-telemetry.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "frontend/tests/e2e/graph.spec.ts",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-DENSITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-MISSION/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-QUALITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-REPORTS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-WALK/browser-telemetry.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "frontend/tests/e2e/hygiene.spec.ts",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-DENSITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-MISSION/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-QUALITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-REPORTS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-WALK/browser-telemetry.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "frontend/tests/e2e/librarian-collections.spec.ts",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-DENSITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-MISSION/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-QUALITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-REPORTS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-WALK/browser-telemetry.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "frontend/tests/e2e/librarian-description.spec.ts",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-DENSITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-MISSION/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-QUALITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-REPORTS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-WALK/browser-telemetry.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "frontend/tests/e2e/librarian-duplicates.spec.ts",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-DENSITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-MISSION/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-QUALITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-REPORTS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-WALK/browser-telemetry.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "frontend/tests/e2e/librarian-navigation.spec.ts",
+    "sources": [
+      "cmos/reports/sprint-67/S67-CLAIMS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-WALK/browser-telemetry.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "frontend/tests/e2e/librarian-reports.spec.ts",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-DENSITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-MISSION/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-QUALITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-REPORTS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-WALK/browser-telemetry.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "frontend/tests/e2e/mission-live-logs.spec.ts",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-DENSITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-MISSION/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-QUALITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-REPORTS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-WALK/browser-telemetry.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "frontend/tests/e2e/mission-protocol.spec.ts",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-DENSITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-MISSION/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-QUALITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-REPORTS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-WALK/browser-telemetry.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "frontend/tests/e2e/mission-quality.spec.ts",
+    "sources": [
+      "cmos/reports/sprint-67/S67-CLAIMS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-QUALITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-QUALITY/capture-telemetry.json",
+      "cmos/reports/sprint-67/S67-WALK/browser-telemetry.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "frontend/tests/e2e/password-recovery.spec.ts",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-DENSITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-MISSION/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-QUALITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-REPORTS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-WALK/browser-telemetry.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "frontend/tests/e2e/project-bundles.spec.ts",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-DENSITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-MISSION/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-QUALITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-REPORTS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-WALK/browser-telemetry.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "frontend/tests/e2e/report-citations.spec.ts",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-DENSITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-MISSION/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-QUALITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-REPORTS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-WALK/browser-telemetry.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "frontend/tests/e2e/report-origins.spec.ts",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-MISSION/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-QUALITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-REPORTS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-WALK/browser-telemetry.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "frontend/tests/e2e/route-migration.spec.ts",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-DENSITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-MISSION/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-QUALITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-REPORTS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-WALK/browser-telemetry.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "frontend/tests/e2e/search-command.spec.ts",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-DENSITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-MISSION/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-QUALITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-REPORTS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-WALK/browser-telemetry.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "frontend/tests/e2e/session-code-accessibility.spec.ts",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-DENSITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-MISSION/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-QUALITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-REPORTS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-WALK/browser-telemetry.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "frontend/tests/e2e/settings.spec.ts",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-DENSITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-MISSION/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-QUALITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-REPORTS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-WALK/browser-telemetry.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "frontend/tests/e2e/token-contrast.spec.ts",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-DENSITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-MISSION/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-QUALITY/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-REPORTS/browser-telemetry.json",
+      "cmos/reports/sprint-67/S67-WALK/browser-telemetry.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "frontend/tests/fixtures/evidence_display_claims.json",
+    "sources": [
+      "cmos/reports/sprint-67/S67-CLAIMS/deployment-repair.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "scripts/check_claim_display_contract.mjs",
+    "sources": [
+      "cmos/reports/sprint-67/S67-CLAIMS/production/mcp-verification-history.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "scripts/run_pytest.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-WALK/testing-summary.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "tests/e2e/evidence.spec.ts",
+    "sources": [
+      "cmos/reports/sprint-67/S67-CLAIMS/deployment-repair.json"
+    ],
+    "status": "historical path retained in original_claim/error; corrected_at_sprint_close names actual current path and repair PR"
+  },
+  {
+    "citation": "tests/fixtures/evidence_display_claims.json",
+    "sources": [
+      "cmos/reports/sprint-67/S67-CLAIMS/deployment-repair.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json"
+    ],
+    "status": "historical path retained in original_claim/error; corrected_at_sprint_close names actual current path and repair PR"
+  },
+  {
+    "citation": "tests/fixtures/s96_consumer_contract.json",
+    "sources": [
+      "cmos/reports/sprint-67/S67-QUALITY/contract-reference.json"
+    ],
+    "status": "external historical DeepSearch reference; exact revision/hash reverified read-only"
+  },
+  {
+    "citation": "tests/integration/test_report_origin_migration.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-REPORTS/ruff.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "tests/performance/test_qdrant_performance.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/verification-history.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "tests/sprint_03/test_api_stability.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "tests/sprint_03/test_evidence_integrity.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "tests/sprint_03/test_quality_gate_effectiveness.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "tests/sprint_03/test_validation_coverage.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "tests/sprint_04/test_coverage_metric.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "tests/sprint_04/test_performance_metrics.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "tests/sprint_04/test_quality_and_load.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "tests/sprint_04/test_tech_debt.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "tests/test_admin_dashboard.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "tests/test_auto_report.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-REPORTS/ruff.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "tests/test_collection_context.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-REPORTS/ruff.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "tests/test_document_ingestion.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "tests/test_evidence_ledger_api.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-REPORTS/ruff.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "tests/test_librarian_reports.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-REPORTS/ruff.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "tests/test_pedr_report_scope.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-REPORTS/ruff.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "tests/test_report_citations.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-REPORTS/ruff.json"
+    ],
+    "status": "present in current tree"
+  },
+  {
+    "citation": "tests/test_report_origins.py",
+    "sources": [
+      "cmos/reports/sprint-67/S67-REPORTS/ruff.json"
+    ],
+    "status": "present in current tree"
+  }
+]

@@ -80,422 +80,55 @@ Receipts: `cmos/reports/sprint-66/`. The mission completion records hold the run
 
 ---
 
-## Sprint 67 — The UX pass (opened 2026-10-14 UTC; target close 2026-10-15)
+## Sprint 67 — The UX pass (opened and closed 2026-10-14 UTC, eight of eight)
 
-**Goal:** an invited person on Monday finds TraceLab calm, dense and obvious:
-- no counts they can't clear;
-- a finished mission opens on its results;
-- the Librarian starts as a conversation;
-- Reports holds documents, not copies;
-- claims read as sentences.
+**Outcome:** all eight missions shipped in the planned order before the October 19 share-out. Each mission passed its local checks, required PR checks, normal squash merge, both Railway deployments, production smoke and live acceptance before the next mission started. No new environment variable or setting was introduced. The final walkthrough fixes shipped in PR #436 (`b3d09ea`); the sprint record and receipt corrections are in a separate closeout PR.
 
-**Source:**
-- Derek's UX feedback, 2026-10-13;
-- the carried follow-up #406;
-- the share-out walk named at Sprint 66 planning.
+The accepted experience is denser, Reports defaults to written documents, recency uses seen-state, completed missions open on Results, quality warnings remain visible, the Librarian starts with conversation, and evidence labels are readable without rewriting citations. The final acceptance run also delivered its completion email and proved member isolation.
 
-Derek's answers at planning:
-- a dot on Missions only;
-- "new" lasts 3 days;
-- the Librarian is conversation-first, with its tools in a chooser;
-- Reports is cleaned up now, not after the share-out: "WE HAVE A WEEK TO CLEAN THAT SHIT UP, STOP DEFERRING."
-
-The email part of his notification ask already exists. Settings → Notifications switches mission emails on and off (`frontend/src/pages/settings.tsx:177-219`, `users.email_notifications_enabled`, default on). Only a text-message channel is left out, and it needs a provider and phone numbers.
-
-**Order:** DENSITY → REPORTS → BADGES → MISSION → QUALITY → LIBRARIAN → CLAIMS → WALK. QUALITY was added at planning from DeepSearch's request and follows MISSION, because both change the Results tab. Each mission is merged, deployed and verified on production before the next starts, as in Sprint 66.
-- **DENSITY first.** It adds the shared page header and container that later pages use, so later screenshots show the final spacing.
-- **REPORTS before BADGES.** Both change `app/adapters/repositories/sqlalchemy_activity_repo.py` and the MCP. BADGES adds seen-state to a Reports list that REPORTS has already cleaned. BADGES carries the sprint's single MCP publish, 2.2.0, which includes REPORTS' changes.
-
-**Rules for every mission:**
-- A new browser spec is added to the enumerated list at `.github/workflows/frontend-production-build.yml:91`.
-- A test that pins old behaviour is updated in the same PR, with the reason in the PR description; it is never skipped.
-- UI evidence means captures at 1440 and 390 px in light and dark, with no horizontal overflow and no serious or critical axe findings.
-- The production check after deploy is read-only, through the existing X-API-Key method.
-- No new environment variable or setting.
-- Any change to an API response that the MCP or the OODS object model exposes names its guard:
-  - `cmos/contracts/oods-object-model.json`, checked by `tests/unit/test_oods_object_contract.py`;
-  - the MCP Contract Guard, a test through the MCP client;
-  - `cmos/contracts/mcp-parity-manifest.json` with `node scripts/mcp_parity_audit.mjs`.
+**Final measured checks:** 3,212 backend tests passed, with four existing external-service skips and 12 documented quarantines; 172 PostgreSQL integration tests passed, with three existing opt-in/environment skips; 451 frontend unit tests and 218 browser cases passed. Frontend types, lint, token contrast, production build, foundational references and the MCP parity audit passed. The MCP remains nine tools / 50 actions, covering 119 classified UI operations. Historical per-mission counts in the receipts describe those earlier commits; the closeout receipt identifies the final measured runs.
 
 ### S67-DENSITY — Tighter, data-platform spacing
 
-> "we just have a lot of space … we could kind of condense it, get a little tighter, a little more enterprise-y … the report and the missions … are actually, I think, maybe a good guide."
-
-**Today:**
-- No shared page container exists; every page writes its own.
-- Home uses `max-w-7xl space-y-7 px-4 py-8 lg:py-10` with a `text-3xl` h1.
-- Missions, Evidence and Reports use `space-y-6 py-8` with `text-3xl`.
-- The Librarian stacks up to seven `p-5` panels.
-- The mission and report detail pages are already dense: one card, `p-6` sections and a `text-2xl` title.
-
-**Change:**
-- **Shared header and container.** Add one `PageHeader` component (h1 at `text-2xl`, with an optional description and actions on one row) and one page container (`mx-auto max-w-7xl px-4 sm:px-6 py-5 space-y-4`). Use both on:
-  - Home and the Librarian;
-  - the Projects list and project detail;
-  - the Missions list, Evidence and the Reports list;
-  - the Collections list and collection detail.
-- **Reference pages unchanged.** The mission and report detail pages keep their layout and are the reference.
-- **Spacing at call sites.** Panel padding goes from `p-5` to `p-4` and list rows to `py-3`, changed where each panel or row is written. **The `.panel` class itself is not changed.** It is plain CSS after `@tailwind utilities` (`frontend/src/styles/globals.css:3,25`), so padding added there would override every call site.
-- **Unchanged:** body text size, small text at no less than 14 px, and the contrast tokens.
-
-**Done when:**
-- At 1440×900, on every listed page, the first content row's top is at least 40 px higher than it was. The receipt records the before and after pixel positions.
-- Home shows at least 3 more Recent activity rows above the fold than before, on the same fixture.
-- Every listed page has captures in both themes at 1440 and 390, with no overflow and no serious or critical axe findings.
-- Existing visual and accessibility specs pass. They are updated only where spacing is the intended difference.
+Shipped in [PR #427](https://github.com/kneelinghorse/TraceLab/pull/427), merge `71c95cc`. Nine pages share the page header and container. Body text stays 16 px, small text is at least 14 px within the shared container, and contrast tokens and the global panel class are preserved. On the fixed 1440×900 fixture, the first content row moved up 56–136 px across all nine pages; Home showed five complete activity rows instead of two. Desktop/phone, light/dark captures and production checks passed. [Receipt](../reports/sprint-67/S67-DENSITY/release-receipt.json).
 
 ### S67-REPORTS — Reports holds documents, not a copy of every mission
 
-> "reports, you kind of expect it to be a written report of some kind … what's a collection versus a report? … If they're agent tools and they are helpful, let's keep them."
-
-**Today:** production holds 512 reports (read-only count, 2026-10-13).
-
-| Kind | Count | Where they come from |
-| --- | --- | --- |
-| Automatic copies of mission results | 451 | One per completed mission, titled "Research: *mission title*" (`app/services/auto_report.py:310`). 448 are still linked from their mission's `result_report_id` |
-| Written from collections or excerpts | 47 | A person or agent, through the report API (`app/services/report_service.py`, `app/api/v1/synthesize.py`) |
-| Agent evidence briefs | 12 | Promoted from an Evidence Ledger session (`app/services/evidence_ledger.py:1305`, type `evidence-ledger`) |
-| Librarian reports | 2 | `app/services/librarian_reports.py:195`, provenance origin `librarian` |
-
-510 of the 512 are drafts.
-
-How the copies show up:
-- **Reports list:** each row shows the raw type ("markdown"), the excerpt count and "0 tokens", and the filter is draft/final.
-- **Report detail page:**
-  - shows "Type: markdown" and "Tokens: 0";
-  - for copies, labels the machine marker "Auto-generated from mission … [tracelab-auto-report:v2]" as "Custom Prompt";
-  - puts Evidence citations above the report's own content;
-  - lists sources as `collection 3f2a…`.
-- **Project page:** the reports list shows `report_type` as each row's summary (`frontend/src/components/projects/ProjectResources.tsx:39-40`), and the project's Reports stat counts every report (`app/services/project_query_service.py:253`, `pages/projects/[id].tsx:273`).
-- **Home:** the copies fill "Recent reports" and Recent activity (`app/adapters/repositories/sqlalchemy_home_repo.py:136-157`; `_reports` in the activity repository).
-- **Evidence detail:** "Open report" leads to the copy (`pages/evidence/[id].tsx:30`, via `app/services/evidence_browser.py`).
-
-Why the copies stay: the mission page renders results from `mission.result_markdown`, not from the copy, but the copy is still read by:
-- the evidence graph (`app/services/pedr/edge_materialization.py`, `relational.py`);
-- report citations;
-- the evidence browser;
-- the MCP.
-
-**So copies are kept and moved out of view, never deleted.**
-
-**Decisions made at plan time:**
-- **Reports means written documents.**
-  - The default view lists reports written by a person, an agent or the Librarian.
-  - Agent evidence briefs and mission results each get their own filter.
-  - A mission result links to its mission's Results tab with an explicit `?tab=results`, because REPORTS ships before MISSION.
-  - The roughly 3 copies with no `result_report_id` are labelled "Mission results" with no link.
-  - Mission completions already appear in Home's Recent activity as missions. The copy leaves Home's Recent activity and "Recent reports" (`sqlalchemy_home_repo.py`, the activity `_reports`). That changes MCP `tracelab_home` output, which the 2.2.0 tool description states.
-- **The origin is stored, not guessed at read time.**
-  - A new column, `reports.origin`, holds `mission | written | librarian | agent_brief`, with a server default of `written`.
-  - Each creation path sets it explicitly, and a test per path asserts that it does:
-
-    | Creation path | Origin |
-    | --- | --- |
-    | `auto_report` | mission |
-    | report API and synthesis | written |
-    | Librarian | librarian |
-    | ledger promote | agent_brief |
-
-  - A migration backfills existing rows using the rules behind the count above, applied in this order:
-    1. Linked from `missions.result_report_id`, or the prompt starts with "Auto-generated from mission " → mission.
-    2. `report_type = 'evidence-ledger'` → agent_brief.
-    3. `generation_provenance` origin `librarian` → librarian.
-    4. Everything else → written.
-  - The revision id is 32 characters or fewer, and the migration is applied to real PostgreSQL, not only SQLite.
-  - Every `Report(` constructor is covered: the four paths above, plus test builders, which take the default.
-- **REST list.** It gains an optional, repeatable `origin` filter. The default stays "all", so existing agent callers are unaffected. The UI asks for the origins it wants.
-- **Plain-language labels**, each with a link where one exists:
-  - "Results of mission *title*";
-  - "Written from collection *name*" or "Written from *n* excerpts";
-  - "Written by the Librarian from *project*";
-  - "Evidence brief from an agent's research session".
-- **Reports list page:**
-  - A source filter replaces draft/final: Reports (the default), Evidence briefs, Mission results. The project filter stays.
-  - Rows show the label, the project and the date. They drop the type, the excerpt count and the token count.
-  - A Final badge shows only on final reports.
-- **Project page.** `ProjectResources` uses the same default origins and labels. The project's Reports stat counts the same default set.
-- **Report detail page:**
-  - The header holds the title, the origin line with its link, the project and the date, then Final, Export and Delete.
-  - The report's content comes first; Evidence citations, source citations and source records follow.
-  - Source records show the collection or document name as a link. Names are looked up on the server through `accessible_filter`. A source the user can't read shows as "Source unavailable", so nothing leaks. This is a nested schema change to `ReportSourceSchema`, and the OODS object model is updated with it.
-  - The prompt shows as "Instructions" only on written and Librarian reports, never the auto-report marker.
-  - The raw type, chunk and token fields are removed.
-- **Evidence detail.** "Open report" for a mission result goes to the mission's Results tab.
-- **MCP.**
-  - `tracelab_report` `list` and `get` return `origin`, and `list` accepts an optional `origin` filter.
-  - It gets a regression test through the MCP client.
-  - The parity manifest classifies the new filter, and the parity audit exits 0.
-  - The publish happens at the end of S67-BADGES.
-
-**Done when:**
-- The report count is the same before and after the migration: nothing is deleted.
-- Production's origin counts match the count above, allowing for reports created since. The receipt records both.
-- Neither the default Reports view nor the project page lists a mission copy. "Mission results" lists them, linked to `?tab=results`.
-- For each origin, a browser test asserts that no report page shows "Tokens: 0", a raw type, the auto-report marker or a UUID stub.
-- Each creation path has a test proving it sets `origin` explicitly.
-- An MCP-client test proves `origin` is returned and filterable.
+Shipped in [PR #428](https://github.com/kneelinghorse/TraceLab/pull/428), merge `9ffdfe5`. Every report has a stored origin: written, librarian, agent brief or mission. The default list, Home and project report views omit mission copies and agent briefs; both remain available through explicit filters. At acceptance, all 512 rows were retained: 47 written, two Librarian, 12 briefs and 451 mission copies; the default list contained 49 documents. Source labels respect current read access and mission copies link to mission Results. PostgreSQL migration, UI and actual installed MCP checks passed. [Receipt](../reports/sprint-67/S67-REPORTS/release-receipt.json).
 
 ### S67-BADGES — Recency and seen-state, not counts
 
-> "it's just an annoying badge at this point that says 99 plus forever … It's almost like a link … have we seen it? Have we not seen it?"
+Shipped in [PR #429](https://github.com/kneelinghorse/TraceLab/pull/429), merge `5a7a69f`. The sidebar shows a Missions dot for unseen completions within three days. Lists use recent/unseen states and reading clears the applicable watermark. The separate activity-state read exposes only readable IDs, including retained mission-copy reports, without mutating seen-state. Existing mission/report response contracts remain intact.
 
-**Today:**
-- An item stays "new" until the user opens it. There is no time window (`sqlalchemy_activity_repo.py` `summary()` :115-123, `_missions` :41-47, `_evidence` :57-79).
-- The sidebar shows those counts for Missions, Evidence and Reports (`Navigation.tsx:72-83`, `NewBadge.tsx`).
-- Viewed state lives in `user_item_views` (migration 049).
-- `ActivityItem` carries only `new` (:77, :100, :104). On Home, an unviewed old item therefore looks the same as a viewed one.
-
-**Decisions made at plan time:**
-- **What "new" means.** An item is new when it is unviewed and happened within the last 3 days. The 3 days is a constant in the activity repository, not configuration. Older unviewed items are "unseen" rather than new. Viewed items read as seen, like a visited link.
-- **The sidebar shows no counts.** `NewBadge` is deleted.
-  - Missions shows a small dot when a mission **completed** in the last 3 days and hasn't been opened since. Its accessible name is "Missions, new results".
-  - The dot is keyed on `completed_at`, which no later write moves. Blocked, cancelled and validation-failed missions still appear as new in Recent activity, but they don't raise the dot: their only timestamp is `updated_at`, and any later write would bring the dot back.
-  - Evidence and Reports show no marker.
-- **The summary API.**
-  - `by_type` counts new items (unviewed, within 3 days).
-  - An added `completed_missions_new` drives the dot.
-  - The MCP `tracelab_home` tool description says so in 2.2.0 (`packages/tracelab-mcp/src/index.ts:727`, `api-client.ts:573`).
-- **Seen-state comes from a separate read.** `MissionResponse` and `ReportListItem` stay unchanged, so the OODS model, the mission-authoring contract and both MCP serializers are untouched.
-  - A new endpoint, `POST /activity/state`, takes `{items: [{type, id}]}` for missions and reports.
-  - It returns `{type, id, viewed, new}`, checking that the caller can read each item.
-  - The Missions and Reports lists call it for the page they show.
-  - Each row:
-
-    | State | Title | Marker |
-    | --- | --- | --- |
-    | unseen | semibold | none |
-    | unseen and new | semibold | small dot |
-    | seen | regular weight, secondary colour | none |
-
-  - Evidence has no per-row state; its seen-state is per group.
-- **Home.**
-  - `ActivityItem` gains `viewed`, and Recent activity rows use the same three styles. This is additive to MCP `tracelab_home`.
-  - The "New" pill and the "N new since you last looked" line use the 3-day window.
-  - When no mission is in progress, Active missions is not rendered, and Recent activity spans the full width. The definition of an active run stays in-progress only.
-- **MCP 2.2.0** ships at the end of this mission, carrying REPORTS' `origin` and this mission's activity changes. It is published under DoD-1 with Derek's browser approval.
-
-**Tests that pin the old behaviour:**
-- `tests/test_activity_api.py`, including `test_items_stay_new_until_viewed…` (:90);
-- `tests/integration/test_home_postgres.py:25` (`new_total == 143`);
-- `tests/integration/test_aggregate_perf_budgets.py:96`: the 75 ms budget for `activity_summary` still holds. Filter evidence groups by time in SQL.
-- `AppShell.test.tsx:70`, `__tests__/home.test.tsx` and `__tests__/missions.test.tsx:82`;
-- `tests/e2e/app-shell.spec.ts:48-62`;
-- the specs that stub `/activity/summary`.
-
-**Done when:**
-- A fixed-clock backend test proves that an unviewed mission completed 4 days ago is neither counted nor dotted, one completed 1 day ago is both, and viewing it clears it. The test fails on the old repository.
-- A browser test proves:
-  - no numeric badge appears anywhere in the sidebar;
-  - the Missions dot appears and clears;
-  - Home and the Missions and Reports lists render seen, unseen and new rows differently;
-  - Active missions is absent when nothing is running.
-- Registry 2.2.0, installed fresh, passes the stdio suite, and its tarball is byte-identical to the tested pack.
-- Production shows no number in the sidebar.
+`@aquex/tracelab-mcp` **2.2.0** was published after Derek's npm browser approval. An empty-directory, empty-cache registry install passed 71 stdio checks, generated 73 links and made 72 checked HTTP requests; the downloaded tarball was byte-identical to the tested tarball. [Release receipt](../reports/sprint-67/S67-BADGES/release-receipt.json) and [registry proof](../reports/sprint-67/S67-BADGES/registry-verification.json).
 
 ### S67-MISSION — A mission page that follows the mission's state
 
-> "when I click on a mission, I want to see the results … right now I have to scroll down to the middle of the page … If I click the run button, that's an action button. It's not going to run it."
-
-**Today:**
-- The tabs are "Run", "Results" and "Evidence". The page always opens on "Run" unless `?tab=` is set (`frontend/src/pages/missions/[id].tsx:46-58, 345-353`).
-- Tab clicks use `router.replace` (:57), so they add no browser history.
-- On the Results tab, three things render above the results:
-  - the back bar;
-  - the header card, with all its actions;
-  - `ScopeOutcomePanel` (:354), which appears on every tab for finished missions.
-
-**Decisions made at plan time:**
-- **The default tab follows the status.**
-  - A completed mission opens on Results. Every other status opens on the first tab.
-  - An explicit `?tab=` still wins.
-  - Each status's default tab has a clean URL.
-  - Tab clicks use `router.push`, so back and forward move between tabs.
-- **The first tab is named for the state.** Its content doesn't change: objective, criteria, research plan, run activity and execution.
-
-  | Status | First tab |
-  | --- | --- |
-  | draft | Plan |
-  | queued, in_progress | Progress |
-  | completed, blocked, cancelled, validation_failed | Details |
-
-- **Results first.**
-  - On the Results tab, the results begin directly under a compacted header.
-  - `ScopeOutcomePanel` moves into Details. When the scope outcome is not clean, Results shows a one-line notice linking to it.
-- **Draft and running states.**
-  - A draft's header says "Ready to run", and Submit to DeepSearch is its primary button.
-  - A running mission keeps its live run activity as the default view.
-  - If a mission completes while its page is open, the page does not jump. A "Results ready" link appears in the header and opens Results.
-- **Links stay valid.** Existing links to `/missions/{id}`, from NOTIFY emails, Home, the Librarian and the MCP, land on the status default. That is the intended change.
-
-**Tests that pin the old behaviour:**
-- `__tests__/missions.test.tsx:47`, the `it.each` over all seven statuses;
-- `tests/e2e/mission-protocol.spec.ts:94`, covering `?tab=results`, the Run and Results labels, and the clean URL;
-- `tests/e2e/authored-scope.spec.ts:62, 74`.
-
-**Done when:**
-- For a completed mission at 1440×900, the first line of its results is above the fold. A browser test asserts its bounding box.
-- For each of the seven statuses, a test asserts the default tab and the first tab's label.
-- A browser test proves back and forward restore the selected tab.
-- A test proves the "Results ready" link appears on a live completion.
-- On production, a real completed mission opens on its results.
+Shipped in [PR #430](https://github.com/kneelinghorse/TraceLab/pull/430), merge `70fe74e`. Drafts open on Plan, queued/running missions on Progress, and completed missions on Results; other statuses open on Details. Explicit tab links, browser history, keyboard navigation and live completion preserve the person's selection. The final implementation reconciles browser navigation from the current URL so a late shallow-route completion cannot undo a newer selection. Production Results began at 607 px on desktop and 893 px on phone in the recorded fixture. [Receipt](../reports/sprint-67/S67-MISSION/release-receipt.json).
 
 ### S67-QUALITY — Results say how far to trust them, and failures say why
 
-**Source:** DeepSearch's request of 2026-10-13 (message `9706116c`), added to Sprint 67 at planning. DeepSearch's own run, S96, has been live since 2026-10-08. Every mission now carries quality and failure details that TraceLab receives but doesn't show. DeepSearch says no migration, API change or citation-schema change is needed.
-
-**Where the data lives today:**
-- **Quality:** `execution_metadata.quality_record`. An identical copy sits at `result_protocol.report_metadata.forensic.quality_record`. It is schema version 5, with `verification`, `evidence_dependencies`, `citation_surface` and `claim_assessment`.
-- **Failures:**
-  - `execution_metadata.synthesis_telemetry.provider_attempts[].failure.rejection`;
-  - `.request_shape`;
-  - `generation_recovery_result`.
-- **What reads it:** only `components/missions/AuthoredScope.tsx:62`, which reads `delivery_quality` for the scope panel's warning. `ExecutionTimeline.tsx` reads the older forensic metrics.
-
-**Change:**
-1. **Quality line.** The Results tab shows one quality line under the header:
-   - `delivery_quality` "clean" reads "No detected material issue", with a separate note: "Sampled verification; report-wide accuracy unknown".
-   - `usable_with_warning`, `degraded` and `failed` are named plainly.
-   - Legacy runs without the fields read "Quality not assessed for this run".
-   - The page never shows an accuracy percentage built from source or sample counts.
-2. **Actionable reasons** show as plain sentences under that line. Examples: `critique_unassessed_claims_N`, `missing_cited_sources_N`, `cited_without_readable_body_N`. Operational retrieval counts and bibliography accounting go in an expandable "Raw quality data" section on the Details tab.
-3. **Failed runs** show:
-   - the rejection subtype: `context_limit`, `unsupported_parameter`, `unsupported_value`, `content_rejection`, `invalid_json`, `invalid_message_structure` or `unknown`;
-   - its `subtype_source`;
-   - whether the request shape was available.
-
-   They distinguish `provider_failed`, a second provider failure during the one retained-memory finalization, from `unknown_finish`, a response with no proven finish reason. Existing `error_message` sanitisation is unchanged.
-4. **Unknown reason strings and subtypes** render generically and never drop the report or hide the raw data.
-
-**Decisions made at plan time:**
-- **Build from TraceLab's own data.** DeepSearch's contract (`docs/s96_quality_and_diagnostics_contract.md`) and fixtures (`tests/fixtures/s96_consumer_contract.json`) live in its repository. Reading another repository needs Derek's permission (constraint c:10). So the build uses two sources:
-  - the field list in DeepSearch's message;
-  - the real production mission S96-MEMORY-ACCEPT-02, which carries `critique_unassessed_claims_3` and is read through TraceLab's own API.
-
-  It writes four TraceLab test fixtures mirroring DeepSearch's four cases: a supported sample, a missing cited body, legacy uncertainty, and a failed retained-memory request. If a field's exact shape can't be established that way, ask Derek for read access to those two files.
-- **Check the API passes the fields through.** First, confirm that `MissionResponse` and the frontend types really carry these fields. If any are dropped, adding them is a contract change under the MCP and OODS guards.
-
-**Done when:**
-- Unit tests render all four fixture cases, plus an unknown-reason case and an unknown-subtype case.
-- No rendered state shows a percentage.
-- On production, S96-MEMORY-ACCEPT-02 shows its quality line and its unassessed-claims reason.
-- DeepSearch's message gets a reply with the result.
+Shipped in [PR #431](https://github.com/kneelinghorse/TraceLab/pull/431), merge `6a82386`. Results display delivery, verification and scope warnings without inventing accuracy; Details preserves raw quality and failure objects, and actionable failure notices remain visible. The schema/version guards and recovery details use DeepSearch's consumer contract, read with Derek's explicit permission, and TraceLab's real deployed payload. The requested consumer reply was sent after verification. The final walkthrough exercised a degraded result and correctly exposed one contradicted sampled claim, two unassessed claims and unknown report-wide accuracy. [Receipt](../reports/sprint-67/S67-QUALITY/release-receipt.json).
 
 ### S67-LIBRARIAN — Conversation first, tools in a chooser
 
-> "all of these are possible use cases, but kind of laying them all out like this is just kind of overwhelming … each of these should be a sort of route or path unto themselves … maybe it's a dropdown menu."
+Shipped in [PR #432](https://github.com/kneelinghorse/TraceLab/pull/432), merge `63b71e2`. Project tools live in a chooser, one at a time, while the conversation stays available and retained review state survives switching tools. General project controls/examples are collapsed; the focused mission-planning flow is preserved. Keyboard/history checks, 56 local captures and 28 production captures passed. In the accepted live view, the composer ended at 457 px on desktop and 533 px on phone. [Receipt](../reports/sprint-67/S67-LIBRARIAN/release-receipt.json).
 
-**Today**, `/librarian?project=X` (`frontend/src/pages/librarian.tsx`) stacks these, top to bottom:
-1. the header and intro;
-2. the three-step strip, the only dismissible help;
-3. the project panel, with a select, an inline new-project form and SpacePicker;
-4. four full tool cards, all at once: Describe, Review duplicates, Organise, Report from (:545-550);
-5. the conversation, with mode radios.
+### S67-CLAIMS — Claims read as sentences (closed the carried claim-formatting follow-up)
 
-The composer starts far down the page.
+Shipped through [PR #433](https://github.com/kneelinghorse/TraceLab/pull/433), [#434](https://github.com/kneelinghorse/TraceLab/pull/434) and [#435](https://github.com/kneelinghorse/TraceLab/pull/435); final merge `707b08b`. UI labels, graph nodes and navigation titles clean complete/partial Markdown table rows and join consecutive rows while preserving surrounding prose. Stored claims, snippets, raw REST/MCP fields and SQL matching/order remain exact.
 
-**Decisions made at plan time:**
-- **Conversation first.**
-  - With a project chosen, the page opens on the transcript and composer.
-  - A compact scope line sits under the header: "About: *project* ▾" changes it, and "New project" is an action.
-  - With no project, which is the sidebar's `/librarian`, the page shows the same conversation with "No project chosen ▾", and the tool chooser stays hidden until a project is chosen.
-  - The three-step strip is removed from the Librarian, and the intro becomes one sentence. The stored dismissal setting stays, because it also hides the draft notice on the mission page.
-  - The Talk, Ask the documents and List chunks modes become a compact segmented control beside the composer.
-- **"More with this project" is one chooser** holding the four tools, each with a one-line plain description:
-
-  | Tool | Description |
-  | --- | --- |
-  | Describe this project | Draft or update its description; you review every change |
-  | Find duplicates | Review documents that look like copies |
-  | Suggest collections | Group documents into collections |
-  | Write a report | A cited report from this project's documents |
-
-  - Choosing one opens only that panel, in place of the conversation, with a "Back to conversation" control.
-  - The choice is in the URL (`?tool=describe|duplicates|collections|report`), linkable, and the browser's back button works.
-  - The transcript and each panel's stored review state survive a trip into a tool and back.
-- **Entry points.**
-  - The project page's "Ask the Librarian" opens the conversation.
-  - "Review description and its drafting history" (`pages/projects/[id].tsx:211`) opens `?tool=describe`.
-  - `/librarian?q=` and `?saved=`, from the command palette (`CommandPalette.tsx:91, 94`), saved searches (`saved-searches.tsx:46`) and the `/search` redirect, still land in list mode.
-  - Plan a mission (`?intent=mission`) is unchanged, as Derek asked.
-
-**Tests that pin the old layout:**
-- `src/__tests__/librarian.test.tsx`, including the steps test at :249;
-- the four `librarian-*.test.tsx` files;
-- `tests/e2e/librarian-{description,duplicates,collections,reports}.spec.ts`, which open `/librarian?project=project`. They move to `?tool=`;
-- `tests/e2e/search-command.spec.ts`.
-
-**Done when:**
-- With a project chosen, the composer is visible without scrolling at 1440×900 and at 390.
-- No tool panel renders until one is chosen, and only one renders at a time.
-- From a project page, each tool takes "Ask the Librarian" plus one chooser choice. Each tool also opens directly from its `?tool=` URL, and the four tool specs pass that way.
-- A test proves the transcript survives a round trip into a tool and back.
-- `?q=`, `?saved=` and Plan a mission behave as before.
-
-### S67-CLAIMS — Claims read as sentences (closes #406)
-
-**Today:**
-- DeepSearch evidence stores the exact cited span as the claim (`app/services/evidence_ledger.py:474`), so a citation inside a Markdown table stores a raw row such as `| … | … |`.
-- Nothing cleans it before display. It shows verbatim in:
-  - evidence cards (`components/evidence/EntryCard.tsx:12`);
-  - the mission Evidence panel (`EvidencePanel.tsx:17`);
-  - the evidence detail heading (`pages/evidence/[id].tsx:30`);
-  - graph node titles (`sqlalchemy_graph_neighborhood_repo.py:133, 138`);
-  - command-palette results (`sqlalchemy_navigation_search_repo.py:29`);
-  - evidence-brief reports (`_render_markdown`, `evidence_ledger.py:692`), where a pipe row also turns the claim line into a table.
-
-**Decisions made at plan time:**
-- **The stored claim stays exact.** The exact-span check (`evidence_ledger.py:228`), the idempotency keys (:387, :605) and search all depend on it, and exactness is the provenance.
-- **Display cleans it**, with one function per side: `displayClaim()` in `frontend/src/lib/api/evidence.ts` and `display_claim()` in `app/services/`.
-  - Each table row has its leading and trailing pipes stripped, and its separator cells (`---`) dropped.
-  - The remaining cells are trimmed and joined with " · ".
-  - A multi-row claim's rows are cleaned the same way and joined with "; ".
-  - Text that isn't a table row passes through unchanged.
-- **Every surface above uses it.** The REST and MCP `claim` field stays raw, so agents keep the exact span. Nothing is asked of DeepSearch.
-
-**Done when:**
-- Unit tests on both sides cover at least ten real table-row claims pulled read-only from production as fixtures, including at least one multi-row claim. They also cover non-table claims that must pass through unchanged.
-- In the rendered HTML of an evidence brief built from a table-row claim, the claim produces no `<table>`, and the claim line reads "a · b".
-- On production, the evidence card for a known table-row claim reads as a sentence.
+The first deployment exposed Railway's frontend-only build root: a shared fixture outside that subtree could not resolve. The fixture moved unchanged into `frontend/tests/fixtures/`, and an isolated frontend-only build plus full gates passed. A verification follow-up corrected the harness's document page-size limit and an existing asynchronous focus assertion. Sixteen final live captures and 13 checks through installed published MCP 2.2.0 passed, including 11 byte-exact raw claims. The carried claim-formatting follow-up is completed. [Final acceptance](../reports/sprint-67/S67-CLAIMS/production-final/completion.json).
 
 ### S67-WALK — The share-out path, on production
 
-**Steps.** On the final Sprint 67 production build, walk the invited-member path end to end:
-1. An admin generates an invite code.
-2. A dedicated temporary test account signs up with it. Its credentials stay private, outside the repository, as in WALK-3 (decision #559).
-3. Home's empty state, then a new project.
-4. The Librarian conversation drafts a mission.
-5. The mission is submitted and runs on DeepSearch. Derek approved paid runs as needed (decision #628).
-6. It opens on its Results.
-7. Its Evidence and its Reports entry under "Mission results".
-8. The mission-complete email arrives.
-9. The new member cannot see anyone else's projects.
+A temporary invited **member**, using real browser authentication, signed up, saw empty Home, created a project, conversed with the Librarian, reviewed and saved its draft, and submitted one approved paid DeepSearch run. Mission `S67-KBD-FOCUS` (`a9526db2-ece6-4655-9d17-6991b12c49c7`) completed in **204.749 seconds**, with 113 visible evidence entries and a mission-result report. Results opened by default, the Evidence tab worked, and the report's Mission results entry returned to Results. The completion email was received at 08:58:16 UTC with the correct mission link and title. The member listed only its own project; foreign-project and admin access returned 403.
 
-Production smoke and the public repository page (README, license, security policy) are checked too.
+The walkthrough found and fixed two defects in [PR #436](https://github.com/kneelinghorse/TraceLab/pull/436): signup's obsolete Mission Protocol wording, and a member Settings button for admin-only invite creation. The existing server policy was correct; Settings now uses the live role context and the public README explains admin invite creation. Both fixes were checked on the deployed merge in light/dark at 1440/390 px. The public repository, README, MIT license and security policy were rendered successfully.
 
-**Fixes and cleanup:**
-- Every defect found is fixed in this sprint, or put in front of Derek by name before the share-out.
-- Afterward, the test account is disabled and its invite revoked.
+Cleanup disabled the temporary account and verified denial for both its existing token and a fresh login. Signup had already consumed the single-use invite; a reuse attempt was rejected. The used invite's audit row is retained because the revoke API intentionally deletes only unused codes. This satisfies the cleanup's access-removal intent without deleting audit history (decision #638). [Walk receipt](../reports/sprint-67/S67-WALK/release-receipt.json).
 
-**Done when:** the receipt holds:
-- the walk's captures at 1440 and 390, in both themes;
-- the run's identity and duration;
-- a disposition for every defect found.
-
-**Out of Sprint 67:**
-- text-message notifications (the email switch already exists);
-- changes to Plan a mission;
-- project sharing;
-- the Reasonbook folder move (Sprint 68);
-- any change in the DeepSearch repository.
-
-**Critic pass (2026-10-13):** an independent critic returned NEEDS-REVISION with five blocking findings, all fixed above:
-1. contract guards for the seen-state change;
-2. the project page's report list and its Reports stat;
-3. Home's unseen state and a check that passed without any change;
-4. the project page's description link;
-5. a back/forward check that `router.replace` made impossible.
-
-Its minor findings are folded in too: the default view, Home's MCP output, evidence links, source-name access, the origin default, the dot timestamp, `.panel` padding, the CI list wording, multi-row claims, one MCP publish, live completion, and the Librarian's no-project state.
+**Carry-forward:** the existing Sprint 68 build-tool advisory maintenance and one cosmetic Reports count-label follow-up remain open. The final capture says “1 mission results”; this was explicitly disclosed to Derek and does not affect filtering, navigation or access. The Reasonbook folder migration and share-out feedback remain in Sprint 68. Text messages, project sharing and DeepSearch repository changes stayed outside Sprint 67. DeepSearch was read only with permission; its repository was not changed.
 
 ## Monday 2026-10-19 — the share-out
 
@@ -580,6 +213,8 @@ Add to this list rather than resolving items silently. Questions 1–4 were answ
 ---
 
 ## Change Log
+
+- **2026-10-14 UTC, Sprint 67 closed (eight of eight).** All missions merged, deployed and verified in order; final WALK merge `b3d09ea` serves on both Railway services with Post-Deploy Check green. The real invited-member run, received email, isolation and disabled-account/consumed-invite checks passed. MCP 2.2.0 was published and verified from an empty registry install after Derek’s approval. Final measured gates: 3,212 backend / 172 PostgreSQL / 451 frontend unit / 218 browser passes, with existing backend/PG skips and quarantines explicit. Claims fixture references are corrected at close; the claim-formatting carry-forward is completed. Two named follow-ups remain for Sprint 68: build-tool maintenance and the disclosed cosmetic single-result count wording.
 
 - **2026-10-14 UTC, Sprint 67 opened for a fresh build session.** Derek approved the scope (decision #627) and paid DeepSearch runs as needed (decision #628): "yes, we can run as many paid deepseek runs as needed, all approved." The identity was synchronised to `sprint-67-active`. S67-DENSITY reads In Progress from planning: a promotion to Current started it instead (learning #311). Its notes record that no build work has begun. Build in roadmap order. The record's work queue lists missions alphabetically. S67-QUALITY was added from DeepSearch's request for the mission page to show its quality and failure details (message `9706116c`).
 

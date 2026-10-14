@@ -1,0 +1,146 @@
+{
+  "success": true,
+  "data": {
+    "sprintId": "sprint-67",
+    "previousStatus": "Active",
+    "currentStatus": "Completed",
+    "summary": "Eight of eight Sprint67 missions completed in strict planned order, each through local exact CI gates, all nine required PR checks, normal squash merge, exact backend/frontend Railway deployment and production acceptance. Density, report origins/defaults, seen-state, stateful mission tabs, honest quality/failure presentation, conversation-first Librarian and display-only claim cleanup shipped; published MCP2.2.0 verified from empty registry install. Final WALK merge b3d09eac893fb0e999b3d00cec32e0c1346bdaf6 and Post-Deploy Check38545462331 passed. Real invited-member mission completed in204.749s; actual inbound completion email, Results/Evidence/Reports, isolation, disabled-account denial and consumed-invite reuse rejection verified. Final local/PR measurements3212 backend passed with4 existing skips/12 quarantines,172 PostgreSQL passed with3 existing skips,451 frontend units,218 browser cases. Receipt audit72 distinct file citations and60 symbol/test/env citations resolved; decision640 corrects moved fixture reference with original history retained. Two carried next steps to existing Sprint68:490 build-tool maintenance and491 disclosed cosmetic Reports singular-count wording. Separate closeout PR contains outcome roadmap, identity/export synchronization and final WALK receipts.",
+    "completedAt": "2026-10-14T10:04:22.138Z",
+    "activeSessionsAtClose": [],
+    "startupBuildTime": "2026-10-13T01:45:59.345Z",
+    "driftMinutes": 0,
+    "readiness": {
+      "totalMissions": 8,
+      "completedMissions": 8,
+      "blockedMissions": 0,
+      "skippedMissions": 0,
+      "openMissions": 0,
+      "parkedMissions": 0,
+      "completedMissionIds": [
+        "S67-BADGES",
+        "S67-CLAIMS",
+        "S67-DENSITY",
+        "S67-LIBRARIAN",
+        "S67-MISSION",
+        "S67-QUALITY",
+        "S67-REPORTS",
+        "S67-WALK"
+      ],
+      "blockedMissionIds": [],
+      "skippedMissionIds": [],
+      "openMissionIds": []
+    },
+    "contexts": {
+      "masterContext": {
+        "snapshotId": 1385,
+        "beforeSize": {
+          "sizeBytes": 62677,
+          "sizeKb": 61.21,
+          "limitKb": 100,
+          "warningThresholdPercent": 75,
+          "usagePercent": 61.21,
+          "nearLimit": false
+        },
+        "afterSize": {
+          "sizeBytes": 62670,
+          "sizeKb": 61.2,
+          "limitKb": 100,
+          "warningThresholdPercent": 75,
+          "usagePercent": 61.2,
+          "nearLimit": false
+        },
+        "nextStepsCleared": 0
+      },
+      "projectContext": {
+        "snapshotId": 1386,
+        "beforeSize": {
+          "sizeBytes": 9206,
+          "sizeKb": 8.99,
+          "limitKb": 100,
+          "warningThresholdPercent": 75,
+          "usagePercent": 8.99,
+          "nearLimit": false
+        },
+        "afterSize": {
+          "sizeBytes": 5329,
+          "sizeKb": 5.2,
+          "limitKb": 100,
+          "warningThresholdPercent": 75,
+          "usagePercent": 5.2,
+          "nearLimit": false
+        },
+        "nextStepsCleared": 0
+      },
+      "totalBeforeSizeKb": 70.2,
+      "totalAfterSizeKb": 66.4
+    },
+    "lifecycle": {
+      "archived": false,
+      "decisionsArchived": 0,
+      "learningsArchived": 0,
+      "archivedDecisionIds": [],
+      "learningIds": [],
+      "kpis": {
+        "completionRate": 1,
+        "avgCycleTimeDays": 0.05,
+        "decisionCount": 16,
+        "learningCount": 11,
+        "blockedCount": 0
+      },
+      "preCloseSnapshotId": "snapshot-20261014T100421876Z-2956",
+      "dbSnapshotId": "snapshot-20261014T100422249Z-2532"
+    },
+    "nextStepsSurvey": {
+      "available": true,
+      "totalPending": 0,
+      "totalOpen": 2,
+      "groups": {
+        "closingSprintWithMissionProvenance": [
+          {
+            "id": 491,
+            "content": "Cosmetic Reports count-label follow-up: a single result renders as '1 mission results'. Observed and disclosed to Derek during the final production WALK; navigation, filtering and access all passed. Correct singular/plural wording for the existing report filters during share-out polish, preserving the source labels.",
+            "sprintId": "sprint-67",
+            "missionId": "S67-WALK",
+            "status": "carried",
+            "closesSurvived": 0,
+            "ageDays": 0.0002466435544192791
+          }
+        ],
+        "closingSprintWithoutMissionProvenance": [],
+        "otherSprintProvenance": [
+          {
+            "id": 490,
+            "content": "Sprint68 dependency maintenance: remove residual build-tool advisories GHSA-vfj7-8cjw-p6xm (braces, no patch on2026-10-13; Tailwind3/ESLint chains) and GHSA-rj75-hqrm-r3gf (postcss-selector-parser6.x via Tailwind3/typography; fix7.1.6 outside declared ranges). Recheck upstream patches at Sprint68 planning; if still unpatched, scope a deliberate Tailwind/toolchain migration with OODS compatibility and full theme/browser verification. Current residuals are build-only on trusted repository input, absent from35 server traces, documented in S66-SECURITY receipt; revisit immediately before introducing user-controlled CSS/glob parsing. No audit suppression.",
+            "sprintId": "sprint-66",
+            "missionId": "S66-SECURITY",
+            "status": "carried",
+            "closesSurvived": 0,
+            "ageDays": 0.0002466435544192791
+          }
+        ],
+        "noSprintProvenance": []
+      },
+      "lease": {
+        "warnAt": 3,
+        "lapseAt": 4,
+        "countingRule": "closes survived = Completed sprints whose recorded end_date — the actual close time — is in the past and later than the row's last carry (resolved_at) or, if never carried, its created_at; a close counts only after it completes, so the closing sprint never counts toward its own close. A row at the drop age is dropped only once it is also 14 days past that same anchor; a row that has survived no close for 42 days is flagged idle; nothing is dropped by the calendar alone",
+        "warned": [],
+        "lapsed": [],
+        "minAgeDays": 14,
+        "heldByMinAge": [],
+        "idleWarnDays": 42,
+        "idle": []
+      }
+    },
+    "lapsedDroppedIds": [],
+    "plannedEndDate": "2026-10-15",
+    "writeFailures": [],
+    "message": "Sprint 'sprint-67' closed successfully",
+    "projectRoot": "/Users/systemsystems/portfolio/TraceLab",
+    "resolvedBy": "explicit"
+  },
+  "warnings": [
+    "context_snapshots has grown to 1352 snapshots holding 68.6 MB of content. Most are copies Reasonbook wrote on its own, and no read path returns them. rbook_db(action=\"prune_snapshots\") shows what emptying those copies would reclaim without changing anything; confirm=true applies it after a database snapshot, and every row, id and reference is kept. A sprint close never prunes on its own.",
+    "60 session(s) in this store carry no sprint tag and are therefore NOT counted here (nor are the decisions, learnings, constraints and next-steps captured in them). This is expected for sessions started while no sprint was in an open status — the record is untagged by design, not missing. Work can stay unscheduled; use rbook_sprint(action=\"add\") if you want it sprint-scoped."
+  ]
+}

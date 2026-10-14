@@ -16,5 +16,16 @@
     "reason": "Single fixture relocated to the Railway frontend build subtree; content unchanged.",
     "byte_identical": true,
     "sha256": "6edb4f58cbd9b4448bf7d71234441a7c9a5d9f3f275677781055170bd95ffdf8"
+  },
+  "original_claim": {
+    "error": "tests/e2e/evidence.spec.ts(2,27): TS2307 Cannot find module '../../../tests/fixtures/evidence_display_claims.json'",
+    "original_fixture_reference": "tests/fixtures/evidence_display_claims.json"
+  },
+  "corrected_at_sprint_close": {
+    "date": "2026-10-14",
+    "session": "PS-2026-10-14-003",
+    "removing_pr": 434,
+    "removing_commit": "3e86bba99acb7ef6929daa4274d6fe9fa81b64f5",
+    "reason": "The error is historical compiler output relative to frontend/. Current source is frontend/tests/e2e/evidence.spec.ts; current fixture is frontend/tests/fixtures/evidence_display_claims.json. Historical text retained, not a current missing-file instruction."
   }
 }

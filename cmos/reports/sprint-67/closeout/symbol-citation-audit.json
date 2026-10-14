@@ -1,0 +1,1112 @@
+[
+  {
+    "citation": "test_auto_ingest",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-DENSITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      "tests/conftest.py",
+      "tests/test_auto_ingest.py",
+      "tests/test_create_ownership_parity.py",
+      "tests/test_result_materialization.py"
+    ],
+    "status": "found",
+    "definitions": [],
+    "testModule": [
+      "tests/test_auto_ingest.py"
+    ]
+  },
+  {
+    "citation": "test_auto_ingest_full_pipeline",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-DENSITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      "tests/test_auto_ingest.py"
+    ],
+    "status": "found",
+    "definitions": [
+      "tests/test_auto_ingest.py:382"
+    ]
+  },
+  {
+    "citation": "test_live_log_cross_service",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-DENSITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      "tests/test_live_log_cross_service.py"
+    ],
+    "status": "found",
+    "definitions": [],
+    "testModule": [
+      "tests/test_live_log_cross_service.py"
+    ]
+  },
+  {
+    "citation": "test_real_sender_receives_replay_ack_and_streams_before_terminal",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-DENSITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      "tests/test_live_log_cross_service.py"
+    ],
+    "status": "found",
+    "definitions": [
+      "tests/test_live_log_cross_service.py:35"
+    ]
+  },
+  {
+    "citation": "test_pedr_unified_search",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-DENSITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      "tests/conftest.py",
+      "tests/test_pedr_unified_search.py"
+    ],
+    "status": "found",
+    "definitions": [],
+    "testModule": [
+      "tests/test_pedr_unified_search.py"
+    ]
+  },
+  {
+    "citation": "test_create_orchestrator_factory",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-DENSITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      "tests/test_pedr_unified_search.py"
+    ],
+    "status": "found",
+    "definitions": [
+      "tests/test_pedr_unified_search.py:895"
+    ]
+  },
+  {
+    "citation": "test_full_search_pipeline",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-DENSITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      "tests/test_pedr_unified_search.py"
+    ],
+    "status": "found",
+    "definitions": [
+      "tests/test_pedr_unified_search.py:906"
+    ]
+  },
+  {
+    "citation": "test_e2e_rbac_live",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/postgres-verification.json",
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-BADGES/verification-history.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-DENSITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/integration-summary.json"
+    ],
+    "hits": [
+      "scripts/rbac_verify.py",
+      "tests/integration/test_e2e_rbac_live.py"
+    ],
+    "status": "found",
+    "definitions": [],
+    "testModule": [
+      "tests/integration/test_e2e_rbac_live.py"
+    ]
+  },
+  {
+    "citation": "test_live_rbac_matrix",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/postgres-verification.json",
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-BADGES/verification-history.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-DENSITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/integration-summary.json"
+    ],
+    "hits": [
+      "tests/integration/test_e2e_rbac_live.py"
+    ],
+    "status": "found",
+    "definitions": [
+      "tests/integration/test_e2e_rbac_live.py:185"
+    ]
+  },
+  {
+    "citation": "test_ingestion_flow",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/postgres-verification.json",
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-BADGES/verification-history.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-DENSITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/integration-summary.json"
+    ],
+    "hits": [
+      "tests/integration/test_ingestion_flow.py"
+    ],
+    "status": "found",
+    "definitions": [],
+    "testModule": [
+      "tests/integration/test_ingestion_flow.py"
+    ]
+  },
+  {
+    "citation": "test_markdown_cli_flow",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/postgres-verification.json",
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-BADGES/verification-history.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-DENSITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/integration-summary.json"
+    ],
+    "hits": [
+      "tests/integration/test_ingestion_flow.py"
+    ],
+    "status": "found",
+    "definitions": [
+      "tests/integration/test_ingestion_flow.py:35"
+    ]
+  },
+  {
+    "citation": "test_qdrant_isolation",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/postgres-verification.json",
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-BADGES/verification-history.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-DENSITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/integration-summary.json"
+    ],
+    "hits": [
+      ".github/ci/README.md",
+      "tests/integration/test_qdrant_isolation.py"
+    ],
+    "status": "found",
+    "definitions": [],
+    "testModule": [
+      "tests/integration/test_qdrant_isolation.py"
+    ]
+  },
+  {
+    "citation": "test_disposable_qdrant_cache_round_trip",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/postgres-verification.json",
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-BADGES/verification-history.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-DENSITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/integration-summary.json"
+    ],
+    "hits": [
+      "tests/integration/test_qdrant_isolation.py"
+    ],
+    "status": "found",
+    "definitions": [
+      "tests/integration/test_qdrant_isolation.py:11"
+    ]
+  },
+  {
+    "citation": "TestAutoIngestIntegration",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-DENSITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      "tests/test_auto_ingest.py"
+    ],
+    "status": "found",
+    "definitions": [
+      "tests/test_auto_ingest.py:376"
+    ]
+  },
+  {
+    "citation": "TestPEDRIntegration",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-DENSITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      "tests/test_pedr_unified_search.py"
+    ],
+    "status": "found",
+    "definitions": [
+      "tests/test_pedr_unified_search.py:889"
+    ]
+  },
+  {
+    "citation": "QDRANT_URL",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-DENSITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      "app/core/qdrant_client.py",
+      "app/main.py",
+      "app/services/document_ingestion.py",
+      "scripts/pytest_isolation.py",
+      "tests/test_qdrant_prewarm.py",
+      "tests/unit/test_test_isolation.py"
+    ],
+    "status": "found"
+  },
+  {
+    "citation": "PEDR_GRAPH_TELEMETRY_ENABLED",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-DENSITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      ".github/workflows/backend-tests.yml",
+      "app/services/pedr/search_orchestrator.py"
+    ],
+    "status": "found"
+  },
+  {
+    "citation": "RBAC_VERIFY_BASE_URL",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/postgres-verification.json",
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-BADGES/verification-history.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-DENSITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/integration-summary.json"
+    ],
+    "hits": [
+      ".github/ci/README.md",
+      "tests/integration/test_e2e_rbac_live.py"
+    ],
+    "status": "found"
+  },
+  {
+    "citation": "PLAYWRIGHT_SKIP_SERVER",
+    "sources": [
+      "cmos/reports/sprint-67/S67-WALK/progress.json"
+    ],
+    "hits": [
+      ".github/workflows/frontend-production-build.yml",
+      ".github/workflows/production-smoke.yml"
+    ],
+    "status": "found"
+  },
+  {
+    "citation": "PLAYWRIGHT_SKIP_WEBSERVER",
+    "sources": [
+      "cmos/reports/sprint-67/S67-WALK/progress.json"
+    ],
+    "hits": [],
+    "status": "historical failed harness invocation, explicitly corrected to PLAYWRIGHT_SKIP_SERVER"
+  },
+  {
+    "citation": "RegisterPanel",
+    "sources": [
+      "cmos/reports/sprint-67/S67-WALK/progress.json"
+    ],
+    "hits": [
+      "frontend/src/components/AppShell.test.tsx",
+      "frontend/src/components/AuthGate.tsx",
+      "frontend/src/components/RegisterPanel.tsx"
+    ],
+    "status": "found"
+  },
+  {
+    "citation": "MissionResponse",
+    "sources": [
+      "cmos/reports/sprint-67/S67-QUALITY/api-field-readback.json",
+      "cmos/reports/sprint-67/S67-QUALITY/verification-history.json"
+    ],
+    "hits": [
+      "app/api/v1/librarian.py",
+      "app/api/v1/missions.py",
+      "app/mcp_server/tools/missions.py",
+      "app/schemas/librarian.py",
+      "app/schemas/mission.py",
+      "frontend/src/lib/api/librarian.ts",
+      "tests/unit/test_missions_agent_ux.py"
+    ],
+    "status": "found"
+  },
+  {
+    "citation": "test_api_stability",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      ".github/ci/backend-quarantine.txt",
+      "tests/sprint_03/test_api_stability.py"
+    ],
+    "status": "found",
+    "definitions": [],
+    "testModule": [
+      "tests/sprint_03/test_api_stability.py"
+    ]
+  },
+  {
+    "citation": "test_api_uptime_and_latency_meet_targets",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      ".github/ci/backend-quarantine.txt",
+      "tests/sprint_03/test_api_stability.py"
+    ],
+    "status": "found",
+    "definitions": [
+      "tests/sprint_03/test_api_stability.py:8"
+    ]
+  },
+  {
+    "citation": "test_evidence_integrity",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      ".github/ci/backend-quarantine.txt",
+      "tests/sprint_03/test_evidence_integrity.py"
+    ],
+    "status": "found",
+    "definitions": [],
+    "testModule": [
+      "tests/sprint_03/test_evidence_integrity.py"
+    ]
+  },
+  {
+    "citation": "test_evidence_integrity_checks_detect_missing_chunks",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      ".github/ci/backend-quarantine.txt",
+      "tests/sprint_03/test_evidence_integrity.py"
+    ],
+    "status": "found",
+    "definitions": [
+      "tests/sprint_03/test_evidence_integrity.py:8"
+    ]
+  },
+  {
+    "citation": "test_quality_gate_effectiveness",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      ".github/ci/backend-quarantine.txt",
+      "tests/sprint_03/test_quality_gate_effectiveness.py"
+    ],
+    "status": "found",
+    "definitions": [],
+    "testModule": [
+      "tests/sprint_03/test_quality_gate_effectiveness.py"
+    ]
+  },
+  {
+    "citation": "test_quality_gate_failures_blocked_with_actionable_feedback",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      ".github/ci/backend-quarantine.txt",
+      "tests/sprint_03/test_quality_gate_effectiveness.py"
+    ],
+    "status": "found",
+    "definitions": [
+      "tests/sprint_03/test_quality_gate_effectiveness.py:8"
+    ]
+  },
+  {
+    "citation": "test_validation_coverage",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      ".github/ci/backend-quarantine.txt",
+      "tests/sprint_03/test_validation_coverage.py"
+    ],
+    "status": "found",
+    "definitions": [],
+    "testModule": [
+      "tests/sprint_03/test_validation_coverage.py"
+    ]
+  },
+  {
+    "citation": "test_validation_rate_exceeds_target",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      ".github/ci/backend-quarantine.txt",
+      "tests/sprint_03/test_validation_coverage.py"
+    ],
+    "status": "found",
+    "definitions": [
+      "tests/sprint_03/test_validation_coverage.py:8"
+    ]
+  },
+  {
+    "citation": "test_coverage_metric",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      ".github/ci/backend-quarantine.txt",
+      "tests/sprint_04/test_coverage_metric.py"
+    ],
+    "status": "found",
+    "definitions": [],
+    "testModule": [
+      "tests/sprint_04/test_coverage_metric.py"
+    ]
+  },
+  {
+    "citation": "test_coverage_threshold_exceeded",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      ".github/ci/backend-quarantine.txt",
+      "tests/sprint_04/test_coverage_metric.py"
+    ],
+    "status": "found",
+    "definitions": [
+      "tests/sprint_04/test_coverage_metric.py:8"
+    ]
+  },
+  {
+    "citation": "test_performance_metrics",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      ".github/ci/backend-quarantine.txt",
+      "tests/sprint_04/test_performance_metrics.py"
+    ],
+    "status": "found",
+    "definitions": [],
+    "testModule": [
+      "tests/sprint_04/test_performance_metrics.py"
+    ]
+  },
+  {
+    "citation": "test_latency_stays_under_two_seconds",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      ".github/ci/backend-quarantine.txt",
+      "tests/sprint_04/test_performance_metrics.py"
+    ],
+    "status": "found",
+    "definitions": [
+      "tests/sprint_04/test_performance_metrics.py:9"
+    ]
+  },
+  {
+    "citation": "test_cost_profile_within_budget",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      ".github/ci/backend-quarantine.txt",
+      "tests/sprint_04/test_performance_metrics.py"
+    ],
+    "status": "found",
+    "definitions": [
+      "tests/sprint_04/test_performance_metrics.py:17"
+    ]
+  },
+  {
+    "citation": "test_quality_and_load",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      ".github/ci/backend-quarantine.txt",
+      "tests/sprint_04/test_quality_and_load.py"
+    ],
+    "status": "found",
+    "definitions": [],
+    "testModule": [
+      "tests/sprint_04/test_quality_and_load.py"
+    ]
+  },
+  {
+    "citation": "test_quality_checks_block_and_pass",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      ".github/ci/backend-quarantine.txt",
+      "tests/sprint_04/test_quality_and_load.py"
+    ],
+    "status": "found",
+    "definitions": [
+      "tests/sprint_04/test_quality_and_load.py:9"
+    ]
+  },
+  {
+    "citation": "test_load_test_supports_target_concurrency",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      ".github/ci/backend-quarantine.txt",
+      "tests/sprint_04/test_quality_and_load.py"
+    ],
+    "status": "found",
+    "definitions": [
+      "tests/sprint_04/test_quality_and_load.py:18"
+    ]
+  },
+  {
+    "citation": "test_tech_debt",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      ".github/ci/backend-quarantine.txt",
+      "tests/sprint_04/test_tech_debt.py"
+    ],
+    "status": "found",
+    "definitions": [],
+    "testModule": [
+      "tests/sprint_04/test_tech_debt.py"
+    ]
+  },
+  {
+    "citation": "test_playwright_migration_eliminates_cypress_cost",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      ".github/ci/backend-quarantine.txt",
+      "tests/sprint_04/test_tech_debt.py"
+    ],
+    "status": "found",
+    "definitions": [
+      "tests/sprint_04/test_tech_debt.py:8"
+    ]
+  },
+  {
+    "citation": "test_admin_dashboard",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      ".github/ci/backend-quarantine.txt",
+      "tests/test_admin_dashboard.py"
+    ],
+    "status": "found",
+    "definitions": [],
+    "testModule": [
+      "tests/test_admin_dashboard.py"
+    ]
+  },
+  {
+    "citation": "test_metrics_aggregator_generates_sections",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      ".github/ci/backend-quarantine.txt",
+      "tests/test_admin_dashboard.py"
+    ],
+    "status": "found",
+    "definitions": [
+      "tests/test_admin_dashboard.py:116"
+    ]
+  },
+  {
+    "citation": "test_document_ingestion",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      ".github/ci/backend-quarantine.txt",
+      "tests/test_document_ingestion.py"
+    ],
+    "status": "found",
+    "definitions": [],
+    "testModule": [
+      "tests/test_document_ingestion.py"
+    ]
+  },
+  {
+    "citation": "test_upload_and_process_endpoints_record_statuses",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      ".github/ci/backend-quarantine.txt",
+      "tests/test_document_ingestion.py"
+    ],
+    "status": "found",
+    "definitions": [
+      "tests/test_document_ingestion.py:247"
+    ]
+  },
+  {
+    "citation": "NODE_ID",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      ".github/ci/backend-quarantine.txt"
+    ],
+    "status": "found"
+  },
+  {
+    "citation": "TelemetryEnvelope",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      ".github/ci/backend-quarantine.txt",
+      "app/core/telemetry.py",
+      "scripts/migrate_telemetry_format.py",
+      "tests/test_telemetry_migration_completion.py",
+      "tests/test_telemetry_standardization.py"
+    ],
+    "status": "found"
+  },
+  {
+    "citation": "DocumentResponse",
+    "sources": [
+      "cmos/reports/sprint-67/S67-BADGES/testing-summary.json",
+      "cmos/reports/sprint-67/S67-CLAIMS/testing-summary.json",
+      "cmos/reports/sprint-67/S67-LIBRARIAN/testing-summary.json",
+      "cmos/reports/sprint-67/S67-MISSION/testing-summary.json",
+      "cmos/reports/sprint-67/S67-QUALITY/testing-summary.json",
+      "cmos/reports/sprint-67/S67-REPORTS/testing-summary.json"
+    ],
+    "hits": [
+      ".github/ci/backend-quarantine.txt"
+    ],
+    "status": "found"
+  },
+  {
+    "citation": "ApiMission",
+    "sources": [
+      "cmos/reports/sprint-67/S67-QUALITY/api-field-readback.json"
+    ],
+    "hits": [
+      "frontend/src/__tests__/authored-scope.test.tsx",
+      "frontend/src/__tests__/mission-authoring.test.tsx",
+      "frontend/src/__tests__/mission-quality.test.tsx",
+      "frontend/src/__tests__/mission-run.test.tsx",
+      "frontend/src/__tests__/missions.test.tsx",
+      "frontend/src/components/missions/AuthoredScope.tsx",
+      "frontend/src/components/missions/MissionForm.tsx",
+      "frontend/src/components/missions/MissionQuality.tsx",
+      "frontend/src/components/missions/MissionRunActivity.tsx",
+      "frontend/src/components/queue/QueueCard.tsx",
+      "frontend/src/lib/api/librarian.ts",
+      "frontend/src/lib/api/missions.ts",
+      "frontend/src/lib/hooks/useMissions.ts",
+      "frontend/src/lib/schemas/apiMissionForm.ts",
+      "frontend/src/pages/missions/[id].tsx",
+      "frontend/src/pages/missions/index.tsx",
+      "frontend/src/pages/missions/new.tsx",
+      "frontend/src/types/mission.ts"
+    ],
+    "status": "found"
+  },
+  {
+    "citation": "missionsApi",
+    "sources": [
+      "cmos/reports/sprint-67/S67-QUALITY/api-field-readback.json"
+    ],
+    "hits": [
+      "frontend/src/__tests__/mission-authoring.test.tsx",
+      "frontend/src/__tests__/missions.test.tsx",
+      "frontend/src/__tests__/project-bundles.test.tsx",
+      "frontend/src/components/missions/ContractPreviewPanel.tsx",
+      "frontend/src/components/missions/MissionForm.tsx",
+      "frontend/src/components/projects/ProjectResources.tsx",
+      "frontend/src/lib/api/missions.ts",
+      "frontend/src/lib/hooks/useMissions.ts",
+      "frontend/src/pages/missions/[id].tsx"
+    ],
+    "status": "found"
+  },
+  {
+    "citation": "toHaveFocus",
+    "sources": [
+      "cmos/reports/sprint-67/S67-CLAIMS/contract-followup/verification-history.json"
+    ],
+    "hits": [
+      "frontend/src/__tests__/librarian-collections.test.tsx",
+      "frontend/src/__tests__/librarian-duplicates.test.tsx",
+      "frontend/src/__tests__/librarian-reports.test.tsx",
+      "frontend/src/__tests__/librarian.test.tsx"
+    ],
+    "status": "found"
+  },
+  {
+    "citation": "test_qdrant_performance",
+    "sources": [
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/verification-history.json"
+    ],
+    "hits": [
+      "tests/performance/test_qdrant_performance.py"
+    ],
+    "status": "found",
+    "definitions": [],
+    "testModule": [
+      "tests/performance/test_qdrant_performance.py"
+    ]
+  },
+  {
+    "citation": "test_parameter_sweep_finds_configuration_with_latency_headroom",
+    "sources": [
+      "cmos/reports/sprint-67/S67-CLAIMS/repair/verification-history.json"
+    ],
+    "hits": [
+      "tests/performance/test_qdrant_performance.py"
+    ],
+    "status": "found",
+    "definitions": [
+      "tests/performance/test_qdrant_performance.py:63"
+    ]
+  },
+  {
+    "citation": "test_report_origin_migration",
+    "sources": [
+      "cmos/reports/sprint-67/S67-REPORTS/ruff.json"
+    ],
+    "hits": [
+      "tests/integration/test_report_origin_migration.py"
+    ],
+    "status": "found",
+    "definitions": [],
+    "testModule": [
+      "tests/integration/test_report_origin_migration.py"
+    ]
+  },
+  {
+    "citation": "test_auto_report",
+    "sources": [
+      "cmos/reports/sprint-67/S67-REPORTS/ruff.json"
+    ],
+    "hits": [
+      "tests/conftest.py",
+      "tests/test_auto_report.py",
+      "tests/test_create_ownership_parity.py"
+    ],
+    "status": "found",
+    "definitions": [],
+    "testModule": [
+      "tests/test_auto_report.py"
+    ]
+  },
+  {
+    "citation": "test_collection_context",
+    "sources": [
+      "cmos/reports/sprint-67/S67-REPORTS/ruff.json"
+    ],
+    "hits": [
+      "tests/integration/test_collection_context_postgres.py",
+      "tests/test_collection_context.py"
+    ],
+    "status": "found",
+    "definitions": [],
+    "testModule": [
+      "tests/test_collection_context.py"
+    ]
+  },
+  {
+    "citation": "test_evidence_ledger_api",
+    "sources": [
+      "cmos/reports/sprint-67/S67-REPORTS/ruff.json"
+    ],
+    "hits": [
+      "tests/test_evidence_ledger_api.py"
+    ],
+    "status": "found",
+    "definitions": [],
+    "testModule": [
+      "tests/test_evidence_ledger_api.py"
+    ]
+  },
+  {
+    "citation": "test_librarian_reports",
+    "sources": [
+      "cmos/reports/sprint-67/S67-REPORTS/ruff.json"
+    ],
+    "hits": [
+      "tests/test_librarian_reports.py"
+    ],
+    "status": "found",
+    "definitions": [],
+    "testModule": [
+      "tests/test_librarian_reports.py"
+    ]
+  },
+  {
+    "citation": "test_pedr_report_scope",
+    "sources": [
+      "cmos/reports/sprint-67/S67-REPORTS/ruff.json"
+    ],
+    "hits": [
+      "tests/test_pedr_report_scope.py"
+    ],
+    "status": "found",
+    "definitions": [],
+    "testModule": [
+      "tests/test_pedr_report_scope.py"
+    ]
+  },
+  {
+    "citation": "test_report_citations",
+    "sources": [
+      "cmos/reports/sprint-67/S67-REPORTS/ruff.json"
+    ],
+    "hits": [
+      "tests/integration/test_report_citations.py",
+      "tests/test_evidence_ledger_api.py",
+      "tests/test_report_citations.py"
+    ],
+    "status": "found",
+    "definitions": [],
+    "testModule": [
+      "tests/test_report_citations.py",
+      "tests/integration/test_report_citations.py"
+    ]
+  },
+  {
+    "citation": "test_report_origins",
+    "sources": [
+      "cmos/reports/sprint-67/S67-REPORTS/ruff.json"
+    ],
+    "hits": [
+      "tests/test_report_origins.py"
+    ],
+    "status": "found",
+    "definitions": [],
+    "testModule": [
+      "tests/test_report_origins.py"
+    ]
+  }
+]
