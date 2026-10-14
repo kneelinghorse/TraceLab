@@ -1040,7 +1040,7 @@
       "mcp": "tracelab_project.neighborhood",
       "classification": "closed-MCP-2",
       "baseline": "sprint-52-read-gap",
-      "rationale": "MCP-2 closes the Sprint 52 read gap: GET /graph/neighborhood with the UI defaults (depth 1, per_relation_limit 12, max_nodes 60) and canonical links for all six node types."
+      "rationale": "MCP-2 closes the Sprint 52 read gap: GET /graph/neighborhood with the UI defaults (depth 1, per_relation_limit 12, max_nodes 60) and canonical links for all six node types. S67-CLAIMS renders evidence titles with display_claim; raw ledger claim values and search matching stay exact. Deployed MCP-client regression: scripts/check_claim_display_contract.mjs."
     },
     {
       "id": "frontend/src/lib/api/home.ts#homeApi.favorites:GET:/home/favorites",
@@ -1387,7 +1387,7 @@
       "mcp": "tracelab_search.navigate",
       "classification": "closed-MCP-1",
       "baseline": "read-gap",
-      "rationale": "Forwards q, entity_type, page and page_size; returns canonical entity links."
+      "rationale": "Forwards q, entity_type, page and page_size; returns canonical entity links. S67-CLAIMS renders evidence titles with display_claim; raw ledger claim values and search matching stay exact. Deployed MCP-client regression: scripts/check_claim_display_contract.mjs."
     },
     {
       "id": "frontend/src/lib/api/projects.ts#projectsApi.createProject:POST:/projects",

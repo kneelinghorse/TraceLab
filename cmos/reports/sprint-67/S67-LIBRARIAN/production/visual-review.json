@@ -1,0 +1,16 @@
+{
+  "checked_at": "2026-10-14T06:55:17.073935+00:00",
+  "captures_reviewed": 28,
+  "method": "All 28 live views inspected in theme contact sheets; four description views retaken after loading and inspected separately at readable phone scale. Final capture run waits for current description content.",
+  "findings": "Conversation opens first with scope and compact modes. Chooser lists four described actions; each opens only its own panel. No clipping or overlap observed in either theme or width. Description content fully loaded.",
+  "composer_bottom": {
+    "phone390": 533,
+    "desktop1440": 457
+  },
+  "viewport_height": 900,
+  "read_only": true,
+  "axe_serious_critical": 0,
+  "overflow": false,
+  "client_or_transport_errors": 0,
+  "navigation": "Project Ask entry and description history link verified; each tool supports browser Back/Forward and Back to conversation; chooser keyboard Enter verified."
+}

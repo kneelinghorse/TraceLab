@@ -12,6 +12,7 @@ vi.mock("@/lib/api/evidence", async importOriginal => ({ ...await importOriginal
 import EvidencePage from "@/pages/evidence";
 import EvidenceDetailPage from "@/pages/evidence/[id]";
 import { EvidencePanel } from "@/components/evidence/EvidencePanel";
+import claimFixtures from "../../../tests/fixtures/evidence_display_claims.json";
 const entry = (id: string) => ({ id, project_id: "alpha", mission_id: null, claim: `Claim ${id}`, summary: "Research summary", snippet: "Verbatim source passage", query: "original research", tags: ["ux"], source_url: "https://example.com/source", source_id: "source-1", source_sighting_count: 43, session_key: "research-session", origin: "mcp-agent", disposition: "supporting", created_at: "2026-09-12T00:00:00Z" });
 beforeEach(() => {
   mocks.router.query = {};
@@ -27,6 +28,19 @@ beforeEach(() => {
 async function browser(component: ReactNode = <EvidencePage />) { await act(async () => { render(<SWRConfig value={{ provider: () => new Map(), dedupingInterval: 0, shouldRetryOnError: false }}>{component}</SWRConfig>); }); }
 
 describe("the evidence browser", () => {
+  it.each(["card", "detail", "panel"])("shows a readable %s while leaving its source snippet exact", async surface => {
+    const fixture = claimFixtures.cases[9];
+    const item = { ...entry("table"), claim: fixture.claim, snippet: fixture.claim };
+    mocks.router.query = surface === "detail" ? { id: "table" } : { project_id: "alpha" };
+    mocks.list.mockResolvedValue({ entries: [item], notes: [], entry_total: 1, note_total: 0, page: 1, page_size: 20 });
+    mocks.get.mockResolvedValue({ entry: item, links: [] });
+    await browser(surface === "detail" ? <EvidenceDetailPage /> : surface === "panel" ? <EvidencePanel projectId="alpha" filters={{}} /> : <EvidencePage />);
+    if (surface === "detail") {
+      expect(await screen.findByRole("heading", { level: 1, name: fixture.display })).toBeVisible();
+      expect(screen.getByText(fixture.claim)).toBeVisible();
+    } else expect(await screen.findByRole("link", { name: fixture.display, exact: true })).toBeVisible();
+    expect(item.claim).toBe(fixture.claim);
+  });
   it("marks the whole opened group seen once, not once per page (BADGE-1)", async () => {
     mocks.router.query = { project_id: "alpha", mission_id: "mission-1", session_key: "agent & session" };
     await browser();

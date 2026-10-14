@@ -9,6 +9,8 @@ computed before authorization, and promotion that loses source provenance.
 from __future__ import annotations
 
 import hashlib
+import json
+from pathlib import Path
 from urllib.parse import quote
 from uuid import UUID, uuid4
 
@@ -1278,6 +1280,46 @@ class TestHttpVerbContract:
             client.put(f"{API}/promote", json=promote_body, headers=headers),
         ]
         assert [response.status_code for response in competing] == [405] * 5
+
+
+def test_table_claim_display_never_changes_capture_search_or_provenance(client, db_session, rbac_on):
+    """Only names/briefs are projections; every ledger read keeps the cited span."""
+    cases = json.loads((Path(__file__).parent / "fixtures/evidence_display_claims.json").read_text())["cases"]
+    case = cases[-1]  # A real multi-row table inside surrounding source prose.
+    member = _user(db_session, "claim-display@example.test")
+    _space, project = _space_project(db_session, member)
+    headers = _bearer(member)
+    response = _capture(client, headers, project, session_key="display-provenance", entries=[{
+        "claim": case["claim"], "source_url": case["source_url"], "disposition": "supporting",
+    }])
+    assert response.status_code == 201, response.text
+    entry_id = response.json()["entries"][0]["id"]
+    assert response.json()["entries"][0]["claim"] == case["claim"]
+    assert client.get(f"{API}/{entry_id}", headers=headers).json()["entry"]["claim"] == case["claim"]
+    assert client.get(API, params={"project_id": str(project.id)}, headers=headers).json()["entries"][0]["claim"] == case["claim"]
+    # Literal table punctuation still matches the original indexed span.
+    query = "| Part Number |"
+    search = client.get(f"{API}/search", params={"project_id": str(project.id), "q": query}, headers=headers)
+    assert search.status_code == 200, search.text
+    assert search.json()["entries"][0]["claim"] == case["claim"]
+    navigation = client.get("/api/v1/navigation/search", params={"q": query, "entity_type": "evidence"}, headers=headers)
+    assert navigation.status_code == 200, navigation.text
+    assert navigation.json()["groups"][0]["items"][0]["title"] == case["display"]
+    # Both a root and a neighboring evidence node use the same readable title.
+    for kind, root_id in [("evidence", entry_id), ("project", str(project.id))]:
+        graph = client.get("/api/v1/graph/neighborhood", params={"root_type": kind, "root_id": root_id}, headers=headers)
+        assert graph.status_code == 200, graph.text
+        node = next(node for node in graph.json()["nodes"] if node["id"] == entry_id)
+        assert node["title"] == case["display"]
+        if kind == "evidence":
+            assert graph.json()["root"]["title"] == case["display"]
+    promoted = client.post(f"{API}/promote", headers=headers, json={
+        "project_id": str(project.id), "session_key": "display-provenance", "target": "report",
+    })
+    assert promoted.status_code == 201, promoted.text
+    report = db_session.get(Report, UUID(promoted.json()["report_id"]))
+    assert f"- **Claim:** {case['display']}\n" in report.content
+    assert db_session.get(LedgerEntry, UUID(entry_id)).claim == case["claim"]
 
 
 class TestPromotion:

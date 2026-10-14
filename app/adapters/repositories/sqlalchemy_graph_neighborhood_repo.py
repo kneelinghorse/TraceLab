@@ -25,6 +25,7 @@ from app.schemas.graph_neighborhood import GraphEdge, GraphGroup, GraphNeighborh
 from app.schemas.navigation_search import NavigationEntityType
 from app.services.document_policy import document_read_policy
 from app.services.evidence_browser import document_evidence_condition, report_evidence_condition
+from app.services.evidence_display import display_claim
 
 _MODELS = {
     "project": Project, "document": Document, "collection": Collection,
@@ -130,7 +131,7 @@ class _Read:
             attributes["updated_at"] = (updated.replace(tzinfo=UTC) if updated.tzinfo is None else updated.astimezone(UTC)).isoformat()
         if kind == "document":
             attributes["chunk_count"] = self.chunk_counts.get(row.id, 0)
-        title = row.claim if kind == "evidence" else row.name if kind in {"project", "document", "collection"} else row.title
+        title = display_claim(row.claim) if kind == "evidence" else row.name if kind in {"project", "document", "collection"} else row.title
         return GraphNode(key=f"{kind}:{row.id}", type=kind, id=row.id, title=title, href=f"{_ROUTES[kind]}/{row.id}", attributes=attributes)
 
     def pairs(self, kind: str, from_id: Any):

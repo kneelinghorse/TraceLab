@@ -19,6 +19,7 @@ from app.schemas.navigation_search import (
     NavigationItem,
     NavigationSearchResponse,
 )
+from app.services.evidence_display import display_claim
 
 _ENTITIES: tuple[tuple[NavigationEntityType, type[Any], Any, str], ...] = (
     ("project", Project, Project.name, "/projects"),
@@ -65,6 +66,6 @@ class SQLAlchemyNavigationSearchRepository:
             page_rows = rows.order_by(func.lower(title), model.id).offset((page - 1) * page_size).limit(page_size).all()
             groups.append(NavigationGroup(
                 entity_type=kind, total=total, page=page, page_size=page_size,
-                items=[NavigationItem(id=row.id, title=row.title, href=f"{route}/{row.id}") for row in page_rows],
+                items=[NavigationItem(id=row.id, title=display_claim(row.title) if kind == "evidence" else row.title, href=f"{route}/{row.id}") for row in page_rows],
             ))
         return NavigationSearchResponse(query=query, groups=groups)

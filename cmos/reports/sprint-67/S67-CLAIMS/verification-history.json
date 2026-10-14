@@ -1,0 +1,7 @@
+{
+  "mission": "S67-CLAIMS",
+  "red": "Before implementation, Python tests failed18/passed5; frontend failed17/passed6. The installed published MCP2.2.0 read all11 raw claims unchanged and then failed the readable graph title assertion against pre-deploy production, as expected.",
+  "correction": "The first full browser attempt was interrupted after four new cases found an incorrect report-region selector (Related evidence belongs to mission/document panels; reports use Evidence citations). The corrected eight evidence browser cases passed, then the full workflow suite was rerun. No product change was needed for this test-selector correction.",
+  "scope": "One display helper per side; six display surfaces. Raw stored/REST/MCP claims, SQL matching/order and snippets preserved. No schema, environment, package or MCP input changes. Graph/navigation MCP title projections are covered by the deployed installed-client regression script.",
+  "follow_up": "Plan #406 is a carried Reasonbook next step, not GitHub PR406. Close that record after production verification."
+}

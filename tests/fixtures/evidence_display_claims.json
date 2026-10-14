@@ -1,0 +1,87 @@
+{
+  "captured_at": "2026-10-14T07:00:18.866366+00:00",
+  "source": "Read-only production GET /api/v1/evidence/search; exact claim values retained. Last case contains a table inside surrounding prose.",
+  "cases": [
+    {
+      "id": "a9d0c59f-2bf1-4973-a0da-bb2abc9f4a00",
+      "project_id": "2d592010-f80a-4544-ac70-28bbc7307407",
+      "source_url": "https://www.chromatic.com/pricing",
+      "claim": "| **Visual diffing wired into CI** | Chromatic, Percy, Argos, Lost Pixel | Chromatic's tiers are priced per billed snapshot with TurboSnap to reduce them",
+      "display": "**Visual diffing wired into CI** · Chromatic, Percy, Argos, Lost Pixel · Chromatic's tiers are priced per billed snapshot with TurboSnap to reduce them"
+    },
+    {
+      "id": "5d5890f4-9ede-4962-b753-8c6697c29187",
+      "project_id": "2d592010-f80a-4544-ac70-28bbc7307407",
+      "source_url": "https://www.supernova.io/guides/supernova-figma-variables-playbook/2-connecting-to-supernova/supernovas-approach-to-design-tokens",
+      "claim": "| **Token-level provenance** (which collection/set/theme a value came from) | Supernova (Collection, Token Set, Theme, Status), Tokens Studio (sets, themes, sync provider), Figma (collections, modes) | Supernova's token element table names Collection, Token Set, Theme, Status, Code Syntax and Custom properties",
+      "display": "**Token-level provenance** (which collection/set/theme a value came from) · Supernova (Collection, Token Set, Theme, Status), Tokens Studio (sets, themes, sync provider), Figma (collections, modes) · Supernova's token element table names Collection, Token Set, Theme, Status, Code Syntax and Custom properties"
+    },
+    {
+      "id": "839169f1-2874-43bb-93aa-1d9d728a449e",
+      "project_id": "2d592010-f80a-4544-ac70-28bbc7307407",
+      "source_url": "https://ui.shadcn.com/docs/registry/mcp",
+      "claim": "| **Semantic/AI-ready registry descriptions** | shadcn registry, Storybook manifests, Knapsack | shadcn's MCP best practices demand \"concise, informative descriptions that help AI assistants understand what a registry item is for\"",
+      "display": "**Semantic/AI-ready registry descriptions** · shadcn registry, Storybook manifests, Knapsack · shadcn's MCP best practices demand \"concise, informative descriptions that help AI assistants understand what a registry item is for\""
+    },
+    {
+      "id": "4ccde08a-aa39-446f-a570-e2139d710f0f",
+      "project_id": "2d592010-f80a-4544-ac70-28bbc7307407",
+      "source_url": "https://www.supernova.io/blog/design-system-mcp-servers",
+      "claim": "| **MCP server with a published tool list** | Figma, Storybook, zeroheight, Knapsack, Supernova, shadcn (via any compliant registry) | Five design-system MCP servers compared with tool-level detail",
+      "display": "**MCP server with a published tool list** · Figma, Storybook, zeroheight, Knapsack, Supernova, shadcn (via any compliant registry) · Five design-system MCP servers compared with tool-level detail"
+    },
+    {
+      "id": "2825d7ac-b8ef-4568-8b93-cbd24fa16678",
+      "project_id": "2d592010-f80a-4544-ac70-28bbc7307407",
+      "source_url": "https://www.figma.com/blog/schema-2025-design-systems-recap/",
+      "claim": "| **DTCG read *and* write** | Figma Variables (native import/export Nov 2025), Tokens Studio (format switch, default still legacy), Supernova (token sets), Knapsack (token manager), Style Dictionary (v4 first-class, v5 converging), zeroheight MCP (W3C token sets) | Figma held native import/export until DTCG hit 1.0",
+      "display": "**DTCG read *and* write** · Figma Variables (native import/export Nov 2025), Tokens Studio (format switch, default still legacy), Supernova (token sets), Knapsack (token manager), Style Dictionary (v4 first-class, v5 converging), zeroheight MCP (W3C token sets) · Figma held native import/export until DTCG hit 1.0"
+    },
+    {
+      "id": "6359ca68-f7fd-49f7-8608-3ebaf84f034e",
+      "project_id": "2d592010-f80a-4544-ac70-28bbc7307407",
+      "source_url": "https://storybook.js.org/docs/ai/manifests",
+      "claim": "| **Component manifests as machine-readable inventory** | Storybook (components/docs manifests), shadcn (registry item schema), Knapsack (structured metadata), Supernova (component objects) | Storybook manifests expose names, props, usage snippets and JSDoc-derived descriptions",
+      "display": "**Component manifests as machine-readable inventory** · Storybook (components/docs manifests), shadcn (registry item schema), Knapsack (structured metadata), Supernova (component objects) · Storybook manifests expose names, props, usage snippets and JSDoc-derived descriptions"
+    },
+    {
+      "id": "e03e260e-7be9-4cd3-8932-343f48cbe913",
+      "project_id": "2d592010-f80a-4544-ac70-28bbc7307407",
+      "source_url": "https://www.supernova.io/blog/design-system-mcp-servers",
+      "claim": "| **Agents can *read* the system, not just the canvas** | Supernova (read/write tokens, docs, components), Knapsack (tokens/components/docs + Storybook data source), zeroheight (pages, styleguides, token sets) | Supernova MCP read/write with bulk property changes",
+      "display": "**Agents can *read* the system, not just the canvas** · Supernova (read/write tokens, docs, components), Knapsack (tokens/components/docs + Storybook data source), zeroheight (pages, styleguides, token sets) · Supernova MCP read/write with bulk property changes"
+    },
+    {
+      "id": "9a9f1a9c-5f74-43f2-8149-20a38d641ccf",
+      "project_id": "2d592010-f80a-4544-ac70-28bbc7307407",
+      "source_url": "https://storybook.js.org/blog/storybook-9/",
+      "claim": "| **Accessibility evidence in the same run as UI evidence** | Storybook (axe-core a11y tests), Chromatic (a11y reports on Enterprise), Stage1 Inspector (axe) | Storybook 9 ships accessibility tests implemented by axe-core",
+      "display": "**Accessibility evidence in the same run as UI evidence** · Storybook (axe-core a11y tests), Chromatic (a11y reports on Enterprise), Stage1 Inspector (axe) · Storybook 9 ships accessibility tests implemented by axe-core"
+    },
+    {
+      "id": "543010ee-a6b7-4dfc-975a-d81ce442b337",
+      "project_id": "f8592094-b13e-481b-a102-d127fbd245f7",
+      "source_url": "https://ediscoverytoday.com/2026/09/30/notable-stats-from-the-relfest-keynote-legal-tech-trends/",
+      "claim": "| aiR Review usage (Sep 2026) | \">14x YoY\"; already surpassed all of last year in September M-T-D | Trade press citing keynote",
+      "display": "aiR Review usage (Sep 2026) · \">14x YoY\"; already surpassed all of last year in September M-T-D · Trade press citing keynote"
+    },
+    {
+      "id": "69d92a7d-3ece-49eb-a4e9-483ce8bbb5fe",
+      "project_id": "f8592094-b13e-481b-a102-d127fbd245f7",
+      "source_url": "https://www.relativity.com/blog/air-in-motion-building-on-breakthroughs-to-power-whats-next/",
+      "claim": "| Throughput | Up to 3M documents/day | Vendor",
+      "display": "Throughput · Up to 3M documents/day · Vendor"
+    },
+    {
+      "id": "f85b3967-f7a0-4507-a311-99ec41bb071b",
+      "project_id": "a38e85ca-5c94-44c7-a723-9b7ebf7fad59",
+      "source_url": "https://www.systemcleaninc.com/product/see-part-number-h-0170383-supersession-use-h-0170383/",
+      "claim": "SEE PART NUMBER H-0170383 SUPERSESSION! USE H-0170383 - System Clean Inc.: Part #H-00290  \nFactory Cat  \nSEE PART NUMBER H-0170383 SUPERSESSION! USE H-0170383  \n| Part Number | H-00290 |\n|---|---|\n| Brand | Factory Cat |\n| Price | 0.00 |  \nPart Number H-00290 Brand Factory Cat Price 0.00  \n$0.00  \nShare this:  \nParts  \n349-1170  \nTennant  \n367585  \n384989  \n222404  \n1270085  \n768320  \n1209594  \n1012469",
+      "display": "SEE PART NUMBER H-0170383 SUPERSESSION! USE H-0170383 - System Clean Inc.: Part #H-00290  \nFactory Cat  \nSEE PART NUMBER H-0170383 SUPERSESSION! USE H-0170383  \nPart Number · H-00290; Brand · Factory Cat; Price · 0.00\nPart Number H-00290 Brand Factory Cat Price 0.00  \n$0.00  \nShare this:  \nParts  \n349-1170  \nTennant  \n367585  \n384989  \n222404  \n1270085  \n768320  \n1209594  \n1012469"
+    }
+  ],
+  "brief": {
+    "claim": "| a | b |\n| --- | --- |\n| c | d |",
+    "markdown": "# Evidence Ledger\n\n**Session:** `claim-display`\n\n## Supporting\n\n### Evidence 1\n\n- **Claim:** a · b; c · d\n- **Disposition:** `supporting`\n- **Origin:** `mcp-agent`\n- **Source:** https://example.test/source\n\n## Contradicting\n\n_No entries._\n\n## Background\n\n_No entries._\n\n## Rejected\n\n_No entries._\n\n## Working Notes\n\n_No notes._\n"
+  }
+}
