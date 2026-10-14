@@ -6,6 +6,13 @@ import { buildApiUrl, expireRejectedSession, httpClient } from "./http";
 import { getStoredAuth } from "@/lib/auth/storage";
 
 export type ReportStatus = "draft" | "final";
+export type ReportOrigin = "mission" | "written" | "librarian" | "agent_brief";
+export type ReportOriginLabel = {
+  origin: ReportOrigin;
+  origin_label?: string | null;
+  origin_href?: string | null;
+  project_name?: string | null;
+};
 export type ReportFormat = "summary" | "report" | "bullets" | "markdown";
 
 export type Citation = {
@@ -21,11 +28,13 @@ export type ReportSource = {
   id: string;
   report_id: string;
   source_type: "collection" | "chunk" | "ledger_entry" | "ledger_note";
-  source_id: string;
+  source_id: string | null;
+  name: string;
+  href: string | null;
   added_at: string;
 };
 
-export type Report = {
+export type Report = ReportOriginLabel & {
   id: string;
   title: string;
   content: string;
@@ -47,7 +56,7 @@ export type ReportDetail = Report & {
   updated_at: string;
 };
 
-export type ReportListItem = {
+export type ReportListItem = ReportOriginLabel & {
   id: string;
   title: string;
   status: ReportStatus;
@@ -81,6 +90,7 @@ export type UpdateReportParams = {
 };
 
 export type ListReportsParams = {
+  origin?: ReportOrigin[];
   project_id?: string;
   status?: ReportStatus;
   page?: number;

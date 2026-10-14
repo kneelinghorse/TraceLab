@@ -78,6 +78,7 @@ def test_preview_then_exact_save_and_retry_never_generate_again(reviewed_report,
     assert row.content == preview["content"]
     assert row.title == preview["title"] and row.status == "draft"
     assert row.generation_provenance["origin"] == "librarian"
+    assert row.origin == "librarian"
     assert row.generation_provenance["accepted_by"] == str(row.owner_id)
     assert [c["marker"] for c in row.citation_manifest] == [1, 3]
     assert {str(s.source_id) for s in row.sources} == {str(c.id) for c in chunks}

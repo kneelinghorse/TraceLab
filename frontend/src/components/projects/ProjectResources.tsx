@@ -13,6 +13,7 @@ import { documentsApi } from "@/lib/api/documents";
 import { evidenceApi } from "@/lib/api/evidence";
 import { collectionsApi } from "@/lib/api/collections";
 import { missionsApi } from "@/lib/api/missions";
+import { ReportOrigin } from "@/components/reports/ReportOrigin";
 import { reportsApi } from "@/lib/api/reports";
 
 export const PROJECT_TABS = ["Overview", "Documents", "Evidence", "Collections", "Missions", "Reports"] as const;
@@ -36,8 +37,8 @@ async function load(tab: ResourceTab, projectId: string, page: number) {
     const result = await missionsApi.list({ project_id: projectId, page, page_size: PAGE_SIZE });
     return { total: result.pagination.total, rows: result.data.map(row => ({ id: row.id, title: row.title, href: `/missions/${row.id}`, summary: row.objective, status: row.status })) };
   }
-  const result = await reportsApi.list({ project_id: projectId, page, page_size: PAGE_SIZE });
-  return { total: result.total, rows: result.items.map(row => ({ id: row.id, title: row.title, href: `/reports/${row.id}`, summary: row.report_type, status: row.status })) };
+  const result = await reportsApi.list({ project_id: projectId, origin: ["written", "librarian"], page, page_size: PAGE_SIZE });
+  return { total: result.total, rows: result.items.map(row => ({ id: row.id, title: row.title, href: `/reports/${row.id}`, summary: <ReportOrigin report={row} />, status: row.status === "final" ? row.status : undefined })) };
 }
 
 export function ProjectResources({ projectId, tab, refreshStats, onBusyChange }: { projectId: string; tab: ResourceTab; refreshStats: () => Promise<unknown>; onBusyChange: (busy: boolean) => void }) {

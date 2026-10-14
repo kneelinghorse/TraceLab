@@ -65,12 +65,13 @@ it("never renders a raw ledger source id as an authorized evidence link", async 
 it("preserves the report total and resets paging when filters change", async () => {
   await browser(<ReportsPage />);
   expect(await screen.findByText("481 reports")).toBeVisible();
+  expect(mocks.reports).toHaveBeenLastCalledWith(expect.objectContaining({ origin: ["written", "librarian"] }));
   fireEvent.click(screen.getByRole("button", { name: "Next" }));
   await waitFor(() => expect(mocks.reports).toHaveBeenLastCalledWith(expect.objectContaining({ page: 2 })));
-  fireEvent.click(screen.getByRole("button", { name: "Final", exact: true }));
-  await waitFor(() => expect(mocks.reports).toHaveBeenLastCalledWith(expect.objectContaining({ page: 1, status: "final" })));
+  fireEvent.click(screen.getByRole("button", { name: "Evidence briefs", exact: true }));
+  await waitFor(() => expect(mocks.reports).toHaveBeenLastCalledWith(expect.objectContaining({ page: 1, origin: ["agent_brief"] })));
   fireEvent.change(screen.getByLabelText("Project"), { target: { value: "project" } });
-  await waitFor(() => expect(mocks.reports).toHaveBeenLastCalledWith(expect.objectContaining({ page: 1, status: "final", project_id: "project" })));
+  await waitFor(() => expect(mocks.reports).toHaveBeenLastCalledWith(expect.objectContaining({ page: 1, origin: ["agent_brief"], project_id: "project" })));
 });
 
 it("keeps sparse numbered report sources separate from Evidence and withholds unavailable links", async () => {

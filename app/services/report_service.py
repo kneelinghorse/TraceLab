@@ -139,6 +139,7 @@ class ReportService:
             )
             # Create report
             report = Report(
+                origin="written",
                 project_id=str(project_id) if project_id else None,
                 title=title,
                 report_type=output_format,
@@ -191,6 +192,7 @@ class ReportService:
         *,
         project_id: UUID | None = None,
         status: str | None = None,
+        origins: list[str] | None = None,
         page: int = 1,
         page_size: int = 20,
         access_filter=None,
@@ -213,6 +215,8 @@ class ReportService:
                 query = query.filter(Report.project_id == str(project_id))
             if status:
                 query = query.filter(Report.status == status)
+            if origins:
+                query = query.filter(Report.origin.in_(origins))
             if access_filter is not None:
                 query = query.filter(access_filter)
 

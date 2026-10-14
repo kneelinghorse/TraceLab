@@ -272,7 +272,7 @@ export const TOOLS: Tool[] = [
   {
     name: 'tracelab_report',
     description:
-      'Persistent reports — synthesized artifacts that survive across sessions. Actions: create (from a collection or specific chunks), list (with optional project/status filter), get (full content + citations + sources), export (explicit format md/json/txt; omitted format preserves report.content bytes), update (title and/or status draft|final). Required: action="create" needs title (and one of collection_id/chunk_ids); action="update" needs report_id and title or status; action="get"/"export" needs report_id.',
+      'Persistent reports — synthesized artifacts that survive across sessions. Actions: create (from a collection or specific chunks), list (optional project/status/origin filters; omitted origin includes all reports), get (full content + citations + named sources), export (explicit format md/json/txt; omitted format preserves report.content bytes), update (title and/or status draft|final). List/get return stored origin: mission, written, librarian or agent_brief. The UI defaults to written + librarian; mission copies are retained. Required: action="create" needs title (and one of collection_id/chunk_ids); action="update" needs report_id and title or status; action="get"/"export" needs report_id.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -312,6 +312,11 @@ export const TOOLS: Tool[] = [
           type: 'string',
           enum: ['summary', 'report', 'bullets', 'markdown', 'md', 'json', 'txt'],
           description: 'For action="create": output format (default: summary).',
+        },
+        origin: {
+          type: 'array',
+          items: { type: 'string', enum: ['mission', 'written', 'librarian', 'agent_brief'] },
+          description: 'For action="list": origins to include. Omit for all; use ["written", "librarian"] for the UI default.',
         },
         status: {
           type: 'string',
@@ -724,7 +729,7 @@ export const TOOLS: Tool[] = [
   },
   {
     name: 'tracelab_home',
-    description: 'Caller-scoped home and recent-activity reads. Server totals are preserved; every request is fresh. A human credential is required (device-code login or a user API key); service principals are rejected. Actions: snapshot (recent activity, active runs, recent reports/projects and evidence activity), favorites (page, page_size, project_id), activity (one recency-ordered stream of missions, reports and evidence; page, page_size; each item carries type, id, title, status, occurred_at, href and a new flag relative to the caller\'s viewed watermark), activity_summary (new_total and by_type counts). Marking activity as viewed stays in the UI (decision #459).',
+    description: 'Caller-scoped home and recent-activity reads. Server totals are preserved; every request is fresh. A human credential is required (device-code login or a user API key); service principals are rejected. Actions: snapshot (recent activity, active runs, recent reports/projects and evidence activity; mission copies are excluded from recent reports and report activity because the mission already appears), favorites (page, page_size, project_id), activity (one recency-ordered stream of missions, reports and evidence; page, page_size; each item carries type, id, title, status, occurred_at, href and a new flag relative to the caller\'s viewed watermark), activity_summary (new_total and by_type counts). Marking activity as viewed stays in the UI (decision #459).',
     inputSchema: {
       type: 'object',
       properties: {
@@ -864,6 +869,7 @@ const CreateReportInput = z.object({
 });
 
 const ListReportsInput = z.object({
+  origin: z.array(z.enum(['mission', 'written', 'librarian', 'agent_brief'])).optional(),
   project_id: z.string().uuid().optional(),
   status: z.enum(['draft', 'final']).optional(),
   page: z.number().min(1).optional().default(1),
@@ -1589,7 +1595,8 @@ async function handleListReports(args: unknown) {
     input.page,
     input.page_size,
     input.project_id,
-    input.status
+    input.status,
+    input.origin
   );
 
   return {
@@ -1604,6 +1611,10 @@ async function handleListReports(args: unknown) {
               title: r.title,
               status: r.status,
               report_type: r.report_type,
+              origin: r.origin,
+              origin_label: r.origin_label,
+              origin_href: r.origin_href,
+              project_name: r.project_name,
               tokens_used: r.tokens_used,
               chunk_count: r.chunk_count,
               project_id: r.project_id,
@@ -1639,6 +1650,10 @@ async function handleGetReport(args: unknown) {
             content: result.content,
             status: result.status,
             report_type: result.report_type,
+            origin: result.origin,
+            origin_label: result.origin_label,
+            origin_href: result.origin_href,
+            project_name: result.project_name,
             tokens_used: result.tokens_used,
             chunk_count: result.chunk_count,
             project_id: result.project_id,
@@ -1648,6 +1663,8 @@ async function handleGetReport(args: unknown) {
               id: s.id,
               source_type: s.source_type,
               source_id: s.source_id,
+              name: s.name,
+              href: s.href,
               added_at: s.added_at,
             })),
             created_at: result.created_at,

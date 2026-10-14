@@ -1303,6 +1303,7 @@ class EvidenceLedgerService:
         report_title = title or f"Evidence Ledger - {session_key}"[:255]
         content = _render_markdown(session_key, entries, notes)
         report = Report(
+            origin="agent_brief",
             project_id=project_id,
             title=report_title,
             report_type="evidence-ledger",

@@ -308,6 +308,7 @@ def create_report_from_protocol(
 
     # Create report
     report = Report(
+        origin="mission",
         project_id=str(mission.project_id),
         owner_id=owner_id,
         workspace_id=workspace_id,

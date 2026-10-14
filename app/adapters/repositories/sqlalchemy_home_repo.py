@@ -133,8 +133,9 @@ class SQLAlchemyHomeRepository:
             .limit(SECTION_LIMIT)
             .all()
         )
+        recent_reports = reports.filter(Report.origin != "mission")
         report_rows = (
-            reports.with_entities(Report.id, Report.title, Report.updated_at)
+            recent_reports.with_entities(Report.id, Report.title, Report.updated_at)
             .order_by(Report.updated_at.desc(), Report.id)
             .limit(SECTION_LIMIT)
             .all()
@@ -152,7 +153,7 @@ class SQLAlchemyHomeRepository:
             activity=SQLAlchemyActivityRepository().page(db, user, now=now, page=1, page_size=ACTIVITY_LIMIT),
             active_runs=HomeSection(total=active.count(), items=[item(m) for m in active_rows]),
             recent_reports=HomeSection(
-                total=reports.count(),
+                total=recent_reports.count(),
                 items=[
                     HomeRecent(id=r.id, title=r.title, updated_at=r.updated_at, href=f"/reports/{r.id}")
                     for r in report_rows

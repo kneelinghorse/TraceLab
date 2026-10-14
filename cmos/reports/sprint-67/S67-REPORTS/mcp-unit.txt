@@ -1,0 +1,19 @@
+
+> @aquex/tracelab-mcp@2.1.3 test:run
+> vitest run
+
+
+ RUN  v1.6.1 /Users/systemsystems/portfolio/TraceLab/packages/tracelab-mcp
+
+ ✓ src/canonical-link.test.ts  (13 tests) 6ms
+ ✓ src/auth/credential-store.test.ts  (6 tests) 16ms
+ ✓ src/auth/device-code.test.ts  (12 tests) 16ms
+ ✓ src/ask.test.ts  (12 tests) 176ms
+ ✓ src/index.test.ts  (62 tests) 183ms
+ ✓ src/mcp2-actions.test.ts  (11 tests) 207ms
+ ✓ src/read-parity.test.ts  (44 tests) 190ms
+
+ Test Files  7 passed (7)
+      Tests  160 passed (160)
+   Start at  21:11:17
+   Duration  544ms (transform 639ms, setup 0ms, collect 903ms, tests 794ms, environment 1ms, prepare 555ms)

@@ -192,6 +192,7 @@ def accept_report(db: Session, user: AuthenticatedUser, project: Project, reques
     try:
         receipt.save_response(request_payload=fingerprint, response_payload=response, status_code=200)
         report = Report(id=identity, project_id=project.id, owner_id=user.user_id, workspace_id=default_workspace_id(db),
+                        origin="librarian",
                         title=proposal["title"], prompt=proposal["prompt"], report_type=proposal["format"], status="draft",
                         content=proposal["content"], content_hash=hashlib.sha256(proposal["content"].encode("utf-8")).hexdigest(),
                         tokens_used=proposal["tokens_used"], chunk_count=len(proposal["inputs"]), citation_manifest=manifest,

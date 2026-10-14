@@ -369,6 +369,7 @@ class TestCreateReportFromProtocol:
         assert report.id is not None
         assert report.title == "Research: Auto Report Test Mission"
         assert report.report_type == "markdown"
+        assert report.origin == "mission"
         assert report.status == "draft"
         assert "Research findings summary." in report.content
         assert str(report.project_id) == str(mission.project_id)

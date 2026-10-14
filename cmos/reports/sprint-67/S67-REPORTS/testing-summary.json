@@ -1,0 +1,92 @@
+{
+  "mission": "S67-REPORTS",
+  "generated_at": "2026-10-14T02:42:30.367339+00:00",
+  "backend": {
+    "status": "passed",
+    "invocation_source": ".github/workflows/backend-tests.yml",
+    "invocation": "set -euo pipefail\n\ndeselect_args=()\nquarantine_count=0\nwhile IFS= read -r line; do\n  [[ -z \"$line\" || \"$line\" == \\#* ]] && continue\n  node_id=\"${line%% \\#*}\"\n  if [[ \"$node_id\" == \"$line\" ]]; then\n    echo \"Quarantine row is missing its reason: $line\" >&2\n    exit 1\n  fi\n  deselect_args+=(\"--deselect=$node_id\")\n  ((quarantine_count += 1))\ndone < .github/ci/backend-quarantine.txt\n\nif [[ \"$quarantine_count\" -ne 12 ]]; then\n  echo \"Expected 12 quarantined nodes, found $quarantine_count\" >&2\n  exit 1\nfi\n\nmkdir -p test-results\npytest_output=\"test-results/backend-suite.log\"\npython scripts/run_pytest.py --timeout-seconds 2100 --grace-seconds 20 -- --ignore=tests/integration --durations=25 --junitxml=test-results/backend-suite.xml \"${deselect_args[@]}\" 2>&1 | tee \"$pytest_output\"\n\nif ! grep -Eq '(^|, )12 deselected(,| in )' \"$pytest_output\"; then\n  echo \"Pytest did not report exactly 12 deselected tests.\" >&2\n  exit 1\nfi\n",
+    "environment": {
+      "QDRANT_URL": "http://127.0.0.1:9",
+      "PEDR_GRAPH_TELEMETRY_ENABLED": "0"
+    },
+    "quarantine": "# CI-1 backend quarantine: 12 exact node IDs after RECOVER-2.\n# Format is NODE_ID # one-line reason. The backend workflow requires a reason on every row.\n# Tests remain collected and tracked; this list is a temporary ratchet, never a deletion list.\n# SQLite foreign-key enforcement remains off in the shared non-integration harness (out of CI-1 scope).\n# Baseline evidence and promotion policy: .github/ci/README.md.\n\ntests/sprint_03/test_api_stability.py::test_api_uptime_and_latency_meet_targets # Historical Sprint-03 evaluator reads unwrapped telemetry and finds no uptime data points.\ntests/sprint_03/test_evidence_integrity.py::test_evidence_integrity_checks_detect_missing_chunks # Historical Sprint-03 evaluator reads unwrapped telemetry and reports zero relevance.\ntests/sprint_03/test_quality_gate_effectiveness.py::test_quality_gate_failures_blocked_with_actionable_feedback # Historical Sprint-03 evaluator does not unwrap the preserved TelemetryEnvelope; actionable_ratio is zero.\ntests/sprint_03/test_validation_coverage.py::test_validation_rate_exceeds_target # Historical Sprint-03 evaluator does not unwrap telemetry; mission_id and validation layers are missing.\ntests/sprint_04/test_coverage_metric.py::test_coverage_threshold_exceeded # Historical Sprint-04 coverage evaluator finds no coverage event in its telemetry fixture.\ntests/sprint_04/test_performance_metrics.py::test_latency_stays_under_two_seconds # Historical Sprint-04 evaluator raises Latency telemetry missing; it does not unwrap envelopes.\ntests/sprint_04/test_performance_metrics.py::test_cost_profile_within_budget # Historical Sprint-04 evaluator raises Cost telemetry missing; it does not unwrap envelopes.\ntests/sprint_04/test_quality_and_load.py::test_quality_checks_block_and_pass # Historical Sprint-04 evaluator cannot find the enveloped quality event in its fixture.\ntests/sprint_04/test_quality_and_load.py::test_load_test_supports_target_concurrency # Historical Sprint-04 evaluator raises Load test telemetry missing; it does not unwrap envelopes.\ntests/sprint_04/test_tech_debt.py::test_playwright_migration_eliminates_cypress_cost # Historical Sprint-04 evaluator cannot find the enveloped tech-debt event in its fixture.\ntests/test_admin_dashboard.py::test_metrics_aggregator_generates_sections # S62-OBS freezes the 2025 fixture clock and this test passes explicitly; retain until the existing 12-node quarantine ratchet is deliberately revised.\ntests/test_document_ingestion.py::test_upload_and_process_endpoints_record_statuses # Document detail fixture expects processing_events, which the current DocumentResponse does not expose (KeyError).\n",
+    "passed": 3185,
+    "skipped": 4,
+    "deselected": 12,
+    "failures": 0,
+    "errors": 0,
+    "warnings": 49,
+    "seconds": 484.5,
+    "skipped_tests": [
+      {
+        "test": "tests.test_auto_ingest.TestAutoIngestIntegration.test_auto_ingest_full_pipeline",
+        "reason": "Full pipeline test requires embedding service and Qdrant \u2014 chunks not created in SQLite test env"
+      },
+      {
+        "test": "tests.test_live_log_cross_service.test_real_sender_receives_replay_ack_and_streams_before_terminal",
+        "reason": "Requires explicit DeepSearch checkout; run the LOG-2 cross-service command"
+      },
+      {
+        "test": "tests.test_pedr_unified_search.TestPEDRIntegration.test_create_orchestrator_factory",
+        "reason": "Requires OpenAI + Qdrant services (orchestrator init fails without them)"
+      },
+      {
+        "test": "tests.test_pedr_unified_search.TestPEDRIntegration.test_full_search_pipeline",
+        "reason": "Requires OpenAI + Qdrant services (orchestrator init fails without them)"
+      }
+    ]
+  },
+  "integration": {
+    "status": "passed",
+    "passed": 172,
+    "skipped": 3,
+    "failures": 0,
+    "details": "integration-summary.json"
+  },
+  "frontend": {
+    "unit": {
+      "status": "passed",
+      "passed": 385,
+      "skipped": 0,
+      "files": 46,
+      "workers": 1
+    },
+    "playwright": {
+      "status": "passed",
+      "passed": 201,
+      "skipped": 0,
+      "retries": 0,
+      "spec_source": ".github/workflows/frontend-production-build.yml",
+      "receipt": "browser-telemetry.json"
+    },
+    "production_build": "passed",
+    "eslint": "passed",
+    "typecheck": "passed"
+  },
+  "mcp": {
+    "unit_passed": 160,
+    "installed_stdio_contracts_passed": 71,
+    "generated_links_checked": 73,
+    "http_requests_checked": 72,
+    "fresh_install": true,
+    "empty_cache": true,
+    "registry_publish": "Explicitly deferred to S67-BADGES 2.2.0"
+  },
+  "ruff": {
+    "status": "passed",
+    "version": "0.8.0",
+    "changed_python_files": 23,
+    "receipt": "ruff.json"
+  },
+  "foundational_references": "passed",
+  "mcp_parity_audit": {
+    "status": "passed",
+    "exit_code": 0,
+    "tools": 9,
+    "actions": 50,
+    "operations": 118
+  },
+  "secret_scan": "passed",
+  "production_verification": "pending merge and both Railway deployments",
+  "intermediate_failures": "verification-history.json"
+}

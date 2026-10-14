@@ -1,0 +1,18 @@
+
+ RUN  v4.1.11 /Users/systemsystems/portfolio/TraceLab/frontend
+
+(node:97042) TimeoutNaNWarning: NaN is not a number.
+Timeout duration was set to 1.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Error: Not implemented: navigation (except hash changes)
+    at module.exports (/Users/systemsystems/portfolio/TraceLab/frontend/node_modules/jsdom/lib/jsdom/browser/not-implemented.js:9:17)
+    at navigateFetch (/Users/systemsystems/portfolio/TraceLab/frontend/node_modules/jsdom/lib/jsdom/living/window/navigation.js:77:3)
+    at exports.navigate (/Users/systemsystems/portfolio/TraceLab/frontend/node_modules/jsdom/lib/jsdom/living/window/navigation.js:55:3)
+    at Timeout._onTimeout (/Users/systemsystems/portfolio/TraceLab/frontend/node_modules/jsdom/lib/jsdom/living/nodes/HTMLHyperlinkElementUtils-impl.js:80:7)
+    at listOnTimeout (node:internal/timers:608:17)
+    at processTimers (node:internal/timers:543:7) undefined
+
+ Test Files  46 passed (46)
+      Tests  385 passed (385)
+   Start at  21:22:27
+   Duration  30.59s (transform 963ms, setup 2.52s, import 7.05s, tests 8.45s, environment 8.73s)

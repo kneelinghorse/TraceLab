@@ -1577,7 +1577,7 @@
       "mcp": "tracelab_report.list",
       "classification": "covered",
       "baseline": "covered",
-      "rationale": "Existing action supplies this live UI operation through the authenticated REST API."
+      "rationale": "S67-REPORTS: optional repeated origin filter is covered by tracelab_report.list origin array. Omitted origin retains all artifacts; the UI requests written and librarian. List/get preserve stored origin and caller-scoped labels."
     },
     {
       "id": "frontend/src/lib/api/reports.ts#reportsApi.update:PUT:/reports/{reportId}",

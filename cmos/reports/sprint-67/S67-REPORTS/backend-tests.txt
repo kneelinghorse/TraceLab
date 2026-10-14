@@ -1,0 +1,120 @@
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionResultFields::test_result_protocol_storage without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionResultFields::test_error_handling_fields without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionTableDefinition::test_table_name without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionTableDefinition::test_required_columns_exist without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionTableDefinition::test_indexes_defined without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionTableDefinition::test_lease_timestamps_are_timezone_aware without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionTableDefinition::test_opaque_lease_fields_are_not_public_dict_fields without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionTableDefinition::test_constraints_defined without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionAuthoringFields::test_instantiation_with_all_authoring_fields without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionAuthoringFields::test_to_dict_includes_authoring_fields without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionAuthoringFields::test_to_mission_protocol_includes_authoring_fields without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionAuthoringFields::test_from_mission_protocol_round_trip without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionAuthoringFields::test_constraints_fallback_to_context without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionAuthoringFields::test_constraints_column_wins_over_context without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_mission_model.py:1
+  /Users/systemsystems/portfolio/TraceLab/tests/test_mission_model.py:1: PytestWarning: usefixtures() in tests/test_mission_model.py::TestMissionAuthoringFields::test_authoring_fields_optional without arguments has no effect
+    """Tests for the Mission model with DeepSearch-compatible schema.
+
+tests/test_evidence_auto_linking.py::test_auto_linking_respects_threshold_and_counts_skips
+  /Users/systemsystems/portfolio/TraceLab/.venv/lib/python3.11/site-packages/pydantic/main.py:464: UserWarning: Pydantic serializer warnings:
+    PydanticSerializationUnexpectedValue(Expected `Evidence` - serialized value may not be as expected [field_name='evidence', input_value={'evidence_id': 'EV-alrea...ry', 'chunk_id': '1234'}, input_type=dict])
+    return self.__pydantic_serializer__.to_python(
+
+tests/test_evidence_ledger_api.py::TestWorkingNotes::test_dot_segment_note_keys_are_rejected[dot]
+tests/test_evidence_ledger_api.py::TestWorkingNotes::test_dot_segment_note_keys_are_rejected[dot-dot]
+tests/test_librarian_api.py::TestDraft::test_unrecoverable_draft_is_422
+tests/test_usage_records.py::TestSummary::test_admin_endpoint_returns_the_summary_and_members_are_refused
+  /Users/systemsystems/portfolio/TraceLab/.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py:986: DeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    result = context.run(func, *args)
+
+tests/test_evidence_ledger_api.py::TestEvidenceBrowser::test_filters_count_all_matching_rows_and_keep_exact_tags
+  /Users/systemsystems/portfolio/TraceLab/app/api/v1/evidence.py:105: DeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    return _normalize_required_filter(value, label)
+
+tests/test_mission_linter.py::TestSubmitEndpointLintIntegration::test_hard_fail_returns_422_with_errors
+tests/test_mission_linter.py::TestSubmitEndpointLintIntegration::test_hard_fail_preserves_draft_status
+  /Users/systemsystems/portfolio/TraceLab/app/api/v1/missions.py:909: DeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    return _submit_existing_mission(db=db, mission=mission, submitted_by=user.user_id)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: /Users/systemsystems/portfolio/TraceLab/test-results/backend-suite.xml -
+
+---------------------------------------------------- benchmark 'rag_concurrency': 1 tests ----------------------------------------------------
+Name (time in ms)                                        Min       Max    Mean  StdDev  Median     IQR  Outliers       OPS  Rounds  Iterations
+----------------------------------------------------------------------------------------------------------------------------------------------
+test_concurrent_queries_reaches_target_throughput     6.6190  100.7049  7.5121  7.9055  6.8386  0.1456       1;4  133.1178     141           1
+----------------------------------------------------------------------------------------------------------------------------------------------
+
+Legend:
+  Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
+  OPS: Operations Per Second, computed as 1 / Mean
+============================= slowest 25 durations =============================
+7.44s call     tests/test_deepsearch_ingestion.py::test_ingest_endpoint_returns_quality_gate_failure
+3.56s call     tests/unit/test_pytest_deadline.py::test_real_pytest_exit_and_diagnostics_survive_tee[ignore-124]
+3.52s call     tests/test_service_principal_route_boundary.py::test_service_credential_is_machine_only_in_every_rbac_state[api-key-rbac-off]
+3.31s call     tests/test_graph_neighborhood_api.py::test_all_root_statuses_match_canonical_details_and_service_is_denied[non_member-api_key-False]
+3.29s call     tests/unit/test_pytest_deadline.py::test_real_pytest_exit_and_diagnostics_survive_tee[hang-124]
+3.18s call     tests/test_service_principal_route_boundary.py::test_service_credential_is_machine_only_in_every_rbac_state[api-key-rbac-on]
+3.14s call     tests/test_graph_neighborhood_api.py::test_all_root_statuses_match_canonical_details_and_service_is_denied[resource_owner-api_key-True]
+3.11s call     tests/test_graph_neighborhood_api.py::test_all_root_statuses_match_canonical_details_and_service_is_denied[resource_owner-api_key-False]
+3.08s call     tests/test_graph_neighborhood_api.py::test_all_root_statuses_match_canonical_details_and_service_is_denied[space_member-api_key-True]
+3.08s call     tests/test_search_ask.py::TestAnswer::test_request_rules
+3.05s call     tests/test_onboarding_register_authz.py::test_alternate_callers_cannot_use_replay_to_gain_access[project_owner-api_key-False]
+3.03s call     tests/test_correction_loop.py::TestWebhookClient::test_retry_on_failure
+3.02s call     tests/test_correction_loop.py::TestWebhookClient::test_dead_letter_queue
+3.02s call     tests/test_graph_neighborhood_api.py::test_all_root_statuses_match_canonical_details_and_service_is_denied[admin-api_key-False]
+3.01s call     tests/test_graph_neighborhood_api.py::test_all_root_statuses_match_canonical_details_and_service_is_denied[service-api_key-False]
+3.00s call     tests/test_graph_neighborhood_api.py::test_all_root_statuses_match_canonical_details_and_service_is_denied[admin-api_key-True]
+3.00s call     tests/test_graph_neighborhood_api.py::test_all_root_statuses_match_canonical_details_and_service_is_denied[space_member-api_key-False]
+2.95s call     tests/test_onboarding_register_authz.py::test_alternate_callers_cannot_use_replay_to_gain_access[project_owner-api_key-True]
+2.95s call     tests/test_graph_neighborhood_api.py::test_all_root_statuses_match_canonical_details_and_service_is_denied[non_member-api_key-True]
+2.95s call     tests/test_graph_neighborhood_api.py::test_all_root_statuses_match_canonical_details_and_service_is_denied[service-api_key-True]
+2.94s call     tests/test_rbac_verify_harness.py::test_harness_passes_against_enforced_app
+2.63s call     tests/test_rbac_verify_harness.py::test_run_never_creates_or_deletes_a_user
+2.58s call     tests/test_wait_for_deploy.py::test_anything_short_of_both_services_serving_the_sha_fails[frontend-forbidden]
+2.58s call     tests/test_wait_for_deploy.py::test_anything_short_of_both_services_serving_the_sha_fails[backend-stale]
+2.57s call     tests/test_wait_for_deploy.py::test_anything_short_of_both_services_serving_the_sha_fails[backend-no-marker]
+=== 3185 passed, 4 skipped, 12 deselected, 49 warnings in 484.50s (0:08:04) ====

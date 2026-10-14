@@ -1,0 +1,30 @@
+{
+  "recorded_at": "2026-10-14T02:31:43.366896+00:00",
+  "intermediate_runs": [
+    {
+      "run": "Initial targeted red test",
+      "outcome": "Failed as intended before implementing origin column"
+    },
+    {
+      "run": "Initial full backend",
+      "outcome": "Interrupted after JSON export metadata and redacted-source placeholder assertions needed updating; not counted as a pass"
+    },
+    {
+      "run": "Second full backend",
+      "outcome": "2 failed,3183 passed,4 skipped,12 deselected; failures were SimpleNamespace report fixtures missing the new origin. Fixture now updated; full rerun pending"
+    },
+    {
+      "run": "Initial frontend unit",
+      "outcome": "One expected old Final-filter test failed; updated to origin-filter pagination intent"
+    },
+    {
+      "run": "Parallel frontend unit after filter fix",
+      "outcome": "One unchanged Librarian keyboard-focus timing assertion failed; targeted7 and serial full385 passed"
+    },
+    {
+      "run": "Initial new browser spec",
+      "outcome": "16 failures because the heading selector counted the hidden delete dialog; changed to visible accessible headings; final full browser201 passed"
+    }
+  ],
+  "final_backend": "3185 passed,4 skipped,12 deselected,49 warnings; all previous failures resolved"
+}

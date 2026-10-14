@@ -17,13 +17,16 @@ from app.core.security import AuthenticatedUser
 from app.models.chunk import DocumentChunk
 from app.models.collection import Collection
 from app.models.document import Document
+from app.models.evidence_ledger import LedgerEntry
 from app.models.mission import Mission
 from app.models.project import Project
 from app.models.user import User
 from app.schemas.librarian import AssistantReply, ReplySegment
 from app.services.corpus_qa import chunk_href
 from app.services.document_policy import document_read_policy
+from app.services.evidence_scope import evidence_href, readable_evidence
 from app.services.librarian import validate_provenance
+from app.services.report_presentation import report_notes
 
 MARKER = re.compile(r"\[(\d+)\]")
 
@@ -184,25 +187,38 @@ def original_documents(db: Session, user, report) -> list[dict[str, str]]:
 
 
 def readable_source_records(db: Session, user, report) -> list:
-    """Input records are provenance, but their identities still require access."""
+    """Keep unavailable provenance visible without disclosing its identity or name."""
     sources = report.sources or []
     chunk_ids = [s.source_id for s in sources if s.source_type == "chunk"]
-    query = db.query(DocumentChunk.id).join(Document).join(Project).filter(
+    query = db.query(DocumentChunk, Document).join(Document).join(Project).filter(
         DocumentChunk.id.in_(chunk_ids), Document.deleted_at.is_(None), Project.deleted_at.is_(None),
     )
     policy = document_read_policy(user, db)
     if policy is not None:
         query = query.filter(policy)
-    readable = {str(row.id) for row in query.all()}
-    collections = db.query(Collection.id).filter(Collection.id.in_(
+    readable = {str(chunk.id): (doc.name, chunk_href(str(doc.id), str(chunk.id), chunk.chunk_index))
+                for chunk, doc in query.all()}
+    collections = db.query(Collection).filter(Collection.id.in_(
         [s.source_id for s in sources if s.source_type == "collection"]
     ))
     scope = accessible_filter(user, Collection, db)
     if scope is not None:
         collections = collections.filter(scope)
-    readable_collections = {str(row.id) for row in collections.all()}
-    return [s for s in sources if (
-        (s.source_type == "chunk" and str(s.source_id) in readable)
-        or (s.source_type == "collection" and str(s.source_id) in readable_collections)
-        or s.source_type not in {"chunk", "collection"}
-    )]
+    readable_collections = {str(row.id): (row.name, f"/collections/{row.id}") for row in collections.all()}
+    readable_entries = {str(row.id): ("Evidence entry", f"/evidence/{row.id}") for row in readable_evidence(db, user).filter(
+        LedgerEntry.id.in_([s.source_id for s in sources if s.source_type == "ledger_entry"]),
+    ).all()}
+    readable_notes = {str(row.id): ("Working note", evidence_href(row.project_id, session_key=row.session_key))
+                      for row in report_notes(db, user, [report]).values()}
+    records = []
+    for source in sources:
+        detail = (readable if source.source_type == "chunk" else readable_collections
+                  if source.source_type == "collection" else readable_entries
+                  if source.source_type == "ledger_entry" else readable_notes
+                  if source.source_type == "ledger_note" else {}).get(str(source.source_id))
+        records.append({
+            "id": source.id, "report_id": source.report_id, "source_type": source.source_type,
+            "source_id": source.source_id if detail else None, "added_at": source.added_at,
+            "name": detail[0] if detail else "Source unavailable", "href": detail[1] if detail else None,
+        })
+    return records

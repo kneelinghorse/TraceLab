@@ -1364,6 +1364,7 @@ class TestPromotion:
         assert str(report.workspace_id) == str(space.id)
         assert report.title == "Passkey evidence review"
         assert report.report_type == "evidence-ledger"
+        assert report.origin == "agent_brief"
         assert report.status == "draft"
         assert report.created_by == member.email
         assert report.content_hash == hashlib.sha256(report.content.encode()).hexdigest()
@@ -1999,6 +2000,7 @@ def test_evidence_links_flag_only_the_capturing_missions_result_report(client, d
     links = client.get(f"{API}/{entry_id}", headers=_bearer(member)).json()["links"]
     flags = {(link["kind"], link["id"]): link["mission_result"] for link in links}
     assert flags == {("mission", str(mission.id)): False, ("report", str(result.id)): True, ("report", str(citing.id)): False}
+    assert next(link["href"] for link in links if link["mission_result"]) == f"/missions/{mission.id}?tab=results"
 
 
 def test_report_citations_resolve_each_source_kind_before_counting_and_paging(client, db_session, rbac_on):

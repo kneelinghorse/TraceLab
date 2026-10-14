@@ -48,7 +48,7 @@ class SQLAlchemyActivityRepository:
 
     def _reports(self, db: Session, user: AuthenticatedUser):
         view = aliased(UserItemView)
-        query = scoped_query(db, user, Report).outerjoin(
+        query = scoped_query(db, user, Report).filter(Report.origin != "mission").outerjoin(
             view, and_(view.user_id == user.user_id, view.item_type == "report", view.item_id == Report.id),
         )
         new = or_(view.item_id.is_(None), view.occurred_at < Report.updated_at)

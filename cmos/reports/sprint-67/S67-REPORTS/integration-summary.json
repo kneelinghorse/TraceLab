@@ -1,0 +1,24 @@
+{
+  "name": "pytest",
+  "errors": "0",
+  "failures": "0",
+  "skipped": "3",
+  "tests": "175",
+  "time": "98.742",
+  "timestamp": "2026-10-13T21:31:44.470319-05:00",
+  "hostname": "Mac",
+  "skipped_tests": [
+    {
+      "test": "tests.integration.test_e2e_rbac_live.test_live_rbac_matrix",
+      "reason": "set RBAC_VERIFY_BASE_URL to run against a live deploy"
+    },
+    {
+      "test": "tests.integration.test_ingestion_flow.test_markdown_cli_flow",
+      "reason": "CLI subprocess requires running server with auth \u2014 not available in test environment"
+    },
+    {
+      "test": "tests.integration.test_qdrant_isolation.test_disposable_qdrant_cache_round_trip",
+      "reason": "Requires --disposable-qdrant and local Docker"
+    }
+  ]
+}
