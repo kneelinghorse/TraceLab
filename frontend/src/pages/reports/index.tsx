@@ -17,10 +17,10 @@ import { projectsApi } from "@/lib/api/projects";
 import { parseApiTimestamp } from "@/lib/api/timestamps";
 
 const FILTERS = [
-  { label: "Reports", origins: ["written", "librarian"] },
-  { label: "Evidence briefs", origins: ["agent_brief"] },
-  { label: "Mission results", origins: ["mission"] },
-] satisfies { label: string; origins: Origin[] }[];
+  { label: "Reports", one: "report", origins: ["written", "librarian"] },
+  { label: "Evidence briefs", one: "evidence brief", origins: ["agent_brief"] },
+  { label: "Mission results", one: "mission result", origins: ["mission"] },
+] satisfies { label: string; one: string; origins: Origin[] }[];
 export default function ReportsPage() {
   const { user } = useAuth();
   const router = useRouter();
@@ -41,7 +41,7 @@ export default function ReportsPage() {
     </section>
     {state.error && <p role="alert" className="text-sm text-secondary">Seen-state could not load. <button className="underline" onClick={() => void state.mutate()}>Retry seen-state</button></p>}
     {response.error ? <PageState state="error" title="Reports could not load." onRetry={() => void response.mutate()} /> : response.isLoading ? <PageState state="loading" title="Loading reports…" /> : data && <>
-      <p className="text-sm text-secondary">{data.total.toLocaleString()} {FILTERS[filter].label.toLowerCase()}</p>
+      <p className="text-sm text-secondary">{data.total.toLocaleString()} {data.total === 1 ? FILTERS[filter].one : FILTERS[filter].label.toLowerCase()}</p>
       {data.items.length === 0 ? <section className="panel space-y-3 p-6"><h2 className="font-semibold">No reports match these filters</h2><p className="text-secondary">Choose another filter or create a report from a collection.</p><Link href="/collections" className="text-accent-text underline">Go to Collections</Link></section> : <ul className="space-y-3">{data.items.map(report => {
         const itemState = state.data?.items?.find(item => item.id === report.id);
         const titleClass = `min-w-0 flex-1 break-words text-lg ${activityTitleClass(itemState)}`;

@@ -24,3 +24,12 @@ it("opening a mission-result title acknowledges the report copy even though its 
   fireEvent.click(title);
   await waitFor(() => expect(mocks.markViewed).toHaveBeenCalledWith([{ type: "report", id: "copy", occurred_at: stamp }]));
 });
+it("counts a single result in the singular, which the Sprint 67 walkthrough showed as '1 mission results'", async () => {
+  const { unmount } = render(<SWRConfig value={{ provider: () => new Map() }}><ReportsPage /></SWRConfig>);
+  fireEvent.click(await screen.findByRole("button", { name: "Mission results", exact: true }));
+  expect(await screen.findByText("1 mission result")).toBeInTheDocument();
+  unmount();
+  mocks.list.mockResolvedValue({ items: [], total: 2, page: 1, page_size: 20 });
+  render(<SWRConfig value={{ provider: () => new Map() }}><ReportsPage /></SWRConfig>);
+  expect(await screen.findByText("2 reports")).toBeInTheDocument();
+});
