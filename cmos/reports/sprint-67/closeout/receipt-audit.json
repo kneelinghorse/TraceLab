@@ -1,0 +1,48 @@
+{
+  "scope": "Sprint 67 only; recursive cmos/reports/sprint-67 JSON receipts, plus active sprint decisions and unscoped approved-scope decision627",
+  "audited_at": "2026-10-14T10:04:01.281665+00:00",
+  "source_head": "3940f8d0f4a643c48340cbe2ae4e2866176041ba",
+  "serving_runtime_commit": "b3d09eac893fb0e999b3d00cec32e0c1346bdaf6",
+  "receipt_json_files_examined_before_audit": 142,
+  "distinct_file_citations": 72,
+  "symbol_test_env_citations": 60,
+  "methods": [
+    "File existence and tracked-source readback; preserve historical compiler-relative paths with corrections.",
+    "Python AST definitions/test module paths; source grep for TypeScript interfaces, helpers and environment references.",
+    "Read each active decision mechanism against its current source; supersede stale fixture reference637 with640.",
+    "Historical DeepSearch producer files read via git show at23e2590 and compared to both recorded SHA256 hashes.",
+    "Current counts remeasured by complete WALK local suites and exact-head PR436 CI; historical per-mission counts retained as historical.",
+    "Review pending/not_done text; intermediate REPORTS rerun request resolved with dated annotation; npm registry delay resolved by published-artifact proof."
+  ],
+  "unresolved_falsified_citations": 0,
+  "runtime_changes_in_closeout": false,
+  "followups": [
+    {
+      "id": 490,
+      "scope": "Existing build-tool advisory maintenance",
+      "target": "sprint-68"
+    },
+    {
+      "id": 491,
+      "scope": "Cosmetic Reports count-label singular/plural wording, disclosed to Derek",
+      "target": "sprint-68"
+    }
+  ],
+  "current_verified_counts": {
+    "backend_passed": 3212,
+    "backend_skipped": 4,
+    "backend_deselected": 12,
+    "postgresql_passed": 172,
+    "postgresql_skipped": 3,
+    "frontend_unit_passed": 451,
+    "browser_passed": 218,
+    "browser_skipped": 0,
+    "ci_source": "../S67-WALK/release-receipt.json"
+  },
+  "files": {
+    "paths": "file-citation-audit.json",
+    "symbols": "symbol-citation-audit.json",
+    "decisions": "decision-audit.json",
+    "external_contracts": "external-contract-audit.json"
+  }
+}

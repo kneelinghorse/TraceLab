@@ -104,7 +104,17 @@
     "count": 11,
     "table_rows": 10,
     "mixed_prose_with_multiple_table_rows": 1,
-    "source": "tests/fixtures/evidence_display_claims.json",
+    "source": "frontend/tests/fixtures/evidence_display_claims.json",
     "read_only": true
+  },
+  "original_claim": {
+    "production_fixtures.source": "tests/fixtures/evidence_display_claims.json"
+  },
+  "corrected_at_sprint_close": {
+    "date": "2026-10-14",
+    "session": "PS-2026-10-14-003",
+    "removing_pr": 434,
+    "removing_commit": "3e86bba99acb7ef6929daa4274d6fe9fa81b64f5",
+    "reason": "Fixture moved unchanged into Railway frontend build subtree; all consumers use the new path."
   }
 }

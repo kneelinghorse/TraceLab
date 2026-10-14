@@ -1,0 +1,18 @@
+{
+  "repository": "DeepSearch.alpha",
+  "access": "read-only git show at documented revision",
+  "checks": [
+    {
+      "path": "docs/s96_quality_and_diagnostics_contract.md",
+      "revision": "23e2590",
+      "sha256": "8624f424466b65cf522ad20be747bd34f7d0d56e862d3d8b6af641e3511f5543",
+      "matched": true
+    },
+    {
+      "path": "tests/fixtures/s96_consumer_contract.json",
+      "revision": "23e2590",
+      "sha256": "59f88b36ddcdf619ac724bcfae201a9d0c5713b7efbf4459a7973535377dc005",
+      "matched": true
+    }
+  ]
+}

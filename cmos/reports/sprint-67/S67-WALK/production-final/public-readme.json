@@ -1,0 +1,28 @@
+{
+  "checkedAt": "2026-10-14T09:55:00.005Z",
+  "public": true,
+  "license": "MIT",
+  "results": [
+    {
+      "name": "readme",
+      "url": "https://github.com/kneelinghorse/TraceLab/blob/main/README.md",
+      "status": 200,
+      "title": "TraceLab/README.md at main · kneelinghorse/TraceLab · GitHub",
+      "expectedContentFound": true
+    },
+    {
+      "name": "license",
+      "url": "https://github.com/kneelinghorse/TraceLab/blob/main/LICENSE",
+      "status": 200,
+      "title": "TraceLab/LICENSE at main · kneelinghorse/TraceLab · GitHub",
+      "expectedContentFound": true
+    },
+    {
+      "name": "security",
+      "url": "https://github.com/kneelinghorse/TraceLab/security/policy",
+      "status": 200,
+      "title": "Security Policy · kneelinghorse/TraceLab · GitHub",
+      "expectedContentFound": true
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "mission": "S67-WALK",
+  "pr": "https://github.com/kneelinghorse/TraceLab/pull/436",
+  "tested_head": "29c7b619998e43ed91fde4426cbb9e814cd2451b",
+  "merge_commit": "b3d09eac893fb0e999b3d00cec32e0c1346bdaf6",
+  "merged_at": "2026-10-14T09:51:48Z",
+  "merge_method": "normal squash with --match-head-commit; no admin override",
+  "required_check_names": [
+    "Secret Scan",
+    "backend-integration",
+    "backend-suite",
+    "build-frontend-production",
+    "lint",
+    "mcp-package",
+    "ruff-diff",
+    "type-check",
+    "vitest"
+  ],
+  "all_required_passed": true,
+  "ci": {
+    "backend": {
+      "run": 38541733306,
+      "passed": 3212,
+      "skipped": 4,
+      "deselected": 12,
+      "warnings": 49,
+      "seconds": 1711.31
+    },
+    "postgresql": {
+      "run": 38541733400,
+      "passed": 172,
+      "skipped": 3,
+      "warnings": 17,
+      "seconds": 127.96
+    },
+    "frontend": {
+      "run": 38541733269,
+      "units": 451,
+      "files": 49,
+      "types": "passed",
+      "lint": "passed"
+    },
+    "browser": {
+      "run": 38541733438,
+      "passed": 218,
+      "skipped": 0,
+      "duration_reported": "6.4 minutes"
+    }
+  },
+  "premerge_production": "progress.json",
+  "completion_email": "completion-email.json",
+  "local_checks": "testing-summary.json",
+  "acceptance_status": "passed; two defects fixed and one cosmetic count-label defect explicitly reported",
+  "deployment": "deployment.json",
+  "post_deploy_check": {
+    "run": 38545462331,
+    "status": "success",
+    "receipt": "post-deploy-check.json"
+  },
+  "final_acceptance": "production-final/progress.json",
+  "final_app_captures": 20,
+  "final_public_pages": "production-final/public-readme.json",
+  "cleanup": {
+    "userId": "445333fa-464b-492f-9157-fb95d9f6ad9e",
+    "disabled": true,
+    "existingTokenDenied": 403,
+    "freshLoginDenied": 403,
+    "inviteId": "5373f5c4-106f-4832-8a36-55c7466f39a2",
+    "inviteStatus": "used",
+    "usedAt": "2026-10-14T08:50:43.696932",
+    "reuseDenied": 400,
+    "inviteAuditRetained": true,
+    "reason": "Single-use signup already invalidated this invite; DELETE intentionally rejects used invites. Verified reuse fails without creating another account (decision 638).",
+    "at": "2026-10-14T09:57:55.741Z"
+  },
+  "verified_at": "2026-10-14T09:59:27.460753+00:00",
+  "remaining_named_defect": "Reports single-result count says 1 mission results (cosmetic; reported and recorded follow-up)."
+}

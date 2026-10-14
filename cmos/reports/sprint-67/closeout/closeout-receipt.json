@@ -1,0 +1,68 @@
+{
+  "sprint": "sprint-67",
+  "status": "Record closed; closeout PR release verification follows",
+  "record_closed_at": "2026-10-14T10:04:22.138Z",
+  "missions": {
+    "total": 8,
+    "completed": 8,
+    "skipped": 0,
+    "blocked": 0
+  },
+  "final_runtime": {
+    "merge": "b3d09eac893fb0e999b3d00cec32e0c1346bdaf6",
+    "pr": 436,
+    "post_deploy_check": 38545462331,
+    "receipt": "../S67-WALK/release-receipt.json"
+  },
+  "closeout_scope": "Documentation, audited receipt corrections and generated MASTER_CONTEXT only; no application, test or workflow changes.",
+  "identity": {
+    "layer0": "sprint-67-complete",
+    "masterIdentity": "sprint-67-complete",
+    "metadata": {
+      "last_condensation": "2026-03-08T22:28:45.820723Z",
+      "condensation_note": "T31.5: Heavy manual pruning of stale fields, old sprint data, and planning text.",
+      "current_sprint": "sprint-67",
+      "sprint_status": "Completed"
+    },
+    "currentSprint": {
+      "id": "sprint-67",
+      "name": "Sprint 67 — The UX pass",
+      "status": "Completed",
+      "focus": "Eight UX missions shipped and verified before the October 19 share-out; final invited-member run, email, access isolation and cleanup accepted. Two explicit follow-ups carried to Sprint 68."
+    }
+  },
+  "identity_readback_at": "2026-10-14T10:08:44.648Z",
+  "export": {
+    "command": "python3 cmos/scripts/db_tools.py export-contexts --output-root /tmp/tracelab-s67-closeout-export",
+    "committed": "cmos/context/MASTER_CONTEXT.json",
+    "project_context": "Scratch export only; tracked PROJECT_CONTEXT left unchanged (decision420)."
+  },
+  "audit": "receipt-audit.json",
+  "lifecycle": "reasonbook-close.json",
+  "carry_forwards": [
+    {
+      "id": 490,
+      "content": "Sprint68 dependency maintenance: remove residual build-tool advisories GHSA-vfj7-8cjw-p6xm (braces, no patch on2026-10-13; Tailwind3/ESLint chains) and GHSA-rj75-hqrm-r3gf (postcss-selector-parser6.x via Tailwind3/typography; fix7.1.6 outside declared ranges). Recheck upstream patches at Sprint68 planning; if still unpatched, scope a deliberate Tailwind/toolchain migration with OODS compatibility and full theme/browser verification. Current residuals are build-only on trusted repository input, absent from35 server traces, documented in S66-SECURITY receipt; revisit immediately before introducing user-controlled CSS/glob parsing. No audit suppression.",
+      "status": "carried",
+      "target": "sprint-68"
+    },
+    {
+      "id": 491,
+      "content": "Cosmetic Reports count-label follow-up: a single result renders as '1 mission results'. Observed and disclosed to Derek during the final production WALK; navigation, filtering and access all passed. Correct singular/plural wording for the existing report filters during share-out polish, preserving the source labels.",
+      "status": "carried",
+      "target": "sprint-68"
+    }
+  ],
+  "validation": {
+    "foundational_references": "passed",
+    "mcp_parity": {
+      "tools": 9,
+      "actions": 50,
+      "ui_operations": 119,
+      "errors": 0
+    },
+    "runtime_unchanged_against": "origin/main at b3d09eac893fb0e999b3d00cec32e0c1346bdaf6",
+    "test_count_source": "Final complete local WALK suites and exact-head PR436 CI; closeout CI will independently rerun required gates."
+  },
+  "warnings": "Sprint close returned advisory context-snapshot size and untagged historical-session warnings, preserved verbatim in reasonbook-close.json; no pruning or unrelated record changes performed."
+}

@@ -26,5 +26,15 @@
       "outcome": "16 failures because the heading selector counted the hidden delete dialog; changed to visible accessible headings; final full browser201 passed"
     }
   ],
-  "final_backend": "3185 passed,4 skipped,12 deselected,49 warnings; all previous failures resolved"
+  "final_backend": "3185 passed,4 skipped,12 deselected,49 warnings; all previous failures resolved",
+  "original_claim": {
+    "intermediate_runs.2.outcome": "2 failed,3183 passed,4 skipped,12 deselected; failures were SimpleNamespace report fixtures missing the new origin. Fixture now updated; full rerun pending"
+  },
+  "corrected_at_sprint_close": {
+    "date": "2026-10-14",
+    "session": "PS-2026-10-14-003",
+    "resolving_pr": 428,
+    "resolving_commit": "9ffdfe5697186e0c9930a51d0b1b762cff350436",
+    "reason": "Pending described an intermediate run. The final_backend field and release-receipt.json record the complete successful rerun and deployment; no operator action remains."
+  }
 }

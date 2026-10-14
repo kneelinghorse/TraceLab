@@ -3,7 +3,7 @@
     "name": "TraceLab",
     "version": "0.0.0",
     "description": "Research knowledge management platform with PEDR search pipeline, mission orchestration, and DeepSearch integration.",
-    "status": "sprint-67-active",
+    "status": "sprint-67-complete",
     "start_date": "2025-01-01",
     "deployment": {
       "platform": "FastAPI + PostgreSQL + Qdrant",
@@ -28,7 +28,7 @@
       "Sprint 18 completed: PEDR Validation Sprint - 6 missions delivered (R18.0, B18.1-B18.6). PEDR SCOPED decision: Not for interactive search (1.5s P50 vs 200ms target), approved for deep research, MCP, and batch processing."
     ],
     "planning_overview": "See cmos/foundational-docs/roadmap-sprints-66-68-open-tracelab.md for the current plan (intent); the Reasonbook record is authoritative for status",
-    "last_sync_at": "2026-10-13T22:28:26.969Z"
+    "last_sync_at": "2026-10-14T10:00:05.025Z"
   },
   "technical_foundation": {
     "critical_facts": [
@@ -267,7 +267,7 @@
     "last_condensation": "2026-03-08T22:28:45.820723Z",
     "condensation_note": "T31.5: Heavy manual pruning of stale fields, old sprint data, and planning text.",
     "current_sprint": "sprint-67",
-    "sprint_status": "Active"
+    "sprint_status": "Completed"
   },
   "working_memory": {
     "session_history": [
@@ -315,21 +315,19 @@
   },
   "next_session_context": {
     "when_we_resume": [
-      "PS-2026-10-02-001: Push codex/s95-ledger-status-codes and open the paired PR.",
-      "PS-2026-10-02-001: Merge/deploy this consumer before requeuing REL-01.",
-      "PS-2026-10-02-001: Run the deployed pure projector on the pinned 62-record candidate, then reconcile exactly one Ledger batch without paid research.",
       "PS-2026-10-13-001: Wire the nine Playwright specs that no CI workflow runs into a required lane, or delete them deliberately. On origin/main bb0b270, 22 specs exist under frontend/tests/e2e/, but frontend-production-build.yml:91 and production-smoke.yml:40 enumerate only 13. These never run: admin-password-recovery and password-recovery (AUTH-2/AUTH-1, 2026-09-30), mission-live-logs (LOG-2), report-citations (REPORT-1), session-code-accessibility (S62-UX), token-contrast (A11Y-1's contrast gate, 2026-09-16), plus console, evidence and hygiene (the last two are what dropped next-step #285 asked to wire). Decision #599 added authored-scope to the list the same way, so the enumerated list is the known mechanism. Per decision #498, a gate that never runs is not evidence. Run each one locally against the production build before wiring it, because any of them may have rotted unnoticed. Supersedes the still-open part of #285.",
       "PS-2026-10-13-002: At the next @aquex/tracelab-mcp publish, fix the README's global-install line. In the published 2.1.2 README (and packages/tracelab-mcp/README.md on main) it still reads `npm install -g @aquex/tracelab-mcp@2.1.1`, one patch behind latest. Use @latest like the other setup examples, or bump it in the release checklist. Aquex was told on 2026-10-12 that TraceLab would correct it at the next publish (reply to request 397036b0).",
       "PS-2026-10-13-002: Sprint-planning start state (2026-10-12). (1) The main checkout at /Users/systemsystems/portfolio/TraceLab sits on stale local branch codex/sprint-61-admin-acceptance, 29 commits behind origin/main (bb0b270), so plan from origin/main. The branch carries two unpushed commits. d0ffd02, an AUTH-2 receipt, is superseded by main's own copy. afa8b39 (2026-10-10) removes the obsolete cmos/cli.py procedure from agents.md and cmos/agents.md; carry it into the planning PR. Leave the two untracked cmos/planning/conversation-2026-09-24*.md files alone, since they are Derek's. (2) The living roadmap cmos/foundational-docs/roadmap-sprints-57-60-the-librarian.md still reads Sprint 64 \"Active\" and has no Sprint 65 section or change-log lines for the 64/65 closes. Rewrite them as outcomes at planning open. (3) Two Reasonbook 4.0 messages stay pending for planning: 960040b8 (rename prep) and 9c5b4fc2 (install/migration). TraceLab app code reads cmos/ paths (app/api/v1/decision_links.py reads the record DB; PEDR telemetry writes cmos/telemetry), so the folder must not move before the app supports rbook/. This overlaps the open-source launch work Derek raised on 2026-10-12.",
       "PS-2026-10-13-003: On Derek's answers to the Sprint 66 open questions (roadmap-sprints-66-68-open-tracelab.md, Open Questions 1-4, asked 2026-10-13):\n(a) With his go, merge PR #416 (pydantic cap), then update PR #415 from main and merge it once required CI is green.\n(b) Record the license decision: draft P4 (MIT, with both vendored @oods packages kept PolyForm Noncommercial) or his amendment. S66-FRONT's LICENSE criterion cites it.\n(c) Act on his history choice for the third-party personal data. On a purge or a private-plus-clean-copy choice, extend S66-EXPOSURE before it starts.\n(d) If he permits it, send DeepSearch the open-source readiness request and answer Reasonbook's 960040b8 with the Sprint 66 and 68 plan.\n(e) Scope Sprint 67 from his UX feedback and his answer on who comes in Monday.\nDone when each answer is recorded as a decision and the matching action is taken or explicitly declined.",
       "PS-2026-10-13-004: Sprint 67 planning: scope the UX pass from Derek's full UX doc. He is writing it while Sprint 66 runs: \"I'll come with a full UX doc for next time when we do planning\" (2026-10-13). Include carried #406, the raw Markdown table rows shown as claim text. End the sprint with an acceptance walk of the invited-member path on the final production build: invite code, sign-up, the Librarian, a mission and its evidence. The 2026-10-19 share-out is an invite-only demo for 5-10 people (decision #614). Done when Sprint 67's missions are recorded from his doc and the roadmap's Sprint 67 section is re-planned.",
-      "PS-2026-10-13-005: Sprint68 dependency maintenance: remove residual build-tool advisories GHSA-vfj7-8cjw-p6xm (braces, no patch on2026-10-13; Tailwind3/ESLint chains) and GHSA-rj75-hqrm-r3gf (postcss-selector-parser6.x via Tailwind3/typography; fix7.1.6 outside declared ranges). Recheck upstream patches at Sprint68 planning; if still unpatched, scope a deliberate Tailwind/toolchain migration with OODS compatibility and full theme/browser verification. Current residuals are build-only on trusted repository input, absent from35 server traces, documented in S66-SECURITY receipt; revisit immediately before introducing user-controlled CSS/glob parsing. No audit suppression."
+      "PS-2026-10-13-005: Sprint68 dependency maintenance: remove residual build-tool advisories GHSA-vfj7-8cjw-p6xm (braces, no patch on2026-10-13; Tailwind3/ESLint chains) and GHSA-rj75-hqrm-r3gf (postcss-selector-parser6.x via Tailwind3/typography; fix7.1.6 outside declared ranges). Recheck upstream patches at Sprint68 planning; if still unpatched, scope a deliberate Tailwind/toolchain migration with OODS compatibility and full theme/browser verification. Current residuals are build-only on trusted repository input, absent from35 server traces, documented in S66-SECURITY receipt; revisit immediately before introducing user-controlled CSS/glob parsing. No audit suppression.",
+      "PS-2026-10-14-003: Cosmetic Reports count-label follow-up: a single result renders as '1 mission results'. Observed and disclosed to Derek during the final production WALK; navigation, filtering and access all passed. Correct singular/plural wording for the existing report filters during share-out polish, preserving the source labels."
     ]
   },
   "context_health": {
-    "sessions_since_reset": 292,
-    "last_update": "2026-10-13T22:28:27.212Z",
-    "size_kb": 60.88,
+    "sessions_since_reset": 294,
+    "last_update": "2026-10-14T10:00:45.470Z",
+    "size_kb": 61.2,
     "size_limit_kb": 100,
     "warning_threshold_percent": 75,
     "retention_keep_sprints": 3
@@ -380,8 +378,8 @@
   "current_sprint": {
     "id": "sprint-67",
     "name": "Sprint 67 — The UX pass",
-    "status": "Active",
-    "focus": "Derek's UX pass before the 2026-10-19 share-out, seven missions in order: DENSITY, REPORTS, BADGES, MISSION, LIBRARIAN, CLAIMS, WALK. Plan: cmos/foundational-docs/roadmap-sprints-66-68-open-tracelab.md."
+    "status": "Completed",
+    "focus": "Eight UX missions shipped and verified before the October 19 share-out; final invited-member run, email, access isolation and cleanup accepted. Two explicit follow-ups carried to Sprint 68."
   },
   "strategic_context": {
     "sprint_13": {
@@ -593,6 +591,19 @@
         "total": 3
       },
       "summary": "Detailed session history for this completed sprint was condensed and preserved in context snapshots."
+    },
+    {
+      "sprint_id": "sprint-65",
+      "archived_at": "2026-10-14T10:04:42.339Z",
+      "keep_detail_sprints": 3,
+      "snapshot_id": 1387,
+      "detail_counts": {
+        "session_history": 0,
+        "recent_sessions": 0,
+        "next_steps": 3,
+        "total": 3
+      },
+      "summary": "Detailed session history for this completed sprint was condensed and preserved in context snapshots."
     }
   ],
   "recent_sessions": [],
@@ -638,7 +649,7 @@
     }
   },
   "sprint_tracking": {
-    "current_sprint": "sprint-67",
-    "last_completed_sprint": "sprint-66"
+    "current_sprint": null,
+    "last_completed_sprint": "sprint-67"
   }
 }
