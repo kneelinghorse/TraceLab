@@ -1,0 +1,13 @@
+
+Running 4 tests using 1 worker
+
+(node:60840) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:60840) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [chromium] › tests/e2e/mission-quality.spec.ts:6:7 › research quality remains readable and honest in light at 390 (2.6s)
+  ✓  2 [chromium] › tests/e2e/mission-quality.spec.ts:6:7 › research quality remains readable and honest in light at 1440 (2.7s)
+  ✓  3 [chromium] › tests/e2e/mission-quality.spec.ts:6:7 › research quality remains readable and honest in dark at 390 (2.7s)
+  ✓  4 [chromium] › tests/e2e/mission-quality.spec.ts:6:7 › research quality remains readable and honest in dark at 1440 (3.1s)
+
+  4 passed (12.0s)

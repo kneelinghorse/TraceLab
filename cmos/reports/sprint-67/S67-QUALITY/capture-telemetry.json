@@ -1,0 +1,73 @@
+{
+  "tool": "playwright",
+  "generatedAt": "2026-10-14T05:32:56.624Z",
+  "completedAt": "2026-10-14T05:33:08.517Z",
+  "status": "passed",
+  "summary": {
+    "total": 4,
+    "expected": 4,
+    "passed": 4,
+    "failed": 0,
+    "skipped": 0,
+    "interrupted": 0,
+    "durationSeconds": 11.893,
+    "retries": 0
+  },
+  "environment": {
+    "node": "v24.6.0",
+    "ci": {
+      "provider": null
+    },
+    "projects": [
+      "chromium"
+    ],
+    "browsers": []
+  },
+  "tests": [
+    {
+      "title": "research quality remains readable and honest in light at 390",
+      "file": "frontend/tests/e2e/mission-quality.spec.ts",
+      "line": 6,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 2597,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "research quality remains readable and honest in light at 1440",
+      "file": "frontend/tests/e2e/mission-quality.spec.ts",
+      "line": 6,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 2721,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "research quality remains readable and honest in dark at 390",
+      "file": "frontend/tests/e2e/mission-quality.spec.ts",
+      "line": 6,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 2682,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "research quality remains readable and honest in dark at 1440",
+      "file": "frontend/tests/e2e/mission-quality.spec.ts",
+      "line": 6,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 3094,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    }
+  ],
+  "artifactPath": "/tmp/s67-quality-captures-telemetry.json"
+}

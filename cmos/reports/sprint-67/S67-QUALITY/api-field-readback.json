@@ -1,0 +1,155 @@
+{
+  "mission_id": "S96-MEMORY-ACCEPT-02",
+  "id": "1a35ada0-aac8-4044-8f2d-a4df66f184cc",
+  "read_only": true,
+  "schema_version": 5,
+  "quality_copies_equal": true,
+  "delivery_quality": "usable_with_warning",
+  "reason": [
+    "critique_unassessed_claims_3"
+  ],
+  "quality_record": {
+    "budget": 40,
+    "coverage": {
+      "content_status": "assessed",
+      "shortfall_score": 0.0,
+      "assessment_status": "assessed",
+      "semantics_version": 2,
+      "content_requirements": [
+        {
+          "kind": "content",
+          "satisfied": true,
+          "requirement": "Comparison"
+        },
+        {
+          "kind": "content",
+          "satisfied": true,
+          "requirement": "Caveats"
+        },
+        {
+          "kind": "content",
+          "satisfied": true,
+          "requirement": "Recommendation"
+        }
+      ],
+      "artifact_requirements": []
+    },
+    "critique": {
+      "errors": 0,
+      "status": "ok",
+      "applied": 0,
+      "dropped": 0,
+      "skipped": 0,
+      "claim_count": 28,
+      "pass_skipped": 0,
+      "applied_ratio": 0.0,
+      "legacy_gap_notes_inserted": 0
+    },
+    "liveness": {
+      "dead": 0,
+      "live": 2,
+      "orphan": 0,
+      "unknown": 0,
+      "available": true,
+      "hallucinated": 0
+    },
+    "recovery": {
+      "passes": 0,
+      "outcome": "not_triggered",
+      "triggered": false,
+      "selected_artifact": "first_pass"
+    },
+    "word_count": 800,
+    "verification": {
+      "scope": "sampled",
+      "version": 1,
+      "clean_means": "no_detected_material_issue",
+      "coverage_ratio": null,
+      "report_claim_count": null,
+      "report_wide_accuracy": "unknown"
+    },
+    "distinct_urls": 2,
+    "hit_max_steps": false,
+    "schema_version": 5,
+    "retrieval_state": {
+      "probes": 2,
+      "available": true,
+      "discovered": 0,
+      "fetch_attempts": 2,
+      "fetched_readable": 2,
+      "grounding_sources": 2
+    },
+    "self_terminated": true,
+    "citation_surface": {
+      "issues": [],
+      "available": true,
+      "actionable": false,
+      "accounting_only": false,
+      "references_only": 0,
+      "unused_reference_numbers": [],
+      "unsupported_reference_rows": 0
+    },
+    "claim_assessment": {
+      "status": "partial",
+      "version": 1,
+      "assessed": 6,
+      "supported": 6,
+      "unassessed": 3,
+      "contradicted": 0,
+      "accuracy_pass": null,
+      "coverage_ratio": null,
+      "declared_context": 0,
+      "report_claim_count": null
+    },
+    "delivery_quality": "usable_with_warning",
+    "terminating_step": 40,
+    "context_truncation": {
+      "occurred": true,
+      "available": true,
+      "critique_cited_dropped": 0,
+      "evidence_loss_occurred": false,
+      "critique_sources_dropped": 0,
+      "critique_sources_truncated": 2,
+      "critique_draft_chars_dropped": 0,
+      "recovery_draft_chars_dropped": 0,
+      "recovery_live_sources_dropped": 0,
+      "critique_liveness_chars_dropped": 0,
+      "recovery_live_sources_truncated": 0
+    },
+    "retrieval_failures": {
+      "total": 0,
+      "by_tool": {},
+      "available": true
+    },
+    "citations_extracted": 45,
+    "markers_quarantined": 0,
+    "evidence_dependencies": {
+      "version": 1,
+      "available": true,
+      "cited_urls": 2,
+      "readable_cited_urls": 2,
+      "local_fetch_refusals": 0,
+      "missing_cited_sources": 0,
+      "truncated_cited_bodies": 0,
+      "uncited_fetch_failures": 0,
+      "cited_without_readable_body": 0,
+      "recovered_cited_fetch_failures": 0,
+      "unresolved_cited_fetch_failures": 0,
+      "fetch_failure_attribution_complete": true
+    }
+  },
+  "generation_recovery_path": "execution_metadata.synthesis_telemetry.generation_recovery_result",
+  "generation_recovery_result": "not_attempted",
+  "failed_runs_examined": 8,
+  "new_rejection_shape_present_in_failed_runs": false,
+  "pass_through": "MissionResponse dict[str,Any]; router assigns both blobs intact; frontend ApiMission execution_metadata Record and forensic index signature; missionsApi.get returns HTTP payload directly. No response changes needed.",
+  "pydantic_round_trip": "Both execution_metadata and result_protocol deep-equal the live response after MissionResponse validation and JSON dump.",
+  "fixture_round_trips": [
+    "supported_sample",
+    "missing_cited_body",
+    "legacy_uncertainty",
+    "live_warning",
+    "failed_retained_memory",
+    "legacy_schema5_unknown"
+  ]
+}

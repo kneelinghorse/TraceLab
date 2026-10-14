@@ -1,0 +1,22 @@
+{
+  "read_only": true,
+  "permission": "Derek: yes, you can look at anything in deepsearch;2026-10-14; decision634",
+  "files": {
+    "docs/s96_quality_and_diagnostics_contract.md": {
+      "revision": "23e2590",
+      "sha256": "8624f424466b65cf522ad20be747bd34f7d0d56e862d3d8b6af641e3511f5543"
+    },
+    "tests/fixtures/s96_consumer_contract.json": {
+      "revision": "23e2590",
+      "sha256": "59f88b36ddcdf619ac724bcfae201a9d0c5713b7efbf4459a7973535377dc005"
+    }
+  },
+  "reason": "Current checkout lacks both paths; read the exact producer revision named in its message via git show. No files or branches changed in DeepSearch.",
+  "findings": [
+    "Quality projection may put delivery_quality and gate arrays at metadata root while live data uses final_outcome.",
+    "Rejection v1 subtype_source is code/type/message_pattern/unknown.",
+    "Request shape v1 available is a boolean; missing shape is unknown, not zero.",
+    "Recovery result is under synthesis_telemetry.",
+    "Provider wording classification does not establish independent root cause."
+  ]
+}

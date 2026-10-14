@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { qualityReason } from "@/components/missions/MissionQuality";
 import { z } from "zod";
 import type { ApiMission, AuthoredScope } from "@/types/mission";
 
@@ -86,7 +87,7 @@ export function ScopeOutcomePanel({ mission }: { mission: ApiMission }) {
       {audit.unavailable.length > 0 && <ul className="space-y-2" aria-label="Unavailable sources">{audit.unavailable.map(({ url, reason: unavailableReason }) => <li key={url} className="break-all">{url}<span className="block text-secondary">{reason(unavailableReason)}</span></li>)}</ul>}
       <details><summary className="cursor-pointer rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent">Count provenance</summary><p className="mt-2 break-all text-muted">{audit.counter_version} · {audit.controlling_surface}<br />SHA-256: {audit.persisted.sha256}</p></details>
     </> : <p className="text-secondary">This run has no readable persisted scope audit. Its status and legacy word or citation counts do not establish scope compliance.</p>}
-    {(qualityWarning || quality.length > 0) && <div className="space-y-1 border-t border-line pt-3"><p className="font-semibold">Independent research quality warning{outcome.delivery_quality ? `: ${String(outcome.delivery_quality).replaceAll("_", " ")}` : ""}</p>{quality.length > 0 && <ul className="list-disc pl-5">{[...new Set(quality)].map(value => <li key={value} className="break-words">{reason(value)}</li>)}</ul>}</div>}
+    {(qualityWarning || quality.length > 0) && <div className="space-y-1 border-t border-line pt-3"><p className="font-semibold">Independent research quality warning{outcome.delivery_quality ? `: ${String(outcome.delivery_quality).replaceAll("_", " ")}` : ""}</p>{quality.length > 0 && <ul className="list-disc pl-5">{[...new Set(quality.map(qualityReason))].map(value => <li key={value} className="break-words">{value}</li>)}</ul>}</div>}
     <p className="text-secondary">Review and export any saved result on the Results tab. A new research run requires an explicit reviewed submission.</p>
   </section>;
 }

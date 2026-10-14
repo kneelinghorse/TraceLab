@@ -24,7 +24,7 @@ it.each(["compliant", "partial", "too_long", "22_sources"])("uses the immutable 
   expect(screen.getByText(`${audit.consulted_count} · maximum 2`)).toBeVisible();
   expect(screen.queryByText(/9999/)).not.toBeInTheDocument();
   expect(screen.getByText(/Independent research quality warning/)).toBeVisible();
-  expect(screen.getByText("independent quality warning")).toBeVisible();
+  expect(screen.getByText("Additional quality issue reported; see Raw quality data in Details.")).toBeVisible();
   expect(screen.getByRole("heading", { name: audit.verdict === "partial" ? "Partial result — source availability warning" : audit.verdict === "violated" ? "Scope validation failed" : "Recorded scope limits met" })).toBeVisible();
   if (name === "partial") expect(screen.getByText("timeout")).toBeVisible();
   if (name === "22_sources") expect(screen.getByText("The run consulted more source pages than allowed.")).toBeVisible();
