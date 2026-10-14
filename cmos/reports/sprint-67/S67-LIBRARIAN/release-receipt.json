@@ -1,0 +1,30 @@
+{
+  "mission": "S67-LIBRARIAN",
+  "pr": "https://github.com/kneelinghorse/TraceLab/pull/432",
+  "head": "ca8956a3f5142590cd1c15f14360ecc3aa8f0a68",
+  "merge": "63b71e26e8e8ba820c4b20953a68ba791e5bdef9",
+  "mergedAt": "2026-10-14T06:46:37Z",
+  "requiredCheckNames": 9,
+  "allRequiredPassed": true,
+  "mergeMethod": "normal squash, no admin override",
+  "ci": {
+    "backend": {
+      "passed": 3188,
+      "skipped": 4,
+      "deselected": 12,
+      "warnings": 49,
+      "seconds": 841.05
+    },
+    "postgres": {
+      "passed": 172,
+      "skipped": 3,
+      "warnings": 17,
+      "seconds": 137.39
+    },
+    "browser": {
+      "passed": 213,
+      "skipped": 0,
+      "minutes": 6.4
+    }
+  }
+}
