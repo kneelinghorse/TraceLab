@@ -1,0 +1,45 @@
+{
+  "mission": "S67-DENSITY",
+  "pr": "https://github.com/kneelinghorse/TraceLab/pull/427",
+  "head_tested": "cc4861348f22ccf0863d76b75f6e19700d4ee39c",
+  "merge_commit": "71c95ccc56364fd1ea949ce03a656c041d25f880",
+  "merged_at": "2026-10-14T01:51:53Z",
+  "verified_at": "2026-10-14T01:58:22.642945+00:00",
+  "required_pr_checks": "Every required check SUCCESS; pr-required-checks.json",
+  "ci_backend": {
+    "passed": 3179,
+    "skipped": 4,
+    "deselected": 12,
+    "warnings": 49
+  },
+  "ci_browser": {
+    "passed": 181
+  },
+  "deployment": "TraceLab and frontend latestDeployment both SUCCESS at the merge commit; deployment.json",
+  "post_deploy_check": "SUCCESS on the merge commit; post-deploy-check.json",
+  "production": {
+    "pages": 9,
+    "cases": 36,
+    "widths": [
+      1440,
+      390
+    ],
+    "height": 900,
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "read_only": true,
+    "suppressed_view_writes": 4,
+    "http_failures": 0,
+    "horizontal_overflow": 0,
+    "serious_or_critical_axe_findings": 0,
+    "browser_exceptions": 0,
+    "api_transport_errors": 0,
+    "page_heading_px": 24,
+    "page_container_top_padding_px": 20,
+    "visual_review": "Reviewed all nine above-fold production captures in both themes at desktop and phone widths. Headers, controls and content remain readable; phone actions stack below descriptions. Full-page captures are retained.",
+    "email_masking": "The capture masks any text-node email matches. None were found on these pages."
+  },
+  "criteria": "Local fixed-fixture comparison proves all nine desktop first-row gains of at least 40 px (actual 56\u2013136); Home exposes 5 full activity rows versus 2; final fixture and production layout/accessibility checks pass."
+}
