@@ -413,12 +413,19 @@
       "observed": "Rendered signup screen at1440/390 in both themes identifies access as Mission Protocol despite TraceLab branding.",
       "disposition": "Replace helper copy with Create your TraceLab account with an invite code.",
       "file": "frontend/src/components/RegisterPanel.tsx",
-      "verification": "Fresh 451-unit suite, types, lint, token gate and production build passed; deployed capture follows merge."
+      "verification": "Fixed in PR #436, deployed at b3d09eac893fb0e999b3d00cec32e0c1346bdaf6, verified in production-final/progress.json."
     },
     {
       "name": "Member Settings offers an admin-only invite action",
       "observed": "Generate code is visible to an invited member; the real POST correctly returns 403.",
-      "disposition": "Fix the control using the existing authoritative role context; clarify the hosted-access README."
+      "disposition": "Fix the control using the existing authoritative role context; clarify the hosted-access README.",
+      "verification": "Fixed in PR #436, deployed at b3d09eac893fb0e999b3d00cec32e0c1346bdaf6, verified in production-final/progress.json."
+    },
+    {
+      "name": "Reports single-result count remains plural",
+      "observed": "1 mission results in the final 390/1440 captures.",
+      "disposition": "Cosmetic follow-up explicitly disclosed to Derek at final WALK; filtering, navigation and access passed. Recorded in Reasonbook for share-out polish.",
+      "file": "frontend/src/pages/reports/index.tsx"
     }
   ],
   "servingCommit": "707b08b3f5cf426232f49f17dd3d549ef2f2f2cd",

@@ -1,0 +1,254 @@
+{
+  "checks": {
+    "fixedSignupCopy": true,
+    "memberInviteControlHidden": true,
+    "adminInviteControlRetained": true,
+    "emailPreferenceEnabled": true,
+    "evidenceLink": "Browse evidence (113)",
+    "completed": {
+      "id": "a9526db2-ece6-4655-9d17-6991b12c49c7",
+      "missionId": "S67-KBD-FOCUS",
+      "title": "Keyboard Focus Visibility Requirements in WCAG 2.2",
+      "status": "completed",
+      "startedAt": "2026-10-14T08:54:45.477209",
+      "completedAt": "2026-10-14T08:58:10.226562",
+      "durationSeconds": 204.749,
+      "resultReportId": "c3f119a9-56d7-4896-a5d3-89cd19b1f3ae",
+      "resultLength": 21961,
+      "resultsDefault": true,
+      "evidenceVisible": true,
+      "reportUnderMissionResults": true,
+      "reportReturnsToResults": true
+    },
+    "access": {
+      "onlyOwnProjectListed": true,
+      "totalReadableProjects": 1,
+      "foreignProjectDenied": 403,
+      "adminDenied": 403
+    },
+    "cleanup": {
+      "userId": "445333fa-464b-492f-9157-fb95d9f6ad9e",
+      "disabled": true,
+      "existingTokenDenied": 403,
+      "freshLoginDenied": 403,
+      "inviteId": "5373f5c4-106f-4832-8a36-55c7466f39a2",
+      "inviteStatus": "used",
+      "usedAt": "2026-10-14T08:50:43.696932",
+      "reuseDenied": 400,
+      "inviteAuditRetained": true,
+      "reason": "Single-use signup already invalidated this invite; DELETE intentionally rejects used invites. Verified reuse fails without creating another account (decision 638).",
+      "at": "2026-10-14T09:57:55.741Z"
+    }
+  },
+  "captures": [
+    {
+      "name": "signup-fixed",
+      "theme": "light",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "signup-fixed-light-390.png",
+      "checkedAt": "2026-10-14T09:57:09.917Z"
+    },
+    {
+      "name": "settings-member-fixed",
+      "theme": "light",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "settings-member-fixed-light-390.png",
+      "checkedAt": "2026-10-14T09:57:11.234Z"
+    },
+    {
+      "name": "signup-fixed",
+      "theme": "light",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "signup-fixed-light-1440.png",
+      "checkedAt": "2026-10-14T09:57:12.338Z"
+    },
+    {
+      "name": "settings-member-fixed",
+      "theme": "light",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "settings-member-fixed-light-1440.png",
+      "checkedAt": "2026-10-14T09:57:13.526Z"
+    },
+    {
+      "name": "signup-fixed",
+      "theme": "dark",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "signup-fixed-dark-390.png",
+      "checkedAt": "2026-10-14T09:57:14.511Z"
+    },
+    {
+      "name": "settings-member-fixed",
+      "theme": "dark",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "settings-member-fixed-dark-390.png",
+      "checkedAt": "2026-10-14T09:57:15.567Z"
+    },
+    {
+      "name": "signup-fixed",
+      "theme": "dark",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "signup-fixed-dark-1440.png",
+      "checkedAt": "2026-10-14T09:57:16.702Z"
+    },
+    {
+      "name": "settings-member-fixed",
+      "theme": "dark",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "settings-member-fixed-dark-1440.png",
+      "checkedAt": "2026-10-14T09:57:17.877Z"
+    },
+    {
+      "name": "completed-results",
+      "theme": "light",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "completed-results-light-390.png",
+      "checkedAt": "2026-10-14T09:57:22.926Z"
+    },
+    {
+      "name": "completed-evidence",
+      "theme": "light",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "completed-evidence-light-390.png",
+      "checkedAt": "2026-10-14T09:57:23.332Z"
+    },
+    {
+      "name": "mission-report",
+      "theme": "light",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "mission-report-light-390.png",
+      "checkedAt": "2026-10-14T09:57:24.677Z"
+    },
+    {
+      "name": "completed-results",
+      "theme": "light",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "completed-results-light-1440.png",
+      "checkedAt": "2026-10-14T09:57:26.608Z"
+    },
+    {
+      "name": "completed-evidence",
+      "theme": "light",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "completed-evidence-light-1440.png",
+      "checkedAt": "2026-10-14T09:57:27.030Z"
+    },
+    {
+      "name": "mission-report",
+      "theme": "light",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "mission-report-light-1440.png",
+      "checkedAt": "2026-10-14T09:57:28.259Z"
+    },
+    {
+      "name": "completed-results",
+      "theme": "dark",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "completed-results-dark-390.png",
+      "checkedAt": "2026-10-14T09:57:30.361Z"
+    },
+    {
+      "name": "completed-evidence",
+      "theme": "dark",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "completed-evidence-dark-390.png",
+      "checkedAt": "2026-10-14T09:57:30.747Z"
+    },
+    {
+      "name": "mission-report",
+      "theme": "dark",
+      "width": 390,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "mission-report-dark-390.png",
+      "checkedAt": "2026-10-14T09:57:31.760Z"
+    },
+    {
+      "name": "completed-results",
+      "theme": "dark",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "completed-results-dark-1440.png",
+      "checkedAt": "2026-10-14T09:57:33.753Z"
+    },
+    {
+      "name": "completed-evidence",
+      "theme": "dark",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "completed-evidence-dark-1440.png",
+      "checkedAt": "2026-10-14T09:57:34.163Z"
+    },
+    {
+      "name": "mission-report",
+      "theme": "dark",
+      "width": 1440,
+      "overflow": false,
+      "violations": [],
+      "errors": [],
+      "screenshot": "mission-report-dark-1440.png",
+      "checkedAt": "2026-10-14T09:57:35.375Z"
+    }
+  ],
+  "defects": [],
+  "servingCommit": "b3d09eac893fb0e999b3d00cec32e0c1346bdaf6",
+  "visualReview": {
+    "at": "2026-10-14T09:59:27.460753+00:00",
+    "captures": 20,
+    "method": "Reviewed all five surfaces at 1440/390 in both themes using contact sheets.",
+    "findings": "Signup names TraceLab; members see invite guidance without Generate code; the real admin retains Generate code. Mission Results, evidence links and the report link are readable; quality degradation remains explicit. No page overflow, serious/critical axe findings or client exceptions.",
+    "minorCopyDefect": "Reports count says 1 mission results; disclosed to Derek and recorded as cosmetic follow-up."
+  }
+}
