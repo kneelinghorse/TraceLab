@@ -1,0 +1,62 @@
+
+> frontend@0.1.0 build
+> npm run check:tokens && next build
+
+
+> frontend@0.1.0 check:tokens
+> node scripts/check-token-colors.mjs
+
+OODS color gate passed: no fixed palette colors or dark variants in rendered source.
+▲ Next.js 16.3.8 (Turbopack)
+- Environments: .env.production.local
+✓ Running next.config.ts took 1714ms
+
+  Running TypeScript ...
+  Finished TypeScript in 5.0s ...
+  Creating an optimized production build ...
+✓ Compiled successfully in 4.0s
+  Collecting page data using 7 workers ...
+  Generating static pages using 7 workers (0/31) ...
+  Generating static pages using 7 workers (7/31)
+  Generating static pages using 7 workers (15/31)
+  Generating static pages using 7 workers (23/31)
+✓ Generating static pages using 7 workers (31/31) in 399ms
+  Finalizing page optimization ...
+
+Route (pages)
+┌ ○ /
+├   /_app
+├ ○ /404
+├ ○ /admin/corrections (309 ms)
+├ ○ /admin/observability (308 ms)
+├ ○ /admin/spaces
+├ ○ /admin/users (308 ms)
+├ ƒ /api/version
+├ ○ /collections (308 ms)
+├ ○ /collections/[id] (307 ms)
+├ ○ /collections/new (309 ms)
+├ ○ /device (308 ms)
+├ ○ /documents
+├ ○ /documents/[id]
+├ ○ /documents/upload
+├ ○ /evidence (309 ms)
+├ ○ /evidence/[id]
+├ ○ /forgot-password (308 ms)
+├ ○ /graph (308 ms)
+├ ○ /librarian
+├ ○ /missions
+├ ○ /missions/[id]
+├ ○ /missions/new (308 ms)
+├ ● /missions/queue
+├ ○ /projects (309 ms)
+├ ○ /projects/[id]
+├ ○ /projects/new
+├ ○ /reports (305 ms)
+├ ○ /reports/[id]
+├ ○ /reset-password (305 ms)
+├ ○ /saved-searches (307 ms)
+└ ○ /settings (307 ms)
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses getStaticProps)
+ƒ  (Dynamic)  server-rendered on demand

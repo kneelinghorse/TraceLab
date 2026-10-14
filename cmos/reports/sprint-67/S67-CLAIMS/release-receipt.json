@@ -1,0 +1,30 @@
+{
+  "mission": "S67-CLAIMS",
+  "pr": "https://github.com/kneelinghorse/TraceLab/pull/433",
+  "head": "86eb814f17bceeba36a6e811af6b6a9d09322993",
+  "merge": "a295a6b1e17dc2ecbd644dbc605c42b157260a1e",
+  "mergedAt": "2026-10-14T07:30:49Z",
+  "requiredCheckNames": 9,
+  "allRequiredPassed": true,
+  "mergeMethod": "normal squash, no admin override",
+  "ci": {
+    "backend": {
+      "passed": 3212,
+      "skipped": 4,
+      "deselected": 12,
+      "warnings": 49,
+      "seconds": 686.94
+    },
+    "postgres": {
+      "passed": 172,
+      "skipped": 3,
+      "warnings": 17,
+      "seconds": 109.28
+    },
+    "browser": {
+      "passed": 217,
+      "skipped": 0,
+      "minutes": 6.3
+    }
+  }
+}

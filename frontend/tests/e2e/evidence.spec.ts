@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import claimFixtures from "../../../tests/fixtures/evidence_display_claims.json";
+import claimFixtures from "../fixtures/evidence_display_claims.json";
 
 for (const theme of ["light", "dark"] as const) for (const width of [390, 1440]) {
   test(`evidence promotion traps keyboard focus and cancels without writing in ${theme} at ${width}`, async ({ page }) => {

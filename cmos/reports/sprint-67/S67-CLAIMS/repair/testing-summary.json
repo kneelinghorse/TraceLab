@@ -1,0 +1,94 @@
+{
+  "mission": "S67-CLAIMS",
+  "repair": "Frontend-only deployment boundary",
+  "generated_at": "2026-10-14T07:58:47.964527+00:00",
+  "backend": {
+    "status": "passed",
+    "passed": 3212,
+    "skipped": 4,
+    "deselected": 12,
+    "failures": 0,
+    "errors": 0,
+    "warnings": 49,
+    "seconds": 472.33,
+    "skipped_tests": [
+      {
+        "test": "tests.test_auto_ingest.TestAutoIngestIntegration.test_auto_ingest_full_pipeline",
+        "reason": "Full pipeline test requires embedding service and Qdrant \u2014 chunks not created in SQLite test env"
+      },
+      {
+        "test": "tests.test_live_log_cross_service.test_real_sender_receives_replay_ack_and_streams_before_terminal",
+        "reason": "Requires explicit DeepSearch checkout; run the LOG-2 cross-service command"
+      },
+      {
+        "test": "tests.test_pedr_unified_search.TestPEDRIntegration.test_create_orchestrator_factory",
+        "reason": "Requires OpenAI + Qdrant services (orchestrator init fails without them)"
+      },
+      {
+        "test": "tests.test_pedr_unified_search.TestPEDRIntegration.test_full_search_pipeline",
+        "reason": "Requires OpenAI + Qdrant services (orchestrator init fails without them)"
+      }
+    ]
+  },
+  "integration": {
+    "status": "passed",
+    "passed": 172,
+    "skipped": 3,
+    "deselected": 0,
+    "failures": 0,
+    "errors": 0,
+    "warnings": 16,
+    "seconds": 99.4,
+    "skipped_tests": [
+      {
+        "test": "tests.integration.test_e2e_rbac_live.test_live_rbac_matrix",
+        "reason": "set RBAC_VERIFY_BASE_URL to run against a live deploy"
+      },
+      {
+        "test": "tests.integration.test_ingestion_flow.test_markdown_cli_flow",
+        "reason": "CLI subprocess requires running server with auth \u2014 not available in test environment"
+      },
+      {
+        "test": "tests.integration.test_qdrant_isolation.test_disposable_qdrant_cache_round_trip",
+        "reason": "Requires --disposable-qdrant and local Docker"
+      }
+    ]
+  },
+  "frontend": {
+    "unit": {
+      "passed": 449,
+      "files": 49,
+      "skipped": 0
+    },
+    "types": "passed",
+    "lint": "passed, zero warnings",
+    "token_gate": "passed",
+    "production_build": "passed",
+    "frontend_only_production_build": "passed",
+    "playwright": {
+      "total": 217,
+      "expected": 217,
+      "passed": 217,
+      "failed": 0,
+      "skipped": 0,
+      "interrupted": 0,
+      "durationSeconds": 258.204,
+      "retries": 0
+    }
+  },
+  "ruff": {
+    "version": "0.8.0",
+    "changed_python_files": 2,
+    "status": "passed"
+  },
+  "foundational_references": "passed",
+  "secret_scan": "passed after staging",
+  "mcp_parity": {
+    "status": "passed",
+    "tools": 9,
+    "actions": 50,
+    "operations": 119
+  },
+  "fixture": "frontend/tests/fixtures/evidence_display_claims.json",
+  "receipt_email_scan": "passed after staging"
+}

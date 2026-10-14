@@ -1284,7 +1284,7 @@ class TestHttpVerbContract:
 
 def test_table_claim_display_never_changes_capture_search_or_provenance(client, db_session, rbac_on):
     """Only names/briefs are projections; every ledger read keeps the cited span."""
-    cases = json.loads((Path(__file__).parent / "fixtures/evidence_display_claims.json").read_text())["cases"]
+    cases = json.loads((Path(__file__).parents[1] / "frontend/tests/fixtures/evidence_display_claims.json").read_text())["cases"]
     case = cases[-1]  # A real multi-row table inside surrounding source prose.
     member = _user(db_session, "claim-display@example.test")
     _space, project = _space_project(db_session, member)
