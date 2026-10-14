@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2.0
+
+- Report list/get expose stored origins and readable source labels; list accepts origin filters. Home excludes duplicate mission reports.
+- Home activity exposes viewed state and a three-day new window. Activity summary adds completed_missions_new for the Missions results dot.
+- Fresh-installed stdio contract tests preserve origin, source names, viewed state and completion counts.
+
 ## 2.1.3
 
 - Replace the mission tool's incomplete output-schema example with a compilable

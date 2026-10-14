@@ -1,3 +1,4 @@
+import { activityTitleClass, ActivityDot } from "@/components/activity/ActivityState";
 import { PageContainer, PageHeader } from "@/components/ui/PageHeader";
 import { parseApiTimestamp } from "@/lib/api/timestamps";
 import Head from "next/head";
@@ -38,11 +39,10 @@ function Section({ title, count, children, link }: { title: string; count: numbe
 const TYPE_LABELS = { mission: "Mission", report: "Report", evidence: "Evidence" } as const;
 
 function ActivityRow({ item, onOpen, onViewed, busy }: { item: ActivityItem; onOpen: (item: ActivityItem) => void; onViewed: (item: ActivityItem) => void; busy: boolean }) {
-  return <li className="flex flex-wrap items-start gap-3 px-4 py-3" data-new={item.new || undefined}>
-    <span aria-hidden="true" className={`mt-2 h-2 w-2 shrink-0 rounded-full ${item.new ? "bg-accent" : "bg-transparent"}`} />
+  return <li className="flex flex-wrap items-start gap-3 px-4 py-3" data-new={item.new || undefined} data-viewed={item.viewed}>
     <div className="min-w-0 flex-1">
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-        <Link href={item.href} onClick={() => onOpen(item)} className="break-words font-medium text-foreground hover:text-accent-text">{item.title}</Link>
+        <Link href={item.href} onClick={() => onOpen(item)} className={`break-words hover:text-accent-text ${activityTitleClass(item)}`}><ActivityDot isNew={item.new} />{item.title}</Link>
         <span className="text-sm text-muted">{TYPE_LABELS[item.type]}</span>
         {item.status && <StatusBadge status={item.status} />}
         {item.new && <span className="rounded-full bg-accent px-2 py-0.5 text-sm font-medium text-on-accent">New</span>}
@@ -51,7 +51,7 @@ function ActivityRow({ item, onOpen, onViewed, busy }: { item: ActivityItem; onO
     </div>
     <div className="flex shrink-0 flex-col items-end gap-2 text-xs text-muted">
       <time dateTime={item.occurred_at}>{updated(item.occurred_at)}</time>
-      {item.new && <button type="button" disabled={busy} onClick={() => onViewed(item)} className="rounded border border-line px-2 py-1 text-secondary hover:bg-surface-alt disabled:opacity-50">Mark viewed</button>}
+      {!item.viewed && <button type="button" disabled={busy} onClick={() => onViewed(item)} className="rounded border border-line px-2 py-1 text-secondary hover:bg-surface-alt disabled:opacity-50">Mark viewed</button>}
     </div>
   </li>;
 }
@@ -80,11 +80,16 @@ function HomeContent() {
     return { type: item.type, id: item.id, occurred_at: item.occurred_at };
   }
   function open(item: ActivityItem) {
-    if (item.new) void markViewed([viewedItem(item)]);
+    if (!item.viewed) void markViewed([viewedItem(item)]);
   }
   async function viewed(item: ActivityItem) {
     setBusy(true);
-    try { await markViewed([viewedItem(item)]); await mutate(); } finally { setBusy(false); }
+    try {
+      if (await markViewed([viewedItem(item)])) {
+        setMore(current => current.map(row => row.type === item.type && row.id === item.id ? { ...row, viewed: true, new: false } : row));
+        await mutate();
+      }
+    } finally { setBusy(false); }
   }
   async function loadMore() {
     setMoreError(false);
@@ -111,7 +116,7 @@ function HomeContent() {
         <p><Link href="/missions" className="font-medium text-accent-text underline underline-offset-4">{data.missions.total.toLocaleString()} missions</Link> in your workspace · {data.missions.by_status.completed.toLocaleString()} completed</p>
         <div className="flex flex-wrap items-center gap-3"><p>Updated <time dateTime={data.generated_at}>{updated(data.generated_at)}</time> · refreshes every {data.refresh_seconds}s</p><button type="button" onClick={() => void mutate()} disabled={isValidating} className="rounded border border-line px-3 py-1.5 text-secondary disabled:opacity-50">{isValidating ? "Refreshing…" : "Refresh"}</button></div>
       </div>
-      <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+      <div className={`grid items-start gap-4 ${data.active_runs.total > 0 ? "xl:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]" : ""}`}>
         <Section title="Recent activity" count={data.activity.total} link={{ href: "/missions", label: "All missions" }}>
           <p className="border-b border-line px-4 py-3 text-xs text-muted">Newest first. {data.activity.new_total > 0 ? `${data.activity.new_total.toLocaleString()} new since you last looked.` : "Nothing new since you last looked."}</p>
           <ol className="divide-y divide-line" aria-label="Activity items">{[...data.activity.items, ...more].map((item) => <ActivityRow key={`${item.type}:${item.id}`} item={item} onOpen={open} onViewed={(target) => void viewed(target)} busy={busy} />)}</ol>
@@ -119,7 +124,7 @@ function HomeContent() {
           {moreError && <p role="alert" className="border-t border-line px-4 py-3 text-sm text-danger">More activity could not load. <button type="button" className="underline" onClick={() => void loadMore()}>Try again</button></p>}
           {data.activity.total > data.activity.items.length + more.length && <div className="border-t border-line px-4 py-3"><button type="button" onClick={() => void loadMore()} className="text-sm text-accent-text underline underline-offset-4">Show more</button><span className="ml-3 text-xs text-muted">Showing {data.activity.items.length + more.length} of {data.activity.total.toLocaleString()}</span></div>}
         </Section>
-        <Section title="Active missions" count={data.active_runs.total} link={{ href: "/missions?status=in_progress", label: "All running" }}>
+        {data.active_runs.total > 0 && <Section title="Active missions" count={data.active_runs.total} link={{ href: "/missions?status=in_progress", label: "All running" }}>
           <ul className="divide-y divide-line">{data.active_runs.items.map((mission) => <li key={mission.id} className="space-y-3 p-4">
             <Link href={`/missions/${mission.id}`} className="block break-words font-semibold hover:text-accent-text">{mission.title}</Link>
             <p className="text-sm text-secondary">{mission.progress.phase ? mission.progress.phase.replaceAll("_", " ") : "Phase not reported"}</p>
@@ -128,9 +133,8 @@ function HomeContent() {
             <p className="text-xs text-muted">{mission.started_at ? <>Started <time dateTime={mission.started_at}>{updated(mission.started_at)}</time></> : "Start time not reported"}</p>
             <Link href={`/missions/${mission.id}`} className="inline-block text-sm text-accent-text underline underline-offset-4">Inspect run</Link>
           </li>)}</ul>
-          {data.active_runs.total === 0 && <p className="p-4 text-sm text-secondary">No missions are running. You can start a new mission and return here to follow it.</p>}
           {data.active_runs.total > data.active_runs.items.length && <p className="border-t border-line p-4 text-xs text-muted">Showing {data.active_runs.items.length} of {data.active_runs.total} active missions.</p>}
-        </Section>
+        </Section>}
       </div>
       <div className="grid items-start gap-4 lg:grid-cols-2">
         <Recents title="Recent reports" data={data.recent_reports} href="/reports" />

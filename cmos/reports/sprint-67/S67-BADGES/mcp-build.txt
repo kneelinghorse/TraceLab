@@ -1,0 +1,3 @@
+
+> @aquex/tracelab-mcp@2.2.0 build
+> tsc

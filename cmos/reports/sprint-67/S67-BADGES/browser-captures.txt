@@ -1,0 +1,12 @@
+Running 4 tests using 1 worker
+
+(node:21733) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:21733) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [chromium] › tests/e2e/activity-state.spec.ts:81:7 › three row states and a clearable Missions dot in light at 390 (2.4s)
+  ✓  2 [chromium] › tests/e2e/activity-state.spec.ts:81:7 › three row states and a clearable Missions dot in light at 1440 (1.5s)
+  ✓  3 [chromium] › tests/e2e/activity-state.spec.ts:81:7 › three row states and a clearable Missions dot in dark at 390 (1.4s)
+  ✓  4 [chromium] › tests/e2e/activity-state.spec.ts:81:7 › three row states and a clearable Missions dot in dark at 1440 (1.5s)
+
+  4 passed (7.8s)

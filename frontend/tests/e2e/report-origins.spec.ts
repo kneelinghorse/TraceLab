@@ -38,7 +38,7 @@ async function fixtures(page: Page, theme: "light" | "dark", width: number) {
     const endpoint = url.pathname;
     let json: unknown = {};
     if (endpoint.endsWith("/auth/me")) json = { user_id: "reader", email: "reader@example.test", role: "admin" };
-    else if (endpoint.endsWith("/activity/summary")) json = { new_total: 0, by_type: { mission: 0, report: 0, evidence: 0 } };
+    else if (endpoint.endsWith("/activity/summary")) json = { completed_missions_new: 0, new_total: 0, by_type: { mission: 0, report: 0, evidence: 0 } };
     else if (endpoint.endsWith("/projects/project/stats")) json = { report_count: 2, document_count: 0, chunk_count: 0, total_tokens: 0 };
     else if (endpoint.endsWith("/projects/project")) json = project;
     else if (endpoint.endsWith("/projects")) json = { data: [project], pagination: { total: 1, page: 1, pages: 1 } };

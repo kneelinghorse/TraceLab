@@ -2,7 +2,7 @@
 export async function handleSmokeApiRequest(route, {api, base, directProduction, apiKey, transportErrors, suppressedWrites, fetchResponse = fetch}) {
     const incoming = new URL(route.request().url());
     const method = route.request().method();
-    const readOnly = method === 'GET' || (method === 'POST' && incoming.pathname === '/api/v1/pedr/search');
+    const readOnly = method === 'GET' || (method === 'POST' && ['/api/v1/pedr/search', '/api/v1/activity/state'].includes(incoming.pathname));
     const localWrite = method === 'PUT' && ['/api/v1/activity/viewed', '/api/v1/activity/viewed/evidence'].includes(incoming.pathname);
     try {
       if (directProduction) {

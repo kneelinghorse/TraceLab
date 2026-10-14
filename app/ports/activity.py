@@ -7,7 +7,7 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 
 from app.core.security import AuthenticatedUser
-from app.schemas.activity import ActivityPage, ActivitySummary, ViewedItem
+from app.schemas.activity import ActivityPage, ActivityStateItem, ActivityStateResponse, ActivitySummary, ViewedItem
 
 
 class ActivityRepository(Protocol):
@@ -16,6 +16,10 @@ class ActivityRepository(Protocol):
     ) -> ActivityPage: ...
 
     def summary(self, db: Session, user: AuthenticatedUser, *, now: datetime) -> ActivitySummary: ...
+
+    def state(
+        self, db: Session, user: AuthenticatedUser, items: list[ActivityStateItem], *, now: datetime
+    ) -> ActivityStateResponse: ...
 
     def mark_viewed(self, db: Session, user: AuthenticatedUser, items: list[ViewedItem], *, now: datetime) -> int: ...
 

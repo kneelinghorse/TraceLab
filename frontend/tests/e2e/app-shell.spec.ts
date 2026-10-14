@@ -21,7 +21,7 @@ test.beforeEach(async ({ page }) => {
       recent_reports: { total: 0, items: [] }, recent_projects: { total: 0, items: [] },
       evidence_activity: { total: 0, items: [] },
     };
-    else if (pathname.endsWith("/activity/summary")) body = { generated_at: "2026-09-13T00:00:00Z", new_total: 0, by_type: { mission: 0, report: 0, evidence: 0 } };
+    else if (pathname.endsWith("/activity/summary")) body = { generated_at: "2026-09-13T00:00:00Z", completed_missions_new: 0, new_total: 0, by_type: { mission: 0, report: 0, evidence: 0 } };
     else if (pathname.endsWith("/projects") || pathname.endsWith("/missions") || pathname.endsWith("/documents")) body = { data: [], pagination: { page: 1, page_size: 20, total: 0, pages: 1 } };
     else if (pathname.endsWith("/saved-searches")) body = { items: [] };
     else if (pathname.endsWith("/navigation/search")) body = { query: new URL(route.request().url()).searchParams.get("q"), groups: [] };
@@ -49,7 +49,7 @@ test("Home keeps viewed activity rows at AA contrast in the light theme", async 
   await page.emulateMedia({ colorScheme: "light" });
   const row = (id: string, isNew: boolean) => ({
     type: "evidence", id, title: `Evidence batch ${id}`, subtitle: "research-session-2026-09-15", status: null,
-    href: `/evidence?session_key=${id}`, occurred_at: "2026-09-15T15:57:27.375860", new: isNew,
+    href: `/evidence?session_key=${id}`, occurred_at: "2026-09-15T15:57:27.375860", new: isNew, viewed: !isNew,
   });
   // Viewed rows sit next to new ones; dimming them pushed their small muted text below the 4.5:1 floor.
   await page.route("**/api/v1/home", async route => route.fulfill({ json: {

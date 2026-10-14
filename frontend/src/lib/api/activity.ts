@@ -10,6 +10,7 @@ export interface ActivityItem {
   occurred_at: string;
   href: string;
   new: boolean;
+  viewed: boolean;
 }
 export interface ActivityPage {
   generated_at: string;
@@ -20,13 +21,16 @@ export interface ActivityPage {
   new_total: number;
   items: ActivityItem[];
 }
-export interface ActivitySummary { generated_at: string; new_total: number; by_type: Record<string, number> }
+export interface ActivitySummary { generated_at: string; new_total: number; by_type: Record<string, number>; completed_missions_new: number }
+export interface ActivityStateItem { type: "mission" | "report"; id: string }
+export interface ActivityItemState extends ActivityStateItem { viewed: boolean; new: boolean }
 export interface ViewedItem { type: ActivityType; id: string; occurred_at: string }
 /** Opening a project's evidence, or one run's, marks every group in that scope seen (BADGE-1). */
 export interface EvidenceGroupScope { project_id: string; mission_id?: string; session_key?: string }
 
 export const activityApi = {
   list: (params: { page?: number; page_size?: number } = {}) => httpClient.get<ActivityPage>("/activity", { params }),
+  state: (items: ActivityStateItem[]) => httpClient.post<{ items: ActivityItemState[] }>("/activity/state", { items }),
   summary: () => httpClient.get<ActivitySummary>("/activity/summary"),
   markViewed: (items: ViewedItem[]) => httpClient.put<{ viewed: number; new_total: number }>("/activity/viewed", { items }),
   markEvidenceViewed: (scope: EvidenceGroupScope) => httpClient.put<{ viewed: number; new_total: number }>("/activity/viewed/evidence", scope),
@@ -37,10 +41,6 @@ export const ACTIVITY_SECTIONS: Record<ActivityType, { label: string; href: stri
   report: { label: "Reports", href: "/reports" },
   evidence: { label: "Evidence", href: "/evidence" },
 };
-
-export function newBadgeName(label: string, count: number) {
-  return `${label}, ${count.toLocaleString()} new`;
-}
 
 /** The moment a mission last happened, matching the server's activity order. */
 export function missionOccurredAt(mission: { status: string; completed_at?: string | null; started_at?: string | null; queued_at?: string | null; created_at?: string; updated_at: string }) {

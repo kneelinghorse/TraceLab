@@ -1,7 +1,7 @@
 """Recency stream over missions, reports and evidence groups, scoped before counting."""
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from sqlalchemy import and_, case, func, or_
 from sqlalchemy.dialects.postgresql import insert as pg_insert
@@ -13,8 +13,18 @@ from app.models.evidence_ledger import LedgerEntry
 from app.models.mission import Mission
 from app.models.report import Report
 from app.models.user_item_view import UserItemView
-from app.schemas.activity import ActivityItem, ActivityPage, ActivitySummary, ViewedItem
+from app.schemas.activity import (
+    ActivityItem,
+    ActivityItemState,
+    ActivityPage,
+    ActivityStateItem,
+    ActivityStateResponse,
+    ActivitySummary,
+    ViewedItem,
+)
 from app.services.evidence_scope import evidence_activity_groups, evidence_href, scoped_query
+
+NEW_WINDOW = timedelta(days=3)
 
 EVIDENCE_NAMESPACE = uuid.UUID("2f6c0b7e-4b1a-4f6e-9a0c-6d3b1c9e7a51")
 
@@ -46,19 +56,25 @@ class SQLAlchemyActivityRepository:
         new = or_(view.item_id.is_(None), view.occurred_at < MISSION_OCCURRED_AT)
         return query, new
 
-    def _reports(self, db: Session, user: AuthenticatedUser):
+    def _reports(self, db: Session, user: AuthenticatedUser, *, include_mission: bool = False):
         view = aliased(UserItemView)
-        query = scoped_query(db, user, Report).filter(Report.origin != "mission").outerjoin(
+        query = scoped_query(db, user, Report).outerjoin(
             view, and_(view.user_id == user.user_id, view.item_type == "report", view.item_id == Report.id),
         )
+        if not include_mission:
+            query = query.filter(Report.origin != "mission")
         new = or_(view.item_id.is_(None), view.occurred_at < Report.updated_at)
         return query, new
 
-    def _evidence(self, db: Session, user: AuthenticatedUser, *, limit: int | None = None) -> list[ActivityItem]:
+    def _evidence(
+        self, db: Session, user: AuthenticatedUser, *, now: datetime, limit: int | None = None, recent_only: bool = False
+    ) -> list[ActivityItem]:
         groups = evidence_activity_groups(db, user).order_by(
             func.max(LedgerEntry.created_at).desc(), LedgerEntry.project_id, LedgerEntry.session_key,
             LedgerEntry.mission_id, LedgerEntry.origin,
         )
+        if recent_only:
+            groups = groups.having(func.max(LedgerEntry.created_at) >= now - NEW_WINDOW)
         rows = (groups.limit(limit) if limit else groups).all()
         viewed = dict(
             db.query(UserItemView.item_id, UserItemView.occurred_at)
@@ -74,7 +90,8 @@ class SQLAlchemyActivityRepository:
                 title=f"{g.entry_count:,} evidence entries · {_origin_label(g.origin)}",
                 subtitle=g.session_key, status=None, occurred_at=g.last_created_at,
                 href=evidence_href(g.project_id, g.mission_id, g.session_key),
-                new=seen is None or seen < g.last_created_at,
+                viewed=seen is not None and seen >= g.last_created_at,
+                new=(seen is None or seen < g.last_created_at) and g.last_created_at >= now - NEW_WINDOW,
             ))
         return items
 
@@ -97,13 +114,15 @@ class SQLAlchemyActivityRepository:
         )
         items = [
             ActivityItem(type="mission", id=r.id, title=r.title, subtitle=r.mission_id, status=r.status,
-                         occurred_at=r.occurred_at, href=f"/missions/{r.id}", new=bool(r.new))
+                         occurred_at=r.occurred_at, href=f"/missions/{r.id}",
+                         viewed=not r.new, new=bool(r.new) and r.occurred_at >= now - NEW_WINDOW)
             for r in mission_rows
         ] + [
             ActivityItem(type="report", id=r.id, title=r.title, subtitle=None, status=r.status,
-                         occurred_at=r.updated_at, href=f"/reports/{r.id}", new=bool(r.new))
+                         occurred_at=r.updated_at, href=f"/reports/{r.id}",
+                         viewed=not r.new, new=bool(r.new) and r.updated_at >= now - NEW_WINDOW)
             for r in report_rows
-        ] + self._evidence(db, user, limit=window)
+        ] + self._evidence(db, user, now=now, limit=window)
         items.sort(key=lambda i: (i.occurred_at, i.type, str(i.id)), reverse=True)
         total = missions.count() + reports.count() + evidence_activity_groups(db, user).count()
         summary = self.summary(db, user, now=now)
@@ -116,11 +135,33 @@ class SQLAlchemyActivityRepository:
         missions, mission_new = self._missions(db, user)
         reports, report_new = self._reports(db, user)
         by_type = {
-            "mission": missions.filter(mission_new).count(),
-            "report": reports.filter(report_new).count(),
-            "evidence": sum(1 for item in self._evidence(db, user) if item.new),
+            "mission": missions.filter(mission_new, now - NEW_WINDOW <= MISSION_OCCURRED_AT).count(),
+            "report": reports.filter(report_new, Report.updated_at >= now - NEW_WINDOW).count(),
+            "evidence": sum(1 for item in self._evidence(db, user, now=now, recent_only=True) if item.new),
         }
-        return ActivitySummary(generated_at=now, new_total=sum(by_type.values()), by_type=by_type)
+        return ActivitySummary(
+            generated_at=now, new_total=sum(by_type.values()), by_type=by_type,
+            completed_missions_new=missions.filter(
+                mission_new, Mission.status == "completed", Mission.completed_at >= now - NEW_WINDOW,
+            ).count(),
+        )
+
+    def state(
+        self, db: Session, user: AuthenticatedUser, items: list[ActivityStateItem], *, now: datetime
+    ) -> ActivityStateResponse:
+        states = {}
+        for item_type, model, occurred in [("mission", Mission, MISSION_OCCURRED_AT), ("report", Report, Report.updated_at)]:
+            ids = [item.id for item in items if item.type == item_type]
+            if not ids:
+                continue
+            query, unseen = self._missions(db, user) if item_type == "mission" else self._reports(db, user, include_mission=True)
+            rows = query.filter(model.id.in_(ids)).with_entities(model.id, occurred.label("occurred"), unseen.label("unseen")).all()
+            for row in rows:
+                states[(item_type, row.id)] = ActivityItemState(
+                    type=item_type, id=row.id, viewed=not row.unseen,
+                    new=bool(row.unseen) and row.occurred >= now - NEW_WINDOW,
+                )
+        return ActivityStateResponse(items=[states[(i.type, i.id)] for i in items if (i.type, i.id) in states])
 
     def mark_evidence_groups_viewed(
         self,
@@ -165,7 +206,7 @@ class SQLAlchemyActivityRepository:
         if report_ids:
             rows = scoped_query(db, user, Report).with_entities(Report.id).filter(Report.id.in_(report_ids)).all()
             readable.update(("report", r[0]) for r in rows)
-        evidence_ids = {item.id for item in self._evidence(db, user)}
+        evidence_ids = {item.id for item in self._evidence(db, user, now=now)}
         readable.update(("evidence", i.id) for i in items if i.type == "evidence" and i.id in evidence_ids)
         values = {}
         for item in items:

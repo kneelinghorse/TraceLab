@@ -58,7 +58,7 @@ Version 2.1.0 exposes nine action-clustered tools / 50 actions:
 | `tracelab_home` | `snapshot`, `favorites`, `activity`, `activity_summary` |
 
 
-Sprint 67's report changes are scheduled for the single **2.2.0** publish at the end of S67-BADGES. `tracelab_report.list` accepts an optional `origin` array (`mission`, `written`, `librarian`, `agent_brief`); omitting it keeps all reports. List/get return the stored origin and caller-scoped origin labels. Source records include readable names and links, with unavailable source identities redacted. The UI requests `["written", "librarian"]` by default. Home's recent reports and report activity exclude mission copies, whose missions already appear in activity.
+**2.2.0** carries Sprint 67's report origins and activity state. `tracelab_report.list` accepts an optional `origin` array (`mission`, `written`, `librarian`, `agent_brief`); omitting it keeps all reports. List/get return the stored origin and caller-scoped origin labels. Source records include readable names and links, with unavailable source identities redacted. The UI requests `["written", "librarian"]` by default. Home's recent reports and report activity exclude mission copies, whose missions already appear in activity.
 
 Sprint 52 additions ship in **1.2.0**, the single publish that decision #425
 called for after every Sprint 52 MCP change landed. Installing 1.1.1 from npm
@@ -118,3 +118,7 @@ and SHA-256, semantic compiler revision and pinned source revision in both summa
 and full output. It is a structural plan; worker deployment is a separate gate.
 See the repository's `cmos/contracts/mission-authoring-contract.md` for the complete
 field map. Explicit save, preview and submit remain separate actions.
+
+`tracelab_home.activity` and `snapshot.activity` preserve `viewed` and `new` per item. New means unviewed and occurred within three days; older unseen items remain in the stream. `activity_summary.by_type` and `new_total` use that window, while `completed_missions_new` counts only unviewed completions by `completed_at` and drives the Missions sidebar dot. No sidebar counts are shown.
+
+The UI-only `POST /activity/state` reads `{items: [{type: "mission" | "report", id}]}` (1–200 items) and returns `{items: [{type, id, viewed, new}]}` for currently readable items, in request order. Missing and inaccessible IDs are omitted alike. It never writes a watermark; `MissionResponse` and `ReportListItem` remain unchanged. Opening an item still uses the existing viewed endpoint.

@@ -1,9 +1,7 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-import { NewBadge } from "@/components/NewBadge";
 import { useRole } from "@/contexts/RoleContext";
-import { newBadgeName } from "@/lib/api/activity";
 import { useActivitySummary } from "@/lib/hooks/useActivitySummary";
 
 export type NavigationItem = { label: string; href: string; icon: string };
@@ -70,7 +68,7 @@ export function Navigation({ onNavigate }: { onNavigate?: () => void }) {
   const { pathname } = useRouter();
   const { isAdmin } = useRole();
   const { data: summary } = useActivitySummary();
-  const counts: Record<string, number> = { "/missions": summary?.by_type?.mission ?? 0, "/evidence": summary?.by_type?.evidence ?? 0, "/reports": summary?.by_type?.report ?? 0 };
+  const newResults = (summary?.completed_missions_new ?? 0) > 0;
   const groups = navigationGroups.filter((group) => !group.admin || isAdmin);
   const active = activeNavigationItem(pathname, groups.flatMap((group) => group.items));
   return (
@@ -79,8 +77,8 @@ export function Navigation({ onNavigate }: { onNavigate?: () => void }) {
         <div key={group.label || "home"}>
           {group.label && <p className="app-nav-group">{group.label}</p>}
           {group.items.map((item) => (
-            <Link key={item.href} href={item.href} className="app-nav-link" aria-current={active?.href === item.href ? "page" : undefined} aria-label={counts[item.href] > 0 ? newBadgeName(item.label, counts[item.href]) : undefined} onClick={onNavigate}>
-              <NavigationIcon name={item.icon} /><span>{item.label}</span>{counts[item.href] > 0 && <NewBadge total={counts[item.href]} className="ml-auto" />}
+            <Link key={item.href} href={item.href} className="app-nav-link" aria-current={active?.href === item.href ? "page" : undefined} aria-label={item.href === "/missions" && newResults ? "Missions, new results" : undefined} onClick={onNavigate}>
+              <NavigationIcon name={item.icon} /><span>{item.label}</span>{item.href === "/missions" && newResults && <span aria-hidden="true" data-testid="new-results-dot" className="ml-auto h-2 w-2 shrink-0 rounded-full bg-accent" />}
             </Link>
           ))}
         </div>

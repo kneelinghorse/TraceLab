@@ -1,0 +1,31 @@
+{
+  "result": {
+    "status": "passed",
+    "passed": 172,
+    "skipped": 3,
+    "failed": 0,
+    "warnings": 16,
+    "seconds": 98.42,
+    "skipped_tests": [
+      {
+        "test": "tests.integration.test_e2e_rbac_live.test_live_rbac_matrix",
+        "reason": "set RBAC_VERIFY_BASE_URL to run against a live deploy"
+      },
+      {
+        "test": "tests.integration.test_ingestion_flow.test_markdown_cli_flow",
+        "reason": "CLI subprocess requires running server with auth \u2014 not available in test environment"
+      },
+      {
+        "test": "tests.integration.test_qdrant_isolation.test_disposable_qdrant_cache_round_trip",
+        "reason": "Requires --disposable-qdrant and local Docker"
+      }
+    ]
+  },
+  "performance": [
+    "baseline GET /api/v1/auth/me p95 = 3.2 ms",
+    "home: p95 25.5 ms, delta +22.3 ms (budget 150 ms), status 200",
+    "activity_summary: p95 17.7 ms, delta +14.5 ms (budget 75 ms), status 200",
+    "graph_stats: p95 6.9 ms, delta +3.7 ms (budget 75 ms), status 200",
+    "graph_neighborhood: p95 21.5 ms, delta +18.3 ms (budget 150 ms), status 200"
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "tool": "playwright",
+  "generatedAt": "2026-10-14T03:21:48.566Z",
+  "completedAt": "2026-10-14T03:21:56.161Z",
+  "status": "passed",
+  "summary": {
+    "total": 4,
+    "expected": 4,
+    "passed": 4,
+    "failed": 0,
+    "skipped": 0,
+    "interrupted": 0,
+    "durationSeconds": 7.595,
+    "retries": 0
+  },
+  "environment": {
+    "node": "v24.6.0",
+    "ci": {
+      "provider": null
+    },
+    "projects": [
+      "chromium"
+    ],
+    "browsers": []
+  },
+  "tests": [
+    {
+      "title": "three row states and a clearable Missions dot in light at 390",
+      "file": "frontend/tests/e2e/activity-state.spec.ts",
+      "line": 81,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 2391,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "three row states and a clearable Missions dot in light at 1440",
+      "file": "frontend/tests/e2e/activity-state.spec.ts",
+      "line": 81,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 1546,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "three row states and a clearable Missions dot in dark at 390",
+      "file": "frontend/tests/e2e/activity-state.spec.ts",
+      "line": 81,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 1395,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "three row states and a clearable Missions dot in dark at 1440",
+      "file": "frontend/tests/e2e/activity-state.spec.ts",
+      "line": 81,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 1476,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    }
+  ],
+  "artifactPath": "/tmp/s67-badges-browser-capture-telemetry.json"
+}

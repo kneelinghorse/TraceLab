@@ -1,0 +1,40 @@
+{
+  "red_tests": "Three new tests failed against old behavior (7 instead of6 mission new count, state404, old evidence count2 instead of1); initial evidence fixture duplicated a unique source, fixed before the clean three-failure red run.",
+  "targeted": "15 activity/home tests pass after implementation.",
+  "frontend": "First388 unit passed; expanded loaded-page seen-state and read-only transport tests then final391 passed. An attempted next lint invocation was invalid in this repository; corrected to its eslint . --max-warnings=0 command, which passed.",
+  "browser": "205 full enumerated cases pass; added unobscured Home captures and reran all4 activity-state cases (20 screenshots).",
+  "skips": "Existing4 backend skips and12 documented quarantine deselections retained; reasons in testing-summary.json.",
+  "integration_initial": {
+    "passed": 171,
+    "failed": 1,
+    "skipped": 3,
+    "reason": "Route coverage inventory required POST/activity/state in the anonymous RBAC probe list; added the route and its pinned inventory assertion, without weakening the gate."
+  },
+  "isolated_harness_attempt": "63passed/2failed: expected old route-list assertion and an existing singleton/order dependency that attempted Qdrant construction without a disposable fixture; isolation guard rejected it. No production Qdrant call. Re-run the exact full CI command after updating the route inventory, then the full integration suite sequentially.",
+  "integration_final": {
+    "status": "passed",
+    "passed": 172,
+    "skipped": 3,
+    "failed": 0,
+    "warnings": 16,
+    "seconds": 98.42,
+    "skipped_tests": [
+      {
+        "test": "tests.integration.test_e2e_rbac_live.test_live_rbac_matrix",
+        "reason": "set RBAC_VERIFY_BASE_URL to run against a live deploy"
+      },
+      {
+        "test": "tests.integration.test_ingestion_flow.test_markdown_cli_flow",
+        "reason": "CLI subprocess requires running server with auth \u2014 not available in test environment"
+      },
+      {
+        "test": "tests.integration.test_qdrant_isolation.test_disposable_qdrant_cache_round_trip",
+        "reason": "Requires --disposable-qdrant and local Docker"
+      }
+    ]
+  },
+  "backend_final": "3188 passed, 4 skipped, 12 documented deselections, 49 warnings; 493.69 seconds. Exact workflow command with isolated Qdrant.",
+  "report_copy_acknowledgement": "New regression test failed before the fix: opening a mission-result copy title navigates to the mission without acknowledging the report. Added title acknowledgement; final frontend 392 tests across 47 files pass, with typecheck, ESLint, color gate and production build all passed.",
+  "parity_final": "Added Reports list to the viewed-watermark consumer inventory after the acknowledgement fix.",
+  "browser_final": "All 205 workflow-enumerated cases passed after the report-copy acknowledgement fix; no skips or retries; 3.7 minutes."
+}

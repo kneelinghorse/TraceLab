@@ -337,7 +337,7 @@ the web UI by decision #426; the MCP never performs them on the user's behalf.
 | `tracelab_report.update` | `PUT /reports/{id}`. Required `report_id` plus `title` and/or `status` (`draft` or `final`). |
 | `tracelab_project.neighborhood` | `GET /graph/neighborhood`. Required `root_type` (project/document/mission/report/collection/evidence) and `root_id`. Optional `depth` (1, max 2), `per_relation_limit` (12, max 50), `max_nodes` (60, max 150). Nodes carry canonical links; groups carry server totals. |
 
-### Report origins (Sprint 67; scheduled for 2.2.0)
+### Report origins (2.2.0)
 
 `tracelab_report.list` accepts an optional `origin` array with `mission`, `written`,
 `librarian` and `agent_brief`. Omit it to keep all artifacts, or use
@@ -358,8 +358,8 @@ section of `tracelab_home.snapshot` (which now carries `activity`).
 
 | Action | Route and parameters |
 | --- | --- |
-| `tracelab_home.activity` | `GET /activity`. Optional `page` (1), `page_size` (20, max 100). Missions, reports and evidence in one recency order; each item has `type`, `id`, `title`, `subtitle`, `status`, `occurred_at`, `href`, `url` and a caller-relative `new` flag. Server `total` and `new_total` are preserved. |
-| `tracelab_home.activity_summary` | `GET /activity/summary`. No parameters. `new_total` and `by_type` counts. |
+| `tracelab_home.activity` | `GET /activity`. Optional `page` (1), `page_size` (20, max 100). Missions, reports and evidence in one recency order; each item has `type`, `id`, `title`, `subtitle`, `status`, `occurred_at`, `href`, `url` and caller-relative `viewed` and `new` flags. `new` means unviewed and occurred within the last three days; older unseen items remain `viewed: false, new: false`. Server `total` and `new_total` are preserved. |
+| `tracelab_home.activity_summary` | `GET /activity/summary`. No parameters. `new_total` and `by_type` count unviewed items within three days. `completed_missions_new` counts only unviewed completed missions whose `completed_at` is within three days; it drives the Missions sidebar dot. |
 
 Marking activity as viewed (`PUT /activity/viewed`) stays in the web UI.
 

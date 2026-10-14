@@ -20,7 +20,7 @@ test.beforeEach(async ({ page }) => {
     else if (pathname.endsWith("/auth/api-keys")) body = { total: 1, keys: [{ id: "key-1", name: keyName, key_prefix: "fixture", created_at: "2026-10-13T02:30:00", last_used_at: "2026-10-13T04:30:00", expires_at: null }] };
     else if (pathname.endsWith("/auth/invite-codes")) body = { total: 1, codes: [{ id: "invite-1", code: "DEMO2026", status: "unused", created_at: "2026-10-13T03:30:00", used_at: null, expires_at: null }] };
     else if (pathname.endsWith("/spaces")) body = [];
-    else if (pathname.endsWith("/activity/summary")) body = { generated_at: "2026-10-13T05:30:00Z", new_total: 0, by_type: { mission: 0, report: 0, evidence: 0 } };
+    else if (pathname.endsWith("/activity/summary")) body = { generated_at: "2026-10-13T05:30:00Z", completed_missions_new: 0, new_total: 0, by_type: { mission: 0, report: 0, evidence: 0 } };
     await route.fulfill({ json: body });
   });
 });

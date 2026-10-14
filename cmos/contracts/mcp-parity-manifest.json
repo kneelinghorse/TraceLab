@@ -1834,7 +1834,7 @@
       "id": "frontend/src/lib/api/activity.ts#activityApi.list:GET:/activity",
       "api_file": "frontend/src/lib/api/activity.ts",
       "operation": "activityApi.list",
-      "source_line": 29,
+      "source_line": 32,
       "method": "GET",
       "path": "/api/v1/activity",
       "live": true,
@@ -1844,20 +1844,21 @@
       "mcp": "tracelab_home.activity",
       "classification": "covered",
       "baseline": "act-1-read",
-      "rationale": "ACT-1 (decision #459): GET /activity with page and page_size; one recency-ordered stream of missions, reports and evidence with server total/new_total and hrefs preserved; requires a human credential. Replaces the closed inbox_list and attention reads."
+      "rationale": "ACT-1 (decision #459): GET /activity with page and page_size; one recency-ordered stream of missions, reports and evidence with server total/new_total and hrefs preserved; requires a human credential. Replaces the closed inbox_list and attention reads. S67-BADGES adds viewed and limits new to the last three days."
     },
     {
       "id": "frontend/src/lib/api/activity.ts#activityApi.markViewed:PUT:/activity/viewed",
       "api_file": "frontend/src/lib/api/activity.ts",
       "operation": "activityApi.markViewed",
-      "source_line": 31,
+      "source_line": 35,
       "method": "PUT",
       "path": "/api/v1/activity/viewed",
       "live": true,
       "ui_consumers": [
         "frontend/src/pages/index.tsx",
         "frontend/src/pages/missions/[id].tsx",
-        "frontend/src/pages/reports/[id].tsx"
+        "frontend/src/pages/reports/[id].tsx",
+        "frontend/src/pages/reports/index.tsx"
       ],
       "mcp": null,
       "classification": "rest-only-by-design",
@@ -1868,7 +1869,7 @@
       "id": "frontend/src/lib/api/activity.ts#activityApi.markEvidenceViewed:PUT:/activity/viewed/evidence",
       "api_file": "frontend/src/lib/api/activity.ts",
       "operation": "activityApi.markEvidenceViewed",
-      "source_line": 32,
+      "source_line": 36,
       "method": "PUT",
       "path": "/api/v1/activity/viewed/evidence",
       "live": true,
@@ -1885,7 +1886,7 @@
       "id": "frontend/src/lib/api/activity.ts#activityApi.summary:GET:/activity/summary",
       "api_file": "frontend/src/lib/api/activity.ts",
       "operation": "activityApi.summary",
-      "source_line": 30,
+      "source_line": 34,
       "method": "GET",
       "path": "/api/v1/activity/summary",
       "live": true,
@@ -1897,7 +1898,7 @@
       "mcp": "tracelab_home.activity_summary",
       "classification": "covered",
       "baseline": "act-1-read",
-      "rationale": "ACT-1 (decision #459): GET /activity/summary; new_total and by_type counts behind the caller's viewed watermark; requires a human credential. Replaces the closed inbox_summary read."
+      "rationale": "S67-BADGES: by_type and new_total count unviewed items within three days; completed_missions_new counts recent completed_at only for the Missions dot. Human credential required."
     },
     {
       "id": "frontend/src/lib/api/spaces.ts#spacesApi.list:GET:/spaces",
@@ -2156,6 +2157,23 @@
       "classification": "rest-only-by-design",
       "baseline": "auth-admin",
       "rationale": "AUTH-1: public credential recovery is REST/UI-only; tokens and password-setting actions are never MCP tools."
+    },
+    {
+      "id": "frontend/src/lib/api/activity.ts#activityApi.state:POST:/activity/state",
+      "api_file": "frontend/src/lib/api/activity.ts",
+      "operation": "activityApi.state",
+      "source_line": 33,
+      "method": "POST",
+      "path": "/api/v1/activity/state",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/missions/index.tsx",
+        "frontend/src/pages/reports/index.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "s67-badges-state-read",
+      "rationale": "Decision625: a caller-relative visible-page seen-state batch for the Missions and Reports UI. MCP receives viewed/new through tracelab_home activity; mission/report response contracts stay unchanged. This POST is read-only and omits inaccessible/missing IDs."
     }
   ]
 }

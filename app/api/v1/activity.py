@@ -8,6 +8,8 @@ from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.dependencies import get_activity_service
 from app.schemas.activity import (
     ActivityPage,
+    ActivityStateRequest,
+    ActivityStateResponse,
     ActivitySummary,
     EvidenceGroupViewedRequest,
     MarkViewedRequest,
@@ -40,6 +42,19 @@ def activity_summary(
 ) -> ActivitySummary:
     response.headers["Cache-Control"] = "private, no-store"
     return service.summary(db, user)
+
+
+@router.post("/state", response_model=ActivityStateResponse)
+def activity_state(
+    request: ActivityStateRequest,
+    response: Response,
+    db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
+    service: ActivityService = Depends(get_activity_service),
+) -> ActivityStateResponse:
+    """Read caller-relative state for a visible page without changing any watermark."""
+    response.headers["Cache-Control"] = "private, no-store"
+    return service.state(db, user, request.items)
 
 
 @router.put("/viewed", response_model=MarkViewedResponse)
