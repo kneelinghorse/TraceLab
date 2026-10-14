@@ -39,6 +39,14 @@
       "new": 0
     }
   },
-  "registry_publication": "Interactive npm publish launched; browser authentication pending",
-  "recorded_at": "2026-10-14T04:01:35.146682+00:00"
+  "registry_publication": {
+    "version": "2.2.0",
+    "status": "published and verified",
+    "fresh_stdio_checks": 71,
+    "byte_identical": true,
+    "verified_at": "2026-10-14T04:13:10.904544+00:00"
+  },
+  "recorded_at": "2026-10-14T04:01:35.146682+00:00",
+  "post_deploy_receipt_commit": "1b88a86",
+  "post_deploy_staged_files": 26
 }

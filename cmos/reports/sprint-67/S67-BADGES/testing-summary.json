@@ -87,7 +87,7 @@
     "empty_directory": true,
     "empty_cache": true,
     "version": "2.2.0",
-    "registry_publish": "pending merge,deploy and npm browser sign-in"
+    "registry_publish": "Published 2.2.0 after Derek browser approval; empty-directory/empty-cache registry install passed 71 stdio checks and registry tarball is byte-identical to tested pack."
   },
   "ruff": {
     "version": "0.8.0",

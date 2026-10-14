@@ -1,0 +1,16 @@
+{
+  "verified_at": "2026-10-14T04:13:10.904544+00:00",
+  "version": "2.2.0",
+  "installed_from": "@aquex/tracelab-mcp@2.2.0",
+  "install_directory": "/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/s67-badges-registry-3ukjd2vf/install",
+  "install_cache_initially_empty": true,
+  "download_cache_initially_empty": true,
+  "registry_tarball": "/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/s67-badges-registry-3ukjd2vf/download/aquex-tracelab-mcp-2.2.0.tgz",
+  "tested_tarball": "/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/s67-badges-release-awfuzhgt/aquex-tracelab-mcp-2.2.0.tgz",
+  "sha512": "f5599aeb09b743336c3eaccd043345d592fc7e531ed589eb2b7c8707361140f56dc6ed91674f93a986b4ab278314003713c4249c6831d49f6d6a47d236a48801",
+  "integrity": "sha512-9Vma6wm3QzNsPqzNBDNF1ZL8flMe1YnrK3yHBzYRQPVtxu2RZ0+TqYa0qyeDFAA3E8QknGgx1J9takfSNqSIAQ==",
+  "byte_identical": true,
+  "fresh_stdio_checks": 71,
+  "generated_links": 73,
+  "http_requests": 72
+}

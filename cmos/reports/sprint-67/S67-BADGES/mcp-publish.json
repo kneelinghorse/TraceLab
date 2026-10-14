@@ -1,0 +1,11 @@
+{
+  "package": "@aquex/tracelab-mcp",
+  "version": "2.2.0",
+  "command": "npm publish <retained tested tarball> --auth-type=web",
+  "browser_approved": true,
+  "exit_code": 0,
+  "output": "npm notice Your package is being processed and may take a few minutes to become available.\n+ @aquex/tracelab-mcp@2.2.0",
+  "registry_verification": "Passed: registry-verification.json and registry-stdio.json",
+  "recorded_at": "2026-10-14T04:07:22.403272+00:00",
+  "registry_published_at": "2026-10-14T04:08:55.461Z"
+}
