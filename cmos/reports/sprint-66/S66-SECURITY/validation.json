@@ -80,8 +80,15 @@
       "result": "passed"
     },
     {
-      "command": "Exact 13 specs enumerated by frontend-production-build.yml, served by next start from CI=1 clean production-only build, workers=1",
-      "result": "97 passed, 0 skipped, 0 retries in 141.663 seconds; browser-checks.json. Repeated after declaring build dependencies explicitly."
+      "command": "The 13 specs then enumerated by frontend-production-build.yml (true at this mission's merge, 381a3aa), served by next start from CI=1 clean production-only build, workers=1",
+      "result": "97 passed, 0 skipped, 0 retries in 141.663 seconds; browser-checks.json. Repeated after declaring build dependencies explicitly.",
+      "original_claim": "Exact 13 specs enumerated by frontend-production-build.yml, served by next start from CI=1 clean production-only build, workers=1",
+      "corrected_at_sprint_close": {
+        "date": "2026-10-13",
+        "session": "Sprint 66 close, 2026-10-13 (Claude Code closeout on branch sprint-66-close)",
+        "superseded_by": "PR #422 (87d2313, S66-TESTS)",
+        "why": "S66-TESTS enumerated nine more specs; the workflow lists 22 at HEAD. The 97-case result stands for the 13-spec list as it was."
+      }
     },
     {
       "command": ".venv/bin/python scripts/run_pytest.py --timeout-seconds240 -- --quiet tests/test_missions_api.py",

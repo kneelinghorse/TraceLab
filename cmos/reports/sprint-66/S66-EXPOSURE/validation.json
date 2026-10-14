@@ -2,7 +2,7 @@
   "mission": "S66-EXPOSURE",
   "date": "2026-10-13",
   "baseline_commit": "7c740a6e6e0f233ce920e1c070db540497d89161",
-  "status": "local acceptance complete; PR CI and merge/deploy verification pending",
+  "status": "complete: merged as dffbf7d (PR #417); all main workflows and the post-deploy check passed",
   "tools": {
     "gitleaks": "8.30.1",
     "tesseract": "5.5.3",
@@ -696,5 +696,12 @@
     "Gitleaks and OCR are detection tools, not a proof that every conceivable secret or personal identifier is absent.",
     "History remains reachable as authorized; this mission cleans the current tree.",
     "GitHub CI and merge/deploy verification are recorded in the mission completion record after they actually run."
-  ]
+  ],
+  "status_original_claim": "local acceptance complete; PR CI and merge/deploy verification pending",
+  "status_corrected_at_sprint_close": {
+    "date": "2026-10-13",
+    "session": "Sprint 66 close, 2026-10-13 (Claude Code closeout on branch sprint-66-close)",
+    "superseded_by": "PR #417 merge (dffbf7d) and its main CI",
+    "why": "The receipt was committed before merge; the pending verification has since passed."
+  }
 }
