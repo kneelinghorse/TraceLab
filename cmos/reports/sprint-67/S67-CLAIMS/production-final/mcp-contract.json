@@ -1,0 +1,72 @@
+{
+  "checkedAt": "2026-10-14T08:46:54.764Z",
+  "api": "https://api.tracelab.aquex.ai",
+  "entrypoint": "/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/s67-badges-registry-3ukjd2vf/install/node_modules/@aquex/tracelab-mcp/dist/index.js",
+  "readOnly": true,
+  "checks": [
+    {
+      "action": "tracelab_evidence.get",
+      "entry_id": "a9d0c59f-2bf1-4973-a0da-bb2abc9f4a00",
+      "rawClaimUnchanged": true
+    },
+    {
+      "action": "tracelab_evidence.get",
+      "entry_id": "5d5890f4-9ede-4962-b753-8c6697c29187",
+      "rawClaimUnchanged": true
+    },
+    {
+      "action": "tracelab_evidence.get",
+      "entry_id": "839169f1-2874-43bb-93aa-1d9d728a449e",
+      "rawClaimUnchanged": true
+    },
+    {
+      "action": "tracelab_evidence.get",
+      "entry_id": "4ccde08a-aa39-446f-a570-e2139d710f0f",
+      "rawClaimUnchanged": true
+    },
+    {
+      "action": "tracelab_evidence.get",
+      "entry_id": "2825d7ac-b8ef-4568-8b93-cbd24fa16678",
+      "rawClaimUnchanged": true
+    },
+    {
+      "action": "tracelab_evidence.get",
+      "entry_id": "6359ca68-f7fd-49f7-8608-3ebaf84f034e",
+      "rawClaimUnchanged": true
+    },
+    {
+      "action": "tracelab_evidence.get",
+      "entry_id": "e03e260e-7be9-4cd3-8932-343f48cbe913",
+      "rawClaimUnchanged": true
+    },
+    {
+      "action": "tracelab_evidence.get",
+      "entry_id": "9a9f1a9c-5f74-43f2-8149-20a38d641ccf",
+      "rawClaimUnchanged": true
+    },
+    {
+      "action": "tracelab_evidence.get",
+      "entry_id": "543010ee-a6b7-4dfc-975a-d81ce442b337",
+      "rawClaimUnchanged": true
+    },
+    {
+      "action": "tracelab_evidence.get",
+      "entry_id": "69d92a7d-3ece-49eb-a4e9-483ce8bbb5fe",
+      "rawClaimUnchanged": true
+    },
+    {
+      "action": "tracelab_evidence.get",
+      "entry_id": "f85b3967-f7a0-4507-a311-99ec41bb071b",
+      "rawClaimUnchanged": true
+    },
+    {
+      "action": "tracelab_project.neighborhood",
+      "readableRootAndNode": true
+    },
+    {
+      "action": "tracelab_search.navigate",
+      "rawQueryMatched": true,
+      "readableTitle": true
+    }
+  ]
+}

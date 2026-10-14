@@ -1,0 +1,12 @@
+{
+  "completedAt": "2026-10-14T08:47:19.867Z",
+  "passed": true,
+  "captures": 16,
+  "readOnly": true,
+  "servingCommit": "707b08b3f5cf426232f49f17dd3d549ef2f2f2cd",
+  "visuallyReviewed": 16,
+  "reviewedAt": "2026-10-14T08:47:41.881250+00:00",
+  "visualFindings": "Readable claim on card, detail heading, graph root and palette at1440/390 in both themes; wrapping stays within viewport. Exact cited snippet remains verbatim.",
+  "mcpChecks": 13,
+  "publishedMcpVersion": "2.2.0"
+}
