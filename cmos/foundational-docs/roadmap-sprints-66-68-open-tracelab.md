@@ -80,7 +80,7 @@ Receipts: `cmos/reports/sprint-66/`. The mission completion records hold the run
 
 ---
 
-## Sprint 67 — The UX pass (planned 2026-10-13; target 2026-10-14 to 2026-10-15)
+## Sprint 67 — The UX pass (opened 2026-10-14 UTC; target close 2026-10-15)
 
 **Goal:** an invited person on Monday finds TraceLab calm, dense and obvious:
 - no counts they can't clear;
@@ -423,7 +423,7 @@ The composer starts far down the page.
 2. A dedicated temporary test account signs up with it. Its credentials stay private, outside the repository, as in WALK-3 (decision #559).
 3. Home's empty state, then a new project.
 4. The Librarian conversation drafts a mission.
-5. The mission is submitted and runs once on DeepSearch. This is one paid run, and it needs Derek's go.
+5. The mission is submitted and runs on DeepSearch. Derek approved paid runs as needed (decision #628).
 6. It opens on its Results.
 7. Its Evidence and its Reports entry under "Mission results".
 8. The mission-complete email arrives.
@@ -539,6 +539,8 @@ Add to this list rather than resolving items silently. Questions 1–4 were answ
 ---
 
 ## Change Log
+
+- **2026-10-14 UTC, Sprint 67 opened for a fresh build session.** Derek approved the scope (decision #627) and paid DeepSearch runs as needed (decision #628): "yes, we can run as many paid deepseek runs as needed, all approved." The identity was synchronised to `sprint-67-active`. S67-DENSITY reads In Progress from planning: a promotion to Current started it instead (learning #311). Its notes record that no build work has begun. Build in roadmap order. The record's work queue lists missions alphabetically.
 
 - **2026-10-13 UTC, Sprint 67 planned from Derek's UX feedback.** Seven missions, in order: DENSITY, REPORTS, BADGES, MISSION, LIBRARIAN, CLAIMS and WALK. Derek's answers: a dot on Missions only; "new" lasts 3 days; the Librarian is conversation-first, with tools in a chooser; Reports is cleaned up now. His last answer overrode a proposed deferral ("STOP DEFERRING"). A read-only production count found 451 of 512 reports are automatic copies of mission results. An independent critic returned NEEDS-REVISION with five blocking findings, all fixed before the plan was recorded.
 
