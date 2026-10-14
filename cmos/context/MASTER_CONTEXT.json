@@ -3,7 +3,7 @@
     "name": "TraceLab",
     "version": "0.0.0",
     "description": "Research knowledge management platform with PEDR search pipeline, mission orchestration, and DeepSearch integration.",
-    "status": "sprint-66-complete",
+    "status": "sprint-67-active",
     "start_date": "2025-01-01",
     "deployment": {
       "platform": "FastAPI + PostgreSQL + Qdrant",
@@ -266,8 +266,8 @@
   "metadata": {
     "last_condensation": "2026-03-08T22:28:45.820723Z",
     "condensation_note": "T31.5: Heavy manual pruning of stale fields, old sprint data, and planning text.",
-    "current_sprint": "sprint-66",
-    "sprint_status": "Completed"
+    "current_sprint": "sprint-67",
+    "sprint_status": "Active"
   },
   "working_memory": {
     "session_history": [
@@ -329,7 +329,7 @@
   "context_health": {
     "sessions_since_reset": 292,
     "last_update": "2026-10-13T22:28:27.212Z",
-    "size_kb": 60.86,
+    "size_kb": 60.88,
     "size_limit_kb": 100,
     "warning_threshold_percent": 75,
     "retention_keep_sprints": 3
@@ -378,10 +378,10 @@
   ],
   "current_focus": "Sprint 66 active. S66-DEPS completed 2026-10-13: pydantic capped below 2.14 (PR #416, 7ee7c8c); all 8 main runs green; production serves 7ee7c8c with pydantic 2.13.5. Next: S66-EXPOSURE, then SETTINGS, FRONT, DECOUPLE, TESTS, MCP. License MIT (decision #613); history not rewritten (decision #614).",
   "current_sprint": {
-    "id": "sprint-66",
-    "name": "Sprint 66 — Clear the deck",
-    "status": "Completed",
-    "focus": "Closed 2026-10-13, eight of eight: carried follow-ups cleared and the public repository cleaned, licensed and proven runnable. Next: Sprint 67 UX pass, scoped from Derek's UX feedback."
+    "id": "sprint-67",
+    "name": "Sprint 67 — The UX pass",
+    "status": "Active",
+    "focus": "Derek's UX pass before the 2026-10-19 share-out, seven missions in order: DENSITY, REPORTS, BADGES, MISSION, LIBRARIAN, CLAIMS, WALK. Plan: cmos/foundational-docs/roadmap-sprints-66-68-open-tracelab.md."
   },
   "strategic_context": {
     "sprint_13": {
@@ -638,7 +638,7 @@
     }
   },
   "sprint_tracking": {
-    "current_sprint": null,
+    "current_sprint": "sprint-67",
     "last_completed_sprint": "sprint-66"
   }
 }
