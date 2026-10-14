@@ -1,7 +1,10 @@
 {
   "message_id": "9706116c-bedf-4e7a-bc32-a24bddfb368f",
-  "status": "replied",
+  "status": "completion follow-up sent",
   "pr": "https://github.com/kneelinghorse/TraceLab/pull/431",
   "result": "Quality line, reasons, safe failure diagnostics, raw Details, tests and eight live captures delivered; no API/schema/MCP changes.",
-  "authorization": "Sprint 67 plan requires replying with the verified result."
+  "authorization": "Sprint 67 plan requires replying with the verified result.",
+  "followup_message_id": "4e71fe89-6155-47b9-b78b-e078d763b639",
+  "target": "rbook://derek/deepsearch",
+  "delivery_note": "The original backlog request was already accepted during planning; the dashboard rejected a second respond call. A separate completion status update was sent successfully."
 }
