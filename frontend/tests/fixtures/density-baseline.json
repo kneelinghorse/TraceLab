@@ -1,0 +1,43 @@
+{
+  "commit": "be9283a",
+  "width": 1440,
+  "height": 900,
+  "surfaces": {
+    "collection": {
+      "firstRowTop": 527,
+      "visibleActivityRows": 0
+    },
+    "collections": {
+      "firstRowTop": 232,
+      "visibleActivityRows": 0
+    },
+    "evidence": {
+      "firstRowTop": 836.46875,
+      "visibleActivityRows": 0
+    },
+    "home": {
+      "firstRowTop": 623,
+      "visibleActivityRows": 2
+    },
+    "librarian": {
+      "firstRowTop": 408,
+      "visibleActivityRows": 0
+    },
+    "missions": {
+      "firstRowTop": 319.578125,
+      "visibleActivityRows": 0
+    },
+    "project": {
+      "firstRowTop": 424,
+      "visibleActivityRows": 0
+    },
+    "projects": {
+      "firstRowTop": 309,
+      "visibleActivityRows": 0
+    },
+    "reports": {
+      "firstRowTop": 380,
+      "visibleActivityRows": 0
+    }
+  }
+}

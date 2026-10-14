@@ -1,3 +1,4 @@
+import { PageContainer, PageHeader } from "@/components/ui/PageHeader";
 import { PaginationBar } from "@/components/ui/PaginationBar";
 import { PageState } from "@/components/ui/PageState";
 import { useAuth } from "@/contexts/AuthContext";
@@ -37,21 +38,13 @@ export default function ProjectsPage() {
   return (
     <AuthGate>
       <div className="min-h-screen bg-background">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <header className="mb-8 flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Projects</h1>
-              <p className="mt-2 text-secondary">
-                Research bundles bring sources, evidence, context and results together.
-              </p>
-            </div>
-            <Link href="/projects/new" className="px-6 py-2 bg-accent text-on-accent rounded-lg hover:bg-accent">New project</Link>
-          </header>
+        <PageContainer>
+          <PageHeader title="Projects" description="Research bundles bring sources, evidence, context and results together." actions={<Link href="/projects/new" className="px-6 py-2 bg-accent text-on-accent rounded-lg hover:bg-accent">New project</Link>} />
 
-          <div className="space-y-6">
+          <div className="space-y-4">
 
             {/* Project List */}
-            <div className="bg-surface border border-line rounded-lg p-6 space-y-4">
+            <div className="bg-surface border border-line rounded-lg p-4 space-y-4">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <h2 className="text-lg font-semibold text-foreground">Project library</h2>
@@ -78,7 +71,7 @@ export default function ProjectsPage() {
                     <Link
                       key={project.id}
                       href={`/projects/${project.id}`}
-                      className="group block py-5"
+                      className="group block py-3"
                     >
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
@@ -104,7 +97,7 @@ export default function ProjectsPage() {
               <PaginationBar page={pagination?.page ?? page} pages={totalPages} onChange={setPage} />
             </div>
           </div>
-        </div>
+        </PageContainer>
       </div>
     </AuthGate>
   );

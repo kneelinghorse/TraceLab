@@ -1,3 +1,4 @@
+import { PageContainer, PageHeader } from "@/components/ui/PageHeader";
 import { PlannedScopeSummary } from "@/components/missions/AuthoredScope";
 import Head from "next/head";
 import Link from "next/link";
@@ -141,7 +142,7 @@ function DraftPanel({
     ["Deliverables", mission.deliverables],
   ];
   return (
-    <section ref={panelRef} tabIndex={-1} className="panel space-y-4 p-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-focus" aria-label="Mission draft">
+    <section ref={panelRef} tabIndex={-1} className="panel space-y-4 p-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-focus" aria-label="Mission draft">
       <header className="space-y-1">
         <p className="text-xs font-semibold uppercase tracking-wide text-secondary">Step 2 of 3 · Mission draft · {mission.mission_id}</p>
         <h2 className="text-xl font-semibold text-foreground">{mission.title}</h2>
@@ -353,8 +354,8 @@ function LibrarianContent() {
   const suggested = lastAssistant?.role === "assistant" && lastAssistant.suggested;
   const canDraft = turns.some((turn) => turn.role === "user") && projectReady && !sending;
   const started = turns.length > 0;
-  const primaryButton = "rounded-xl bg-accent px-5 py-3 font-semibold text-on-accent hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-60";
-  const secondaryButton = "rounded-xl border border-line-strong px-5 py-3 font-semibold text-foreground disabled:cursor-not-allowed disabled:opacity-60";
+  const primaryButton = "rounded-xl bg-accent px-4 py-3 font-semibold text-on-accent hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-60";
+  const secondaryButton = "rounded-xl border border-line-strong px-4 py-3 font-semibold text-foreground disabled:cursor-not-allowed disabled:opacity-60";
 
   function startOver() {
     changeProject("");
@@ -477,7 +478,7 @@ function LibrarianContent() {
   }
 
   const projectPanel = (
-      <section className="panel space-y-3 p-5" aria-label="Project">
+      <section className="panel space-y-3 p-4" aria-label="Project">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
           <div className="flex-1">
             <label htmlFor="librarian-project" className="form-label">Project</label>
@@ -525,20 +526,16 @@ function LibrarianContent() {
   );
 
   return (
-    <div className={`mx-auto space-y-6 px-4 py-8 sm:px-6 ${started ? "max-w-6xl" : "max-w-4xl"}`}>
+    <PageContainer>
       <Head>
         <title>{focusedPlanning ? "Plan a mission" : "Librarian"} · TraceLab</title>
       </Head>
-      <header className="space-y-2">
-        <h1 className="text-2xl font-semibold text-foreground">{focusedPlanning ? "Plan a mission" : "Librarian"}</h1>
-        <p className="text-secondary">
-          {focusedPlanning ? "Describe your question, choose or create a project, then review the proposed mission. It stays a draft until you submit it to run." : <>Describe what you want to learn. The Librarian helps shape it into a research question, then drafts a DeepSearch mission you review and run. Or ask a question about a project&apos;s documents and get an answer that cites them, or list the chunks that match a phrase.</>}
-        </p>
+      <PageHeader title={focusedPlanning ? "Plan a mission" : "Librarian"} description={focusedPlanning ? "Describe your question, choose or create a project, then review the proposed mission. It stays a draft until you submit it to run." : <>Describe what you want to learn. The Librarian helps shape it into a research question, then drafts a DeepSearch mission you review and run. Or ask a question about a project&apos;s documents and get an answer that cites them, or list the chunks that match a phrase.</>}>
         <p className="text-sm text-muted">
           Plain text is the Librarian speaking from general knowledge. A highlighted passage is a claim about this project&apos;s documents or evidence and links to what it cites.
         </p>
         {focusedPlanning && <p className="flex flex-wrap gap-4 text-sm"><Link href="/missions/new" className="text-accent-text underline">Create manually</Link><Link href="/librarian" className="text-accent-text underline">All Librarian tools</Link></p>}
-      </header>
+      </PageHeader>
 
       {!orientationHidden && <LibrarianSteps current={draft ? 2 : 1} onDismiss={dismissOrientation} />}
 
@@ -549,7 +546,7 @@ function LibrarianContent() {
       {!focusedPlanning && project && <CollectionSuggestions key={`collections:${storageUser}:${project.id}`} userId={storageUser} projectId={project.id} projectName={project.name} />}
       {!focusedPlanning && project && <ReportDraft key={`reports:${storageUser}:${project.id}`} userId={storageUser} projectId={project.id} projectName={project.name} />}
 
-      <section className="panel p-5" aria-label="Conversation with the Librarian">
+      <section className="panel p-4" aria-label="Conversation with the Librarian">
         {started && (
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <p className="text-sm text-secondary">{draft ? "Step 2 of 3 · Review the draft below" : "Step 1 of 3 · Shape it"}</p>
@@ -700,7 +697,7 @@ function LibrarianContent() {
       )}
       {draft && projectReady && <DraftPanel draft={draft} creating={creating} disabled={sending || drafting} onCreate={() => void createMission()} onDismiss={() => setDraft(null)} panelRef={draftPanelRef} />}
       {feedback}
-    </div>
+    </PageContainer>
   );
 }
 

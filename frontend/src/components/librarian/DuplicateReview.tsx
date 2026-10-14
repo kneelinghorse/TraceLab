@@ -74,7 +74,7 @@ export function DuplicateReview({ userId, projectId, projectName }: { userId: st
 
   const coverage = result?.coverage;
   const visible = result?.candidates.filter(pair => !reviews[pair.candidate_id]) ?? [];
-  return <section className="panel space-y-4 p-5" aria-label="Duplicate review">
+  return <section className="panel space-y-4 p-4" aria-label="Duplicate review">
     <header>
       <h2 className="text-lg font-semibold">Review possible duplicates in {projectName}</h2>
       <p className="text-sm text-secondary">Compare extracted text in this project, then decide what to keep. Scanning and review leave your documents unchanged.</p>

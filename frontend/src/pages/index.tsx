@@ -1,3 +1,4 @@
+import { PageContainer, PageHeader } from "@/components/ui/PageHeader";
 import { parseApiTimestamp } from "@/lib/api/timestamps";
 import Head from "next/head";
 import Link from "next/link";
@@ -26,7 +27,7 @@ function updated(value: string) {
 
 function Section({ title, count, children, link }: { title: string; count: number; children: ReactNode; link?: { href: string; label: string } }) {
   return <section className="panel min-w-0 overflow-hidden" aria-label={title}>
-    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4">
+    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-3">
       <h2 className="flex items-center gap-2 text-base font-semibold">{title}<span className="rounded-full bg-surface-alt px-2 py-0.5 text-xs font-medium text-secondary">{count.toLocaleString()}</span></h2>
       {link && <Link className="text-sm text-accent-text underline-offset-4 hover:underline" href={link.href}>{link.label}</Link>}
     </div>
@@ -37,11 +38,15 @@ function Section({ title, count, children, link }: { title: string; count: numbe
 const TYPE_LABELS = { mission: "Mission", report: "Report", evidence: "Evidence" } as const;
 
 function ActivityRow({ item, onOpen, onViewed, busy }: { item: ActivityItem; onOpen: (item: ActivityItem) => void; onViewed: (item: ActivityItem) => void; busy: boolean }) {
-  return <li className="flex flex-wrap items-start gap-3 px-5 py-4" data-new={item.new || undefined}>
+  return <li className="flex flex-wrap items-start gap-3 px-4 py-3" data-new={item.new || undefined}>
     <span aria-hidden="true" className={`mt-2 h-2 w-2 shrink-0 rounded-full ${item.new ? "bg-accent" : "bg-transparent"}`} />
     <div className="min-w-0 flex-1">
-      <div className="flex flex-wrap items-center gap-2 text-xs text-muted"><span>{TYPE_LABELS[item.type]}</span>{item.status && <StatusBadge status={item.status} />}{item.new && <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-medium text-on-accent">New</span>}</div>
-      <Link href={item.href} onClick={() => onOpen(item)} className="mt-1 block break-words font-medium text-foreground hover:text-accent-text">{item.title}</Link>
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+        <Link href={item.href} onClick={() => onOpen(item)} className="break-words font-medium text-foreground hover:text-accent-text">{item.title}</Link>
+        <span className="text-sm text-muted">{TYPE_LABELS[item.type]}</span>
+        {item.status && <StatusBadge status={item.status} />}
+        {item.new && <span className="rounded-full bg-accent px-2 py-0.5 text-sm font-medium text-on-accent">New</span>}
+      </div>
       {item.subtitle && <p className="mt-0.5 break-all text-xs text-muted">{item.subtitle}</p>}
     </div>
     <div className="flex shrink-0 flex-col items-end gap-2 text-xs text-muted">
@@ -53,11 +58,11 @@ function ActivityRow({ item, onOpen, onViewed, busy }: { item: ActivityItem; onO
 
 function Recents({ title, data, href }: { title: string; data: HomeSection<HomeRecent>; href: string }) {
   return <Section title={title} count={data.total} link={{ href, label: "View all" }}>
-    <ul className="divide-y divide-line">{data.items.map((item) => <li key={item.id} className="px-5 py-4">
+    <ul className="divide-y divide-line">{data.items.map((item) => <li key={item.id} className="px-4 py-3">
       <Link href={item.href} className="block break-words font-medium text-foreground hover:text-accent-text">{item.title}</Link>
       {item.updated_at && <p className="mt-1 text-xs text-muted">Updated <time dateTime={item.updated_at}>{updated(item.updated_at)}</time></p>}
     </li>)}</ul>
-    {data.total === 0 && <p className="p-5 text-sm text-secondary">Nothing here yet.</p>}
+    {data.total === 0 && <p className="p-4 text-sm text-secondary">Nothing here yet.</p>}
   </Section>;
 }
 
@@ -92,33 +97,30 @@ function HomeContent() {
     }
   }
 
-  return <div className="mx-auto max-w-7xl space-y-7 px-4 py-8 sm:px-6 lg:py-10">
+  return <PageContainer>
     <Head><title>Home · TraceLab</title></Head>
-    <header className="flex flex-wrap items-end justify-between gap-5">
-      <div><p className="mb-2 text-xs font-semibold uppercase tracking-widest text-muted">Research workspace</p><h1 className="text-3xl font-semibold tracking-tight">Home</h1><p className="mt-2 max-w-xl text-secondary">What happened most recently across your missions, reports and evidence.</p></div>
-      <div className="flex flex-wrap items-center gap-4"><Link href="/librarian?intent=mission" className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-on-accent"><NavigationIcon name="mission" />Plan a mission</Link><Link href="/missions/new" className="text-sm text-accent-text underline">Create manually</Link></div>
-    </header>
-    <button type="button" onClick={openCommandPalette} className="panel flex w-full items-center gap-3 px-5 py-4 text-left text-secondary hover:border-line-strong">
+    <PageHeader title="Home" description="What happened most recently across your missions, reports and evidence." actions={<div className="flex flex-wrap items-center gap-4"><Link href="/librarian?intent=mission" className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-on-accent"><NavigationIcon name="mission" />Plan a mission</Link><Link href="/missions/new" className="text-sm text-accent-text underline">Create manually</Link></div>} />
+    <button type="button" onClick={openCommandPalette} className="panel flex w-full items-center gap-3 px-4 py-3 text-left text-secondary hover:border-line-strong">
       <NavigationIcon name="search" /><span className="min-w-0 flex-1">Search research or jump to a section</span><kbd className="hidden rounded border border-line px-2 py-1 text-xs sm:inline">⌘ K</kbd>
     </button>
     {isLoading && <div role="status" className="panel p-8 text-secondary">Loading your workspace…</div>}
-    {error && <div role="alert" className="rounded-lg border border-line bg-danger-surface p-5 text-danger"><p>{data ? "Home could not refresh. The last successful snapshot is shown below." : "Home could not load. Try again to retrieve your workspace."}</p><button type="button" onClick={() => void mutate()} className="mt-3 rounded border border-current px-3 py-2 text-sm">Try again</button></div>}
+    {error && <div role="alert" className="rounded-lg border border-line bg-danger-surface p-4 text-danger"><p>{data ? "Home could not refresh. The last successful snapshot is shown below." : "Home could not load. Try again to retrieve your workspace."}</p><button type="button" onClick={() => void mutate()} className="mt-3 rounded border border-current px-3 py-2 text-sm">Try again</button></div>}
     {data && <>
       {data.favorites && <FavoriteProjects key={user?.user_id} initial={data.favorites} />}
       <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-muted">
         <p><Link href="/missions" className="font-medium text-accent-text underline underline-offset-4">{data.missions.total.toLocaleString()} missions</Link> in your workspace · {data.missions.by_status.completed.toLocaleString()} completed</p>
         <div className="flex flex-wrap items-center gap-3"><p>Updated <time dateTime={data.generated_at}>{updated(data.generated_at)}</time> · refreshes every {data.refresh_seconds}s</p><button type="button" onClick={() => void mutate()} disabled={isValidating} className="rounded border border-line px-3 py-1.5 text-secondary disabled:opacity-50">{isValidating ? "Refreshing…" : "Refresh"}</button></div>
       </div>
-      <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+      <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
         <Section title="Recent activity" count={data.activity.total} link={{ href: "/missions", label: "All missions" }}>
-          <p className="border-b border-line px-5 py-3 text-xs text-muted">Newest first. {data.activity.new_total > 0 ? `${data.activity.new_total.toLocaleString()} new since you last looked.` : "Nothing new since you last looked."}</p>
+          <p className="border-b border-line px-4 py-3 text-xs text-muted">Newest first. {data.activity.new_total > 0 ? `${data.activity.new_total.toLocaleString()} new since you last looked.` : "Nothing new since you last looked."}</p>
           <ol className="divide-y divide-line" aria-label="Activity items">{[...data.activity.items, ...more].map((item) => <ActivityRow key={`${item.type}:${item.id}`} item={item} onOpen={open} onViewed={(target) => void viewed(target)} busy={busy} />)}</ol>
           {data.activity.total === 0 && <div className="p-6"><p className="font-medium">Nothing has happened yet.</p><p className="mt-1 text-sm text-secondary">Missions, reports and evidence will appear here as they happen.</p></div>}
-          {moreError && <p role="alert" className="border-t border-line px-5 py-3 text-sm text-danger">More activity could not load. <button type="button" className="underline" onClick={() => void loadMore()}>Try again</button></p>}
-          {data.activity.total > data.activity.items.length + more.length && <div className="border-t border-line px-5 py-3"><button type="button" onClick={() => void loadMore()} className="text-sm text-accent-text underline underline-offset-4">Show more</button><span className="ml-3 text-xs text-muted">Showing {data.activity.items.length + more.length} of {data.activity.total.toLocaleString()}</span></div>}
+          {moreError && <p role="alert" className="border-t border-line px-4 py-3 text-sm text-danger">More activity could not load. <button type="button" className="underline" onClick={() => void loadMore()}>Try again</button></p>}
+          {data.activity.total > data.activity.items.length + more.length && <div className="border-t border-line px-4 py-3"><button type="button" onClick={() => void loadMore()} className="text-sm text-accent-text underline underline-offset-4">Show more</button><span className="ml-3 text-xs text-muted">Showing {data.activity.items.length + more.length} of {data.activity.total.toLocaleString()}</span></div>}
         </Section>
         <Section title="Active missions" count={data.active_runs.total} link={{ href: "/missions?status=in_progress", label: "All running" }}>
-          <ul className="divide-y divide-line">{data.active_runs.items.map((mission) => <li key={mission.id} className="space-y-3 p-5">
+          <ul className="divide-y divide-line">{data.active_runs.items.map((mission) => <li key={mission.id} className="space-y-3 p-4">
             <Link href={`/missions/${mission.id}`} className="block break-words font-semibold hover:text-accent-text">{mission.title}</Link>
             <p className="text-sm text-secondary">{mission.progress.phase ? mission.progress.phase.replaceAll("_", " ") : "Phase not reported"}</p>
             {mission.progress.percent !== null ? <div className="flex items-center gap-3"><div role="progressbar" aria-label={`${mission.title} progress`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={mission.progress.percent} className="h-2 min-w-0 flex-1 overflow-hidden rounded-full bg-surface-alt"><div className="h-full rounded-full bg-accent" style={{ width: `${mission.progress.percent}%` }} /></div><span className="text-xs text-secondary">{mission.progress.percent}%</span></div> : <p className="text-xs text-muted">Progress not reported yet.</p>}
@@ -126,24 +128,24 @@ function HomeContent() {
             <p className="text-xs text-muted">{mission.started_at ? <>Started <time dateTime={mission.started_at}>{updated(mission.started_at)}</time></> : "Start time not reported"}</p>
             <Link href={`/missions/${mission.id}`} className="inline-block text-sm text-accent-text underline underline-offset-4">Inspect run</Link>
           </li>)}</ul>
-          {data.active_runs.total === 0 && <p className="p-5 text-sm text-secondary">No missions are running. You can start a new mission and return here to follow it.</p>}
+          {data.active_runs.total === 0 && <p className="p-4 text-sm text-secondary">No missions are running. You can start a new mission and return here to follow it.</p>}
           {data.active_runs.total > data.active_runs.items.length && <p className="border-t border-line p-4 text-xs text-muted">Showing {data.active_runs.items.length} of {data.active_runs.total} active missions.</p>}
         </Section>
       </div>
-      <div className="grid items-start gap-6 lg:grid-cols-2">
+      <div className="grid items-start gap-4 lg:grid-cols-2">
         <Recents title="Recent reports" data={data.recent_reports} href="/reports" />
         <Recents title="Recent projects" data={data.recent_projects} href="/projects" />
       </div>
       <Section title="Agent & evidence activity" count={data.evidence_activity.total} link={{ href: "/evidence", label: "Browse evidence" }}>
-        <p className="border-b border-line px-5 py-3 text-xs text-muted">Recent evidence writes grouped by project, mission, session and origin.</p>
-        <ul className="divide-y divide-line">{data.evidence_activity.items.map((activity) => <li key={`${activity.project_id}:${activity.mission_id}:${activity.session_key}:${activity.origin}`} className="flex flex-wrap items-center justify-between gap-3 p-5">
+        <p className="border-b border-line px-4 py-3 text-xs text-muted">Recent evidence writes grouped by project, mission, session and origin.</p>
+        <ul className="divide-y divide-line">{data.evidence_activity.items.map((activity) => <li key={`${activity.project_id}:${activity.mission_id}:${activity.session_key}:${activity.origin}`} className="flex flex-wrap items-center justify-between gap-3 p-4">
           <div className="min-w-0 flex-1"><Link href={activity.href} className="break-words font-medium text-foreground hover:text-accent-text">{activity.entry_count.toLocaleString()} evidence entries · {activity.origin === "deepsearch-worker" ? "DeepSearch" : "Research agent"}</Link><p className="mt-1 break-all text-xs text-muted">{activity.session_key}</p></div>
           <time className="text-xs text-muted" dateTime={activity.last_created_at}>{updated(activity.last_created_at)}</time>
         </li>)}</ul>
-        {data.evidence_activity.total === 0 && <p className="p-5 text-sm text-secondary">Evidence activity will appear as agents capture sourced findings.</p>}
+        {data.evidence_activity.total === 0 && <p className="p-4 text-sm text-secondary">Evidence activity will appear as agents capture sourced findings.</p>}
       </Section>
     </>}
-  </div>;
+  </PageContainer>;
 }
 
 export default function HomePage() {

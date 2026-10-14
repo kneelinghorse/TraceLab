@@ -1,3 +1,4 @@
+import { PageContainer, PageHeader } from "@/components/ui/PageHeader";
 import { PageState } from "@/components/ui/PageState";
 import { PaginationBar } from "@/components/ui/PaginationBar";
 import { useFeedback } from "@/components/ui/useFeedback";
@@ -45,17 +46,9 @@ export default function CollectionsPage() {
     <AuthGate>
       {feedback}
       <div className="min-h-screen bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <PageContainer>
           {/* Header */}
-          <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Collections</h1>
-              <p className="mt-2 text-secondary">
-                Keep instructions, documents and excerpts together to guide your next mission
-              </p>
-            </div>
-            <Link href="/collections/new" className="px-6 py-2 bg-accent text-on-accent rounded-lg hover:bg-accent transition-colors">New collection</Link>
-          </div>
+          <PageHeader title="Collections" description="Keep instructions, documents and excerpts together to guide your next mission" actions={<Link href="/collections/new" className="px-6 py-2 bg-accent text-on-accent rounded-lg hover:bg-accent transition-colors">New collection</Link>} />
 
           {response && !error && <p className="mb-4 text-sm text-secondary">{response.total.toLocaleString()} collections</p>}
           {/* Collections List */}
@@ -73,7 +66,7 @@ export default function CollectionsPage() {
               {collections.map((collection) => (
                 <div
                   key={collection.id}
-                  className="bg-surface rounded-lg border border-line p-6 hover:shadow-lg transition-shadow"
+                  className="bg-surface rounded-lg border border-line p-4 hover:shadow-lg transition-shadow"
                 >
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0 flex-1">
@@ -128,7 +121,7 @@ export default function CollectionsPage() {
             </div>
           )}
           {!error && <PaginationBar page={page} pages={pages} total={response?.total} onChange={setPage} />}
-        </div>
+        </PageContainer>
       </div>
     </AuthGate>
   );

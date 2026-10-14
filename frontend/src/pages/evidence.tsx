@@ -1,3 +1,4 @@
+import { PageContainer, PageHeader } from "@/components/ui/PageHeader";
 import { PaginationBar } from "@/components/ui/PaginationBar";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import useSWR from "swr";
@@ -51,9 +52,9 @@ function EvidenceBrowser({ initial }: { initial: Record<string, string | string[
     const key = grouped ? entry.source_id : "entries";
     groups.set(key, [...(groups.get(key) || []), entry]);
   }
-  return <div className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-6">
-    <header><h1 className="text-3xl font-semibold">Evidence</h1><p className="mt-2 text-secondary">Follow a claim back to its source, research session and outputs.</p></header>
-    <section className="panel space-y-4 p-5" aria-label="Choose a project">
+  return <PageContainer>
+    <PageHeader title="Evidence" description="Follow a claim back to its source, research session and outputs." />
+    <section className="panel space-y-4 p-4" aria-label="Choose a project">
       <label className="form-label">Find a project<input className="form-input mt-2" value={projectSearch} onChange={e => { setProjectSearch(e.target.value); setProjectPage(1); }} placeholder="Search project names" /></label>
       <label className="form-label">Project<select aria-label="Project" className="form-input mt-2" value={projectId} onChange={e => { setProjectId(e.target.value); setPage(1); setFilters({}); setDraft({}); setQuery(""); setDraftQuery(""); }}>
         <option value="">Select a project</option>
@@ -63,7 +64,7 @@ function EvidenceBrowser({ initial }: { initial: Record<string, string | string[
       {projects.isLoading && <p role="status">Loading projects…</p>}
       {projects.data && projects.data.pagination.pages > 1 && <PaginationBar label="Project pages" page={projectPage} pages={projects.data.pagination.pages} onChange={setProjectPage} previousLabel="Previous projects" nextLabel="Next projects" />}
     </section>
-    {projectId && <form onSubmit={apply} className="panel space-y-4 p-5" aria-label="Evidence filters">
+    {projectId && <form onSubmit={apply} className="panel space-y-4 p-4" aria-label="Evidence filters">
       <label className="form-label">Search evidence<input className="form-input mt-2" type="search" value={draftQuery} onChange={e => setDraftQuery(e.target.value)} placeholder="Search claims, snippets and sources" /></label>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <label className="form-label">Disposition<select aria-label="Disposition" className="form-input mt-2" value={draft.disposition || ""} onChange={e => setDraft({ ...draft, disposition: e.target.value as EvidenceFilters["disposition"] })}><option value="">All dispositions</option>{["supporting", "contradicting", "background", "rejected"].map(value => <option key={value} value={value}>{value}</option>)}</select></label>
@@ -82,5 +83,5 @@ function EvidenceBrowser({ initial }: { initial: Record<string, string | string[
       {ledger.data.entry_total > ledger.data.page_size && <PaginationBar label="Evidence pages" page={page} pages={Math.ceil(ledger.data.entry_total / ledger.data.page_size)} onChange={setPage} />}
     </section>}
     {projectId && filters.session_key && <SessionNotes key={`${projectId}:${filters.session_key}`} projectId={projectId} sessionKey={filters.session_key} />}
-  </div>;
+  </PageContainer>;
 }

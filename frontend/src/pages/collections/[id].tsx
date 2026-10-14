@@ -1,3 +1,4 @@
+import { PageContainer, PageHeader } from "@/components/ui/PageHeader";
 import { RelationshipLink } from "@/components/graph/RelationshipLink";
 import { HttpError } from "@/lib/api/http";
 import { PageState } from "@/components/ui/PageState";
@@ -120,7 +121,7 @@ export default function CollectionDetailPage() {
     <AuthGate>
       {feedback}
       <div className="min-h-screen bg-background">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <PageContainer>
           {/* Back Link */}
           <Link
             href="/collections"
@@ -130,7 +131,7 @@ export default function CollectionDetailPage() {
           </Link>
 
           {/* Header */}
-          <div className="bg-surface rounded-lg border border-line p-6 mb-6">
+          <div className="bg-surface rounded-lg border border-line p-4 mb-4">
             {isEditing ? (
               <div className="space-y-4">
                 <div>
@@ -184,18 +185,7 @@ export default function CollectionDetailPage() {
               </div>
             ) : (
               <>
-                <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-                  <div>
-                    <h1 className="break-words text-2xl font-bold text-foreground">
-                      {collection.name}
-                    </h1>
-                    {collection.description && (
-                      <p className="mt-2 text-secondary">
-                        {collection.description}
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex max-w-full flex-wrap gap-2">
+                <PageHeader title={collection.name} description={collection.description} actions={<>
                     <RelationshipLink type="collection" id={collection.id} />
                     <Link href={`/missions/new?collection=${collection.id}`} className="rounded bg-accent px-4 py-2 text-sm text-on-accent">Seed mission</Link>
                     <button
@@ -224,10 +214,9 @@ export default function CollectionDetailPage() {
                     >
                       Delete
                     </button>
-                  </div>
-                </div>
+                  </>} />
 
-                <section className="mt-5 space-y-2" aria-label="Collection instructions"><h2 className="font-semibold">Instructions</h2><p className="whitespace-pre-wrap break-words text-sm text-secondary">{collection.instructions || "Add instructions to guide missions seeded from this collection."}</p></section>
+                <section className="mt-3 space-y-2" aria-label="Collection instructions"><h2 className="font-semibold">Instructions</h2><p className="whitespace-pre-wrap break-words text-sm text-secondary">{collection.instructions || "Add instructions to guide missions seeded from this collection."}</p></section>
                 <div className="mt-4 flex flex-wrap gap-4 text-sm text-secondary">
                   <span className="inline-flex items-center gap-1">
                     <span className="font-medium text-accent-text">
@@ -246,7 +235,7 @@ export default function CollectionDetailPage() {
           {collection.librarian_generated && <CollectionOrigin userId={user?.user_id ?? ""} collectionId={collection.id} />}
           <CollectionDocuments collectionId={collection.id} onChange={() => mutate()} />
           {/* Collection Items */}
-          <div className="bg-surface rounded-lg border border-line p-6">
+          <div className="bg-surface rounded-lg border border-line p-4">
             <h2 className="text-lg font-semibold text-foreground mb-4">
               Chunks in Collection
             </h2>
@@ -311,7 +300,7 @@ export default function CollectionDetailPage() {
               </div>
             )}
           </div>
-        </div>
+        </PageContainer>
       </div>
 
       {/* Create Report Modal */}

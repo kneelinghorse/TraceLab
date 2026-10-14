@@ -1,0 +1,362 @@
+[
+  {
+    "surface": "collection",
+    "theme": "dark",
+    "width": 1440,
+    "selector": "section[aria-label=\"Collection documents\"] li",
+    "firstRowTop": 527,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "collection",
+    "theme": "dark",
+    "width": 390,
+    "selector": "section[aria-label=\"Collection documents\"] li",
+    "firstRowTop": 737,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "collection",
+    "theme": "light",
+    "width": 1440,
+    "selector": "section[aria-label=\"Collection documents\"] li",
+    "firstRowTop": 527,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "collection",
+    "theme": "light",
+    "width": 390,
+    "selector": "section[aria-label=\"Collection documents\"] li",
+    "firstRowTop": 737,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "collections",
+    "theme": "dark",
+    "width": 1440,
+    "selector": "main .grid > .bg-surface",
+    "firstRowTop": 232,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "collections",
+    "theme": "dark",
+    "width": 390,
+    "selector": "main .grid > .bg-surface",
+    "firstRowTop": 312,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "collections",
+    "theme": "light",
+    "width": 1440,
+    "selector": "main .grid > .bg-surface",
+    "firstRowTop": 232,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "collections",
+    "theme": "light",
+    "width": 390,
+    "selector": "main .grid > .bg-surface",
+    "firstRowTop": 312,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "evidence",
+    "theme": "dark",
+    "width": 1440,
+    "selector": "section[aria-label=\"Evidence entries\"] article",
+    "firstRowTop": 836.46875,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "evidence",
+    "theme": "dark",
+    "width": 390,
+    "selector": "section[aria-label=\"Evidence entries\"] article",
+    "firstRowTop": 1239.34375,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "evidence",
+    "theme": "light",
+    "width": 1440,
+    "selector": "section[aria-label=\"Evidence entries\"] article",
+    "firstRowTop": 836.46875,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "evidence",
+    "theme": "light",
+    "width": 390,
+    "selector": "section[aria-label=\"Evidence entries\"] article",
+    "firstRowTop": 1239.34375,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "home",
+    "theme": "dark",
+    "width": 1440,
+    "selector": "ol[aria-label=\"Activity items\"] > li",
+    "firstRowTop": 623,
+    "visibleActivityRows": 2,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "home",
+    "theme": "dark",
+    "width": 390,
+    "selector": "ol[aria-label=\"Activity items\"] > li",
+    "firstRowTop": 761,
+    "visibleActivityRows": 1,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "home",
+    "theme": "light",
+    "width": 1440,
+    "selector": "ol[aria-label=\"Activity items\"] > li",
+    "firstRowTop": 623,
+    "visibleActivityRows": 2,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "home",
+    "theme": "light",
+    "width": 390,
+    "selector": "ol[aria-label=\"Activity items\"] > li",
+    "firstRowTop": 761,
+    "visibleActivityRows": 1,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "librarian",
+    "theme": "dark",
+    "width": 1440,
+    "selector": "section[aria-label=\"Project\"]",
+    "firstRowTop": 408,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "librarian",
+    "theme": "dark",
+    "width": 390,
+    "selector": "section[aria-label=\"Project\"]",
+    "firstRowTop": 608,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "librarian",
+    "theme": "light",
+    "width": 1440,
+    "selector": "section[aria-label=\"Project\"]",
+    "firstRowTop": 408,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "librarian",
+    "theme": "light",
+    "width": 390,
+    "selector": "section[aria-label=\"Project\"]",
+    "firstRowTop": 608,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "missions",
+    "theme": "dark",
+    "width": 1440,
+    "selector": "section[aria-label=\"Mission list\"] li",
+    "firstRowTop": 319.578125,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "missions",
+    "theme": "dark",
+    "width": 390,
+    "selector": "section[aria-label=\"Mission list\"] li",
+    "firstRowTop": 574.734375,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "missions",
+    "theme": "light",
+    "width": 1440,
+    "selector": "section[aria-label=\"Mission list\"] li",
+    "firstRowTop": 319.578125,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "missions",
+    "theme": "light",
+    "width": 390,
+    "selector": "section[aria-label=\"Mission list\"] li",
+    "firstRowTop": 574.734375,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "project",
+    "theme": "dark",
+    "width": 1440,
+    "selector": "#project-panel section",
+    "firstRowTop": 424,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "project",
+    "theme": "dark",
+    "width": 390,
+    "selector": "#project-panel section",
+    "firstRowTop": 542,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "project",
+    "theme": "light",
+    "width": 1440,
+    "selector": "#project-panel section",
+    "firstRowTop": 424,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "project",
+    "theme": "light",
+    "width": 390,
+    "selector": "#project-panel section",
+    "firstRowTop": 542,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "projects",
+    "theme": "dark",
+    "width": 1440,
+    "selector": "main a.group[href=\"/projects/density-project\"]",
+    "firstRowTop": 309,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "projects",
+    "theme": "dark",
+    "width": 390,
+    "selector": "main a.group[href=\"/projects/density-project\"]",
+    "firstRowTop": 467,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "projects",
+    "theme": "light",
+    "width": 1440,
+    "selector": "main a.group[href=\"/projects/density-project\"]",
+    "firstRowTop": 309,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "projects",
+    "theme": "light",
+    "width": 390,
+    "selector": "main a.group[href=\"/projects/density-project\"]",
+    "firstRowTop": 467,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "reports",
+    "theme": "dark",
+    "width": 1440,
+    "selector": "main li.panel",
+    "firstRowTop": 380,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "reports",
+    "theme": "dark",
+    "width": 390,
+    "selector": "main li.panel",
+    "firstRowTop": 404,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "reports",
+    "theme": "light",
+    "width": 1440,
+    "selector": "main li.panel",
+    "firstRowTop": 380,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "surface": "reports",
+    "theme": "light",
+    "width": 390,
+    "selector": "main li.panel",
+    "firstRowTop": 404,
+    "visibleActivityRows": 0,
+    "overflow": false,
+    "violations": []
+  }
+]

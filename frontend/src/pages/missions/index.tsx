@@ -1,3 +1,4 @@
+import { PageContainer, PageHeader } from "@/components/ui/PageHeader";
 import { parseApiTimestamp } from "@/lib/api/timestamps";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -21,7 +22,7 @@ const SORTS: { value: MissionSort; label: string }[] = [
 ];
 function MissionCard({ mission }: { mission: ApiMission }) {
   return <li className="panel flex min-w-0 flex-col hover:border-line-strong">
-    <Link href={`/missions/${mission.id}`} className="flex h-full flex-col gap-3 rounded-2xl p-5 focus-visible:outline-focus">
+    <Link href={`/missions/${mission.id}`} className="flex h-full flex-col gap-3 rounded-2xl p-4 focus-visible:outline-focus">
       <div className="flex items-start justify-between gap-3">
         <h2 className="line-clamp-2 min-w-0 break-words text-base font-semibold leading-snug">{mission.title}</h2>
         <StatusBadge status={mission.status} />
@@ -52,11 +53,8 @@ function MissionsContent() {
     Object.keys(query).forEach(key => { if (query[key] === undefined || query[key] === "") delete query[key]; });
     void router.push({ pathname: "/missions", query }, undefined, { shallow: true });
   }
-  return <div className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6">
-    <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-      <div><h1 className="text-3xl font-bold">Missions</h1><p className="mt-2 text-secondary">Research runs and their results, newest first.</p></div>
-      <div className="flex flex-wrap items-center gap-4"><Link className="rounded-lg bg-accent px-4 py-2 text-center text-sm font-medium text-on-accent" href="/librarian?intent=mission">Plan a mission</Link><Link className="text-sm text-accent-text underline" href="/missions/new">Create manually</Link></div>
-    </header>
+  return <PageContainer>
+    <PageHeader title="Missions" description="Research runs and their results, newest first." actions={<div className="flex flex-wrap items-center gap-4"><Link className="rounded-lg bg-accent px-4 py-2 text-center text-sm font-medium text-on-accent" href="/librarian?intent=mission">Plan a mission</Link><Link className="text-sm text-accent-text underline" href="/missions/new">Create manually</Link></div>} />
     <section aria-label="Mission filters" className="panel flex flex-wrap items-end gap-3 p-4">
       <div><label htmlFor="status-filter" className="form-label">Status</label><select id="status-filter" className="form-input" value={status ?? ""} onChange={event => change({ status: event.target.value, page: 1 })}><option value="">All statuses</option>{STATUSES.map(value => <option key={value} value={value}>{value.replaceAll("_", " ")}</option>)}</select></div>
       <div className="min-w-0 max-w-full"><label htmlFor="project-filter" className="form-label">Project</label><select id="project-filter" className="form-input max-w-full sm:max-w-72" value={projectId ?? ""} onChange={event => change({ project_id: event.target.value, page: 1 })}><option value="">All projects</option>{projects.data?.map(project => <option key={project.id} value={project.id}>{project.name}</option>)}</select></div>
@@ -71,6 +69,6 @@ function MissionsContent() {
         <PaginationBar page={page} pages={pagination?.pages ?? 0} onChange={next => change({ page: next })} />
       </>}
     </section>
-  </div>;
+  </PageContainer>;
 }
 export default function MissionsPage() { return <AuthGate><MissionsContent /></AuthGate>; }
