@@ -35,6 +35,7 @@ from app.models.project import Project
 from app.models.report import Report, ReportSource
 from app.schemas.evidence_ledger import CaptureItem, CaptureRequest, NoteUpsertRequest
 from app.services.evidence_browser import filter_entries
+from app.services.evidence_display import display_claim
 from app.services.report_promotion import ReportPromotionService
 
 MCP_AGENT_ORIGIN = "mcp-agent"
@@ -689,7 +690,7 @@ def _render_markdown(
                 (
                     f"### Evidence {ordinal}",
                     "",
-                    f"- **Claim:** {entry.claim}",
+                    f"- **Claim:** {display_claim(entry.claim)}",
                     f"- **Disposition:** `{entry.disposition}`",
                     f"- **Origin:** `{entry.origin}`",
                     f"- **Source:** {entry.source_url}",

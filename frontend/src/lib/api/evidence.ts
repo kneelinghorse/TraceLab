@@ -53,3 +53,23 @@ export function evidenceHref(projectId: string, filters: EvidenceFilters = {}) {
   return `/evidence?${query}`;
 }
 export function sourceDomain(url: string) { try { return new URL(url).hostname; } catch { return "Source"; } }
+
+/** Format cited table rows for people without changing the stored/API claim. */
+export function displayClaim(claim: string): string {
+  const lines: string[] = [];
+  let rows: string[] = [];
+  for (const line of claim.split("\n")) {
+    const stripped = line.trim();
+    const cells = stripped.replace(/^\|/, "").replace(/\|$/, "").split("|");
+    // Exact cited spans often end before the closing pipe.
+    if ((stripped.startsWith("|") || stripped.endsWith("|")) && cells.length > 1) {
+      const rendered = cells.map(cell => cell.trim()).filter(cell => cell && !/^:?-{3,}:?$/.test(cell)).join(" · ");
+      if (rendered) rows.push(rendered);
+    } else {
+      if (rows.length) { lines.push(rows.join("; ")); rows = []; }
+      lines.push(line);
+    }
+  }
+  if (rows.length) lines.push(rows.join("; "));
+  return lines.join("\n");
+}
