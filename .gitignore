@@ -93,3 +93,9 @@ tests/test_ingestion.db-journal
 
 # Generated application outputs; historical record receipts remain immutable.
 /telemetry/runtime/
+
+# Report screenshots stay local: production captures show project names and account details.
+# Keep written receipts in cmos/reports; keep images out of the public repo.
+cmos/reports/**/*.png
+cmos/reports/**/*.jpg
+cmos/reports/**/*.jpeg
