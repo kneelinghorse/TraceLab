@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   build-frontend-production:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # Playwright 1.56.1 does not support Ubuntu 26.04.
     env:
       NODE_ENV: production
       NEXT_TELEMETRY_DISABLED: "1"
