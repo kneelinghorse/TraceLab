@@ -424,7 +424,7 @@ Create a mission and submit it to DeepSearch:
 Submit returns a `warnings` array. These warnings do not block execution; review
 and supply project-local inputs directly in the mission's fields when requested.
 DeepSearch can read the public web, but cannot open the project's other documents,
-reports or tags. See the [authoring boundary](../../cmos/contracts/mission-authoring-contract.md#ui-authoring-and-run-boundaries-ux-6-2026-09-13).
+reports or tags. See the [authoring boundary](https://github.com/kneelinghorse/TraceLab/blob/main/cmos/contracts/mission-authoring-contract.md#ui-authoring-and-run-boundaries-ux-6-2026-09-13).
 
 ```json
 {
