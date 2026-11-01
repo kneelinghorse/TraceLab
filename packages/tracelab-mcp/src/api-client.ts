@@ -387,6 +387,7 @@ export interface MissionListResponse {
 }
 
 export interface MissionSubmitResponse {
+  warnings?: Array<{ rule: string; field: string; message: string; suggestion?: string | null }>;
   status: string;
   mode: string;
   mission_id: string;

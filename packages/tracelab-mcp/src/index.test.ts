@@ -1106,7 +1106,7 @@ describe('T41.7 — cluster dispatch (per-cluster smoke)', () => {
       handleTracelabProject: (args: unknown) => Promise<unknown>;
     };
     await expect(
-      handleTracelabProject({ action: 'create', name: 'x', workspace_id: 'parts-town' })
+      handleTracelabProject({ action: 'create', name: 'x', workspace_id: 'example-client' })
     ).rejects.toThrow();
     expect(mockFetch).not.toHaveBeenCalled();
   });

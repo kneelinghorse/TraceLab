@@ -1058,5 +1058,107 @@
         "budget": 40
       }
     }
+  },
+  "schema6_clean": {
+    "status": "completed",
+    "result_markdown": "# Retained result\n\nA sourced finding remains available.",
+    "execution_metadata": {
+      "quality_record": {
+        "schema_version": 6,
+        "delivery_quality": "clean",
+        "verification": {
+          "version": 1,
+          "scope": "sampled",
+          "report_wide_accuracy": "unknown"
+        },
+        "claim_assessment": {
+          "version": 2,
+          "assessed": 11,
+          "supported": 11,
+          "unassessed": 1,
+          "declared_context": 1,
+          "contradicted": 0,
+          "unverified_contradicted": 0,
+          "inconsistent": 0,
+          "unknown_verdicts": 0
+        }
+      },
+      "final_outcome": {
+        "delivery_quality": "clean",
+        "quality_gate_failures": []
+      }
+    },
+    "result_protocol": null
+  },
+  "schema6_warning": {
+    "status": "completed",
+    "result_markdown": "# Retained result\n\nA sourced finding remains available.",
+    "execution_metadata": {
+      "quality_record": {
+        "schema_version": 6,
+        "delivery_quality": "usable_with_warning",
+        "verification": {
+          "version": 1,
+          "scope": "sampled",
+          "report_wide_accuracy": "unknown"
+        },
+        "claim_assessment": {
+          "version": 2,
+          "assessed": 11,
+          "supported": 11,
+          "unassessed": 1,
+          "declared_context": 1,
+          "contradicted": 0,
+          "unverified_contradicted": 1,
+          "inconsistent": 2,
+          "unknown_verdicts": 1
+        }
+      },
+      "final_outcome": {
+        "delivery_quality": "usable_with_warning",
+        "quality_gate_failures": [
+          "critique_unverified_contradiction_1",
+          "critique_internal_inconsistency_2",
+          "critique_unknown_verdicts_1",
+          "future_reason_v9"
+        ]
+      }
+    },
+    "result_protocol": null
+  },
+  "schema6_provenance_error": {
+    "status": "completed",
+    "result_markdown": "# Retained result\n\nA sourced finding remains available.",
+    "execution_metadata": {
+      "quality_record": {
+        "schema_version": 6,
+        "delivery_quality": "usable_with_warning",
+        "verification": {
+          "version": 1,
+          "scope": "sampled",
+          "report_wide_accuracy": "unknown"
+        },
+        "claim_assessment": {
+          "status": "assessed",
+          "version": 1,
+          "assessed": 6,
+          "supported": 6,
+          "unassessed": 0,
+          "contradicted": 0,
+          "accuracy_pass": null,
+          "coverage_ratio": null,
+          "declared_context": 0,
+          "report_claim_count": null,
+          "provenance_error": true
+        }
+      },
+      "final_outcome": {
+        "delivery_quality": "usable_with_warning",
+        "quality_gate_failures": [
+          "critique_assessment_provenance_error"
+        ]
+      }
+    },
+    "result_protocol": null
   }
 }

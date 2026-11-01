@@ -28,9 +28,19 @@ for (const theme of ["light", "dark"]) for (const width of [390, 1440]) {
       await expect(quality).toBeVisible();
       await expect(quality).not.toContainText(/%|percent/);
       await expect(page.getByRole("heading", { name: "Retained result" })).toBeVisible();
-      if (name === "supported_sample") {
+      if (name === "supported_sample" || name === "schema6_clean") {
         await expect(quality).toContainText("No detected material issue");
         await expect(quality).toContainText("Sampled verification; report-wide accuracy unknown");
+        await expect(quality.getByRole("list")).toHaveCount(0);
+      } else if (name === "schema6_warning") {
+        await expect(quality).toContainText("Usable with warnings");
+        await expect(quality).toContainText("1 possible contradiction could not be verified.");
+        await expect(quality).toContainText("2 claims were flagged as inconsistent within the report.");
+        await expect(quality).toContainText("The verification verdict for 1 claim could not be read.");
+        await expect(quality).toContainText("Additional quality issue reported");
+        await expect(quality).toContainText("Sampled verification; report-wide accuracy unknown");
+      } else if (name === "schema6_provenance_error") {
+        await expect(quality).toContainText("Detailed verification provenance is unavailable; an earlier assessment format was retained.");
       } else if (name === "legacy_uncertainty") await expect(quality).toContainText("Quality not assessed for this run");
       else if (name === "live_warning") await expect(quality).toContainText("3 claims were not assessed.");
       else if (name === "missing_cited_body") await expect(quality).toContainText("1 cited source has no readable body.");

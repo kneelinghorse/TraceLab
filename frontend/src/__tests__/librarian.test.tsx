@@ -208,7 +208,7 @@ describe("Librarian page", () => {
   it("lets a member of a shared Space create the new project there", async () => {
     mocks.listSpaces.mockResolvedValue([
       { id: "space-mine", name: "Reader's Space", created_at: "", personal_owner_id: "reader" },
-      { id: "space-parts", name: "Parts Town", created_at: "", personal_owner_id: null },
+      { id: "space-parts", name: "Example Client", created_at: "", personal_owner_id: null },
     ]);
     mocks.createProject.mockResolvedValue({ id: projectId, name: "Catalog audit" });
     page();

@@ -112,6 +112,16 @@ research phases and custom metadata survive edit and re-run preparation.
 Submission always calls `POST /missions/{id}/submit` after saving, so the existing
 linter and one-execution guard run. It does not create a queued record directly.
 
+`project-private-reference` is a warning, never a submission blocker. It checks
+objective, success criteria, deliverables and constraints for project-local
+reports/documents/tags, earlier mission reports and mission-ID ranges. Background
+context is excluded. The remedy is to include the inputs in the mission's fields
+and give sources public URLs; the worker cannot retrieve private project content.
+The Librarian's draft response exposes this through `lint_warnings`. REST submit
+returns `warnings`, and the npm MCP submit response preserves that array (including
+unknown future rules). The production-dark Python MCP also returns soft warnings;
+its existing hard-gate behavior is unchanged. No authored-field mapping changes.
+
 A failed preview or submit keeps the saved draft ID and a link to it. Before
 retrying a saved draft, the UI re-reads its state; it never resets an already
 queued or terminal run. Re-run opens a new-ID authoring form with only authored

@@ -39,6 +39,7 @@ class _MissionStub:
     expected_output_schema: dict[str, Any] | None = None
     background: str | None = None
     focus: str | None = None
+    constraints: list[str] | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -225,6 +226,40 @@ class TestBroadObjectiveRule:
         assert self.rule.check(mission) == []
 
 
+class TestProjectPrivateReferenceRule:
+    """A paid web researcher cannot resolve implicit project-local inputs."""
+
+    @pytest.mark.parametrize("field,text", [
+        ("objective", "Synthesize M1–M6."),
+        ("success_criteria", "Adjudicate seven flagged citations tagged do-not-cite-as-established in this project."),
+        ("deliverables", "A synthesis of previous mission reports."),
+        ("constraints", "Use this project's documents as the evidence corpus."),
+        ("objective", "Compare earlier mission reports."),
+        ("objective", "Synthesize M1-M6."),
+        ("objective", "Synthesize M1 — M6."),
+    ])
+    def test_warns_when_inputs_only_name_private_project_content(self, field, text):
+        value = text if field == "objective" else [text]
+        result = lint_mission_for_submit(_MissionStub(**{field: value}))
+        warnings = [w for w in result.warnings if w.rule == "project-private-reference"]
+        assert len(warnings) == 1
+        assert warnings[0].field == field
+        assert "public web" in warnings[0].message
+        assert "background" in warnings[0].suggestion
+        assert all(e.rule != "project-private-reference" for e in result.errors)
+
+    @pytest.mark.parametrize("fields", [
+        {"background": "This project's working thesis uses earlier mission reports M1–M6."},
+        {"objective": "Assess public reports about open-source projects."},
+        {"objective": "Research flagged citations listed below.", "background": "One: https://example.org/paper"},
+        {"objective": "This project's working thesis is that records decay."},
+        {"objective": "Compare Apple's M1 and M2 processors."},
+    ])
+    def test_leaves_context_and_explicit_web_research_alone(self, fields):
+        result = lint_mission_for_submit(_MissionStub(**fields))
+        assert not any(w.rule == "project-private-reference" for w in result.warnings)
+
+
 # ---------------------------------------------------------------------------
 # lint_mission_for_submit — aggregate
 # ---------------------------------------------------------------------------
@@ -338,6 +373,19 @@ class TestSubmitEndpointLintIntegration:
         assert body["status"] == "queued"
         rules = {w["rule"] for w in body.get("warnings", [])}
         assert "broad-objective-no-entities" in rules
+
+    def test_private_project_inputs_warn_without_blocking_submission(self, auth_headers, db_session):
+        project = _make_project(db_session)
+        mission = _make_mission(
+            db_session, project_id=project.id,
+            objective="Synthesize M1–M6.", success_criteria=["Return key findings."],
+        )
+        response = TestClient(app).post(
+            f"/api/v1/missions/{mission.id}/submit", headers=auth_headers,
+        )
+        assert response.status_code == 200, response.text
+        assert response.json()["status"] == "queued"
+        assert "project-private-reference" in {w["rule"] for w in response.json()["warnings"]}
 
     def test_clean_mission_submits_with_empty_warnings(self, auth_headers, db_session):
         project = _make_project(db_session)

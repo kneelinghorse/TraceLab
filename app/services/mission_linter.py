@@ -233,7 +233,7 @@ def _coerce_prose(*parts: object) -> str:
             continue
         if isinstance(p, str):
             pieces.append(p)
-        elif isinstance(p, (list, tuple)):
+        elif isinstance(p, list | tuple):
             for item in p:
                 if isinstance(item, str):
                     pieces.append(item)
@@ -283,7 +283,7 @@ def _proper_noun_candidates(text: str) -> set[str]:
 def _list_or_none(value: object) -> list:
     if value is None:
         return []
-    if isinstance(value, (list, tuple)):
+    if isinstance(value, list | tuple):
         return list(value)
     return []
 
@@ -462,11 +462,46 @@ class BroadObjectiveNeedsEntities:
         ]
 
 
+class ProjectPrivateReference:
+    """Warn about inputs a web-only researcher cannot retrieve from the project."""
+
+    name = "project-private-reference"
+    severity = "warning"
+
+    _project = re.compile(r"\b(?:in\s+this\s+project|this\s+project['’]s)\b", re.IGNORECASE)
+    _content = re.compile(r"\b(?:tagged|flagged|corpus|reports?|documents?)\b", re.IGNORECASE)
+    _prior_reports = re.compile(r"\b(?:previous|earlier)\s+mission\s+reports?\b", re.IGNORECASE)
+    _mission_range = re.compile(r"\bM\d+\s*[-–—]\s*M\d+\b", re.IGNORECASE)
+
+    def check(self, mission) -> list[LintViolation]:
+        warnings: list[LintViolation] = []
+        # Background is context, not an instruction to retrieve private inputs.
+        for field in ("objective", "success_criteria", "deliverables", "constraints"):
+            text = _coerce_prose(getattr(mission, field, None))
+            if (
+                (self._project.search(text) and self._content.search(text))
+                or self._prior_reports.search(text)
+                or self._mission_range.search(text)
+            ):
+                warnings.append(LintViolation(
+                    rule=self.name,
+                    field=field,
+                    message="DeepSearch can only see this mission's fields and the public web.",
+                    suggestion=(
+                        "Put the referenced items in the background, and list sources "
+                        "as references with a url. Project documents, reports and tags "
+                        "are not available to the researcher."
+                    ),
+                ))
+        return warnings
+
+
 DEFAULT_RULES: tuple[LintRule, ...] = (
     DistributivePhrasingNeedsEntities(),
     StructuralOutputNeedsShape(),
     ExclusionLanguageNeedsExcludedEntities(),
     BroadObjectiveNeedsEntities(),
+    ProjectPrivateReference(),
 )
 
 

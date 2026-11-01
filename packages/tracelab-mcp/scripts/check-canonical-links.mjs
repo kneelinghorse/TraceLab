@@ -53,7 +53,8 @@ route('GET', '/missions', { data: [mission], pagination });
 route('GET', `/missions/${ids.mission}`, mission);
 route('POST', '/missions', mission);
 route('PATCH', `/missions/${ids.mission}`, mission);
-route('POST', `/missions/${ids.mission}/submit`, { uuid: ids.mission, mission_id: mission.mission_id, status: 'queued', mode: 'worker' });
+const submitWarnings = [{ rule: 'project-private-reference', field: 'objective', message: 'DeepSearch can only see this mission’s fields and the public web.', suggestion: 'Put the items in the background and list source URLs.' }];
+route('POST', `/missions/${ids.mission}/submit`, { uuid: ids.mission, mission_id: mission.mission_id, status: 'queued', mode: 'worker', warnings: submitWarnings });
 route('GET', `/missions/${ids.mission}/status`, mission);
 route('GET', `/missions/${ids.mission}/contract-preview`, preview);
 route('GET', '/evidence', { entries: [evidence], notes: [note], entry_total: 1, note_total: 1 });
@@ -197,7 +198,10 @@ try {
   }
   for (const key of Object.keys(mission)) if (!(key in priorMission)) delete mission[key];
   Object.assign(mission, priorMission);
-  await check('mission_execution', { action: 'submit', mission_id: ids.mission }, [`POST /missions/${ids.mission}/submit`], { url: url('mission') });
+  await check('mission_execution', { action: 'submit', mission_id: ids.mission }, [`POST /missions/${ids.mission}/submit`], { url: url('mission') }, value => assert.deepEqual(value.warnings, submitWarnings));
+  // Older servers omit warnings; the additive client field stays a list.
+  route('POST', `/missions/${ids.mission}/submit`, { uuid: ids.mission, mission_id: mission.mission_id, status: 'queued', mode: 'worker' });
+  await check('mission_execution', { action: 'submit', mission_id: ids.mission }, [`POST /missions/${ids.mission}/submit`], { url: url('mission') }, value => assert.deepEqual(value.warnings, []));
   await check('mission_execution', { action: 'status', mission_id: ids.mission }, [`GET /missions/${ids.mission}/status`], { url: url('mission') });
   const exactReferences = [{ url: 'https://docs.example.test/page?scope=' + 'x'.repeat(600) }];
   await check('mission', { action: 'create', mission_id: 'EXACT-1', title: 'Exact pages', objective: mission.objective, success_criteria: mission.success_criteria, project_id: ids.project, references: exactReferences, context: { authored_scope: authoredScope, unrelated: 'keep' } }, ['POST /missions'], {}, () => { assert.deepEqual(calls.at(-1).body.references, exactReferences); assert.equal(calls.at(-1).body.context.unrelated, 'keep'); assert.deepEqual(calls.at(-1).body.context.authored_scope, authoredScope); });

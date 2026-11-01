@@ -73,7 +73,8 @@ dev = [
     "sqlalchemy[mypy]",
 ]
 test = [
-    "pytest>=8.0.0",
+    # pytest-benchmark 5.3 uses _nodeid, removed in pytest 9.2; lift after plugin support.
+    "pytest>=8.0.0,<9.2",
     "pytest-asyncio>=0.24.0",
     "pytest-cov>=4.1.0",
     "pytest-benchmark>=4.0.0",

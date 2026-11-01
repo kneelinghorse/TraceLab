@@ -159,7 +159,7 @@ class TestPersonalSpaceAdmin:
     def test_the_list_marks_personal_spaces(self, client, db_session, auth_headers):
         owner = _make_user(db_session, "listed@example.com")
         personal = ensure_personal_space(db_session, owner)
-        shared = Workspace(name="Parts Town")
+        shared = Workspace(name="Example Client")
         db_session.add(shared)
         db_session.commit()
 

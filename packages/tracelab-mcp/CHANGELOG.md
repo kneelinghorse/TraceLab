@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.2.1
+
+- Preserve REST submit warnings in `tracelab_mission_execution.submit`, including
+  warnings about project inputs the public-web researcher cannot access.
+- Verify warning preservation through the installed stdio entrypoint and its
+  actual HTTP POST verb. Older API responses without warnings return an empty list.
+
 ## 2.2.0
 
 - Report list/get expose stored origins and readable source labels; list accepts origin filters. Home excludes duplicate mission reports.

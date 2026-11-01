@@ -69,7 +69,7 @@ The UI renders the two differently, so a user always knows which they are readin
 | Collections | 53 | |
 | Projects | 54, zero soft-deleted | Cleaned at Sprint 56 close |
 | Users | 8 | |
-| Spaces | Default (35 projects), Derek-Private (17), Parts Town (2), Personal Archive (0) | |
+| Spaces | Default (35 projects), Derek-Private (17), Example Client (2), Personal Archive (0) | |
 
 **Nobody but Derek has ever run a mission.** Participant 3 has had a Space and access since before this arc opened and has run zero. So the multi-user path is not being scaled — it is being used for the first time.
 

@@ -102,7 +102,7 @@ class TestListMySpaces:
     def test_a_member_sees_their_own_spaces_personal_first(self, client, db_session):
         participant_3 = _user(db_session, "Participant 3")
         stranger = _user(db_session, "Stranger")
-        parts = _shared(db_session, "Parts Town", participant_3)
+        parts = _shared(db_session, "Example Client", participant_3)
         _shared(db_session, "Elsewhere", stranger)
 
         resp = client.get(SPACES_URL, headers=_bearer(participant_3))
@@ -116,7 +116,7 @@ class TestListMySpaces:
         participant_2 = _user(db_session, "Participant 2", ROLE_ADMIN)
         derek = _user(db_session, "Derek", ROLE_OWNER)
         guest = _user(db_session, "Guest")
-        shared = _shared(db_session, "Parts Town", guest)
+        shared = _shared(db_session, "Example Client", guest)
 
         for caller in (participant_2, derek):
             rows = client.get(SPACES_URL, headers=_bearer(caller)).json()
@@ -141,7 +141,7 @@ class TestCreateInASpace:
         participant_3 = _user(db_session, "Participant 3")
         colleague = _user(db_session, "Colleague")
         outsider = _user(db_session, "Outsider")
-        parts = _shared(db_session, "Parts Town", participant_3, colleague)
+        parts = _shared(db_session, "Example Client", participant_3, colleague)
 
         created = client.post(
             PROJECTS_URL,

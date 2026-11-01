@@ -1,0 +1,113 @@
+{
+  "mission": "S68-INTAKE",
+  "date": "2026-10-31",
+  "baseline": "d9c8abd",
+  "scope": [
+    "public README and neutral fixture names",
+    "warning-only project-private-reference lint",
+    "MCP submit warning preservation",
+    "schema 6 quality warning explanations"
+  ],
+  "red_tests": {
+    "mission_linter": "8 failed, 40 passed before implementation",
+    "quality_ui": "7 failed, 25 passed before implementation",
+    "python_mcp": "missing warnings key before implementation",
+    "installed_stdio_contract": "submit warnings were undefined before implementation"
+  },
+  "validation": {
+    "targeted_backend": {
+      "passed": 141,
+      "skipped": 0,
+      "command": "pytest tests/test_mission_linter.py tests/mcp_tools/test_mcp_missions_unit.py tests/test_personal_spaces.py tests/test_shared_space_create.py tests/test_librarian_api.py -q"
+    },
+    "final_librarian_with_draft_warning_regression": {
+      "passed": 30,
+      "skipped": 0
+    },
+    "targeted_frontend_unit": {
+      "passed": 69,
+      "skipped": 0
+    },
+    "frontend_types": "passed",
+    "frontend_lint": "passed",
+    "built_quality_browser": {
+      "passed": 4,
+      "skipped": 0,
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        390,
+        1440
+      ],
+      "fixture_count": 9,
+      "checks": [
+        "no horizontal overflow",
+        "no serious/critical axe violations",
+        "raw details keyboard access",
+        "schema6 clean/warning/version1 provenance fallback",
+        "legacy and unknown future data"
+      ],
+      "visual_review": "phone light warning rendering inspected"
+    },
+    "mcp_unit": {
+      "passed": 160,
+      "skipped": 0
+    },
+    "mcp_2_2_1_installed_tarball": {
+      "passed": 72,
+      "http_requests": 73,
+      "generated_links": 74,
+      "checks": [
+        "npm pack",
+        "install in throwaway directory",
+        "actual stdio MCP entrypoint",
+        "submit POST and warning preservation",
+        "legacy missing-warnings fallback",
+        "ESM CJS-global scan; existing import.meta.url-derived local __dirname intentional"
+      ]
+    },
+    "ruff_changed_python": "passed; two existing UP038 findings corrected in touched linter file",
+    "foundational_refs": "passed",
+    "mcp_surface_parity": "119 operations, 9 clusters, 50 actions, zero errors",
+    "mcp_argument_parity": "126 arguments, zero gaps",
+    "credential_scan": "passed",
+    "client_name_scan": "zero tracked current-tree matches; no history rewrite",
+    "diff_check": "passed",
+    "pytest_benchmark_compatibility": {
+      "mission": "S68-PYTEST",
+      "failing_ci_run": 41262897467,
+      "ci_result": "3226 passed, 4 existing skips, 12 standing deselections, 1 benchmark setup error",
+      "last_green_versions": "pytest9.1.1 / pytest-benchmark5.3.0",
+      "failing_versions": "pytest9.2.0 / pytest-benchmark5.3.0",
+      "clean_reproduction": "Unchanged throughput test fails at node._nodeid with9.2.0 and passes with9.1.1 selected by pyproject.toml constraint; no skips",
+      "constraint": "test-only pytest>=8.0.0,<9.2; remove when plugin supports9.2"
+    }
+  },
+  "live_read_only": {
+    "STIG-008": {
+      "status": "completed",
+      "quality_schema": 6,
+      "delivery_quality": "clean",
+      "verification_scope": "sampled",
+      "report_wide_accuracy": "unknown",
+      "materialization": "ready",
+      "search_ready": true,
+      "linked_document_and_report": true
+    },
+    "older_recoveries": {
+      "M7": "ready/search_ready=true on 2026-10-28",
+      "RB-MA1": "ready/search_ready=true on 2026-10-28"
+    },
+    "limits": [
+      "No new paid run",
+      "No current billing/refund/receipt-counter check",
+      "DeepSearch records a known attribution error in STIG-008 despite its clean tier",
+      "Source-body widening was not exercised by the squeezed STIG-008 run, per DeepSearch validation record"
+    ]
+  },
+  "release": {
+    "state": "prepared; PR CI, deployment and npm registry release not yet verified"
+  }
+}
