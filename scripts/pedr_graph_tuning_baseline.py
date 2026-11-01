@@ -11,10 +11,11 @@ from __future__ import annotations
 import argparse
 import random
 import sys
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -24,14 +25,14 @@ from app.models.search_history import SearchHistory
 from app.services.pedr.pragmatic import QueryIntent, get_pragmatic_service
 from app.services.pedr.search_orchestrator import create_pedr_orchestrator
 
-DEFAULT_OUTPUT = Path("cmos/telemetry/events/graph-tuning-baseline.jsonl")
+DEFAULT_OUTPUT = Path("rbook/telemetry/events/graph-tuning-baseline.jsonl")
 
 
 @dataclass(frozen=True)
 class QuerySpec:
     query: str
-    filters: Dict[str, Any]
-    search_mode: Optional[str] = None
+    filters: dict[str, Any]
+    search_mode: str | None = None
 
 
 def normalize_query(query: str) -> str:
@@ -48,9 +49,9 @@ def _dedupe_key(spec: QuerySpec) -> tuple:
     )
 
 
-def dedupe_specs(specs: Iterable[QuerySpec]) -> List[QuerySpec]:
+def dedupe_specs(specs: Iterable[QuerySpec]) -> list[QuerySpec]:
     seen = set()
-    output: List[QuerySpec] = []
+    output: list[QuerySpec] = []
     for spec in specs:
         key = _dedupe_key(spec)
         if key in seen:
@@ -60,12 +61,12 @@ def dedupe_specs(specs: Iterable[QuerySpec]) -> List[QuerySpec]:
     return output
 
 
-def filters_to_search_params(filters: Mapping[str, Any]) -> Dict[str, Any]:
-    params: Dict[str, Any] = {}
+def filters_to_search_params(filters: Mapping[str, Any]) -> dict[str, Any]:
+    params: dict[str, Any] = {}
     if not filters:
         return params
 
-    def _parse_date(value: Optional[str]) -> Optional[date]:
+    def _parse_date(value: str | None) -> date | None:
         if not value:
             return None
         try:
@@ -91,8 +92,8 @@ def filters_to_search_params(filters: Mapping[str, Any]) -> Dict[str, Any]:
     return {k: v for k, v in params.items() if v is not None}
 
 
-def load_queries_from_file(path: Path) -> List[QuerySpec]:
-    specs: List[QuerySpec] = []
+def load_queries_from_file(path: Path) -> list[QuerySpec]:
+    specs: list[QuerySpec] = []
     for line in path.read_text(encoding="utf-8").splitlines():
         raw = line.strip()
         if not raw or raw.startswith("#"):
@@ -105,8 +106,8 @@ def load_queries_from_history(
     *,
     history_limit: int,
     lookback_days: int,
-    search_modes: Optional[Sequence[str]],
-) -> List[QuerySpec]:
+    search_modes: Sequence[str] | None,
+) -> list[QuerySpec]:
     cutoff = datetime.utcnow() - timedelta(days=lookback_days)
     session = SessionLocal()
     try:
@@ -120,7 +121,7 @@ def load_queries_from_history(
             .limit(max(1, history_limit))
             .all()
         )
-        specs: List[QuerySpec] = []
+        specs: list[QuerySpec] = []
         for row in rows:
             if not row.query_text:
                 continue
@@ -138,9 +139,9 @@ def load_queries_from_history(
 
 def bucket_specs_by_intent(
     specs: Sequence[QuerySpec],
-) -> Dict[QueryIntent, List[QuerySpec]]:
+) -> dict[QueryIntent, list[QuerySpec]]:
     pragmatic = get_pragmatic_service()
-    buckets: Dict[QueryIntent, List[QuerySpec]] = {intent: [] for intent in QueryIntent}
+    buckets: dict[QueryIntent, list[QuerySpec]] = {intent: [] for intent in QueryIntent}
     for spec in specs:
         intent = pragmatic.classify_intent(spec.query).intent
         buckets[intent].append(spec)
@@ -152,19 +153,19 @@ def select_diverse_queries(
     *,
     limit: int,
     seed: int,
-) -> List[QuerySpec]:
+) -> list[QuerySpec]:
     if limit <= 0:
         return []
     if len(specs) <= limit:
         return list(specs)
 
     buckets = bucket_specs_by_intent(specs)
-    rng = random.Random(seed)
+    rng = random.Random(seed)  # noqa: S311 - reproducible benchmark sampling, not a security token
     for bucket in buckets.values():
         rng.shuffle(bucket)
 
     intents = [intent for intent in QueryIntent if buckets.get(intent)]
-    selected: List[QuerySpec] = []
+    selected: list[QuerySpec] = []
     while intents and len(selected) < limit:
         for intent in list(intents):
             bucket = buckets.get(intent, [])
@@ -193,14 +194,14 @@ def run_capture(
     *,
     output_path: Path,
     top_k: int,
-    graph_depth: Optional[int],
-    graph_decay: Optional[float],
-    graph_weight: Optional[float],
-    graph_edge_types: Optional[List[str]],
-    graph_top_k_seeds: Optional[int],
+    graph_depth: int | None,
+    graph_decay: float | None,
+    graph_weight: float | None,
+    graph_edge_types: list[str] | None,
+    graph_top_k_seeds: int | None,
     disable_cache: bool,
     verbose: bool,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     if disable_cache:
         settings.pedr_cache_enabled = False
 
@@ -211,7 +212,7 @@ def run_capture(
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     success = 0
-    failed: List[Dict[str, str]] = []
+    failed: list[dict[str, str]] = []
 
     for idx, spec in enumerate(specs, start=1):
         query_text = normalize_query(spec.query)
@@ -249,7 +250,7 @@ def run_capture(
     }
 
 
-def _split_csv(value: Optional[str]) -> Optional[List[str]]:
+def _split_csv(value: str | None) -> list[str] | None:
     if not value:
         return None
     items = [item.strip() for item in value.split(",") if item.strip()]

@@ -5,7 +5,7 @@ Sprint 03 Mission Protocol Efficacy Evaluator (B3.5)
 
 Aggregates validation, quality gate, and API telemetry to determine whether
 Sprint 03 success criteria were met. Generates both Markdown and JSON reports
-under ``cmos/reports/sprint-03`` so planning artifacts stay synchronized with
+under ``rbook/reports/sprint-03`` so planning artifacts stay synchronized with
 the CMOS Mission Protocol workspace.
 """
 
@@ -13,20 +13,20 @@ from __future__ import annotations
 
 import argparse
 import json
+from collections.abc import Sequence
 from dataclasses import asdict, dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from statistics import fmean
-from typing import Any, Dict, Iterable, List, Sequence
-
+from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-TELEMETRY_DIR = REPO_ROOT / "cmos" / "telemetry" / "events"
-REPORTS_DIR = REPO_ROOT / "cmos" / "reports" / "sprint-03"
+TELEMETRY_DIR = REPO_ROOT / "rbook" / "telemetry" / "events"
+REPORTS_DIR = REPO_ROOT / "rbook" / "reports" / "sprint-03"
 SUMMARY_PATH = REPORTS_DIR / "sprint-03-summary.md"
 METRICS_PATH = REPORTS_DIR / "metrics.json"
 
-TELEMETRY_FILES: Dict[str, Path] = {
+TELEMETRY_FILES: dict[str, Path] = {
     "validation": TELEMETRY_DIR / "sprint-03-validation.jsonl",
     "quality_gates": TELEMETRY_DIR / "sprint-03-quality-gates.jsonl",
     "api_performance": TELEMETRY_DIR / "sprint-03-api-performance.jsonl",
@@ -44,19 +44,19 @@ class MetricResult:
     met: bool
     actual: Any
     target: Any
-    details: Dict[str, Any]
+    details: dict[str, Any]
 
-    def as_dict(self) -> Dict[str, Any]:
+    def as_dict(self) -> dict[str, Any]:
         payload = asdict(self)
         return payload
 
 
-def load_jsonl(path: Path) -> List[Dict[str, Any]]:
+def load_jsonl(path: Path) -> list[dict[str, Any]]:
     """Load newline-delimited JSON telemetry."""
 
     if not path.exists():
         raise FileNotFoundError(f"Telemetry file missing: {path}")
-    items: List[Dict[str, Any]] = []
+    items: list[dict[str, Any]] = []
     for line in path.read_text(encoding="utf-8").splitlines():
         line = line.strip()
         if not line:
@@ -69,13 +69,13 @@ def _pct(part: int, whole: int) -> float:
     return 0.0 if whole == 0 else part / whole
 
 
-def compute_validation_coverage(events: Sequence[Dict[str, Any]]) -> MetricResult:
+def compute_validation_coverage(events: Sequence[dict[str, Any]]) -> MetricResult:
     """Mission Protocol validation must exceed 95% success across all layers."""
 
     required_layers = ("api", "service", "database")
     total = len(events)
     passing = 0
-    failures: List[Dict[str, Any]] = []
+    failures: list[dict[str, Any]] = []
 
     for event in events:
         layers = event.get("layers", {})
@@ -114,12 +114,12 @@ def compute_validation_coverage(events: Sequence[Dict[str, Any]]) -> MetricResul
 
 
 def compute_quality_gate_effectiveness(
-    events: Sequence[Dict[str, Any]],
+    events: Sequence[dict[str, Any]],
 ) -> MetricResult:
     """Quality gate failures must block promotion and include actionable notes."""
 
-    gate_totals: Dict[str, Dict[str, int]] = {}
-    fail_records: List[Dict[str, Any]] = []
+    gate_totals: dict[str, dict[str, int]] = {}
+    fail_records: list[dict[str, Any]] = []
 
     for event in events:
         gate = event.get("gate")
@@ -163,7 +163,7 @@ def compute_quality_gate_effectiveness(
     )
 
 
-def compute_api_stability(events: Sequence[Dict[str, Any]]) -> MetricResult:
+def compute_api_stability(events: Sequence[dict[str, Any]]) -> MetricResult:
     """Mission Protocol CRUD endpoints must run >99% uptime with p95 latency <500ms."""
 
     if not events:
@@ -200,7 +200,7 @@ def compute_api_stability(events: Sequence[Dict[str, Any]]) -> MetricResult:
     )
 
 
-def compute_yaml_roundtrip(events: Sequence[Dict[str, Any]]) -> MetricResult:
+def compute_yaml_roundtrip(events: Sequence[dict[str, Any]]) -> MetricResult:
     """Import→export→import loop must retain 100% fidelity."""
 
     total = len(events)
@@ -225,7 +225,7 @@ def compute_yaml_roundtrip(events: Sequence[Dict[str, Any]]) -> MetricResult:
     )
 
 
-def compute_evidence_integrity(events: Sequence[Dict[str, Any]]) -> MetricResult:
+def compute_evidence_integrity(events: Sequence[dict[str, Any]]) -> MetricResult:
     """All linked evidence chunks must exist and meet relevance thresholds."""
 
     missing_events = [
@@ -258,7 +258,7 @@ def compute_evidence_integrity(events: Sequence[Dict[str, Any]]) -> MetricResult
 
 
 def compute_progress_accuracy(
-    events: Sequence[Dict[str, Any]], tolerance: float = 0.05
+    events: Sequence[dict[str, Any]], tolerance: float = 0.05
 ) -> MetricResult:
     """Progress tracker must stay within ±5% of actual field coverage."""
 
@@ -293,7 +293,7 @@ def compute_progress_accuracy(
 def build_summary(results: Sequence[MetricResult]) -> str:
     """Render Markdown report for planning handoff."""
 
-    timestamp = datetime.now(timezone.utc).isoformat()
+    timestamp = datetime.now(UTC).isoformat()
     met_count = sum(1 for result in results if result.met)
     lines = [
         "# Sprint 03 Mission Protocol Evaluation",
@@ -330,7 +330,7 @@ def write_reports(results: Sequence[MetricResult]) -> None:
     REPORTS_DIR.mkdir(parents=True, exist_ok=True)
     metrics_payload = {
         "sprint": "Sprint 03",
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": datetime.now(UTC).isoformat(),
         "results": [result.as_dict() for result in results],
     }
     SUMMARY_PATH.write_text(build_summary(results) + "\n", encoding="utf-8")

@@ -11,7 +11,7 @@ from pydantic import BaseModel
 from app.schemas.evidence_ledger import LedgerDisposition
 from app.schemas.mission import MissionStatus
 
-CONTRACT = json.loads((Path(__file__).resolve().parents[2] / "cmos/contracts/oods-object-model.json").read_text())
+CONTRACT = json.loads((Path(__file__).resolve().parents[2] / "rbook/contracts/oods-object-model.json").read_text())
 
 pytestmark = pytest.mark.unit
 
@@ -68,7 +68,7 @@ def test_absent_ownership_is_not_made_required_and_chunks_stay_embedded():
 @pytest.mark.parametrize("name", CONTRACT["objects"])
 def test_mapping_constraints_match_the_retained_native_forge_registry(name):
     """The mapping must describe the tool's composed schema, including trait overrides."""
-    snapshot = Path(__file__).resolve().parents[2] / "cmos/reports/sprint-50/oods-previews/objects" / f"{name}.json"
+    snapshot = Path(__file__).resolve().parents[2] / "rbook/reports/sprint-50/oods-previews/objects" / f"{name}.json"
     actual = json.loads(snapshot.read_text())
     assert actual["name"] == name
     assert actual["maturity"] == "alpha"

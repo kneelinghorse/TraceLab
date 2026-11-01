@@ -19,11 +19,11 @@ import re
 import time
 import unicodedata
 from collections import Counter
+from collections.abc import Iterable
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Tuple
-
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CORPUS_DIR = PROJECT_ROOT / "artifacts/benchmarks/benchmark-corpus"
@@ -91,25 +91,25 @@ SOURCE_DOCS = [
         "doc_id": "doc-009-sprint-19-retrospective",
         "title": "Sprint 19 Retrospective",
         "category": "reports",
-        "source_path": "cmos/reports/sprint-19/retrospective.md",
+        "source_path": "rbook/reports/sprint-19/retrospective.md",
     },
     {
         "doc_id": "doc-010-pedr-baseline-capture",
         "title": "PEDR Baseline Capture (Sprint 18)",
         "category": "reports",
-        "source_path": "cmos/reports/sprint-18/pedr-baseline-capture.md",
+        "source_path": "rbook/reports/sprint-18/pedr-baseline-capture.md",
     },
     {
         "doc_id": "doc-011-graph-parameter-optimization",
         "title": "Graph Parameter Optimization (Sprint 26)",
         "category": "reports",
-        "source_path": "cmos/reports/sprint-26/graph-parameter-optimization.md",
+        "source_path": "rbook/reports/sprint-26/graph-parameter-optimization.md",
     },
     {
         "doc_id": "doc-012-qdrant-optimization-research",
         "title": "Qdrant Optimization Research (Sprint 19)",
         "category": "reports",
-        "source_path": "cmos/reports/sprint-19/qdrant-optimization-research.md",
+        "source_path": "rbook/reports/sprint-19/qdrant-optimization-research.md",
     },
     {
         "doc_id": "doc-013-docs-readme",
@@ -388,19 +388,19 @@ SOURCE_DOCS = [
 class CorpusDocument:
     doc_id: str
     text: str
-    tokens: List[str]
+    tokens: list[str]
     term_freq: Counter
     length: int
 
 
 @dataclass(frozen=True)
 class CorpusIndex:
-    documents: List[CorpusDocument]
+    documents: list[CorpusDocument]
     doc_freqs: Counter
     avg_doc_len: float
     doc_count: int
-    tfidf_idf: Dict[str, float]
-    tfidf_doc_norms: Dict[str, float]
+    tfidf_idf: dict[str, float]
+    tfidf_doc_norms: dict[str, float]
 
 
 def sanitize_ascii(text: str) -> str:
@@ -409,12 +409,12 @@ def sanitize_ascii(text: str) -> str:
     return ascii_text
 
 
-def tokenize(text: str) -> List[str]:
+def tokenize(text: str) -> list[str]:
     return TOKEN_RE.findall(text.lower())
 
 
-def build_documents_from_texts(texts: Dict[str, str]) -> List[CorpusDocument]:
-    documents: List[CorpusDocument] = []
+def build_documents_from_texts(texts: dict[str, str]) -> list[CorpusDocument]:
+    documents: list[CorpusDocument] = []
     for doc_id, text in texts.items():
         tokens = tokenize(text)
         term_freq = Counter(tokens)
@@ -433,13 +433,13 @@ def build_documents_from_texts(texts: Dict[str, str]) -> List[CorpusDocument]:
 def build_corpus(
     corpus_dir: Path,
     *,
-    sources: List[Dict[str, str]],
+    sources: list[dict[str, str]],
     overwrite: bool = False,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     documents_dir = corpus_dir / "documents"
     documents_dir.mkdir(parents=True, exist_ok=True)
 
-    manifest_docs: List[Dict[str, Any]] = []
+    manifest_docs: list[dict[str, Any]] = []
     for source in sources:
         source_path = PROJECT_ROOT / source["source_path"]
         if not source_path.exists():
@@ -469,7 +469,7 @@ def build_corpus(
 
     manifest = {
         "corpus_id": "tracelab-rag-baseline-v1",
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": datetime.now(UTC).isoformat(),
         "document_count": len(manifest_docs),
         "documents": manifest_docs,
     }
@@ -478,10 +478,10 @@ def build_corpus(
     return manifest
 
 
-def load_corpus(corpus_dir: Path) -> Tuple[Dict[str, Any], List[CorpusDocument]]:
+def load_corpus(corpus_dir: Path) -> tuple[dict[str, Any], list[CorpusDocument]]:
     manifest_path = corpus_dir / "corpus_manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    texts: Dict[str, str] = {}
+    texts: dict[str, str] = {}
     for doc in manifest["documents"]:
         text_path = corpus_dir / doc["text_path"]
         texts[doc["doc_id"]] = text_path.read_text(encoding="utf-8")
@@ -489,10 +489,10 @@ def load_corpus(corpus_dir: Path) -> Tuple[Dict[str, Any], List[CorpusDocument]]
     return manifest, documents
 
 
-def build_index(documents: List[CorpusDocument]) -> CorpusIndex:
+def build_index(documents: list[CorpusDocument]) -> CorpusIndex:
     doc_freqs: Counter = Counter()
     for doc in documents:
-        for term in doc.term_freq.keys():
+        for term in doc.term_freq:
             doc_freqs[term] += 1
 
     doc_count = len(documents)
@@ -514,10 +514,10 @@ def build_index(documents: List[CorpusDocument]) -> CorpusIndex:
 
 
 def _compute_tfidf_doc_norms(
-    documents: List[CorpusDocument],
-    idf: Dict[str, float],
-) -> Dict[str, float]:
-    norms: Dict[str, float] = {}
+    documents: list[CorpusDocument],
+    idf: dict[str, float],
+) -> dict[str, float]:
+    norms: dict[str, float] = {}
     for doc in documents:
         norm_sq = 0.0
         for term, count in doc.term_freq.items():
@@ -534,8 +534,8 @@ def bm25_scores(
     index: CorpusIndex,
     k1: float = 1.5,
     b: float = 0.75,
-) -> Dict[str, float]:
-    scores: Dict[str, float] = {}
+) -> dict[str, float]:
+    scores: dict[str, float] = {}
     query_terms = list(query_tokens)
     for doc in index.documents:
         score = 0.0
@@ -556,10 +556,10 @@ def tfidf_scores(
     query_tokens: Iterable[str],
     *,
     index: CorpusIndex,
-) -> Dict[str, float]:
+) -> dict[str, float]:
     query_counts = Counter(query_tokens)
     query_len = sum(query_counts.values()) or 1
-    query_weights: Dict[str, float] = {}
+    query_weights: dict[str, float] = {}
     for term, count in query_counts.items():
         tf = count / query_len
         query_weights[term] = tf * index.tfidf_idf.get(term, 0.0)
@@ -567,7 +567,7 @@ def tfidf_scores(
     query_norm_sq = sum(weight * weight for weight in query_weights.values())
     query_norm = math.sqrt(query_norm_sq) or 1.0
 
-    scores: Dict[str, float] = {}
+    scores: dict[str, float] = {}
     for doc in index.documents:
         dot = 0.0
         for term, q_weight in query_weights.items():
@@ -580,14 +580,14 @@ def tfidf_scores(
     return scores
 
 
-def min_max_normalize(scores: Dict[str, float]) -> Dict[str, float]:
+def min_max_normalize(scores: dict[str, float]) -> dict[str, float]:
     if not scores:
         return {}
     values = list(scores.values())
     minimum = min(values)
     maximum = max(values)
     span = maximum - minimum
-    normalized: Dict[str, float] = {}
+    normalized: dict[str, float] = {}
     for doc_id, score in scores.items():
         if span <= 0:
             normalized[doc_id] = 1.0 if score > 0 or score == maximum else 0.0
@@ -597,15 +597,15 @@ def min_max_normalize(scores: Dict[str, float]) -> Dict[str, float]:
 
 
 def hybrid_scores(
-    semantic_scores: Dict[str, float],
-    keyword_scores: Dict[str, float],
+    semantic_scores: dict[str, float],
+    keyword_scores: dict[str, float],
     *,
     semantic_weight: float,
     keyword_weight: float,
-) -> Dict[str, float]:
+) -> dict[str, float]:
     semantic_norm = min_max_normalize(semantic_scores)
     keyword_norm = min_max_normalize(keyword_scores)
-    combined: Dict[str, float] = {}
+    combined: dict[str, float] = {}
     for doc_id in set(semantic_norm) | set(keyword_norm):
         combined[doc_id] = (
             semantic_norm.get(doc_id, 0.0) * semantic_weight
@@ -614,29 +614,29 @@ def hybrid_scores(
     return combined
 
 
-def rank_scores(scores: Dict[str, float], *, top_k: int) -> List[Tuple[str, float]]:
+def rank_scores(scores: dict[str, float], *, top_k: int) -> list[tuple[str, float]]:
     return sorted(scores.items(), key=lambda item: (-item[1], item[0]))[:top_k]
 
 
-def precision_at_k(relevant: Dict[str, int], retrieved: List[str], k: int) -> float:
+def precision_at_k(relevant: dict[str, int], retrieved: list[str], k: int) -> float:
     if k <= 0:
         return 0.0
     hits = sum(1 for doc_id in retrieved[:k] if doc_id in relevant)
     return hits / k
 
 
-def recall_at_k(relevant: Dict[str, int], retrieved: List[str], k: int) -> float:
+def recall_at_k(relevant: dict[str, int], retrieved: list[str], k: int) -> float:
     if not relevant:
         return 0.0
     hits = sum(1 for doc_id in retrieved[:k] if doc_id in relevant)
     return hits / len(relevant)
 
 
-def ndcg_at_k(relevant: Dict[str, int], retrieved: List[str], k: int) -> float:
+def ndcg_at_k(relevant: dict[str, int], retrieved: list[str], k: int) -> float:
     if not relevant or k <= 0:
         return 0.0
 
-    def _dcg(items: List[str]) -> float:
+    def _dcg(items: list[str]) -> float:
         score = 0.0
         for idx, doc_id in enumerate(items[:k], start=1):
             rel = relevant.get(doc_id, 0)
@@ -652,7 +652,7 @@ def ndcg_at_k(relevant: Dict[str, int], retrieved: List[str], k: int) -> float:
     return dcg / idcg if idcg > 0 else 0.0
 
 
-def summarize_metric(values: List[float]) -> Dict[str, float]:
+def summarize_metric(values: list[float]) -> dict[str, float]:
     if not values:
         return {"mean": 0.0, "p50": 0.0, "p95": 0.0}
     sorted_values = sorted(values)
@@ -666,21 +666,21 @@ def summarize_metric(values: List[float]) -> Dict[str, float]:
 def evaluate_queries(
     *,
     index: CorpusIndex,
-    queries: List[Dict[str, Any]],
+    queries: list[dict[str, Any]],
     top_k: int,
     semantic_weight: float,
     keyword_weight: float,
-) -> Dict[str, Any]:
-    semantic_results: List[Dict[str, Any]] = []
-    hybrid_results: List[Dict[str, Any]] = []
-    semantic_metrics: List[float] = []
-    hybrid_metrics: List[float] = []
-    semantic_recalls: List[float] = []
-    hybrid_recalls: List[float] = []
-    semantic_ndcg: List[float] = []
-    hybrid_ndcg: List[float] = []
-    semantic_latencies: List[float] = []
-    hybrid_latencies: List[float] = []
+) -> dict[str, Any]:
+    semantic_results: list[dict[str, Any]] = []
+    hybrid_results: list[dict[str, Any]] = []
+    semantic_metrics: list[float] = []
+    hybrid_metrics: list[float] = []
+    semantic_recalls: list[float] = []
+    hybrid_recalls: list[float] = []
+    semantic_ndcg: list[float] = []
+    hybrid_ndcg: list[float] = []
+    semantic_latencies: list[float] = []
+    hybrid_latencies: list[float] = []
 
     for query in queries:
         query_text = query["query"]
@@ -791,16 +791,16 @@ def evaluate_queries(
     }
 
 
-def load_queries(queries_path: Path) -> List[Dict[str, Any]]:
+def load_queries(queries_path: Path) -> list[dict[str, Any]]:
     payload = json.loads(queries_path.read_text(encoding="utf-8"))
     return payload["queries"]
 
 
 def build_queries(
     *,
-    sources: List[Dict[str, str]],
+    sources: list[dict[str, str]],
     top_k: int = DEFAULT_TOP_K,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     queries = []
     for index, source in enumerate(sources, start=1):
         queries.append(
@@ -816,9 +816,9 @@ def build_queries(
 def write_queries(
     queries_path: Path,
     *,
-    sources: List[Dict[str, str]],
+    sources: list[dict[str, str]],
     top_k: int = DEFAULT_TOP_K,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     payload = build_queries(sources=sources, top_k=top_k)
     queries_path.parent.mkdir(parents=True, exist_ok=True)
     queries_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
@@ -833,7 +833,7 @@ def run_benchmark(
     top_k: int,
     semantic_weight: float,
     keyword_weight: float,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     manifest, documents = load_corpus(corpus_dir)
     index = build_index(documents)
     queries = load_queries(queries_path)
@@ -849,7 +849,7 @@ def run_benchmark(
     payload = {
         "benchmark": {
             "name": "rag-hybrid-baseline",
-            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "generated_at": datetime.now(UTC).isoformat(),
             "corpus_manifest": str(corpus_dir / "corpus_manifest.json"),
             "queries_path": str(queries_path),
             "doc_count": manifest["document_count"],

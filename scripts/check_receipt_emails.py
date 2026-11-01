@@ -47,7 +47,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         paths = [
             p for p in _tracked_paths()
-            if p.as_posix().startswith(("cmos/reports/", "telemetry/"))
+            if p.as_posix().startswith(("rbook/reports/", "telemetry/"))
         ] if args.tracked else args.paths
         failed = False
         for path in paths:

@@ -13,7 +13,6 @@ Covers:
 from __future__ import annotations
 
 import json
-from pathlib import Path
 
 import pytest
 
@@ -23,7 +22,6 @@ from app.core.telemetry import (
     is_envelope_format,
     validate_jsonl_file,
 )
-
 
 # -------------------------------------------------------------------------
 # TelemetryEnvelope tests
@@ -337,6 +335,18 @@ class TestValidateJsonlFile:
 
 class TestMigrationScript:
     """Tests for the migration script's line-level logic."""
+
+    @pytest.mark.parametrize("record_folder", ["cmos", "rbook"])
+    def test_record_move_preserves_event_source(self, tmp_path, record_folder):
+        """Renaming the record must not reclassify its events as application telemetry."""
+        from scripts.migrate_telemetry_format import migrate_line
+
+        filepath = tmp_path / record_folder / "telemetry" / "events" / "session.jsonl"
+        parsed = json.loads(migrate_line('{"status": "completed"}', filepath))
+        assert is_envelope_format(parsed)
+        assert parsed["source"] == "cmos"
+        assert parsed["event_type"] == "cmos.event"
+        assert parsed["payload"] == {"status": "completed"}
 
     def test_migrate_legacy_line(self, tmp_path):
         from scripts.migrate_telemetry_format import migrate_line

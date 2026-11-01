@@ -5,7 +5,7 @@ TraceLab's Sprint 07 workflow validation proves both the browser workspace and t
 ## Prerequisites
 - Core services running: PostgreSQL + Qdrant (`docker-compose up -d`), FastAPI (`uvicorn app.main:app --reload`), and the Next.js Mission Protocol frontend (`cd frontend && npm run dev`).
 - Environment configured with valid `OPENAI_API_KEY`, `QDRANT_URL`, and auth credentials from `AUTH_USERNAME` / `AUTH_PASSWORD`.
-- Mission Protocol SQLite mirrors synced via `python cmos/scripts/migrate_cmos_memory.py --source cmos --target cmos --sync-db` and parity verified with `python cmos/scripts/validate_parity.py --check`.
+- Mission Protocol SQLite mirrors synced via `python rbook/scripts/migrate_cmos_memory.py --source cmos --target cmos --sync-db` and parity verified with `python rbook/scripts/validate_parity.py --check`.
 - (Optional) When running Playwright automation locally, export `NEXT_PUBLIC_E2E_AUTH_TOKEN` to bypass the login panel inside controlled test runs.
 
 ## Browser Workflow

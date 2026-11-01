@@ -3,8 +3,8 @@
 Baseline: main `bf750cb70550a33f179b0ca4c2518454122ff87c` (2026-09-15, end of the Sprint 52 build), with
 later scoped updates. S63-CLEAN (2026-10-01) verified the mission routes/filters,
 command palette and saved-search path below; it did not re-audit the entire page.
-Architecture follows `cmos/foundational-docs/tech_arch_template.md`. Intent and the sprint plan live in the living
-roadmap, `cmos/foundational-docs/roadmap-sprints-50-53-ux-overhaul.md`; CMOS holds mission
+Architecture follows `rbook/foundational-docs/tech_arch_template.md`. Intent and the sprint plan live in the living
+roadmap, `rbook/foundational-docs/roadmap-sprints-50-53-ux-overhaul.md`; CMOS holds mission
 status. The Sprint 03 "Mission Protocol UI" notes this page replaces are in git history
 (`git show 3a498c6:docs/frontend_architecture.md`).
 
@@ -94,7 +94,7 @@ and the route-migration map together.
   (30 s); the shared summary poll (`lib/hooks/useActivitySummary.ts`) also owns `markViewed`, which records
   an opened item and revalidates the badges and Home.
 - Every transport in this directory is inventoried by `scripts/mcp_parity_audit.mjs` and classified in
-  `cmos/contracts/mcp-parity-manifest.json`, so the MCP surface and the UI cannot drift apart silently.
+  `rbook/contracts/mcp-parity-manifest.json`, so the MCP surface and the UI cannot drift apart silently.
 
 ## UI primitives (`frontend/src/components/ui`)
 
@@ -133,7 +133,7 @@ pages render not-found as a distinct state), `PaginationBar`, `StatusBadge`, `Ta
   on a schedule and on dispatch, and every UI mission reruns the read-only direct-browser baseline
   `frontend/scripts/ui-shell-smoke.mjs` (every route, Light and Dark, 1440 and 390 px, axe and overflow
   checks under an America/Chicago clock) only after both Railway services report SUCCESS. Receipts live
-  under `cmos/reports/sprint-N/`.
+  under `rbook/reports/sprint-N/`.
 
 ## Configuration
 

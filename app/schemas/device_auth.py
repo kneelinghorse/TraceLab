@@ -2,7 +2,7 @@
 
 Wire shape mirrors the cmos-mcp contract verbatim so the MCP-client device-
 code module can be ported with a single base-URL swap. See
-``cmos/contracts/`` (companion doc) and ``app/api/v1/auth/device.py``.
+``rbook/contracts/`` (companion doc) and ``app/api/v1/auth/device.py``.
 """
 from __future__ import annotations
 

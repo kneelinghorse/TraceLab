@@ -15,7 +15,7 @@ import sqlite3
 
 import pytest
 
-from cmos.context.session_runtime import SessionCapture, SessionRuntime
+from rbook.context.session_runtime import SessionCapture, SessionRuntime
 
 # -------------------------------------------------------------------------
 # SessionCapture evidence tests
@@ -313,7 +313,7 @@ class TestStrategicDecisionsSyncWithEvidence:
 
     @pytest.fixture()
     def db_client(self, cmos_db):
-        from cmos.context.db_client import SQLiteClient
+        from rbook.context.db_client import SQLiteClient
 
         client = SQLiteClient(cmos_db, create_missing=False)
         yield client
@@ -386,14 +386,14 @@ class TestStrategicDecisionsSyncWithEvidence:
         assert len(rows) == 1
 
     def test_parse_decision_entry_string(self):
-        from cmos.context.db_client import SQLiteClient
+        from rbook.context.db_client import SQLiteClient
 
         result = SQLiteClient._parse_decision_entry("Simple decision")
         assert result["decision_text"] == "Simple decision"
         assert result["evidence"] is None
 
     def test_parse_decision_entry_dict(self):
-        from cmos.context.db_client import SQLiteClient
+        from rbook.context.db_client import SQLiteClient
 
         result = SQLiteClient._parse_decision_entry(
             {
@@ -408,13 +408,13 @@ class TestStrategicDecisionsSyncWithEvidence:
         assert evidence[0]["type"] == "insight"
 
     def test_parse_decision_entry_empty_text(self):
-        from cmos.context.db_client import SQLiteClient
+        from rbook.context.db_client import SQLiteClient
 
         result = SQLiteClient._parse_decision_entry({"text": ""})
         assert result is None
 
     def test_parse_decision_entry_non_string_non_dict(self):
-        from cmos.context.db_client import SQLiteClient
+        from rbook.context.db_client import SQLiteClient
 
         result = SQLiteClient._parse_decision_entry(42)
         assert result is None
@@ -471,7 +471,7 @@ class TestRetroactiveLinking:
             {"type": "search_result", "id": "graph-quality-report-2026-03-12"},
             {
                 "type": "document",
-                "id": "cmos/telemetry/events/graph-quality-report.json",
+                "id": "rbook/telemetry/events/graph-quality-report.json",
             },
         ]
         conn.execute(

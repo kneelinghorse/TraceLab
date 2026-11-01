@@ -1,6 +1,9 @@
 # TraceLab Agent Playbook
 
-CMOS keeps this project's record at the **Builder** level: decisions, lessons, sprints and missions. Its tools and hooks say when to use it; `cmos-mcp ambient off` turns the hooks off here.
+Reasonbook keeps this project's record at the **Builder** level: decisions, lessons, sprints and missions. Its tools and hooks say when to use it; `reasonbook ambient off` turns the hooks off here.
+
+The foundational rules below are preserved verbatim. Their former tool names now
+map to `rbook_decisions` and `rbook_learnings`.
 
 ## Hard Operating Rules
 
@@ -100,8 +103,8 @@ Any feature that reads a new environment variable is NOT done until that var is 
 ---
 
 ## Project Overview
-- TraceLab ships a FastAPI + PostgreSQL research platform with RAG pipelines plus the CMOS Mission Protocol workspace under `cmos/` for backlog, telemetry, and agent orchestration.
-- The canonical runtime artifacts live at repository root (`app/`, `docs/`, `db/`, `scripts/`, `tests/`, etc.); treat `cmos/` as an internal planning workbench per `cmos/agents.md`.
+- TraceLab ships a FastAPI + PostgreSQL research platform with RAG pipelines plus the CMOS Mission Protocol workspace under `rbook/` for backlog, telemetry, and agent orchestration.
+- The canonical runtime artifacts live at repository root (`app/`, `docs/`, `db/`, `scripts/`, `tests/`, etc.); treat `rbook/` as an internal planning workbench per `rbook/agents.md`.
 - All deliverables must preserve parity between PostgreSQL (core app) and SQLite (Mission Protocol) environments; keep file mirrors as read-friendly exports only.
 
 ## Build & Development Commands
@@ -151,7 +154,7 @@ pre-commit install
 - After editing `packages/tracelab-mcp/src/`, rebuild before testing locally: `cd packages/tracelab-mcp && npm run build`. The `bin` entry (`dist/index.js`) won't exist on a fresh clone until you build.
 - `npm publish` automatically runs `prepublishOnly` → `npm run build`, so the published tarball is always built from current src — no manual step needed at publish time.
 - If the MCP appears stale in Claude Desktop, run `npm run build` and restart the client; do not re-add `dist/` to git.
-- **MCP tool surface (T41.7 foundation; LEDGER-1, MCP-1, MCP-2 and MCP-6 extensions):** 9 action-clustered tools / 50 actions in source, not the prior ~24 flat ones. Each cluster takes an `action` param plus action-specific keys; the authoritative tables are `docs/mcp-tools.md` and `packages/tracelab-mcp/README.md`, and `cmos/contracts/mcp-parity-manifest.json` classifies every UI operation against them (`node scripts/mcp_parity_audit.mjs` must exit 0). Legacy tool-name calls return a friendly migration error pointing at the new cluster+action. Mapping table and migration error live in `packages/tracelab-mcp/src/index.ts::LEGACY_TO_CLUSTER`.
+- **MCP tool surface (T41.7 foundation; LEDGER-1, MCP-1, MCP-2 and MCP-6 extensions):** 9 action-clustered tools / 50 actions in source, not the prior ~24 flat ones. Each cluster takes an `action` param plus action-specific keys; the authoritative tables are `docs/mcp-tools.md` and `packages/tracelab-mcp/README.md`, and `rbook/contracts/mcp-parity-manifest.json` classifies every UI operation against them (`node scripts/mcp_parity_audit.mjs` must exit 0). Legacy tool-name calls return a friendly migration error pointing at the new cluster+action. Mapping table and migration error live in `packages/tracelab-mcp/src/index.ts::LEGACY_TO_CLUSTER`.
 
 ### Evidence Ledger Research Convention
 
@@ -182,12 +185,12 @@ cd frontend && npx playwright test
 - **Python**: follow PEP 8 with type hints, pytest fixtures, and lint via `ruff`; keep FastAPI routers thin and push logic into `app/services`.
 - **Linting**: `ruff check` enforces E/F/W/I/UP/B/SIM/S rules. Config in `pyproject.toml`.
 - **Type checking**: `mypy` with `disallow_untyped_defs` on `app/core/` and `app/ports/` (not strict mode). It is a local diagnostic only: CI-2 removed the mypy lane and no Python type gate runs in CI (decision #407).
-- **TypeScript/Node utilities** (under `cmos/` or tooling scripts): use ES2020 modules, strict TS configs, and JSDoc for exported helpers.
-- Keep mission documentation single-sourced: updates to `docs/`, `foundational-docs/`, or `cmos/docs/` must reference the guiding template rather than duplicating content.
+- **TypeScript/Node utilities** (under `rbook/` or tooling scripts): use ES2020 modules, strict TS configs, and JSDoc for exported helpers.
+- Keep mission documentation single-sourced: updates to `docs/`, `foundational-docs/`, or `rbook/docs/` must reference the guiding template rather than duplicating content.
 
 ## Security & Quality Guardrails
 - Enforce the project's OWASP controls (no secrets in logs, parameterized DB access, TLS-only external calls); see `docs/authentication.md`, `docs/data-protection-audit.md` and `scripts/check_no_credential_literals.py`.
-- Before concluding any mission that touches runtime code, execute `python cmos/scripts/validate_foundational_refs.py` (it confirms the roadmap and architecture template references in cmos/agents.md, cmos/README.md and cmos/context/MASTER_CONTEXT.json; it does not check that links resolve) and rerun relevant pytest suites (`pytest tests/` or targeted folders).
+- Before concluding any mission that touches runtime code, execute `python rbook/scripts/validate_foundational_refs.py` (it confirms the roadmap and architecture template references in rbook/agents.md, rbook/README.md and rbook/context/MASTER_CONTEXT.json; it does not check that links resolve) and rerun relevant pytest suites (`pytest tests/` or targeted folders).
 
 ## MCP Contract Guard (sprint-41 codification)
 
@@ -212,20 +215,20 @@ Apply this rule when changing:
 
 For the parallel-serializers gap specifically, see the **two MCP
 serialization surfaces** note in
-[cmos/contracts/mission-authoring-contract.md](cmos/contracts/mission-authoring-contract.md).
+[rbook/contracts/mission-authoring-contract.md](rbook/contracts/mission-authoring-contract.md).
 
 ## Mission-Authoring Boundary Contract
 
 When changing any mission-authoring field (anything that flows from
 `create_mission` / `update_mission` through the contract compiler to
 the DeepSearch worker), update
-[cmos/contracts/mission-authoring-contract.md](cmos/contracts/mission-authoring-contract.md)
+[rbook/contracts/mission-authoring-contract.md](rbook/contracts/mission-authoring-contract.md)
 in the same commit. That doc is the single source of truth for the
 MCP param ↔ Pydantic field ↔ DB column ↔ REST response field ↔ DS
 worker SELECT mapping. Origin: DeepSearch ask in message
 `3cf143ee` (T41.3 deliverable).
 
-Related: [cmos/contracts/deepsearch-compiler-vendor.md](cmos/contracts/deepsearch-compiler-vendor.md)
+Related: [rbook/contracts/deepsearch-compiler-vendor.md](rbook/contracts/deepsearch-compiler-vendor.md)
 documents the resync ritual for the vendored DS contract compiler at
 `app/services/contract_compiler/`.
 
@@ -257,11 +260,11 @@ def get_doc(doc_id: UUID, repo: DocumentRepository = Depends(get_document_reposi
 ### Core Service Layer
 - **Core service**: FastAPI app backed by PostgreSQL 15, Alembic migrations, and ingestion pipelines under `app/services` plus document processing scripts in `scripts/`.
 - **RAG assets**: Generated corpora and embeddings live under `data/` and `artifacts/`; keep synthetic data generation reproducible via the scripts in `scripts/`.
-- **Packaging**: Starter releases are built from root directories only; the `cmos/` tree provides planning, reports, telemetry timelines, and should never house production app code.
+- **Packaging**: Starter releases are built from root directories only; the `rbook/` tree provides planning, reports, telemetry timelines, and should never house production app code.
 
 ## AI Agent Specific Instructions
 1. **Pre-flight**
-   - Load this `agents.md`, then `cmos/agents.md` to understand workspace restrictions.
+   - Load this `agents.md`, then `rbook/agents.md` to understand workspace restrictions.
 
 2. **Execution**
    - Keep edits scoped to the active mission; if work exceeds scope, create or split missions through the backlog tooling rather than ad-hoc commits.
@@ -269,16 +272,16 @@ def get_doc(doc_id: UUID, repo: DocumentRepository = Depends(get_document_reposi
 3. **Validation & Closure**
    - Execute relevant test suites (`pytest`, targeted `npm run test:*`, integration runner) and record outcomes in telemetry (`telemetry/events/testing-summary.json` or mission-specific files).
 4. **Restricted Areas**
-   - Do not place application code, generated packages, or new dependencies inside `cmos/`; use the root starter layout. Treat `cmos/` as read-mostly research/history per its local guardrails.
+   - Do not place application code, generated packages, or new dependencies inside `rbook/`; use the root starter layout. Treat `rbook/` as read-mostly research/history per its local guardrails.
 
 ## Reference Guides
 - `README.md` – core TraceLab architecture and developer workflow.
-- `docs/frontend_architecture.md` and `cmos/foundational-docs/technical_architecture.md` – the frontend and platform as built (rewritten in Sprint 52, DOC-1).
-- `cmos/foundational-docs/roadmap-sprints-66-68-open-tracelab.md` – **the living vision and roadmap** (Sprint 66 onward: carry-forward clearance, open-source readiness, the 2026-10-19 share-out). Authoritative for intent; the Reasonbook record is authoritative for status. Update at every sprint open and close. Its predecessors, closed to new sprint sections, are `roadmap-sprints-57-60-the-librarian.md` (Sprints 57–65) and `roadmap-sprints-50-53-ux-overhaul.md` (Sprints 50–56).
-- `cmos/foundational-docs/roadmap_template.md` – canonical backlog + milestone template used for every sprint.
-- `cmos/foundational-docs/tech_arch_template.md` – authoritative technical architecture template for Mission Protocol deliverables.
-- `cmos/contracts/mission-authoring-contract.md` – single source of truth for the MCP param ↔ DB column ↔ REST ↔ DS worker mapping (T41.3).
-- `cmos/contracts/deepsearch-compiler-vendor.md` – resync ritual for the vendored DeepSearch contract compiler at `app/services/contract_compiler/` (T41.1).
+- `docs/frontend_architecture.md` and `rbook/foundational-docs/technical_architecture.md` – the frontend and platform as built (rewritten in Sprint 52, DOC-1).
+- `rbook/foundational-docs/roadmap-sprints-66-68-open-tracelab.md` – **the living vision and roadmap** (Sprint 66 onward: carry-forward clearance, open-source readiness, the 2026-10-19 share-out). Authoritative for intent; the Reasonbook record is authoritative for status. Update at every sprint open and close. Its predecessors, closed to new sprint sections, are `roadmap-sprints-57-60-the-librarian.md` (Sprints 57–65) and `roadmap-sprints-50-53-ux-overhaul.md` (Sprints 50–56).
+- `rbook/foundational-docs/roadmap_template.md` – canonical backlog + milestone template used for every sprint.
+- `rbook/foundational-docs/tech_arch_template.md` – authoritative technical architecture template for Mission Protocol deliverables.
+- `rbook/contracts/mission-authoring-contract.md` – single source of truth for the MCP param ↔ DB column ↔ REST ↔ DS worker mapping (T41.3).
+- `rbook/contracts/deepsearch-compiler-vendor.md` – resync ritual for the vendored DeepSearch contract compiler at `app/services/contract_compiler/` (T41.1).
 
 ---
 Last Updated: 2026-09-15

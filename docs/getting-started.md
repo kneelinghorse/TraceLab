@@ -28,13 +28,13 @@ This quickstart extends the canonical roadmap guidance in `foundational-docs/roa
 ## 3. Mission Protocol + CMOS
 1. Sync the planning workspace into SQLite (authoritative for missions):
    ```bash
-   python cmos/scripts/migrate_cmos_memory.py --source cmos --target cmos --sync-db
+   python rbook/scripts/migrate_cmos_memory.py --source cmos --target cmos --sync-db
    ```
 2. Validate backlog parity before working a mission:
    ```bash
-   python cmos/scripts/validate_parity.py --check
+   python rbook/scripts/validate_parity.py --check
    ```
-3. Use `./cmos/cli.py db show current` to inspect the queue and `cmos/context/mission_runtime.py` helpers to `start`, `complete`, or `block` missions.
+3. Use `./rbook/cli.py db show current` to inspect the queue and `rbook/context/mission_runtime.py` helpers to `start`, `complete`, or `block` missions.
 
 ## 4. Testing & Coverage
 1. Execute the pytest suite (unit + integration):
@@ -47,15 +47,15 @@ This quickstart extends the canonical roadmap guidance in `foundational-docs/roa
    ```
 3. Generate a coverage report for Sprint 04 deliverables:
    ```bash
-   pytest --cov=app --cov-report=html:cmos/reports/sprint-04/htmlcov
+   pytest --cov=app --cov-report=html:rbook/reports/sprint-04/htmlcov
    ```
-   Publish `cmos/reports/sprint-04/test-coverage-report.html` as the audit artifact referenced in `foundational-docs/roadmap_template.md`.
+   Publish `rbook/reports/sprint-04/test-coverage-report.html` as the audit artifact referenced in `foundational-docs/roadmap_template.md`.
 
 ## 5. Validation Checklist
 Before declaring a mission complete:
-- Re-run `python cmos/scripts/validate_parity.py --check`.
-- Capture telemetry via `node cmos/context/integration_test_runner.js`.
+- Re-run `python rbook/scripts/validate_parity.py --check`.
+- Capture telemetry via `node rbook/context/integration_test_runner.js`.
 - Update `PROJECT_CONTEXT` / `MASTER_CONTEXT` using `context.db_client.SQLiteClient`.
-- Tail `cmos/telemetry/events/database-health.jsonl` to confirm green status.
+- Tail `rbook/telemetry/events/database-health.jsonl` to confirm green status.
 
-For advanced orchestration patterns and worker delegation consult `cmos/docs/AI-coding-assistant-workflows.md`.
+For advanced orchestration patterns and worker delegation consult `rbook/docs/AI-coding-assistant-workflows.md`.

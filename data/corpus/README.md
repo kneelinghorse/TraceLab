@@ -69,7 +69,7 @@ python scripts/evaluate_presidio.py
 
 Options:
 - `--corpus-dir DIR`: Corpus directory (default: `data/corpus`)
-- `--output FILE`: Output report path (default: `cmos/reports/sprint-01/presidio_corpus_baseline.json`)
+- `--output FILE`: Output report path (default: `rbook/reports/sprint-01/presidio_corpus_baseline.json`)
 
 The evaluator leverages the source text snapshots persisted alongside annotations to ensure offsets remain accurate across TXT, CSV, DOCX, PDF, and Markdown exemplars.
 

@@ -35,7 +35,7 @@ def _complete_payload(**overrides):
             {
                 "evidence_id": "EV-001",
                 "source": "pytest-cov",
-                "summary": "Coverage report stored under cmos/reports",
+                "summary": "Coverage report stored under rbook/reports",
             }
         ],
         "quality_checkpoints": [

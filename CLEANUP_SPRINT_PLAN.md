@@ -19,18 +19,18 @@
 ```
 sqlite3.IntegrityError: FOREIGN KEY constraint failed
 ```
-When running: `./cmos/cli.py session start`
+When running: `./rbook/cli.py session start`
 
 **Tasks**:
-- [ ] Inspect `cmos/context/session_runtime.py` line 152
-- [ ] Check `cmos/db/schema.sql` for foreign key constraints
+- [ ] Inspect `rbook/context/session_runtime.py` line 152
+- [ ] Check `rbook/db/schema.sql` for foreign key constraints
 - [ ] Verify sprint references exist in sprints table
 - [ ] Add missing sprint records OR relax constraint
 - [ ] Test session start/capture/complete workflow
 - [ ] Document fix in mission notes
 
 **Success Criteria**:
-- ✅ `./cmos/cli.py session start --type planning --title "Test" --sprint "Sprint 08"` succeeds
+- ✅ `./rbook/cli.py session start --type planning --title "Test" --sprint "Sprint 08"` succeeds
 - ✅ Session capture and complete work end-to-end
 - ✅ No foreign key errors in logs
 
@@ -44,11 +44,11 @@ When running: `./cmos/cli.py session start`
 **Context**: Migration happened 2025-11-14, need to verify completeness
 
 **Tasks**:
-- [ ] Run `./cmos/cli.py db show current` (verify no errors)
-- [ ] Run `./cmos/cli.py db show backlog` (verify missions loaded)
-- [ ] Check context snapshots: `./cmos/cli.py context history master`
+- [ ] Run `./rbook/cli.py db show current` (verify no errors)
+- [ ] Run `./rbook/cli.py db show backlog` (verify missions loaded)
+- [ ] Check context snapshots: `./rbook/cli.py context history master`
 - [ ] Verify session events table populated
-- [ ] Export contexts: `./cmos/cli.py db export contexts`
+- [ ] Export contexts: `./rbook/cli.py db export contexts`
 - [ ] Compare exported contexts to working memory in PROJECT_CONTEXT
 - [ ] Document any discrepancies
 
@@ -94,7 +94,7 @@ When running: `./cmos/cli.py session start`
 **Problem**: 3 collection errors preventing test runs
 
 **Tasks**:
-- [ ] Fix `cmos/tests/test_cli_research_export.py` import error
+- [ ] Fix `rbook/tests/test_cli_research_export.py` import error
 - [ ] Fix `cmos.old/tests/test_cli_research_export.py` (delete if obsolete)
 - [ ] Fix `cmos.old/tests/test_mission_runtime_api.py` (delete if obsolete)
 - [ ] Run `pytest --collect-only` until clean
@@ -253,8 +253,8 @@ When running: `./cmos/cli.py session start`
 **Context**: CMOS underwent rapid fixes, docs may be stale
 
 **Tasks**:
-- [ ] Review `cmos/docs/getting-started.md`
-- [ ] Review `cmos/docs/operations-guide.md`
+- [ ] Review `rbook/docs/getting-started.md`
+- [ ] Review `rbook/docs/operations-guide.md`
 - [ ] Verify CLI commands still work as documented
 - [ ] Update session management guide with fixes
 - [ ] Document foreign key fix from B8.1
@@ -348,7 +348,7 @@ When running: `./cmos/cli.py session start`
 4. What should Sprint 09 focus on?
 
 **Deliverables**:
-- [ ] `cmos/reports/sprint-08/sprint-08-summary.md`
+- [ ] `rbook/reports/sprint-08/sprint-08-summary.md`
 - [ ] Updated MASTER_CONTEXT with learnings
 - [ ] Sprint 09 planning notes
 

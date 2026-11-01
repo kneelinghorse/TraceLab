@@ -9,7 +9,7 @@ to validate the latency targets from the B19.4 mission:
 - Precision comparable to full PEDR (>90% overlap)
 
 Usage:
-    python scripts/hybrid_rerank_benchmark.py --output cmos/reports/sprint-19/hybrid-rerank-benchmark.json
+    python scripts/hybrid_rerank_benchmark.py --output rbook/reports/sprint-19/hybrid-rerank-benchmark.json
 
 Requires:
     - PostgreSQL database with document_chunks table (content_tsv column)
@@ -20,10 +20,9 @@ Requires:
 import argparse
 import json
 import sys
-import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -48,11 +47,11 @@ BENCHMARK_QUERIES = [
 
 def run_mode_benchmark(
     mode: str,
-    queries: List[str],
+    queries: list[str],
     top_k: int = 10,
     candidate_pool: int = 50,
     verbose: bool = True,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Run benchmark for a specific search mode.
 
     Args:
@@ -155,7 +154,7 @@ def run_mode_benchmark(
     }
 
 
-def _calculate_statistics(latencies: List[float]) -> Optional[Dict[str, float]]:
+def _calculate_statistics(latencies: list[float]) -> dict[str, float] | None:
     """Calculate latency statistics."""
     if not latencies:
         return None
@@ -175,9 +174,9 @@ def _calculate_statistics(latencies: List[float]) -> Optional[Dict[str, float]]:
 
 
 def calculate_precision_overlap(
-    full_results: List[Dict],
-    hybrid_results: List[Dict],
-) -> Dict[str, Any]:
+    full_results: list[dict],
+    hybrid_results: list[dict],
+) -> dict[str, Any]:
     """Calculate result overlap between full and hybrid modes.
 
     Args:
@@ -190,12 +189,12 @@ def calculate_precision_overlap(
     overlaps = []
     query_comparisons = []
 
-    for full, hybrid in zip(full_results, hybrid_results):
+    for full, hybrid in zip(full_results, hybrid_results, strict=False):
         if "error" in full or "error" in hybrid:
             continue
 
-        full_ids: Set[str] = set(full.get("chunk_ids", []))
-        hybrid_ids: Set[str] = set(hybrid.get("chunk_ids", []))
+        full_ids: set[str] = set(full.get("chunk_ids", []))
+        hybrid_ids: set[str] = set(hybrid.get("chunk_ids", []))
 
         if not full_ids:
             continue
@@ -228,11 +227,11 @@ def calculate_precision_overlap(
 
 
 def run_benchmark(
-    queries: List[str],
+    queries: list[str],
     top_k: int = 10,
     candidate_pool: int = 50,
     verbose: bool = True,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Run complete benchmark comparing hybrid vs full modes.
 
     Args:
@@ -244,7 +243,7 @@ def run_benchmark(
     Returns:
         Complete benchmark results
     """
-    timestamp = datetime.now(timezone.utc).isoformat()
+    timestamp = datetime.now(UTC).isoformat()
 
     # Run full mode benchmark
     full_results = run_mode_benchmark(
@@ -334,7 +333,7 @@ def main():
     parser.add_argument(
         "--output",
         "-o",
-        default="cmos/reports/sprint-19/hybrid-rerank-benchmark.json",
+        default="rbook/reports/sprint-19/hybrid-rerank-benchmark.json",
         help="Output path for benchmark results",
     )
     parser.add_argument(
@@ -380,11 +379,11 @@ def main():
 
     # Print summary
     summary = results.get("summary", {})
-    print(f"\nSummary:")
+    print("\nSummary:")
     print(f"  Queries: {summary.get('query_count', 0)}")
 
     criteria = summary.get("success_criteria", {})
-    print(f"\nSuccess Criteria:")
+    print("\nSuccess Criteria:")
     for name, criterion in criteria.items():
         status = "✓ PASS" if criterion.get("pass") else "✗ FAIL"
         actual = criterion.get("actual")
@@ -393,7 +392,7 @@ def main():
         print(f"  {name}: {status} (target: {target}, actual: {actual_str})")
 
     comparison = summary.get("latency_comparison", {})
-    print(f"\nLatency Comparison:")
+    print("\nLatency Comparison:")
     print(f"  Full mode P50: {comparison.get('full_p50_ms', 'N/A')}ms")
     print(f"  Hybrid mode P50: {comparison.get('hybrid_p50_ms', 'N/A')}ms")
     if comparison.get("speedup_pct"):

@@ -2,7 +2,7 @@
 
 **Status**: L6 graph layer delivered (Sprint 25)
 **Primary reference**: docs/architecture/PEDR-search.md
-**Plan reference**: cmos/foundational-docs/pedr-graph-search-plan.md
+**Plan reference**: rbook/foundational-docs/pedr-graph-search-plan.md
 
 ## Scope
 
@@ -16,7 +16,7 @@ Baseline latency for 1K edges (SQLite):
 - Depth 2: 41.73 ms (1000 candidates)
 - Depth 3: 280.66 ms (1000 candidates)
 
-Reference: `cmos/telemetry/events/sprint-25-graph-baseline.json`.
+Reference: `rbook/telemetry/events/sprint-25-graph-baseline.json`.
 
 Cache effectiveness (adjacency cache):
 - Dual-seed micro-benchmark: ~0.50 hit rate (750 hits / 1502 lookups) at depth 2.
@@ -28,5 +28,5 @@ Memory usage (Python heap):
 ## References
 
 - `docs/architecture/PEDR-search.md`
-- `cmos/foundational-docs/pedr-graph-search-plan.md`
-- `cmos/telemetry/events/sprint-25-graph-baseline.json`
+- `rbook/foundational-docs/pedr-graph-search-plan.md`
+- `rbook/telemetry/events/sprint-25-graph-baseline.json`

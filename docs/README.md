@@ -13,4 +13,4 @@ Central index for TraceLab docs. Each guide references the canonical templates i
 | [`docs/quality_automation.md`](quality_automation.md) | Automation patterns for bias, traceability, and synthesis gates. |
 | [`docs/quality_gates.md`](quality_gates.md) | Research-side definition of each quality checkpoint referenced in the backlog. |
 
-For historical research docs see `cmos/reports/`; for CMOS operating procedures see `cmos/docs/README.md` and `cmos/docs/operations-guide.md`.
+For historical research docs see `rbook/reports/`; for CMOS operating procedures see `rbook/docs/README.md` and `rbook/docs/operations-guide.md`.

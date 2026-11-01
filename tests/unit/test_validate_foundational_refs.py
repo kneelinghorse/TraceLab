@@ -2,9 +2,9 @@
 
 Commit 7ec2c02 recorded a real false positive: the forbidden string
 ``docs/technical_architecture.md`` matched inside the legitimate
-``cmos/foundational-docs/technical_architecture.md``, and the fix at the time
+``rbook/foundational-docs/technical_architecture.md``, and the fix at the time
 was to reword CMOS text. Both entry points (the standalone script and
-``./cmos/cli.py validate docs``) must share one boundary-aware matcher.
+``./rbook/cli.py validate docs``) must share one boundary-aware matcher.
 """
 
 from __future__ import annotations
@@ -18,13 +18,13 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[2]
 FORBIDDEN = ["docs/roadmap.md", "docs/technical_architecture.md"]
 NOT_FLAGGED = [
-    "cmos/foundational-docs/technical_architecture.md",
+    "rbook/foundational-docs/technical_architecture.md",
     "foundational-docs/roadmap_template.md",
-    "cmos/foundational-docs/roadmap.md",
+    "rbook/foundational-docs/roadmap.md",
 ]
 FLAGGED = [
     "docs/technical_architecture.md",
-    "`cmos/docs/technical_architecture.md`",
+    "`rbook/docs/technical_architecture.md`",
     "./docs/roadmap.md",
     "docs/roadmap.md.",
 ]
@@ -42,12 +42,12 @@ def _load(relative: str, name: str):
 
 @pytest.fixture(scope="module")
 def script():
-    return _load("cmos/scripts/validate_foundational_refs.py", "validate_foundational_refs_under_test")
+    return _load("rbook/scripts/validate_foundational_refs.py", "validate_foundational_refs_under_test")
 
 
 @pytest.fixture(scope="module")
 def shared():
-    return _load("cmos/context/foundational_refs.py", "foundational_refs_under_test")
+    return _load("rbook/context/foundational_refs.py", "foundational_refs_under_test")
 
 
 def _check(script, tmp_path: Path, text: str) -> list[str]:
@@ -82,7 +82,7 @@ def test_script_and_cli_share_one_matcher(script, shared):
     """Both entry points must consume the shared rules, not private copies of them."""
     assert set(script.CHECKS) == {Path("agents.md"), Path("README.md"), Path("context/MASTER_CONTEXT.json")}
     assert script.CHECKS == shared.FOUNDATIONAL_CHECKS
-    cli_source = (REPO_ROOT / "cmos" / "cli.py").read_text(encoding="utf-8")
+    cli_source = (REPO_ROOT / "rbook" / "cli.py").read_text(encoding="utf-8")
     assert "from context.foundational_refs import" in cli_source
     assert "FOUNDATIONAL_CHECKS = {" not in cli_source
     assert "if needle in content" not in cli_source

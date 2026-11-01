@@ -6,7 +6,7 @@ const baseURL = process.env.PLAYWRIGHT_BASE_URL || `http://127.0.0.1:${port}`;
 const skipServer = ["1", "true"].includes(String(process.env.PLAYWRIGHT_SKIP_SERVER).toLowerCase());
 
 const repoRoot = path.resolve(__dirname, "..");
-const telemetryReporterPath = path.resolve(repoRoot, "cmos/scripts/playwright_telemetry_reporter.js");
+const telemetryReporterPath = path.resolve(repoRoot, "rbook/scripts/playwright_telemetry_reporter.js");
 const telemetryOutputPath = process.env.PLAYWRIGHT_TELEMETRY_OUTPUT
   ? path.resolve(process.env.PLAYWRIGHT_TELEMETRY_OUTPUT)
   : path.resolve(repoRoot, "telemetry/events/.artifacts/playwright-latest.json");

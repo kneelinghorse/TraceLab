@@ -81,11 +81,11 @@ See the [local development guide](docs/local-development.md) for separate servic
 | [`packages/tracelab-mcp/`](packages/tracelab-mcp/) | Supported MCP package |
 | [`tests/`](tests/) and [`frontend/tests/`](frontend/tests/) | Backend and browser tests |
 | [`docs/`](docs/) | Developer and operations documentation |
-| [`cmos/`](cmos/) | Reasonbook project record, planning documents and acceptance receipts |
+| [`rbook/`](rbook/) | Reasonbook project record, planning documents and acceptance receipts |
 
-The tracked checkout alone is about 1 GB, mostly development history and screenshot receipts under `cmos/`; a full clone also includes Git history. The record is a development workbench, separate from the research data stored by the application in PostgreSQL and Qdrant. Its local SQLite database is ignored by Git. Application code lives outside `cmos/`.
+The tracked checkout alone is about 1 GB, mostly development history and screenshot receipts under `rbook/`; a full clone also includes Git history. The record is a development workbench, separate from the research data stored by the application in PostgreSQL and Qdrant. Its local SQLite database is ignored by Git. Application code lives outside `rbook/`.
 
-Useful references: [frontend architecture](docs/frontend_architecture.md), [architecture decisions](docs/adr/), [MCP tool reference](docs/mcp-tools.md), and [mission-authoring contract](cmos/contracts/mission-authoring-contract.md).
+Useful references: [frontend architecture](docs/frontend_architecture.md), [architecture decisions](docs/adr/), [MCP tool reference](docs/mcp-tools.md), and [mission-authoring contract](rbook/contracts/mission-authoring-contract.md).
 
 ## Contributing and security
 

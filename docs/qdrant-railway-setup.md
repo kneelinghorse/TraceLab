@@ -94,4 +94,4 @@ We no longer use the Railway Qdrant template for production, but if you need a q
 - **Bulk ingest stuck in write mode**  
   - Reissue the init endpoint with `{"write_optimized": false}` and monitor `/api/v1/admin/health`.
 
-Document every fix in `telemetry/events/database-health.jsonl` and rerun `python cmos/scripts/validate_parity.py --check` whenever you touch the vector infrastructure.
+Document every fix in `telemetry/events/database-health.jsonl` and rerun `python rbook/scripts/validate_parity.py --check` whenever you touch the vector infrastructure.

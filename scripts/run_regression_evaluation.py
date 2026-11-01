@@ -22,14 +22,14 @@ def main():
     parser.add_argument(
         "--baseline-report",
         type=str,
-        default="cmos/reports/sprint-01/presidio_corpus_baseline.json",
-        help="Path to baseline evaluation report (default: cmos/reports/sprint-01/presidio_corpus_baseline.json)",
+        default="rbook/reports/sprint-01/presidio_corpus_baseline.json",
+        help="Path to baseline evaluation report (default: rbook/reports/sprint-01/presidio_corpus_baseline.json)",
     )
     parser.add_argument(
         "--output",
         type=str,
-        default="cmos/reports/sprint-01/presidio_tuned_results.json",
-        help="Output path for comparison results (default: cmos/reports/sprint-01/presidio_tuned_results.json)",
+        default="rbook/reports/sprint-01/presidio_tuned_results.json",
+        help="Output path for comparison results (default: rbook/reports/sprint-01/presidio_tuned_results.json)",
     )
 
     parser.parse_args()

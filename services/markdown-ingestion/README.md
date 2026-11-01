@@ -29,11 +29,11 @@ src/
 
 ## Configuration
 
-All configuration is env-driven. Defaults target local development with the research corpus in `cmos/missions/research`.
+All configuration is env-driven. Defaults target local development with the research corpus in `rbook/missions/research`.
 
 | Variable | Description | Default |
 | --- | --- | --- |
-| `INGESTION_WATCH_PATHS` | Comma-separated directories to watch | `cmos/missions/research`
+| `INGESTION_WATCH_PATHS` | Comma-separated directories to watch | `rbook/missions/research`
 | `INGESTION_IGNORE_PATTERNS` | Comma-separated globs to skip | `**/.git/**,**/node_modules/**,**/.DS_Store`
 | `INGESTION_DEBOUNCE_MS` | Debounce window for watcher events | `750`
 | `INGESTION_QUEUE_DRIVER` | `memory` or `rabbitmq` | `memory`

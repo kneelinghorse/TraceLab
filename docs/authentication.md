@@ -266,7 +266,7 @@ silently widen; guarded by `tests/test_rbac_flip_regression.py::TestServiceCarve
 | --- | --- | --- |
 | `GET /api/v1/auth/me` (startup role verification) | Any authenticated principal | Read-only exception: returns the caller's live database role so a worker can fail closed unless it resolves to `service`. |
 | `POST /missions/{id}/logs` (legacy log ingest) | **service principal** in every feature-flag state | Bounded, terminal-only, unattributed compatibility until LOG-2 cutover; no v2 downgrade. |
-| `GET /missions/{id}/logs/capabilities` and `POST /missions/{id}/logs/v2` | **service principal** in every feature-flag state | Explicit contract negotiation, atomic lease ownership and stable-event replay. [Delivery contract](../cmos/contracts/mission-log-delivery-contract.md), decision #568. GET log history remains scoped to humans; no proof is exposed. |
+| `GET /missions/{id}/logs/capabilities` and `POST /missions/{id}/logs/v2` | **service principal** in every feature-flag state | Explicit contract negotiation, atomic lease ownership and stable-event replay. [Delivery contract](../rbook/contracts/mission-log-delivery-contract.md), decision #568. GET log history remains scoped to humans; no proof is exposed. |
 | `POST /missions/events/cmos` (CMOS event bridge) | **service principal** when `RBAC_ENABLED` on; authn-only when off | Emits operational CMOS transition events. |
 | `POST /missions/{id}/evidence` (DeepSearch ledger projection) | **service principal** (`role=service`) in every feature-flag state | Triggers idempotent projection of the exact persisted terminal mission/job result; every human role is denied and the request cannot supply evidence, project, session, or origin fields. |
 | `POST /api/v1/webhooks/deepsearch` | HMAC-SHA256 shared secret (env `DEEPSEARCH_TRACELAB_SERVICE_SECRET`, legacy fallback `DEEPSEARCH_WEBHOOK_SECRET`) | Never user-authed; structural carve-out (never calls `authorize()`). ⚠️ If neither is set, HMAC validation is **skipped** (dev-only mode) — must be set in prod. |
@@ -337,8 +337,8 @@ If separate service accounts are needed later:
 For now, shared credentials are appropriate.
 
 **Cross-Reference:**
-- DeepSearch integration: `DeepSearch.alpha/cmos/planning/Answers-from-tracelab-sprint12.md`
-- Sprint 12 mission: `cmos/missions/sprint-12/B12.3_Create-Service-Account-Production.yaml`
+- DeepSearch integration: `DeepSearch.alpha/rbook/planning/Answers-from-tracelab-sprint12.md`
+- Sprint 12 mission: `rbook/missions/sprint-12/B12.3_Create-Service-Account-Production.yaml`
 
 
 ### Restored operational routes (RECOVER-1)

@@ -9,7 +9,7 @@ Key capabilities:
 - Criticality calculation: Weighted formula for importance scoring
 - Manifest creation: Transform entities into protocol manifests
 
-Reference: cmos/planning/PEDR-docs/protocol-enhanced-deep-research/PROTOCOL_ARCHITECTURE_GUIDE.md
+Reference: rbook/planning/PEDR-docs/protocol-enhanced-deep-research/PROTOCOL_ARCHITECTURE_GUIDE.md
 """
 
 from __future__ import annotations

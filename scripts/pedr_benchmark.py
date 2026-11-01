@@ -5,23 +5,21 @@ This script runs the same queries from R18.0 baseline capture through the PEDR
 unified search API and compares results.
 
 Usage:
-    python scripts/pedr_benchmark.py --output cmos/reports/sprint-18/pedr-benchmark.json
+    python scripts/pedr_benchmark.py --output rbook/reports/sprint-18/pedr-benchmark.json
 """
 
 import argparse
 import json
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from app.services.pedr.search_orchestrator import create_pedr_orchestrator
-from app.services.pedr.fusion import RRFFusion
-
 
 # Baseline queries from R18.0
 BASELINE_QUERIES = [
@@ -39,10 +37,10 @@ BASELINE_QUERIES = [
 
 
 def run_pedr_benchmark(
-    queries: List[str],
+    queries: list[str],
     top_k: int = 5,
     verbose: bool = True,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Run PEDR unified search on benchmark queries.
 
     Args:
@@ -127,7 +125,7 @@ def run_pedr_benchmark(
             latencies.append(0)
 
     # Calculate summary statistics
-    valid_latencies = [l for l in latencies if l > 0]
+    valid_latencies = [latency for latency in latencies if latency > 0]
     if valid_latencies:
         latencies_sorted = sorted(valid_latencies)
         p50_idx = int(len(latencies_sorted) * 0.5)
@@ -135,7 +133,7 @@ def run_pedr_benchmark(
         p95_idx = int(len(latencies_sorted) * 0.95)
 
         summary = {
-            "capture_timestamp": datetime.now(timezone.utc).isoformat(),
+            "capture_timestamp": datetime.now(UTC).isoformat(),
             "query_count": len(queries),
             "successful_queries": len(valid_latencies),
             "latency_p50_ms": latencies_sorted[p50_idx]
@@ -154,7 +152,7 @@ def run_pedr_benchmark(
         }
     else:
         summary = {
-            "capture_timestamp": datetime.now(timezone.utc).isoformat(),
+            "capture_timestamp": datetime.now(UTC).isoformat(),
             "query_count": len(queries),
             "successful_queries": 0,
             "error": "No successful queries",
@@ -172,10 +170,10 @@ def run_pedr_benchmark(
     }
 
 
-def _run_mock_benchmark(queries: List[str], top_k: int) -> Dict[str, Any]:
+def _run_mock_benchmark(queries: list[str], top_k: int) -> dict[str, Any]:
     """Run mock benchmark when DB is not available."""
-    from app.services.pedr.syntactic import get_syntactic_service
     from app.services.pedr.pragmatic import get_pragmatic_service
+    from app.services.pedr.syntactic import get_syntactic_service
 
     syntactic = get_syntactic_service()
     pragmatic = get_pragmatic_service()
@@ -207,7 +205,7 @@ def _run_mock_benchmark(queries: List[str], top_k: int) -> Dict[str, Any]:
 
     return {
         "summary": {
-            "capture_timestamp": datetime.now(timezone.utc).isoformat(),
+            "capture_timestamp": datetime.now(UTC).isoformat(),
             "query_count": len(queries),
             "successful_queries": len(queries),
             "note": "Mock benchmark without database",
@@ -220,9 +218,9 @@ def _run_mock_benchmark(queries: List[str], top_k: int) -> Dict[str, Any]:
 
 
 def compare_with_baseline(
-    pedr_results: Dict[str, Any],
-    baseline_path: str = "cmos/reports/sprint-18/pedr-baseline-capture.json",
-) -> Dict[str, Any]:
+    pedr_results: dict[str, Any],
+    baseline_path: str = "rbook/reports/sprint-18/pedr-baseline-capture.json",
+) -> dict[str, Any]:
     """Compare PEDR results with baseline.
 
     Args:
@@ -287,7 +285,7 @@ def main():
     parser.add_argument(
         "--output",
         "-o",
-        default="cmos/reports/sprint-18/pedr-benchmark.json",
+        default="rbook/reports/sprint-18/pedr-benchmark.json",
         help="Output path for benchmark results",
     )
     parser.add_argument(
@@ -332,7 +330,7 @@ def main():
 
     # Print summary
     summary = results.get("summary", {})
-    print(f"\nSummary:")
+    print("\nSummary:")
     print(f"  Queries: {summary.get('query_count', 0)}")
     print(f"  Successful: {summary.get('successful_queries', 0)}")
     if "latency_p50_ms" in summary:
@@ -343,7 +341,7 @@ def main():
 
     if "comparison" in results:
         comp = results["comparison"]
-        print(f"\nBaseline Comparison:")
+        print("\nBaseline Comparison:")
         print(f"  Baseline P50: {comp['baseline']['latency_p50_ms']:.1f}ms")
         print(f"  PEDR P50: {comp['pedr']['latency_p50_ms']:.1f}ms")
         if comp["improvements"].get("latency_change_pct") is not None:

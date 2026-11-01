@@ -45,7 +45,7 @@ Clients simply append `"search_mode": "hybrid"` (or `"keyword"`) to existing pay
 - `tests/test_hybrid_search.py` covers normalization, weighting, and error handling.
 - `tests/test_rag_service.py` gained coverage ensuring `search_mode` propagates through the full RAG stack and API.
 - Run `pytest tests/test_hybrid_search.py tests/test_rag_service.py` before promoting changes.
-- Performance telemetry is captured in `cmos/telemetry/events/sprint-09-hybrid-search.jsonl`. Each entry logs query type, timing, and delta vs. semantic-only runs so we can confirm the `<200ms` latency budget and ≥15% precision lift.
+- Performance telemetry is captured in `rbook/telemetry/events/sprint-09-hybrid-search.jsonl`. Each entry logs query type, timing, and delta vs. semantic-only runs so we can confirm the `<200ms` latency budget and ≥15% precision lift.
 
 ## Operational Notes
 

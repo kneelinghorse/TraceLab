@@ -1,0 +1,18 @@
+{
+  "success": true,
+  "data": {
+    "dryRun": true,
+    "moved": false,
+    "changed": [
+      "<project>/cmos -> <project>/rbook",
+      "<project>/agents.md",
+      "<project>/cmos/README.md",
+      "<project>/cmos/tiers/build.md"
+    ],
+    "left": [
+      "<project>/agents.md: left 2 line(s) of project-owned prose mentioning the former name.",
+      "<project>/cmos/README.md: left 7 line(s) of project-owned prose mentioning the former name.",
+      "<project>/cmos/tiers/build.md: left 2 line(s) of project-owned prose mentioning the former name."
+    ]
+  }
+}

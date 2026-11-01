@@ -15,8 +15,8 @@ Usage:
 
     # Analyze specific files
     python scripts/pedr_graph_quality_validation.py --telemetry-files \
-        cmos/telemetry/events/graph-tuning-baseline.jsonl \
-        cmos/telemetry/events/graph-tuning-depth1-seeds5.jsonl
+        rbook/telemetry/events/graph-tuning-baseline.jsonl \
+        rbook/telemetry/events/graph-tuning-depth1-seeds5.jsonl
 
     # Run live comparison (requires database)
     python scripts/pedr_graph_quality_validation.py --live \
@@ -33,18 +33,19 @@ import argparse
 import json
 import sys
 from collections import defaultdict
-from dataclasses import asdict, dataclass, field
+from collections.abc import Sequence
+from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any
 
 DEFAULT_TELEMETRY_FILES = [
-    "cmos/telemetry/events/graph-tuning-baseline.jsonl",
-    "cmos/telemetry/events/graph-tuning-depth1-seeds5.jsonl",
-    "cmos/telemetry/events/sprint-26-graph-telemetry.jsonl",
+    "rbook/telemetry/events/graph-tuning-baseline.jsonl",
+    "rbook/telemetry/events/graph-tuning-depth1-seeds5.jsonl",
+    "rbook/telemetry/events/sprint-26-graph-telemetry.jsonl",
 ]
 
-DEFAULT_OUTPUT = Path("cmos/telemetry/events/graph-quality-report.json")
+DEFAULT_OUTPUT = Path("rbook/telemetry/events/graph-quality-report.json")
 
 
 # ---------------------------------------------------------------------------
@@ -106,8 +107,8 @@ class QueryMetrics:
     graph_decay: float
     graph_weight: float
     graph_top_k_seeds: int
-    seed_count: Optional[int]
-    total_candidates: Optional[int]
+    seed_count: int | None
+    total_candidates: int | None
     graph_candidates_expanded: int
     results_with_graph: int
     result_share: float
@@ -116,11 +117,11 @@ class QueryMetrics:
     graph_ms: float
     fusion_ms: float
     total_ms: float
-    layers_used: List[str]
+    layers_used: list[str]
     graph_contribution_rate: float
     multi_layer_result_rate: float
-    rrf_score_avg: Optional[float] = None
-    rrf_score_max: Optional[float] = None
+    rrf_score_avg: float | None = None
+    rrf_score_max: float | None = None
 
 
 @dataclass
@@ -151,13 +152,13 @@ class QualityReport:
 
     generated_at: str
     mode: str
-    telemetry_files_analyzed: List[str]
+    telemetry_files_analyzed: list[str]
     total_events_analyzed: int
-    config_summaries: List[Dict[str, Any]]
-    graph_edge_assessment: Dict[str, Any]
-    recommendations: List[str]
-    config_comparison: List[Dict[str, Any]]
-    raw_metrics: Optional[List[Dict[str, Any]]] = None
+    config_summaries: list[dict[str, Any]]
+    graph_edge_assessment: dict[str, Any]
+    recommendations: list[str]
+    config_comparison: list[dict[str, Any]]
+    raw_metrics: list[dict[str, Any]] | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -165,7 +166,7 @@ class QualityReport:
 # ---------------------------------------------------------------------------
 
 
-def parse_telemetry_event(event: Dict[str, Any]) -> Optional[QueryMetrics]:
+def parse_telemetry_event(event: dict[str, Any]) -> QueryMetrics | None:
     """Parse a single telemetry JSONL event into QueryMetrics."""
     if event.get("event") != "pedr_graph_telemetry":
         return None
@@ -206,7 +207,7 @@ def parse_telemetry_event(event: Dict[str, Any]) -> Optional[QueryMetrics]:
     )
 
 
-def _infer_config_name(graph: Dict[str, Any]) -> str:
+def _infer_config_name(graph: dict[str, Any]) -> str:
     """Infer the configuration preset name from graph parameters."""
     depth = graph.get("depth", 0)
     decay = graph.get("decay", 0.0)
@@ -226,9 +227,9 @@ def _infer_config_name(graph: Dict[str, Any]) -> str:
     return f"custom_d{depth}_w{weight:.2f}_k{seeds}"
 
 
-def load_telemetry_events(paths: Sequence[Path]) -> List[QueryMetrics]:
+def load_telemetry_events(paths: Sequence[Path]) -> list[QueryMetrics]:
     """Load and parse telemetry events from JSONL files."""
-    metrics: List[QueryMetrics] = []
+    metrics: list[QueryMetrics] = []
     for path in paths:
         if not path.exists():
             continue
@@ -246,7 +247,7 @@ def load_telemetry_events(paths: Sequence[Path]) -> List[QueryMetrics]:
     return metrics
 
 
-def summarize_config(config_name: str, metrics: List[QueryMetrics]) -> ConfigSummary:
+def summarize_config(config_name: str, metrics: list[QueryMetrics]) -> ConfigSummary:
     """Compute aggregate summary for a configuration group."""
     n = len(metrics)
     if n == 0:
@@ -294,14 +295,14 @@ def summarize_config(config_name: str, metrics: List[QueryMetrics]) -> ConfigSum
     )
 
 
-def _safe_avg(values: List[float]) -> float:
+def _safe_avg(values: list[float]) -> float:
     """Average of a list, returning 0.0 for empty lists."""
     if not values:
         return 0.0
     return sum(values) / len(values)
 
 
-def assess_graph_edges(metrics: List[QueryMetrics]) -> Dict[str, Any]:
+def assess_graph_edges(metrics: list[QueryMetrics]) -> dict[str, Any]:
     """Assess graph edge density from telemetry metrics."""
     total_queries = len(metrics)
     total_seeds = sum(m.seed_count or 0 for m in metrics)
@@ -335,7 +336,7 @@ def assess_graph_edges(metrics: List[QueryMetrics]) -> Dict[str, Any]:
     }
 
 
-def _percentile(sorted_values: List[float], p: float) -> float:
+def _percentile(sorted_values: list[float], p: float) -> float:
     """Simple percentile calculation on pre-sorted list."""
     if not sorted_values:
         return 0.0
@@ -344,11 +345,11 @@ def _percentile(sorted_values: List[float], p: float) -> float:
 
 
 def generate_recommendations(
-    edge_assessment: Dict[str, Any],
-    config_summaries: List[ConfigSummary],
-) -> List[str]:
+    edge_assessment: dict[str, Any],
+    config_summaries: list[ConfigSummary],
+) -> list[str]:
     """Generate actionable recommendations based on analysis."""
-    recs: List[str] = []
+    recs: list[str] = []
     verdict = edge_assessment.get("edge_density_verdict", "UNKNOWN")
 
     if verdict == "EMPTY":
@@ -402,10 +403,10 @@ def generate_recommendations(
 
 
 def build_config_comparison(
-    config_summaries: List[ConfigSummary],
-) -> List[Dict[str, Any]]:
+    config_summaries: list[ConfigSummary],
+) -> list[dict[str, Any]]:
     """Build a comparison table across configurations."""
-    rows: List[Dict[str, Any]] = []
+    rows: list[dict[str, Any]] = []
     for s in config_summaries:
         rows.append(
             {
@@ -433,14 +434,14 @@ def build_config_comparison(
 
 
 def analyze_telemetry(
-    telemetry_paths: List[Path],
+    telemetry_paths: list[Path],
     include_raw: bool = False,
 ) -> QualityReport:
     """Main analysis pipeline for ANALYZE mode."""
     metrics = load_telemetry_events(telemetry_paths)
 
     # Group by config
-    by_config: Dict[str, List[QueryMetrics]] = defaultdict(list)
+    by_config: dict[str, list[QueryMetrics]] = defaultdict(list)
     for m in metrics:
         by_config[m.config_name].append(m)
 
@@ -472,8 +473,8 @@ def analyze_telemetry(
 
 
 def run_live_comparison(
-    queries: List[str],
-    configs: List[str],
+    queries: list[str],
+    configs: list[str],
     top_k: int = 10,
     verbose: bool = True,
 ) -> QualityReport:
@@ -486,8 +487,8 @@ def run_live_comparison(
     settings.pedr_cache_enabled = False
     orchestrator = create_pedr_orchestrator()
 
-    all_metrics: List[QueryMetrics] = []
-    results_by_query: Dict[str, Dict[str, List[str]]] = defaultdict(dict)
+    all_metrics: list[QueryMetrics] = []
+    results_by_query: dict[str, dict[str, list[str]]] = defaultdict(dict)
 
     for config_name in configs:
         cfg = GRAPH_CONFIGS.get(config_name)
@@ -555,7 +556,7 @@ def run_live_comparison(
             all_metrics.append(m)
 
     # Build comparison including result-set overlap
-    by_config: Dict[str, List[QueryMetrics]] = defaultdict(list)
+    by_config: dict[str, list[QueryMetrics]] = defaultdict(list)
     for m in all_metrics:
         by_config[m.config_name].append(m)
 
@@ -585,14 +586,14 @@ def run_live_comparison(
 
 
 def _compute_result_overlap(
-    results_by_query: Dict[str, Dict[str, List[str]]],
-    configs: List[str],
-) -> List[Dict[str, Any]]:
+    results_by_query: dict[str, dict[str, list[str]]],
+    configs: list[str],
+) -> list[dict[str, Any]]:
     """Compute Jaccard similarity between disabled and enabled configs."""
     if "disabled" not in configs:
         return []
 
-    overlaps: List[Dict[str, Any]] = []
+    overlaps: list[dict[str, Any]] = []
     for query, config_results in results_by_query.items():
         baseline = set(config_results.get("disabled", []))
         if not baseline:

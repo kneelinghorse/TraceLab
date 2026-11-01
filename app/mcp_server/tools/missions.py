@@ -10,7 +10,7 @@ action-clustered tools (``tracelab_mission`` etc.) in sprint-41. This
 Python MCP server is **production-dark** — Railway runs FastAPI, not
 ``python -m app.mcp_server`` — so the cluster refactor only landed on
 the TS side. If/when the Python server gains a production caller, mirror
-the TS cluster shape here. See ``cmos/contracts/mission-authoring-contract.md``
+the TS cluster shape here. See ``rbook/contracts/mission-authoring-contract.md``
 ("Two MCP serialization surfaces") for context.
 """
 

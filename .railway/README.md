@@ -30,7 +30,7 @@ from `main` as before. No new CI credential is required by this manual workflow.
 
 ## Sprint 62 migration order and rollback
 
-The baseline and reviewed diff are in `cmos/reports/sprint-62/S62-DEPLOY/`.
+The baseline and reviewed diff are in `rbook/reports/sprint-62/S62-DEPLOY/`.
 The active deployment manifests are authoritative for behavior: the backend
 actually uses `/Dockerfile`, despite its legacy JSON saying Nixpacks; frontend
 actually uses Nixpacks and `/admin/users`, despite different dashboard defaults.

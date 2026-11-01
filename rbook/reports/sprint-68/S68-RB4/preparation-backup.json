@@ -1,0 +1,16 @@
+{
+  "status": "preparation only; recapture immediately before the offline move",
+  "integrity_check": "ok",
+  "row_counts": {
+    "strategic_decisions": 651,
+    "learnings": 326,
+    "constraints": 11,
+    "missions": 452,
+    "sprints": 69,
+    "next_steps": 495,
+    "sessions": 248
+  },
+  "messages": "Dashboard-hosted; not a local SQLite table. Compare inbox and sent totals at cutover.",
+  "official_pre_migrate_snapshot_created": false,
+  "live_record_moved": false
+}

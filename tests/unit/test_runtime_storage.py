@@ -88,6 +88,7 @@ def test_metrics_cli_writes_generated_output_outside_the_record(monkeypatch, tmp
     output = Path("telemetry/runtime/qdrant_performance.json")
     assert json.loads(output.read_text()) == metrics
     assert not (tmp_path / "cmos").exists()
+    assert not (tmp_path / "rbook").exists()
 
 
 def test_coverage_report_uses_runtime_storage_without_changing_response(monkeypatch, tmp_path):
@@ -111,3 +112,4 @@ def test_coverage_report_uses_runtime_storage_without_changing_response(monkeypa
         "chunked_rate_percent": 50.0,
     }}
     assert not (tmp_path / "cmos").exists()
+    assert not (tmp_path / "rbook").exists()

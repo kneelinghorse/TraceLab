@@ -312,6 +312,6 @@ If imports fail after version upgrade:
 ## References
 
 - [Schema Package Distribution Guide](./schema-package.md)
-- [DeepSearch Integration Contract](../cmos/planning/DeepSearch-TraceLab-Integration-Contract.md)
+- [DeepSearch Integration Contract](../rbook/planning/DeepSearch-TraceLab-Integration-Contract.md)
 - [CHANGELOG](../tracelab_schemas/CHANGELOG.md)
 - [Semantic Versioning Spec](https://semver.org/)

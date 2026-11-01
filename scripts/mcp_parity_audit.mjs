@@ -181,7 +181,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   const operations = inventory();
   const actions = clusterActions();
   const inventoryOnly = process.argv.includes('--inventory');
-  const manifest = inventoryOnly ? undefined : JSON.parse(fs.readFileSync(path.join(ROOT, 'cmos/contracts/mcp-parity-manifest.json'), 'utf8'));
+  const manifest = inventoryOnly ? undefined : JSON.parse(fs.readFileSync(path.join(ROOT, 'rbook/contracts/mcp-parity-manifest.json'), 'utf8'));
   const errors = manifest ? audit(operations, manifest, actions) : [];
   const classified = operations.map(operation => ({ ...(manifest?.operations.find(row => row.id === operation.id) ?? {}), ...operation }));
   const totals = { operations: operations.length, live: operations.filter(op => op.live).length, dead: operations.filter(op => !op.live).length, tools: Object.keys(actions).length, actions: Object.values(actions).flat().length, classifications: Object.fromEntries([...classifications].map(kind => [kind, classified.filter(row => row.classification === kind).length])) };

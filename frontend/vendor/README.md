@@ -39,7 +39,7 @@ Forge owns review and fixes; TraceLab owns the consumer install and smoke.
 High contrast is deferred to Sprint 54 (THEME-2, decision #408): the current and
 prepared replacement tokens fail active-text contrast. THEME-1 exposes System,
 Light and Dark; stored `hc` preferences fall back to System. The failed HC baseline
-remains in `cmos/reports/sprint-51/theme-1-local-smoke/hc/` for the follow-up.
+remains in `rbook/reports/sprint-51/theme-1-local-smoke/hc/` for the follow-up.
 Only the Dark theme sets the compatibility `.dark` class;
 Tailwind color variants are retired and `check:tokens` rejects new ones. Markdown
 typography uses semantic prose variables, with no inversion exception.

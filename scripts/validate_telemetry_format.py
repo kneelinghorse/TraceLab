@@ -24,7 +24,7 @@ from app.core.telemetry import validate_jsonl_file  # noqa: E402
 def find_jsonl_files() -> list[Path]:
     dirs = [
         PROJECT_ROOT / "telemetry" / "events",
-        PROJECT_ROOT / "cmos" / "telemetry" / "events",
+        PROJECT_ROOT / "rbook" / "telemetry" / "events",
     ]
     files = []
     for d in dirs:
@@ -44,7 +44,7 @@ def main():
     files = [args.file] if args.file else find_jsonl_files()
 
     print(f"\n{'=' * 70}")
-    print(f" Telemetry Envelope Conformance Report")
+    print(" Telemetry Envelope Conformance Report")
     print(f"{'=' * 70}\n")
 
     total_files = 0

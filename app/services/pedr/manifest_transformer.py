@@ -1,6 +1,6 @@
 """Transform Tracelab missions to PEDR manifest format.
 
-Reference: cmos/planning/PEDR-docs/tracelab-to-pedr-mapping.md
+Reference: rbook/planning/PEDR-docs/tracelab-to-pedr-mapping.md
 
 This module provides backward-compatible manifest transformation while
 integrating with the new Semantic Protocol for full protocol features.
@@ -448,11 +448,7 @@ class ManifestTransformer:
             return False
 
         # Check for common PII patterns
-        for pattern in PII_PATTERNS:
-            if pattern.search(text):
-                return True
-
-        return False
+        return any(pattern.search(text) for pattern in PII_PATTERNS)
 
     def _calculate_impact(
         self,
