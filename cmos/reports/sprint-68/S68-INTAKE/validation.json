@@ -74,7 +74,16 @@
     "mcp_argument_parity": "126 arguments, zero gaps",
     "credential_scan": "passed",
     "client_name_scan": "zero tracked current-tree matches; no history rewrite",
-    "diff_check": "passed"
+    "diff_check": "passed",
+    "pytest_benchmark_compatibility": {
+      "mission": "S68-PYTEST",
+      "failing_ci_run": 41262897467,
+      "ci_result": "3226 passed, 4 existing skips, 12 standing deselections, 1 benchmark setup error",
+      "last_green_versions": "pytest9.1.1 / pytest-benchmark5.3.0",
+      "failing_versions": "pytest9.2.0 / pytest-benchmark5.3.0",
+      "clean_reproduction": "Unchanged throughput test fails at node._nodeid with9.2.0 and passes with9.1.1 selected by pyproject.toml constraint; no skips",
+      "constraint": "test-only pytest>=8.0.0,<9.2; remove when plugin supports9.2"
+    }
   },
   "live_read_only": {
     "STIG-008": {

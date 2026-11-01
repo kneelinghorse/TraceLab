@@ -154,6 +154,13 @@ completed through PR #441, pinning the browser runners to Ubuntu 24.04.
   and the installed MCP tarball's stdio client/HTTP-verb checks. Record read-only
   production delivery evidence; no new paid research run is required.
 
+**S68-PYTEST — restore benchmark compatibility** is a bounded CI prerequisite
+found during intake validation. Fresh CI selected pytest 9.2, whose internal
+node-id change breaks pytest-benchmark 5.3 before the throughput test runs.
+Constrain test-only pytest below 9.2 until the plugin supports it; reproduce the
+failure and passing unchanged benchmark in a clean environment, then rerun the
+full backend gate. Keep all tests enabled and runtime dependencies unchanged.
+
 The record migration below remains separate. The two older outage-affected
 missions (M7 and RB-MA1) and S103's STIG-008 now report materialization ready and
 search_ready=true through the live MCP status verb. This does not establish
