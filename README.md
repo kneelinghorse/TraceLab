@@ -20,7 +20,7 @@ The [hosted app](https://tracelab.aquex.ai) is invite-only. Use the invite code 
 
 The quickstart runs PostgreSQL, Qdrant and the FastAPI API in Docker, with the Next.js UI on the host. It requires Docker with Compose v2, Node.js **22.12 or newer**, npm, and free ports **3000, 8000 and 6333**. PostgreSQL uses host port **5433**, with an alternate-port option below. Python 3.11 is supplied by the API container.
 
-**Research execution requires a DeepSearch worker.** That worker is a separate project and is not publicly available while its repository is private; cloning TraceLab alone does not provide an end-to-end autonomous research runner. Provider-backed Librarian answers, embeddings and report generation also need provider credentials. The startup and health checks below require no paid provider calls.
+**Research execution requires a DeepSearch worker.** The [DeepSearch worker](https://github.com/kneelinghorse/DeepSearch#run-a-worker-for-tracelab) is a separate, public MIT-licensed project; cloning TraceLab alone does not provide an end-to-end autonomous research runner. Provider-backed Librarian answers, embeddings and report generation also need provider credentials. The startup and health checks below require no paid provider calls.
 
 1. Clone and create the local environment file:
 

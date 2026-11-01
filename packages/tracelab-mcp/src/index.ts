@@ -2194,6 +2194,7 @@ async function handleSubmitMission(args: unknown) {
             uuid: result.uuid,
             url: canonicalLink('mission', result.uuid),
             job_id: result.job_id,
+            warnings: result.warnings ?? [],
           },
           null,
           2

@@ -33,6 +33,7 @@ from app.services.deepsearch_client import (
     DeepSearchClientError,
     DeepSearchConfigurationError,
 )
+from app.services.mission_linter import lint_mission_for_submit
 from app.services.mission_service import (
     MissionNotFoundError,
     MissionService,
@@ -622,6 +623,10 @@ async def handle_submit_mission(arguments: dict[str, Any]) -> list[TextContent]:
                     )
                 ]
 
+            # Preserve the legacy server's submit behavior; expose soft warnings
+            # without introducing a new hard gate on its production-dark path.
+            lint_warnings = lint_mission_for_submit(mission).warnings
+
             # 5. Check mode: worker (DB polling) or http (API calls)
             deepsearch_mode = getattr(settings, "deepsearch_mode", "worker").lower()
 
@@ -708,6 +713,7 @@ async def handle_submit_mission(arguments: dict[str, Any]) -> list[TextContent]:
                 "uuid": str(updated_mission.id),
                 "url": _mission_url(updated_mission.id),
                 "message": message,
+                "warnings": [warning.to_dict() for warning in lint_warnings],
             }
             if job_id:
                 result["job_id"] = job_id

@@ -19,7 +19,7 @@ vi.mock("@/components/AuthGate", () => ({ AuthGate: ({ children }: { children: R
 vi.mock("next/router", () => ({ useRouter: () => ({ query: {}, push: mocks.push, pathname: "/projects/new" }) }));
 
 const MINE = { id: "space-mine", name: "Participant 3's Space", created_at: "", personal_owner_id: "self" };
-const PARTS = { id: "space-parts", name: "Parts Town", created_at: "", personal_owner_id: null };
+const PARTS = { id: "space-parts", name: "Example Client", created_at: "", personal_owner_id: null };
 
 function page() {
   return render(
@@ -57,7 +57,7 @@ describe("New project page", () => {
     page();
     const picker = (await screen.findByRole("combobox", { name: "Space" })) as HTMLSelectElement;
     expect(picker.value).toBe("");
-    expect(within(picker).getAllByRole("option").map((option) => option.textContent)).toEqual(["My Space", "Parts Town"]);
+    expect(within(picker).getAllByRole("option").map((option) => option.textContent)).toEqual(["My Space", "Example Client"]);
     submit("Field notes");
     await waitFor(() => expect(mocks.createProject).toHaveBeenCalledTimes(1));
     expect(mocks.createProject.mock.calls[0][0]).not.toHaveProperty("workspace_id");

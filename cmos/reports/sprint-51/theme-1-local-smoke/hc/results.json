@@ -997,7 +997,7 @@
             "target": [
               ".hover\\:border-info-line.hover\\:shadow-md.transition-all:nth-child(9) > .items-start.justify-between.flex > .flex-1.min-w-0 > .mt-1.line-clamp-2.text-sm"
             ],
-            "html": "<p class=\"text-sm text-muted mt-1 line-clamp-2\">Yep, its says parts town</p>",
+            "html": "<p class=\"text-sm text-muted mt-1 line-clamp-2\">Yep, its says example client</p>",
             "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.94 (foreground color: #808080, background color: #ffffff, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
           },
           {
@@ -19188,7 +19188,7 @@
             "target": [
               ".hover\\:border-info-line.hover\\:shadow-md.transition-all:nth-child(9) > .items-start.justify-between.flex > .flex-1.min-w-0 > .mt-1.line-clamp-2.text-sm"
             ],
-            "html": "<p class=\"text-sm text-muted mt-1 line-clamp-2\">Yep, its says parts town</p>",
+            "html": "<p class=\"text-sm text-muted mt-1 line-clamp-2\">Yep, its says example client</p>",
             "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.94 (foreground color: #808080, background color: #ffffff, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
           },
           {

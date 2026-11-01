@@ -127,3 +127,38 @@ it.each([null, [], { schema_version: 5, delivery_quality: "clean", verification:
   render(<MissionQualitySummary mission={item} />);
   expect(screen.getByText("Quality not assessed for this run")).toBeVisible();
 });
+
+
+it("schema 6 keeps unassessed sample coverage distinct from a detected issue", () => {
+  const item = mission(fixtures.supported_sample);
+  item.execution_metadata.quality_record = {
+    ...item.execution_metadata.quality_record as object,
+    schema_version: 6,
+    claim_assessment: { version: 2, assessed: 11, supported: 11, unassessed: 1, declared_context: 1, contradicted: 0, unverified_contradicted: 0, inconsistent: 0, unknown_verdicts: 0 },
+  };
+  const { container } = render(<MissionQualitySummary mission={item} />);
+  expect(screen.getByText("No detected material issue")).toBeVisible();
+  expect(screen.getByText("Sampled verification; report-wide accuracy unknown")).toBeVisible();
+  expect(screen.queryByRole("list")).toBeNull();
+  expect(container.textContent).not.toMatch(/%|percent/);
+});
+
+it.each([
+  ["critique_unverified_contradiction_1", "1 possible contradiction could not be verified."],
+  ["critique_unverified_contradiction_2", "2 possible contradictions could not be verified."],
+  ["critique_internal_inconsistency_1", "1 claim was flagged as inconsistent within the report."],
+  ["critique_internal_inconsistency_2", "2 claims were flagged as inconsistent within the report."],
+  ["critique_unknown_verdicts_1", "The verification verdict for 1 claim could not be read."],
+  ["critique_unknown_verdicts_2", "The verification verdict for 2 claims could not be read."],
+  ["critique_assessment_provenance_error", "Detailed verification provenance is unavailable; an earlier assessment format was retained."],
+])("explains schema 6 warning %s without claiming a verified contradiction", (reason, explanation) => {
+  const item = mission(fixtures.supported_sample);
+  item.execution_metadata.quality_record = { ...item.execution_metadata.quality_record as object, schema_version: 6 };
+  item.execution_metadata.final_outcome = { delivery_quality: "usable_with_warning", quality_gate_failures: [reason] };
+  const { container } = render(<><MissionQualitySummary mission={item} /><RawQualityData mission={item} /></>);
+  expect(screen.getByText("Usable with warnings")).toBeVisible();
+  expect(screen.getByText(explanation)).toBeVisible();
+  expect(screen.getByText("Sampled verification; report-wide accuracy unknown")).toBeVisible();
+  expect(container.querySelector("pre")?.textContent).toContain(reason);
+  expect(screen.queryByText(/assessed claims? (was|were) contradicted/)).toBeNull();
+});

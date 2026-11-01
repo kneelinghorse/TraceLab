@@ -298,6 +298,19 @@ class TestTurn:
 
 
 class TestDraft:
+    def test_private_inputs_warn_during_draft_review_before_submission(self, librarian, project, auth_headers):
+        draft = {**VALID_DRAFT, "objective": "Synthesize M1–M6 into findings for this project."}
+        librarian(ModelReply(content=json.dumps(draft), usage=_usage()))
+        response = TestClient(app).post(
+            "/api/v1/librarian/drafts",
+            json={"project_id": str(project.id), "messages": _messages("Draft a synthesis.")},
+            headers=auth_headers,
+        )
+        assert response.status_code == 200, response.text
+        body = response.json()
+        assert "project-private-reference" in {w["rule"] for w in body["lint_warnings"]}
+        assert body["draft"]["objective"] == draft["objective"]
+
     def test_invalid_draft_is_repaired_then_compiled_and_linted(self, librarian, project, auth_headers):
         broken = {**VALID_DRAFT, "objective": "short", "success_criteria": []}
         model = librarian(

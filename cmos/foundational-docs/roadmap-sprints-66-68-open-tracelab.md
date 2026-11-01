@@ -132,7 +132,32 @@ Cleanup disabled the temporary account and verified denial for both its existing
 
 ## Monday 2026-10-19 — the share-out
 
-## Sprint 68 — After the share-out (planned shell)
+## Sprint 68 — After the share-out (active)
+
+The 2026-10-31 resume confirmed that Sprint 67 is closed. Its singular Reports
+count fix and stranded closeout receipt are already merged. S68-SMOKE also
+completed through PR #441, pinning the browser runners to Ubuntu 24.04.
+
+**S68-INTAKE — inbox fixes and DeepSearch compatibility** is the immediate work:
+
+- Correct the README's private-worker claim using DeepSearch's public README;
+  replace the client name in seven tracked files, current tree only.
+- Add the warning-only `project-private-reference` lint rule to the existing
+  draft/submit linter. Check authored action fields, leave background context
+  alone, and do not guess whether a counted set has been fully supplied.
+- Preserve submit warnings through both MCP surfaces. The production-dark Python
+  server retains its prior hard-gate behavior; npm forwards the REST warnings.
+- Explain the four schema 6 warning reasons without treating unverified
+  contradictions as established facts or sample coverage as report-wide accuracy.
+  Retain unknown future codes and raw quality data.
+- Verify regressions through backend tests, frontend unit and built browser tests,
+  and the installed MCP tarball's stdio client/HTTP-verb checks. Record read-only
+  production delivery evidence; no new paid research run is required.
+
+The record migration below remains separate. The two older outage-affected
+missions (M7 and RB-MA1) and S103's STIG-008 now report materialization ready and
+search_ready=true through the live MCP status verb. This does not establish
+current OpenAI account balance or refund settlement.
 
 - **S68-RB4: move the record to Reasonbook 4.0's folder** (messages `960040b8` and `9c5b4fc2`).
   - Follow Reasonbook's migration guide: run `migrate --docs-only`, then preview `migrate --project`, then apply `migrate --apply` only while no other session holds the record. Never stop another session's process.
@@ -213,6 +238,11 @@ Add to this list rather than resolving items silently. Questions 1–4 were answ
 ---
 
 ## Change Log
+
+- **2026-10-31, Sprint 68 resumed from the inbox.** Confirmed Sprint 67 and
+  S68-SMOKE were already closed; added the bounded S68-INTAKE mission above.
+  Reviewed DeepSearch's completed Sprint 103 and schema 6 consumer contract,
+  and checked persisted STIG-008 plus both older materialization recoveries.
 
 - **2026-10-14 UTC, Sprint 67 closeout released.** The closeout PR #437 merged as `e921de2`. Both Railway services serve it, and all eight main workflows and two later Production Smoke runs are green on it. Its [release receipt](../reports/sprint-67/closeout/release-receipt.json) was committed after the squash-merge, so it never reached main (learning #303). It lands unchanged in a follow-up PR.
 

@@ -398,6 +398,23 @@ class TestSubmitMissionExecutionBoundary:
         update_mission.assert_not_called()
         db.close.assert_called_once()
 
+    def test_private_project_reference_warning_survives_python_mcp_submit(self):
+        from app.mcp_server.tools.missions import handle_submit_mission
+
+        mission = _make_mission_mock(project_id="project-uuid", objective="Synthesize M1–M6.")
+        db = MagicMock()
+        with (
+            patch("app.mcp_server.tools.missions.get_db", return_value=iter([db])),
+            patch("app.mcp_server.tools.missions._get_mission_by_id_or_mission_id", return_value=mission),
+            patch("app.mcp_server.tools.missions._mission_service.update_mission", return_value=mission),
+            patch("app.mcp_server.tools.missions.settings.deepsearch_mode", "worker"),
+        ):
+            result = asyncio.run(handle_submit_mission({"mission_id": mission.mission_id}))
+        body = json.loads(result[0].text)
+        assert body["status"] == "queued"
+        assert "project-private-reference" in {w["rule"] for w in body["warnings"]}
+
+
 
 class TestSerializeMission:
     """Tests for mission serialization helper - uses mocks."""

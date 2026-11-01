@@ -25,16 +25,20 @@ function qualityData(mission: ApiMission) {
 
 /** Translate actionable codes without treating sample or retrieval counts as accuracy. */
 export function qualityReason(value: string): string {
-  const count = /^(critique_unassessed_claims|critique_contradicted|missing_cited_sources|cited_without_readable_body|truncated_cited_bodies|unresolved_cited_fetch_failures)_(\d+)$/.exec(value);
+  const count = /^(critique_unassessed_claims|critique_contradicted|critique_unverified_contradiction|critique_internal_inconsistency|critique_unknown_verdicts|missing_cited_sources|cited_without_readable_body|truncated_cited_bodies|unresolved_cited_fetch_failures)_(\d+)$/.exec(value);
   if (count) {
     const [, code, n] = count;
     if (code === "critique_unassessed_claims") return `${n} claim${n === "1" ? " was" : "s were"} not assessed.`;
+    if (code === "critique_unverified_contradiction") return `${n} possible contradiction${n === "1" ? "" : "s"} could not be verified.`;
+    if (code === "critique_internal_inconsistency") return `${n} claim${n === "1" ? " was" : "s were"} flagged as inconsistent within the report.`;
+    if (code === "critique_unknown_verdicts") return `The verification verdict for ${n} claim${n === "1" ? "" : "s"} could not be read.`;
     if (code === "critique_contradicted") return `${n} assessed claim${n === "1" ? " was" : "s were"} contradicted.`;
     if (code === "missing_cited_sources") return `${n} cited source${n === "1" ? " is" : "s are"} missing.`;
     if (code === "truncated_cited_bodies") return `${n} cited source bod${n === "1" ? "y was" : "ies were"} truncated.`;
     if (code === "unresolved_cited_fetch_failures") return `${n} cited source fetch${n === "1" ? " remains" : "es remain"} unresolved.`;
     return `${n} cited source${n === "1" ? " has" : "s have"} no readable body.`;
   }
+  if (value === "critique_assessment_provenance_error") return "Detailed verification provenance is unavailable; an earlier assessment format was retained.";
   if (value === "critique_assessment_unknown") return "Claim assessment is unavailable or incomplete.";
   if (value === "retrieval_dependency_attribution_unknown") return "The effect of retrieval failures on cited evidence is unknown.";
   if (value === "retrieval_failure_impact_unknown") return "The impact of earlier retrieval failures is unknown.";
