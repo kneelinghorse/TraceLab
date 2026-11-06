@@ -13,3 +13,8 @@ telemetry/events/*.tmp
 .DS_Store
 __pycache__/
 *.pyc
+db/*.sqlite
+db/*.sqlite-wal
+db/*.sqlite-shm
+db/snapshots/pre-migrate-*.sqlite
+db/snapshots/
