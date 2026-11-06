@@ -3,11 +3,11 @@
 This tutorial extends the architectural guardrails captured in `foundational-docs/tech_arch_template.md` and demonstrates how to capture, validate, and promote Mission Protocol payloads end-to-end.
 
 ## 1. Draft Creation
-1. Start from the backlog export (`./cmos/cli.py db export backlog --output cmos/missions/backlog.yaml`).
+1. Start from the backlog export (`./rbook/cli.py db export backlog --output rbook/missions/backlog.yaml`).
 2. Draft missions in YAML using the `MissionProtocolDraft` schema:
    ```bash
-   ./cmos/cli.py missions add B4.4 --sprint sprint-04 --name "Testing & Documentation"
-   ./cmos/cli.py missions update B4.4 --metadata '{"description": "Coverage + docs"}'
+   ./rbook/cli.py missions add B4.4 --sprint sprint-04 --name "Testing & Documentation"
+   ./rbook/cli.py missions update B4.4 --metadata '{"description": "Coverage + docs"}'
    ```
 3. Use `app/services/mission_protocol_validation.parse_mission_yaml` to lint YAML before import.
 
@@ -28,7 +28,7 @@ This tutorial extends the architectural guardrails captured in `foundational-doc
    ```bash
    http POST :8000/api/v1/quality/automated mission_id==B4.4 gate=="traceability"
    ```
-2. Inspect the resulting telemetry under `cmos/telemetry/events/mission-protocol-*.jsonl` and ensure the gate verdicts align with `REQUIRED_COMPLETION_GATES` in `app/models/mission_protocol.py`.
+2. Inspect the resulting telemetry under `rbook/telemetry/events/mission-protocol-*.jsonl` and ensure the gate verdicts align with `REQUIRED_COMPLETION_GATES` in `app/models/mission_protocol.py`.
 
 ## 4. Documentation & Evidence
 1. Store research artifacts under `artifacts/` and index them via `app/services/evidence_linking.py`.
@@ -38,4 +38,4 @@ This tutorial extends the architectural guardrails captured in `foundational-doc
 ## 5. Completion Checklist
 - Draft validated through `pytest tests/test_mission_protocol_validation.py` and API contract tests.
 - Quality gates show `pass` for research statement, evidence links, synthesis, traceability, and contradictions.
-- Mission marked `complete` using `cmos/context/mission_runtime.complete` with summary + next hint recorded in SQLite.
+- Mission marked `complete` using `rbook/context/mission_runtime.complete` with summary + next hint recorded in SQLite.

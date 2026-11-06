@@ -22,7 +22,7 @@ pytest tests/integration -v
 Run `ruff check app/ tests/`. CI applies Ruff to changed files; **`ruff format` is not enforced**, and broad formatting churn should be avoided. Mypy is a local diagnostic, not a required CI gate. Before concluding runtime work, also run:
 
 ```bash
-python cmos/scripts/validate_foundational_refs.py
+python rbook/scripts/validate_foundational_refs.py
 ```
 
 The full serialized backend lane and its documented quarantine are defined in [backend-tests.yml](.github/workflows/backend-tests.yml) and the [CI baseline](.github/ci/README.md). Do not introduce skips to make a regression green.
@@ -66,6 +66,6 @@ PLAYWRIGHT_SKIP_SERVER=1 PLAYWRIGHT_BASE_URL=http://127.0.0.1:3100 npx playwrigh
 
 ## MCP and contracts
 
-Follow the [MCP package guide](packages/tracelab-mcp/README.md). Rebuild after editing package source; never commit `packages/*/dist/`. Verify installable artifacts from an `npm pack` tarball installed in a clean directory. MCP surface changes need a regression through the MCP client, and mission-authoring changes must update the [boundary contract](cmos/contracts/mission-authoring-contract.md).
+Follow the [MCP package guide](packages/tracelab-mcp/README.md). Rebuild after editing package source; never commit `packages/*/dist/`. Verify installable artifacts from an `npm pack` tarball installed in a clean directory. MCP surface changes need a regression through the MCP client, and mission-authoring changes must update the [boundary contract](rbook/contracts/mission-authoring-contract.md).
 
-Keep application code, dependencies and generated packages outside `cmos/`. That directory holds the project record and historical receipts; PostgreSQL remains the application's database.
+Keep application code, dependencies and generated packages outside `rbook/`. That directory holds the project record and historical receipts; PostgreSQL remains the application's database.

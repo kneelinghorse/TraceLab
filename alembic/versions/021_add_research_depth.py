@@ -1,16 +1,17 @@
 """Add research_depth column to missions table.
 
 Supports DeepSearch depth tier system (baseline/deep/alpha) per Sprint 22.
-See cmos/planning/research-depth-tiers.md for full specification.
+See rbook/planning/research-depth-tiers.md for full specification.
 
 Revision ID: 021_add_research_depth
 Revises: 020_audit_metadata
 Create Date: 2025-12-11
 """
 
-from alembic import op
 import sqlalchemy as sa
 from sqlalchemy import inspect
+
+from alembic import op
 
 revision = "021_add_research_depth"
 down_revision = "020_audit_metadata"

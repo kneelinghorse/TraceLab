@@ -13,10 +13,10 @@ Usage:
     python scripts/pedr_latency_benchmark.py
 
     # Save results to telemetry
-    python scripts/pedr_latency_benchmark.py -o cmos/telemetry/events/pedr-benchmark-$(date +%Y%m%d).json
+    python scripts/pedr_latency_benchmark.py -o rbook/telemetry/events/pedr-benchmark-$(date +%Y%m%d).json
 
     # Compare to Sprint 18 baseline
-    python scripts/pedr_latency_benchmark.py -c cmos/reports/sprint-18/pedr-baseline-capture.json
+    python scripts/pedr_latency_benchmark.py -c rbook/reports/sprint-18/pedr-baseline-capture.json
 
     # Run hybrid mode benchmark
     python scripts/pedr_latency_benchmark.py --mode hybrid
@@ -34,12 +34,11 @@ import statistics
 import sys
 import time
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import httpx
-
 
 # Standard test queries from R19.0 research
 # Covers UX research, technical, process, and domain-specific topics
@@ -81,17 +80,17 @@ class QueryResult:
 
     query: str
     runs: int
-    latencies_ms: List[float] = field(default_factory=list)
+    latencies_ms: list[float] = field(default_factory=list)
     p50_ms: float = 0.0
     mean_ms: float = 0.0
     min_ms: float = 0.0
     max_ms: float = 0.0
-    layer_timings: Optional[LayerTimings] = None
+    layer_timings: LayerTimings | None = None
     result_count: int = 0
-    intent: Optional[str] = None
-    detected_type: Optional[str] = None
+    intent: str | None = None
+    detected_type: str | None = None
     cache_hit: bool = False
-    error: Optional[str] = None
+    error: str | None = None
 
 
 @dataclass
@@ -102,12 +101,12 @@ class BenchmarkResult:
     sprint: str
     benchmark_type: str
     rerank_mode: str
-    queries: List[Dict[str, Any]]
-    aggregate: Dict[str, Any]
-    comparison: Optional[Dict[str, Any]] = None
+    queries: list[dict[str, Any]]
+    aggregate: dict[str, Any]
+    comparison: dict[str, Any] | None = None
 
 
-def get_auth_headers(api_base: str) -> Dict[str, str]:
+def get_auth_headers(api_base: str) -> dict[str, str]:
     """Get authentication headers for API requests.
 
     Checks for JWT token in environment or attempts to get one.
@@ -131,7 +130,7 @@ def get_auth_headers(api_base: str) -> Dict[str, str]:
             if response.status_code == 200:
                 token_data = response.json()
                 return {"Authorization": f"Bearer {token_data['access_token']}"}
-    except Exception:
+    except Exception:  # noqa: S110 - optional login; preserve anonymous benchmark fallback
         pass
 
     return {}
@@ -142,10 +141,10 @@ def run_single_query(
     api_base: str,
     query: str,
     top_k: int,
-    headers: Dict[str, str],
+    headers: dict[str, str],
     rerank_mode: str = "full",
     hnsw_ef: int = 128,
-) -> tuple[float, Dict[str, Any]]:
+) -> tuple[float, dict[str, Any]]:
     """Execute a single search query and return latency + response data.
 
     Args:
@@ -180,7 +179,7 @@ def run_single_query(
 
 
 def run_benchmark(
-    queries: List[str],
+    queries: list[str],
     runs_per_query: int = 3,
     api_base: str = DEFAULT_API_BASE,
     top_k: int = DEFAULT_TOP_K,
@@ -203,11 +202,11 @@ def run_benchmark(
         BenchmarkResult with all collected metrics.
     """
     headers = get_auth_headers(api_base)
-    results: List[QueryResult] = []
-    all_latencies: List[float] = []
+    results: list[QueryResult] = []
+    all_latencies: list[float] = []
 
     if verbose:
-        print(f"PEDR Latency Benchmark Suite")
+        print("PEDR Latency Benchmark Suite")
         print("=" * 60)
         print(f"API:       {api_base}")
         print(f"Mode:      {rerank_mode}")
@@ -220,13 +219,13 @@ def run_benchmark(
     with httpx.Client(timeout=60.0) as client:
         for i, query in enumerate(queries, 1):
             query_result = QueryResult(query=query, runs=0)
-            query_latencies: List[float] = []
-            last_response: Optional[Dict[str, Any]] = None
+            query_latencies: list[float] = []
+            last_response: dict[str, Any] | None = None
 
             if verbose:
                 print(f"[{i:2d}/{len(queries)}] {query[:45]:<45}", end=" ")
 
-            for run in range(runs_per_query):
+            for _run in range(runs_per_query):
                 try:
                     elapsed_ms, data = run_single_query(
                         client, api_base, query, top_k, headers, rerank_mode, hnsw_ef
@@ -350,7 +349,7 @@ def run_benchmark(
         query_dicts.append(d)
 
     return BenchmarkResult(
-        timestamp=datetime.now(timezone.utc).isoformat(),
+        timestamp=datetime.now(UTC).isoformat(),
         sprint="sprint-19",
         benchmark_type="pedr_latency",
         rerank_mode=rerank_mode,
@@ -359,7 +358,7 @@ def run_benchmark(
     )
 
 
-def _compute_aggregate(latencies: List[float]) -> Dict[str, Any]:
+def _compute_aggregate(latencies: list[float]) -> dict[str, Any]:
     """Compute aggregate statistics from latency list."""
     if not latencies:
         return {"error": "No successful queries"}
@@ -379,7 +378,7 @@ def _compute_aggregate(latencies: List[float]) -> Dict[str, Any]:
     }
 
 
-def _compute_layer_timing_aggregate(results: List[QueryResult]) -> Dict[str, float]:
+def _compute_layer_timing_aggregate(results: list[QueryResult]) -> dict[str, float]:
     """Compute average layer timings across all queries."""
     timing_sums = {
         "lexical_ms": 0.0,
@@ -410,7 +409,7 @@ def _compute_layer_timing_aggregate(results: List[QueryResult]) -> Dict[str, flo
 def compare_to_baseline(
     current: BenchmarkResult,
     baseline_path: str,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Compare current benchmark results to Sprint 18 baseline.
 
     Args:
@@ -438,10 +437,7 @@ def compare_to_baseline(
     current_p95 = current.aggregate.get("p95_ms", 0)
 
     # Calculate improvement percentage
-    if baseline_p50 > 0:
-        improvement_pct = ((baseline_p50 - current_p50) / baseline_p50) * 100
-    else:
-        improvement_pct = 0
+    improvement_pct = ((baseline_p50 - current_p50) / baseline_p50) * 100 if baseline_p50 > 0 else 0
 
     # Sprint 19 targets
     target_p50 = 500  # ms

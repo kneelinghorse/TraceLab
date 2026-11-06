@@ -10,18 +10,18 @@ Generates Markdown/JSON report highlighting met vs unmet targets and recommended
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import yaml
 
 # Paths
 REPO_ROOT = Path(__file__).resolve().parent.parent
-BACKLOG_PATH = REPO_ROOT / "cmos" / "missions" / "backlog.yaml"
+BACKLOG_PATH = REPO_ROOT / "rbook" / "missions" / "backlog.yaml"
 
 
-def load_yaml(path: Path) -> Dict[str, Any]:
+def load_yaml(path: Path) -> dict[str, Any]:
     """Load YAML file. Handles multi-document YAML by taking the mission document."""
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         docs = list(yaml.safe_load_all(f))
         for doc in docs:
             if (
@@ -33,17 +33,17 @@ def load_yaml(path: Path) -> Dict[str, Any]:
         return docs[-1] if docs else {}
 
 
-def load_json(path: Path) -> Optional[Dict[str, Any]]:
+def load_json(path: Path) -> dict[str, Any] | None:
     """Load JSON file, return None if missing."""
     if not path.exists():
         return None
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         return json.load(f)
 
 
 def extract_sprint_missions(
-    backlog: Dict[str, Any], sprint_id: str
-) -> List[Dict[str, Any]]:
+    backlog: dict[str, Any], sprint_id: str
+) -> list[dict[str, Any]]:
     """Extract missions for a specific sprint."""
     for sprint in backlog.get("domainFields", {}).get("sprints", []):
         if sprint.get("sprintId") == sprint_id:
@@ -52,9 +52,9 @@ def extract_sprint_missions(
 
 
 def evaluate_presidio_metric(
-    baseline: Optional[Dict[str, Any]],
-    tuned: Optional[Dict[str, Any]],
-) -> Tuple[bool, str, Dict[str, Any]]:
+    baseline: dict[str, Any] | None,
+    tuned: dict[str, Any] | None,
+) -> tuple[bool, str, dict[str, Any]]:
     """
     Evaluate: Presidio recall ≥ 0.95 on synthetic corpus priority entities.
 
@@ -102,8 +102,8 @@ def evaluate_presidio_metric(
 
 
 def evaluate_ingestion_metric(
-    coverage: Optional[Dict[str, Any]],
-) -> Tuple[bool, str, Dict[str, Any]]:
+    coverage: dict[str, Any] | None,
+) -> tuple[bool, str, dict[str, Any]]:
     """
     Evaluate: Five priority formats ingested end-to-end with sanitized chunks in PostgreSQL.
 
@@ -146,8 +146,8 @@ def evaluate_ingestion_metric(
 
 
 def evaluate_qdrant_metric(
-    performance: Optional[Dict[str, Any]],
-) -> Tuple[bool, str, Dict[str, Any]]:
+    performance: dict[str, Any] | None,
+) -> tuple[bool, str, dict[str, Any]]:
     """Evaluate: Embedding pipeline stores ≥1 sample project in Qdrant with <10ms p99 query latency (local)."""
     if not performance:
         return False, "qdrant_performance.json missing", {}
@@ -192,14 +192,14 @@ def evaluate_qdrant_metric(
     return met, " | ".join(status_parts), details
 
 
-def evaluate_script_metric() -> Tuple[bool, str, Dict[str, Any]]:
+def evaluate_script_metric() -> tuple[bool, str, dict[str, Any]]:
     """Evaluate: Sprint evaluation script executes and produces retrospective report."""
     return True, "Script executed successfully", {}
 
 
 def evaluate_rag_query_metric(
-    metrics: Optional[Dict[str, Any]],
-) -> Tuple[bool, str, Dict[str, Any]]:
+    metrics: dict[str, Any] | None,
+) -> tuple[bool, str, dict[str, Any]]:
     """Evaluate Sprint 02 RAG query accuracy and citation coverage."""
     if not metrics:
         return False, "rag_query_metrics.json missing", {}
@@ -230,8 +230,8 @@ def evaluate_rag_query_metric(
 
 
 def evaluate_context_compression_metric(
-    metrics: Optional[Dict[str, Any]],
-) -> Tuple[bool, str, Dict[str, Any]]:
+    metrics: dict[str, Any] | None,
+) -> tuple[bool, str, dict[str, Any]]:
     """Evaluate Sprint 02 context compression reduction targets."""
     if not metrics:
         return False, "context_compression_metrics.json missing", {}
@@ -263,8 +263,8 @@ def evaluate_context_compression_metric(
 
 
 def evaluate_semantic_cache_metric(
-    metrics: Optional[Dict[str, Any]],
-) -> Tuple[bool, str, Dict[str, Any]]:
+    metrics: dict[str, Any] | None,
+) -> tuple[bool, str, dict[str, Any]]:
     """Evaluate Sprint 02 semantic cache hit rate target."""
     if not metrics:
         return False, "semantic_cache_metrics.json missing", {}
@@ -286,8 +286,8 @@ def evaluate_semantic_cache_metric(
 
 
 def evaluate_tiered_routing_metric(
-    metrics: Optional[Dict[str, Any]],
-) -> Tuple[bool, str, Dict[str, Any]]:
+    metrics: dict[str, Any] | None,
+) -> tuple[bool, str, dict[str, Any]]:
     """Evaluate Sprint 02 tiered routing escalation rate."""
     if not metrics:
         return False, "tiered_routing_metrics.json missing", {}
@@ -308,8 +308,8 @@ def evaluate_tiered_routing_metric(
 
 
 def evaluate_cost_metric(
-    metrics: Optional[Dict[str, Any]],
-) -> Tuple[bool, str, Dict[str, Any]]:
+    metrics: dict[str, Any] | None,
+) -> tuple[bool, str, dict[str, Any]]:
     """Evaluate Sprint 02 cost per query target."""
     if not metrics:
         return False, "cost_metrics.json missing", {}
@@ -329,8 +329,8 @@ def evaluate_cost_metric(
 
 
 def evaluate_latency_metric(
-    metrics: Optional[Dict[str, Any]],
-) -> Tuple[bool, str, Dict[str, Any]]:
+    metrics: dict[str, Any] | None,
+) -> tuple[bool, str, dict[str, Any]]:
     """Evaluate Sprint 02 RAG query latency targets."""
     if not metrics:
         return False, "query_latency_metrics.json missing", {}
@@ -355,8 +355,8 @@ def evaluate_latency_metric(
 
 def generate_report(
     sprint_id: str,
-    missions: List[Dict[str, Any]],
-    evaluations: List[Tuple[str, bool, str, Dict[str, Any]]],
+    missions: list[dict[str, Any]],
+    evaluations: list[tuple[str, bool, str, dict[str, Any]]],
     output_dir: Path,
 ) -> Path:
     """Generate Markdown report for a sprint."""
@@ -480,26 +480,26 @@ def _format_artifact_key(key: str) -> str:
 
 SPRINT_CONFIG = {
     "Sprint 01": {
-        "reports_dir": REPO_ROOT / "cmos" / "reports" / "sprint-01",
-        "missions_dir": REPO_ROOT / "cmos" / "missions" / "sprint-01",
+        "reports_dir": REPO_ROOT / "rbook" / "reports" / "sprint-01",
+        "missions_dir": REPO_ROOT / "rbook" / "missions" / "sprint-01",
         "telemetry_paths": {
             "presidio_baseline": REPO_ROOT
-            / "cmos"
+            / "rbook"
             / "reports"
             / "sprint-01"
             / "presidio_corpus_baseline.json",
             "presidio_tuned": REPO_ROOT
-            / "cmos"
+            / "rbook"
             / "reports"
             / "sprint-01"
             / "presidio_tuned_results.json",
             "ingestion_coverage": REPO_ROOT
-            / "cmos"
+            / "rbook"
             / "reports"
             / "sprint-01"
             / "ingestion_format_coverage.json",
             "qdrant_performance": REPO_ROOT
-            / "cmos"
+            / "rbook"
             / "reports"
             / "sprint-01"
             / "qdrant_performance.json",
@@ -521,43 +521,43 @@ SPRINT_CONFIG = {
                 "inputs": ["qdrant_performance"],
             },
             {
-                "metric": "Sprint 1: Sprint evaluation script executes and produces retrospective report in `cmos/reports/`.",
+                "metric": "Sprint 1: Sprint evaluation script executes and produces retrospective report in `rbook/reports/`.",
                 "func": evaluate_script_metric,
                 "inputs": [],
             },
         ],
     },
     "Sprint 02": {
-        "reports_dir": REPO_ROOT / "cmos" / "reports" / "sprint-02",
-        "missions_dir": REPO_ROOT / "cmos" / "missions" / "sprint-02",
+        "reports_dir": REPO_ROOT / "rbook" / "reports" / "sprint-02",
+        "missions_dir": REPO_ROOT / "rbook" / "missions" / "sprint-02",
         "telemetry_paths": {
             "rag_query_metrics": REPO_ROOT
-            / "cmos"
+            / "rbook"
             / "reports"
             / "sprint-02"
             / "rag_query_metrics.json",
             "context_compression_metrics": REPO_ROOT
-            / "cmos"
+            / "rbook"
             / "reports"
             / "sprint-02"
             / "context_compression_metrics.json",
             "semantic_cache_metrics": REPO_ROOT
-            / "cmos"
+            / "rbook"
             / "reports"
             / "sprint-02"
             / "semantic_cache_metrics.json",
             "tiered_routing_metrics": REPO_ROOT
-            / "cmos"
+            / "rbook"
             / "reports"
             / "sprint-02"
             / "tiered_routing_metrics.json",
             "cost_metrics": REPO_ROOT
-            / "cmos"
+            / "rbook"
             / "reports"
             / "sprint-02"
             / "cost_metrics.json",
             "query_latency_metrics": REPO_ROOT
-            / "cmos"
+            / "rbook"
             / "reports"
             / "sprint-02"
             / "query_latency_metrics.json",
@@ -594,7 +594,7 @@ SPRINT_CONFIG = {
                 "inputs": ["query_latency_metrics"],
             },
             {
-                "metric": "Sprint 2: Sprint evaluation script executes and produces retrospective report in `cmos/reports/sprint-02/`.",
+                "metric": "Sprint 2: Sprint evaluation script executes and produces retrospective report in `rbook/reports/sprint-02/`.",
                 "func": evaluate_script_metric,
                 "inputs": [],
             },
@@ -637,7 +637,7 @@ def main() -> None:
     missions = extract_sprint_missions(backlog, sprint_id)
     print(f"Found {len(missions)} missions for {sprint_id}")
 
-    telemetry_data: Dict[str, Optional[Dict[str, Any]]] = {}
+    telemetry_data: dict[str, dict[str, Any] | None] = {}
     print("Loaded telemetry artifacts:")
     for key, path in config.get("telemetry_paths", {}).items():
         data = load_json(path)
@@ -646,7 +646,7 @@ def main() -> None:
         relative_path = path.relative_to(REPO_ROOT)
         print(f"  - {_format_artifact_key(key)}: {status_icon} ({relative_path})")
 
-    evaluations: List[Tuple[str, bool, str, Dict[str, Any]]] = []
+    evaluations: list[tuple[str, bool, str, dict[str, Any]]] = []
     for evaluation in config["evaluations"]:
         metric = evaluation["metric"]
         func = evaluation["func"]

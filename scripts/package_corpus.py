@@ -13,13 +13,12 @@ import hashlib
 import json
 import shutil
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Dict, Literal, Optional
-
+from typing import Literal
 
 ARCHIVE_FORMAT = Literal["gztar", "zip"]
-DEFAULT_BASELINE_PATH = Path("cmos/reports/sprint-01/presidio_corpus_baseline.json")
+DEFAULT_BASELINE_PATH = Path("rbook/reports/sprint-01/presidio_corpus_baseline.json")
 
 
 def _compute_sha256(file_path: Path) -> str:
@@ -36,8 +35,8 @@ def package_corpus(
     output_dir: Path,
     archive_format: ARCHIVE_FORMAT = "gztar",
     include_baseline: bool = True,
-    baseline_path: Optional[Path] = None,
-) -> Dict[str, Optional[Path]]:
+    baseline_path: Path | None = None,
+) -> dict[str, Path | None]:
     """
     Package a corpus directory into an archive and produce a manifest.
 
@@ -62,10 +61,10 @@ def package_corpus(
             f"corpus_metadata.json not found at {metadata_path}. Generate the corpus first."
         )
 
-    with open(metadata_path, "r", encoding="utf-8") as handle:
+    with open(metadata_path, encoding="utf-8") as handle:
         corpus_metadata = json.load(handle)
 
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
+    timestamp = datetime.now(UTC).strftime("%Y%m%d%H%M%S")
     archive_basename = output_dir / f"synthetic_corpus_{timestamp}"
 
     archive_path_str = shutil.make_archive(
@@ -76,8 +75,8 @@ def package_corpus(
     archive_path = Path(archive_path_str)
     checksum = _compute_sha256(archive_path)
 
-    generated_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
-    manifest: Dict[str, object] = {
+    generated_at = datetime.now(UTC).isoformat().replace("+00:00", "Z")
+    manifest: dict[str, object] = {
         "generated_at": generated_at,
         "archive": {
             "path": str(archive_path),
@@ -88,7 +87,7 @@ def package_corpus(
         "corpus_metadata": corpus_metadata,
     }
 
-    baseline_copy: Optional[Path] = None
+    baseline_copy: Path | None = None
     if include_baseline:
         resolved_baseline = (baseline_path or DEFAULT_BASELINE_PATH).resolve()
         if resolved_baseline.exists():
@@ -114,7 +113,7 @@ def package_corpus(
     }
 
 
-def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Package the synthetic corpus into an archive with manifest."
     )
@@ -150,7 +149,7 @@ def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
-def main(argv: Optional[list[str]] = None) -> None:
+def main(argv: list[str] | None = None) -> None:
     args = parse_args(argv)
     result = package_corpus(
         corpus_dir=args.corpus_dir,

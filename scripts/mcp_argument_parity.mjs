@@ -10,7 +10,7 @@
 //   * the Zod schema the handler .parse()s — the runtime contract
 // Zod strips unknown keys by default, so a property advertised but absent from the Zod
 // schema is accepted, ignored and never reported. This is the input-side twin of the
-// two-serializers bug in cmos/contracts/mission-authoring-contract.md.
+// two-serializers bug in rbook/contracts/mission-authoring-contract.md.
 import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';

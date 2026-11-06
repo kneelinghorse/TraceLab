@@ -68,34 +68,35 @@ artifacts/**/*
 # baseline when it was copied here for safekeeping, so a receipt would have cited
 # files that were never committed. Same defect class as the `*.log` rule that hid
 # 21 evidence logs across three sprints (Sprint 55).
-!cmos/reports/baselines/**/artifacts/
-!cmos/reports/baselines/**/artifacts/**
+!rbook/reports/baselines/**/artifacts/
+!rbook/reports/baselines/**/artifacts/**
 
 # Stage1 design-scan output (research evidence; large JSON artifacts).
 # NOTE: this is why the only copy of the April 2026 fingerprint baseline lived on
-# one machine. The preserved copy is tracked under cmos/reports/baselines/.
+# one machine. The preserved copy is tracked under rbook/reports/baselines/.
 out/
 
 # Telemetry build artifacts
 telemetry/events/.artifacts/
 
-# CMOS v2 — local runtime only
-cmos/db/cmos.sqlite
-cmos/db/cmos.sqlite-shm
-cmos/db/cmos.sqlite-wal
-cmos/context/master_context.json
-cmos/context/project_context.json
+# Reasonbook — local runtime only
+rbook/db/rbook.sqlite
+rbook/db/rbook.sqlite-shm
+rbook/db/rbook.sqlite-wal
+rbook/db/snapshots/
+rbook/context/master_context.json
+rbook/context/project_context.json
 
-# Local validation outputs; canonical receipts are copied into cmos/reports.
+# Local validation outputs; canonical receipts are copied into rbook/reports.
 telemetry/events/*.jsonl
-cmos/telemetry/**
+rbook/telemetry/**
 tests/test_ingestion.db-journal
 
 # Generated application outputs; historical record receipts remain immutable.
 /telemetry/runtime/
 
 # Report screenshots stay local: production captures show project names and account details.
-# Keep written receipts in cmos/reports; keep images out of the public repo.
-cmos/reports/**/*.png
-cmos/reports/**/*.jpg
-cmos/reports/**/*.jpeg
+# Keep written receipts in rbook/reports; keep images out of the public repo.
+rbook/reports/**/*.png
+rbook/reports/**/*.jpg
+rbook/reports/**/*.jpeg

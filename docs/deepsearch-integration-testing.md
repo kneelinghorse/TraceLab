@@ -1,6 +1,6 @@
 # DeepSearch Integration Testing Guide
 
-_This format follows the sprint-level expectations in `cmos/docs/integration-testing-guide.md` so TraceLab and DeepSearch share a single source of truth for Week 7 validation._
+_This format follows the sprint-level expectations in `rbook/docs/integration-testing-guide.md` so TraceLab and DeepSearch share a single source of truth for Week 7 validation._
 
 ## Scope & Goals
 TraceLab uses this suite to prove the DeepSearch ingestion contract end-to-end: MissionProtocol JSON → quality gates → evidence auto-linking → RAG search surfaces. The tests run entirely against the FastAPI application with the SQLite test database (`tests/test_ingestion.db`) and never mutate the Mission Protocol SQLite runtime.
@@ -45,7 +45,7 @@ The suite currently executes ~6.5s on a MacBook Pro (M3 Max) and produces 10 ato
 - `tests/integration/test_deepsearch_integration.py` seeds documents and chunks in SQLite for every test. The helper `_seed_chunks` writes `Document` + `DocumentChunk` rows so EvidenceAutoLinking can match summaries deterministically.
 
 ## Reporting & Telemetry
-- Every pytest run appends an entry to `cmos/telemetry/events/sprint-10-integration-testing.jsonl` (see repo root for latest payload). Include this artifact in sprint validation notes per `cmos/docs/cmos_Playbook.md`.
+- Every pytest run appends an entry to `rbook/telemetry/events/sprint-10-integration-testing.jsonl` (see repo root for latest payload). Include this artifact in sprint validation notes per `rbook/docs/cmos_Playbook.md`.
 - For parity tracking, capture the pytest command, duration, and commit hash in sprint notes or TraceLab telemetry dashboards.
 
 ## Next Steps

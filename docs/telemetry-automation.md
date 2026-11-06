@@ -7,10 +7,10 @@ so every pytest, Playwright, and integration run produces auditable evidence.
 
 | Component | Path | Description |
 |-----------|------|-------------|
-| Pytest plugin | `cmos/scripts/pytest_telemetry_plugin.py` | Captures per-test results, durations, and metadata for any pytest invocation. Loaded via `tests/conftest.py`. |
-| Playwright reporter | `cmos/scripts/playwright_telemetry_reporter.js` | Custom reporter executed from `frontend/playwright.config.ts` that writes telemetry for UI tests. |
-| Integrations | `cmos/context/integration_test_runner.js` | Existing Node runner that now feeds the aggregator via `.artifacts/integration-runner.json`. |
-| Aggregator | `cmos/scripts/aggregate_test_telemetry.py` | Merges pytest + Playwright + integration artifacts into `telemetry/events/testing-summary.json` and mirrors it under `cmos/telemetry/events/`. |
+| Pytest plugin | `rbook/scripts/pytest_telemetry_plugin.py` | Captures per-test results, durations, and metadata for any pytest invocation. Loaded via `tests/conftest.py`. |
+| Playwright reporter | `rbook/scripts/playwright_telemetry_reporter.js` | Custom reporter executed from `frontend/playwright.config.ts` that writes telemetry for UI tests. |
+| Integrations | `rbook/context/integration_test_runner.js` | Existing Node runner that now feeds the aggregator via `.artifacts/integration-runner.json`. |
+| Aggregator | `rbook/scripts/aggregate_test_telemetry.py` | Merges pytest + Playwright + integration artifacts into `telemetry/events/testing-summary.json` and mirrors it under `rbook/telemetry/events/`. |
 | CI workflow | `.github/workflows/test-telemetry.yml` | Executes pytest, Playwright, and aggregation on every push / PR. |
 
 ## Local Workflow
@@ -25,7 +25,7 @@ NEXT_PUBLIC_E2E_AUTH_TOKEN=test-playwright npx playwright test tests/e2e/mission
 
 # 3. Aggregate telemetry (runs integration tests automatically)
 cd ..
-python cmos/scripts/aggregate_test_telemetry.py
+python rbook/scripts/aggregate_test_telemetry.py
 ```
 
 The aggregator exits with a non-zero code if any suite failed. Use
@@ -37,7 +37,7 @@ The aggregator exits with a non-zero code if any suite failed. Use
 
 1. Install Python deps and run pytest.
 2. Install Node deps, browsers, and run Playwright.
-3. Execute `python cmos/scripts/aggregate_test_telemetry.py`.
+3. Execute `python rbook/scripts/aggregate_test_telemetry.py`.
 4. Upload `telemetry/events/testing-summary.json` as a workflow artifact.
 
 ### Environment variables
@@ -58,7 +58,7 @@ telemetry/
       playwright-latest.json
       integration-runner.json
     testing-summary.json          # aggregated artifact (auto-generated)
-cmos/telemetry/events/testing-summary.json  # mirrored copy for Mission Protocol evidence
+rbook/telemetry/events/testing-summary.json  # mirrored copy for Mission Protocol evidence
 ```
 
 Keep the `.artifacts` directory out of commits if you only need transient data;

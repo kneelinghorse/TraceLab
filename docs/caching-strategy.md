@@ -5,7 +5,7 @@ Sprint 08 introduces a dedicated application-level caching layer that wraps the 
 ## Architecture
 
 - `app/core/cache.py` provides a thread-safe `TTLCache` wrapper with stats, invalidation helpers, and a decorator for simple memoisation.
-- `app/services/cache_manager.py` centralises cache configuration, key builders, invalidation helpers, and telemetry logging (`cmos/telemetry/events/sprint-08-cache-metrics.jsonl`).
+- `app/services/cache_manager.py` centralises cache configuration, key builders, invalidation helpers, and telemetry logging (`rbook/telemetry/events/sprint-08-cache-metrics.jsonl`).
 - Cached operations use the manager's `cached_value` helper so every request receives a fresh copy of the cached payload while statistics stay accurate.
 
 ## Cache Targets & TTLs
@@ -29,7 +29,7 @@ All cache hits include `cache.layer="ttl"` metadata on the response plus the con
 
 ## Monitoring & Telemetry
 
-- `GET /api/v1/cache/stats` returns the live hit/miss counters, size, and TTL configuration for each bucket and appends the snapshot to `cmos/telemetry/events/sprint-08-cache-metrics.jsonl`.
+- `GET /api/v1/cache/stats` returns the live hit/miss counters, size, and TTL configuration for each bucket and appends the snapshot to `rbook/telemetry/events/sprint-08-cache-metrics.jsonl`.
 - `GET /api/v1/monitoring/performance` now surfaces the TTL cache snapshot under `ttl_caches` in addition to the semantic cache metrics and routing data.
 - Cache metrics use the same UTC timestamping as other telemetry feeds so parity checks can compare cache behaviour before and after missions.
 

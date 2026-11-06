@@ -17,7 +17,7 @@ Trade-offs:
 - Slightly lower recall than full semantic search
 - More complex orchestration
 
-Reference: R19.0 Qdrant Optimization Research (cmos/reports/sprint-19/)
+Reference: R19.0 Qdrant Optimization Research (rbook/reports/sprint-19/)
 """
 
 from __future__ import annotations

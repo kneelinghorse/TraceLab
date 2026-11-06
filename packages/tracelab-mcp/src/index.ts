@@ -21,7 +21,7 @@
  *
  * MCP-2 (sprint-52): per-user acknowledgements (favorites, saved searches and
  * the activity viewed watermark) and every DELETE route stay REST/UI-only by
- * decision #426; see cmos/contracts/mcp-parity-manifest.json. ACT-1 (decision
+ * decision #426; see rbook/contracts/mcp-parity-manifest.json. ACT-1 (decision
  * #459) replaced the inbox, attention, mission reviews and saved mission views
  * with one recency-ordered activity stream.
  */
@@ -2813,7 +2813,7 @@ async function main() {
                 `Tool "${name}" was renamed in T41.7 (sprint-41). ` +
                 `Use ${migrated.tool}(action="${migrated.action}", ...) ` +
                 `with the same parameters. See packages/tracelab-mcp/CHANGELOG ` +
-                `or cmos/contracts/mission-authoring-contract.md for the ` +
+                `or rbook/contracts/mission-authoring-contract.md for the ` +
                 `full legacy → cluster mapping.`,
             },
           ],

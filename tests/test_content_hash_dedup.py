@@ -13,14 +13,13 @@ from __future__ import annotations
 import hashlib
 import json
 import sqlite3
-import tempfile
+from contextlib import suppress
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pytest
 
-from cmos.context.db_client import SQLiteClient
-
+from rbook.context.db_client import SQLiteClient
 
 # ─── Content Hash Tests ──────────────────────────────────────────────────────
 
@@ -81,17 +80,15 @@ class TestHashBasedDedup:
     def db_client(self, tmp_path: Path) -> SQLiteClient:
         """Create a temporary SQLite database with schema."""
         db_path = tmp_path / "test.sqlite"
-        schema_path = Path(__file__).parent.parent / "cmos" / "db" / "schema.sql"
+        schema_path = Path(__file__).parent.parent / "rbook" / "db" / "schema.sql"
         client = SQLiteClient(db_path, schema_path=schema_path, create_missing=True)
         # Ensure connection is initialized
         _ = client.connection
         # Add content_hash column if not in schema
-        try:
+        with suppress(Exception):  # Column may already exist from schema.
             client.execute(
                 "ALTER TABLE strategic_decisions ADD COLUMN content_hash TEXT"
             )
-        except Exception:
-            pass  # Column may already exist from schema
         # Create contexts table entry for master_context
         client.execute(
             "INSERT OR REPLACE INTO contexts (id, source_path, content, updated_at) "
@@ -101,7 +98,7 @@ class TestHashBasedDedup:
 
     def test_dedup_by_hash_prevents_duplicates(self, db_client: SQLiteClient):
         """Identical decisions are not inserted twice."""
-        master_context: Dict[str, Any] = {
+        master_context: dict[str, Any] = {
             "decisions_made": [
                 "Use PostgreSQL for ACID compliance",
                 "Enable WAL mode for concurrent reads",
@@ -126,12 +123,12 @@ class TestHashBasedDedup:
 
     def test_new_decisions_are_added(self, db_client: SQLiteClient):
         """New decisions get inserted alongside existing ones."""
-        master_context1: Dict[str, Any] = {"decisions_made": ["Decision A"]}
+        master_context1: dict[str, Any] = {"decisions_made": ["Decision A"]}
         db_client._sync_strategic_decisions(
             master_context1, None, "2026-01-01T00:00:00Z"
         )
 
-        master_context2: Dict[str, Any] = {
+        master_context2: dict[str, Any] = {
             "decisions_made": ["Decision A", "Decision B"]
         }
         db_client._sync_strategic_decisions(
@@ -143,7 +140,7 @@ class TestHashBasedDedup:
 
     def test_content_hash_stored_on_insert(self, db_client: SQLiteClient):
         """content_hash is computed and stored for new decisions."""
-        master_context: Dict[str, Any] = {"decisions_made": ["Use PostgreSQL"]}
+        master_context: dict[str, Any] = {"decisions_made": ["Use PostgreSQL"]}
         db_client._sync_strategic_decisions(
             master_context, None, "2026-01-01T00:00:00Z"
         )
@@ -157,7 +154,7 @@ class TestHashBasedDedup:
 
     def test_domain_decisions_dedup(self, db_client: SQLiteClient):
         """Domain-specific decisions use domain in hash for dedup."""
-        master_context: Dict[str, Any] = {
+        master_context: dict[str, Any] = {
             "decisions_made": ["Use PostgreSQL"],
             "working_memory": {
                 "domains": {"tracelab": {"decisions_made": ["Use PostgreSQL"]}}
@@ -174,7 +171,7 @@ class TestHashBasedDedup:
 
     def test_rich_decision_entries_dedup(self, db_client: SQLiteClient):
         """Rich dict decisions with evidence dedup correctly."""
-        master_context: Dict[str, Any] = {
+        master_context: dict[str, Any] = {
             "decisions_made": [
                 {"text": "Use graph layer", "evidence": [{"type": "doc", "id": "123"}]},
                 {"text": "Use graph layer", "evidence": [{"type": "doc", "id": "456"}]},
@@ -197,7 +194,7 @@ class TestHashBasedDedup:
             "VALUES ('master_context', 'Legacy decision', '2025-01-01T00:00:00Z', 'general')"
         )
 
-        master_context: Dict[str, Any] = {"decisions_made": ["Legacy decision"]}
+        master_context: dict[str, Any] = {"decisions_made": ["Legacy decision"]}
 
         db_client._sync_strategic_decisions(
             master_context, None, "2026-01-01T00:00:00Z"
@@ -215,7 +212,7 @@ class TestMigrationScript:
 
     def test_migration_computes_hashes(self, tmp_path: Path):
         """Migration adds content_hash column and computes hashes."""
-        from cmos.scripts.migrate_content_hash import migrate, compute_content_hash
+        from rbook.scripts.migrate_content_hash import compute_content_hash, migrate
 
         db_path = tmp_path / "test.sqlite"
         conn = sqlite3.connect(str(db_path))
@@ -274,7 +271,7 @@ class TestMigrationScript:
 
     def test_migration_detects_duplicates(self, tmp_path: Path):
         """Migration reports duplicate records found by content hash."""
-        from cmos.scripts.migrate_content_hash import migrate
+        from rbook.scripts.migrate_content_hash import migrate
 
         db_path = tmp_path / "test.sqlite"
         conn = sqlite3.connect(str(db_path))
@@ -318,7 +315,7 @@ class TestMigrationScript:
 
     def test_migration_idempotent(self, tmp_path: Path):
         """Running migration twice doesn't re-hash or break."""
-        from cmos.scripts.migrate_content_hash import migrate
+        from rbook.scripts.migrate_content_hash import migrate
 
         db_path = tmp_path / "test.sqlite"
         conn = sqlite3.connect(str(db_path))
@@ -361,7 +358,7 @@ class TestMigrationScript:
 
     def test_hash_cross_language_consistency(self):
         """Python hash matches expected canonical JSON format for TypeScript compat."""
-        from cmos.scripts.migrate_content_hash import compute_content_hash
+        from rbook.scripts.migrate_content_hash import compute_content_hash
 
         # The canonical form is JSON.stringify({d: domain, t: text}) in TS
         # which produces: {"d":"general","t":"Use PostgreSQL"}

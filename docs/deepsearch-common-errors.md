@@ -1,6 +1,6 @@
 # DeepSearch Integration – Common Errors & Remedies
 
-_Reference: structured after the troubleshooting checklist in `cmos/docs/AI-coding-assistant-workflows.md` to keep remediation steps in sync with Mission Protocol guardrails._
+_Reference: structured after the troubleshooting checklist in `rbook/docs/AI-coding-assistant-workflows.md` to keep remediation steps in sync with Mission Protocol guardrails._
 
 ## QUALITY_GATE_FAILURE (evidence_links / traceability)
 **Symptom:** `/api/v1/deepsearch/ingest` responds with `{"error":{"code":"QUALITY_GATE_FAILURE"...}}` and `failing_gates` includes `evidence_links` or `traceability`.
@@ -14,7 +14,7 @@ _Reference: structured after the troubleshooting checklist in `cmos/docs/AI-codi
 1. Confirm the JSON mission references at least one evidence entry per key insight. Our fixtures in `tests/fixtures/deepsearch_missions/*.json` are good templates.
 2. When DeepSearch has traceability data, populate `chunk_id` before hitting the API so EvidenceAutoLinking can skip the entry.
 3. If linkages should be automatic, ensure the corresponding document/chunk exists for the provided `project_id`. Use `_seed_chunks` helper as shown in `tests/integration/test_deepsearch_integration.py` for local verification.
-4. Retry ingestion and re-check telemetry `cmos/telemetry/events/sprint-10-integration-testing.jsonl` to confirm auto-linking succeeded.
+4. Retry ingestion and re-check telemetry `rbook/telemetry/events/sprint-10-integration-testing.jsonl` to confirm auto-linking succeeded.
 
 ## project_id missing when auto_create_project=false
 **Symptom:** `HTTP 400` with detail `"project_id is required unless auto_create_project is true"`.
@@ -32,6 +32,6 @@ _Reference: structured after the troubleshooting checklist in `cmos/docs/AI-codi
 **Fix:** Patch `get_rag_service` / override `get_search_history_service` with deterministic fakes before calling the endpoint. `test_ingested_mission_available_via_search_endpoint` shows the exact monkeypatching + `app.dependency_overrides` needed.
 
 ## Auto-linking telemetry missing
-**Symptom:** `cmos/telemetry/events/sprint-10-deepsearch-ingestion.jsonl` does not update because tests write elsewhere.
+**Symptom:** `rbook/telemetry/events/sprint-10-deepsearch-ingestion.jsonl` does not update because tests write elsewhere.
 
-**Fix:** The integration suite intentionally redirects telemetry to a tmp file per test. When running manual verification, set `EVIDENCE_TELEMETRY_PATH` or instantiate `EvidenceAutoLinkingService(telemetry_path=Path("cmos/telemetry/events/sprint-10-deepsearch-ingestion.jsonl"))` to send output to the canonical location.
+**Fix:** The integration suite intentionally redirects telemetry to a tmp file per test. When running manual verification, set `EVIDENCE_TELEMETRY_PATH` or instantiate `EvidenceAutoLinkingService(telemetry_path=Path("rbook/telemetry/events/sprint-10-deepsearch-ingestion.jsonl"))` to send output to the canonical location.

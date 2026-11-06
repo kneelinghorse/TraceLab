@@ -55,7 +55,7 @@ def test_tracked_mode_checks_nested_receipts_but_not_application_fixtures(tmp_pa
     from scripts import check_receipt_emails
 
     monkeypatch.chdir(tmp_path)
-    receipt = Path("cmos/reports/sprint-66/fixture/receipt.json")
+    receipt = Path("rbook/reports/sprint-66/fixture/receipt.json")
     receipt.parent.mkdir(parents=True)
     receipt.write_text('{"email":"person@unapproved-domain.com"}')
     fixture = Path("tests/fixture.json")

@@ -10,7 +10,7 @@ expected_output_schema.
 
 Pinned to DeepSearch.alpha commit `79ef848` (branch codex/s94-authored-scope).
 Source paths and resync steps live at
-`cmos/contracts/deepsearch-compiler-vendor.md`.
+`rbook/contracts/deepsearch-compiler-vendor.md`.
 
 Public API used by TraceLab:
 - `compile_contract_from_state(state, *, origin)` — entry point

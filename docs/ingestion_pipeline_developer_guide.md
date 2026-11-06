@@ -8,7 +8,7 @@ The Sprint B1.4 ingestion workflow accepts the five prioritized UX research form
 2. **Extraction** – `DocumentIngestionService` detects the format and routes it to the appropriate parser (pdfminer.six, python-docx, python-pptx, pandas/openpyxl). Successful runs emit an `extracted` event with token counts.
 3. **Redaction** – The Presidio service (re-used from B1.3) pseudonymizes detected entities before any persistence. The document body stored in the database is always redacted, and an audit event is recorded under the `redacted` stage.
 4. **Chunking** – Redacted text is split into 500–1000 token chunks (750 target, 50 token overlap) with positional metadata. Persistence stores `DocumentChunk` rows and links `prev/next` references. Completion is tracked with a `chunked` event.
-5. **Coverage Reporting** – Every successful run refreshes `cmos/reports/sprint-01/ingestion_format_coverage.json`, summarizing success, failure, and progress metrics per format.
+5. **Coverage Reporting** – Every successful run refreshes `rbook/reports/sprint-01/ingestion_format_coverage.json`, summarizing success, failure, and progress metrics per format.
 
 Processing state is persisted in `document_processing_statuses` with the following schema:
 
@@ -102,7 +102,7 @@ When failures occur (for example, parsing errors), the service records a `failed
   - CSV/XLSX: `pandas` with `openpyxl`
 - **Redaction** – Presidio is lazily instantiated via `app.api.v1.redaction.get_redaction_service()`. Tests inject a stub using the same hook.
 - **Chunking** – Defined in `app/services/chunking.py`. Chunks include overlap to preserve context and store start/end character offsets plus estimated token counts.
-- **Coverage Metrics** – Regenerated automatically on successful processing. Inspect `cmos/reports/sprint-01/ingestion_format_coverage.json` for up-to-date counts and rates per format.
+- **Coverage Metrics** – Regenerated automatically on successful processing. Inspect `rbook/reports/sprint-01/ingestion_format_coverage.json` for up-to-date counts and rates per format.
 - **Testing** – `tests/test_document_ingestion.py` provides end-to-end coverage for all formats with dependency stubs, ensuring deterministic results.
 
 ## Quick Troubleshooting

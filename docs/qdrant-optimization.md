@@ -26,7 +26,7 @@ Memory estimates from the diagnostics endpoint place the current footprint at **
 1. Use `scripts/qdrant_parameter_sweep.py` to benchmark a grid of `hnsw_ef` values (default `[64, 96, 128, 160]`).
 2. The script samples live query vectors (falling back to synthetic vectors if the collection is empty) and issues `top_k` semantic searches against the real Qdrant service.
 3. For every candidate, it records average and p99 latency plus recall vs. the highest `hnsw_ef` baseline.
-4. Results are persisted to `artifacts/qdrant_parameter_sweep.json` and mirrored into `cmos/telemetry/events/sprint-08-qdrant-benchmarks.jsonl` for long-term auditing.
+4. Results are persisted to `artifacts/qdrant_parameter_sweep.json` and mirrored into `rbook/telemetry/events/sprint-08-qdrant-benchmarks.jsonl` for long-term auditing.
 
 Run it manually:
 
@@ -77,8 +77,8 @@ Example configuration payload:
 
 - `pytest tests/test_admin_endpoints.py tests/performance/test_qdrant_performance.py`
 - `python scripts/qdrant_parameter_sweep.py` (records JSON artifact + telemetry)
-- Update telemetry file: `cmos/telemetry/events/sprint-08-qdrant-benchmarks.jsonl`
-- Run `./cmos/cli.py db show current` before/after closing the mission, per CMOS guardrails.
+- Update telemetry file: `rbook/telemetry/events/sprint-08-qdrant-benchmarks.jsonl`
+- Run `./rbook/cli.py db show current` before/after closing the mission, per CMOS guardrails.
 
 ## Next Steps
 

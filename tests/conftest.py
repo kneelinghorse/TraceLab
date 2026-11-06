@@ -68,7 +68,7 @@ if "sqlite" in str(engine.url):
 pytest_plugins: tuple[str, ...] = ()
 
 _TELEMETRY_PLUGIN_NAME = "cmos_pytest_telemetry_plugin"
-_TELEMETRY_PLUGIN_PATH = REPO_ROOT / "cmos" / "scripts" / "pytest_telemetry_plugin.py"
+_TELEMETRY_PLUGIN_PATH = REPO_ROOT / "rbook" / "scripts" / "pytest_telemetry_plugin.py"
 
 if _TELEMETRY_PLUGIN_PATH.exists():
     _spec = importlib.util.spec_from_file_location(

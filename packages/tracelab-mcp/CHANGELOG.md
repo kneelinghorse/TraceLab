@@ -306,7 +306,7 @@ modernized auth base.
 - Node ≥ 18.
 - Targets the TraceLab FastAPI service (any deployment that ships
   alembic migrations through 029).
-- Tool input/output shapes match `cmos/contracts/mission-authoring-contract.md`
+- Tool input/output shapes match `rbook/contracts/mission-authoring-contract.md`
   at the pin recorded in the TraceLab repo.
 
 ### Migration

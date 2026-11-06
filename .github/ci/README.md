@@ -140,7 +140,7 @@ succeeded. `lint` is a generic context name bound to GitHub Actions app ID
 enabled; all other protection fields are preserved. The `mcp-package` lane had
 four qualifying main pushes at that historical check and was still on the ratchet.
 
-The [CI-5 receipt](../../cmos/reports/sprint-52/ci-5-validation.json) archives the
+The [CI-5 receipt](../../rbook/reports/sprint-52/ci-5-validation.json) archives the
 full streak evidence, before/after protection readbacks, rollback payload,
 required PR checks, post-merge main CI, and both Railway deployment IDs. Sprint
 51 receipt corrections preserve the earlier PR-head results but explicitly

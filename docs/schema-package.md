@@ -52,7 +52,7 @@ Because `py.typed` is included, downstream projects receive type information.
 
 - [ ] `pytest tracelab_schemas/tests`
 - [ ] `pytest tests/test_mission_protocol_validation.py` (TraceLab integration)
-- [ ] `python cmos/scripts/validate_foundational_refs.py`
-- [ ] `python cmos/scripts/validate_parity.py --check`
+- [ ] `python rbook/scripts/validate_foundational_refs.py`
+- [ ] `python rbook/scripts/validate_parity.py --check`
 
 Capture test outputs in the mission telemetry summary upon completion.

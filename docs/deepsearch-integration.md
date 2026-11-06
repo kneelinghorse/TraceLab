@@ -72,7 +72,7 @@ DeepSearch supplies URL-only evidence; TraceLab enriches those entries by matchi
   1. **Primary — Embedding similarity** (Sprint 29+): Embeds each evidence summary via `text-embedding-3-large` (3072d) and queries Qdrant for the nearest document chunks by cosine similarity. Faster and dramatically more accurate for paraphrased or summarized evidence.
   2. **Fallback — difflib string similarity**: Activated only if the embedding service or Qdrant is unavailable and `auto_link_fallback_to_difflib` is `True` (default). Loads up to 750 chunks and uses `SequenceMatcher`.
 - Matches above the configurable threshold (default: 0.78 cosine similarity) update `chunk_id` and `relevance_score` in-memory before validation executes, ensuring the `evidence_links` and `traceability` gates evaluate against chunk-backed evidence.
-- Results (attempted/skipped/linked, per-evidence similarity measurements, linking method, and success rate) are written to `cmos/telemetry/events/sprint-10-deepsearch-ingestion.jsonl` for auditing.
+- Results (attempted/skipped/linked, per-evidence similarity measurements, linking method, and success rate) are written to `rbook/telemetry/events/sprint-10-deepsearch-ingestion.jsonl` for auditing.
 - New error types `EMBEDDING_FAILED` and `QDRANT_ERROR` are retryable via the correction queue.
 
 > **Note:** Tests override the telemetry sink to avoid mutating repository fixtures, but production deployments should keep the default path to satisfy the CMOS mission deliverable.
@@ -86,7 +86,7 @@ DeepSearch supplies URL-only evidence; TraceLab enriches those entries by matchi
 
 ## Telemetry
 
-- Auto-linking telemetry: `cmos/telemetry/events/sprint-10-deepsearch-ingestion.jsonl`
+- Auto-linking telemetry: `rbook/telemetry/events/sprint-10-deepsearch-ingestion.jsonl`
 - Quality gate telemetry still flows through `telemetry/events/quality-gates.jsonl` because `QualityGateService` emits one event per gate evaluation.
 
 ## Testing

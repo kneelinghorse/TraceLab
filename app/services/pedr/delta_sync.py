@@ -1,7 +1,7 @@
 """Delta detection and sync orchestration for PEDR integration.
 
 Event-driven sync architecture with delta detection based on updated_at timestamps.
-Reference: cmos/planning/PEDR-docs/tracelab-to-pedr-mapping.md
+Reference: rbook/planning/PEDR-docs/tracelab-to-pedr-mapping.md
 """
 
 from __future__ import annotations

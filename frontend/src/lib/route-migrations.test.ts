@@ -6,7 +6,7 @@ import config from "../../next.config";
 import migrations from "./route-migrations.json";
 
 it("keeps every maintained roadmap row in the executable migration map", () => {
-  const roadmap = fs.readFileSync(path.resolve(process.cwd(), "../cmos/foundational-docs/roadmap-sprints-50-53-ux-overhaul.md"), "utf8");
+  const roadmap = fs.readFileSync(path.resolve(process.cwd(), "../rbook/foundational-docs/roadmap-sprints-50-53-ux-overhaul.md"), "utf8");
   const table = roadmap.split("## Route Migration Map")[1].split("\n---")[0];
   const rows = table.split("\n").filter(line => line.startsWith("| `/"));
   expect(rows).toHaveLength(migrations.length);

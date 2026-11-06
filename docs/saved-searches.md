@@ -65,8 +65,8 @@ snake_case payloads aligned with the FastAPI schema.
 - **Pytest**: `tests/test_saved_searches.py` covers CRUD, retention limits, and execute flow (with stubbed RAG/retrieval services).
 - **Browser checks**: `frontend/tests/e2e/search-command.spec.ts` saves a search from the Librarian's chunk
   list and reruns it from `/saved-searches` and from the command palette.
-- **Docs + Parity**: Exported backlog/context mirrors via `./cmos/cli.py db export backlog|contexts`,
-  regenerated `cmos/SESSIONS.jsonl`, and ran `python cmos/scripts/validate_parity.py --check` (green).
+- **Docs + Parity**: Exported backlog/context mirrors via `./rbook/cli.py db export backlog|contexts`,
+  regenerated `rbook/SESSIONS.jsonl`, and ran `python rbook/scripts/validate_parity.py --check` (green).
 
 Before shipping, re-run `pytest tests/test_saved_searches.py tests/test_search_history.py`
-plus any impacted suites, then capture telemetry per `cmos/docs/AI-coding-assistant-workflows.md`.
+plus any impacted suites, then capture telemetry per `rbook/docs/AI-coding-assistant-workflows.md`.

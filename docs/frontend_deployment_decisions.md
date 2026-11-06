@@ -43,7 +43,7 @@ The `.env.production.example` file under `frontend/` is the canonical checklist 
 3. Add the environment variables above, mirroring `docs/frontend_architecture.md` defaults for local parity.
 4. Trigger a deploy. Confirm build logs show `npm run build` and runtime logs show `Ready on 0.0.0.0:${PORT}`.
 5. Smoke test: `curl https://<service>.up.railway.app/missions` (200 OK + HTML response) and optionally run `PLAYWRIGHT_BASE_URL=https://<service>.up.railway.app npm run test:e2e`.
-6. Append a telemetry record to `cmos/telemetry/events/sprint-05-frontend-deployment.jsonl` capturing the timestamp, service URL, build command, and smoke-test result.
+6. Append a telemetry record to `rbook/telemetry/events/sprint-05-frontend-deployment.jsonl` capturing the timestamp, service URL, build command, and smoke-test result.
 
 ## Cloudflare Domain Wiring
 

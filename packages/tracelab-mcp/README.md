@@ -424,7 +424,7 @@ Create a mission and submit it to DeepSearch:
 Submit returns a `warnings` array. These warnings do not block execution; review
 and supply project-local inputs directly in the mission's fields when requested.
 DeepSearch can read the public web, but cannot open the project's other documents,
-reports or tags. See the [authoring boundary](https://github.com/kneelinghorse/TraceLab/blob/main/cmos/contracts/mission-authoring-contract.md#ui-authoring-and-run-boundaries-ux-6-2026-09-13).
+reports or tags. See the [authoring boundary](https://github.com/kneelinghorse/TraceLab/blob/main/rbook/contracts/mission-authoring-contract.md#ui-authoring-and-run-boundaries-ux-6-2026-09-13).
 
 ```json
 {
@@ -642,5 +642,5 @@ seeds (exact `url`, optional `title`). Scope uses `restriction`, `allowed_urls`,
 do not restrict sources. Preview returns `authored_scope`, canonical contract ID
 and SHA-256, semantic compiler revision and pinned source revision in both summary
 and full output. It is a structural plan; worker deployment is a separate gate.
-See the repository's `cmos/contracts/mission-authoring-contract.md` for the complete
+See the repository's `rbook/contracts/mission-authoring-contract.md` for the complete
 field map. Explicit save, preview and submit remain separate actions.

@@ -16,7 +16,7 @@ keep working without modification. The ``client`` keyword argument is kept
 on `preview_mission_contract` for backwards source compatibility but is
 ignored; nothing makes outbound HTTP calls anymore.
 
-See ``cmos/contracts/deepsearch-compiler-vendor.md`` for the pinned commit
+See ``rbook/contracts/deepsearch-compiler-vendor.md`` for the pinned commit
 hash and the resync ritual that keeps the vendored compiler in step with
 DeepSearch's evolution.
 """

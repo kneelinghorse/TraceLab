@@ -141,6 +141,15 @@ async function check(tool, args, expectedCalls, links, verify, expectedQueries) 
 }
 try {
   await client.connect(transport);
+  // The installed verb must guide old clients to the contract after the record move.
+  const legacy = await client.callTool({ name: 'create_mission', arguments: {} });
+  assert.equal(legacy.isError, true);
+  assert.match(legacy.content[0].text, /Use tracelab_mission\(action="create"/);
+  const contractPath = 'rbook/contracts/mission-authoring-contract.md';
+  assert.ok(legacy.content[0].text.includes(contractPath));
+  assert.ok(readFileSync(path.resolve(root, '../..', contractPath), 'utf8').includes('create_mission'));
+  assert.equal(calls.length, 0, 'A legacy tool migration error must not create a mission');
+  checks.push({ tool: 'create_mission', action: 'migration_error', links: 0, http: [], queries: [] });
   const tools = (await client.listTools()).tools;
   const homeDescription = tools.find(tool => tool.name === 'tracelab_home').description;
   assert.match(homeDescription, /within the last 3 days/);

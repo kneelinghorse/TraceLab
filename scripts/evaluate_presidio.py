@@ -7,7 +7,6 @@ Usage:
 """
 
 import argparse
-import sys
 
 
 def main():
@@ -23,8 +22,8 @@ def main():
     parser.add_argument(
         "--output",
         type=str,
-        default="cmos/reports/sprint-01/presidio_corpus_baseline.json",
-        help="Output path for evaluation report (default: cmos/reports/sprint-01/presidio_corpus_baseline.json)",
+        default="rbook/reports/sprint-01/presidio_corpus_baseline.json",
+        help="Output path for evaluation report (default: rbook/reports/sprint-01/presidio_corpus_baseline.json)",
     )
     parser.parse_args()
 

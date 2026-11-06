@@ -5,7 +5,7 @@ Sprint 04 Mission Protocol Efficacy Evaluator (B4.5)
 
 Aggregates Sprint 04 telemetry (tech debt, quality automation, performance, load,
 and coverage) to confirm that success criteria were met. Produces Markdown +
-JSON reports under ``cmos/reports/sprint-04`` so planning artifacts stay aligned
+JSON reports under ``rbook/reports/sprint-04`` so planning artifacts stay aligned
 with the SQLite backlog.
 """
 
@@ -13,19 +13,19 @@ from __future__ import annotations
 
 import argparse
 import json
+from collections.abc import Iterable, Sequence
 from dataclasses import asdict, dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Sequence
-
+from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-TELEMETRY_DIR = REPO_ROOT / "cmos" / "telemetry" / "events"
-REPORTS_DIR = REPO_ROOT / "cmos" / "reports" / "sprint-04"
+TELEMETRY_DIR = REPO_ROOT / "rbook" / "telemetry" / "events"
+REPORTS_DIR = REPO_ROOT / "rbook" / "reports" / "sprint-04"
 SUMMARY_PATH = REPORTS_DIR / "sprint-04-summary.md"
 METRICS_PATH = REPORTS_DIR / "metrics.json"
 
-TELEMETRY_FILES: Dict[str, Path] = {
+TELEMETRY_FILES: dict[str, Path] = {
     "playwright": TELEMETRY_DIR / "sprint-04-playwright-migration.jsonl",
     "quality": TELEMETRY_DIR / "sprint-04-quality-automation.jsonl",
     "performance": TELEMETRY_DIR / "sprint-04-performance.jsonl",
@@ -41,18 +41,18 @@ class MetricResult:
     met: bool
     actual: Any
     target: Any
-    details: Dict[str, Any]
+    details: dict[str, Any]
 
-    def as_dict(self) -> Dict[str, Any]:
+    def as_dict(self) -> dict[str, Any]:
         return asdict(self)
 
 
-def load_jsonl(path: Path) -> List[Dict[str, Any]]:
+def load_jsonl(path: Path) -> list[dict[str, Any]]:
     """Load newline-delimited JSON telemetry."""
 
     if not path.exists():
         raise FileNotFoundError(f"Telemetry file missing: {path}")
-    events: List[Dict[str, Any]] = []
+    events: list[dict[str, Any]] = []
     for line in path.read_text(encoding="utf-8").splitlines():
         line = line.strip()
         if not line:
@@ -61,14 +61,14 @@ def load_jsonl(path: Path) -> List[Dict[str, Any]]:
     return events
 
 
-def _first(items: Iterable[Dict[str, Any]], predicate) -> Dict[str, Any]:
+def _first(items: Iterable[dict[str, Any]], predicate) -> dict[str, Any]:
     for item in items:
         if predicate(item):
             return item
     raise ValueError("Expected telemetry event not found.")
 
 
-def compute_tech_debt_resolution(events: Sequence[Dict[str, Any]]) -> MetricResult:
+def compute_tech_debt_resolution(events: Sequence[dict[str, Any]]) -> MetricResult:
     """Verify Cypress was removed and Playwright runs at $0/month."""
 
     primary = _first(events, lambda event: "cypress_cost_monthly" in event)
@@ -99,12 +99,12 @@ def compute_tech_debt_resolution(events: Sequence[Dict[str, Any]]) -> MetricResu
     )
 
 
-def compute_quality_automation(events: Sequence[Dict[str, Any]]) -> MetricResult:
+def compute_quality_automation(events: Sequence[dict[str, Any]]) -> MetricResult:
     """Bias detection and traceability automation must pass with actionable blocking."""
 
     required_checks = ("bias_detection", "traceability")
-    check_summary: Dict[str, Dict[str, Any]] = {}
-    failing: List[str] = []
+    check_summary: dict[str, dict[str, Any]] = {}
+    failing: list[str] = []
 
     for check in required_checks:
         record = _first(events, lambda event, chk=check: event.get("check") == chk)
@@ -141,7 +141,7 @@ def compute_quality_automation(events: Sequence[Dict[str, Any]]) -> MetricResult
 
 
 def compute_query_latency(
-    events: Sequence[Dict[str, Any]], target_ms: int = 2000
+    events: Sequence[dict[str, Any]], target_ms: int = 2000
 ) -> MetricResult:
     """Ensure P95 latency remains under the 2s target."""
 
@@ -177,7 +177,7 @@ def compute_query_latency(
 
 
 def compute_cost_compliance(
-    events: Sequence[Dict[str, Any]],
+    events: Sequence[dict[str, Any]],
     budget_min: float = 80.0,
     budget_max: float = 105.0,
     cost_per_query_target: float = 0.00023,
@@ -217,7 +217,7 @@ def compute_cost_compliance(
 
 
 def compute_load_test(
-    events: Sequence[Dict[str, Any]], target_users: int = 100
+    events: Sequence[dict[str, Any]], target_users: int = 100
 ) -> MetricResult:
     """Confirm system sustains 100 concurrent queries without errors."""
 
@@ -248,7 +248,7 @@ def compute_load_test(
 
 
 def compute_test_coverage(
-    events: Sequence[Dict[str, Any]], minimum: float = 0.8
+    events: Sequence[dict[str, Any]], minimum: float = 0.8
 ) -> MetricResult:
     """Ensure Python coverage stays above 80%."""
 
@@ -294,8 +294,8 @@ def compute_report_generation_metric() -> MetricResult:
         },
         target={
             "artifacts": [
-                "cmos/reports/sprint-04/sprint-04-summary.md",
-                "cmos/reports/sprint-04/metrics.json",
+                "rbook/reports/sprint-04/sprint-04-summary.md",
+                "rbook/reports/sprint-04/metrics.json",
             ]
         },
         details=details,
@@ -305,7 +305,7 @@ def compute_report_generation_metric() -> MetricResult:
 def build_summary(results: Sequence[MetricResult]) -> str:
     """Render Markdown summary for documentation handoff."""
 
-    timestamp = datetime.now(timezone.utc).isoformat()
+    timestamp = datetime.now(UTC).isoformat()
     met_count = sum(1 for result in results if result.met)
     lines = [
         "# Sprint 04 Mission Protocol Evaluation",
@@ -316,7 +316,7 @@ def build_summary(results: Sequence[MetricResult]) -> str:
         "",
         f"- **Metrics Met:** {met_count}/{len(results)}",
         f"- **Metrics Unmet:** {len(results) - met_count}/{len(results)}",
-        "- References: cmos/reports/sprint-04/SPRINT-04-PLANNING.md, docs/mission-protocol-tutorial.md",
+        "- References: rbook/reports/sprint-04/SPRINT-04-PLANNING.md, docs/mission-protocol-tutorial.md",
         "",
         "## Metric Details",
         "",
@@ -342,7 +342,7 @@ def write_reports(results: Sequence[MetricResult]) -> None:
     REPORTS_DIR.mkdir(parents=True, exist_ok=True)
     metrics_payload = {
         "sprint": "Sprint 04",
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": datetime.now(UTC).isoformat(),
         "results": [result.as_dict() for result in results],
     }
     SUMMARY_PATH.write_text(build_summary(results) + "\n", encoding="utf-8")

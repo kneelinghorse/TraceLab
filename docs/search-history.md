@@ -55,4 +55,4 @@ State updates trigger `mutateHistory()` so the UI stays synchronized with the ba
   to keep filters consistent with Mission Protocol data contracts.
 
 Run `pytest tests/test_search_history.py` plus existing search-related suites before deploying. Finish with
-`python cmos/scripts/validate_parity.py --check` per agents.md to ensure Mission Protocol mirrors remain in sync.
+`python rbook/scripts/validate_parity.py --check` per agents.md to ensure Mission Protocol mirrors remain in sync.

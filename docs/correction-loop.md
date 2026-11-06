@@ -187,7 +187,7 @@ Sent when all items for a mission have been processed.
 
 ## Telemetry Format
 
-Telemetry is written to `cmos/telemetry/events/sprint-11-corrections.jsonl` in JSONL format for Grafana ingestion.
+Telemetry is written to `rbook/telemetry/events/sprint-11-corrections.jsonl` in JSONL format for Grafana ingestion.
 
 ### Event Types
 

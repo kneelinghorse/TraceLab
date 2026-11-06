@@ -18,7 +18,7 @@ const ConfigSchema = z.object({
   watchPaths: z
     .string()
     .optional()
-    .transform((value) => commaSeparated(value, ['cmos/missions/research'])),
+    .transform((value) => commaSeparated(value, ['rbook/missions/research'])),
   ignorePatterns: z
     .string()
     .optional()

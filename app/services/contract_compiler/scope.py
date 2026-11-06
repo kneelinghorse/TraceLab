@@ -1,5 +1,5 @@
 """Vendored from DeepSearch 79ef84842fb84259bafe59924b21fe2f5ad05d7d.
-See cmos/contracts/deepsearch-compiler-vendor.md for local adaptations.
+See rbook/contracts/deepsearch-compiler-vendor.md for local adaptations.
 
 Versioned authored bounds and deterministic evidence admission (no providers)."""
 

@@ -95,15 +95,15 @@ results; they do not promise live streaming.
 ## Contract authorities
 
 - Mission authoring and the two serializer surfaces:
-  [mission-authoring-contract.md](../cmos/contracts/mission-authoring-contract.md)
+  [mission-authoring-contract.md](../rbook/contracts/mission-authoring-contract.md)
 - Evidence capture, retrieval, and promotion:
-  [evidence-ledger-contract.md](../cmos/contracts/evidence-ledger-contract.md)
+  [evidence-ledger-contract.md](../rbook/contracts/evidence-ledger-contract.md)
 
 The Python server under `app/mcp_server/` is retained for local development
 and serializer-parity coverage. It is production-dark and is not the install
 path for Codex, Claude, or other external MCP clients.
 
-The [UI parity manifest](../cmos/contracts/mcp-parity-manifest.json) classifies
+The [UI parity manifest](../rbook/contracts/mcp-parity-manifest.json) classifies
 every frontend API operation. Run `node scripts/mcp_parity_audit.mjs` from the
 repository root after installing MCP package dependencies. CI rejects new
 unclassified operations, stale consumers and mappings to absent source actions.
@@ -116,7 +116,7 @@ seeds (exact `url`, optional `title`). Scope uses `restriction`, `allowed_urls`,
 do not restrict sources. Preview returns `authored_scope`, canonical contract ID
 and SHA-256, semantic compiler revision and pinned source revision in both summary
 and full output. It is a structural plan; worker deployment is a separate gate.
-See the repository's `cmos/contracts/mission-authoring-contract.md` for the complete
+See the repository's `rbook/contracts/mission-authoring-contract.md` for the complete
 field map. Explicit save, preview and submit remain separate actions.
 
 `tracelab_home.activity` and `snapshot.activity` preserve `viewed` and `new` per item. New means unviewed and occurred within three days; older unseen items remain in the stream. `activity_summary.by_type` and `new_total` use that window, while `completed_missions_new` counts only unviewed completions by `completed_at` and drives the Missions sidebar dot. No sidebar counts are shown.

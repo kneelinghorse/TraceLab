@@ -1,0 +1,521 @@
+# Mission-Authoring Boundary Contract
+
+Single source of truth for every mission-authoring field's full round-trip:
+**MCP param → Pydantic schema → DB column → REST response → DS worker
+visibility.** When DeepSearch's worker SELECT or TraceLab's create/update
+surface gains/loses/renames a field, this doc is the one place to update.
+
+Origin: DeepSearch asked for this verbatim in message
+`3cf143ee-8cb9-43ac-bc22-f0029fcdd3ae` (2026-04-27): *"we'd like a
+documented contract for which top-level params round-trip end-to-end so
+this stops being something we discover via paid smoke regressions."*
+
+## Commit pins (versions for which this contract is valid)
+
+| Project | Commit | Branch | Date |
+| --- | --- | --- | --- |
+| TraceLab | `21271b5` (lease-v2 runtime boundary in migration 039, landed on main; attribution in CMOS decision #328) | `main` | 2026-08-14 |
+| DeepSearch.alpha | `79ef84842fb84259bafe59924b21fe2f5ad05d7d` (immutable S94 worker SELECT/converter and structural compiler) | `codex/s94-authored-scope` | 2026-10-01 |
+
+The S64 scope additions are described below; lease-v2 attribution above remains
+historical. The compiler now pins schema 1.2/semantic revision 3 at `79ef848`;
+see [vendor contract](deepsearch-compiler-vendor.md) and its source manifest.
+Fidelity remains `structural_only`: canonical fixture parity does not prove worker
+deployment or configured enrichment. Guiding template:
+[technical architecture](../foundational-docs/tech_arch_template.md).
+
+## S64 authored scope and preview boundary (2026-10-01)
+
+`context.authored_scope` is the durable typed input, carried unchanged through
+manual create/edit, collection seeds, reviewed Librarian drafts and new-ID reruns.
+There is no new database column or top-level scope parameter. Unrelated context
+keys survive. New runs copy authored fields, not leases/results/execution metadata.
+The pinned worker SELECT reads the JSON `context` and dedicated authoring columns;
+`converter._build_mission_context` merges context and uses non-null columns as
+authoritative, including empty arrays/objects that explicitly clear legacy values.
+Null columns permit fallback. TraceLab preview and constraint read serializers now
+follow that rule; it supersedes the older empty/null fallback description.
+
+| Surface | Authored input | Compiled output |
+| --- | --- | --- |
+| REST/manual | `context.authored_scope`, structured `references` with exact `url`, optional `title` | GET `/missions/{id}/contract-preview` |
+| Librarian | `MissionDraft.context` and `.references` survive model validation, namespace preview, reviewed request and persistence | Preview before and after save has identical canonical identity and scope |
+| TS MCP | `tracelab_mission` create/update accepts context and references (including URL-only seeds); update null/empty clearing preserved | `tracelab_mission_execution.preview`: summary and full both carry scope/identity |
+| Python MCP | Legacy create accepts context and references; mission serializer preserves both | No separate Python preview tool exists; REST uses the shared shaper |
+| PostgreSQL / SQLite | JSONB / CrossDBJSON `context`, quoted `"references"` column | Both database boundaries tested |
+| DeepSearch S94 | `MissionRow.context` and `.references` → merged `mission_context` | `AuthoredScope` compiled before enrichment |
+
+Typed scope uses the pinned `AuthoredScope`: `version`, reference seeds,
+`restriction` (unrestricted/domains/exact_pages), `allowed_urls`, `allowed_domains`,
+`min_words`, `max_words`, `max_sources`. References alone remain seeds; only the
+supported compiler grammar or structured restrictions creates limits. Invalid
+scope produces an actionable 422 preview error (or Librarian preview_error), never
+an unrestricted fallback. A saved draft still requires explicit submit.
+
+Additive preview fields (shared dataclass → REST model → API/TS MCP/Librarian):
+`authored_scope`, `contract_id` (preview origin), `canonical_contract_id`,
+`canonical_contract_sha256` (complete canonical JSON, canonical origin/time,
+no enrichment), `compiler_semantic_revision` (3), and `compiler_source_revision`
+(exact vendor commit). Existing `compiler_revision` remains the source commit for
+compatibility; `contract_version` remains schema 1.2. `fidelity` stays
+`structural_only`. Old servers may omit additive fields; readers treat that as
+unknown. Runtime contract identity remains distinct from canonical preview.
+
+## How to use this doc
+
+- **Adding a field to mission authoring?** Add a row to the table below
+  AND update both vendor docs if applicable.
+- **DS worker SELECT changed?** Update the "DS worker SELECT" column.
+- **A field stopped round-tripping in production?** Use this doc to
+  bisect which layer is broken. The T41.2 incident — MCP `_serialize_mission`
+  silently dropped 12 T40.1 fields — would have been caught here if this
+  doc had existed and a CI check enforced parity.
+
+## MCP tool surface (T41.7 foundation; LEDGER-1 extension)
+
+The TS MCP package exposes **8 action-clustered tools**, not the prior
+~24 flat tools. LEDGER-1 added `tracelab_evidence` without changing the
+mission-authoring calls documented here; its separate field/verb contract is
+[`evidence-ledger-contract.md`](evidence-ledger-contract.md). The MCP-param
+column below uses the legacy names
+(`create_mission`, `get_mission`, …) for readability — the over-the-wire
+calls now go through:
+
+| Legacy tool | New cluster call | New action |
+| --- | --- | --- |
+| `create_mission` | `tracelab_mission` | `create` |
+| `list_missions` | `tracelab_mission` | `list` |
+| `get_mission` | `tracelab_mission` | `get` |
+| `update_mission` | `tracelab_mission` | `update` |
+| `submit_mission` | `tracelab_mission_execution` | `submit` |
+| `get_mission_status` | `tracelab_mission_execution` | `status` |
+| `preview_mission_contract` | `tracelab_mission_execution` | `preview` |
+
+Hard-cut migration — legacy names are not registered as tools but the
+dispatcher returns a friendly error pointing to the cluster + action
+target. Full mapping for the rest of the legacy surface (project, collection,
+report, document, search) is in
+`packages/tracelab-mcp/src/index.ts::LEGACY_TO_CLUSTER`.
+
+Field shapes are unchanged: every parameter listed below is passed as a
+top-level key alongside `action` in the cluster call. The Pydantic /
+DB / REST / DS-worker columns are unaffected by the cluster refactor.
+
+## UI authoring and run boundaries (UX-6, 2026-09-13)
+
+The UI uses this same field map, including all twelve compiler fields. **Save
+and preview** creates a pristine draft via `POST /missions`, then reads
+`GET /missions/{id}/contract-preview` inline with `contract_version`,
+`compiler_revision` and `fidelity`. Subsequent saves use `PATCH` on that draft;
+clearing optional fields sends `null`. Unchanged structured references, context,
+research phases and custom metadata survive edit and re-run preparation.
+Submission always calls `POST /missions/{id}/submit` after saving, so the existing
+linter and one-execution guard run. It does not create a queued record directly.
+
+`project-private-reference` is a warning, never a submission blocker. It checks
+objective, success criteria, deliverables and constraints for project-local
+reports/documents/tags, earlier mission reports and mission-ID ranges. Background
+context is excluded. The remedy is to include the inputs in the mission's fields
+and give sources public URLs; the worker cannot retrieve private project content.
+The Librarian's draft response exposes this through `lint_warnings`. REST submit
+returns `warnings`, and the npm MCP submit response preserves that array (including
+unknown future rules). The production-dark Python MCP also returns soft warnings;
+its existing hard-gate behavior is unchanged. No authored-field mapping changes.
+
+A failed preview or submit keeps the saved draft ID and a link to it. Before
+retrying a saved draft, the UI re-reads its state; it never resets an already
+queued or terminal run. Re-run opens a new-ID authoring form with only authored
+inputs copied. Lease proofs, execution metadata and results are not copied.
+Validation violations attach to their named form field. Research depth remains
+removed; this work does not reintroduce it or change MCP schemas/serializers.
+
+`GET /missions` also accepts optional `view=all|attention|queue` for the UI:
+Home's shared attention predicate orders exceptions before pagination; queue
+contains queued and running missions. Status/project filters and RBAC apply
+before totals. Omitting `view` preserves existing newest-first API/MCP ordering.
+Recent activity uses `GET /missions/events/recent?mission_id=<uuid>` and is a
+bounded server history, not a durable audit trail. Logs without records are
+shown as unavailable while production streaming remains dormant.
+
+Regression coverage: `tests/test_mission_views.py`,
+`tests/integration/test_home_postgres.py`, the existing
+`TestMissionVerbContract` / MCP client suites, and the frontend mission unit and
+built-browser flows. No DB migration or worker SELECT change is needed.
+
+## Collection context seed (UX-8, 2026-09-13)
+
+Reference edits preserve each row’s structured document identity when titles change or duplicate filenames are removed; title matching must not substitute another document.
+
+The mission form keeps its project selector controlled by the authored `project_id`.
+When project options arrive asynchronously, the visible selection must match the
+seed or rerun destination and must retain any subsequent user choice. A hidden
+form value with a blank visible selector is not an accepted prefill.
+
+`GET /collections/{id}/mission-seed` is a read-only projection of the collection's
+instructions and complete, currently readable document context. It independently
+checks the collection, documents and their non-deleted parent projects. Direct
+document membership and collected excerpts produce one reference per document;
+the projection is not limited to the first UI page.
+
+The seed uses existing authoring fields: `background` carries instructions and a
+named document inventory with UUIDs; `references` retains `{title, document_id,
+href}` objects; `context.collection_id` and `context.document_ids` retain source
+identity. The historical context object is used only for that provenance, not
+as a replacement for top-level compiler fields. A single source project may be
+preselected; mixed-project context leaves project selection to the author.
+
+Document references are authored context, not a worker-enforced authorization
+boundary or a promise that every referenced document was retrieved. Every later
+resource access retains its own policy check. The seed adds no top-level MCP
+parameter, mission DB column, compiler version or worker SELECT field. Authors
+review the objective, criteria and project before the existing draft, preview
+and submit lifecycle. Execution state is never seeded.
+
+## Computed MCP browser links (UX-10, 2026-09-14)
+
+TS mission create/update projections (`mission.url`), list rows (`url`), get
+(`url`), execution submit/status (`url`) and the preview summary (`preview.url`)
+now carry canonical `/missions/{uuid}` browser URLs. The shared TS
+`canonicalLink` helper also builds project, document, collection, report and
+evidence navigation metadata. The Python MCP serializer and submit/status
+handlers mirror the mission `url`, using the resolved record UUID even when
+the caller supplied a human mission ID and the existing `FRONTEND_URL` setting.
+Python remains production-dark and retains its existing flat tool names.
+
+These fields are **computed response metadata only**: there is no authoring
+input, Pydantic field, DB column, compiler input or worker SELECT change.
+References, context, evidence source URLs, full previews and export bytes are
+opaque authored/provenance content and remain unchanged, including historical
+URLs. Canonicalization must not recursively rewrite those values.
+
+The TS process resolves the public TraceLab API to its public browser origin
+and loopback API hosts to `http://localhost:3000`. Other deployments require
+`TRACELAB_FRONTEND_URL` in the MCP process environment; configuration is
+validated before login or tool execution. This is not a new server variable.
+See the package README for the configuration contract.
+
+Regression guards: `packages/tracelab-mcp/scripts/check-canonical-links.mjs`
+uses a real stdio client across all eight clusters and 29 actions, verifying
+HTTP verbs, authentication, generated URLs and preservation of authored values.
+`scripts/check-package.sh` runs that contract against a clean tarball install.
+`TestCanonicalMissionLinks` in `tests/mcp_tools/test_mcp_missions_unit.py`
+exercises all five registered Python tools through an MCP client session.
+
+## Create routes authorize the project (2026-09-22)
+
+`POST /missions` and `POST /missions/create-and-submit` now load the named
+`project_id` (404 when missing or soft-deleted) and call `authorize_or_403`
+with the caller's own principal before creating anything, the same check the
+Librarian's create route has always made. Decision #521: formal research is
+always attached to a project the caller can reach. No field, column, MCP
+schema or worker SELECT change; the TS MCP client's `tracelab_mission.create`
+goes through the same route under the caller's device-code credential.
+Regression coverage: `TestMissionCreateAuthorization` in
+`tests/test_missions_api.py`.
+
+## Librarian authoring (LIB-1, 2026-09-22)
+
+The Librarian is a fourth authoring entry point beside the MCP, the REST API and
+the mission form. It adds **no field, column, compiler input or worker SELECT
+change**; it produces the same `MissionCreate` the form produces.
+
+- `POST /api/v1/librarian/turns` and `POST /api/v1/librarian/drafts` write
+  nothing. The draft call returns a `MissionDraft` (the `MissionBase` fields plus
+  `background`, `focus`, `required_entities`, `excluded_entities`, `constraints`,
+  `deliverable_format`, `deliverables`, `tags`) validated with `MissionBase`'s own
+  validators, the offline contract preview (`preview_mission_contract`, same
+  `contract_version` / `compiler_revision` / `fidelity` as the form) and the
+  submit linter's errors and warnings.
+- `POST /api/v1/librarian/missions` creates the reviewed draft through
+  `MissionService.create_mission` as a pristine `draft` with
+  `created_by="librarian"` and a `librarian` tag. It is idempotent on
+  `mission_id`: the same draft again returns the existing mission with HTTP 200;
+  a different mission under that id is 409. Submission is not part of the call;
+  it happens on the mission page through `POST /missions/{id}/submit`, so the
+  linter and one-execution guard run unchanged.
+- Every Librarian route requires a human principal and authorizes the project
+  with the caller's own principal (`authorize_or_403`); there is no service-role
+  path. The evidence tool the conversation may use is scoped by
+  `evidence_access_filter`, shared with the ledger routes.
+- The transcript is client-held and resent per call; there is no conversation
+  table and no migration (decision #519).
+
+Regression coverage: `tests/test_librarian_api.py`,
+`tests/unit/test_librarian_provenance.py`, `frontend/src/__tests__/librarian.test.tsx`.
+Parity classification: `rest-only-by-design` rows in
+`rbook/contracts/mcp-parity-manifest.json`.
+
+## Top-level field map
+
+RECOVER-1 (2026-09-12) restores the legacy protocol adapter boundary: YAML
+export uses a protocol-shaped stored `context` when present and otherwise
+exports `Mission.to_mission_protocol()`, retaining every canonical compiler
+field below. Adapter updates accept an explicit protocol context, reuse a
+stored protocol, or delegate ordinary field updates to `MissionService` when
+neither context is protocol-shaped. MCP parameters, REST update verbs, and
+the worker field map are unchanged. Regression coverage lives in
+`tests/test_mission_protocol_service.py`.
+
+Listed in MCP `create_mission` argument order — for clusters this means
+`tracelab_mission(action="create", ...)`. Every field is documented in
+both create and update flows unless noted.
+
+### Identity & core
+
+| MCP param | MCP type | Required (create) | Pydantic field | DB column | DB type | REST response field | DS worker SELECT |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `mission_id` | string (1-50 chars) | ✓ | `MissionCreate.mission_id` | `mission_id` | `String(50)` UNIQUE | `mission_id` | ✓ |
+| `title` | string (3-255 chars) | ✓ | `MissionCreate.title` | `title` | `String(255)` | `title` | ✓ |
+| `objective` | string (≥10 chars) | ✓ | `MissionCreate.objective` | `objective` | `Text` | `objective` | ✓ |
+| `success_criteria` | array of strings (min 1) | ✓ | `MissionCreate.success_criteria` | `success_criteria` | `CrossDBJSON` (JSONB on Postgres) | `success_criteria` | ✓ |
+| `project_id` | UUID string | **✓ (T41.6)** | `MissionCreate.project_id` (UUID) | `project_id` | `GUID` FK→projects.id | `project_id` | ✗ — DS resolves project context via TL API, not SELECT |
+
+### Authoring fields (T40.1) — DeepSearch contract compiler input
+
+| MCP param | MCP type | Pydantic field | DB column | DB type | REST response field | DS worker SELECT |
+| --- | --- | --- | --- | --- | --- | --- |
+| `background` | string | `MissionCreate.background` | `background` | `Text` nullable | `background` | ✓ (S94 pin) |
+| `focus` | string | `MissionCreate.focus` | `focus` | `Text` nullable | `focus` | ✓ (S94 pin) |
+| `references` | array of structured `{url?, title?, ...}` seeds | `MissionCreate.references` | `"references"` | `CrossDBJSON` nullable | `references` | ✓ (S94 pin) |
+| `required_entities` | array of strings | `MissionCreate.required_entities` | `required_entities` | `CrossDBJSON` nullable | `required_entities` | **✓** (added in DS S59.1) |
+| `excluded_entities` | array of strings | `MissionCreate.excluded_entities` | `excluded_entities` | `CrossDBJSON` nullable | `excluded_entities` | **✓** (added in DS S59.1) |
+| `expected_output_schema` | one object (DS OutputSchema descriptor; see boundary below) | `MissionCreate.expected_output_schema` | `expected_output_schema` | `CrossDBJSON` nullable | `expected_output_schema` | ✓ (S94 pin) |
+| `coverage_thresholds` | object (string→number) | `MissionCreate.coverage_thresholds` | `coverage_thresholds` | `CrossDBJSON` nullable | `coverage_thresholds` | ✓ (S94 pin) |
+| `validation_thresholds` | object (string→number) | `MissionCreate.validation_thresholds` | `validation_thresholds` | `CrossDBJSON` nullable | `validation_thresholds` | ✓ (S94 pin) |
+| `deliverable_format` | string | `MissionCreate.deliverable_format` | `deliverable_format` | `Text` nullable | `deliverable_format` | ✓ (S94 pin) |
+| `max_loops` | integer ≥1 | `MissionCreate.max_loops` | `max_loops` | `Integer` nullable | `max_loops` | ✓ (S94 pin) |
+| `min_loops` | integer ≥1 | `MissionCreate.min_loops` | `min_loops` | `Integer` nullable | `min_loops` | ✓ (S94 pin) |
+| `constraints` | array of strings | `MissionCreate.constraints` | `constraints` | `CrossDBJSON` nullable | `constraints` (with fallback) | ✓ (S94 pin) |
+
+**Constraints fallback:** only a null column permits `context.constraints`.
+An explicit empty list clears it in REST, Python MCP, preview and the pinned worker.
+
+**Output descriptor boundary (S66-MCP):** TraceLab's REST create/update, TypeScript
+MCP create/update and UI accept one `expected_output_schema` object. The vendored
+compiler internally accepts either a mapping or a sequence of mappings; that
+does not expose arrays through TraceLab's authoring API. Draft storage remains
+flexible, with descriptor validation at contract preview/compilation. A nonempty
+descriptor requires nonempty string `kind`, `title` and `format`, such as
+`{"kind":"report","title":"Research summary","format":"markdown","required_sections":["Executive summary","Evidence","Limitations"]}`.
+It is not a raw JSON Schema with `type`/`properties`. Omission or an empty object
+leaves deliverable inference to the compiler. The canonical user-facing example
+is in `packages/tracelab-mcp/README.md` under **Authoring an output descriptor**;
+tests compile that example and the tool/UI examples without dispatch.
+
+Both MCP serialization surfaces retain the authored descriptor in get/list
+responses. The legacy Python `create_mission` tool now declares the object and
+passes it to `MissionCreate` rather than silently dropping it; its create
+response also retains it. TypeScript's create/update acknowledgments remain slim;
+read the mission to inspect stored fields. The compiler and worker SELECT are
+unchanged. Installed-client regression checks exercise POST/PATCH and both read
+serializers, and deployed acceptance checks create only disposable drafts.
+
+| Authored nested field | Pydantic | DB storage | REST | DS worker |
+| --- | --- | --- | --- | --- |
+| `context.authored_scope` | `MissionCreate.context` / `MissionUpdate.context`; compiler validates typed shape | JSON content inside existing `context` | preserved inside `context` | SELECT `context`; converter merges scope before compilation |
+
+### Operational / output fields (not authoring)
+
+| MCP param | Pydantic field | DB column | DS worker SELECT |
+| --- | --- | --- | --- |
+| `context` (authored scope + legacy/provenance) | `MissionCreate.context` | `context` | ✓ |
+| `deliverables` | `MissionCreate.deliverables` | `deliverables` | ✓ |
+| `research_phases` | `MissionCreate.research_phases` | `research_phases` | ✓ |
+| `tags` | `MissionCreate.tags` | `tags` | ✗ |
+| `metadata` (column: `mission_metadata`) | `MissionCreate.metadata` | `mission_metadata` | ✗ |
+| `status` | `MissionCreate.status` | `status` | ✓ (filter only) |
+| `created_by` | `MissionCreate.created_by` | `created_by` | ✗ |
+
+`queued_at`, `started_at`, `completed_at`, `deepsearch_job_id`,
+`execution_metadata`, `result_document_ids`, `result_report_id`,
+`result_markdown`, `result_protocol`, `error_message`, `created_at`,
+`updated_at` are server-managed lifecycle fields — present in the REST
+response and MCP serializers but not in `create_mission`/`update_mission`
+input.
+
+`owner_id` and `workspace_id` (added to the `missions` table in Alembic
+migration `030_add_owner_workspace_columns`, Sprint 43 T43.2) are internal
+ownership/tenancy columns: nullable, server-set, never accepted as
+`create_mission`/`update_mission` input, absent from the MCP/REST authoring
+surface, and NOT in the DS worker SELECT. As of Sprint 43 nothing reads them
+(zero enforcement); they back the RBAC ownership model wired up in later
+sprints.
+
+### DeepSearch lease fields (internal operational boundary)
+
+Alembic migration `039_deepsearch_lease_v1` makes the worker's fenced-claim
+schema reproducible from a clean TraceLab checkout. These fields are never
+accepted from mission authors. Opaque ownership/result proofs remain absent
+from REST and MCP; the authorized lightweight status surface exposes only the
+attempt count and lease expiry needed to diagnose a stranded run.
+
+| DB column | PostgreSQL type/default | DeepSearch use | Public REST/MCP |
+| --- | --- | --- | --- |
+| `deepsearch_lease_owner` | `text` nullable | claim, heartbeat, terminal fencing | ✗ |
+| `deepsearch_lease_token` | `text` nullable; unique while non-null | opaque per-attempt ownership proof | ✗ |
+| `deepsearch_leased_at` | `timestamptz` nullable | claim audit | ✗ |
+| `deepsearch_heartbeat_at` | `timestamptz` nullable | liveness/recovery | ✗ |
+| `deepsearch_lease_expires_at` | `timestamptz` nullable | claim/recovery/terminal fencing | authorized status telemetry only |
+| `deepsearch_attempt_count` | `integer NOT NULL DEFAULT 0` | bounded retry and stale-token fencing | authorized status telemetry only |
+| `deepsearch_result_key` | `text` nullable; unique while non-null | idempotent terminal persistence | ✗ |
+
+Runtime contract identifier: `tracelab-missions-lease-v2`. The Alembic revision
+name remains `039_deepsearch_lease_v1` to preserve the immutable migration
+chain; its converged DDL implements the lease-v2 nullability, defaults, index
+predicates, and global claim policy. The frozen claim policy is
+global across non-orphan projects, matching audited DeepSearch `b7009c6`
+`CLAIM_MISSION_SQL`; RBAC controls human visibility, not worker dispatch. The
+claim index is therefore `(status, deepsearch_lease_expires_at, queued_at)` and
+must not lead with `project_id`. DeepSearch must remove the stale
+`TRACELAB_PROJECT_ID`-scoped wording from its S87 coordination report before
+deployment.
+
+One TraceLab mission represents one fenced DeepSearch execution. Only pristine
+`draft` missions may be submitted; terminal missions are immutable and another
+run requires a new mission ID. This prevents an exhausted attempt counter or an
+old result link from contaminating a later run. A terminal database row is
+authoritative when processing the current minimal HMAC completion receipt.
+DeepSearch's current uncommitted Sprint 91 working tree persists
+`deepsearch_job_id` alongside `deepsearch_result_key` in each fenced terminal
+write. Treat that correlation as implemented-but-unverified until DeepSearch
+returns a commit SHA and passing boundary evidence. The unpaid deployed smoke
+must prove the minimal signed receipt's `job_id` exactly matches the persisted
+terminal row; any future multi-run/versioned mission design must retain an
+equivalent fenced correlation proof.
+
+Lease-v2 rollout is deliberately ordered:
+
+1. Drain and stop every legacy/unfenced DeepSearch worker; verify no old worker
+   can still claim or finish a mission.
+2. Deploy TraceLab migration `038_backfill_mission_report`, then
+   `039_deepsearch_lease_v1`. Migration 039 intentionally makes legacy
+   `in_progress` rows without a lease token immediately reclaimable.
+3. Verify the seven lease columns, nullable terminal-clear fields, partial
+   uniqueness predicates, and global claim index in the deployed database.
+4. Only then start the lease-v2 DeepSearch worker and exercise an unpaid
+   create → claim → heartbeat → terminal receipt smoke. Never overlap old and
+   lease-v2 workers; overlap can execute a tokenless legacy mission twice.
+5. Paid CAT dispatch remains a separate explicit authorization after the
+   deployed lifecycle and artifact-search convergence checks pass.
+
+The completion receipt uses one rotated HMAC value under intentionally inverse
+environment names: TraceLab reads `DEEPSEARCH_TRACELAB_SERVICE_SECRET`, while
+DeepSearch signs with `TRACELAB_DEEPSEARCH_SERVICE_SECRET`. Both deployed
+services must hold the exact same value. `DEEPSEARCH_WEBHOOK_SECRET` is a
+TraceLab-only transitional fallback and must not be the steady-state production
+configuration. TraceLab fails closed on a missing production secret. Before
+worker acceptance, exercise an unpaid live receipt and prove both signature
+validation and persisted `job_id` correlation; a local unit test or merely
+setting one side is insufficient. Unsigned callbacks are allowed only in an
+explicit `test`/`testing` environment or local `development`/`dev`/`local`
+mode with `DEBUG=true`; missing `ENVIRONMENT` plus the default `DEBUG=false`
+therefore fails closed.
+
+TraceLab's public `GET /api/v1/health` response exposes
+`deepsearch_receipt_receiver_configured`. This boolean proves only that the
+TraceLab receiver resolved a canonical or transitional secret; it cannot prove
+value equality with the worker. DeepSearch acceptance preflight must fail
+closed when the field is false, missing, malformed, or unreachable, then still
+require a signed live receipt with persisted `job_id` correlation.
+
+TraceLab owns the durable fallback when DeepSearch exhausts receipt retries or
+crashes after its terminal database write. The production rollout is not
+convergent until a separate Railway scheduled service is live with:
+
+- start command `python -m app.cli.reconcile_mission_results --limit 100`;
+- schedule `*/15 * * * *` (UTC), using the same `DATABASE_URL`, embedding, and
+  Qdrant configuration as the API service;
+- no public domain and no long-running process—the command must exit after one
+  bounded pass;
+- an alert on non-zero exit and on absence of a successful run for 30 minutes.
+
+Immediately after migrations and before worker acceptance, run the targeted
+backfill
+`python -m app.cli.reconcile_mission_results --mission-id pedr-retrieval-evaluation-R001`,
+then repeat `--limit 500` passes until output reports `eligible: 0`. DeepSearch
+must continue retrying TraceLab receipt `5xx` responses; a durable DS receipt
+outbox can later replace this fallback, but the current in-memory retry queue
+cannot. The cron service, one-time backfill evidence, and alert are TraceLab
+deployment responsibilities.
+
+### Update-only fields
+
+| MCP param | Pydantic field | Notes |
+| --- | --- | --- |
+| `project_id` (T41.5) | `MissionUpdate.project_id` | Re-parents the mission. Route validates target project exists (404 if not). Pre-T41.5 was immutable after create. |
+
+`mission_id`, `id`, `created_at` are immutable. Pydantic silently drops
+them from `MissionUpdate` payloads.
+
+## Postgres reserved-word quoting
+
+`references` is a Postgres reserved word. SQLAlchemy quotes it
+automatically when emitting SQL. Hand-written SQL (DS worker, raw
+Alembic migrations, ad-hoc psql) MUST quote it as `"references"`. The DS
+worker's pinned S94 CLAIM_MISSION_SQL SELECTs `mission."references"`.
+TraceLab migration 027 demonstrates the same quoted-column pattern.
+
+## Two MCP serialization surfaces (T41.4 critical learning)
+
+TraceLab has TWO independent MCP-side serialization paths:
+
+1. **Python MCP server** at `app/mcp_server/tools/missions.py::_serialize_mission`
+   — runs ONLY when `python -m app.mcp_server` is exposed externally.
+   Railway runs the FastAPI REST API, not the Python MCP server, so this
+   path is **dark in production**.
+2. **TS MCP package** at `packages/tracelab-mcp/src/index.ts::handleGetMission`
+   / `handleListMissions` — calls the FastAPI REST endpoint and shapes
+   the response client-side. **This is the load-bearing path** for all
+   real users (Claude Desktop, Claude Code).
+
+Implication for this contract: when a field gains/loses, BOTH serializers
+must be updated. T41.2 was discovered when the Python serializer was
+fixed but not the TS one (both had hand-rolled object literals stripping
+the same 12 fields). After T41.4 split slim/full payloads, BOTH apply
+the trim with matching thresholds (5KB).
+
+## How to update this doc
+
+Whenever any of these fire, edit this doc as part of the same commit:
+
+1. **`MissionCreate` or `MissionUpdate` Pydantic schema** gains/loses a
+   field → add/remove a row in the table above.
+2. **MCP `create_mission` or `update_mission` tool input schema** changes
+   in either `app/mcp_server/tools/missions.py::MISSION_TOOLS` or
+   `packages/tracelab-mcp/src/index.ts` → confirm the row matches the
+   new schema; both the JSON schema and Zod schema are derived from
+   this doc.
+3. **`MissionResponse` schema or REST `_to_response`** changes → update
+   the "REST response field" column; if the field was renamed, both
+   serializers need updating too.
+4. **Mission ORM model** gains/loses a column → update the "DB column"
+   and "DB type" columns; check that all serializers and the DS worker
+   SELECT are accounted for.
+5. **DS worker `CLAIM_MISSION_SQL`** changes → update the "DS worker
+   SELECT" column. This is the one column DS owns; coordinate via the
+   message bus when this changes upstream.
+6. Bump the **commit pins** in the header table to point at the
+   commits that match the doc's current state.
+
+Treat the rule the same way as the T40.0 MCP contract-guard rule (now
+in `CLAUDE.md`): a mission-shape change isn't done until this doc is
+updated and a commit-time CI check (future T-something) enforces the
+parity.
+
+## Related docs
+
+- `rbook/contracts/deepsearch-compiler-vendor.md` — the vendored DS
+  contract compiler in TraceLab and its resync ritual. The compiler
+  reads `mission_context` (the dict built by
+  `build_mission_context_from_mission`); this doc tells you what's
+  in that dict.
+- `CLAUDE.md` — links here for any agent touching mission shape.
+- TraceLab `app/api/v1/missions.py::_to_response` — the canonical REST
+  serializer; mirror its field list when adding new authoring fields.
+- TraceLab `app/mcp_server/tools/missions.py::_serialize_mission` — the
+  Python MCP serializer (production-dark per the T41.4 learning).
+- TraceLab `packages/tracelab-mcp/src/index.ts::handleGetMission` — the
+  load-bearing TS MCP shaper.
+- DeepSearch `deepsearch/worker/poller.py::CLAIM_MISSION_SQL` — the
+  worker SELECT; if it doesn't include a column, that field is invisible
+  to DS at runtime even if it's correctly persisted.

@@ -1,0 +1,314 @@
+# CMOS Operations Guide
+
+This guide consolidates operational procedures for both AI agents and human maintainers working with CMOS. All practices assume the SQLite-backed runtime is authoritative and every session follows the backlog-driven mission lifecycle.
+
+---
+
+## Purpose
+
+- Align agent prompts, mission orchestration, and validation commands with CMOS guardrails
+- Provide deterministic steps for context management, delegation patterns, and failure recovery
+- Ensure automation honors security, quality, and telemetry requirements before marking missions complete
+- Document procedures maintainers follow when operating CMOS
+
+---
+
+## Core Workflows
+
+### Context Intake
+
+1. **Load core context**: Read `rbook/agents.md` for CMOS operations guidance. Contexts (PROJECT and MASTER) are loaded from the database via the mission runtime helpers or SQLiteClient.
+2. **Validate session state**: Check database health and review recent sessions via `./rbook/cli.py db show current`.
+3. **Assess mission readiness**: Query database for next mission via `next_mission()` and ensure prerequisites are completed.
+4. **Document assumptions**: If new constraints surface, update MASTER_CONTEXT in database via SQLiteClient.
+
+**AI Agent Requirements**:
+- Load `rbook/agents.md` before any mission; treat it as non-optional configuration
+- Honor directory-specific overrides when editing submodules
+- Mirror mission selection, session count, and last-session markers between `PROJECT_CONTEXT.json`, the `contexts` table, and `SESSIONS.jsonl`
+- Follow OWASP rules; never echo secrets in prompts or logs
+
+### Mission Lifecycle
+
+1. **Select mission**: Apply status precedence (`In Progress` → `Current` → `Queued`). Use `next_mission()` to get the next candidate.
+2. **Start**: Use `start()` to mark In Progress and log to database.
+3. **Execute**: Follow mission requirements. Capture intermediate decisions in mission notes or MASTER_CONTEXT (in database).
+4. **Validate**: Run required tests and link validators. Document outcomes in mission notes.
+5. **Complete**: Use `complete()` to mark Completed, record notes, and auto-promote the next mission.
+6. **Export research artifacts**: When the mission is research-focused, run `./rbook/cli.py research export <mission-id>` to capture the Markdown report under `rbook/research/` (created on first export) before committing.
+
+**Orchestration Patterns**:
+- Choose a single mode (`none`, `rsip`, `delegation`, `boomerang`) per mission
+- Document the pattern decision in mission notes
+- Follow pattern-specific validation requirements
+
+### Runtime Operations
+
+- **Database-only storage**: `rbook/db/rbook.sqlite` is the single source of truth. All missions, contexts, and sessions live in the database.
+- **Export on-demand**: Generate file views when needed:
+  - `./rbook/cli.py db export backlog` - Export current backlog
+  - `./rbook/cli.py db export contexts` - Export PROJECT and MASTER contexts
+- **Backlog editing**: Use `./rbook/cli.py mission add|update|depends` to manage backlog entries. Each command updates SQLite first and then rewrites `rbook/missions/backlog.yaml` automatically.
+- **Research exports**: After completing research missions, generate Markdown reports with `./rbook/cli.py research export <mission-id>`. Commit only the exported file; the SQLite database remains authoritative.
+- **Seeding**: Import from external sources with `python rbook/scripts/seed_sqlite.py --data-root <path>`
+- **Telemetry**: Database health events logged to `rbook/telemetry/events/database-health.jsonl`. Review after sessions.
+- **Failure handling**: Log blockers with `status: Blocked` in database. Document unblock requirements in mission metadata.
+
+### Quality & Security
+
+**Test Suite Matrix**
+
+| Suite | Focus | Command | When to Run |
+| --- | --- | --- | --- |
+| Integration | Presence and wiring of mission templates, context files, orchestration assets | `node rbook/context/integration_test_runner.js` | After template/asset changes |
+| Security Guardrails | OWASP coverage, context protection, forbidden patterns | `npm run test:integration -- security` | After security guidance changes |
+| Quality Assurance | LLM output validation and style enforcement | `npm run test:quality` | After code generation changes |
+| Performance Benchmarks | Regression checks for runtime throughput | `npm run test:performance` | After runtime changes |
+| Backward Compatibility | Legacy mission scenarios and workflows | `npm run test:integration -- backward` | Before major releases |
+| Database Health | SQLite connectivity and integrity | `./rbook/cli.py db show current` | Start of each session |
+| Documentation Links | Foundational doc references | `./rbook/cli.py validate docs` | After doc updates |
+
+**Mandatory Checkpoints**
+
+1. **Before completing any mission**:
+   - Run applicable test suites based on what was modified (use git diff to scope)
+   - Run `./rbook/cli.py validate docs` if documentation was updated
+   - Document test results in mission notes
+
+2. **Before closing a session**:
+   - Check database health: `./rbook/cli.py db show current`
+   - Review `rbook/telemetry/events/database-health.jsonl` for anomalies
+   - Verify recent missions are tracked correctly
+
+3. **During sprint planning**:
+   - Review test results from previous sprint
+   - Update performance benchmarks if runtime characteristics changed
+   - Add new test fixtures for any new security rules or mission templates
+   - Archive old telemetry events from `rbook/telemetry/events/`
+
+**Security Posture**:
+- Ensure prepared statements for all DB access
+- Apply rate limiting guidance in runtime assets
+- Leverage fixtures under `rbook/tests/security/` to confirm OWASP coverage
+- Update security checklist if controls change
+
+**Performance Monitoring**: 
+- Update `rbook/tests/performance/benchmarks.json` when runtime characteristics shift
+- Review benchmarks during sprint planning for degradation trends
+
+### Documentation Governance
+
+- **Internal vs external**: Store maintainer-only procedures in this playbook. Material intended for downstream starters belongs under `rbook/docs/` or `rbook/foundational-docs/`.
+- **Cross-references**: Replace duplicated roadmap or architecture content with links to `rbook/foundational-docs/roadmap_template.md` and `rbook/foundational-docs/tech_arch_template.md`.
+- **Review cadence**: Re-evaluate each document when orchestration patterns, database schema, or telemetry targets change. Use the checklist in `rbook/README.md`.
+- **Knowledge capture**: Record new operational patterns or deviations within `rbook/context/MASTER_CONTEXT.json` and update this guide when behavior changes persist.
+
+### Escalation & Fallback
+
+- **Tier 1**: Automatic retry on `worker_timeout`, `evaluation_call_failure`, or `network_errors` (one retry per worker/iteration)
+- **Tier 2**: Pattern-specific thresholds (RSIP max iterations, Delegation two failed workers, Boomerang two failed step attempts or checkpoint write failure)
+- **Tier 3**: Fallback gracefully to linear execution and emit `status=fallback`, `fallbackTriggered=true` in telemetry
+- **Tier 4**: Require human review before closing missions that triggered fallback; document remediation steps in mission notes
+- **Blocked missions**: Set backlog status to `Blocked`, append a `needs` array in `SESSIONS.jsonl`, and document unblock criteria in mission notes
+- **Knowledge capture**: For recurring incidents, add a `decisions_made` entry to `rbook/context/MASTER_CONTEXT.json` and update relevant workflow sections
+
+---
+
+## Quick Reference
+
+### MCP Tools (Recommended for AI Agents)
+
+MCP provides direct database access without shell commands. Use these tools for agent-native workflows.
+
+| Purpose | MCP Tool |
+| --- | --- |
+| Agent onboarding | `cmos_agent_onboard()` |
+| Check DB health | `cmos_db_health()` |
+| View work queue | `cmos_mission_status(includeBlocked=true)` |
+| Create sprint | `cmos_sprint_add(sprintId, title, ...)` |
+| List sprints | `cmos_sprint_list()` |
+| Show sprint | `cmos_sprint_show(sprintId)` |
+| Update sprint | `cmos_sprint_update(sprintId, fields={...})` |
+| Create mission | `cmos_mission_add(missionId, name, sprintId, ...)` |
+| List missions | `cmos_mission_list(status, sprintId)` |
+| Show mission | `cmos_mission_show(missionId)` |
+| Start mission | `cmos_mission_start(missionId)` |
+| Complete mission | `cmos_mission_complete(missionId, notes)` |
+| Block mission | `cmos_mission_block(missionId, reason, blockers)` |
+| Unblock mission | `cmos_mission_unblock(missionId, resolution)` |
+| Update mission | `cmos_mission_update(missionId, fields={...})` |
+| Add dependency | `cmos_mission_depends(fromId, toId, type)` |
+| Start session | `cmos_session_start(type, title)` |
+| Capture insight | `cmos_session_capture(category, content)` |
+| Complete session | `cmos_session_complete(summary)` |
+| List sessions | `cmos_session_list(status, type)` |
+| View context | `cmos_context_view(contextType)` |
+| Take snapshot | `cmos_context_snapshot(contextType, source)` |
+| View history | `cmos_context_history(contextType)` |
+| List decisions | `cmos_decisions_list(domain, sprintId)` |
+| Search decisions | `cmos_decisions_search(query)` |
+
+See `rbook/docs/mcp-reference.md` for complete parameter documentation.
+
+### CLI Commands (For Human Operators)
+
+| Purpose | Command |
+| --- | --- |
+| Seed database | `python rbook/scripts/seed_sqlite.py` |
+| Migrate YAML missions | `python rbook/scripts/migrate_sprint_yaml_to_db.py --sprint N` |
+| Check DB health | `./rbook/cli.py db show current` |
+| Integration suite | `node rbook/context/integration_test_runner.js` |
+| Guardrail refs | `./rbook/cli.py validate docs` |
+| Show backlog | `./rbook/cli.py db show backlog` |
+| Mission status | `./rbook/cli.py mission status` |
+| Add backlog mission | `./rbook/cli.py mission add <id> "<name>" --sprint "<sprint>"` |
+| Update mission | `./rbook/cli.py mission update <id> --status "<status>" [--notes ...]` |
+| Add dependency | `./rbook/cli.py mission depends <from> <to> --type "<label>"` |
+| Start mission | `./rbook/cli.py mission start <id> --summary "<session>"` |
+| Complete mission | `./rbook/cli.py mission complete <id> --summary "<session>" --notes "<notes>"` |
+| Export research report | `./rbook/cli.py research export <id>` |
+| Snapshot context | `./rbook/cli.py context snapshot master --source "<milestone>"` |
+| View context history | `./rbook/cli.py context history master` |
+| List strategic decisions | `./rbook/cli.py decisions list [--limit N] [--domain]` |
+| Search decisions | `./rbook/cli.py decisions search "<keyword>"` |
+| Start session | `./rbook/cli.py session start --type <type> --title "<title>"` |
+| Capture insight | `./rbook/cli.py session capture <category> "<content>"` |
+| Complete session | `./rbook/cli.py session complete --summary "<summary>"` |
+| Onboard agent | `./rbook/cli.py session onboard` |
+| List sessions | `./rbook/cli.py session list [--limit N] [--type <type>]` |
+| Search sessions | `./rbook/cli.py session search "<query>"` |
+| Package starter | `./rbook/scripts/package_starter.sh` |
+| Reset starter | `./rbook/scripts/reset_starter.sh` |
+
+### Validation Checklist
+
+- [ ] Mission events logged to database (`session_events` table)
+- [ ] Mission status updated in database
+- [ ] Required test suites executed based on changes made (see Test Suite Matrix)
+- [ ] Test results documented in mission notes
+- [ ] Telemetry updated or explicitly noted as unchanged
+- [ ] Mission notes capture orchestration mode and follow-up actions
+
+---
+
+## AI Agent Specific Instructions
+
+### Pre-Flight Requirements
+
+**Using MCP (Recommended):**
+1. Load `rbook/agents.md` before starting any mission
+2. Get project context via `cmos_agent_onboard()`
+3. Review work queue via `cmos_mission_status()`
+4. Confirm database health via `cmos_db_health()`
+
+**Using CLI (Fallback):**
+1. Load `rbook/agents.md` before starting any mission
+2. Review the backlog entry for the candidate mission
+3. Confirm database health via `./rbook/cli.py validate health`
+
+### Operational Constraints
+- **Status precedence**: Query missions in the order `In Progress → Current → Queued`
+- **Sensitive data handling**: Use provided repositories/env vars instead of embedding credentials
+- **Session consistency**: Keep `PROJECT_CONTEXT.json`, SQLite `contexts` table, and `SESSIONS.jsonl` synchronized
+- **Scope boundaries**: Keep operations limited to the active mission; split backlogs if work scope grows
+
+### Output Requirements
+- Document all decisions in mission notes or `rbook/context/MASTER_CONTEXT.json`
+- Include clear `next_hint` guidance in completion events
+- Record orchestration mode selection and rationale
+- Flag any fallbacks or escalations for human review
+
+---
+
+## Human Operator Procedures
+
+### Session Management
+- Monitor `rbook/telemetry/events/database-health.jsonl` for anomalies
+- Review session events for patterns or recurring issues
+- Update `rbook/context/MASTER_CONTEXT.json` with operational insights
+- Keep working memory synchronized across context stores
+
+### Maintenance Operations
+- **Database refresh**: Run `python rbook/scripts/seed_sqlite.py` when importing external data or schema changes
+- **YAML migration**: When agents write mission specs to YAML files instead of DB, run `python rbook/scripts/migrate_sprint_yaml_to_db.py --sprint N --dry-run` to preview and then apply migration
+- **Database health**: Check `./rbook/cli.py db show current` and review telemetry logs
+- **Export contexts**: Generate file snapshots when needed: `./rbook/cli.py db export contexts`
+- **Export backlog**: Generate minimal backlog view: `./rbook/cli.py db export backlog`
+- **Telemetry cleanup**: Archive old events from `rbook/telemetry/events/` periodically
+- **Performance review**: Check `rbook/tests/performance/benchmarks.json` for degradation trends
+- **Packaging**: Create distribution with `./rbook/scripts/package_starter.sh` (outputs to `rbook/dist/`)
+- **Reset for distribution**: Use `./rbook/scripts/reset_starter.sh` to clear runtime data before packaging
+
+### Sprint-Boundary Identity Sync (Runbook)
+
+`project_identity.status` and `master_context.project_identity.status` do **not** auto-update when a sprint opens or closes — `cmos_sprint(action="complete")` and sprint creation only touch the sprint record. Left unsynced, `cmos_review` reports a stale sprint (e.g. project shows `sprint-44-complete` while `sprint-45` is already Active). Run this runbook at **every sprint open and every sprint close** until the sync is automated server-side (see Durable fix below). A sprint open includes the silent one: starting a mission inside a Planned shell activates the sprint (its `startDate` becomes the mission's `startedAt`), so the session that starts the first mission in a shell is the open and runs this runbook before it closes. MCP-5 activated `sprint-59` on 2026-09-23 this way while the identity stayed `sprint-58-complete` until the next review.
+
+**Status-string convention** (`project_identity.status` / `master_context.project_identity.status`):
+
+- Active sprint: `sprint-<N>-active`
+- Closed sprint: `sprint-<N>-complete`
+
+**Pointers that must agree on the current sprint** (four denormalized copies + the authoritative sprint record):
+
+| Store | Path | Sync target |
+| --- | --- | --- |
+| project_identity (Layer 0) | `status` | `sprint-<N>-active` / `-complete` |
+| master_context | `project_identity.status` | same as above |
+| master_context | `metadata.current_sprint` / `metadata.sprint_status` | `sprint-<N>` / `Active`\|`Completed` |
+| master_context | `current_sprint.{id,name,status,focus}` | the active sprint's fields |
+| sprint record | `cmos_sprint(action="show", sprintId="sprint-<N>")` | authoritative — read-only source of truth |
+
+**Procedure** (MCP tools; `<N>` = the new current sprint):
+
+1. Read the source of truth: `cmos_sprint(action="list")` → note the single sprint with `status:"Active"`.
+2. Sync Layer-0 identity: `cmos_context(action="update", contextType="project_identity", mode="manual", fieldUpdates=[{path:"status", value:"sprint-<N>-active"}])`
+3. Sync master_context in one call: `cmos_context(action="update", contextType="master_context", mode="manual", fieldUpdates=[{path:"project_identity.status", value:"sprint-<N>-active"}, {path:"metadata.current_sprint", value:"sprint-<N>"}, {path:"metadata.sprint_status", value:"Active"}, {path:"current_sprint", value:{id:"sprint-<N>", name:"<title>", status:"Active", focus:"<one-line focus>"}}])`
+4. Verify: `cmos_review()` → `project.status` reads `sprint-<N>-active` and `sprint.id` = `sprint-<N>`. The full `master_context` view is large; extract just these fields with `jq` rather than reading the whole blob.
+5. Update the living roadmap `rbook/foundational-docs/roadmap-sprints-66-68-open-tracelab.md` (authoritative for intent; CMOS is authoritative for status): at sprint CLOSE, rewrite the closing sprint's section as outcome (what shipped, what moved, where); at sprint OPEN, re-plan the opening sprint's section from the CMOS missions; append a dated line to its Change Log either way. A sprint is not closed while its roadmap section still reads as a plan.
+
+On **sprint close** with no immediately-following open, use the `-complete` variant and `metadata.sprint_status:"Completed"`.
+
+**Durable fix (cross-project), partly shipped:** cmos-mcp 3.1.0 (reply on backlog request 6508d78e, 2026-09-18) keeps `master_context.sprint_tracking.current_sprint` and `last_completed_sprint` in step from the sprint handlers, and deliberately does not write the four pointers above (project_identity.status is the project's status; `metadata.*` had no reader). `cmos_review` still reads `project_identity.status`, so this runbook stays the mechanism for the four pointers — keep it in the build-session closeout checklist. A mission start that activates a Planned shell bypasses the sprint handlers entirely (`sprint_tracking.current_sprint` was null after MCP-5 activated `sprint-59` on 2026-09-23), so on a silent open set that pointer by hand as well.
+
+### Receipt Re-Verification at Sprint Close (Runbook)
+
+A receipt is verified when it merges and then never read again, so a later commit in the **same sprint** can falsify it silently — the deleting commit has no way to know which receipts cite it. Run this before `cmos_sprint(action="complete")`, per decision #509.
+
+**What happened once already:** `rbook/reports/sprint-56/rbac-5-receipt.json` merged at 02:05Z in PR #339 and was falsified at 04:12Z by PR #343, which deleted the cron, the CLI entrypoint, the `RBAC_VERIFY_PRINCIPALS` environment variable and three cited tests. Nothing flagged it. The receipt sat on `main` asking Derek to create four permanent production accounts for a feature that no longer existed.
+
+**Procedure** (`<N>` = the closing sprint):
+
+1. Collect every citation in `rbook/reports/sprint-<N>/*.json` that names something in the tree: symbols, function and class names, test names, environment variables, file paths, workflow filenames.
+2. Grep HEAD for each one. A citation that returns zero hits, or hits only in prose and comments, is **falsified**.
+3. Do the same for the sprint's active decisions: `cmos_decisions(action="list", sprintId="sprint-<N>")`.
+4. For each falsified citation, either **correct it in place** or **annotate it with the commit that removed it** — never leave it standing. Preserve the original text under an `original_claim` key so the record of what was built is not erased; add a `corrected_at_sprint_close` block naming the date, the session and the removing PR.
+5. Re-measure any test counts the receipt asserts, rather than copying them forward.
+6. A decision whose *mechanism* is falsified but whose *principle* holds is superseded by a corrected restatement, not archived — `cmos_decisions(action="update", decisionId=<old>, supersededBy=<new>)`.
+7. Check `not_done_and_why` and equivalent sections last: these carry **requests for operator action**, and a stale one asks a human to do work the tree no longer needs.
+
+The cost is one grep per citation. A sprint is not closed while a receipt on `main` describes code that is not there.
+
+### Incident Response
+- For blocked missions: Document unblock criteria and required actions in database
+- For fallback scenarios: Review telemetry, document root cause, update patterns if needed
+- For database errors: Check telemetry logs, verify schema integrity, re-seed if corrupted
+- For security violations: Immediate rollback, audit log review, guardrail reinforcement
+
+---
+
+## Reference Links
+
+- **MCP reference**: `rbook/docs/mcp-reference.md`
+- **Core guidance**: `rbook/agents.md`, `rbook/README.md`
+- **Roadmap template**: `rbook/foundational-docs/roadmap_template.md`
+- **Technical architecture**: `rbook/foundational-docs/tech_arch_template.md`
+- **Build session prompt**: `rbook/docs/build-session-prompt.md`
+- **SQLite schema**: `rbook/docs/sqlite-schema-reference.md`
+- **Migration guide**: `rbook/docs/legacy-migration-guide.md`
+- **Test assets**: `rbook/tests/` (integration, security, quality, performance, backward compatibility)
+
+---
+
+**Last Updated**: 2026-09-15
+**CMOS Version**: 2.1 (MCP-enabled)
+**Replaces**: the retired AI-coding-assistant-workflows, cmos_Playbook and packaging-guide documents (removed from the repository); `rbook/docs/integration-testing-guide.md` is still maintained separately

@@ -17,18 +17,18 @@ import json
 import statistics
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from sqlalchemy import func, select
+
 from app.core.database import SessionLocal
 from app.models.chunk import DocumentChunk
 from app.models.document import Document
-
 
 # Representative queries covering different research topics
 BASELINE_QUERIES = [
@@ -49,7 +49,7 @@ BASELINE_QUERIES = [
 ]
 
 
-def keyword_search(session, query: str, limit: int = 5) -> List[Dict[str, Any]]:
+def keyword_search(session, query: str, limit: int = 5) -> list[dict[str, Any]]:
     """Execute PostgreSQL full-text search."""
     if not query.strip():
         return []
@@ -74,7 +74,7 @@ def keyword_search(session, query: str, limit: int = 5) -> List[Dict[str, Any]]:
     )
 
     rows = session.execute(stmt).all()
-    results: List[Dict[str, Any]] = []
+    results: list[dict[str, Any]] = []
     for row in rows:
         mapping = row._mapping
         results.append(
@@ -97,12 +97,12 @@ def keyword_search(session, query: str, limit: int = 5) -> List[Dict[str, Any]]:
     return results
 
 
-def run_baseline_capture() -> Dict[str, Any]:
+def run_baseline_capture() -> dict[str, Any]:
     """Run baseline queries and capture metrics."""
     session = SessionLocal()
 
-    results: List[Dict[str, Any]] = []
-    latencies: List[float] = []
+    results: list[dict[str, Any]] = []
+    latencies: list[float] = []
 
     print("=" * 60)
     print("PEDR BASELINE CAPTURE - R18.0")
@@ -175,7 +175,7 @@ def run_baseline_capture() -> Dict[str, Any]:
     valid_latencies = [r["latency_ms"] for r in results if r.get("latency_ms")]
 
     summary = {
-        "capture_timestamp": datetime.now(timezone.utc).isoformat(),
+        "capture_timestamp": datetime.now(UTC).isoformat(),
         "query_count": len(BASELINE_QUERIES),
         "successful_queries": len(valid_latencies),
         "latency_p50_ms": statistics.median(valid_latencies)
@@ -232,12 +232,12 @@ def main() -> int:
     baseline = run_baseline_capture()
 
     # Save to telemetry
-    telemetry_path = Path("cmos/telemetry/events/sprint-18-pedr-baseline.jsonl")
+    telemetry_path = Path("rbook/telemetry/events/sprint-18-pedr-baseline.jsonl")
     telemetry_path.parent.mkdir(parents=True, exist_ok=True)
 
     with open(telemetry_path, "a") as f:
         event = {
-            "ts": datetime.now(timezone.utc).isoformat(),
+            "ts": datetime.now(UTC).isoformat(),
             "event_type": "pedr_baseline_capture",
             "mission_id": "R18.0",
             "data": baseline["summary"],
@@ -246,7 +246,7 @@ def main() -> int:
     print(f"\nTelemetry logged to: {telemetry_path}")
 
     # Save detailed report
-    report_path = Path("cmos/reports/sprint-18/pedr-baseline-capture.json")
+    report_path = Path("rbook/reports/sprint-18/pedr-baseline-capture.json")
     report_path.parent.mkdir(parents=True, exist_ok=True)
 
     with open(report_path, "w") as f:
@@ -254,7 +254,7 @@ def main() -> int:
     print(f"Detailed report saved to: {report_path}")
 
     # Also create a markdown summary
-    md_path = Path("cmos/reports/sprint-18/pedr-baseline-capture.md")
+    md_path = Path("rbook/reports/sprint-18/pedr-baseline-capture.md")
     with open(md_path, "w") as f:
         f.write("# PEDR Baseline Capture - R18.0\n\n")
         f.write(f"**Captured**: {baseline['summary']['capture_timestamp']}\n\n")

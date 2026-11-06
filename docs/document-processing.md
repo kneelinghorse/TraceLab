@@ -52,7 +52,7 @@ R7.1 proved the previous 404s were caused by mixing an API key with an `http://`
 | `QDRANT_API_KEY`          | Omit for local `http://localhost:6333` sessions. Match the cloud key in production.  |
 | `QDRANT_COLLECTION_NAME`  | Defaults to `research_chunks`; admin endpoints (`/api/v1/admin/init-qdrant`) keep it in sync. |
 
-For provisioning, follow `docs/qdrant-railway-setup.md` (Cloud first, Docker/Railway remain supported for dev). The R7.1 research report (`cmos/missions/research/R7.1_Qdrant-Setup-Investigation.mdR7.1_Qdrant-Setup-Investigation.md`) documents the full root-cause analysis and should accompany any future config edits.
+For provisioning, follow `docs/qdrant-railway-setup.md` (Cloud first, Docker/Railway remain supported for dev). The R7.1 research report (`rbook/missions/research/R7.1_Qdrant-Setup-Investigation.mdR7.1_Qdrant-Setup-Investigation.md`) documents the full root-cause analysis and should accompany any future config edits.
 
 ## Validation workflow
 
@@ -67,7 +67,7 @@ For provisioning, follow `docs/qdrant-railway-setup.md` (Cloud first, Docker/Rai
    - `POST /api/v1/documents/{id}/process` and confirm `stages.embedded.status == "success"`
    - Hit the search endpoint or `RetrievalService` to confirm vectors round-trip
 4. **Parity + documentation**
-   - `python cmos/scripts/validate_parity.py --check`
+   - `python rbook/scripts/validate_parity.py --check`
    - Update telemetry (`telemetry/events/testing-summary.json`) with the pytest output
 
 ## Troubleshooting tips
@@ -77,4 +77,4 @@ For provisioning, follow `docs/qdrant-railway-setup.md` (Cloud first, Docker/Rai
 - **Embedding stage stuck on `skipped`**: check the Process response for `reason`. Common causes are `ENVIRONMENT=test` (intended for CI) or a missing `OPENAI_API_KEY`.
 - **Partial failures**: Inspect `document_processing_statuses` for the `embedded` entries. The pipeline now records `in_progress`, `failed`, and error context before the outer exception handler promotes the document to `flagged`.
 
-See `docs/implementation_guide.md` for the broader deployment playbook and `cmos/docs/AI-coding-assistant-workflows.md` for Mission Protocol expectations around telemetry and closure.
+See `docs/implementation_guide.md` for the broader deployment playbook and `rbook/docs/AI-coding-assistant-workflows.md` for Mission Protocol expectations around telemetry and closure.

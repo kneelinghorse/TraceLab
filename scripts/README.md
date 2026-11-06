@@ -13,10 +13,10 @@ The `pedr_latency_benchmark.py` script measures PEDR search performance against 
 python scripts/pedr_latency_benchmark.py
 
 # Save results for tracking
-python scripts/pedr_latency_benchmark.py -o cmos/telemetry/events/pedr-benchmark-$(date +%Y%m%d).json
+python scripts/pedr_latency_benchmark.py -o rbook/telemetry/events/pedr-benchmark-$(date +%Y%m%d).json
 
 # Compare to Sprint 18 baseline
-python scripts/pedr_latency_benchmark.py -c cmos/reports/sprint-18/pedr-baseline-capture.json
+python scripts/pedr_latency_benchmark.py -c rbook/reports/sprint-18/pedr-baseline-capture.json
 ```
 
 ### Options
@@ -116,7 +116,7 @@ Example GitHub Actions step:
 - name: Run PEDR benchmark
   run: |
     python scripts/pedr_latency_benchmark.py \
-      -c cmos/reports/sprint-18/pedr-baseline-capture.json \
+      -c rbook/reports/sprint-18/pedr-baseline-capture.json \
       -o benchmark-results.json
 ```
 
@@ -162,7 +162,7 @@ Exit codes:
 
 ```bash
 python scripts/pedr_graph_tuning_baseline.py \
-  --output cmos/telemetry/events/graph-tuning-baseline.jsonl
+  --output rbook/telemetry/events/graph-tuning-baseline.jsonl
 ```
 
 ### PEDR Benchmark

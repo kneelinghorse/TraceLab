@@ -153,4 +153,4 @@ the CLI succeeds.
 
 - `README.md` – architecture overview and production smoke guidance.
 - `docs/auth_and_cors_guidance.md` – environment variable explanations for API + UI parity.
-- `cmos/docs/operations-guide.md` – automation, telemetry, and validation policy.
+- `rbook/docs/operations-guide.md` – automation, telemetry, and validation policy.

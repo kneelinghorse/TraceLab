@@ -213,7 +213,7 @@ Exit codes:
 
 ## Telemetry
 
-Pre-flight queries are logged to `cmos/telemetry/events/sprint-11-preflight.jsonl` for analysis:
+Pre-flight queries are logged to `rbook/telemetry/events/sprint-11-preflight.jsonl` for analysis:
 
 ```json
 {
@@ -255,6 +255,6 @@ The endpoint uses hybrid search (semantic + keyword) with quality-aware ranking.
 
 ## See Also
 
-- [DeepSearch Integration Contract](../cmos/planning/DeepSearch-TraceLab-Integration-Contract.md)
+- [DeepSearch Integration Contract](../rbook/planning/DeepSearch-TraceLab-Integration-Contract.md)
 - [Quality-Aware Search](../docs/quality-aware-search.md)
 - [Mission Protocol Schema](../docs/mission-protocol.md)

@@ -30,8 +30,8 @@ def require(condition: object, observation: str) -> None:
 
 def main() -> None:
     root = Path(__file__).resolve().parents[1]
-    original = root / "cmos/reports/sprint-61/LOG-2"
-    output = root / "cmos/reports/sprint-62/S62-SCOPE"
+    original = root / "rbook/reports/sprint-61/LOG-2"
+    output = root / "rbook/reports/sprint-62/S62-SCOPE"
     proposed = json.loads((original / "proposed-mission.json").read_text())
     saved_preview = json.loads((original / "contract-preview.json").read_text())
     worker_preview = json.loads((original / "worker-structural-contract.json").read_text())

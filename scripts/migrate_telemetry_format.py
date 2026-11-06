@@ -85,7 +85,7 @@ def _resolve_source_and_type(filepath: Path, event: dict) -> tuple[str, str]:
             )
             return source, actual_type
 
-    if "cmos" in str(filepath):
+    if "rbook" in filepath.parts or "cmos" in filepath.parts:
         return "cmos", event.get("event_type", event.get("event", "cmos.event"))
     return "tracelab", event.get("event_type", event.get("event", "tracelab.event"))
 
@@ -141,7 +141,7 @@ def migrate_file(filepath: Path, *, apply: bool = False) -> dict:
                     migrated = migrate_line(raw, filepath)
                     stats["migrated"] += 1
                     lines.append(migrated)
-            except (json.JSONDecodeError, Exception) as exc:
+            except (json.JSONDecodeError, Exception):
                 stats["errors"] += 1
                 lines.append(raw)
 
@@ -160,7 +160,7 @@ def find_jsonl_files() -> list[Path]:
     """Find all telemetry JSONL files in the project."""
     dirs = [
         PROJECT_ROOT / "telemetry" / "events",
-        PROJECT_ROOT / "cmos" / "telemetry" / "events",
+        PROJECT_ROOT / "rbook" / "telemetry" / "events",
     ]
     files = []
     for d in dirs:
@@ -213,7 +213,7 @@ def main():
     print(f"   To migrate:       {total_migrated}")
     print(f"   Already migrated: {total_already}")
     if not args.apply and total_migrated > 0:
-        print(f"\n   Run with --apply to apply migration")
+        print("\n   Run with --apply to apply migration")
     print(f"{'=' * 60}\n")
 
 

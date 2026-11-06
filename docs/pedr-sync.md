@@ -1,7 +1,7 @@
 # PEDR Delta Sync Architecture
 
 **Status**: Implemented (Sprint 11)
-**Reference**: cmos/planning/PEDR-docs/tracelab-to-pedr-mapping.md
+**Reference**: rbook/planning/PEDR-docs/tracelab-to-pedr-mapping.md
 
 ## Overview
 
@@ -206,7 +206,7 @@ PII is flagged from:
 
 ## Telemetry
 
-Sync events are logged to `cmos/telemetry/events/sprint-11-pedr-sync.jsonl`:
+Sync events are logged to `rbook/telemetry/events/sprint-11-pedr-sync.jsonl`:
 
 ```json
 {
