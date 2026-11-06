@@ -1,7 +1,14 @@
 {
-  "match_count": 4646,
-  "file_count": 290,
+  "match_count": 4647,
+  "file_count": 291,
   "files": [
+    {
+      "file": "rbook/.gitignore",
+      "lines": [
+        4
+      ],
+      "reason": "Preserve the existing ignore for nested historical starter exports; not a runtime path."
+    },
     {
       "file": "rbook/SESSIONS.jsonl",
       "lines": [

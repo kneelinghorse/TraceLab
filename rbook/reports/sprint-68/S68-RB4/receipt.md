@@ -25,6 +25,8 @@ remain unchanged. MCP source guidance changes here; no new npm release is claime
   assertion that an offline move or before/after comparison has happened.
 - Three pre-existing untracked planning notes remain in the canonical checkout;
   they were hashed for preservation and were not copied into this branch.
+  Two previously ignored nested starter exports dated November 2025 also remain
+  untouched and ignored; they are not new migration output.
 - All 1,784 tracked files under historical missions, planning, receipts,
   telemetry, research and status are exact blob renames. Session exports also
   retain their original contents. `retained-legacy-paths.json` lists every retained

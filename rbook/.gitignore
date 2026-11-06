@@ -1,5 +1,7 @@
 # Exclude internal workbench and transient artifacts from starter bundle
 rbook/
+# Preserve the existing ignore for nested historical starter exports.
+cmos/
 dist/
 SESSIONS.jsonl
 *.log
