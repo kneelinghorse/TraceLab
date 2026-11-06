@@ -167,11 +167,11 @@ search_ready=true through the live MCP status verb. This does not establish
 current OpenAI account balance or refund settlement.
 
 - **S68-RB4: move the record to Reasonbook 4.0's folder** (messages `960040b8` and `9c5b4fc2`).
-  - The tracked move and readers are prepared in an isolated checkout. The live database remains at the former location until Reasonbook 4.9.0's offline guard clears; other sessions' processes are not stopped. See the [migration receipt](../reports/sprint-68/S68-RB4/receipt.md).
-  - Follow Reasonbook's migration guide: run `migrate --docs-only`, then preview `migrate --project`, then apply `migrate --apply` only while no other session holds the record. Never stop another session's process.
+  - The live record has moved; recovery verification on November 5 found an official November 3 snapshot with identical rows in all seven core tables. Reasonbook 4.12 reports no pending migration or blocker, and dashboard registration points to the new database. PR #443 integrates the tracked readers and fixes local compiler provenance hashes; required CI gates merge. No other session was stopped. See the [migration receipt](../reports/sprint-68/S68-RB4/receipt.md).
+  - Docs-only apply and full preview were preserved on November 1. The later apply was recovered from its snapshot, not repeated; its process preflight was not observed in this chat. The snapshot has zero active sessions. Never stop another session's process.
   - The same change updates every reference outside `app/`:
     - `tests/conftest.py:71`, which loads `rbook/scripts/pytest_telemetry_plugin.py`;
-    - `tests/test_content_hash_dedup.py:22,84` and `tests/test_decision_insight_linking.py:24`, which import `cmos.context`;
+    - `tests/test_content_hash_dedup.py:22,84` and `tests/test_decision_insight_linking.py:24`, whose imports now use `rbook.context`;
     - `tests/unit/test_oods_object_contract.py:14,71` and `tests/unit/test_validate_foundational_refs.py:45-85`;
     - `scripts/evaluate_sprint_03.py:24`, which the Sprint 3 tests use;
     - `frontend/playwright.config.ts:9`, the reporter;
@@ -180,8 +180,8 @@ current OpenAI account balance or refund settlement.
     - `scripts/rag_baseline_benchmark.py:94-112`, which `tests/unit/test_benchmark_corpus.py` reads;
     - the agent rules.
 
-    This list is a starting point. The mission is done when `git grep rbook/` finds only historical text kept on purpose.
-  - Record counts must match before and after, and CI must stay green.
+    This list is a starting point. The mission is done when `git grep cmos/` finds only historical text kept on purpose; the receipt inventories those matches.
+  - Core record rows and counts match the pre-migrate snapshot. Dashboard inbox count is unchanged; the receipt distinguishes remote, user-scoped sent-message evidence from SQLite preservation. CI must stay green.
 - What people hit at the share-out.
 - Recheck the two build-tool advisories carried from S66-SECURITY: `braces` GHSA-vfj7-8cjw-p6xm has no published patch as of 2026-10-13; selector-parser GHSA-rj75-hqrm-r3gf is fixed in 7.1.6, outside Tailwind 3/typography's declared 6.x ranges. Prefer upstream compatible fixes; otherwise scope a deliberate toolchain migration with OODS compatibility and theme/browser verification. Revisit sooner if a feature would parse user-controlled CSS or glob patterns. The security receipt preserves the nonzero audit counts and dependency paths.
 - DeepSearch's opening, if it is not done by Monday. That work is owned by DeepSearch, as are the quality follow-ups named at the Sprint 64 and 65 closes.

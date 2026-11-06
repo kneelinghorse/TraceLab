@@ -1,6 +1,6 @@
 {
-  "match_count": 4645,
-  "file_count": 289,
+  "match_count": 4646,
+  "file_count": 290,
   "files": [
     {
       "file": "rbook/SESSIONS.jsonl",
@@ -121,6 +121,13 @@
         581
       ],
       "reason": "Historical planning, mission, or receipt text; original paths preserved."
+    },
+    {
+      "file": "rbook/foundational-docs/roadmap-sprints-66-68-open-tracelab.md",
+      "lines": [
+        183
+      ],
+      "reason": "Migration audit search target; not a live path dependency."
     },
     {
       "file": "rbook/foundational-docs/sprint-01_metrics_plan.md",

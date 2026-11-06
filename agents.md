@@ -2,9 +2,6 @@
 
 Reasonbook keeps this project's record at the **Builder** level: decisions, lessons, sprints and missions. Its tools and hooks say when to use it; `reasonbook ambient off` turns the hooks off here.
 
-The foundational rules below are preserved verbatim. Their former tool names now
-map to `rbook_decisions` and `rbook_learnings`.
-
 ## Hard Operating Rules
 
 **Foundational — preserve this block when customizing the rest of this file.**
@@ -36,7 +33,7 @@ Strong success criteria let Claude loop independently.
 
 ### Rule 5 — Capture decisions and learnings
 
-Non-trivial choices belong in CMOS. Decisions to `cmos_decisions`, cross-cutting patterns to `cmos_learnings`.
+Non-trivial choices belong in CMOS. Decisions to `rbook_decisions`, cross-cutting patterns to `rbook_learnings`.
 If future-you needs to know why, capture it now.
 
 ### Rule 6 — Commit at coherent boundaries

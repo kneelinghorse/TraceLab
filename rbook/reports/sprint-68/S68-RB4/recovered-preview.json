@@ -1,0 +1,14 @@
+{
+  "success": true,
+  "data": {
+    "dryRun": true,
+    "moved": false,
+    "changed": [],
+    "left": [
+      "/Users/systemsystems/portfolio/TraceLab/agents.md: left 2 line(s) of project-owned prose mentioning the former name.",
+      "/Users/systemsystems/portfolio/TraceLab/rbook/README.md: left 7 line(s) of project-owned prose mentioning the former name.",
+      "/Users/systemsystems/portfolio/TraceLab/rbook/tiers/build.md: left 2 line(s) of project-owned prose mentioning the former name."
+    ],
+    "blocked": []
+  }
+}

@@ -257,7 +257,7 @@ Create a distributable archive with:
 ./rbook/scripts/package_starter.sh
 ```
 
-The script normalises from cmos root, strips transient artefacts, and produces a tarball in `rbook/dist/`. Share the archive with downstream teams or automation pipelines to bootstrap new Mission Protocol projects quickly.
+The script normalises from rbook root, strips transient artefacts, and produces a tarball in `rbook/dist/`. Share the archive with downstream teams or automation pipelines to bootstrap new Mission Protocol projects quickly.
 
 ---
 

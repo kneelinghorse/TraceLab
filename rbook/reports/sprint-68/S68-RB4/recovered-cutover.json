@@ -1,0 +1,76 @@
+{
+  "snapshot": "rbook/db/snapshots/pre-migrate-657129e5-2fad-4da1-a368-9b33b58fc711.sqlite",
+  "captured_before_resume_writes": true,
+  "tables": {
+    "strategic_decisions": {
+      "before": 653,
+      "after": 653,
+      "rows_equal": true,
+      "before_sha256": "6c0fe3be44cfd1985eb88757df26a71d463bb1e57779dcf62c56eba544c9072e",
+      "after_sha256": "6c0fe3be44cfd1985eb88757df26a71d463bb1e57779dcf62c56eba544c9072e"
+    },
+    "learnings": {
+      "before": 327,
+      "after": 327,
+      "rows_equal": true,
+      "before_sha256": "2ff8d9a8320b2c427403af9c3b8e7f9a5e4c7c33438ad6e64371f805d47d560b",
+      "after_sha256": "2ff8d9a8320b2c427403af9c3b8e7f9a5e4c7c33438ad6e64371f805d47d560b"
+    },
+    "constraints": {
+      "before": 11,
+      "after": 11,
+      "rows_equal": true,
+      "before_sha256": "eab61ee1bc6453bbd2826c7d728c178b91014d06459e754c54e9fd02a7fca4cb",
+      "after_sha256": "eab61ee1bc6453bbd2826c7d728c178b91014d06459e754c54e9fd02a7fca4cb"
+    },
+    "missions": {
+      "before": 452,
+      "after": 452,
+      "rows_equal": true,
+      "before_sha256": "885acec31e9bd910026f7328ccff06b00db7b96e7882c6845b30b48b6b5f3e1d",
+      "after_sha256": "885acec31e9bd910026f7328ccff06b00db7b96e7882c6845b30b48b6b5f3e1d"
+    },
+    "sprints": {
+      "before": 69,
+      "after": 69,
+      "rows_equal": true,
+      "before_sha256": "759a7aa6b6f2c636ded67f6c2c62f5247eae97d2ce50f29d9dba4ef833080541",
+      "after_sha256": "759a7aa6b6f2c636ded67f6c2c62f5247eae97d2ce50f29d9dba4ef833080541"
+    },
+    "next_steps": {
+      "before": 495,
+      "after": 495,
+      "rows_equal": true,
+      "before_sha256": "66c8cb6b0b2cf27750bbe7c3a19c15639f17e8580f09f0552fb4a39fe7aa9411",
+      "after_sha256": "66c8cb6b0b2cf27750bbe7c3a19c15639f17e8580f09f0552fb4a39fe7aa9411"
+    },
+    "sessions": {
+      "before": 248,
+      "after": 248,
+      "rows_equal": true,
+      "before_sha256": "52223210183d80944b703d1bf08f71f1896b7f2c01b7af32c8b5d06118044d42",
+      "after_sha256": "52223210183d80944b703d1bf08f71f1896b7f2c01b7af32c8b5d06118044d42"
+    }
+  },
+  "verified_on": "2026-11-05",
+  "snapshot_mtime_utc": "2026-11-03T16:25:44Z",
+  "integrity_check": {
+    "snapshot": "ok",
+    "live": "ok"
+  },
+  "snapshot_sessions": {
+    "completed": 248,
+    "active": 0
+  },
+  "apply_observed_in_this_session": false,
+  "dashboard": {
+    "id": "c6a0e350-6bc4-4ba7-9fc2-3b460bdef428",
+    "slug": "tracelab",
+    "local_db_path": "rbook/db/rbook.sqlite",
+    "inbox_before": 51,
+    "inbox_after": 51,
+    "sent_before": null,
+    "sent_after_user_scoped": 45,
+    "sent_count_limitation": "No contemporaneous pre-move sent-total receipt; messages are remote, not in the migrated SQLite database."
+  }
+}

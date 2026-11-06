@@ -56,6 +56,9 @@ Local adaptations, enumerated in the manifest:
 4. Sort imports and supply `zip(strict=False)` for local lint without semantic
    changes. Legacy upstream typing syntax retains the existing scoped Ruff
    modernization exemptions; correctness rules remain enabled.
+5. Attribution links follow the Reasonbook folder rename. Refresh only the local
+   source hashes for this documentation change; retain the immutable upstream
+   revision, upstream hashes and canonical fixtures.
 
 ## State and canonical identity
 
